@@ -1,4 +1,4 @@
-# nornj
+# NornJ
 a javascript template engine
 ## 这是 H2
 
