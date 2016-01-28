@@ -3,7 +3,11 @@
 
 这款js模板引擎的构建方式不是使用传统的字符串，而是使用javascript原生的数组与对象构成，就像这样：
 ```js
-ffffff
+var tmpl =
+['div',
+    'this the test demo {msg}.',
+    ['<input onclick={click} />', { id: 'test' }]
+'/div'];
 ```
 
 ## 这是 H2
