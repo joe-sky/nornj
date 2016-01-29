@@ -11,7 +11,7 @@ var tmpl =
 
 var html = nornj.compile(tmpl, 'tmpl1')({
     msg: 'Hello world!',
-    click: 'alert('test')'
+    click: "alert('test')"
 });
 ```
 
