@@ -11,7 +11,8 @@ NornJ模板目前分为两种形式：
 ```
 * 构建在html内的模板,结构例如:
 ```html
-<div>
-    
-</div>
+<nj:slider>
+    'this the test slider {msg}.'
+    <nj:sliderItem id='test' onsliderend={event} />
+</nj:slider>
 ```
