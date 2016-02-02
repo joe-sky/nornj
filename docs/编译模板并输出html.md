@@ -11,6 +11,4 @@ var tmpl =
     'this the test demo{no}.'
     ['<i>', 'test{no}'],
 '/div'];
-
-var 
 ```
