@@ -9,7 +9,7 @@ var tmpl =
     ['<input onclick={click} />', { id: 'test' }],
 '/div'];
 
-var html = nornj.compile(tmpl, 'tmpl1')({
+var html = NornJ.compile(tmpl, 'tmpl1')({
     msg: 'Hello world!',
     click: "alert('test')"
 });
