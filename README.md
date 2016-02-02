@@ -21,4 +21,4 @@ var html = nornj.compile(tmpl, 'tmpl1')({
 
 ### 参考文档
 
-* [模板结构]()
+* [模板结构](https://github.com/joe-sky/nornj/blob/master/docs/模板结构.md)
