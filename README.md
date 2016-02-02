@@ -21,7 +21,8 @@ var html = nornj.compile(tmpl, 'tmpl1')({
 
 ### 浏览器支持
 
-* 输出html字符串功能可支持所有现代浏览器以及
+* 输出html字符串功能可支持所有现代浏览器以及Internet Explorer 6+。
+* 配合React作为JSX替代模板语言时可支持所有现代浏览器以及Internet Explorer 8+。
 
 ### 技术文档
 
