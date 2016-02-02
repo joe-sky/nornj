@@ -9,6 +9,8 @@
 var tmpl =
 ['div id=test1',
     'this the test demo{no}.'
-    ['<i>', 'test{no}],
+    ['<i>', 'test{no}'],
 '/div'];
+
+var 
 ```
