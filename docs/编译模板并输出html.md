@@ -40,6 +40,9 @@ var html = tmplFn({
 
 console.log(html);
 /*输出html:
-
+<div id="test1">
+    this the test demo100.
+    <i>test100</i>
+</div>
 */
 ```
