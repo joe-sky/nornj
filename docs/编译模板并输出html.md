@@ -22,6 +22,7 @@ var tmplFn = nj.compile(tmpl, 'tmpl1');
 
 ### 执行模板函数并输出html
 
+举例：
 ```js
 //定义模板
 var tmpl =
@@ -46,3 +47,5 @@ console.log(html);
 </div>
 */
 ```
+
+1. 模板函数只有一个参数，值为json格式的数据。模板中和传入数据中对应的值会自动进行相应替换，最后输出结果为替换后的html字符串。
