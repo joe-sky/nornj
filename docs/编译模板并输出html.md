@@ -6,9 +6,13 @@
 
 举例：
 ```js
+//定义模板
 var tmpl =
 ['div id=test1',
     'this the test demo{no}.'
     ['<i>', 'test{no}'],
 '/div'];
+
+//编译为模板函数
+var tmplFn = nj.compile(tmpl, 'tmpl1');
 ```
