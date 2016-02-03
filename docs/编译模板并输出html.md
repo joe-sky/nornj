@@ -49,3 +49,17 @@ console.log(html);
 ```
 
 1. 模板函数只有一个参数，值为json格式的数据。模板中和传入数据中对应的值会自动进行相应替换，最后输出结果为替换后的html字符串。
+2. 模板函数的参数也可以传入1个任意长度的数组，如下所示：
+```js
+//输出html
+var html = tmplFn({
+    no: 100
+});
+
+console.log(html);
+/*输出html:
+<div id="test1">
+    this the test demo100.
+    <i>test100</i>
+</div>
+```
