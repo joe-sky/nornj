@@ -123,7 +123,7 @@ nj.registerFilter([
 ```
 ##### 流程控制块
 
-NornJ模板中可用的流程控制块有if、each、else、tmpl等。
+NornJ模板中可用的流程控制块有if、else、each等。
 
 * if块
 
