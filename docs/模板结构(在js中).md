@@ -1,13 +1,13 @@
 # 模板结构
 
 NornJ模板目前分为两种形式：
-* [构建在js内的模板](#构建在js内的模板)
+1. [构建在js内的模板](#构建在js内的模板)
  * [用途](#用途)
  * [构成原理](#构成原理)
  * [模板替换参数](#模板替换参数)
  * [过滤器](#过滤器)
  * [流程控制块](#流程控制块)
-* [构建在html内的模板](https://github.com/joe-sky/nornj/blob/master/docs/模板结构(在html中).md)
+2. [构建在html内的模板](https://github.com/joe-sky/nornj/blob/master/docs/模板结构(在html中).md)
 
 ### 构建在js内的模板
 * * *
