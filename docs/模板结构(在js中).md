@@ -10,7 +10,7 @@ NornJ模板目前分为两种形式：
 * [构建在html内的模板](https://github.com/joe-sky/nornj/blob/master/docs/模板结构(在html中).md)
 
 ### 构建在js内的模板
-***
+---
 
 结构例如:
 ```js
