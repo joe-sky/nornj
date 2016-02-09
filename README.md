@@ -28,5 +28,5 @@ var html = NornJ.compile(tmpl, 'tmpl1')({
 
 ### 技术文档
 
-* [模板结构](https://github.com/joe-sky/nornj/blob/master/docs/模板结构.md)
+* [模板结构](https://github.com/joe-sky/nornj/blob/master/docs/模板结构(在js中).md)
 * [编译模板并输出html](https://github.com/joe-sky/nornj/blob/master/docs/编译模板并输出html.md)
