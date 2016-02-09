@@ -167,17 +167,3 @@ NornJ模板中可用的流程控制块有if、each、else、tmpl等。
     '/$each'],  //each块结束标签,此处可省略
 '/div']
 ```
-### 构建在html内的模板
-* * *
-
-结构例如:
-```html
-<nj:slider>
-    'this the test slider {msg}.'
-    <nj:sliderItem id='test' onsliderend={event} />
-</nj:slider>
-```
-
-##### 用途
-
-配合React框架使用，用于替代React.render方法，使React开发的组件拥有html api直接嵌入到html中展示。
