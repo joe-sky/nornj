@@ -153,17 +153,17 @@ NornJ模板中可用的流程控制块有if、else、each等。
 举例：
 ```js
 ['div',
-    'this is the if block demo.',
+    'this is the if block demo{no}.',
     ['$each {items}',  //each块开始标签(1)
         'test if block',
-        ['<span>', 'test{no}'],
+        ['<span>', 'test{no2}'],  //items数组每项的no2属性(3)
     '$else',  //else标签
-        ['<span>', 'test'],
+        ['<span>', 'test{../no}'],  //与items数组同一层的no属性(4)
     '/$each'],  //each块结束标签,此处可省略(2)
 '/div']
 ```
 
-1. each块接受一个js数组格式的参数，如例中(1)处的items，
+1. each块接受一个js数组格式的参数，如例中(1)处的items。
 
 * else块
 
