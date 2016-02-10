@@ -189,11 +189,16 @@ var tmplFn = nj.compile(tmpl, "tmpl1"),
         ]
     });
 
+console.log(html);
 /*输出html:
 <div>
+    'this is the if block demo100.
+    test if block200
+    <span>test100</span>
+    test if block300
+    <span>test100</span>
 </div>
 */
-console.log(html);
 ```
 
 1. each块接受一个js数组格式的参数，如例中(1)处的items。
