@@ -138,7 +138,7 @@ NornJ模板中可用的流程控制块有if、else、each等。
 '/div']
 ```
 
-1. 流程控制块使用一个数组来声明。数组第一项为开始标签，最后一项为结束标签，如例中(1)、(2)处所示。
+1. 流程控制块使用一个数组来声明。数组第一项为开始标签，最后一项为结束标签，如例中(1)、(2)处所示。另外，控制块的结束标签也可以省略不写。
 2. 开始标签使用"$ + 控制块名"来声明，并可添加控制块参数。参数格式与元素节点中的设置参数方式相同。如例中(1)处所示，"type"即为参数。
 3. 在执行模板函数时，如if块的参数计算结果为true，则会执行if块内的模板；如为false则不会执行if块内的模板。
 4. 流程控制块参数内也可以添加过滤器，这样就可以实现更复杂的逻辑，例如：
@@ -146,6 +146,21 @@ NornJ模板中可用的流程控制块有if、else、each等。
 ['$if {type:filter1}',
     'test if block',
 '/$if']
+```
+
+* each块
+
+举例：
+```js
+['div',
+    'this is the if block demo.',
+    ['$each {items}',  //each块开始标签
+        'test if block',
+        ['<span>', 'test{no}'],
+    '$else',  //else标签
+        ['<span>', 'test'],
+    '/$each'],  //each块结束标签,此处可省略
+'/div']
 ```
 
 * else块
@@ -163,17 +178,4 @@ NornJ模板中可用的流程控制块有if、else、each等。
 '/div']
 ```
 
-* each块
-
-举例：
-```js
-['div',
-    'this is the if block demo.',
-    ['$each {items}',  //each块开始标签
-        'test if block',
-        ['<span>', 'test{no}'],
-    '$else',  //else标签
-        ['<span>', 'test'],
-    '/$each'],  //each块结束标签,此处可省略
-'/div']
-```
+1. 在执行模板函数时，
