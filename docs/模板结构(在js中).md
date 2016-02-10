@@ -157,13 +157,14 @@ NornJ模板中可用的流程控制块有if、else、each等。
     ['$if {type}',
         'test if block',
         ['<span>', 'test1'],
-    '$else',  //else标签
-        ['<span>', 'test2']
+    '$else',  //else标签(1)
+        ['<span>', 'test2']  //type参数计算结果为false时执行此处的模板(2)
     ],
 '/div']
 ```
 
-1. 在执行模板函数时，
+1. else标签须定义在if块内，格式为"$else"。如例中(1)处所示。
+2. 在执行模板函数时，如if块的参数计算结果为false，则会执行排在if块内的else标签之后的模板，如例中(2)处所示。
 
 * each块
 
