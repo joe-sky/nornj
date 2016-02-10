@@ -180,7 +180,20 @@ var tmpl = ['div',
     '/$each'],  //each块结束标签,此处可省略(5)
 '/div'];
 
-var html = nj.compile();
+var tmplFn = nj.compile(tmpl, "tmpl1"),
+    html = tmplFn({
+        no: 100,
+        items: [
+            { no: 200 },
+            { no: 300 }
+        ]
+    });
+
+/*输出html:
+<div>
+</div>
+*/
+console.log(html);
 ```
 
 1. each块接受一个js数组格式的参数，如例中(1)处的items。
