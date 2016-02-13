@@ -176,29 +176,48 @@ var tmpl = ['div',
         'test if block{no}',  //items数组每项的no属性(2)
         ['<span>', 'test{../no}'],  //与items数组同一层的no属性(3)
     '$else',
-        ['<span>', 'test{no}'],  //排在else标签后的模板(4)
+        ['<span>', 'test else{no}'],  //排在else标签后的模板(4)
     '/$each'],  //each块结束标签,此处可省略(5)
+    ['$each {numbers}',
+        'num:{.} '  //点号表示直接使用数组项渲染(6)
+    ]
 '/div'];
 
-var tmplFn = nj.compile(tmpl, "tmpl1"),
-    html = tmplFn({
-        no: 100,
-        items: [
-            { no: 200 },
-            { no: 300 }
-        ]
-    });
+var tmplFn = nj.compile(tmpl, "tmpl1");
+var html = tmplFn({
+    no: 100,
+    items: [
+        { no: 200 },
+        { no: 300 }
+    ],
+    numbers: [0, 1, 2]
+});
 
 console.log(html);
 /*输出html:
 <div>
-    'this is the if block demo100.
+    this is the if block demo100.
     test if block200
     <span>test100</span>
     test if block300
     <span>test100</span>
+    num:0 num:1 num:2
+</div>
+*/
+
+var html2 = tmplFn({
+    no: 100,
+    items: null,
+    numbers: null
+});
+
+console.log(html2);
+/*输出html:
+<div>
+    this is the if block demo100.
+    <span>test else100</span>
 </div>
 */
 ```
 
-1. each块接受一个js数组格式的参数，如例中(1)处的items。
+1. each块接受一个js数组格式的参数，如例中(1)处的"{items}"参数。
