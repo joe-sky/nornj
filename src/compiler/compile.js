@@ -7,26 +7,31 @@ var nj = require('../core'),
 
 //编译字面量并返回转换函数
 function compile(obj, tmplName, isComponent, isTag) {
-    if(!obj) {
+    if (!obj) {
         return;
     }
-    
+
     var root;
     if (tmplName) {
         root = nj.templates[tmplName];
     }
     if (!root) {
-        root = {
-            type: "nj_root",
-            content: []
-        };
-
-        //分析传入参数并转换为节点树对象
-        if (isTag) {
-            utils.checkTagElem(obj, root);
+        if (utils.isObject(obj)) {  //If obj is Object,we think obj is a precompiled template.
+            root = obj;
         }
         else {
-            utils.checkElem(obj, root);
+            root = {
+                type: "nj_root",
+                content: []
+            };
+
+            //分析传入参数并转换为节点树对象
+            if (isTag) {
+                utils.checkTagElem(obj, root);
+            }
+            else {
+                utils.checkElem(obj, root);
+            }
         }
 
         //保存模板编译结果到全局集合中
@@ -61,7 +66,7 @@ function renderTagComponent(data, el) {
     var tags = utils.getTagComponents(el),
         ret = [];
 
-    utils.each(tags, function(tag) {
+    utils.each(tags, function (tag) {
         var tmpl = compileTagComponent(tag, tag.getAttribute(nj.tagId));
         ret.push(nj.componentLibDom[nj.componentRender](tmpl(data), tag.parentNode));
     });
