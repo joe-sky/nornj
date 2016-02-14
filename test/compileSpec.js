@@ -97,7 +97,7 @@ describe('test compile', function () {
                 html = tmplFn(data);
 
             console.log(html);
-            expect(html).toBeTruthy();
+            expect(html).toBe("<div id='1' name='test1' fn='fn'><h1 id='testH1' name='test10'>hello world1<div id='test2'></div><divx name='joe_sky<input>'/><img/><input id='test5'/></h1><h2>hello world2<div>test3</div></h2><h1 ids='hello world333 !!!!!___1110'>test___aaa7bbbcccddd1ddd2ddd3ddd1ddd2ddd3ddd1ddd2ddd3</h1><h1 ids='hello world333 !!!!!___1110'>test___aaa9bbbcccddd1ddd2ddd3ddd1ddd2ddd3ddd1ddd2ddd3</h1><h1 ids='hello world333 !!!!!___1110'>test___aaa11bbbcccddd1ddd2ddd3ddd1ddd2ddd3ddd1ddd2ddd3</h1></div>");
         });
     });
 });
