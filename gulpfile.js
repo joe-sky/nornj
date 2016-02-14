@@ -29,9 +29,10 @@ gulp.task('build js', function () {
         .bundle()
         .pipe(source(libName))
         .pipe(buffer()))
-        .pipe(gulp.dest('./dist/js'));
+        .pipe(gulp.dest('./dist'));
 });
 
+//unit testing
 gulp.task("test", function (callback) {
     return gulp.src(["./test/**/**Spec.js"])
         .pipe(jasmine());

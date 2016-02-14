@@ -911,7 +911,7 @@ function replaceParams(value, data, newObj, newKey, parent) {
 
 //提取替换参数
 function getReplaceParam(obj) {
-    var pattern = /({+)([^"'\s{}]+)}+/g,
+    var pattern = /({{1,2})([^"'\s{}]+)}{1,2}/g,
         matchArr,
         ret;
 

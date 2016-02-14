@@ -59,7 +59,7 @@ describe('test compile', function () {
             var tmplSon =
             ["$each {key4}",
                 ['<h1>', { ids: 'hello world333 !!!!!___{../id2:filter1}' },
-                    'test___',
+                    'test{{{../name}}}___',
                     [
                         "aaa{.:filter1:filter2}",
                         "bbb",
