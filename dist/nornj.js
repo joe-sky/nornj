@@ -119,7 +119,7 @@ function checkElem(obj, parent) {
                     node.params = params;
                 }
                 else {  //为特殊节点时取refer
-                    var retR = tools.getControlRefer(params.refer);
+                    var retR = tools.getInsideBraceParam(params.refer);
                     node.refer = retR ? retR[1] : params.refer;
                 }
 
@@ -128,6 +128,12 @@ function checkElem(obj, parent) {
 
             if (!control) {
                 node.type = openTagName;
+
+                //If open tag has a brace,add the typeRefer param.
+                var typeRefer = tools.getInsideBraceParam(openTagName);
+                if(typeRefer) {
+                    node.typeRefer = typeRefer[1];
+                }
 
                 //获取openTag内参数
                 var tagParams = tools.getOpenTagParams(first, !xmlOpenTag);
@@ -249,7 +255,7 @@ function checkTagElem(obj, parent) {
                     tools.addTmpl(node, parent);
                 }
                 else {  //流程控制块
-                    var retR = tools.getControlRefer(params.refer);
+                    var retR = tools.getInsideBraceParam(params.refer);
                     node.refer = retR ? retR[1] : params.refer;
                 }
             }
@@ -428,6 +434,14 @@ function transformToComponent(obj, data, parent) {
         var componentClass = nj.componentClasses[obj.type.toLowerCase()],
             type = componentClass ? componentClass : obj.type;
 
+        //If typeRefer isn't undefined,use it replace the node type.
+        if (obj.typeRefer) {
+            var typeRefer = utils.getDataValue(data, obj.typeRefer, parent);
+            if (typeRefer) {
+                type = typeRefer;
+            }
+        }
+
         //调用创建组件接口,必须需要用apply以多个参数的形式传参,否则在react中,元素放在数组里时会报需要加key属性的警告
         ret = nj.componentLibObj[nj.componentPort].apply(nj.componentLibObj,
             [type,                                                 //组件名
@@ -499,9 +513,19 @@ function transformToString(obj, data, parent) {
         }
     }
     else {
-        var openTag = "<" + obj.type + utils.transformParams(obj.params, data, parent);
+        var type = obj.type;
+
+        //If typeRefer isn't undefined,use it replace the node type.
+        if (obj.typeRefer) {
+            var typeRefer = utils.getDataValue(data, obj.typeRefer, parent);
+            if (typeRefer) {
+                type = typeRefer;
+            }
+        }
+
+        var openTag = "<" + type + utils.transformParams(obj.params, data, parent);
         if (!obj.selfCloseTag) {
-            ret = openTag + ">" + transformContentToString(obj.content, data, parent) + "</" + obj.type + ">";
+            ret = openTag + ">" + transformContentToString(obj.content, data, parent) + "</" + type + ">";
         }
         else {  //自闭合标签
             ret = openTag + "/>";
@@ -517,7 +541,7 @@ function transformContentToString(content, data, parent) {
     if (!content) {
         return ret;
     }
-    if(!parent && data) {  //Init a parent data object and cascade pass on the children node
+    if (!parent && data) {  //Init a parent data object and cascade pass on the children node
         parent = {
             data: utils.isArray(data) ? data[0] : data
         };
@@ -932,7 +956,7 @@ function getReplaceParam(obj) {
 
 //提取xml open tag
 function getXmlOpenTag(obj) {
-    return /^<([a-z][-a-z0-9_:.]*)[^>]*>$/i.exec(obj);
+    return /^<([a-z{][-a-z0-9_:.}]*)[^>]*>$/i.exec(obj);
 }
 
 //验证xml self close tag
@@ -977,7 +1001,7 @@ function isXmlCloseTag(obj, tagName) {
 
 //提取open tag
 function getOpenTag(obj) {
-    return /^[a-z][-a-z0-9_:.]*/i.exec(obj);
+    return /^[a-z{][-a-z0-9_:.}]*/i.exec(obj);
 }
 
 //验证self close tag
@@ -990,8 +1014,8 @@ function isCloseTag(obj, tagName) {
     return isString(obj) && obj.toLowerCase() === "/" + tagName.toLowerCase();
 }
 
-//提取流程控制块refer值
-function getControlRefer(obj) {
+//get inside brace param
+function getInsideBraceParam(obj) {
     return /{([^"'\s{}]+)}/i.exec(obj);
 }
 
@@ -1001,7 +1025,7 @@ function isControl(obj) {
     if (ret1) {
         ret = [ret1[1]];
 
-        var ret2 = getControlRefer(obj);  //提取refer值
+        var ret2 = getInsideBraceParam(obj);  //提取refer值
         if (ret2) {
             ret.push(ret2[1]);
         }
@@ -1137,7 +1161,7 @@ var tools = {
     getOpenTagParams: getOpenTagParams,
     isXmlSelfCloseTag: isXmlSelfCloseTag,
     isSelfCloseTag: isSelfCloseTag,
-    getControlRefer: getControlRefer,
+    getInsideBraceParam: getInsideBraceParam,
     isControl: isControl,
     isControlCloseTag: isControlCloseTag,
     getTagComponentName: getTagComponentName,

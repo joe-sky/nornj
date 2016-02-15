@@ -6,7 +6,7 @@
     jasmine = require('gulp-jasmine'),
     rename = require('gulp-rename');
 
-var isJsMin = true,
+var isJsMin = false,
     libName = "nornj.js";
 if(isJsMin) {
     libName = "nornj.min.js";
