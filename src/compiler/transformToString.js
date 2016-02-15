@@ -35,9 +35,19 @@ function transformToString(obj, data, parent) {
         }
     }
     else {
-        var openTag = "<" + obj.type + utils.transformParams(obj.params, data, parent);
+        var type = obj.type;
+
+        //If typeRefer isn't undefined,use it replace the node type.
+        if (obj.typeRefer) {
+            var typeRefer = utils.getDataValue(data, obj.typeRefer, parent);
+            if (typeRefer) {
+                type = typeRefer;
+            }
+        }
+
+        var openTag = "<" + type + utils.transformParams(obj.params, data, parent);
         if (!obj.selfCloseTag) {
-            ret = openTag + ">" + transformContentToString(obj.content, data, parent) + "</" + obj.type + ">";
+            ret = openTag + ">" + transformContentToString(obj.content, data, parent) + "</" + type + ">";
         }
         else {  //自闭合标签
             ret = openTag + "/>";
@@ -53,7 +63,7 @@ function transformContentToString(content, data, parent) {
     if (!content) {
         return ret;
     }
-    if(!parent && data) {  //Init a parent data object and cascade pass on the children node
+    if (!parent && data) {  //Init a parent data object and cascade pass on the children node
         parent = {
             data: utils.isArray(data) ? data[0] : data
         };

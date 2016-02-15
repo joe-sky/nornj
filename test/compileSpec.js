@@ -16,7 +16,7 @@ describe('test compile', function () {
     });
 
     describe('compile template to html', function () {
-        it('test compile 1', function () {
+        xit('test compile 1', function () {
             var data = {
                 name: "joe_sky",
                 id: "joe",
@@ -53,7 +53,8 @@ describe('test compile', function () {
                 key3: [
                     { id: 1 }, { id: 2 }, { id: 3 }
                 ],
-                key4: [1, 2, 3]
+                key4: [1, 2, 3],
+                divx: "testdiv"
             };
 
             var tmplSon =
@@ -78,7 +79,7 @@ describe('test compile', function () {
                 ['<h1 name=test10>', { id: 'testH1' },
                     'hello world1',
                     ['<div>', { id: 'test2' }],
-                    ['<divx name={{name}} />'],
+                    ['{divx} name={{name}}', '/{divx}'],
                     ['img/'],
                     ['input id="test5" /'],
                 '</h1>'],
@@ -97,12 +98,12 @@ describe('test compile', function () {
                 html = tmplFn(data);
 
             console.log(html);
-            expect(html).toBe("<div id='1' name='test1' fn='fn'><h1 id='testH1' name='test10'>hello world1<div id='test2'></div><divx name='joe_sky<input>'/><img/><input id='test5'/></h1><h2>hello world2<div>test3</div></h2><h1 ids='hello world333 !!!!!___1110'>test{joe_sky<input>}___aaa7bbbcccddd1ddd2ddd3ddd1ddd2ddd3ddd1ddd2ddd3</h1><h1 ids='hello world333 !!!!!___1110'>test{joe_sky<input>}___aaa9bbbcccddd1ddd2ddd3ddd1ddd2ddd3ddd1ddd2ddd3</h1><h1 ids='hello world333 !!!!!___1110'>test{joe_sky<input>}___aaa11bbbcccddd1ddd2ddd3ddd1ddd2ddd3ddd1ddd2ddd3</h1></div>");
+            expect(html).toBe("<div id='1' name='test1' fn='fn'><h1 id='testH1' name='test10'>hello world1<div id='test2'></div><testdiv name='joe_sky<input>'></testdiv><img/><input id='test5'/></h1><h2>hello world2<div>test3</div></h2><h1 ids='hello world333 !!!!!___1110'>test{joe_sky<input>}___aaa7bbbcccddd1ddd2ddd3ddd1ddd2ddd3ddd1ddd2ddd3</h1><h1 ids='hello world333 !!!!!___1110'>test{joe_sky<input>}___aaa9bbbcccddd1ddd2ddd3ddd1ddd2ddd3ddd1ddd2ddd3</h1><h1 ids='hello world333 !!!!!___1110'>test{joe_sky<input>}___aaa11bbbcccddd1ddd2ddd3ddd1ddd2ddd3ddd1ddd2ddd3</h1></div>");
         });
     });
 
     describe('compile precompiled template', function () {
-        it('test precompiled 1', function () {
+        xit('test precompiled 1', function () {
             var data = {
                 name: "joe_sky",
                 id: "joe",

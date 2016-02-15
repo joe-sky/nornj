@@ -267,7 +267,7 @@ function getReplaceParam(obj) {
 
 //提取xml open tag
 function getXmlOpenTag(obj) {
-    return /^<([a-z][-a-z0-9_:.]*)[^>]*>$/i.exec(obj);
+    return /^<([a-z{][-a-z0-9_:.}]*)[^>]*>$/i.exec(obj);
 }
 
 //验证xml self close tag
@@ -312,7 +312,7 @@ function isXmlCloseTag(obj, tagName) {
 
 //提取open tag
 function getOpenTag(obj) {
-    return /^[a-z][-a-z0-9_:.]*/i.exec(obj);
+    return /^[a-z{][-a-z0-9_:.}]*/i.exec(obj);
 }
 
 //验证self close tag
@@ -325,8 +325,8 @@ function isCloseTag(obj, tagName) {
     return isString(obj) && obj.toLowerCase() === "/" + tagName.toLowerCase();
 }
 
-//提取流程控制块refer值
-function getControlRefer(obj) {
+//get inside brace param
+function getInsideBraceParam(obj) {
     return /{([^"'\s{}]+)}/i.exec(obj);
 }
 
@@ -336,7 +336,7 @@ function isControl(obj) {
     if (ret1) {
         ret = [ret1[1]];
 
-        var ret2 = getControlRefer(obj);  //提取refer值
+        var ret2 = getInsideBraceParam(obj);  //提取refer值
         if (ret2) {
             ret.push(ret2[1]);
         }
@@ -472,7 +472,7 @@ var tools = {
     getOpenTagParams: getOpenTagParams,
     isXmlSelfCloseTag: isXmlSelfCloseTag,
     isSelfCloseTag: isSelfCloseTag,
-    getControlRefer: getControlRefer,
+    getInsideBraceParam: getInsideBraceParam,
     isControl: isControl,
     isControlCloseTag: isControlCloseTag,
     getTagComponentName: getTagComponentName,

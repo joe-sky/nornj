@@ -92,7 +92,7 @@ function checkElem(obj, parent) {
                     node.params = params;
                 }
                 else {  //为特殊节点时取refer
-                    var retR = tools.getControlRefer(params.refer);
+                    var retR = tools.getInsideBraceParam(params.refer);
                     node.refer = retR ? retR[1] : params.refer;
                 }
 
@@ -101,6 +101,12 @@ function checkElem(obj, parent) {
 
             if (!control) {
                 node.type = openTagName;
+
+                //If open tag has a brace,add the typeRefer param.
+                var typeRefer = tools.getInsideBraceParam(openTagName);
+                if(typeRefer) {
+                    node.typeRefer = typeRefer[1];
+                }
 
                 //获取openTag内参数
                 var tagParams = tools.getOpenTagParams(first, !xmlOpenTag);

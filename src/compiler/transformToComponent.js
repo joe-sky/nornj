@@ -46,6 +46,14 @@ function transformToComponent(obj, data, parent) {
         var componentClass = nj.componentClasses[obj.type.toLowerCase()],
             type = componentClass ? componentClass : obj.type;
 
+        //If typeRefer isn't undefined,use it replace the node type.
+        if (obj.typeRefer) {
+            var typeRefer = utils.getDataValue(data, obj.typeRefer, parent);
+            if (typeRefer) {
+                type = typeRefer;
+            }
+        }
+
         //调用创建组件接口,必须需要用apply以多个参数的形式传参,否则在react中,元素放在数组里时会报需要加key属性的警告
         ret = nj.componentLibObj[nj.componentPort].apply(nj.componentLibObj,
             [type,                                                 //组件名

@@ -43,7 +43,7 @@ function checkTagElem(obj, parent) {
                     tools.addTmpl(node, parent);
                 }
                 else {  //流程控制块
-                    var retR = tools.getControlRefer(params.refer);
+                    var retR = tools.getInsideBraceParam(params.refer);
                     node.refer = retR ? retR[1] : params.refer;
                 }
             }
