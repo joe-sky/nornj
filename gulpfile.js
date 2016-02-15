@@ -33,7 +33,7 @@ gulp.task('build js', function () {
 });
 
 //unit testing
-gulp.task("test", function (callback) {
+gulp.task("test", function () {
     return gulp.src(["./test/**/**Spec.js"])
         .pipe(jasmine());
 });
