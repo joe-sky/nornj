@@ -1,10 +1,10 @@
 {
   "name": "nornj",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "a javascript template engine",
-  "main": "./dist/nornj.js",
+  "main": "dist/nornj.js",
   "files": [
-    "./dist/",
+    "dist/",
     "LICENSE"
   ],
   "scripts": {
