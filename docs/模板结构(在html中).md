@@ -18,4 +18,4 @@ NornJ模板目前分为两种形式：
 
 ##### 用途
 
-配合React框架使用，用于替代React.render方法，使React开发的组件拥有html api直接嵌入到html中展示。
+配合React框架使用，用于替代ReactDOM.render方法，使React开发的组件拥有html api直接嵌入到html中展示。
