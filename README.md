@@ -21,7 +21,7 @@ var html = NornJ.compile(tmpl, 'tmpl1')({
 * 它也可以支持React.js，作为JSX的替代模板语言，并且使用它开发的React程序无需编译转换也可运行在浏览器环境中;
 * 由于它可以输出html字符串，所以也可以作为node.js服务器框架Express.js的模板引擎。
 
-## 安装
+### 安装
 
 使用npm安装:
 
