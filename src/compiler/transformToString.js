@@ -39,7 +39,7 @@ function transformToString(obj, data, parent) {
 
         //If typeRefer isn't undefined,use it replace the node type.
         if (obj.typeRefer) {
-            var typeRefer = utils.getDataValue(data, obj.typeRefer, parent);
+            var typeRefer = utils.escape(utils.getDataValue(data, obj.typeRefer, parent));
             if (typeRefer) {
                 type = typeRefer;
             }

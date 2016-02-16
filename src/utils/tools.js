@@ -482,7 +482,8 @@ var tools = {
     getDataValue: getDataValue,
     getItemParam: getItemParam,
     isTmpl: isTmpl,
-    addTmpl: addTmpl
+    addTmpl: addTmpl,
+    escape: escape
 };
 
 //部分函数绑定到nj对象
