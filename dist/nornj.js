@@ -866,13 +866,13 @@ function setObjParam(obj, key, value, notTran) {
 }
 
 //Use filters
-function _useFilters(filters, ret) {
+function _useFilters(filters, ret, data) {
     if (filters) {
         var filtersObj = nj.filters;
         each(filters, function (k) {
             var filter = filtersObj[k.toLowerCase()];
             if (filter) {
-                ret = filter(ret);
+                ret = filter.call({ data: data }, ret);
             }
         });
     }
@@ -921,7 +921,7 @@ function getDataValue(data, prop, parent) {
             ret = obj[prop];
 
             //Use filters
-            ret = _useFilters(filters, ret);
+            ret = _useFilters(filters, ret, list);
 
             if (ret != null) {
                 return false;
