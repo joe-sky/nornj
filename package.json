@@ -1,6 +1,6 @@
 {
   "name": "nornj",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "a javascript template engine",
   "main": "dist/nornj.js",
   "files": [
