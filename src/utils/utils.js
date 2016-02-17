@@ -14,9 +14,6 @@ var utils = {
     createTagNamespace: registerComponent.createTagNamespace,
     registerFilter: filter.registerFilter
 };
-
-for (var k in tools) {
-    utils[k] = tools[k];
-}
+tools.assign(utils, tools);
 
 module.exports = utils;

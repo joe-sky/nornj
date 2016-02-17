@@ -1,4 +1,45 @@
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.NornJ = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+/* eslint-disable no-unused-vars */
+'use strict';
+var hasOwnProperty = Object.prototype.hasOwnProperty;
+var propIsEnumerable = Object.prototype.propertyIsEnumerable;
+
+function toObject(val) {
+	if (val === null || val === undefined) {
+		throw new TypeError('Object.assign cannot be called with null or undefined');
+	}
+
+	return Object(val);
+}
+
+module.exports = Object.assign || function (target, source) {
+	var from;
+	var to = toObject(target);
+	var symbols;
+
+	for (var s = 1; s < arguments.length; s++) {
+		from = Object(arguments[s]);
+
+		for (var key in from) {
+			if (hasOwnProperty.call(from, key)) {
+				to[key] = from[key];
+			}
+		}
+
+		if (Object.getOwnPropertySymbols) {
+			symbols = Object.getOwnPropertySymbols(from);
+			for (var i = 0; i < symbols.length; i++) {
+				if (propIsEnumerable.call(from, symbols[i])) {
+					to[symbols[i]] = from[symbols[i]];
+				}
+			}
+		}
+	}
+
+	return to;
+};
+
+},{}],2:[function(require,module,exports){
 'use strict';
 
 var nj = require('./core'),
@@ -24,7 +65,7 @@ if (typeof React !== "undefined") {
 
 var global = typeof self !== "undefined" ? self : this;
 module.exports = global.NornJ = global.nj = nj;
-},{"./compiler/compile":4,"./core":7,"./utils/utils":13}],2:[function(require,module,exports){
+},{"./compiler/compile":5,"./core":8,"./utils/utils":14}],3:[function(require,module,exports){
 'use strict';
 
 var nj = require('../core'),
@@ -209,7 +250,7 @@ module.exports = {
     checkElem: checkElem,
     checkTagElem: checkTagElem
 };
-},{"../core":7,"../utils/tools":12,"./checkTagElem":3}],3:[function(require,module,exports){
+},{"../core":8,"../utils/tools":13,"./checkTagElem":4}],4:[function(require,module,exports){
 'use strict';
 
 var nj = require('../core'),
@@ -302,7 +343,7 @@ function checkTagContentElem(obj, parent) {
 }
 
 module.exports = checkTagElem;
-},{"../core":7,"../utils/tools":12}],4:[function(require,module,exports){
+},{"../core":8,"../utils/tools":13}],5:[function(require,module,exports){
 'use strict';
 
 var nj = require('../core'),
@@ -385,7 +426,7 @@ module.exports = {
     compileTagComponent: compileTagComponent,
     renderTagComponent: renderTagComponent
 };
-},{"../core":7,"../utils/utils":13,"./transformToComponent":5,"./transformToString":6}],5:[function(require,module,exports){
+},{"../core":8,"../utils/utils":14,"./transformToComponent":6,"./transformToString":7}],6:[function(require,module,exports){
 'use strict';
 
 var nj = require('../core'),
@@ -475,7 +516,7 @@ module.exports = {
     transformToComponent: transformToComponent,
     transformContentToComponent: transformContentToComponent
 };
-},{"../core":7,"../utils/utils":13}],6:[function(require,module,exports){
+},{"../core":8,"../utils/utils":14}],7:[function(require,module,exports){
 'use strict';
 
 var utils = require('../utils/utils');
@@ -517,7 +558,7 @@ function transformToString(obj, data, parent) {
 
         //If typeRefer isn't undefined,use it replace the node type.
         if (obj.typeRefer) {
-            var typeRefer = utils.getDataValue(data, obj.typeRefer, parent);
+            var typeRefer = utils.escape(utils.getDataValue(data, obj.typeRefer, parent));
             if (typeRefer) {
                 type = typeRefer;
             }
@@ -558,7 +599,7 @@ module.exports = {
     transformToString: transformToString,
     transformContentToString: transformContentToString
 };
-},{"../utils/utils":13}],7:[function(require,module,exports){
+},{"../utils/utils":14}],8:[function(require,module,exports){
 'use strict';
 
 var nj = {
@@ -576,7 +617,7 @@ var nj = {
 };
 
 module.exports = nj;
-},{}],8:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 'use strict';
 
 var ESCAPE_LOOKUP = {
@@ -589,13 +630,17 @@ var ESCAPE_LOOKUP = {
 ESCAPE_REGEX = /[&><"']/g;
 
 function escape(text) {
+    if(text == null) {
+        return;
+    }
+
     return ('' + text).replace(ESCAPE_REGEX, function(match) {
         return ESCAPE_LOOKUP[match];
     });
 }
 
 module.exports = escape;
-},{}],9:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 'use strict';
 
 var nj = require('../core'),
@@ -621,7 +666,7 @@ var filter = {
 };
 
 module.exports = filter;
-},{"../core":7,"./tools":12}],10:[function(require,module,exports){
+},{"../core":8,"./tools":13}],11:[function(require,module,exports){
 'use strict';
 
 var nj = require('../core'),
@@ -667,7 +712,7 @@ module.exports = {
     registerTagNamespace: registerTagNamespace,
     createTagNamespace: createTagNamespace
 };
-},{"../core":7,"./tools":12}],11:[function(require,module,exports){
+},{"../core":8,"./tools":13}],12:[function(require,module,exports){
 'use strict';
 
 var nj = require('../core');
@@ -686,11 +731,12 @@ function setComponentEngine(name, obj, dom, port, render) {
 }
 
 module.exports = setComponentEngine;
-},{"../core":7}],12:[function(require,module,exports){
+},{"../core":8}],13:[function(require,module,exports){
 'use strict';
 
 var nj = require('../core'),
     escape = require('./escape'),
+    assign = require('object-assign'),
     arrayEvery = Array.prototype.every;
 
 //判断是否为数组
@@ -1171,7 +1217,9 @@ var tools = {
     getDataValue: getDataValue,
     getItemParam: getItemParam,
     isTmpl: isTmpl,
-    addTmpl: addTmpl
+    addTmpl: addTmpl,
+    escape: escape,
+    assign: assign
 };
 
 //部分函数绑定到nj对象
@@ -1182,9 +1230,10 @@ nj.isString = isString;
 nj.each = each;
 nj.inArray = inArray;
 nj.trim = trim;
+nj.assign = assign;
 
 module.exports = tools;
-},{"../core":7,"./escape":8}],13:[function(require,module,exports){
+},{"../core":8,"./escape":9,"object-assign":1}],14:[function(require,module,exports){
 'use strict';
 
 var checkElem = require('../checkElem/checkElem'),
@@ -1201,11 +1250,8 @@ var utils = {
     createTagNamespace: registerComponent.createTagNamespace,
     registerFilter: filter.registerFilter
 };
-
-for (var k in tools) {
-    utils[k] = tools[k];
-}
+tools.assign(utils, tools);
 
 module.exports = utils;
-},{"../checkElem/checkElem":2,"./filter":9,"./registerComponent":10,"./setComponentEngine":11,"./tools":12}]},{},[1])(1)
+},{"../checkElem/checkElem":3,"./filter":10,"./registerComponent":11,"./setComponentEngine":12,"./tools":13}]},{},[2])(2)
 });

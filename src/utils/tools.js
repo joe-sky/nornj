@@ -2,6 +2,7 @@
 
 var nj = require('../core'),
     escape = require('./escape'),
+    assign = require('object-assign'),
     arrayEvery = Array.prototype.every;
 
 //判断是否为数组
@@ -483,7 +484,8 @@ var tools = {
     getItemParam: getItemParam,
     isTmpl: isTmpl,
     addTmpl: addTmpl,
-    escape: escape
+    escape: escape,
+    assign: assign
 };
 
 //部分函数绑定到nj对象
@@ -494,5 +496,6 @@ nj.isString = isString;
 nj.each = each;
 nj.inArray = inArray;
 nj.trim = trim;
+nj.assign = assign;
 
 module.exports = tools;

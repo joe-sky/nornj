@@ -16,6 +16,9 @@
   },
   "author": "Joe_Sky <hitomi_doax@sina.com>",
   "license": "MIT",
+  "dependencies": {
+    "object-assign": "^4.0.1"
+  },
   "devDependencies": {
     "browserify": "^11.2.0",
     "gulp": "^3.9.0",
