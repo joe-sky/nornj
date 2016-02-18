@@ -27,10 +27,11 @@ function transformToComponent(obj, data, parent) {
             case "nj_each":
                 if (dataRefer && dataRefer.length) {
                     ret = [];
-                    utils.each(dataRefer, function (item) {
+                    utils.each(dataRefer, function (item, index) {
                         var _parent = {  //Create a parent data object
                             data: item,
-                            parent: parent
+                            parent: parent,
+                            index: index
                         };
                         ret.push(transformContentToComponent(obj.content, utils.getItemParam(item, data), _parent));
                     });

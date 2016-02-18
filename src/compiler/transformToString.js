@@ -20,10 +20,11 @@ function transformToString(obj, data, parent) {
                 break;
             case "nj_each":
                 if (dataRefer && dataRefer.length) {
-                    utils.each(dataRefer, function (item) {
+                    utils.each(dataRefer, function (item, index) {
                         var _parent = {  //Create a parent data object
                             data: item,
-                            parent: parent
+                            parent: parent,
+                            index: index
                         };
                         ret += transformContentToString(obj.content, utils.getItemParam(item, data), _parent);
                     });
