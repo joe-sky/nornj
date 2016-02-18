@@ -19,4 +19,5 @@
         );
     }
 });
+
 nj.registerComponent('TodoList', TodoList);

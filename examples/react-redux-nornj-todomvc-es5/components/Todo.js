@@ -17,4 +17,5 @@
         );
     }
 });
+
 nj.registerComponent('Todo', Todo);

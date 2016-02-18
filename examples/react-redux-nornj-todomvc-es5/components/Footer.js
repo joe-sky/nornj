@@ -14,17 +14,20 @@
     },
     render: function () {
         return this.template(
-            [{
-                filters: [
-                    { filter: 'SHOW_ALL', name: 'All' },
-                    { filter: 'SHOW_COMPLETED', name: 'Completed' },
-                    { filter: 'SHOW_ACTIVE', name: 'Active' }
-                ]
-            }, {
-                filter: this.props.filter,
-                filterChange: this.filterChange
-            }]
+            [
+                {
+                    filters: [
+                        { filter: 'SHOW_ALL', name: 'All' },
+                        { filter: 'SHOW_COMPLETED', name: 'Completed' },
+                        { filter: 'SHOW_ACTIVE', name: 'Active' }
+                    ]
+                }, {
+                    filter: this.props.filter,
+                    filterChange: this.filterChange
+                }
+            ]
         );
     }
 });
+
 nj.registerComponent('Footer', Footer);

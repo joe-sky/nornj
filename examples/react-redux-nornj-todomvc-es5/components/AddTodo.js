@@ -13,4 +13,5 @@
         return this.template({ handleClick: this.handleClick });
     }
 });
+
 nj.registerComponent('AddTodo', AddTodo);
