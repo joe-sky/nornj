@@ -43,7 +43,7 @@ describe('test compile', function () {
             expect(html).toBeTruthy();
         });
 
-        it('test compile 2', function () {
+        xit('test compile 2', function () {
             var data = {
                 name: "joe_sky<input>",
                 id: "joe",
@@ -103,7 +103,7 @@ describe('test compile', function () {
     });
 
     describe('compile precompiled template', function () {
-        xit('test precompiled 1', function () {
+        it('test precompiled 1', function () {
             var data = {
                 name: "joe_sky",
                 id: "joe",

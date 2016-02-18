@@ -1,0 +1,37 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>React + Redux + NornJ TodoMVC example</title>
+    <meta charset="utf-8" />
+    <script src="../vendor/es5-shim.min.js"></script>
+    <script src="../vendor/es5-sham.min.js"></script>
+    <script src="../vendor/console-polyfill.js"></script>
+    <script src="../vendor/react.js"></script>
+    <script src="../vendor/react-dom.js"></script>
+    <script src="../vendor/redux.js"></script>
+    <script src="../vendor/react-redux.js"></script>
+    <script src="../../dist/nornj.js"></script>
+</head>
+<body>
+    <div>
+        <nj:Provider class="nj-component" store={store}>
+            <nj:App />
+        </nj:Provider>
+    </div>
+    <script src="../react-redux-nornj-todomvc-es5/actions/actions.js"></script>
+    <script src="../react-redux-nornj-todomvc-es5/reducers/reducers.js"></script>
+    <script src="../react-redux-nornj-todomvc-es5/filters/filters.js"></script>
+    <script src="../react-redux-nornj-todomvc-es5/templates/AddTodoTmpl.js"></script>
+    <script src="../react-redux-nornj-todomvc-es5/components/AddTodo.js"></script>
+    <script src="../react-redux-nornj-todomvc-es5/templates/FooterTmpl.js"></script>
+    <script src="../react-redux-nornj-todomvc-es5/components/Footer.js"></script>
+    <script src="../react-redux-nornj-todomvc-es5/templates/TodoTmpl.js"></script>
+    <script src="../react-redux-nornj-todomvc-es5/components/Todo.js"></script>
+    <script src="../react-redux-nornj-todomvc-es5/templates/TodoListTmpl.js"></script>
+    <script src="../react-redux-nornj-todomvc-es5/components/TodoList.js"></script>
+    <script src="../react-redux-nornj-todomvc-es5/templates/AppTmpl.js"></script>
+    <script src="../react-redux-nornj-todomvc-es5/containers/App.js"></script>
+    <script src="index.js"></script>
+</body>
+</html>

@@ -16,7 +16,7 @@ function compile(obj, tmplName, isComponent, isTag) {
         root = nj.templates[tmplName];
     }
     if (!root) {
-        if (utils.isObject(obj)) {  //If obj is Object,we think obj is a precompiled template.
+        if (utils.isObject(obj) && obj.type === "nj_root") {  //If obj is Object,we think obj is a precompiled template.
             root = obj;
         }
         else {

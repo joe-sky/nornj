@@ -362,7 +362,7 @@ function compile(obj, tmplName, isComponent, isTag) {
         root = nj.templates[tmplName];
     }
     if (!root) {
-        if (utils.isObject(obj)) {  //If obj is Object,we think obj is a precompiled template.
+        if (utils.isObject(obj) && obj.type === "nj_root") {  //If obj is Object,we think obj is a precompiled template.
             root = obj;
         }
         else {
@@ -456,10 +456,11 @@ function transformToComponent(obj, data, parent) {
             case "nj_each":
                 if (dataRefer && dataRefer.length) {
                     ret = [];
-                    utils.each(dataRefer, function (item) {
+                    utils.each(dataRefer, function (item, index) {
                         var _parent = {  //Create a parent data object
                             data: item,
-                            parent: parent
+                            parent: parent,
+                            index: index
                         };
                         ret.push(transformContentToComponent(obj.content, utils.getItemParam(item, data), _parent));
                     });
@@ -539,10 +540,11 @@ function transformToString(obj, data, parent) {
                 break;
             case "nj_each":
                 if (dataRefer && dataRefer.length) {
-                    utils.each(dataRefer, function (item) {
+                    utils.each(dataRefer, function (item, index) {
                         var _parent = {  //Create a parent data object
                             data: item,
-                            parent: parent
+                            parent: parent,
+                            index: index
                         };
                         ret += transformContentToString(obj.content, utils.getItemParam(item, data), _parent);
                     });
@@ -887,20 +889,17 @@ function getDataValue(data, prop, parent) {
     }
 
     var isArr = isArray(data),
-        filters;
-    if (prop.indexOf(":") >= 0) {  //prop中有分隔线时使用过滤器
+        filters, list, ret;
+
+    //prop中有分隔线时使用过滤器
+    if (prop.indexOf(":") >= 0) {
         filters = prop.split(":");
         prop = filters[0];
         filters = filters.slice(1);
     }
-    if (prop === ".") {  //prop为点号时直接使用data作为返回值
-        return _useFilters(filters, isArr ? data[0] : data);
-    }
 
-    var list, ret,
-        filtersObj = nj.filters;
-
-    if (parent && prop.indexOf("../") > -1) {  //According to the param path to get data
+    //According to the param path to get data
+    if (parent && prop.indexOf("../") > -1) {
         prop = prop.replace(/\.\.\//g, function () {
             var _parent = parent.parent;
             throwIf(_parent, "Parent data is undefined, please check the param path declare.");
@@ -914,6 +913,13 @@ function getDataValue(data, prop, parent) {
     }
     else {
         list = [data];
+    }
+
+    if (prop === ".") {  //prop为点号时直接使用data作为返回值
+        return _useFilters(filters, isArr ? data[0] : data, list);
+    }
+    else if(prop === "..") {  //Get current item index
+        return _useFilters(filters, parent.index, list);
     }
 
     each(list, function (obj) {
