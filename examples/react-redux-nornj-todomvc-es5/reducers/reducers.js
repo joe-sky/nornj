@@ -8,6 +8,17 @@ function visibilityFilter(state, action) {
     switch (action.type) {
         case SET_VISIBILITY_FILTER:
             return action.filter
+        case ReactRouterRedux.UPDATE_LOCATION:
+            var filter = action.payload.pathname.substr(1);
+            switch (filter) {
+                case '':
+                case 'all':
+                    return 'SHOW_ALL';
+                case 'active':
+                    return 'SHOW_ACTIVE';
+                case 'completed':
+                    return 'SHOW_COMPLETED';
+            }
         default:
             return state
     }
@@ -33,7 +44,7 @@ function todos(state, action) {
     }
 }
 
-var todoApp = Redux.combineReducers({
+var todoApp = {
     visibilityFilter: visibilityFilter,
     todos: todos
-});
+};

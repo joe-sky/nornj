@@ -1,4 +1,4 @@
-﻿var App = React.createClass({
+﻿var _App = React.createClass({
     propTypes: {
         visibleTodos: React.PropTypes.arrayOf(React.PropTypes.shape({
             text: React.PropTypes.string.isRequired,
@@ -59,4 +59,5 @@ function select(state) {
 }
 
 //包装componen,注入dispatch和state到其默认的connect(select)(App)中
-nj.registerComponent('App', ReactRedux.connect(select)(App));
+var App = ReactRedux.connect(select)(_App);
+nj.registerComponent('App', App);
