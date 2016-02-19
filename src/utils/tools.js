@@ -182,7 +182,7 @@ function getDataValue(data, prop, parent) {
     if (prop === ".") {  //prop为点号时直接使用data作为返回值
         return _useFilters(filters, isArr ? data[0] : data, list);
     }
-    else if(prop === "..") {  //Get current item index
+    else if(prop === "#") {  //Get current item index
         return _useFilters(filters, parent.index, list);
     }
 

@@ -43,7 +43,7 @@ describe('test compile', function () {
             expect(html).toBeTruthy();
         });
 
-        xit('test compile 2', function () {
+        it('test compile 2', function () {
             var data = {
                 name: "joe_sky<input>",
                 id: "joe",
@@ -63,7 +63,7 @@ describe('test compile', function () {
                     'test{{{../name}}}___',
                     [
                         "aaa{.:filter1:filter2}",
-                        "bbb{..}",
+                        "bbb{#}",
                         "ccc",
                         ['$each {../key3}',
                             ['$each {../../key2}', 'ddd{.}']
@@ -103,7 +103,7 @@ describe('test compile', function () {
     });
 
     describe('compile precompiled template', function () {
-        it('test precompiled 1', function () {
+        xit('test precompiled 1', function () {
             var data = {
                 name: "joe_sky",
                 id: "joe",
