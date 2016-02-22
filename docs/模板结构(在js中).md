@@ -97,11 +97,12 @@ NornJ模板目前分为两种形式：
 * 在替换参数中可以定义过滤器，来对数据进行一些定制化操作。语法为"{替换参数:过滤器1:过滤器2...}"，如使用多个过滤器则会按顺序依次执行，如下所示：
 ```js
 nj.registerFilter("format", function(obj) {
-    return obj.trim();
+    return obj + 1;
 });
 
 ['div',
-    '{content:format:count}',
+    '{list:count}',        //获取总数
+    '{list:count:format}', //先获取总数,然后格式化
 '/div']
 ```
 
