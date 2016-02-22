@@ -649,7 +649,17 @@ var nj = require('../core'),
     tools = require('./tools');
 
 //过滤器对象
-nj.filters = {};
+nj.filters = {
+    //Get parameter properties
+    props: function (obj, props) {
+        var ret = obj;
+        tools.each(props.split("."), function (prop) {
+            ret = ret[prop];
+        });
+
+        return ret;
+    }
+};
 
 //注册过滤器
 function registerFilter(name, filter) {
@@ -872,14 +882,31 @@ function _useFilters(filters, ret, data) {
     if (filters) {
         var filtersObj = nj.filters;
         each(filters, function (k) {
-            var filter = filtersObj[k.toLowerCase()];
+            var retF = _getFilterParam(k),
+                filter = filtersObj[retF[1]];  //Get filter function
+
             if (filter) {
-                ret = filter.call({ data: data }, ret);
+                var params = [ret],
+                    paramsF = retF[3];  //Get filter param
+
+                //Multiple params are separated by commas.
+                if (paramsF) {
+                    each(paramsF.split(","), function (p) {
+                        params[params.length] = p;
+                    });
+                }
+
+                ret = filter.apply({ data: data }, params);
             }
         });
     }
 
     return ret;
+}
+
+//Get filter param
+function _getFilterParam(obj) {
+    return /([\w$]+)(\(([^()]+)\))*/.exec(obj);
 }
 
 //获取data值

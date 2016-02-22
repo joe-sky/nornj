@@ -4,7 +4,17 @@ var nj = require('../core'),
     tools = require('./tools');
 
 //过滤器对象
-nj.filters = {};
+nj.filters = {
+    //Get parameter properties
+    props: function (obj, props) {
+        var ret = obj;
+        tools.each(props.split("."), function (prop) {
+            ret = ret[prop];
+        });
+
+        return ret;
+    }
+};
 
 //注册过滤器
 function registerFilter(name, filter) {
