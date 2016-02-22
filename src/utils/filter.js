@@ -5,11 +5,11 @@ var nj = require('../core'),
 
 //过滤器对象
 nj.filters = {
-    //Get parameter properties
+    //Get param properties
     prop: function (obj, props) {
         var ret = obj;
-        tools.each(props.split("."), function (prop) {
-            ret = ret[prop];
+        tools.each(props.split("."), function (p) {
+            ret = ret[p];
         });
 
         return ret;

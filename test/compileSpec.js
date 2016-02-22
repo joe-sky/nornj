@@ -91,7 +91,7 @@ describe('test compile', function () {
                     ['input id="test5" /'],
                 '</h1>'],
                 ['h2',
-                    ['hello world2{key4:count}',
+                    ['hello world2{key3:count},{key4:item(3)}',
                     ['<div>', 'test3']],
                 '/h2'],
                 ["$if {key:filter3}",

@@ -251,7 +251,7 @@ function replaceParams(value, data, newObj, newKey, parent) {
             if (dataProp
                 && !newObj                  //Only in transform to string need escape
                 && param[1].length < 2) {   //Only in the opening brace's length less than 2 need escape
-                dataProp = escape(dataProp);
+                dataProp = escape.escape(dataProp);
             }
 
             //如果参数只存在占位符,则可传引用参数
@@ -263,7 +263,7 @@ function replaceParams(value, data, newObj, newKey, parent) {
                 value = dataProp;
             }
             else {  //逐个替换占位符
-                value = value.replace(new RegExp(placeholder.replace("/(/g", "\(").replace("/)/g", "\)"), "ig"), dataProp);
+                value = value.replace(new RegExp(escape.escapeBrackets(placeholder), "ig"), dataProp);
             }
         });
     }
@@ -510,9 +510,9 @@ var tools = {
     getItemParam: getItemParam,
     isTmpl: isTmpl,
     addTmpl: addTmpl,
-    escape: escape,
     assign: assign
 };
+assign(tools, escape);
 
 //部分函数绑定到nj对象
 nj.isArray = isArray;
