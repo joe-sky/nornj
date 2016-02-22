@@ -6,13 +6,23 @@ var nj = require('../core'),
 //过滤器对象
 nj.filters = {
     //Get parameter properties
-    props: function (obj, props) {
+    prop: function (obj, props) {
         var ret = obj;
         tools.each(props.split("."), function (prop) {
             ret = ret[prop];
         });
 
         return ret;
+    },
+
+    //Get list count
+    count: function (obj) {
+        return obj ? obj.length : 0;
+    },
+
+    //Get list item
+    item: function (obj, no) {
+        return obj ? obj[no] : null;
     }
 };
 

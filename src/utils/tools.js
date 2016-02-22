@@ -137,7 +137,7 @@ function _useFilters(filters, ret, data) {
         var filtersObj = nj.filters;
         each(filters, function (k) {
             var retF = _getFilterParam(k),
-                filter = filtersObj[retF[1]];  //Get filter function
+                filter = filtersObj[retF[1].toLowerCase()];  //Get filter function
 
             if (filter) {
                 var params = [ret],
@@ -152,6 +152,11 @@ function _useFilters(filters, ret, data) {
 
                 ret = filter.apply({ data: data }, params);
             }
+
+            //var filter = filtersObj[k.toLowerCase()];
+            //if (filter) {
+            //    ret = filter.call({ data: data }, ret);
+            //}
         });
     }
 
@@ -258,7 +263,7 @@ function replaceParams(value, data, newObj, newKey, parent) {
                 value = dataProp;
             }
             else {  //逐个替换占位符
-                value = value.replace(new RegExp(placeholder, "ig"), dataProp);
+                value = value.replace(new RegExp(placeholder.replace("/(/g", "\(").replace("/)/g", "\)"), "ig"), dataProp);
             }
         });
     }

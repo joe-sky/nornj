@@ -53,7 +53,7 @@ describe('test compile', function () {
                 key3: [
                     { id: 1 }, { id: 2 }, { id: 3 }
                 ],
-                key4: [1, 2, 3],
+                key4: [1, 2, 3, 5],
                 divx: "testdiv<div>",
                 names: {
                     name: "I am joe_sky<b>.",
@@ -86,12 +86,12 @@ describe('test compile', function () {
                 ['<h1 name=test10>', { id: 'testH1' },
                     'hello world1',
                     ['<div>', { id: 'test2' }],
-                    ['{divx} name={{names:props(my.name2)}}', '/{divx}'],
+                    ['{divx} name={{names:prop(my.name2)}}', '/{divx}'],
                     ['img/'],
                     ['input id="test5" /'],
                 '</h1>'],
                 ['h2',
-                    ['hello world2',
+                    ['hello world2{key4:count}',
                     ['<div>', 'test3']],
                 '/h2'],
                 ["$if {key:filter3}",
