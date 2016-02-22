@@ -629,19 +629,29 @@ var ESCAPE_LOOKUP = {
     '"': '&quot;',
     '\'': '&#x27;'
 },
-ESCAPE_REGEX = /[&><"']/g;
+ESCAPE_REGEX = /[&><"']/g,
+ESCAPE_LOOKUP_BRACKETS = {
+    '(': '\\(',
+    ')': '\\)'
+},
+ESCAPE_REGEX_BRACKETS = /[()]/g;
 
-function escape(text) {
-    if(text == null) {
-        return;
-    }
+function _escape(regex, lookup) {
+    return function (text) {
+        if (text == null) {
+            return;
+        }
 
-    return ('' + text).replace(ESCAPE_REGEX, function(match) {
-        return ESCAPE_LOOKUP[match];
-    });
+        return ('' + text).replace(regex, function (match) {
+            return lookup[match];
+        });
+    };
 }
 
-module.exports = escape;
+module.exports = {
+    escape: _escape(ESCAPE_REGEX, ESCAPE_LOOKUP),
+    escapeBrackets: _escape(ESCAPE_REGEX_BRACKETS, ESCAPE_LOOKUP_BRACKETS)
+};
 },{}],10:[function(require,module,exports){
 'use strict';
 
@@ -650,14 +660,24 @@ var nj = require('../core'),
 
 //过滤器对象
 nj.filters = {
-    //Get parameter properties
-    props: function (obj, props) {
+    //Get param properties
+    prop: function (obj, props) {
         var ret = obj;
-        tools.each(props.split("."), function (prop) {
-            ret = ret[prop];
+        tools.each(props.split("."), function (p) {
+            ret = ret[p];
         });
 
         return ret;
+    },
+
+    //Get list count
+    count: function (obj) {
+        return obj ? obj.length : 0;
+    },
+
+    //Get list item
+    item: function (obj, no) {
+        return obj ? obj[no] : null;
     }
 };
 
@@ -883,7 +903,7 @@ function _useFilters(filters, ret, data) {
         var filtersObj = nj.filters;
         each(filters, function (k) {
             var retF = _getFilterParam(k),
-                filter = filtersObj[retF[1]];  //Get filter function
+                filter = filtersObj[retF[1].toLowerCase()];  //Get filter function
 
             if (filter) {
                 var params = [ret],
@@ -898,6 +918,11 @@ function _useFilters(filters, ret, data) {
 
                 ret = filter.apply({ data: data }, params);
             }
+
+            //var filter = filtersObj[k.toLowerCase()];
+            //if (filter) {
+            //    ret = filter.call({ data: data }, ret);
+            //}
         });
     }
 
@@ -992,7 +1017,7 @@ function replaceParams(value, data, newObj, newKey, parent) {
             if (dataProp
                 && !newObj                  //Only in transform to string need escape
                 && param[1].length < 2) {   //Only in the opening brace's length less than 2 need escape
-                dataProp = escape(dataProp);
+                dataProp = escape.escape(dataProp);
             }
 
             //如果参数只存在占位符,则可传引用参数
@@ -1004,7 +1029,7 @@ function replaceParams(value, data, newObj, newKey, parent) {
                 value = dataProp;
             }
             else {  //逐个替换占位符
-                value = value.replace(new RegExp(placeholder, "ig"), dataProp);
+                value = value.replace(new RegExp(escape.escapeBrackets(placeholder), "ig"), dataProp);
             }
         });
     }
@@ -1251,9 +1276,9 @@ var tools = {
     getItemParam: getItemParam,
     isTmpl: isTmpl,
     addTmpl: addTmpl,
-    escape: escape,
     assign: assign
 };
+assign(tools, escape);
 
 //部分函数绑定到nj对象
 nj.isArray = isArray;
