@@ -94,14 +94,14 @@ NornJ模板目前分为两种形式：
 
 ##### 过滤器
 
-* 在替换参数中可以定义过滤器，来对数据进行一些定制化操作。语法为"{替换参数:过滤器1:过滤器2...}"，如下所示：
+* 在替换参数中可以定义过滤器，来对数据进行一些定制化操作。语法为"{替换参数:过滤器1:过滤器2...}"，如使用多个过滤器则会按顺序依次执行，如下所示：
 ```js
 nj.registerFilter("format", function(obj) {
     return obj.trim();
 });
 
 ['div',
-    '{content:format}',
+    '{content:format:count}',
 '/div']
 ```
 
@@ -131,11 +131,11 @@ nj.registerFilter([
 
 * 内置过滤器
 
-| 名称                      | 作用                        |
-|:------------------------- |:--------------------------- |
-| [autolink](#auto-link)    | `true`or`false`             |
-| [bracket](#bracket)       | `square`or`round`           |
-| [depth](#depth)           | uint (`0` means "no limit") |
+| 名称           | 作用            | 示例                    |
+|:---------------|:----------------|:------------------------|
+| prop           | 获取对象属性值  | {content:prop(foo.bar)} |
+| count          | 获取集合总数    | {content:count}         |
+| item           | 获取集合项值    | {content:item(0)}       |
 
 ##### 流程控制块
 
