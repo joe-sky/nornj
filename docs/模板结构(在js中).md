@@ -129,6 +129,13 @@ nj.registerFilter([
 '/div']
 ```
 
+* 内置过滤器
+| 名称                | 作用                      |
+|:------------------------- |:--------------------------- |
+| [autolink](#auto-link)    | `true`or`false`             |
+| [bracket](#bracket)       | `square`or`round`           |
+| [depth](#depth)           | uint (`0` means "no limit") |
+
 ##### 流程控制块
 
 NornJ模板中可用的流程控制块有if、else、each等。
