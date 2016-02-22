@@ -130,7 +130,8 @@ nj.registerFilter([
 ```
 
 * 内置过滤器
-| 名称                | 作用                      |
+
+| 名称                      | 作用                        |
 |:------------------------- |:--------------------------- |
 | [autolink](#auto-link)    | `true`or`false`             |
 | [bracket](#bracket)       | `square`or`round`           |
