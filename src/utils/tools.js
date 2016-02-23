@@ -152,11 +152,6 @@ function _useFilters(filters, ret, data) {
 
                 ret = filter.apply({ data: data }, params);
             }
-
-            //var filter = filtersObj[k.toLowerCase()];
-            //if (filter) {
-            //    ret = filter.call({ data: data }, ret);
-            //}
         });
     }
 
