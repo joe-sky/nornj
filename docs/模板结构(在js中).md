@@ -132,8 +132,6 @@ nj.registerFilter("test", function(obj, p1, p2) {
     return obj;
 });
 
-
-
 nj.compile(['div',
     '{data:test(1, 2)}',
 '/div'])({
