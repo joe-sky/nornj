@@ -128,7 +128,7 @@ nj.registerFilter([
 nj.registerFilter("test", function(obj, p1, p2) {
     console.log(obj);  //输出test
     console.log(p1);   //输出1
-    console.log(p2);  / /输出2
+    console.log(p2);   //输出2
     return obj;
 });
 
