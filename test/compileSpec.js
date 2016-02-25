@@ -8,9 +8,11 @@ describe('test compile', function () {
             return v * 2;
         });
         nj.registerFilter("filter2", function (v) {
+            console.log(this.data);
             return v + 5;
         });
         nj.registerFilter("filter3", function (v) {
+            //console.log(this.index);
             return !!!v;
         });
     });
@@ -82,7 +84,7 @@ describe('test compile', function () {
             ];
 
             var tmpl =
-            ['<div>', { id: 1, name: 'test1', fn: "fn" },
+            ['<div>', { id: 1, name: 'test1{key5}2', fn: "fn" },
                 ['<h1 name=test10>', { id: 'testH1' },
                     'hello world1',
                     ['<div>', { id: 'test2' }],

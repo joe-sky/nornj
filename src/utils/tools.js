@@ -132,7 +132,7 @@ function setObjParam(obj, key, value, notTran) {
 }
 
 //Use filters
-function _useFilters(filters, ret, data) {
+function _useFilters(filters, ret, data, parent, index) {
     if (filters) {
         var filtersObj = nj.filters;
         each(filters, function (k) {
@@ -150,7 +150,11 @@ function _useFilters(filters, ret, data) {
                     });
                 }
 
-                ret = filter.apply({ data: data }, params);
+                ret = filter.apply({
+                    data: data,
+                    parent: parent,
+                    index: index
+                }, params);
             }
         });
     }
@@ -164,13 +168,13 @@ function _getFilterParam(obj) {
 }
 
 //获取data值
-function getDataValue(data, prop, parent) {
+function getDataValue(data, prop, parent, defaultEmpty) {
     if (data == null) {
         return;
     }
 
     var isArr = isArray(data),
-        filters, list, ret;
+        filters, datas, ret, dataP, index;
 
     //prop中有分隔线时使用过滤器
     if (prop.indexOf(":") >= 0) {
@@ -179,42 +183,53 @@ function getDataValue(data, prop, parent) {
         filters = filters.slice(1);
     }
 
+    //if inside each block,get the parent data and current index
+    if (parent && parent.parent) {
+        dataP = parent.parent.data;
+        index = parent.index;
+    }
+
     //According to the param path to get data
     if (parent && prop.indexOf("../") > -1) {
         prop = prop.replace(/\.\.\//g, function () {
             var _parent = parent.parent;
             throwIf(_parent, "Parent data is undefined, please check the param path declare.");
             parent = _parent;
-            list = [parent.data];
+            datas = [parent.data];
             return "";
         });
     }
     else if (isArr) {  //The data param is array
-        list = data;
+        datas = data;
     }
     else {
-        list = [data];
+        datas = [data];
     }
 
     if (prop === ".") {  //prop为点号时直接使用data作为返回值
-        return _useFilters(filters, isArr ? data[0] : data, list);
+        return _useFilters(filters, isArr ? data[0] : data, datas, dataP, index);
     }
-    else if(prop === "#") {  //Get current item index
-        return _useFilters(filters, parent.index, list);
+    else if (prop === "#") {  //Get current item index
+        return _useFilters(filters, index, datas, dataP, index);
     }
 
-    each(list, function (obj) {
+    each(datas, function (obj) {
         if (obj) {
             ret = obj[prop];
 
             //Use filters
-            ret = _useFilters(filters, ret, list);
+            ret = _useFilters(filters, ret, datas, dataP, index);
 
             if (ret != null) {
                 return false;
             }
         }
     });
+
+    //Default set empty
+    if (defaultEmpty && ret == null) {
+        ret = '';
+    }
 
     return ret;
 }
@@ -239,7 +254,7 @@ function replaceParams(value, data, newObj, newKey, parent) {
         each(params, function (param) {
             var placeholder = param[0],
                 prop = param[2],
-                dataProp = getDataValue(data, prop, parent),
+                dataProp = getDataValue(data, prop, parent, !newObj),
                 isAll = placeholder === value;
 
             //参数为字符串时,须做特殊字符转义

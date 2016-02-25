@@ -8,7 +8,7 @@ nj.filters = {
     //Get param properties
     prop: function (obj, props) {
         var ret = obj;
-        tools.each(props.split("."), function (p) {
+        ret && tools.each(props.split("."), function (p) {
             ret = ret[p];
         });
 
