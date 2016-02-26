@@ -56,6 +56,7 @@ describe('test compile', function () {
                     { id: 1 }, { id: 2 }, { id: 3 }
                 ],
                 key4: [1, 2, 3, 5],
+                key6: [{ k: [1, 2] }, { k: [11, 12] }, { k: [21, 22] }],
                 divx: "testdiv<div>",
                 names: {
                     name: "I am joe_sky<b>.",
@@ -95,6 +96,11 @@ describe('test compile', function () {
                 ['h2',
                     ['hello world2{key3:count},{key4:item(3)}',
                     ['<div>', 'test3']],
+                    ['$each {key6}',
+                        ['$each {k}',
+                            '{.}'
+                        ]
+                    ],
                 '/h2'],
                 ["$if {key:filter3}",
                     ['<h3>', 'hello world3 !!!'],
