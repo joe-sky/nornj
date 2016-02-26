@@ -123,12 +123,38 @@ nj.registerFilter([
 ]);
 ```
 
-* 过滤器也可以添加参数，语法为"{替换参数:过滤器1(参数1,参数2...):过滤器2(参数1,参数2...)...}"，如下所示：
+* 过滤器也可以添加参数，语法为"{替换参数:过滤器1(参数1,参数2...):过滤器2(参数1,参数2...)...}"。在过滤器方法中第一个参数是当前传入的数据；从第二个参数开始依次为这些模板中传入的参数，如下所示：
 ```js
-['div',
-    '{list:item(0)}',
-'/div']
+nj.registerFilter("test", function(obj, p1, p2) {
+    console.log(obj);  //输出test
+    console.log(p1);   //输出1
+    console.log(p2);   //输出2
+    return obj;
+});
+
+nj.compile(['div',
+    '{data:test(1, 2)}',
+'/div'])({
+    data: 'test'
+});
 ```
+
+* 在过滤器方法内，可以通过this.x的方式获取一些参数，如下所示：
+```js
+nj.registerFilter("test", function(obj) {
+    console.log(this.data);    //输出1
+    console.log(this.parent);  //输出{ list: [1] }
+    console.log(this.index);   //输出0
+    return obj;
+});
+
+nj.compile(['each {list}',
+    '{#:test}',
+'/each'])({
+    list: [1]
+});
+```
+
 
 * 内置过滤器
 
