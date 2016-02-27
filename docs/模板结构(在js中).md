@@ -316,18 +316,26 @@ if,each,else等流程控制块的构建形式与普通模板略有不同，如�
 
 //模板字符串语法糖结构：
 nj`
-<if {refer}>  //
+<if {refer}>  //if块须要写成一对xml标签
 ...
 </if>
 `
 
 nj`
-<each {refer}>
+<each {refer}>  //each块须要写成一对xml标签
 ...
-<else />
+<else />  //else块须要写成一个自闭合xml标签
 ...
 </each>
 `
 ```
 
 * 元素参数的表示形式
+
+```js
+//普通模板可以用对象形式的标签参数：
+['<div>', { id: 'test' }]
+
+//模板字符串语法糖只能将标签参数写在xml标签内：
+nj`<div id=test></div>`
+```
