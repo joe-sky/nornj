@@ -311,14 +311,6 @@ nj`
 `
 
 nj`
-<if {refer}>
-...
-<else />
-...
-</if>
-`
-
-nj`
 <each {refer}>
 ...
 <else />
