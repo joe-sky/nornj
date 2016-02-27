@@ -276,7 +276,7 @@ console.log(html2);
 
 NornJ模板还有一种使用es6(es2015)提供的模板字符串来描述模板的功能，可以使用类似xml标签嵌套的方式来构建模板，结构就像这样：
 ```js
-nj`  <!--模板字符串前须要加nj标签函数-->
+nj`        <!--模板字符串前须要加nj标签函数-->
 <slider>
     this the test slider {msg}.
     <sliderItem id=test onsliderend={event} />
