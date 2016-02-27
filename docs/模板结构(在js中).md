@@ -273,3 +273,12 @@ console.log(html2);
 6. each块内还可以使用#号"{#}"设置替换参数，表示使用数组项索引值渲染，如例中(7)处所示。
 
 ##### 使用es6模板字符串语法糖
+
+NornJ模板还有一种使用es6(es2015)提供的模板字符串来描述模板的功能，结构就像这样：
+```js
+nj`
+<slider>
+    this the test slider {msg}.
+    <sliderItem id=test onsliderend={event} />
+</slider>`;
+```
