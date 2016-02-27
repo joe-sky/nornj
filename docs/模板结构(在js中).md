@@ -316,14 +316,14 @@ if,each,else等流程控制块的构建形式与普通模板略有不同，如�
 
 //模板字符串语法糖结构：
 nj`
-<if {refer}>  //if块须要写成一对xml标签
+<if {refer}>  <!--if块须要写成一对xml标签-->
 ...
 </if>`
 
 nj`
-<each {refer}>  //each块须要写成一对xml标签
+<each {refer}>  <!--each块须要写成一对xml标签-->
 ...
-<else />  //else块须要写成一个自闭合xml标签
+<else />  <!--else块须要写成一个自闭合xml标签-->
 ...
 </each>`
 ```
