@@ -280,5 +280,12 @@ nj`
 <slider>
     this the test slider {msg}.
     <sliderItem id=test onsliderend={event} />
-</slider>`;
+</slider>`
+```
+
+但使用es6模板字符串形式构建的模板，实际上是普通模板的语法糖形式，如下所示：
+```js
+nj`
+
+<slider />`
 ```
