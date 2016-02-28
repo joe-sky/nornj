@@ -401,6 +401,35 @@ var tmpl4 = nj`
 es6模板字符串语法糖可以使用es5兼容写法。如果模板需要嵌套，则须要使用${x}的方式来定义替换参数，x为从0开始的整数。如下所示：
 ```html
 <script id="tmpl1" type="text/nornj">
-
+<div>
+    <slider />
+</div>
 </script>
+
+<script id="tmpl2" type="text/nornj">
+<span>
+    <slider />
+</span>
+</script>
+
+<script id="tmpl3" type="text/nornj">
+<section>
+    ${0}
+    <br />
+    ${1}
+</section>
+</script>
+```
+```js
+var tmplStr1 = document.getElementById('tmpl1').innerHTML,
+    tmplStr2 = document.getElementById('tmpl2').innerHTML,
+    tmplStr3 = document.getElementById('tmpl3').innerHTML,
+    tmpl4 = ['<input type=button />'];
+
+var tmpl = nj(
+    tmplStr3,      //第一个参数为html字符串
+    nj(tmplStr1),  //从第二个参数开始为填充模板中的"${x}"占位符，可以使用nj函数返回的模板对象
+    tmplStr2,      //占位符替换参数也可以直接传入字符串
+    tmpl4          //占位符替换参数也可以传入普通模板对象
+);
 ```
