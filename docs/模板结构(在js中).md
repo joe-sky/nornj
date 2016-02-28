@@ -426,10 +426,27 @@ var tmplStr1 = document.getElementById('tmpl1').innerHTML,
     tmplStr3 = document.getElementById('tmpl3').innerHTML,
     tmpl4 = ['<input type=button />'];
 
-var tmpl = nj(
+var tmpl = nj(     //须使用nj函数处理字符串
     tmplStr3,      //第一个参数为html字符串
     nj(tmplStr1),  //从第二个参数开始为填充模板中的"${x}"占位符，可以使用nj函数返回的模板对象
     tmplStr2,      //占位符替换参数也可以直接传入字符串
     tmpl4          //占位符替换参数也可以传入普通模板对象
 );
+
+//编译并执行模板
+var html = nj.compile(tmpl)();
+
+console.log(html);
+/* 输出html:
+<section>
+    <div>
+        <slider />
+    </div>
+    <br />
+    <span>
+        <slider />
+    </span>
+    <input type=button />
+</section>
+*/
 ```
