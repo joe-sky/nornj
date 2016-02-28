@@ -8,6 +8,9 @@ NornJ模板目前分为两种形式：
  * [过滤器](#过滤器)
  * [流程控制块](#流程控制块)
  * [使用es6模板字符串语法糖](#使用es6模板字符串语法糖)
+  * [模板字符串语法糖模板结构](#模板字符串语法糖模板结构)
+  * [模板字符串语法糖与普通模板的不同点](#模板字符串语法糖与普通模板的不同点)
+  * [模板字符串语法糖与普通模板相互嵌套](#模板字符串语法糖与普通模板相互嵌套)
 * [构建在html内的模板](https://github.com/joe-sky/nornj/blob/master/docs/模板结构(在html中).md)
 
 ### 构建在js内的模板
@@ -310,6 +313,17 @@ var tmpl2 = nj`
 <section>
     ${tmpl1}
 </section>`;
+
+//嵌套多个元素：
+var tmpl3 = nj`
+<span>
+    <slider />
+</span>`;
+
+var tmpl4 = nj`
+<section>
+    ${[tmpl2, tmpl3]}
+</section>`;
 ```
 ###### 模板字符串语法糖与普通模板的不同点
 
@@ -353,3 +367,26 @@ nj`<div id=test></div>`
 ```
 
 ###### 模板字符串语法糖与普通模板相互嵌套
+
+举例：
+```js
+var tmpl1 =
+['<div>',
+    ['<slider />'],
+'</div>'];
+
+var tmpl2 = nj`
+<section>
+    ${tmpl1}
+</section>`;
+
+//嵌套多个元素：
+var tmpl3 =
+['<span>',
+    ['<slider />'],
+'</span>'];
+
+var tmpl4 = nj`
+<section>
+    ${[tmpl2, tmpl3]}
+</section>`;
