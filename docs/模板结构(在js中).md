@@ -394,11 +394,12 @@ var tmpl4 = nj`
 <section>
     ${[tmpl1, tmpl3]}
 </section>`;
+```
 
 ###### 模板字符串语法糖的es5兼容写法
 
 es6模板字符串语法糖可以使用es5兼容写法。如果模板需要嵌套，则须要使用${x}的方式来定义替换参数，x为从0开始的整数。如下所示：
-```js
+```html
 <script id="tmpl1" type="text/nornj">
 
 </script>
