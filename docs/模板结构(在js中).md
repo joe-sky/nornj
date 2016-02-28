@@ -384,9 +384,10 @@ var tmpl2 = nj`
 var tmpl3 =
 ['<span>',
     ['<slider />'],
+    tmpl2,
 '</span>'];
 
 var tmpl4 = nj`
 <section>
-    ${[tmpl2, tmpl3]}
+    ${[tmpl1, tmpl3]}
 </section>`;
