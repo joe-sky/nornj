@@ -401,24 +401,24 @@ var tmpl4 = nj`
 es6模板字符串语法糖可以使用es5兼容写法。如果模板需要嵌套，则须要使用${x}的方式来定义替换参数，x为从0开始的整数。如下所示：
 ```html
 <script id="tmpl1" type="text/nornj">
-<div>
-    <slider />
-</div>
+    <div>
+        <slider />
+    </div>
 </script>
 
 <script id="tmpl2" type="text/nornj">
-<span>
-    <slider />
-</span>
+    <span>
+        <slider />
+    </span>
 </script>
 
 <script id="tmpl3" type="text/nornj">
-<section>
-    ${0}
-    <br />
-    ${1}
-    ${2}
-</section>
+    <section>
+        ${0}
+        <br />
+        ${1}
+        ${2}
+    </section>
 </script>
 ```
 ```js
