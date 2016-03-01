@@ -8,7 +8,7 @@ describe('test compile', function () {
             return v * 2;
         });
         nj.registerFilter("filter2", function (v) {
-            console.log(this.data);
+            //console.log(this.data);
             return v + 5;
         });
         nj.registerFilter("filter3", function (v) {

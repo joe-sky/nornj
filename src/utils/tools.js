@@ -163,8 +163,9 @@ function _useFilters(filters, ret, data, parent, index) {
 }
 
 //Get filter param
+var REGEX_FILTER_PARAM = /([\w$]+)(\(([^()]+)\))*/;
 function _getFilterParam(obj) {
-    return /([\w$]+)(\(([^()]+)\))*/.exec(obj);
+    return REGEX_FILTER_PARAM.exec(obj);
 }
 
 //获取data值
@@ -287,12 +288,12 @@ function replaceParams(value, data, newObj, newKey, parent) {
 }
 
 //提取替换参数
+var REGEX_REPLACE_PARAM = /({{1,2})([^"'\s{}]+)}{1,2}/g;
 function getReplaceParam(obj) {
-    var pattern = /({{1,2})([^"'\s{}]+)}{1,2}/g,
-        matchArr,
+    var matchArr,
         ret;
 
-    while ((matchArr = pattern.exec(obj))) {
+    while ((matchArr = REGEX_REPLACE_PARAM.exec(obj))) {
         if (!ret) {
             ret = [];
         }
@@ -303,22 +304,24 @@ function getReplaceParam(obj) {
 }
 
 //提取xml open tag
+var REGEX_XML_OPEN_TAG = /^<([a-z{][-a-z0-9_:.}]*)[^>]*>$/i;
 function getXmlOpenTag(obj) {
-    return /^<([a-z{][-a-z0-9_:.}]*)[^>]*>$/i.exec(obj);
+    return REGEX_XML_OPEN_TAG.exec(obj);
 }
 
 //验证xml self close tag
+var REGEX_XML_SELF_CLOSE_TAG = /^<[^>]+\/>$/i;
 function isXmlSelfCloseTag(obj) {
-    return /^<[^>]+\/>$/i.test(obj);
+    return REGEX_XML_SELF_CLOSE_TAG.test(obj);
 }
 
 //提取xml open tag内参数
+var REGEX_OPEN_TAG_PARAMS = /([^\s=]+)=((['"][^"']+['"])|(['"]?[^"'\s]+['"]?))/g;
 function getOpenTagParams(obj, noXml) {
-    var pattern = /([^\s=]+)=((['"][^"']+['"])|(['"]?[^"'\s]+['"]?))/g,  //如果属性值中有空格,则必须加引号
-        matchArr,
+    var matchArr,
         ret;
 
-    while ((matchArr = pattern.exec(obj))) {
+    while ((matchArr = REGEX_OPEN_TAG_PARAMS.exec(obj))) {
         if (!ret) {
             ret = [];
         }
@@ -348,13 +351,15 @@ function isXmlCloseTag(obj, tagName) {
 }
 
 //提取open tag
+var REGEX_OPEN_TAG = /^[a-z{][-a-z0-9_:.}]*/i;
 function getOpenTag(obj) {
-    return /^[a-z{][-a-z0-9_:.}]*/i.exec(obj);
+    return REGEX_OPEN_TAG.exec(obj);
 }
 
 //验证self close tag
+var REGEX_SELF_CLOSE_TAG = /\/$/i;
 function isSelfCloseTag(obj) {
-    return /\/$/i.test(obj);
+    return REGEX_SELF_CLOSE_TAG.test(obj);
 }
 
 //判断close tag
@@ -363,13 +368,15 @@ function isCloseTag(obj, tagName) {
 }
 
 //get inside brace param
+var REGEX_INSIDE_BRACE_PARAM = /{([^"'\s{}]+)}/i;
 function getInsideBraceParam(obj) {
-    return /{([^"'\s{}]+)}/i.exec(obj);
+    return REGEX_INSIDE_BRACE_PARAM.exec(obj);
 }
 
 //判断流程控制块并返回refer值
+var REGEX_CONTROL = /^\$(if|each|tmpl)/i;
 function isControl(obj) {
-    var ret, ret1 = /^\$(if|each|tmpl)/i.exec(obj);
+    var ret, ret1 = REGEX_CONTROL.exec(obj);
     if (ret1) {
         ret = [ret1[1]];
 
@@ -420,13 +427,13 @@ function getTagComponentName(el) {
 }
 
 //提取style内参数
+var REGEX_STYLE_PARAMS = /([^\s:]+)[\s]?:[\s]?([^\s;]+)[;]?/g;
 function getStyleParams(obj) {
     //参数为字符串
-    var pattern = /([^\s:]+)[\s]?:[\s]?([^\s;]+)[;]?/g,
-        matchArr,
+    var matchArr,
         ret;
 
-    while ((matchArr = pattern.exec(obj))) {
+    while ((matchArr = REGEX_STYLE_PARAMS.exec(obj))) {
         var key = matchArr[1].toLowerCase(),
             value = matchArr[2];
 
@@ -477,8 +484,9 @@ function getTagComponentAttrs(el) {
 }
 
 //判断标签流程控制块
+var REGEX_TAG_CONTROL = /^(if|each|else|tmpl)$/i;
 function isTagControl(obj) {
-    return /^(if|each|else|tmpl)$/i.test(obj);
+    return REGEX_TAG_CONTROL.test(obj);
 }
 
 //获取全部标签组件
