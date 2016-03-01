@@ -6,7 +6,7 @@
 var tmpl =
 ['div',
     'this the test demo {msg}.',
-    ['<input onclick={click} />', { id: 'test' }],
+    ['input onclick={click} /', { id: 'test' }],
 '/div'];
 
 var html = NornJ.compile(tmpl, 'tmpl1')({
