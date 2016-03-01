@@ -259,7 +259,7 @@ var nj = require('../core'),
     tools = require('../utils/tools'),
     REGEX_CLEAR_NOTES = /<!--[\s\S]*?-->/g,
     REGEX_CLEAR_BLANK = />\s+([^\s<]*)\s+</g,
-    REGEX_CHECK_ELEM = /([^>]*)(<([a-z{/$][-a-z0-9_:.{}$]*)[^>]*(\/*)>)([^<]*)/g,
+    REGEX_CHECK_ELEM = /([^>]*)(<([a-z{/$][-a-z0-9_:.{}$]*)[^>]*>)([^<]*)/g,
     REGEX_SPLIT = /\$\{\d+\}/;
 
 //Cache the string template by unique key
@@ -346,8 +346,7 @@ function _checkStringElem(xml, params) {
         var textBefore = matchArr[1],
             elem = matchArr[2],
             elemName = matchArr[3],
-            closeSign = matchArr[4],
-            textAfter = matchArr[5];
+            textAfter = matchArr[4];
 
         //Text before tag
         if (textBefore) {
