@@ -3,7 +3,8 @@
 var nj = require('./core'),
     utils = require('./utils/utils'),
     setComponentEngine = utils.setComponentEngine,
-    compiler = require('./compiler/compile');
+    compiler = require('./compiler/compile'),
+    compileStringTmpl = require('./checkElem/checkStringElem');
 
 nj.setComponentEngine = setComponentEngine;
 nj.compile = compiler.compile;

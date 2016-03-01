@@ -498,6 +498,23 @@ function getTagComponents(el) {
     return el.querySelectorAll("." + nj.tagClassName);
 }
 
+//create a unique key
+function uniqueKey(str) {
+    var hash = 0,
+        i, chr, len;
+    if (str.length == 0) {
+        return str;
+    }
+
+    for (i = 0, len = str.length; i < len; i++) {
+        chr = str.charCodeAt(i);
+        hash = ((hash << 5) - hash) + chr;
+        hash |= 0;
+    }
+
+    return hash;
+}
+
 var tools = {
     isArray: isArray,
     isArrayLike: isArrayLike,
@@ -528,7 +545,8 @@ var tools = {
     getItemParam: getItemParam,
     isTmpl: isTmpl,
     addTmpl: addTmpl,
-    assign: assign
+    assign: assign,
+    uniqueKey: uniqueKey
 };
 assign(tools, escape);
 

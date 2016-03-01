@@ -38,8 +38,6 @@ function registerFilter(name, filter) {
     });
 }
 
-var filter = {
+module.exports = {
     registerFilter: registerFilter
 };
-
-module.exports = filter;

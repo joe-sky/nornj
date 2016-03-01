@@ -15,4 +15,6 @@ function setComponentEngine(name, obj, dom, port, render) {
     nj.componentRender = render;
 }
 
-module.exports = setComponentEngine;
+module.exports = {
+    setComponentEngine: setComponentEngine
+};

@@ -45,7 +45,8 @@ module.exports = Object.assign || function (target, source) {
 var nj = require('./core'),
     utils = require('./utils/utils'),
     setComponentEngine = utils.setComponentEngine,
-    compiler = require('./compiler/compile');
+    compiler = require('./compiler/compile'),
+    compileStringTmpl = require('./checkElem/checkStringElem');
 
 nj.setComponentEngine = setComponentEngine;
 nj.compile = compiler.compile;
@@ -65,7 +66,7 @@ if (typeof React !== "undefined") {
 
 var global = typeof self !== "undefined" ? self : this;
 module.exports = global.NornJ = global.nj = nj;
-},{"./compiler/compile":5,"./core":8,"./utils/utils":14}],3:[function(require,module,exports){
+},{"./checkElem/checkStringElem":4,"./compiler/compile":6,"./core":9,"./utils/utils":15}],3:[function(require,module,exports){
 'use strict';
 
 var nj = require('../core'),
@@ -250,7 +251,165 @@ module.exports = {
     checkElem: checkElem,
     checkTagElem: checkTagElem
 };
-},{"../core":8,"../utils/tools":13,"./checkTagElem":4}],4:[function(require,module,exports){
+},{"../core":9,"../utils/tools":14,"./checkTagElem":5}],4:[function(require,module,exports){
+'use strict';
+
+var nj = require('../core'),
+    tools = require('../utils/tools'),
+    REGEX_CLEAR_NOTES = /<!--[\s\S]*?-->/g,
+    REGEX_CLEAR_BLANK = />\s+([^\s<]*)\s+</g,
+    REGEX_CHECK_ELEM = /([^>]*)(<([a-z{/$][-a-z0-9_:.{}$]*)[^>/]*(\/*)>)([^<]*)/g,
+    REGEX_SPLIT = /\$\{\d+\}/;
+
+//Cache the string template by unique key
+nj.strTmpls = {};
+
+//Compile string template
+function compileStringTmpl(tmpl) {
+    var isStr = tools.isString(tmpl),
+        tmplKey;
+
+    //Get unique key
+    if (isStr) {
+        tmplKey = tools.uniqueKey(tmpl);
+    }
+    else {
+        var fullStr = '';
+        tools.each(tmpl, function (xml) {
+            fullStr += xml;
+        });
+
+        tmplKey = tools.uniqueKey(fullStr);
+    }
+
+    //If the cache already has template data,then return the template
+    var ret = nj.strTmpls[tmplKey];
+    if (ret) {
+        return ret;
+    }
+
+    var xmls = tmpl,
+        args = arguments,
+        splitNo = 0,
+        params = [];
+
+    ret = '';
+    if (isStr) {
+        xmls = tmpl.split(REGEX_SPLIT);
+    }
+
+    //Connection xml string
+    var l = xmls.length;
+    tools.each(xmls, function (xml, i) {
+        var split = '';
+        if(i < l.length - 1) {
+            var arg = args[i + 1];
+            if(tools.isString(arg)) {
+                split = arg;
+            }
+            else {
+                split = '<nj-split_' + i + ' />';
+                params.push(arg);
+            }
+        }
+
+        ret += xml + split;
+    });
+
+    //Resolve string to element
+    ret = _checkStringElem(ret, params);
+
+    //Save to the cache
+    nj.strTmpls[tmplKey] = ret;
+    return ret;
+}
+
+//Resolve string to element
+function _checkStringElem(xml, params) {
+    var root = [],
+        current = {
+            elem: root,
+            elemName: 'root',
+            parent: null
+        },
+        parent = null,
+        matchArr;
+
+    while ((matchArr = REGEX_CHECK_ELEM.exec(xml))) {
+        var textBefore = matchArr[1],
+            elem = matchArr[2],
+            elemName = matchArr[3],
+            closeSign = matchArr[4],
+            textAfter = matchArr[5];
+
+        //标签前文本
+        if (textBefore) {
+            if (/\s/.test(textBefore[textBefore.length - 1])) {
+                textBefore = _formatText(textBefore);
+            }
+            current.elem.push(textBefore);
+        }
+
+        //标签
+        if (elem) {
+            if (elemName[0] === '/') {  //结束标签
+                if (elemName === '/' + current.elemName) {
+                    current = current.parent;
+                }
+            }
+            else if (closeSign) {  //自闭合标签
+                current.elem.push(_getSelfCloseElem(elem, elemName, params));
+            }
+            else {  //开始标签
+                parent = current;
+                current = {
+                    elem: [],
+                    elemName: elemName,
+                    parent: parent
+                };
+
+                parent.elem.push(current.elem);
+                current.elem.push(getElem(elem, elemName));
+            }
+        }
+
+        //标签后文本
+        if (textAfter) {
+            if (/\s/.test(textAfter[0])) {
+                textAfter = _formatText(textAfter);
+            }
+            current.elem.push(textAfter);
+        }
+    }
+}
+
+function _formatText(str) {
+    return str.replace(/\n/g, '').trim();
+}
+
+function _getElem(elem, elemName) {
+    switch (elemName) {
+        case '$if':
+        case '$each':
+            return elem.substring(1, elem.length - 1);
+        default:
+            return elem;
+    }
+}
+
+//Get self close element
+function _getSelfCloseElem(elem, elemName, params) {
+    if (elemName.indexOf('nj-split') >= 0) {
+        return params[elemName.split('_')[1]];
+    }
+    else {
+        var ret = _getElem(elem, elemName);
+        return elemName === '$else' ? elem.substr(1, 5) : [ret];
+    }
+}
+
+module.exports = compileStringTmpl;
+},{"../core":9,"../utils/tools":14}],5:[function(require,module,exports){
 'use strict';
 
 var nj = require('../core'),
@@ -343,7 +502,7 @@ function checkTagContentElem(obj, parent) {
 }
 
 module.exports = checkTagElem;
-},{"../core":8,"../utils/tools":13}],5:[function(require,module,exports){
+},{"../core":9,"../utils/tools":14}],6:[function(require,module,exports){
 'use strict';
 
 var nj = require('../core'),
@@ -426,7 +585,7 @@ module.exports = {
     compileTagComponent: compileTagComponent,
     renderTagComponent: renderTagComponent
 };
-},{"../core":8,"../utils/utils":14,"./transformToComponent":6,"./transformToString":7}],6:[function(require,module,exports){
+},{"../core":9,"../utils/utils":15,"./transformToComponent":7,"./transformToString":8}],7:[function(require,module,exports){
 'use strict';
 
 var nj = require('../core'),
@@ -517,7 +676,7 @@ module.exports = {
     transformToComponent: transformToComponent,
     transformContentToComponent: transformContentToComponent
 };
-},{"../core":8,"../utils/utils":14}],7:[function(require,module,exports){
+},{"../core":9,"../utils/utils":15}],8:[function(require,module,exports){
 'use strict';
 
 var utils = require('../utils/utils');
@@ -601,7 +760,7 @@ module.exports = {
     transformToString: transformToString,
     transformContentToString: transformContentToString
 };
-},{"../utils/utils":14}],8:[function(require,module,exports){
+},{"../utils/utils":15}],9:[function(require,module,exports){
 'use strict';
 
 var nj = {
@@ -619,7 +778,7 @@ var nj = {
 };
 
 module.exports = nj;
-},{}],9:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 'use strict';
 
 var ESCAPE_LOOKUP = {
@@ -652,7 +811,7 @@ module.exports = {
     escape: _escape(ESCAPE_REGEX, ESCAPE_LOOKUP),
     escapeBrackets: _escape(ESCAPE_REGEX_BRACKETS, ESCAPE_LOOKUP_BRACKETS)
 };
-},{}],10:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 'use strict';
 
 var nj = require('../core'),
@@ -693,12 +852,10 @@ function registerFilter(name, filter) {
     });
 }
 
-var filter = {
+module.exports = {
     registerFilter: registerFilter
 };
-
-module.exports = filter;
-},{"../core":8,"./tools":13}],11:[function(require,module,exports){
+},{"../core":9,"./tools":14}],12:[function(require,module,exports){
 'use strict';
 
 var nj = require('../core'),
@@ -744,7 +901,7 @@ module.exports = {
     registerTagNamespace: registerTagNamespace,
     createTagNamespace: createTagNamespace
 };
-},{"../core":8,"./tools":13}],12:[function(require,module,exports){
+},{"../core":9,"./tools":14}],13:[function(require,module,exports){
 'use strict';
 
 var nj = require('../core');
@@ -762,8 +919,10 @@ function setComponentEngine(name, obj, dom, port, render) {
     nj.componentRender = render;
 }
 
-module.exports = setComponentEngine;
-},{"../core":8}],13:[function(require,module,exports){
+module.exports = {
+    setComponentEngine: setComponentEngine
+};
+},{"../core":9}],14:[function(require,module,exports){
 'use strict';
 
 var nj = require('../core'),
@@ -1264,6 +1423,23 @@ function getTagComponents(el) {
     return el.querySelectorAll("." + nj.tagClassName);
 }
 
+//create a unique key
+function uniqueKey(str) {
+    var hash = 0,
+        i, chr, len;
+    if (str.length == 0) {
+        return str;
+    }
+
+    for (i = 0, len = str.length; i < len; i++) {
+        chr = str.charCodeAt(i);
+        hash = ((hash << 5) - hash) + chr;
+        hash |= 0;
+    }
+
+    return hash;
+}
+
 var tools = {
     isArray: isArray,
     isArrayLike: isArrayLike,
@@ -1294,7 +1470,8 @@ var tools = {
     getItemParam: getItemParam,
     isTmpl: isTmpl,
     addTmpl: addTmpl,
-    assign: assign
+    assign: assign,
+    uniqueKey: uniqueKey
 };
 assign(tools, escape);
 
@@ -1309,25 +1486,22 @@ nj.trim = trim;
 nj.assign = assign;
 
 module.exports = tools;
-},{"../core":8,"./escape":9,"object-assign":1}],14:[function(require,module,exports){
+},{"../core":9,"./escape":10,"object-assign":1}],15:[function(require,module,exports){
 'use strict';
 
-var checkElem = require('../checkElem/checkElem'),
-    tools = require('./tools'),
+var tools = require('./tools'),
+    checkElem = require('../checkElem/checkElem'),
+    setComponentEngine = require('./setComponentEngine'),
     registerComponent = require('./registerComponent'),
     filter = require('./filter');
 
-var utils = {
-    checkElem: checkElem.checkElem,
-    checkTagElem: checkElem.checkTagElem,
-    setComponentEngine: require('./setComponentEngine'),
-    registerComponent: registerComponent.registerComponent,
-    registerTagNamespace: registerComponent.registerTagNamespace,
-    createTagNamespace: registerComponent.createTagNamespace,
-    registerFilter: filter.registerFilter
-};
-tools.assign(utils, tools);
-
-module.exports = utils;
-},{"../checkElem/checkElem":3,"./filter":10,"./registerComponent":11,"./setComponentEngine":12,"./tools":13}]},{},[2])(2)
+module.exports = tools.assign(
+    {},
+    checkElem,
+    setComponentEngine,
+    registerComponent,
+    filter,
+    tools
+);
+},{"../checkElem/checkElem":3,"./filter":11,"./registerComponent":12,"./setComponentEngine":13,"./tools":14}]},{},[2])(2)
 });
