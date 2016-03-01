@@ -500,12 +500,13 @@ function getTagComponents(el) {
 
 //create a unique key
 function uniqueKey(str) {
-    var hash = 0,
-        i, chr, len;
-    if (str.length == 0) {
+    str = str.trim();
+    var len = str.length;
+    if (len == 0) {
         return str;
     }
 
+    var hash = 0, i, chr;
     for (i = 0, len = str.length; i < len; i++) {
         chr = str.charCodeAt(i);
         hash = ((hash << 5) - hash) + chr;

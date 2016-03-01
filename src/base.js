@@ -13,6 +13,7 @@ nj.compileTagComponent = compiler.compileTagComponent;
 nj.renderTagComponent = compiler.renderTagComponent;
 nj.registerComponent = utils.registerComponent;
 nj.registerFilter = utils.registerFilter;
+nj.compileStringTmpl = compileStringTmpl;
 
 //创建标签命名空间
 utils.createTagNamespace();

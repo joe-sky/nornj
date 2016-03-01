@@ -1,17 +1,19 @@
 ﻿'use strict';
 
-var nj = {
-    componentLib: null,
-    componentLibObj: null,
-    componentLibDom: null,
-    componentPort: null,
-    componentRender: null,
-    componentClasses: {},
-    tagNamespace: "nj",
-    tagId: "nj-id",
-    tagStyle: "nj-style",
-    tagClassName: "nj-component",
-    templates: {}
-};
+function nj() {
+    return nj.compileStringTmpl.apply(null, arguments);
+}
+
+nj.componentLib = null;
+nj.componentLibObj = null;
+nj.componentLibDom = null;
+nj.componentPort = null;
+nj.componentRender = null;
+nj.componentClasses = {};
+nj.tagNamespace = "nj";
+nj.tagId = "nj-id";
+nj.tagStyle = "nj-style";
+nj.tagClassName = "nj-component";
+nj.templates = {};
 
 module.exports = nj;

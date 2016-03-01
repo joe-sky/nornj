@@ -55,6 +55,7 @@ nj.compileTagComponent = compiler.compileTagComponent;
 nj.renderTagComponent = compiler.renderTagComponent;
 nj.registerComponent = utils.registerComponent;
 nj.registerFilter = utils.registerFilter;
+nj.compileStringTmpl = compileStringTmpl;
 
 //创建标签命名空间
 utils.createTagNamespace();
@@ -258,7 +259,7 @@ var nj = require('../core'),
     tools = require('../utils/tools'),
     REGEX_CLEAR_NOTES = /<!--[\s\S]*?-->/g,
     REGEX_CLEAR_BLANK = />\s+([^\s<]*)\s+</g,
-    REGEX_CHECK_ELEM = /([^>]*)(<([a-z{/$][-a-z0-9_:.{}$]*)[^>/]*(\/*)>)([^<]*)/g,
+    REGEX_CHECK_ELEM = /([^>]*)(<([a-z{/$][-a-z0-9_:.{}$]*)[^>]*(\/*)>)([^<]*)/g,
     REGEX_SPLIT = /\$\{\d+\}/;
 
 //Cache the string template by unique key
@@ -271,12 +272,17 @@ function compileStringTmpl(tmpl) {
 
     //Get unique key
     if (isStr) {
+        tmpl = _clearNotesAndBlank(tmpl);
         tmplKey = tools.uniqueKey(tmpl);
     }
     else {
-        var fullStr = '';
-        tools.each(tmpl, function (xml) {
-            fullStr += xml;
+        var fullStr = '',
+            str;
+
+        tmpl = tmpl.map(function (xml) {
+            str = _clearNotesAndBlank(xml);
+            fullStr += str;
+            return str;
         });
 
         tmplKey = tools.uniqueKey(fullStr);
@@ -302,7 +308,7 @@ function compileStringTmpl(tmpl) {
     var l = xmls.length;
     tools.each(xmls, function (xml, i) {
         var split = '';
-        if(i < l.length - 1) {
+        if(i < l - 1) {
             var arg = args[i + 1];
             if(tools.isString(arg)) {
                 split = arg;
@@ -335,6 +341,7 @@ function _checkStringElem(xml, params) {
         parent = null,
         matchArr;
 
+    xml = xml.trim();
     while ((matchArr = REGEX_CHECK_ELEM.exec(xml))) {
         var textBefore = matchArr[1],
             elem = matchArr[2],
@@ -342,7 +349,7 @@ function _checkStringElem(xml, params) {
             closeSign = matchArr[4],
             textAfter = matchArr[5];
 
-        //标签前文本
+        //Text before tag
         if (textBefore) {
             if (/\s/.test(textBefore[textBefore.length - 1])) {
                 textBefore = _formatText(textBefore);
@@ -350,17 +357,17 @@ function _checkStringElem(xml, params) {
             current.elem.push(textBefore);
         }
 
-        //标签
+        //Element tag
         if (elem) {
-            if (elemName[0] === '/') {  //结束标签
+            if (elemName[0] === '/') {  //Close tag
                 if (elemName === '/' + current.elemName) {
                     current = current.parent;
                 }
             }
-            else if (closeSign) {  //自闭合标签
+            else if (elem[elem.length - 2] === '/') {  //Self close tag
                 current.elem.push(_getSelfCloseElem(elem, elemName, params));
             }
-            else {  //开始标签
+            else {  //Open tag
                 parent = current;
                 current = {
                     elem: [],
@@ -369,11 +376,11 @@ function _checkStringElem(xml, params) {
                 };
 
                 parent.elem.push(current.elem);
-                current.elem.push(getElem(elem, elemName));
+                current.elem.push(_getElem(elem, elemName));
             }
         }
 
-        //标签后文本
+        //Text after tag
         if (textAfter) {
             if (/\s/.test(textAfter[0])) {
                 textAfter = _formatText(textAfter);
@@ -381,6 +388,12 @@ function _checkStringElem(xml, params) {
             current.elem.push(textAfter);
         }
     }
+
+    return root;
+}
+
+function _clearNotesAndBlank(str) {
+    return str.replace(REGEX_CLEAR_NOTES, '').replace(REGEX_CLEAR_BLANK, '>$1<');
 }
 
 function _formatText(str) {
@@ -763,19 +776,21 @@ module.exports = {
 },{"../utils/utils":15}],9:[function(require,module,exports){
 'use strict';
 
-var nj = {
-    componentLib: null,
-    componentLibObj: null,
-    componentLibDom: null,
-    componentPort: null,
-    componentRender: null,
-    componentClasses: {},
-    tagNamespace: "nj",
-    tagId: "nj-id",
-    tagStyle: "nj-style",
-    tagClassName: "nj-component",
-    templates: {}
-};
+function nj() {
+    return nj.compileStringTmpl.apply(null, arguments);
+}
+
+nj.componentLib = null;
+nj.componentLibObj = null;
+nj.componentLibDom = null;
+nj.componentPort = null;
+nj.componentRender = null;
+nj.componentClasses = {};
+nj.tagNamespace = "nj";
+nj.tagId = "nj-id";
+nj.tagStyle = "nj-style";
+nj.tagClassName = "nj-component";
+nj.templates = {};
 
 module.exports = nj;
 },{}],10:[function(require,module,exports){
@@ -1425,12 +1440,13 @@ function getTagComponents(el) {
 
 //create a unique key
 function uniqueKey(str) {
-    var hash = 0,
-        i, chr, len;
-    if (str.length == 0) {
+    str = str.trim();
+    var len = str.length;
+    if (len == 0) {
         return str;
     }
 
+    var hash = 0, i, chr;
     for (i = 0, len = str.length; i < len; i++) {
         chr = str.charCodeAt(i);
         hash = ((hash << 5) - hash) + chr;

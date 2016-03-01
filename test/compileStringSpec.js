@@ -1,7 +1,6 @@
 ﻿var nj = require("../src/base"),
     utils = require("../src/utils/utils"),
-    compile = require("../src/compiler/compile").compile,
-    compileStringTmpl = require("../src/checkElem/checkStringElem");
+    compile = require("../src/compiler/compile").compile;
 
 describe('test compile string', function () {
     beforeAll(function () {
@@ -20,36 +19,41 @@ describe('test compile string', function () {
         it('test compile 1', function () {
             var data = {
                 name: "joe_sky",
-                id: "joe",
+                id: 100,
                 test0: true
             };
 
-            //var tmpl =
-            //["<div name1=../111>", { name: "my name:{name},id:{id},name:{name}", id: "test1" },
-            //    ["<span>", "sky:{name},{id}"],
-            //    ["span1", "joe", "/span1"],
-            //    ["div id=555", [
-            //        ["<a />"],
-            //        ["input type=button /"],
-            //        ['$if key={test0}',
-            //            ['input id="test5" /']
-            //        ]
-            //    ], "/div"]
-            //];
+            var tmpl1 =
+            ['div name1=../111', { name: "my name:{name},id:{id},name:{name}", id: "test1" },
+                ["span",
+                    'sky:{name},{id}',
+                '/span'],
+                ['span1',
+                    'joe',
+                '/span1'],
+                ['div id=555',
+                    ['a /'],
+                    [
+                        ['input type=button /'],
+                        ['$if key={test0}',
+                            ['input id="test5" /'],
+                        '/$if']
+                    ],
+                '/div'],
+            '/div'];
 
-            var tmpl =
+            var tmpl2 =
             [
-                '<div name1=111>',
+                '<div name1=../111>',
                     '<span>',
                         '<img />',
-                        'sky:{name},{id}',
+                        'sky:{name},{id:filter2}',
+                        '${0}',
                     '</span>',
                 '</div>'
             ].join('');
-
-            //console.log(compileStringTmpl(tmpl));
-
-            var tmplFn = compile(compileStringTmpl(tmpl)),
+            
+            var tmplFn = compile(nj(tmpl2, tmpl1)),
                 html = tmplFn(data);
 
             console.log(html);
