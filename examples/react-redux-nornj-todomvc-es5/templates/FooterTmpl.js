@@ -5,12 +5,14 @@
         ['$if {filter:isCurrent}',
             '{name}',
         '$else',
-            ['<a href=# data-filter={filter} onClick={filterChange}>', '{name}']
-        ],
+            ['a href=# data-filter={filter} onClick={filterChange}',
+                '{name}',
+            '/a'],
+        '/$if'],
         ['$if {name:isActive}',
             '.',
         '$else',
-            ', '
-        ]
-    ],
+            ', ',
+        '/$if'],
+    '/$each'],
 '/p'];
