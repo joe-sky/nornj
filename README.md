@@ -19,7 +19,7 @@ var tmpl = nj`
 ```
 然后可以这样编译后输出html字符串：
 ```js
-var html = NornJ.compile(tmpl, 'tmpl1')({
+var html = nj.compile(tmpl, 'tmpl1')({
     msg: 'Hello world!',
     click: "alert('test')"
 });
