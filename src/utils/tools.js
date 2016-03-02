@@ -274,7 +274,12 @@ function replaceParams(value, data, newObj, newKey, parent) {
                 value = dataProp;
             }
             else {  //逐个替换占位符
-                value = value.replace(new RegExp(escape.escapeBrackets(placeholder), "ig"), dataProp);
+                try {
+                    value = value.replace(new RegExp(escape.escapeBrackets(placeholder), "ig"), dataProp);
+                }
+                catch (ex) {
+                    console.error('Replace parameter error:' + ex.message);
+                }
             }
         });
     }
@@ -500,7 +505,6 @@ function getTagComponents(el) {
 
 //create a unique key
 function uniqueKey(str) {
-    str = str.trim();
     var len = str.length;
     if (len == 0) {
         return str;

@@ -20,9 +20,11 @@ describe('test compile string', function () {
             var data = {
                 name: "joe_sky",
                 id: 100,
-                test0: true
+                test0: true,
+                list: [0, 1, 2]
             };
 
+            //normal template
             var tmpl1 =
             ['div name1=../111', { name: "my name:{name},id:{id},name:{name}", id: "test1" },
                 ["span",
@@ -42,6 +44,7 @@ describe('test compile string', function () {
                 '/div'],
             '/div'];
 
+            //string template by es5
             var tmpl2 =
             [
                 '<div name1=../111>',
@@ -52,8 +55,32 @@ describe('test compile string', function () {
                     '</span>',
                 '</div>'
             ].join('');
+
+            //string template by es6
+            var tmpl3 = nj`
+            <div name=test1>
+                test2
+                <span>
+                    ${tmpl2}
+                    <img />
+                    sky:{name},{id:filter2}
+                    ${
+                        ['section',
+                            tmpl1,
+                        '/section']
+                    }
+                    <input type=button />
+                    ${nj`
+                        <$each {list}>
+                            <slider>
+                                <sliderItem no={.} />
+                            </slider>
+                        </$each>
+                    `}
+                </span>
+            </div>`;
             
-            var tmplFn = compile(nj(tmpl2, tmpl1)),
+            var tmplFn = compile(tmpl3, 'tmplEs6'),
                 html = tmplFn(data);
 
             console.log(html);

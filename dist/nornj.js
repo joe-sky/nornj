@@ -276,16 +276,12 @@ function compileStringTmpl(tmpl) {
         tmplKey = tools.uniqueKey(tmpl);
     }
     else {
-        var fullStr = '',
-            str;
-
-        tmpl = tmpl.map(function (xml) {
-            str = _clearNotesAndBlank(xml);
-            fullStr += str;
-            return str;
+        var fullXml = '';
+        tools.each(tmpl, function (xml) {
+            fullXml += xml;
         });
 
-        tmplKey = tools.uniqueKey(fullStr);
+        tmplKey = tools.uniqueKey(_clearNotesAndBlank(fullXml));
     }
 
     //If the cache already has template data,then return the template
@@ -314,8 +310,9 @@ function compileStringTmpl(tmpl) {
                 split = arg;
             }
             else {
-                split = '<nj-split_' + i + ' />';
+                split = '<nj-split_' + splitNo + ' />';
                 params.push(arg);
+                splitNo++;
             }
         }
 
@@ -323,7 +320,7 @@ function compileStringTmpl(tmpl) {
     });
 
     //Resolve string to element
-    ret = _checkStringElem(ret, params);
+    ret = _checkStringElem(isStr ? ret : _clearNotesAndBlank(ret), params);
 
     //Save to the cache
     nj.strTmpls[tmplKey] = ret;
@@ -341,7 +338,6 @@ function _checkStringElem(xml, params) {
         parent = null,
         matchArr;
 
-    xml = xml.trim();
     while ((matchArr = REGEX_CHECK_ELEM.exec(xml))) {
         var textBefore = matchArr[1],
             elem = matchArr[2],
@@ -392,7 +388,7 @@ function _checkStringElem(xml, params) {
 }
 
 function _clearNotesAndBlank(str) {
-    return str.replace(REGEX_CLEAR_NOTES, '').replace(REGEX_CLEAR_BLANK, '>$1<');
+    return str.replace(REGEX_CLEAR_NOTES, '').replace(REGEX_CLEAR_BLANK, '>$1<').trim();
 }
 
 function _formatText(str) {
@@ -415,12 +411,12 @@ function _getSelfCloseElem(elem, elemName, params) {
         return params[elemName.split('_')[1]];
     }
     else {
-        var ret = _getElem(elem, elemName);
-        return elemName === '$else' ? elem.substr(1, 5) : [ret];
+        return elemName === '$else' ? elem.substr(1, 5) : [_getElem(elem, elemName)];
     }
 }
 
 module.exports = compileStringTmpl;
+
 },{"../core":9,"../utils/tools":14}],5:[function(require,module,exports){
 'use strict';
 
@@ -1213,7 +1209,12 @@ function replaceParams(value, data, newObj, newKey, parent) {
                 value = dataProp;
             }
             else {  //逐个替换占位符
-                value = value.replace(new RegExp(escape.escapeBrackets(placeholder), "ig"), dataProp);
+                try {
+                    value = value.replace(new RegExp(escape.escapeBrackets(placeholder), "ig"), dataProp);
+                }
+                catch (ex) {
+                    console.error('Replace parameter error:' + ex.message);
+                }
             }
         });
     }
@@ -1439,7 +1440,6 @@ function getTagComponents(el) {
 
 //create a unique key
 function uniqueKey(str) {
-    str = str.trim();
     var len = str.length;
     if (len == 0) {
         return str;

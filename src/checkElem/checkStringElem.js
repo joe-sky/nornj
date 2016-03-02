@@ -21,16 +21,12 @@ function compileStringTmpl(tmpl) {
         tmplKey = tools.uniqueKey(tmpl);
     }
     else {
-        var fullStr = '',
-            str;
-
-        tmpl = tmpl.map(function (xml) {
-            str = _clearNotesAndBlank(xml);
-            fullStr += str;
-            return str;
+        var fullXml = '';
+        tools.each(tmpl, function (xml) {
+            fullXml += xml;
         });
 
-        tmplKey = tools.uniqueKey(fullStr);
+        tmplKey = tools.uniqueKey(_clearNotesAndBlank(fullXml));
     }
 
     //If the cache already has template data,then return the template
@@ -59,8 +55,9 @@ function compileStringTmpl(tmpl) {
                 split = arg;
             }
             else {
-                split = '<nj-split_' + i + ' />';
+                split = '<nj-split_' + splitNo + ' />';
                 params.push(arg);
+                splitNo++;
             }
         }
 
@@ -68,7 +65,7 @@ function compileStringTmpl(tmpl) {
     });
 
     //Resolve string to element
-    ret = _checkStringElem(ret, params);
+    ret = _checkStringElem(isStr ? ret : _clearNotesAndBlank(ret), params);
 
     //Save to the cache
     nj.strTmpls[tmplKey] = ret;
@@ -86,7 +83,6 @@ function _checkStringElem(xml, params) {
         parent = null,
         matchArr;
 
-    xml = xml.trim();
     while ((matchArr = REGEX_CHECK_ELEM.exec(xml))) {
         var textBefore = matchArr[1],
             elem = matchArr[2],
@@ -137,7 +133,7 @@ function _checkStringElem(xml, params) {
 }
 
 function _clearNotesAndBlank(str) {
-    return str.replace(REGEX_CLEAR_NOTES, '').replace(REGEX_CLEAR_BLANK, '>$1<');
+    return str.replace(REGEX_CLEAR_NOTES, '').replace(REGEX_CLEAR_BLANK, '>$1<').trim();
 }
 
 function _formatText(str) {
