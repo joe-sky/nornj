@@ -160,8 +160,7 @@ function _getSelfCloseElem(elem, elemName, params) {
         return params[elemName.split('_')[1]];
     }
     else {
-        var ret = _getElem(elem, elemName);
-        return elemName === '$else' ? elem.substr(1, 5) : [ret];
+        return elemName === '$else' ? elem.substr(1, 5) : [_getElem(elem, elemName)];
     }
 }
 
