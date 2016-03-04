@@ -24,6 +24,7 @@ describe('test convert template', function () {
             utils.checkElem(tmpl, root);
 
             console.log(root.content);
+            
             expect(root).toBeTruthy();
         });    
 });
