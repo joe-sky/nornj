@@ -25,6 +25,7 @@ describe('test convert template', function () {
 
             console.log(root.content);
             
+            
             expect(root).toBeTruthy();
         });    
 });
