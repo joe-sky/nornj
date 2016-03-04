@@ -1362,6 +1362,9 @@ function getTagComponentName(el) {
     if (tagName.indexOf(namespace + ":") === 0) {
         tagName = tagName.split(":")[1];
     }
+    else if(tagName.indexOf(namespace + "-") === 0) {
+        tagName = tagName.split("-")[1];
+    }
 
     return tagName;
 }

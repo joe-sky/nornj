@@ -2,7 +2,7 @@ var nj = require("../src/base"),
     utils = require("../src/utils/utils");
 
 describe('test convert template', function () {
-	it('test convert 1', function () {
+	xit('test convert 1', function () {
             var tmpl =
             ["<div name1=../111>", { name: "my name:fanyj,id:1231,name:name", id: "test1" },
                 ["<span>", "sky:name,id"],

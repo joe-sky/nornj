@@ -15,7 +15,7 @@ var tmpl = nj`
 <div>
     this the test demo Hello {msg}
     <input id=test onclick={click} />
-</div>`
+</div>`;
 ```
 然后可以这样编译后输出html字符串：
 ```js
