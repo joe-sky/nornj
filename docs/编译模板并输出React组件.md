@@ -52,6 +52,9 @@ var TestComponent = React.createClass({
     }
 });
 
+//在NornJ全局注册组件
+nj.registerComponent('TestComponent', TestComponent);
+
 //使用renderToStaticMarkup方法输出html
 var html = ReactDOMServer.renderToStaticMarkup(nj.compileComponent(['TestComponent no=100 /'], 'tmpl2')());
 
