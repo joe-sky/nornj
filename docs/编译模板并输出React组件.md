@@ -52,16 +52,17 @@ var TestComponent = React.createClass({
     }
 });
 
-//在NornJ全局注册组件
+//注册NornJ模板组件
 nj.registerComponent('TestComponent', TestComponent);
 
+//输出React组件
+var comp = nj.compileComponent(
+   ['TestComponent no=100 /'],
+   'tmpl2'
+)();
+
 //使用renderToStaticMarkup方法输出html
-var html = ReactDOMServer.renderToStaticMarkup(
-    nj.compileComponent(
-        ['TestComponent no=100 /'],
-        'tmpl2'
-    )()
-);
+var html = ReactDOMServer.renderToStaticMarkup(comp);
 
 /* the es6+ way */
 import Component from 'react';
