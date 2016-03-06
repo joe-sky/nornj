@@ -28,8 +28,9 @@ var tmplFn = nj.compileComponent(tmpl, 'tmpl1');
 
 ### 执行组件模板函数并输出React组件
 
-举例(es5)：
+举例：
 ```js
+/* es5 */
 var React = require("react"),
     ReactDOM = require("react-dom"),
     ReactDOMServer = require("react-dom/server");
@@ -62,6 +63,8 @@ var html = ReactDOMServer.renderToStaticMarkup(
         'tmpl2'
     )()
 );
+
+/* es6 */
 
 console.log(html);
 /*输出html:
