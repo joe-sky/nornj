@@ -28,7 +28,7 @@ var tmplFn = nj.compileComponent(tmpl, 'tmpl1');
 
 ### 执行组件模板函数并输出React组件
 
-举例：
+举例(es5)：
 ```js
 var React = require("react"),
     ReactDOM = require("react-dom"),
@@ -56,7 +56,12 @@ var TestComponent = React.createClass({
 nj.registerComponent('TestComponent', TestComponent);
 
 //使用renderToStaticMarkup方法输出html
-var html = ReactDOMServer.renderToStaticMarkup(nj.compileComponent(['TestComponent no=100 /'], 'tmpl2')());
+var html = ReactDOMServer.renderToStaticMarkup(
+    nj.compileComponent(
+        ['TestComponent no=100 /'],
+        'tmpl2'
+    )()
+);
 
 console.log(html);
 /*输出html:
