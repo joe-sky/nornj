@@ -52,8 +52,8 @@ var TestComponent = React.createClass({
     }
 });
 
-//输出html
-var html = ReactDOMServer(nj.compileComponent(['TestComponent no=100 /'], 'tmpl2')());
+//使用renderToStaticMarkup方法输出html
+var html = ReactDOMServer.renderToStaticMarkup(nj.compileComponent(['TestComponent no=100 /'], 'tmpl2')());
 
 console.log(html);
 /*输出html:
@@ -64,7 +64,7 @@ console.log(html);
 */
 ```
 
-1. 模板函数只有一个参数，值为json格式的数据。模板中和传入数据中对应的值会自动进行相应替换，最后输出结果为替换后的html字符串。
+1. 模板函数只有一个参数，值为json格式的数据。模板中和传入数据中对应的值会自动进行相应替换，最后输出结果为替换后的React组件。
 2. 模板函数的参数也可以传入1个任意长度的数组，如下所示：
 ```js
 //定义模板
