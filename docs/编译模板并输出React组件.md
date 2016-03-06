@@ -30,6 +30,10 @@ var tmplFn = nj.compileComponent(tmpl, 'tmpl1');
 
 举例：
 ```js
+var React = require("react"),
+    ReactDOM = require("react-dom"),
+    ReactDOMServer = require("react-dom/server");
+
 //定义模板
 var tmpl =
 ['div id=test1',
@@ -37,13 +41,19 @@ var tmpl =
     ['<i>', 'test{no}'],
 '/div'];
 
-//编译为组件模板函数
-var tmplFn = nj.compileComponent(tmpl, 'tmpl1');
+//定义组件
+var TestComponent = React.createClass({
+    //编译为组件模板函数
+    template: nj.compileComponent(tmpl, 'tmpl1'),
+    render: function() {
+        return this.template({
+            no: this.props.no
+        });
+    }
+});
 
 //输出html
-var html = tmplFn({
-    no: 100
-});
+var html = ReactDOMServer(nj.compileComponent(['TestComponent no=100 /'], 'tmpl2')());
 
 console.log(html);
 /*输出html:
