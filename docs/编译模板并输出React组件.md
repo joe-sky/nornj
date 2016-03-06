@@ -30,9 +30,8 @@ var tmplFn = nj.compileComponent(tmpl, 'tmpl1');
 
 举例：
 ```js
-/* es5 */
+/* the es5 way */
 var React = require("react"),
-    ReactDOM = require("react-dom"),
     ReactDOMServer = require("react-dom/server");
 
 //定义模板
@@ -64,7 +63,16 @@ var html = ReactDOMServer.renderToStaticMarkup(
     )()
 );
 
-/* es6 */
+/* the es6+ way */
+import Component from 'react';
+import renderToStaticMarkup from 'react-dom/server';
+
+//定义模板
+let tmpl = nj`
+<div id=test1>
+    this the test demo{no}.
+    <i>test{no}</i>
+</div>`;
 
 console.log(html);
 /*输出html:
