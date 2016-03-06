@@ -75,6 +75,30 @@ let tmpl = nj`
     <i>test{no}</i>
 </div>`;
 
+//编译为组件模板函数
+let template = nj.compileComponent(tmpl, 'tmpl1');
+
+//定义组件
+class TestComponent extends Component {
+    render() {
+        return template({
+            no: this.props.no
+        });
+    }
+}
+
+//注册NornJ模板组件
+nj.registerComponent('TestComponent', TestComponent);
+
+//输出React组件
+let comp = nj.compileComponent(
+   nj`<TestComponent no=100 />`,
+   'tmpl2'
+)();
+
+//使用renderToStaticMarkup方法输出html
+let html = renderToStaticMarkup(comp);
+
 console.log(html);
 /*输出html:
 <div id="test1">
