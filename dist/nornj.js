@@ -597,7 +597,8 @@ module.exports = {
 'use strict';
 
 var nj = require('../core'),
-    utils = require('../utils/utils');
+    utils = require('../utils/utils'),
+    arrayPush = Array.prototype.push;
 
 //转换节点为组件节点
 function transformToComponent(obj, data, parent) {
@@ -651,11 +652,13 @@ function transformToComponent(obj, data, parent) {
             }
         }
 
+        //Make React.createElement's parameters
+        var params = [type,                                                               //组件名
+            utils.transformParamsToObj(obj.params, data, parent)];                        //参数
+        arrayPush.apply(params, transformContentToComponent(obj.content, data, parent));  //子组件
+
         //调用创建组件接口,必须需要用apply以多个参数的形式传参,否则在react中,元素放在数组里时会报需要加key属性的警告
-        ret = nj.componentLibObj[nj.componentPort].apply(nj.componentLibObj,
-            [type,                                                 //组件名
-            utils.transformParamsToObj(obj.params, data, parent)].concat(  //参数
-            transformContentToComponent(obj.content, data, parent)));      //子组件
+        ret = nj.componentLibObj[nj.componentPort].apply(nj.componentLibObj, params);
     }
 
     return ret;
@@ -677,7 +680,7 @@ function transformContentToComponent(content, data, parent) {
         ret.push(transformToComponent(obj, data, parent));
     });
 
-    return ret.length === 1 ? ret[0] : ret;
+    return ret;
 }
 
 module.exports = {
