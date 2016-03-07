@@ -19,7 +19,7 @@ var tmpl = nj`
 ```
 然后可以这样编译后输出html字符串：
 ```js
-var html = nj.compile(tmpl, 'tmpl1')({
+var html = nj.compile(tmpl)({
     msg: 'Hello world!',
     click: "alert('test')"
 });
@@ -55,8 +55,7 @@ class TestComponent extends Component {
 nj.registerComponent('TestComponent', TestComponent);
 
 render(nj.compileComponent(
-   nj`<TestComponent no=100 />`,
-   'tmpl2'
+   nj`<TestComponent no=100 />`
 )(), document.body);
 
 /* output:
