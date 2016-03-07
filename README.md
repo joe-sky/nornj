@@ -35,6 +35,7 @@ console.log(html);
 
 也可以替代JSX输出React组件：
 ```js
+import nj from 'nornj';
 import { Component } from 'react';
 import { render } from 'react-dom';
 
