@@ -33,6 +33,40 @@ console.log(html);
 */
 ```
 
+也可以替代JSX输出React组件：
+```js
+import { Component } from 'react';
+import { render } from 'react-dom';
+
+let template = nj.compileComponent(nj`
+<div id=test1>
+    this the test demo{no}.
+    <i>test{no}</i>
+</div>`, 'tmpl1');
+
+class TestComponent extends Component {
+    render() {
+        return template({
+            no: this.props.no
+        });
+    }
+}
+
+nj.registerComponent('TestComponent', TestComponent);
+
+render(nj.compileComponent(
+   nj`<TestComponent no=100 />`,
+   'tmpl2'
+)(), document.body);
+
+/* output:
+<div id="test1">
+    this the test demo100.
+    <i>test100</i>
+</div>
+*/
+```
+
 ### 用途
 
 * 它可以作为Backbone.js等传统MVC框架的模板引擎，职责是接受数据输出html字符串;
