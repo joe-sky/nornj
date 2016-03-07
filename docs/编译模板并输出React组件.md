@@ -67,6 +67,7 @@ var html = ReactDOMServer.renderToStaticMarkup(comp);
 es6+环境下示例：
 ```js
 import nj from 'nornj';
+import { compileComponent, registerComponent } from 'nornj';
 import { Component } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 
@@ -78,7 +79,7 @@ let tmpl = nj`
 </div>`;
 
 //编译为组件模板函数
-let template = nj.compileComponent(tmpl, 'tmpl1');
+let template = compileComponent(tmpl, 'tmpl1');
 
 //定义组件
 class TestComponent extends Component {
@@ -90,10 +91,10 @@ class TestComponent extends Component {
 }
 
 //注册NornJ模板组件
-nj.registerComponent('TestComponent', TestComponent);
+registerComponent('TestComponent', TestComponent);
 
 //输出React组件
-let comp = nj.compileComponent(
+let comp = compileComponent(
    nj`<TestComponent no=100 />`,
    'tmpl2'
 )();
