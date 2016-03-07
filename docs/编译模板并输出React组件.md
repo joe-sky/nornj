@@ -65,8 +65,8 @@ var comp = nj.compileComponent(
 var html = ReactDOMServer.renderToStaticMarkup(comp);
 
 /* the es6+ way */
-import Component from 'react';
-import renderToStaticMarkup from 'react-dom/server';
+import { Component } from 'react';
+import { renderToStaticMarkup } from 'react-dom/server';
 
 //定义模板
 let tmpl = nj`
