@@ -42,7 +42,7 @@ let template = nj.compileComponent(nj`
 <div id=test1>
     this the test demo{no}.
     <i>test{no}</i>
-</div>`, 'tmpl1');
+</div>`);
 
 class TestComponent extends Component {
     render() {
