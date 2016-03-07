@@ -4,7 +4,7 @@ var nj = require('../core'),
     tools = require('../utils/tools'),
     REGEX_CLEAR_NOTES = /<!--[\s\S]*?-->/g,
     REGEX_CLEAR_BLANK = />\s+([^\s<]*)\s+</g,
-    REGEX_CHECK_ELEM = /([^>]*)(<([a-z{/$][-a-z0-9_:.{}$]*)[^>]*>)([^<]*)/g,
+    REGEX_CHECK_ELEM = /([^>]*)(<([a-z{/$][-a-z0-9_:.{}$]*)[^>]*>)([^<]*)/ig,
     REGEX_SPLIT = /\$\{\d+\}/;
 
 //Cache the string template by unique key

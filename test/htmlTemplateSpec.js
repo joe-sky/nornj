@@ -32,6 +32,12 @@ describe('test compile html', function () {
                                 {no}
                             </nj-else>
                         </nj-if>
+                        <section>
+                            <nj-each refer="{../list}">
+                                _{no}_
+                            </nj-each>
+                        </section>
+                        <br />
                     </nj-each>
                 </div>`,
                 function (err, window) {
