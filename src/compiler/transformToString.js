@@ -9,7 +9,7 @@ function transformToString(obj, data, parent) {
 
   if (obj.type === 'nj_plaintext') {
     //替换插入在文本中的参数
-    ret = utils.replaceParams(obj.content[0], data, null, null, parent);
+    ret = utils.replaceParams(obj.content[0], data, false, false, parent);
   }
   else if (controlRefer != null) {  //流程控制块
     var dataRefer = utils.getDataValue(data, controlRefer, parent);
@@ -21,11 +21,11 @@ function transformToString(obj, data, parent) {
       case 'nj_each':
         if (dataRefer && dataRefer.length) {
           utils.each(dataRefer, function (item, index) {
-            var _parent = {  //Create a parent data object
-              data: item,
-              parent: parent,
-              index: index
-            };
+            var _parent = utils.lightObj();  //Create a parent data object
+            _parent.data = item;
+            _parent.parent = parent;
+            _parent.index = index;
+
             ret += transformContentToString(obj.content, utils.getItemParam(item, data), _parent);
           });
         }
@@ -65,9 +65,8 @@ function transformContentToString(content, data, parent) {
     return ret;
   }
   if (!parent && data) {  //Init a parent data object and cascade pass on the children node
-    parent = {
-      data: utils.isArray(data) ? data[0] : data
-    };
+    parent = utils.lightObj();
+    parent.data = utils.isArray(data) ? data[0] : data;
   }
 
   utils.each(content, function (obj) {

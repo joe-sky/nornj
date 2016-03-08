@@ -606,7 +606,7 @@ function transformToComponent(obj, data, parent) {
 
   if (obj.type === 'nj_plaintext') {
     //替换插入在文本中的参数
-    ret = utils.replaceParams(obj.content[0], data, true, null, parent);
+    ret = utils.replaceParams(obj.content[0], data, true, false, parent);
 
     //执行模板数据
     if (utils.isObject(ret) && ret.type === 'nj_tmpl') {
@@ -624,11 +624,11 @@ function transformToComponent(obj, data, parent) {
         if (dataRefer && dataRefer.length) {
           ret = [];
           utils.each(dataRefer, function (item, index) {
-            var _parent = {  //Create a parent data object
-              data: item,
-              parent: parent,
-              index: index
-            };
+            var _parent = utils.lightObj();  //Create a parent data object
+            _parent.data = item;
+            _parent.parent = parent;
+            _parent.index = index;
+
             ret.push(transformContentToComponent(obj.content, utils.getItemParam(item, data), _parent));
           });
         }
@@ -652,9 +652,12 @@ function transformToComponent(obj, data, parent) {
     }
 
     //Make React.createElement's parameters
-    var params = [type,                                                               //组件名
-      utils.transformParamsToObj(obj.params, data, parent)];                          //参数
-    arrayPush.apply(params, transformContentToComponent(obj.content, data, parent));  //子组件
+    var params = [type,                                                  //组件名
+      utils.transformParamsToObj(obj.params, data, parent)],             //参数
+      content = transformContentToComponent(obj.content, data, parent);  //子组件
+    if (content) {
+      arrayPush.apply(params, content);
+    }
 
     //调用创建组件接口,必须需要用apply以多个参数的形式传参,否则在react中,元素放在数组里时会报需要加key属性的警告
     ret = nj.componentLibObj[nj.componentPort].apply(nj.componentLibObj, params);
@@ -669,9 +672,8 @@ function transformContentToComponent(content, data, parent) {
     return null;
   }
   if (!parent && data) {  //Init a parent data object and cascade pass on the children node
-    parent = {
-      data: utils.isArray(data) ? data[0] : data
-    };
+    parent = utils.lightObj();
+    parent.data = utils.isArray(data) ? data[0] : data;
   }
 
   var ret = [];
@@ -698,7 +700,7 @@ function transformToString(obj, data, parent) {
 
   if (obj.type === 'nj_plaintext') {
     //替换插入在文本中的参数
-    ret = utils.replaceParams(obj.content[0], data, null, null, parent);
+    ret = utils.replaceParams(obj.content[0], data, false, false, parent);
   }
   else if (controlRefer != null) {  //流程控制块
     var dataRefer = utils.getDataValue(data, controlRefer, parent);
@@ -710,11 +712,11 @@ function transformToString(obj, data, parent) {
       case 'nj_each':
         if (dataRefer && dataRefer.length) {
           utils.each(dataRefer, function (item, index) {
-            var _parent = {  //Create a parent data object
-              data: item,
-              parent: parent,
-              index: index
-            };
+            var _parent = utils.lightObj();  //Create a parent data object
+            _parent.data = item;
+            _parent.parent = parent;
+            _parent.index = index;
+
             ret += transformContentToString(obj.content, utils.getItemParam(item, data), _parent);
           });
         }
@@ -754,9 +756,8 @@ function transformContentToString(content, data, parent) {
     return ret;
   }
   if (!parent && data) {  //Init a parent data object and cascade pass on the children node
-    parent = {
-      data: utils.isArray(data) ? data[0] : data
-    };
+    parent = utils.lightObj();
+    parent.data = utils.isArray(data) ? data[0] : data;
   }
 
   utils.each(content, function (obj) {
@@ -1033,7 +1034,7 @@ function throwIf(val, msg) {
 function transformParams(obj, data, parent) {
   var ret = '';
   each(obj, function (v, k) {
-    ret += ' ' + k + "='" + replaceParams(v, data, null, null, parent) + "'";
+    ret += ' ' + k + "='" + replaceParams(v, data, false, false, parent) + "'";
   }, false, false);
 
   return ret;
@@ -1463,6 +1464,11 @@ function uniqueKey(str) {
   return hash;
 }
 
+//create light weight object
+function lightObj() {
+  return Object.create(null);
+}
+
 var tools = {
   isArray: isArray,
   isArrayLike: isArrayLike,
@@ -1494,7 +1500,8 @@ var tools = {
   isTmpl: isTmpl,
   addTmpl: addTmpl,
   assign: assign,
-  uniqueKey: uniqueKey
+  uniqueKey: uniqueKey,
+  lightObj: lightObj
 };
 assign(tools, escape);
 

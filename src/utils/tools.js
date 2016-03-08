@@ -96,7 +96,7 @@ function throwIf(val, msg) {
 function transformParams(obj, data, parent) {
   var ret = '';
   each(obj, function (v, k) {
-    ret += ' ' + k + "='" + replaceParams(v, data, null, null, parent) + "'";
+    ret += ' ' + k + "='" + replaceParams(v, data, false, false, parent) + "'";
   }, false, false);
 
   return ret;
@@ -526,6 +526,11 @@ function uniqueKey(str) {
   return hash;
 }
 
+//create light weight object
+function lightObj() {
+  return Object.create(null);
+}
+
 var tools = {
   isArray: isArray,
   isArrayLike: isArrayLike,
@@ -557,7 +562,8 @@ var tools = {
   isTmpl: isTmpl,
   addTmpl: addTmpl,
   assign: assign,
-  uniqueKey: uniqueKey
+  uniqueKey: uniqueKey,
+  lightObj: lightObj
 };
 assign(tools, escape);
 
