@@ -20,10 +20,9 @@ function compile(obj, tmplName, isComponent, isTag) {
       root = obj;
     }
     else {
-      root = {
-        type: 'nj_root',
-        content: []
-      };
+      root = utils.lightObj();
+      root.type = 'nj_root';
+      root.content = [];
 
       //分析传入参数并转换为节点树对象
       if (isTag) {

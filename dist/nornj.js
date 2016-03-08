@@ -82,7 +82,7 @@ function checkElem(obj, parent) {
   if (!tools.isArray(obj)) {
     if (tools.isString(obj)) {  //判断是否为文本节点
       node.type = 'nj_plaintext';
-      node.content = [obj];
+      node.content = [tools.compiledParam(obj)];
       parent[parentContent].push(node);
     }
 
@@ -186,7 +186,7 @@ function checkElem(obj, parent) {
           }
 
           tools.each(tagParams, function (param) {
-            node.params[param.key] = param.value;
+            node.params[param.key] = tools.compiledParam(param.value);
           }, false, true);
         }
       }
@@ -532,10 +532,9 @@ function compile(obj, tmplName, isComponent, isTag) {
       root = obj;
     }
     else {
-      root = {
-        type: 'nj_root',
-        content: []
-      };
+      root = utils.lightObj();
+      root.type = 'nj_root';
+      root.content = [];
 
       //分析传入参数并转换为节点树对象
       if (isTag) {
@@ -596,8 +595,7 @@ module.exports = {
 'use strict';
 
 var nj = require('../core'),
-    utils = require('../utils/utils'),
-    arrayPush = Array.prototype.push;
+    utils = require('../utils/utils');
 
 //转换节点为组件节点
 function transformToComponent(obj, data, parent) {
@@ -656,7 +654,7 @@ function transformToComponent(obj, data, parent) {
       utils.transformParamsToObj(obj.params, data, parent)],             //参数
       content = transformContentToComponent(obj.content, data, parent);  //子组件
     if (content) {
-      arrayPush.apply(params, content);
+      utils.listPush(params, content);
     }
 
     //调用创建组件接口,必须需要用apply以多个参数的形式传参,否则在react中,元素放在数组里时会报需要加key属性的警告
@@ -941,7 +939,15 @@ module.exports = {
 var nj = require('../core'),
   escape = require('./escape'),
   assign = require('object-assign'),
-  arrayEvery = Array.prototype.every;
+  arrayProto = Array.prototype,
+  arrayEvery = arrayProto.every,
+  arrayPush = arrayProto.push;
+
+//Array push
+function listPush(arr1, arr2) {
+  arrayPush.apply(arr1, arr2);
+  return arr1;
+}
 
 //判断是否为数组
 function isArray(obj) {
@@ -1180,29 +1186,29 @@ function getDataValue(data, prop, parent, defaultEmpty) {
 function getItemParam(item, data) {
   var ret = item;
   if (isArray(data)) {
-    ret = [item].concat(data.slice(1));
+    ret = listPush([item], data.slice(1));
   }
 
   return ret;
 }
 
 //替换参数字符串
-function replaceParams(value, data, newObj, newKey, parent) {
-  var params = getReplaceParam(value),
+function replaceParams(valueObj, data, newObj, newKey, parent) {
+  var props = valueObj.props,
+    strs = valueObj.strs,
+    isAll = valueObj.isAll,
     useObj = isObject(newObj),  //newObj的值可能为对象或布尔值,此处判断是否为对象
-    isAll;
+    value = strs[0];
 
-  if (params) {
-    each(params, function (param) {
-      var placeholder = param[0],
-        prop = param[2],
-        dataProp = getDataValue(data, prop, parent, !newObj),
-        isAll = placeholder === value;
+  if (props) {
+    each(props, function (propObj, i) {
+      var dataProp = getDataValue(data, propObj.prop, parent, !newObj);
+      //var dataProp = 'test_' + parent.index;
 
       //参数为字符串时,须做特殊字符转义
       if (dataProp
-        && !newObj                  //Only in transform to string need escape
-        && param[1].length < 2) {   //Only in the opening brace's length less than 2 need escape
+        && !newObj          //Only in transform to string need escape
+        && propObj.escape) {   //Only in the opening brace's length less than 2 need escape
         dataProp = escape.escape(dataProp);
       }
 
@@ -1215,12 +1221,13 @@ function replaceParams(value, data, newObj, newKey, parent) {
         value = dataProp;
       }
       else {  //逐个替换占位符
-        try {
-          value = value.replace(new RegExp(escape.escapeBrackets(placeholder), 'ig'), dataProp);
-        }
-        catch (ex) {
-          console.error('Replace parameter error:' + ex.message);
-        }
+        //try {
+        //  value = value.replace(new RegExp(escape.escapeBrackets(placeholder), 'ig'), dataProp);
+        //}
+        //catch (ex) {
+        //  console.error('Replace parameter error:' + ex.message);
+        //}
+        value += dataProp + strs[i + 1];
       }
     }, false, true);
   }
@@ -1237,7 +1244,7 @@ function replaceParams(value, data, newObj, newKey, parent) {
 var REGEX_REPLACE_PARAM = /({{1,2})([^"'\s{}]+)}{1,2}/g;
 function getReplaceParam(obj) {
   var matchArr,
-      ret;
+    ret;
 
   while ((matchArr = REGEX_REPLACE_PARAM.exec(obj))) {
     if (!ret) {
@@ -1246,6 +1253,35 @@ function getReplaceParam(obj) {
     ret.push(matchArr);
   }
 
+  return ret;
+}
+
+//get compiled parameter
+var REGEX_REPLACE_SPLIT = /{{1,2}[^"'\s{}]+}{1,2}/g;
+function compiledParam(value) {
+  var ret = lightObj(),
+    strs = isString(value) ? value.split(REGEX_REPLACE_SPLIT) : [value],
+    props = null,
+    isAll = false;
+
+  if (strs.length > 1) {
+    var params = getReplaceParam(value);
+    props = [];
+
+    each(params, function (param) {
+      var prop = param[2],
+        retP = lightObj();
+      isAll = param[0] === value;
+
+      retP.prop = prop;
+      retP.escape = param[1].length < 2;
+      props.push(retP);
+    }, false, true);
+  }
+
+  ret.props = props;
+  ret.strs = strs;
+  ret.isAll = isAll;
   return ret;
 }
 
@@ -1501,7 +1537,9 @@ var tools = {
   addTmpl: addTmpl,
   assign: assign,
   uniqueKey: uniqueKey,
-  lightObj: lightObj
+  lightObj: lightObj,
+  listPush: listPush,
+  compiledParam: compiledParam
 };
 assign(tools, escape);
 

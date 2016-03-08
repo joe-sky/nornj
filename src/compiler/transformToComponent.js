@@ -1,8 +1,7 @@
 ﻿'use strict';
 
 var nj = require('../core'),
-    utils = require('../utils/utils'),
-    arrayPush = Array.prototype.push;
+    utils = require('../utils/utils');
 
 //转换节点为组件节点
 function transformToComponent(obj, data, parent) {
@@ -61,7 +60,7 @@ function transformToComponent(obj, data, parent) {
       utils.transformParamsToObj(obj.params, data, parent)],             //参数
       content = transformContentToComponent(obj.content, data, parent);  //子组件
     if (content) {
-      arrayPush.apply(params, content);
+      utils.listPush(params, content);
     }
 
     //调用创建组件接口,必须需要用apply以多个参数的形式传参,否则在react中,元素放在数组里时会报需要加key属性的警告

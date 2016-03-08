@@ -12,7 +12,7 @@ function checkElem(obj, parent) {
   if (!tools.isArray(obj)) {
     if (tools.isString(obj)) {  //判断是否为文本节点
       node.type = 'nj_plaintext';
-      node.content = [obj];
+      node.content = [tools.compiledParam(obj)];
       parent[parentContent].push(node);
     }
 
@@ -116,7 +116,7 @@ function checkElem(obj, parent) {
           }
 
           tools.each(tagParams, function (param) {
-            node.params[param.key] = param.value;
+            node.params[param.key] = tools.compiledParam(param.value);
           }, false, true);
         }
       }
