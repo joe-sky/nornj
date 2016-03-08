@@ -1,10 +1,10 @@
 ﻿'use strict';
 
 var nj = require('./core'),
-    utils = require('./utils/utils'),
-    setComponentEngine = utils.setComponentEngine,
-    compiler = require('./compiler/compile'),
-    compileStringTmpl = require('./checkElem/checkStringElem');
+  utils = require('./utils/utils'),
+  setComponentEngine = utils.setComponentEngine,
+  compiler = require('./compiler/compile'),
+  compileStringTmpl = require('./checkElem/checkStringElem');
 
 nj.setComponentEngine = setComponentEngine;
 nj.compile = compiler.compile;
@@ -19,9 +19,9 @@ nj.compileStringTmpl = compileStringTmpl;
 utils.createTagNamespace();
 
 //默认使用react作为组件引擎
-if (typeof React !== "undefined") {
-    setComponentEngine("react", React, typeof ReactDOM !== "undefined" ? ReactDOM : null);
+if (typeof React !== 'undefined') {
+  setComponentEngine('react', React, typeof ReactDOM !== 'undefined' ? ReactDOM : null);
 }
 
-var global = typeof self !== "undefined" ? self : this;
+var global = typeof self !== 'undefined' ? self : this;
 module.exports = global.NornJ = global.nj = nj;

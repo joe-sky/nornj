@@ -1,42 +1,35 @@
 ﻿var gulp = require('gulp'),
-    browserify = require('browserify'),
-    uglify = require('gulp-uglify'),
-    source = require('vinyl-source-stream'),
-    buffer = require('vinyl-buffer'),
-    jasmine = require('gulp-jasmine'),
-    rename = require('gulp-rename');
+  browserify = require('browserify'),
+  uglify = require('gulp-uglify'),
+  source = require('vinyl-source-stream'),
+  buffer = require('vinyl-buffer'),
+  jasmine = require('gulp-jasmine'),
+  rename = require('gulp-rename'),
+  gulpif = require('gulp-if'),
+  argv = require('yargs').argv;
 
-var isJsMin = false,
-    libName = "nornj.js";
-if(isJsMin) {
-    libName = "nornj.min.js";
-}
+gulp.task('build', function () {
+  var libName = 'nornj.js';
+  if(argv.min) {
+    libName = 'nornj.min.js';
+  }
 
-//compress js
-function jsMin(obj) {
-    if (isJsMin) {
-        return obj.pipe(uglify());
-    }
-
-    return obj;
-}
-
-gulp.task('build js', function () {
-    return jsMin(browserify({
-            entries: './src/base.js',
-            standalone: 'NornJ'
-        })
-        .bundle()
-        .pipe(source(libName))
-        .pipe(buffer()))
-        .pipe(gulp.dest('./dist'));
+  return browserify({
+    entries: './src/base.js',
+    standalone: 'NornJ'
+  })
+    .bundle()
+    .pipe(source(libName))
+    .pipe(buffer())
+    .pipe(gulpif(argv.min, uglify()))
+    .pipe(gulp.dest('./dist'));
 });
 
 //unit testing
 gulp.task("test", function () {
-    return gulp.src(["./test/**/**Spec.js"])
-        .pipe(jasmine());
+  return gulp.src(["./test/**/**Spec.js"])
+    .pipe(jasmine());
 });
 
 //default task
-gulp.task('default', ['build js']);
+gulp.task('default', ['build']);
