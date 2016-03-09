@@ -267,12 +267,11 @@ function replaceParams(valueObj, data, newObj, newKey, parent) {
   if (props) {
     each(props, function (propObj, i) {
       var dataProp = getDataValue(data, propObj.prop, parent, !newObj);
-      //var dataProp = 'test_' + parent.index;
 
       //参数为字符串时,须做特殊字符转义
       if (dataProp
-        && !newObj          //Only in transform to string need escape
-        && propObj.escape) {   //Only in the opening brace's length less than 2 need escape
+        && !newObj            //Only in transform to string need escape
+        && propObj.escape) {  //Only in the opening brace's length less than 2 need escape
         dataProp = escape.escape(dataProp);
       }
 
@@ -284,13 +283,7 @@ function replaceParams(valueObj, data, newObj, newKey, parent) {
 
         value = dataProp;
       }
-      else {  //逐个替换占位符
-        //try {
-        //  value = value.replace(new RegExp(escape.escapeBrackets(placeholder), 'ig'), dataProp);
-        //}
-        //catch (ex) {
-        //  console.error('Replace parameter error:' + ex.message);
-        //}
+      else {  //Splicing value by one by one
         value += dataProp + strs[i + 1];
       }
     }, false, true);
@@ -328,16 +321,16 @@ function compiledParam(value) {
     props = null,
     isAll = false;
 
+  //If have placehorder
   if (strs.length > 1) {
     var params = getReplaceParam(value);
     props = [];
 
     each(params, function (param) {
-      var prop = param[2],
-        retP = lightObj();
+      var retP = lightObj();
       isAll = param[0] === value;
 
-      retP.prop = prop;
+      retP.prop = param[2];
       retP.escape = param[1].length < 2;
       props.push(retP);
     }, false, true);
@@ -346,6 +339,16 @@ function compiledParam(value) {
   ret.props = props;
   ret.strs = strs;
   ret.isAll = isAll;
+  return ret;
+}
+
+//get compiled parameters from a object
+function compiledParams(obj) {
+  var ret = lightObj();
+  each(obj, function (v, k) {
+    ret[k] = compiledParam(v);
+  }, false, false);
+
   return ret;
 }
 
@@ -513,7 +516,7 @@ function getTagComponentAttrs(el) {
     if (attrName !== nj.tagId && obj.specified) {  //此处如不判断specified属性,则低版本IE中会列出所有可能的属性
       var val = obj.nodeValue;
       if (!ret) {
-        ret = {};
+        ret = lightObj();
       }
 
       if (attrName === 'style') {  //style属性使用cssText
@@ -603,7 +606,8 @@ var tools = {
   uniqueKey: uniqueKey,
   lightObj: lightObj,
   listPush: listPush,
-  compiledParam: compiledParam
+  compiledParam: compiledParam,
+  compiledParams: compiledParams
 };
 assign(tools, escape);
 

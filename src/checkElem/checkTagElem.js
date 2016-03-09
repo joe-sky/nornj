@@ -17,7 +17,7 @@ function checkTagElem(obj, parent) {
     }
 
     node.type = 'nj_plaintext';
-    node.content = [nodeValue];
+    node.content = [tools.compiledParam(nodeValue)];
     parent[parentContent].push(node);
 
     return;
@@ -58,7 +58,7 @@ function checkTagElem(obj, parent) {
     else {  //元素节点
       node.type = tagName;
       if (params) {
-        node.params = params;
+        node.params = tools.compiledParams(params);
       }
     }
 

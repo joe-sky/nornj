@@ -89,7 +89,7 @@ function checkElem(obj, parent) {
       var params = obj[1];
       if (tools.isObject(params)) {  //如果第二个参数为对象,则为节点参数
         if (!control) {  //为元素节点时取各参数
-          node.params = params;
+          node.params = tools.compiledParams(params);
         }
         else {  //为特殊节点时取refer
           var retR = tools.getInsideBraceParam(params.refer);
@@ -112,7 +112,7 @@ function checkElem(obj, parent) {
         var tagParams = tools.getOpenTagParams(first, !xmlOpenTag);
         if (tagParams) {
           if (!node.params) {
-            node.params = {};
+            node.params = tools.lightObj();
           }
 
           tools.each(tagParams, function (param) {

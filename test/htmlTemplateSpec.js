@@ -32,7 +32,7 @@ describe('test compile html', function () {
                 {no}
               </nj-else>
             </nj-if>
-            <section>
+            <section nj-style="color:blue;" class="test">
               <nj-each refer="{../list}">
                 _{no}_
               </nj-each>
