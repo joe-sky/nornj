@@ -48,7 +48,7 @@ function transformToString(obj, data, parent) {
 
     var openTag = '<' + type + utils.transformParams(obj.params, data, parent);
     if (!obj.selfCloseTag) {
-      ret = openTag + '>' + transformContentToString(obj.content, data, parent) + "</" + type + ">";
+      ret = openTag + '>' + transformContentToString(obj.content, data, parent) + '</' + type + '>';
     }
     else {  //自闭合标签
       ret = openTag + '/>';
