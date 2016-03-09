@@ -3,7 +3,8 @@
 var nj = require('../core'),
   utils = require('../utils/utils'),
   tranString = require('./transformToString'),
-  tranComponent = require('./transformToComponent');
+  tranComponent = require('./transformToComponent'),
+  compileStringTmpl = require('../checkElem/checkStringElem');
 
 //编译字面量并返回转换函数
 function compile(obj, tmplName, isComponent, isTag) {
@@ -26,7 +27,7 @@ function compile(obj, tmplName, isComponent, isTag) {
 
       //Auto transform string template to array
       if(utils.isString(obj)) {
-        obj = nj(obj);
+        obj = compileStringTmpl(obj);
       }
 
       //分析传入参数并转换为节点树对象
