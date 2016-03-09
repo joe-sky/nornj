@@ -529,7 +529,8 @@ function compile(obj, tmplName, isComponent, isTag) {
     root = nj.templates[tmplName];
   }
   if (!root) {
-    if (utils.isObject(obj) && obj.type === 'nj_root') {  //If obj is Object,we think obj is a precompiled template.
+    //If obj is Object,we think obj is a precompiled template
+    if (utils.isObject(obj) && obj.type === 'nj_root') {
       root = obj;
     }
     else {
@@ -973,16 +974,16 @@ function isString(obj) {
 }
 
 //获取属性值
-function getProperty(key) {
+function _getProperty(key) {
   return function (obj) {
     return obj == null ? void 0 : obj[key];
   };
 }
 
 //是否为类数组
-var getLength = getProperty('length');
+var _getLength = _getProperty('length');
 function isArrayLike(obj) {
-  var length = getLength(obj);
+  var length = _getLength(obj);
   return typeof length == 'number' && length >= 0;
 }
 

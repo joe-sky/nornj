@@ -30,16 +30,16 @@ function isString(obj) {
 }
 
 //获取属性值
-function getProperty(key) {
+function _getProperty(key) {
   return function (obj) {
     return obj == null ? void 0 : obj[key];
   };
 }
 
 //是否为类数组
-var getLength = getProperty('length');
+var _getLength = _getProperty('length');
 function isArrayLike(obj) {
-  var length = getLength(obj);
+  var length = _getLength(obj);
   return typeof length == 'number' && length >= 0;
 }
 
