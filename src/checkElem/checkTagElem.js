@@ -44,7 +44,7 @@ function checkTagElem(obj, parent) {
         }
         else {  //流程控制块
           var retR = tools.getInsideBraceParam(params.refer);
-          node.refer = retR ? retR[1] : params.refer;
+          node.refer = tools.compiledProp(retR ? retR[1] : params.refer);
         }
       }
       else {  //else节点

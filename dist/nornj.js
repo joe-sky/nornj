@@ -140,7 +140,7 @@ function checkElem(obj, parent) {
 
         node.type = 'nj_' + ctrl;
         if (refer != null) {
-          node.refer = refer;
+          node.refer = tools.compiledProp(refer);
         }
 
         if (tools.isControlCloseTag(last, ctrl)) {  //判断是否有流程控制块闭合标签
@@ -163,7 +163,7 @@ function checkElem(obj, parent) {
         }
         else {  //为特殊节点时取refer
           var retR = tools.getInsideBraceParam(params.refer);
-          node.refer = retR ? retR[1] : params.refer;
+          node.refer = tools.compiledProp(retR ? retR[1] : params.refer);
         }
 
         hasParams = true;
@@ -175,7 +175,7 @@ function checkElem(obj, parent) {
         //If open tag has a brace,add the typeRefer param.
         var typeRefer = tools.getInsideBraceParam(openTagName);
         if (typeRefer) {
-          node.typeRefer = typeRefer[1];
+          node.typeRefer = tools.compiledProp(typeRefer[1]);
         }
 
         //获取openTag内参数
@@ -463,7 +463,7 @@ function checkTagElem(obj, parent) {
         }
         else {  //流程控制块
           var retR = tools.getInsideBraceParam(params.refer);
-          node.refer = retR ? retR[1] : params.refer;
+          node.refer = tools.compiledProp(retR ? retR[1] : params.refer);
         }
       }
       else {  //else节点
@@ -737,7 +737,7 @@ function transformToString(obj, data, parent) {
 
     var openTag = '<' + type + utils.transformParams(obj.params, data, parent);
     if (!obj.selfCloseTag) {
-      ret = openTag + '>' + transformContentToString(obj.content, data, parent) + "</" + type + ">";
+      ret = openTag + '>' + transformContentToString(obj.content, data, parent) + '</' + type + '>';
     }
     else {  //自闭合标签
       ret = openTag + '/>';
@@ -769,6 +769,7 @@ module.exports = {
   transformToString: transformToString,
   transformContentToString: transformContentToString
 };
+
 },{"../utils/utils":15}],9:[function(require,module,exports){
 'use strict';
 
@@ -1082,54 +1083,40 @@ function setObjParam(obj, key, value, notTran) {
 function _useFilters(filters, ret, data, parent, index) {
   if (filters) {
     var filtersObj = nj.filters;
-    each(filters, function (k) {
-      var retF = _getFilterParam(k),
-        filter = filtersObj[retF[1].toLowerCase()];  //Get filter function
+    each(filters, function (filterObj) {
+      var params,
+        paramsF = filterObj.params,
+        filter = filtersObj[filterObj.name],  //Get filter function
+        thisObj = lightObj();
 
-      if (filter) {
-        var params = [ret],
-          paramsF = retF[3];  //Get filter param
-
-        //Multiple params are separated by commas.
-        if (paramsF) {
-          each(paramsF.split(','), function (p) {
-            params[params.length] = p;
-          }, false, true);
-        }
-
-        ret = filter.apply({
-          data: data,
-          parent: parent,
-          index: index
-        }, params);
+      if (paramsF) {
+        params = listPush([ret], paramsF);
       }
+      else {
+        params = [ret];
+      }
+
+      thisObj.data = data;
+      thisObj.parent = parent;
+      thisObj.index = index;
+      ret = filter.apply(thisObj, params);
     }, false, true);
   }
 
   return ret;
 }
 
-//Get filter param
-var REGEX_FILTER_PARAM = /([\w$]+)(\(([^()]+)\))*/;
-function _getFilterParam(obj) {
-  return REGEX_FILTER_PARAM.exec(obj);
-}
-
 //获取data值
-function getDataValue(data, prop, parent, defaultEmpty) {
+function getDataValue(data, propObj, parent, defaultEmpty) {
   if (data == null) {
     return;
   }
 
   var isArr = isArray(data),
-    filters, datas, ret, dataP, index;
-
-  //prop中有分隔线时使用过滤器
-  if (prop.indexOf(':') >= 0) {
-    filters = prop.split(':');
-    prop = filters[0];
-    filters = filters.slice(1);
-  }
+    prop = propObj.name,
+    filters = propObj.filters,
+    parentNum = propObj.parentNum,
+    datas, ret, dataP, index;
 
   //if inside each block,get the parent data and current index
   if (parent && parent.parent) {
@@ -1138,14 +1125,13 @@ function getDataValue(data, prop, parent, defaultEmpty) {
   }
 
   //According to the param path to get data
-  if (parent && prop.indexOf('../') > -1) {
-    prop = prop.replace(/\.\.\//g, function () {
+  if (parent && parentNum) {
+    for (var i = 0; i < parentNum; i++) {
       var _parent = parent.parent;
       throwIf(_parent, 'Parent data is undefined, please check the param path declare.');
       parent = _parent;
       datas = [parent.data];
-      return '';
-    });
+    }
   }
   else if (isArr) {  //The data param is array
     datas = data;
@@ -1249,7 +1235,7 @@ function getReplaceParam(obj) {
   return ret;
 }
 
-//get compiled parameter
+//Get compiled parameter
 var REGEX_REPLACE_SPLIT = /{{1,2}[^"'\s{}]+}{1,2}/g;
 function compiledParam(value) {
   var ret = lightObj(),
@@ -1266,7 +1252,7 @@ function compiledParam(value) {
       var retP = lightObj();
       isAll = param[0] === value;
 
-      retP.prop = param[2];
+      retP.prop = compiledProp(param[2]);
       retP.escape = param[1].length < 2;
       props.push(retP);
     }, false, true);
@@ -1278,7 +1264,7 @@ function compiledParam(value) {
   return ret;
 }
 
-//get compiled parameters from a object
+//Get compiled parameters from a object
 function compiledParams(obj) {
   var ret = lightObj();
   each(obj, function (v, k) {
@@ -1286,6 +1272,65 @@ function compiledParams(obj) {
   }, false, false);
 
   return ret;
+}
+
+//Get compiled property
+function compiledProp(prop) {
+  var ret = lightObj();
+
+  //If there are colons in the property,then use filter
+  if (prop.indexOf(':') >= 0) {
+    var filters = [],
+      filtersTmp;
+    filtersTmp = prop.split(':');
+    prop = filtersTmp[0];  //Extract property
+
+    filtersTmp = filtersTmp.slice(1);
+    each(filtersTmp, function (filter) {
+      var retF = _getFilterParam(filter),
+        filterObj = lightObj(),
+        filterName = retF[1].toLowerCase();  //Get filter name
+
+      if (filterName) {
+        var paramsF = retF[3];  //Get filter param
+
+        //Multiple params are separated by commas.
+        if (paramsF) {
+          var params = [];
+          each(paramsF.split(','), function (p) {
+            params[params.length] = p;
+          }, false, true);
+
+          filterObj.params = params;
+        }
+
+        filterObj.name = filterName;
+        filters.push(filterObj);
+      }
+    }, false, true);
+
+    ret.filters = filters;
+  }
+
+  //Extract the parent data path
+  if (prop.indexOf('../') > -1) {
+    var n = 0;
+    prop = prop.replace(/\.\.\//g, function () {
+      n++;
+      return '';
+    });
+
+    ret.parentNum = n;
+  }
+
+  ret.name = prop;
+  return ret;
+}
+
+//Get filter param
+var REGEX_FILTER_PARAM = /([\w$]+)(\(([^()]+)\))*/;
+function _getFilterParam(obj) {
+  return REGEX_FILTER_PARAM.exec(obj);
 }
 
 //提取xml open tag
@@ -1543,7 +1588,8 @@ var tools = {
   lightObj: lightObj,
   listPush: listPush,
   compiledParam: compiledParam,
-  compiledParams: compiledParams
+  compiledParams: compiledParams,
+  compiledProp: compiledProp
 };
 assign(tools, escape);
 

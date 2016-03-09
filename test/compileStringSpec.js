@@ -16,7 +16,7 @@ describe('test compile string', function () {
   });
 
   describe('compile string template to html', function () {
-    it('test compile 1', function () {
+    xit('test compile 1', function () {
       var data = {
         name: "joe_sky",
         id: 100,

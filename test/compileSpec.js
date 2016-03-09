@@ -22,7 +22,8 @@ describe('test compile', function () {
       var data = {
         name: "joe_sky",
         id: "joe",
-        test0: true
+        test0: true,
+        num: 100
       };
 
       var tmpl =
@@ -30,7 +31,7 @@ describe('test compile', function () {
         ["<span>", "sky:{name},{id}"],
         ["span1", "joe", "/span1"],
         ["div id=555", [
-          ["<a />"],
+          ["<a class={num:filter1(a,b):filter2} />"],
           ["input type=button /"],
           ['$if key={test0}',
               ['input id="test5" /']
@@ -38,9 +39,10 @@ describe('test compile', function () {
         ], "/div"]
       ];
 
-      var tmplFn = compile(tmpl),
+      var tmplFn = compile(tmpl, 'tmpl1'),
           html = tmplFn(data);
 
+      //console.log(JSON.stringify(nj.templates['tmpl1']));
       console.log(html);
       expect(html).toBeTruthy();
     });
@@ -119,55 +121,110 @@ describe('test compile', function () {
   });
 
   describe('compile precompiled template', function () {
-    xit('test precompiled 1', function () {
+    it('test precompiled 1', function () {
       var data = {
         name: "joe_sky",
         id: "joe",
-        test0: true
+        test0: true,
+        num: 100
       };
 
       var preTmpl = {
         "type": "nj_root",
         "content": [
           {
-            "params": { "name": "my name:{name},id:{id},name:{name}", "id": "test1", "name1": "../111" },
+            "params": {
+              "name": {
+                "props": [
+                  { "prop": { "name": "name" }, "escape": true },
+                  { "prop": { "name": "id" }, "escape": true },
+                  { "prop": { "name": "name" }, "escape": true }
+                ],
+                "strs": ["my name:", ",id:", ",name:", ""],
+                "isAll": false
+              },
+              "id": {
+                "props": null,
+                "strs": ["test1"],
+                "isAll": false
+              },
+              "name1": {
+                "props": null,
+                "strs": ["../111"],
+                "isAll": false
+              }
+            },
             "type": "div",
             "content": [
               {
-                "type": "span",
-                "content": [
-                  {
-                    "type": "nj_plaintext",
-                    "content": ["sky:{name},{id}"]
-                  }
+                "type": "span", "content": [
+                {
+                  "type": "nj_plaintext",
+                  "content": [
+                    {
+                      "props": [
+                        { "prop": { "name": "name" }, "escape": true },
+                        { "prop": { "name": "id" }, "escape": true }
+                      ],
+                      "strs": ["sky:", ",", ""], "isAll": false
+                    }
+                  ]
+                }
                 ]
               }, {
                 "type": "span1",
                 "content": [
                   {
                     "type": "nj_plaintext",
-                    "content": ["joe"]
+                    "content": [
+                      { "props": null, "strs": ["joe"], "isAll": false }
+                    ]
                   }
                 ]
               }, {
                 "type": "div",
-                "params": { "id": "555" },
+                "params": {
+                  "id": { "props": null, "strs": ["555"], "isAll": false }
+                },
                 "content": [
                   {
                     "selfCloseTag": true,
-                    "type": "a"
+                    "type": "a",
+                    "params": {
+                      "class": {
+                        "props": [
+                          { "prop": { "filters": [{ "params": ["a", "b"], "name": "filter1" }, { "name": "filter2" }], "name": "num" }, "escape": true }
+                        ],
+                        "strs": ["", ""],
+                        "isAll": true
+                      }
+                    }
                   }, {
                     "selfCloseTag": true,
                     "type": "input",
-                    "params": { "type": "button" }
+                    "params": {
+                      "type": {
+                        "props": null,
+                        "strs": ["button"],
+                        "isAll": false
+                      }
+                    }
                   }, {
                     "type": "nj_if",
-                    "refer": "test0",
+                    "refer": {
+                      "name": "test0"
+                    },
                     "content": [
                       {
                         "selfCloseTag": true,
                         "type": "input",
-                        "params": { "id": "test5" }
+                        "params": {
+                          "id": {
+                            "props": null,
+                            "strs": ["test5"],
+                            "isAll": false
+                          }
+                        }
                       }
                     ]
                   }
@@ -182,7 +239,7 @@ describe('test compile', function () {
         html = tmplFn(data);
 
       console.log(html);
-      expect(html).toBe("<div name='my name:joe_sky,id:joe,name:joe_sky' id='test1' name1='../111'><span>sky:joe_sky,joe</span><span1>joe</span1><div id='555'><a/><input type='button'/><input id='test5'/></div></div>");
+      expect(html).toBeTruthy();
     });
   });
 });
