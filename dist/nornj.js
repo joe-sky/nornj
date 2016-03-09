@@ -536,6 +536,11 @@ function compile(obj, tmplName, isComponent, isTag) {
       root.type = 'nj_root';
       root.content = [];
 
+      //Auto transform string template to array
+      if(utils.isString(obj)) {
+        obj = nj(obj);
+      }
+
       //分析传入参数并转换为节点树对象
       if (isTag) {
         utils.checkTagElem(obj, root);
