@@ -1,8 +1,11 @@
-﻿nj.registerComponent('Provider', ReactRedux.Provider);
-nj.registerComponent('Router', ReactRouter.Router);
-nj.registerComponent('Route', ReactRouter.Route);
-nj.registerComponent('Redirect', ReactRouter.Redirect);
-nj.registerComponent('Link', ReactRouter.Link);
+﻿nj.setComponentEngine('react', React, ReactDOM);
+nj.registerComponent([
+  { name: 'Provider', component: ReactRedux.Provider },
+  { name: 'Router', component: ReactRouter.Router },
+  { name: 'Route', component: ReactRouter.Route },
+  { name: 'Redirect', component: ReactRouter.Redirect },
+  { name: 'Link', component: ReactRouter.Link }
+]);
 
 var reducer = Redux.combineReducers(nj.assign({}, todoApp, {
     routing: ReactRouterRedux.routeReducer
@@ -15,8 +18,8 @@ var store = createStoreWithMiddleware(reducer);
 reduxRouterMiddleware.listenForReplays(store);
 
 //var store = Redux.createStore(reducer);
-nj.renderTagComponent({
-    store: store,
-    hashHistory: ReactRouter.hashHistory,
-    App: App
+nj.setInitTagData({
+  store: store,
+  hashHistory: ReactRouter.hashHistory,
+  App: App
 });

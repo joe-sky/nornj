@@ -46,12 +46,14 @@ var nj = require('./core'),
   utils = require('./utils/utils'),
   setComponentEngine = utils.setComponentEngine,
   compiler = require('./compiler/compile'),
-  compileStringTmpl = require('./checkElem/checkStringElem');
+  compileStringTmpl = require('./checkElem/checkStringElem'),
+  docReady = require('./utils/docReady');
 
 nj.setComponentEngine = setComponentEngine;
 nj.registerComponent = utils.registerComponent;
 nj.registerFilter = utils.registerFilter;
 nj.compileStringTmpl = compileStringTmpl;
+nj.docReady = docReady;
 utils.assign(nj, compiler);
 
 //创建标签命名空间
@@ -62,9 +64,20 @@ if (typeof React !== 'undefined') {
   setComponentEngine('react', React, typeof ReactDOM !== 'undefined' ? ReactDOM : null);
 }
 
-var global = typeof self !== 'undefined' ? self : this;
+var inBrowser = typeof self !== 'undefined',
+  global = inBrowser ? self : this;
+
+//Init tag template
+if (inBrowser) {
+  docReady(function () {
+    if (!nj.preventAutoRenderTag) {
+      nj.renderTagComponent(nj.initTagData);
+    }
+  });
+}
+
 module.exports = global.NornJ = global.nj = nj;
-},{"./checkElem/checkStringElem":4,"./compiler/compile":6,"./core":9,"./utils/utils":15}],3:[function(require,module,exports){
+},{"./checkElem/checkStringElem":4,"./compiler/compile":6,"./core":9,"./utils/docReady":10,"./utils/utils":16}],3:[function(require,module,exports){
 'use strict';
 
 var nj = require('../core'),
@@ -249,7 +262,7 @@ module.exports = {
   checkElem: checkElem,
   checkTagElem: checkTagElem
 };
-},{"../core":9,"../utils/tools":14,"./checkTagElem":5}],4:[function(require,module,exports){
+},{"../core":9,"../utils/tools":15,"./checkTagElem":5}],4:[function(require,module,exports){
 'use strict';
 
 var nj = require('../core'),
@@ -413,7 +426,7 @@ function _getSelfCloseElem(elem, elemName, params) {
 }
 
 module.exports = compileStringTmpl;
-},{"../core":9,"../utils/tools":14}],5:[function(require,module,exports){
+},{"../core":9,"../utils/tools":15}],5:[function(require,module,exports){
 'use strict';
 
 var nj = require('../core'),
@@ -505,8 +518,13 @@ function checkTagContentElem(obj, parent) {
   }, false, true);
 }
 
+//Set init data for tag component
+nj.setInitTagData = function (data) {
+  nj.initTagData = data;
+};
+
 module.exports = checkTagElem;
-},{"../core":9,"../utils/tools":14}],6:[function(require,module,exports){
+},{"../core":9,"../utils/tools":15}],6:[function(require,module,exports){
 'use strict';
 
 var nj = require('../core'),
@@ -584,8 +602,8 @@ function compileTagComponent(obj, tmplName) {
 }
 
 //渲染标签组件
-function renderTagComponent(data, el) {
-  var tags = utils.getTagComponents(el),
+function renderTagComponent(data, el, selector) {
+  var tags = utils.getTagComponents(el, selector),
     ret = [];
 
   utils.each(tags, function (tag) {
@@ -611,7 +629,7 @@ module.exports = {
   renderTagComponent: renderTagComponent,
   precompile: precompile
 };
-},{"../checkElem/checkStringElem":4,"../core":9,"../utils/utils":15,"./transformToComponent":7,"./transformToString":8}],7:[function(require,module,exports){
+},{"../checkElem/checkStringElem":4,"../core":9,"../utils/utils":16,"./transformToComponent":7,"./transformToString":8}],7:[function(require,module,exports){
 'use strict';
 
 var nj = require('../core'),
@@ -706,7 +724,7 @@ module.exports = {
   transformToComponent: transformToComponent,
   transformContentToComponent: transformContentToComponent
 };
-},{"../core":9,"../utils/utils":15}],8:[function(require,module,exports){
+},{"../core":9,"../utils/utils":16}],8:[function(require,module,exports){
 'use strict';
 
 var utils = require('../utils/utils');
@@ -790,7 +808,7 @@ module.exports = {
   transformContentToString: transformContentToString
 };
 
-},{"../utils/utils":15}],9:[function(require,module,exports){
+},{"../utils/utils":16}],9:[function(require,module,exports){
 'use strict';
 
 function nj() {
@@ -812,6 +830,18 @@ nj.errorTitle = 'NornJ error:';
 
 module.exports = nj;
 },{}],10:[function(require,module,exports){
+'use strict';
+
+module.exports = function (callback) {
+  var doc = document;
+  if (doc.addEventListener) {
+    doc.addEventListener("DOMContentLoaded", callback, false);
+  }
+  else {
+    self.attachEvent("onload", callback);
+  }
+};
+},{}],11:[function(require,module,exports){
 'use strict';
 
 var ESCAPE_LOOKUP = {
@@ -844,7 +874,7 @@ module.exports = {
   escape: _escape(ESCAPE_REGEX, ESCAPE_LOOKUP),
   escapeBrackets: _escape(ESCAPE_REGEX_BRACKETS, ESCAPE_LOOKUP_BRACKETS)
 };
-},{}],11:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 'use strict';
 
 var nj = require('../core'),
@@ -888,7 +918,7 @@ function registerFilter(name, filter) {
 module.exports = {
   registerFilter: registerFilter
 };
-},{"../core":9,"./tools":14}],12:[function(require,module,exports){
+},{"../core":9,"./tools":15}],13:[function(require,module,exports){
 'use strict';
 
 var nj = require('../core'),
@@ -898,11 +928,11 @@ var nj = require('../core'),
 function registerComponent(name, obj) {
   var params = name;
   if (!tools.isArray(name)) {
-    params = [{ name: name, obj: obj }];
+    params = [{ name: name, component: obj }];
   }
 
   tools.each(params, function (param) {
-    nj.componentClasses[param.name.toLowerCase()] = param.obj;
+    nj.componentClasses[param.name.toLowerCase()] = param.component;
   }, false, true);
 }
 
@@ -934,7 +964,7 @@ module.exports = {
   registerTagNamespace: registerTagNamespace,
   createTagNamespace: createTagNamespace
 };
-},{"../core":9,"./tools":14}],13:[function(require,module,exports){
+},{"../core":9,"./tools":15}],14:[function(require,module,exports){
 'use strict';
 
 var nj = require('../core');
@@ -955,7 +985,7 @@ function setComponentEngine(name, obj, dom, port, render) {
 module.exports = {
   setComponentEngine: setComponentEngine
 };
-},{"../core":9}],14:[function(require,module,exports){
+},{"../core":9}],15:[function(require,module,exports){
 'use strict';
 
 var nj = require('../core'),
@@ -1062,7 +1092,7 @@ function throwIf(val, msg) {
 function transformParams(obj, data, parent) {
   var ret = '';
   each(obj, function (v, k) {
-    ret += ' ' + k + "='" + replaceParams(v, data, false, false, parent) + "'";
+    ret += ' ' + k + '="' + replaceParams(v, data, false, false, parent) + '"';
   }, false, false);
 
   return ret;
@@ -1383,7 +1413,7 @@ function getOpenTagParams(obj, noXml) {
     }
 
     var key = matchArr[1],
-      value = matchArr[2].replace(/['"]+/g, ""),  //去除引号
+      value = matchArr[2].replace(/['"]+/g, ''),  //去除引号
       len = value.length;
 
     //去除末尾的"/>"或">"
@@ -1549,12 +1579,15 @@ function isTagControl(obj) {
 }
 
 //获取全部标签组件
-function getTagComponents(el) {
+function getTagComponents(el, selector) {
   if (!el) {
     el = document;
   }
+  if (!selector) {
+    selector = '.' + nj.tagClassName;
+  }
 
-  return el.querySelectorAll('.' + nj.tagClassName);
+  return el.querySelectorAll(selector);
 }
 
 //create a unique key
@@ -1630,7 +1663,7 @@ nj.trim = trim;
 nj.assign = assign;
 
 module.exports = tools;
-},{"../core":9,"./escape":10,"object-assign":1}],15:[function(require,module,exports){
+},{"../core":9,"./escape":11,"object-assign":1}],16:[function(require,module,exports){
 'use strict';
 
 var tools = require('./tools'),
@@ -1647,5 +1680,5 @@ module.exports = tools.assign(
   filter,
   tools
 );
-},{"../checkElem/checkElem":3,"./filter":11,"./registerComponent":12,"./setComponentEngine":13,"./tools":14}]},{},[2])(2)
+},{"../checkElem/checkElem":3,"./filter":12,"./registerComponent":13,"./setComponentEngine":14,"./tools":15}]},{},[2])(2)
 });

@@ -591,12 +591,15 @@ function isTagControl(obj) {
 }
 
 //获取全部标签组件
-function getTagComponents(el) {
+function getTagComponents(el, selector) {
   if (!el) {
     el = document;
   }
+  if (!selector) {
+    selector = '.' + nj.tagClassName;
+  }
 
-  return el.querySelectorAll('.' + nj.tagClassName);
+  return el.querySelectorAll(selector);
 }
 
 //create a unique key

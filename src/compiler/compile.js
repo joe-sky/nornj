@@ -75,8 +75,8 @@ function compileTagComponent(obj, tmplName) {
 }
 
 //渲染标签组件
-function renderTagComponent(data, el) {
-  var tags = utils.getTagComponents(el),
+function renderTagComponent(data, el, selector) {
+  var tags = utils.getTagComponents(el, selector),
     ret = [];
 
   utils.each(tags, function (tag) {

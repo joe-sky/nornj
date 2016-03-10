@@ -89,4 +89,9 @@ function checkTagContentElem(obj, parent) {
   }, false, true);
 }
 
+//Set init data for tag component
+nj.setInitTagData = function (data) {
+  nj.initTagData = data;
+};
+
 module.exports = checkTagElem;

@@ -27,8 +27,10 @@ var inBrowser = typeof self !== 'undefined',
 
 //Init tag template
 if (inBrowser) {
-  docReady(function() {
-
+  docReady(function () {
+    if (!nj.preventAutoRenderTag) {
+      nj.renderTagComponent(nj.initTagData);
+    }
   });
 }
 

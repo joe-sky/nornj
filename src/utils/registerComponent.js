@@ -7,11 +7,11 @@ var nj = require('../core'),
 function registerComponent(name, obj) {
   var params = name;
   if (!tools.isArray(name)) {
-    params = [{ name: name, obj: obj }];
+    params = [{ name: name, component: obj }];
   }
 
   tools.each(params, function (param) {
-    nj.componentClasses[param.name.toLowerCase()] = param.obj;
+    nj.componentClasses[param.name.toLowerCase()] = param.component;
   }, false, true);
 }
 

@@ -1,15 +1,22 @@
-﻿nj.registerFilter("isCurrent", function (obj) {
-    return obj === this.data[1].filter;
-});
-
-nj.registerFilter("isActive", function (obj) {
-    return obj === "Active";
-});
-
-nj.registerFilter("textDecoration", function (obj) {
-    return obj ? 'line-through' : 'none';
-});
-
-nj.registerFilter("cursor", function (obj) {
-    return obj ? 'default' : 'pointer';
-});
+﻿nj.registerFilter([
+  {
+    name: 'isCurrent', filter: function (obj) {
+      return obj === this.data[1].filter;
+    }
+  },
+  {
+    name: 'isActive', filter: function (obj) {
+      return obj === "Active";
+    }
+  },
+  {
+    name: 'textDecoration', filter: function (obj) {
+      return obj ? 'line-through' : 'none';
+    }
+  },
+  {
+    name: 'cursor', filter: function (obj) {
+      return obj ? 'default' : 'pointer';
+    }
+  }
+]);
