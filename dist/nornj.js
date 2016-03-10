@@ -808,6 +808,7 @@ nj.tagId = 'nj-id';
 nj.tagStyle = 'nj-style';
 nj.tagClassName = 'nj-component';
 nj.templates = {};
+nj.errorTitle = 'NornJ error:';
 
 module.exports = nj;
 },{}],10:[function(require,module,exports){
@@ -1104,10 +1105,15 @@ function _useFilters(filters, ret, data, parent, index) {
   if (filters) {
     var filtersObj = nj.filters;
     each(filters, function (filterObj) {
+      var filter = filtersObj[filterObj.name];  //Get filter function
+      if(!filter) {
+        console.warn(nj.errorTitle + 'A filter called ' + filterObj.name + ' is undefined.');
+        return;
+      }
+
       var params,
         paramsF = filterObj.params,
-        filter = filtersObj[filterObj.name],  //Get filter function
-        thisObj = lightObj();
+        thisObj = lightObj(); 
 
       if (paramsF) {
         params = listPush([ret], paramsF);
