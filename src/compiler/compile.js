@@ -6,7 +6,7 @@ var nj = require('../core'),
   tranComponent = require('./transformToComponent'),
   compileStringTmpl = require('../checkElem/checkStringElem');
 
-//编译字面量并返回转换函数
+//编译模板并返回转换函数
 function compile(obj, tmplName, isComponent, isTag) {
   if (!obj) {
     return;
@@ -22,12 +22,10 @@ function compile(obj, tmplName, isComponent, isTag) {
       root = obj;
     }
     else {
-      root = utils.lightObj();
-      root.type = 'nj_root';
-      root.content = [];
+      root = _createRoot();
 
       //Auto transform string template to array
-      if(utils.isString(obj)) {
+      if (utils.isString(obj)) {
         obj = compileStringTmpl(obj);
       }
 
@@ -57,6 +55,15 @@ function compile(obj, tmplName, isComponent, isTag) {
   };
 }
 
+//Create template root object
+function _createRoot() {
+  var root = utils.lightObj();
+  root.type = 'nj_root';
+  root.content = [];
+
+  return root;
+}
+
 //编译字面量并返回组件转换函数
 function compileComponent(obj, tmplName) {
   return compile(obj, tmplName, true);
@@ -80,9 +87,18 @@ function renderTagComponent(data, el) {
   return ret;
 }
 
+//precompile template
+function precompile(obj) {
+  var root = _createRoot();
+  utils.checkElem(obj, root);
+
+  return root;
+}
+
 module.exports = {
   compile: compile,
   compileComponent: compileComponent,
   compileTagComponent: compileTagComponent,
-  renderTagComponent: renderTagComponent
+  renderTagComponent: renderTagComponent,
+  precompile: precompile
 };

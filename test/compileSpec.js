@@ -1,6 +1,7 @@
 ﻿var nj = require("../src/base"),
     utils = require("../src/utils/utils"),
-    compile = require("../src/compiler/compile").compile;
+    compiler = require("../src/compiler/compile"),
+    compile = compiler.compile;
 
 describe('test compile', function () {
   beforeAll(function () {
@@ -43,6 +44,7 @@ describe('test compile', function () {
           html = tmplFn(data);
 
       //console.log(JSON.stringify(nj.templates['tmpl1']));
+      //console.log(JSON.stringify(compiler.precompile(tmpl)));
       console.log(html);
       expect(html).toBeTruthy();
     });

@@ -5,6 +5,7 @@
   "main": "dist/nornj.js",
   "files": [
     "dist/",
+    "precompiler.js",
     "LICENSE"
   ],
   "scripts": {

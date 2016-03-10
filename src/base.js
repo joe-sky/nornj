@@ -7,13 +7,10 @@ var nj = require('./core'),
   compileStringTmpl = require('./checkElem/checkStringElem');
 
 nj.setComponentEngine = setComponentEngine;
-nj.compile = compiler.compile;
-nj.compileComponent = compiler.compileComponent;
-nj.compileTagComponent = compiler.compileTagComponent;
-nj.renderTagComponent = compiler.renderTagComponent;
 nj.registerComponent = utils.registerComponent;
 nj.registerFilter = utils.registerFilter;
 nj.compileStringTmpl = compileStringTmpl;
+utils.assign(nj, compiler);
 
 //创建标签命名空间
 utils.createTagNamespace();
