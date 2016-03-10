@@ -1,5 +1,6 @@
 ﻿'use strict';
 
-var nj = require('./dist/nornj.js');
+var nj = require('./src/base'),
+  precompile = nj.precompile;
 
 module.exports = {};
