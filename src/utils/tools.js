@@ -104,7 +104,7 @@ function throwIf(val, msg) {
 function transformParams(obj, data, parent) {
   var ret = '';
   each(obj, function (v, k) {
-    ret += ' ' + k + "='" + replaceParams(v, data, false, false, parent) + "'";
+    ret += ' ' + k + '="' + replaceParams(v, data, false, false, parent) + '"';
   }, false, false);
 
   return ret;
@@ -425,7 +425,7 @@ function getOpenTagParams(obj, noXml) {
     }
 
     var key = matchArr[1],
-      value = matchArr[2].replace(/['"]+/g, ""),  //去除引号
+      value = matchArr[2].replace(/['"]+/g, ''),  //去除引号
       len = value.length;
 
     //去除末尾的"/>"或">"
