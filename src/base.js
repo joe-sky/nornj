@@ -14,10 +14,10 @@ nj.compileStringTmpl = compileStringTmpl;
 nj.docReady = docReady;
 utils.assign(nj, compiler);
 
-//创建标签命名空间
+//Create vml tag namespace(primarily for IE8)
 utils.createTagNamespace();
 
-//默认使用react作为组件引擎
+//Default use React as component engine
 if (typeof React !== 'undefined') {
   setComponentEngine('react', React, typeof ReactDOM !== 'undefined' ? ReactDOM : null);
 }
