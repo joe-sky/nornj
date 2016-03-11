@@ -3,7 +3,7 @@
 var nj = require('../core'),
   tools = require('./tools');
 
-//过滤器对象
+//Global filter list
 nj.filters = {
   //Get param properties
   prop: function (obj, props) {
@@ -31,7 +31,7 @@ nj.filters = {
   }
 };
 
-//注册过滤器
+//Register filter and also can batch add
 function registerFilter(name, filter) {
   var params = name;
   if (!tools.isObject(name)) {
