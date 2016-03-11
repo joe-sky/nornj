@@ -6,10 +6,13 @@
       completed: React.PropTypes.bool.isRequired
     }).isRequired).isRequired
   },
-  template: nj.compileComponent(TodoListTmpl, 'TodoList'),
+
+  template: nj.compileComponent(TodoListTmpl),
+
   todoClick: function (index) {
     this.props.onTodoClick(index);
   },
+
   render: function () {
     return this.template(
       [

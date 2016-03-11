@@ -1,7 +1,6 @@
 ﻿//Action type
 var ADD_TODO = 'ADD_TODO';
 var COMPLETE_TODO = 'COMPLETE_TODO';
-var SET_VISIBILITY_FILTER = 'SET_VISIBILITY_FILTER';
 
 //Other constant
 var VisibilityFilters = {
@@ -17,8 +16,4 @@ function addTodo(text) {
 
 function completeTodo(index) {
   return { type: COMPLETE_TODO, index: index }
-}
-
-function setVisibilityFilter(filter) {
-  return { type: SET_VISIBILITY_FILTER, filter: filter }
 }

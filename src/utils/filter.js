@@ -23,6 +23,11 @@ nj.filters = {
   //Get list item
   item: function (obj, no) {
     return obj ? obj[no] : null;
+  },
+
+  //Judge equal
+  equal: function (obj, val) {
+    return obj == val;
   }
 };
 

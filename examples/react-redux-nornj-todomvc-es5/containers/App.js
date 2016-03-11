@@ -5,21 +5,22 @@
       completed: React.PropTypes.bool.isRequired
     }).isRequired).isRequired,
     visibilityFilter: React.PropTypes.oneOf([
-      'SHOW_ALL',
-      'SHOW_COMPLETED',
-      'SHOW_ACTIVE'
+      VisibilityFilters.SHOW_ALL,
+      VisibilityFilters.SHOW_COMPLETED,
+      VisibilityFilters.SHOW_ACTIVE
     ]).isRequired
   },
-  template: nj.compileComponent(AppTmpl, 'App'),
+
+  template: nj.compileComponent(AppTmpl),
+
   addClick: function (text) {
     this.props.dispatch(addTodo(text));
   },
+
   todoClick: function (index) {
     this.props.dispatch(completeTodo(index));
   },
-  filterChange: function (nextFilter) {
-    this.props.dispatch(setVisibilityFilter(nextFilter));
-  },
+
   render: function () {
     return this.template(
       [
