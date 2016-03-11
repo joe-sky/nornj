@@ -17,6 +17,18 @@ var tmpl = nj`
     <input id=test onclick={click} />
 </div>`;
 ```
+当然，也可以支持在es5环境下使用普通的字符串：
+```html
+<script id="template" type="text/nornj">
+    <div>
+        this the test demo Hello {msg}
+        <input id=test onclick={click} />
+    </div>
+</script>
+```
+```js
+var tmpl = document.querySelector('#template').innerHTML;
+```
 然后可以这样编译后输出html字符串：
 ```js
 var html = nj.compile(tmpl)({
