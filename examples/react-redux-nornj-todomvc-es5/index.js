@@ -8,7 +8,7 @@ nj.registerComponent([
 ]);
 
 var reducer = Redux.combineReducers(nj.assign({}, todoApp, {
-    routing: ReactRouterRedux.routeReducer
+  routing: ReactRouterRedux.routeReducer
 }));
 
 var reduxRouterMiddleware = ReactRouterRedux.syncHistory(ReactRouter.hashHistory);
@@ -17,7 +17,7 @@ var createStoreWithMiddleware = Redux.applyMiddleware(reduxRouterMiddleware)(Red
 var store = createStoreWithMiddleware(reducer);
 reduxRouterMiddleware.listenForReplays(store);
 
-//var store = Redux.createStore(reducer);
+//Set default data for first render NornJ html template.
 nj.setInitTagData({
   store: store,
   hashHistory: ReactRouter.hashHistory,
