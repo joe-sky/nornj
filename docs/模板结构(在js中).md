@@ -184,6 +184,7 @@ nj.compile(['each {list}',
 | prop           | 获取对象属性值  | {content:prop(foo.bar)} |
 | count          | 获取集合总数    | {content:count}         |
 | item           | 获取集合项值    | {content:item(0)}       |
+| equal          | 是否等于某个值  | {content:equal(foo)}    |
 
 ##### 流程控制块
 
