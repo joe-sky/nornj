@@ -40,8 +40,8 @@ var tmpl =
     ['<i>', 'test{no}'],
 '/div'];
 
-//定义组件
-var TestComponent = React.createClass({
+//注册NornJ模板组件
+nj.registerComponent('TestComponent', React.createClass({
     //编译为组件模板函数
     template: nj.compileComponent(tmpl, 'tmpl1'),
     render: function() {
@@ -49,10 +49,7 @@ var TestComponent = React.createClass({
             no: this.props.no
         });
     }
-});
-
-//注册NornJ模板组件
-nj.registerComponent('TestComponent', TestComponent);
+}));
 
 //输出React组件
 var comp = nj.compileComponent(

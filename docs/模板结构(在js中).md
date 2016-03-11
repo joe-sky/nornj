@@ -129,19 +129,14 @@ nj.registerFilter("format", function(obj) {
 
 * 也可以一次定义多个过滤器：
 ```js
-nj.registerFilter([
-{
-    name: "format",
-    filter: function(obj) {
+nj.registerFilter({
+    format: function(obj) {
         return obj.trim();
-    }
-}, {
-    name: "replace",
-    filter: function(obj) {
+    },
+    replace: function(obj) {
         return obj.replace(/id/g, "test1");
     }
-}
-]);
+});
 ```
 
 * 过滤器也可以添加参数，语法为"{替换参数:过滤器1(参数1,参数2...):过滤器2(参数1,参数2...)...}"。在过滤器方法中第一个参数是当前传入的数据；从第二个参数开始依次为这些模板中传入的参数，如下所示：
