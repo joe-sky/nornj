@@ -60,5 +60,4 @@ function select(state) {
 }
 
 //Wrap component,inject dispatch and state into its default connect(select)(App)
-var App = ReactRedux.connect(select)(_App);
-nj.registerComponent('App', App);
+var App = nj.registerComponent('App', ReactRedux.connect(select)(_App));

@@ -1,4 +1,4 @@
-﻿var Todo = React.createClass({
+﻿nj.registerComponent('Todo', React.createClass({
   propTypes: {
     onClick: React.PropTypes.func.isRequired,
     text: React.PropTypes.string.isRequired,
@@ -19,6 +19,4 @@
       ]
     );
   }
-});
-
-nj.registerComponent('Todo', Todo);
+}));

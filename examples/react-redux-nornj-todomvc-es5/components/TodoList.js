@@ -1,4 +1,4 @@
-﻿var TodoList = React.createClass({
+﻿nj.registerComponent('TodoList', React.createClass({
   propTypes: {
     onTodoClick: React.PropTypes.func.isRequired,
     todos: React.PropTypes.arrayOf(React.PropTypes.shape({
@@ -21,6 +21,4 @@
       ]
     );
   }
-});
-
-nj.registerComponent('TodoList', TodoList);
+}));

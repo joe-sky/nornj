@@ -34,13 +34,14 @@ nj.filters = {
 //注册过滤器
 function registerFilter(name, filter) {
   var params = name;
-  if (!tools.isArray(name)) {
-    params = [{ name: name, filter: filter }];
+  if (!tools.isObject(name)) {
+    params = {};
+    params[name] = filter;
   }
 
-  tools.each(params, function (param) {
-    nj.filters[param.name.toLowerCase()] = param.filter;
-  }, false, true);
+  tools.each(params, function (v, k) {
+    nj.filters[k.toLowerCase()] = v;
+  }, false, false);
 }
 
 module.exports = {

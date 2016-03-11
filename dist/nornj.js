@@ -911,13 +911,14 @@ nj.filters = {
 //注册过滤器
 function registerFilter(name, filter) {
   var params = name;
-  if (!tools.isArray(name)) {
-    params = [{ name: name, filter: filter }];
+  if (!tools.isObject(name)) {
+    params = {};
+    params[name] = filter;
   }
 
-  tools.each(params, function (param) {
-    nj.filters[param.name.toLowerCase()] = param.filter;
-  }, false, true);
+  tools.each(params, function (v, k) {
+    nj.filters[k.toLowerCase()] = v;
+  }, false, false);
 }
 
 module.exports = {
@@ -930,15 +931,18 @@ var nj = require('../core'),
   tools = require('./tools');
 
 //注册组件
-function registerComponent(name, obj) {
+function registerComponent(name, component) {
   var params = name;
-  if (!tools.isArray(name)) {
-    params = [{ name: name, component: obj }];
+  if (!tools.isObject(name)) {
+    params = {};
+    params[name] = component;
   }
 
-  tools.each(params, function (param) {
-    nj.componentClasses[param.name.toLowerCase()] = param.component;
-  }, false, true);
+  tools.each(params, function (v, k) {
+    nj.componentClasses[k.toLowerCase()] = v;
+  }, false, false);
+
+  return component;
 }
 
 //注册组件标签命名空间

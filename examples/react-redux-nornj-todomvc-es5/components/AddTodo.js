@@ -1,4 +1,4 @@
-﻿var AddTodo = React.createClass({
+﻿nj.registerComponent('AddTodo', React.createClass({
   propTypes: {
     onAddClick: React.PropTypes.func.isRequired
   },
@@ -15,6 +15,4 @@
   render: function () {
     return this.template({ handleClick: this.handleClick });
   }
-});
-
-nj.registerComponent('AddTodo', AddTodo);
+}));

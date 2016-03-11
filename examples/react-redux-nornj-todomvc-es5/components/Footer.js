@@ -1,4 +1,4 @@
-﻿var Footer = React.createClass({
+﻿nj.registerComponent('Footer', React.createClass({
   propTypes: {
     filter: React.PropTypes.oneOf([
       VisibilityFilters.SHOW_ALL,
@@ -19,6 +19,4 @@
       currentFilter: this.props.filter
     });
   }
-});
-
-nj.registerComponent('Footer', Footer);
+}));
