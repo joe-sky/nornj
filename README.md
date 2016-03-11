@@ -25,9 +25,9 @@ var tmpl = nj`
         <input id=test onclick={click} />
     </div>
 </script>
-```
-```js
-var tmpl = document.querySelector('#template').innerHTML;
+<script type="text/javascript">
+    var tmpl = document.querySelector('#template').innerHTML;
+</script>
 ```
 然后可以这样编译后输出html字符串：
 ```js
