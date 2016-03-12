@@ -79,6 +79,14 @@ render(nj.compileComponent(
 */
 ```
 
+还可以替代ReactDOM.render来在html内渲染React组件：
+```js
+...
+<body>
+    <nj:TestComponent class="nj-component" no="100" />
+</body>
+```
+
 ### 用途
 
 * 它可以作为Backbone.js等传统MVC框架的模板引擎，职责是接受数据输出html字符串;
