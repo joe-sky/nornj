@@ -80,7 +80,7 @@ render(nj.compileComponent(
 ```
 
 还可以替代ReactDOM.render来在html内渲染React组件：
-```js
+```html
 ...
 <body>
     <nj:TestComponent class="nj-component" no="100" />
