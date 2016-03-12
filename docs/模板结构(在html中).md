@@ -1,6 +1,6 @@
 # 模板结构(在html中)
 
-NornJ模板目前分为两种形式：
+NornJ模板可以在js或html中构建，分别有不同的用途：
 * [构建在js中的模板](https://github.com/joe-sky/nornj/blob/master/docs/模板结构(在js中).md)
 * [构建在html中的模板](#构建在html中的模板)
  * [用途](#用途)
