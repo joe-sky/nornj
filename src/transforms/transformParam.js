@@ -1,6 +1,6 @@
 ﻿'use strict';
 
-var tools = require('./tools');
+var tools = require('../utils/tools');
 
 //Get compiled parameters from a object
 function compiledParams(obj) {

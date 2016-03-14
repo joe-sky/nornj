@@ -2,8 +2,8 @@
 
 var nj = require('../core'),
   tools = require('../utils/tools'),
-  tranParam = require('../utils/transformParam'),
-  tranElem = require('../utils/transformElement');
+  tranParam = require('../transforms/transformParam'),
+  tranElem = require('../transforms/transformElement');
 
 //检测标签元素节点
 function checkTagElem(obj, parent) {

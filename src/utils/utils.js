@@ -1,9 +1,9 @@
 ﻿'use strict';
 
 var tools = require('./tools'),
-  transformElement = require('./transformElement'),
-  transformParam = require('./transformParam'),
-  transformData = require('./transformData'),
+  transformElement = require('../transforms/transformElement'),
+  transformParam = require('../transforms/transformParam'),
+  transformData = require('../transforms/transformData'),
   escape = require('./escape'),
   checkElem = require('../checkElem/checkElem'),
   setComponentEngine = require('./setComponentEngine'),

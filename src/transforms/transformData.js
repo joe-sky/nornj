@@ -1,8 +1,8 @@
 ﻿'use strict';
 
 var nj = require('../core'),
-  tools = require('./tools'),
-  escape = require('./escape');
+  tools = require('../utils/tools'),
+  escape = require('../utils/escape');
 
 //转换节点参数为字符串
 function transformParams(obj, data, parent) {

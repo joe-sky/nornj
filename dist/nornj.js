@@ -77,13 +77,13 @@ if (inBrowser) {
 }
 
 module.exports = global.NornJ = global.nj = nj;
-},{"./checkElem/checkStringElem":4,"./compiler/compile":6,"./core":9,"./utils/docReady":10,"./utils/utils":19}],3:[function(require,module,exports){
+},{"./checkElem/checkStringElem":4,"./compiler/compile":6,"./core":9,"./utils/docReady":13,"./utils/utils":19}],3:[function(require,module,exports){
 'use strict';
 
 var nj = require('../core'),
   tools = require('../utils/tools'),
-  tranParam = require('../utils/transformParam'),
-  tranElem = require('../utils/transformElement'),
+  tranParam = require('../transforms/transformParam'),
+  tranElem = require('../transforms/transformElement'),
   checkTagElem = require('./checkTagElem');
 
 //检测元素节点
@@ -264,7 +264,7 @@ module.exports = {
   checkElem: checkElem,
   checkTagElem: checkTagElem
 };
-},{"../core":9,"../utils/tools":15,"../utils/transformElement":17,"../utils/transformParam":18,"./checkTagElem":5}],4:[function(require,module,exports){
+},{"../core":9,"../transforms/transformElement":11,"../transforms/transformParam":12,"../utils/tools":18,"./checkTagElem":5}],4:[function(require,module,exports){
 'use strict';
 
 var nj = require('../core'),
@@ -428,13 +428,13 @@ function _getSelfCloseElem(elem, elemName, params) {
 }
 
 module.exports = compileStringTmpl;
-},{"../core":9,"../utils/tools":15}],5:[function(require,module,exports){
+},{"../core":9,"../utils/tools":18}],5:[function(require,module,exports){
 'use strict';
 
 var nj = require('../core'),
   tools = require('../utils/tools'),
-  tranParam = require('../utils/transformParam'),
-  tranElem = require('../utils/transformElement');
+  tranParam = require('../transforms/transformParam'),
+  tranElem = require('../transforms/transformElement');
 
 //检测标签元素节点
 function checkTagElem(obj, parent) {
@@ -528,7 +528,7 @@ nj.setInitTagData = function (data) {
 };
 
 module.exports = checkTagElem;
-},{"../core":9,"../utils/tools":15,"../utils/transformElement":17,"../utils/transformParam":18}],6:[function(require,module,exports){
+},{"../core":9,"../transforms/transformElement":11,"../transforms/transformParam":12,"../utils/tools":18}],6:[function(require,module,exports){
 'use strict';
 
 var nj = require('../core'),
@@ -836,308 +836,9 @@ module.exports = nj;
 },{}],10:[function(require,module,exports){
 'use strict';
 
-module.exports = function (callback) {
-  var doc = document;
-  if (doc.addEventListener) {
-    doc.addEventListener("DOMContentLoaded", callback, false);
-  }
-  else {
-    self.attachEvent("onload", callback);
-  }
-};
-},{}],11:[function(require,module,exports){
-'use strict';
-
-var ESCAPE_LOOKUP = {
-  '&': '&amp;',
-  '>': '&gt;',
-  '<': '&lt;',
-  '"': '&quot;',
-  '\'': '&#x27;'
-},
-ESCAPE_REGEX = /[&><"']/g;
-
-function escape(text) {
-  if (text == null) {
-    return;
-  }
-
-  return ('' + text).replace(ESCAPE_REGEX, function (match) {
-    return ESCAPE_LOOKUP[match];
-  });
-}
-
-module.exports = escape;
-},{}],12:[function(require,module,exports){
-'use strict';
-
 var nj = require('../core'),
-  tools = require('./tools');
-
-//Global filter list
-nj.filters = {
-  //Get param properties
-  prop: function (obj, props) {
-    var ret = obj;
-    ret && tools.each(props.split('.'), function (p) {
-      ret = ret[p];
-    }, false, true);
-
-    return ret;
-  },
-
-  //Get list count
-  count: function (obj) {
-    return obj ? obj.length : 0;
-  },
-
-  //Get list item
-  item: function (obj, no) {
-    return obj ? obj[no] : null;
-  },
-
-  //Judge equal
-  equal: function (obj, val) {
-    return obj == val;
-  }
-};
-
-//Register filter and also can batch add
-function registerFilter(name, filter) {
-  var params = name;
-  if (!tools.isObject(name)) {
-    params = {};
-    params[name] = filter;
-  }
-
-  tools.each(params, function (v, k) {
-    nj.filters[k.toLowerCase()] = v;
-  }, false, false);
-}
-
-module.exports = {
-  registerFilter: registerFilter
-};
-
-},{"../core":9,"./tools":15}],13:[function(require,module,exports){
-'use strict';
-
-var nj = require('../core'),
-  tools = require('./tools');
-
-//注册组件
-function registerComponent(name, component) {
-  var params = name;
-  if (!tools.isObject(name)) {
-    params = {};
-    params[name] = component;
-  }
-
-  tools.each(params, function (v, k) {
-    nj.componentClasses[k.toLowerCase()] = v;
-  }, false, false);
-
-  return component;
-}
-
-//注册组件标签命名空间
-function registerTagNamespace(name) {
-  nj.tagNamespace = name;
-  createTagNamespace();
-
-  //修改标签组件id及类名
-  nj.tagId = name + '-id';
-  nj.tagStyle = name + '-style';
-  nj.tagClassName = name + '-component';
-}
-
-//创建标签命名空间
-function createTagNamespace() {
-  if (typeof document === 'undefined') {
-    return;
-  }
-
-  var doc = document;
-  if (doc && doc.namespaces) {
-    doc.namespaces.add(nj.tagNamespace, 'urn:schemas-microsoft-com:vml', '#default#VML');
-  }
-}
-
-module.exports = {
-  registerComponent: registerComponent,
-  registerTagNamespace: registerTagNamespace,
-  createTagNamespace: createTagNamespace
-};
-},{"../core":9,"./tools":15}],14:[function(require,module,exports){
-'use strict';
-
-var nj = require('../core');
-
-//设置组件引擎
-function setComponentEngine(name, obj, dom, port, render) {
-  nj.componentLib = name;
-  nj.componentLibObj = obj;
-  nj.componentLibDom = dom || obj;
-  if (name === 'react') {
-    port = 'createElement';
-    render = 'render';
-  }
-  nj.componentPort = port;
-  nj.componentRender = render;
-}
-
-module.exports = {
-  setComponentEngine: setComponentEngine
-};
-},{"../core":9}],15:[function(require,module,exports){
-'use strict';
-
-var nj = require('../core'),
-  assign = require('object-assign'),
-  arrayProto = Array.prototype,
-  arrayEvery = arrayProto.every,
-  arrayPush = arrayProto.push;
-
-//Array push
-function listPush(arr1, arr2) {
-  arrayPush.apply(arr1, arr2);
-  return arr1;
-}
-
-//判断是否为数组
-function isArray(obj) {
-  return Array.isArray(obj);
-}
-
-//判断是否为对象
-function isObject(obj) {
-  var type = typeof obj;
-  return !isArray(obj) && (type === 'function' || type === 'object' && !!obj);
-}
-
-//判断是否为字符串
-function isString(obj) {
-  return Object.prototype.toString.call(obj) === '[object String]';
-}
-
-//获取属性值
-function _getProperty(key) {
-  return function (obj) {
-    return obj == null ? void 0 : obj[key];
-  };
-}
-
-//是否为类数组
-var _getLength = _getProperty('length');
-function isArrayLike(obj) {
-  var length = _getLength(obj);
-  return typeof length == 'number' && length >= 0;
-}
-
-//遍历数组或对象
-function each(obj, func, context, isArr) {
-  if (!obj) {
-    return;
-  }
-  if (isArr == null) {
-    isArr = isArrayLike(obj);
-  }
-
-  //设置回调函数上下文
-  context = context ? context : obj;
-
-  if (isArr) {
-    arrayEvery.call(obj, function (o, i, arr) {
-      var ret = func.call(context, o, i, arr);
-
-      if (ret === false) {
-        return ret;
-      }
-      return true;
-    });
-  }
-  else {
-    var keys = Object.keys(obj);
-    arrayEvery.call(keys, function (o, i) {
-      var key = keys[i],
-        ret = func.call(context, obj[key], key, obj);
-
-      if (ret === false) {
-        return ret;
-      }
-      return true;
-    });
-  }
-}
-
-//判断是否在数组内
-function inArray(obj, value) {
-  return obj.indexOf(value);
-}
-
-//去除字符串空格
-function trim(str) {
-  if (!!!str) {
-    return '';
-  }
-
-  return str.trim();
-}
-
-//抛出异常
-function throwIf(val, msg) {
-  if (!val) {
-    throw Error(msg || val);
-  }
-}
-
-//create a unique key
-function uniqueKey(str) {
-  var len = str.length;
-  if (len == 0) {
-    return str;
-  }
-
-  var hash = 0, i, chr;
-  for (i = 0, len = str.length; i < len; i++) {
-    chr = str.charCodeAt(i);
-    hash = ((hash << 5) - hash) + chr;
-    hash |= 0;
-  }
-
-  return hash;
-}
-
-//create light weight object
-function lightObj() {
-  return Object.create(null);
-}
-
-var tools = {
-  isArray: isArray,
-  isArrayLike: isArrayLike,
-  isObject: isObject,
-  isString: isString,
-  each: each,
-  inArray: inArray,
-  trim: trim,
-  throwIf: throwIf,
-  assign: assign,
-  uniqueKey: uniqueKey,
-  lightObj: lightObj,
-  listPush: listPush
-};
-
-//绑定到nj对象
-assign(nj, tools);
-
-module.exports = tools;
-},{"../core":9,"object-assign":1}],16:[function(require,module,exports){
-'use strict';
-
-var nj = require('../core'),
-  tools = require('./tools'),
-  escape = require('./escape');
+  tools = require('../utils/tools'),
+  escape = require('../utils/escape');
 
 //转换节点参数为字符串
 function transformParams(obj, data, parent) {
@@ -1367,11 +1068,11 @@ module.exports = {
   getItemParam: getItemParam,
   setObjParam: setObjParam
 };
-},{"../core":9,"./escape":11,"./tools":15}],17:[function(require,module,exports){
+},{"../core":9,"../utils/escape":14,"../utils/tools":18}],11:[function(require,module,exports){
 'use strict';
 
 var nj = require('../core'),
-  tools = require('./tools'),
+  tools = require('../utils/tools'),
   tranData = require('./transformData');
 
 //提取xml open tag
@@ -1565,10 +1266,10 @@ module.exports = {
   isTagControl: isTagControl,
   getTagComponents: getTagComponents
 };
-},{"../core":9,"./tools":15,"./transformData":16}],18:[function(require,module,exports){
+},{"../core":9,"../utils/tools":18,"./transformData":10}],12:[function(require,module,exports){
 'use strict';
 
-var tools = require('./tools');
+var tools = require('../utils/tools');
 
 //Get compiled parameters from a object
 function compiledParams(obj) {
@@ -1689,13 +1390,312 @@ module.exports = {
   compiledParams: compiledParams,
   compiledProp: compiledProp
 };
-},{"./tools":15}],19:[function(require,module,exports){
+},{"../utils/tools":18}],13:[function(require,module,exports){
+'use strict';
+
+module.exports = function (callback) {
+  var doc = document;
+  if (doc.addEventListener) {
+    doc.addEventListener("DOMContentLoaded", callback, false);
+  }
+  else {
+    self.attachEvent("onload", callback);
+  }
+};
+},{}],14:[function(require,module,exports){
+'use strict';
+
+var ESCAPE_LOOKUP = {
+  '&': '&amp;',
+  '>': '&gt;',
+  '<': '&lt;',
+  '"': '&quot;',
+  '\'': '&#x27;'
+},
+ESCAPE_REGEX = /[&><"']/g;
+
+function escape(text) {
+  if (text == null) {
+    return;
+  }
+
+  return ('' + text).replace(ESCAPE_REGEX, function (match) {
+    return ESCAPE_LOOKUP[match];
+  });
+}
+
+module.exports = escape;
+},{}],15:[function(require,module,exports){
+'use strict';
+
+var nj = require('../core'),
+  tools = require('./tools');
+
+//Global filter list
+nj.filters = {
+  //Get param properties
+  prop: function (obj, props) {
+    var ret = obj;
+    ret && tools.each(props.split('.'), function (p) {
+      ret = ret[p];
+    }, false, true);
+
+    return ret;
+  },
+
+  //Get list count
+  count: function (obj) {
+    return obj ? obj.length : 0;
+  },
+
+  //Get list item
+  item: function (obj, no) {
+    return obj ? obj[no] : null;
+  },
+
+  //Judge equal
+  equal: function (obj, val) {
+    return obj == val;
+  }
+};
+
+//Register filter and also can batch add
+function registerFilter(name, filter) {
+  var params = name;
+  if (!tools.isObject(name)) {
+    params = {};
+    params[name] = filter;
+  }
+
+  tools.each(params, function (v, k) {
+    nj.filters[k.toLowerCase()] = v;
+  }, false, false);
+}
+
+module.exports = {
+  registerFilter: registerFilter
+};
+
+},{"../core":9,"./tools":18}],16:[function(require,module,exports){
+'use strict';
+
+var nj = require('../core'),
+  tools = require('./tools');
+
+//注册组件
+function registerComponent(name, component) {
+  var params = name;
+  if (!tools.isObject(name)) {
+    params = {};
+    params[name] = component;
+  }
+
+  tools.each(params, function (v, k) {
+    nj.componentClasses[k.toLowerCase()] = v;
+  }, false, false);
+
+  return component;
+}
+
+//注册组件标签命名空间
+function registerTagNamespace(name) {
+  nj.tagNamespace = name;
+  createTagNamespace();
+
+  //修改标签组件id及类名
+  nj.tagId = name + '-id';
+  nj.tagStyle = name + '-style';
+  nj.tagClassName = name + '-component';
+}
+
+//创建标签命名空间
+function createTagNamespace() {
+  if (typeof document === 'undefined') {
+    return;
+  }
+
+  var doc = document;
+  if (doc && doc.namespaces) {
+    doc.namespaces.add(nj.tagNamespace, 'urn:schemas-microsoft-com:vml', '#default#VML');
+  }
+}
+
+module.exports = {
+  registerComponent: registerComponent,
+  registerTagNamespace: registerTagNamespace,
+  createTagNamespace: createTagNamespace
+};
+},{"../core":9,"./tools":18}],17:[function(require,module,exports){
+'use strict';
+
+var nj = require('../core');
+
+//设置组件引擎
+function setComponentEngine(name, obj, dom, port, render) {
+  nj.componentLib = name;
+  nj.componentLibObj = obj;
+  nj.componentLibDom = dom || obj;
+  if (name === 'react') {
+    port = 'createElement';
+    render = 'render';
+  }
+  nj.componentPort = port;
+  nj.componentRender = render;
+}
+
+module.exports = {
+  setComponentEngine: setComponentEngine
+};
+},{"../core":9}],18:[function(require,module,exports){
+'use strict';
+
+var nj = require('../core'),
+  assign = require('object-assign'),
+  arrayProto = Array.prototype,
+  arrayEvery = arrayProto.every,
+  arrayPush = arrayProto.push;
+
+//Array push
+function listPush(arr1, arr2) {
+  arrayPush.apply(arr1, arr2);
+  return arr1;
+}
+
+//判断是否为数组
+function isArray(obj) {
+  return Array.isArray(obj);
+}
+
+//判断是否为对象
+function isObject(obj) {
+  var type = typeof obj;
+  return !isArray(obj) && (type === 'function' || type === 'object' && !!obj);
+}
+
+//判断是否为字符串
+function isString(obj) {
+  return Object.prototype.toString.call(obj) === '[object String]';
+}
+
+//获取属性值
+function _getProperty(key) {
+  return function (obj) {
+    return obj == null ? void 0 : obj[key];
+  };
+}
+
+//是否为类数组
+var _getLength = _getProperty('length');
+function isArrayLike(obj) {
+  var length = _getLength(obj);
+  return typeof length == 'number' && length >= 0;
+}
+
+//遍历数组或对象
+function each(obj, func, context, isArr) {
+  if (!obj) {
+    return;
+  }
+  if (isArr == null) {
+    isArr = isArrayLike(obj);
+  }
+
+  //设置回调函数上下文
+  context = context ? context : obj;
+
+  if (isArr) {
+    arrayEvery.call(obj, function (o, i, arr) {
+      var ret = func.call(context, o, i, arr);
+
+      if (ret === false) {
+        return ret;
+      }
+      return true;
+    });
+  }
+  else {
+    var keys = Object.keys(obj);
+    arrayEvery.call(keys, function (o, i) {
+      var key = keys[i],
+        ret = func.call(context, obj[key], key, obj);
+
+      if (ret === false) {
+        return ret;
+      }
+      return true;
+    });
+  }
+}
+
+//判断是否在数组内
+function inArray(obj, value) {
+  return obj.indexOf(value);
+}
+
+//去除字符串空格
+function trim(str) {
+  if (!!!str) {
+    return '';
+  }
+
+  return str.trim();
+}
+
+//抛出异常
+function throwIf(val, msg) {
+  if (!val) {
+    throw Error(msg || val);
+  }
+}
+
+//create a unique key
+function uniqueKey(str) {
+  var len = str.length;
+  if (len == 0) {
+    return str;
+  }
+
+  var hash = 0, i, chr;
+  for (i = 0, len = str.length; i < len; i++) {
+    chr = str.charCodeAt(i);
+    hash = ((hash << 5) - hash) + chr;
+    hash |= 0;
+  }
+
+  return hash;
+}
+
+//create light weight object
+function lightObj() {
+  return Object.create(null);
+}
+
+var tools = {
+  isArray: isArray,
+  isArrayLike: isArrayLike,
+  isObject: isObject,
+  isString: isString,
+  each: each,
+  inArray: inArray,
+  trim: trim,
+  throwIf: throwIf,
+  assign: assign,
+  uniqueKey: uniqueKey,
+  lightObj: lightObj,
+  listPush: listPush
+};
+
+//绑定到nj对象
+assign(nj, tools);
+
+module.exports = tools;
+},{"../core":9,"object-assign":1}],19:[function(require,module,exports){
 'use strict';
 
 var tools = require('./tools'),
-  transformElement = require('./transformElement'),
-  transformParam = require('./transformParam'),
-  transformData = require('./transformData'),
+  transformElement = require('../transforms/transformElement'),
+  transformParam = require('../transforms/transformParam'),
+  transformData = require('../transforms/transformData'),
   escape = require('./escape'),
   checkElem = require('../checkElem/checkElem'),
   setComponentEngine = require('./setComponentEngine'),
@@ -1713,5 +1713,5 @@ module.exports = tools.assign(
   transformParam,
   transformData
 );
-},{"../checkElem/checkElem":3,"./escape":11,"./filter":12,"./registerComponent":13,"./setComponentEngine":14,"./tools":15,"./transformData":16,"./transformElement":17,"./transformParam":18}]},{},[2])(2)
+},{"../checkElem/checkElem":3,"../transforms/transformData":10,"../transforms/transformElement":11,"../transforms/transformParam":12,"./escape":14,"./filter":15,"./registerComponent":16,"./setComponentEngine":17,"./tools":18}]},{},[2])(2)
 });

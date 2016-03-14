@@ -1,7 +1,7 @@
 ﻿'use strict';
 
 var nj = require('../core'),
-  tools = require('./tools'),
+  tools = require('../utils/tools'),
   tranData = require('./transformData');
 
 //提取xml open tag
