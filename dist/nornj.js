@@ -56,10 +56,10 @@ nj.compileStringTmpl = compileStringTmpl;
 nj.docReady = docReady;
 utils.assign(nj, compiler);
 
-//创建标签命名空间
+//Create vml tag namespace(primarily for IE8)
 utils.createTagNamespace();
 
-//默认使用react作为组件引擎
+//Default use React as component engine
 if (typeof React !== 'undefined') {
   setComponentEngine('react', React, typeof ReactDOM !== 'undefined' ? ReactDOM : null);
 }
@@ -77,11 +77,13 @@ if (inBrowser) {
 }
 
 module.exports = global.NornJ = global.nj = nj;
-},{"./checkElem/checkStringElem":4,"./compiler/compile":6,"./core":9,"./utils/docReady":10,"./utils/utils":16}],3:[function(require,module,exports){
+},{"./checkElem/checkStringElem":4,"./compiler/compile":6,"./core":9,"./utils/docReady":10,"./utils/utils":19}],3:[function(require,module,exports){
 'use strict';
 
 var nj = require('../core'),
   tools = require('../utils/tools'),
+  tranParam = require('../utils/transformParam'),
+  tranElem = require('../utils/transformElement'),
   checkTagElem = require('./checkTagElem');
 
 //检测元素节点
@@ -92,7 +94,7 @@ function checkElem(obj, parent) {
   if (!tools.isArray(obj)) {
     if (tools.isString(obj)) {  //判断是否为文本节点
       node.type = 'nj_plaintext';
-      node.content = [tools.compiledParam(obj)];
+      node.content = [tranParam.compiledParam(obj)];
       parent[parentContent].push(node);
     }
 
@@ -108,7 +110,7 @@ function checkElem(obj, parent) {
       control;
 
     //判断是否为xml标签
-    var xmlOpenTag = tools.getXmlOpenTag(first),
+    var xmlOpenTag = tranElem.getXmlOpenTag(first),
       openTagName,
       hasCloseTag = false,
       isTmpl;
@@ -116,8 +118,8 @@ function checkElem(obj, parent) {
     if (xmlOpenTag) {  //tagname为xml标签时,则认为是元素节点
       openTagName = xmlOpenTag[1];
 
-      if (!tools.isXmlSelfCloseTag(first)) {  //非自闭合标签才验证是否存在关闭标签
-        hasCloseTag = tools.isXmlCloseTag(last, openTagName);
+      if (!tranElem.isXmlSelfCloseTag(first)) {  //非自闭合标签才验证是否存在关闭标签
+        hasCloseTag = tranElem.isXmlCloseTag(last, openTagName);
       }
       else {  //自闭合标签
         node.selfCloseTag = true;
@@ -125,14 +127,14 @@ function checkElem(obj, parent) {
       isElemNode = true;
     }
     else {
-      control = tools.isControl(first);
+      control = tranElem.isControl(first);
       if (!control) {  //tagname不为xml标签时,必须有结束标签才认为是元素节点
-        var openTag = tools.getOpenTag(first);
+        var openTag = tranElem.getOpenTag(first);
         if (openTag) {
           openTagName = openTag[0];
 
-          if (!tools.isSelfCloseTag(first)) {  //非自闭合标签
-            hasCloseTag = tools.isCloseTag(last, openTagName);
+          if (!tranElem.isSelfCloseTag(first)) {  //非自闭合标签
+            hasCloseTag = tranElem.isCloseTag(last, openTagName);
             if (hasCloseTag) {
               isElemNode = true;
             }
@@ -146,14 +148,14 @@ function checkElem(obj, parent) {
       else {  //为特殊节点,也可视为一个元素节点
         var ctrl = control[0].toLowerCase(),
           refer = control[1];
-        isTmpl = tools.isTmpl(ctrl);
+        isTmpl = tranElem.isTmpl(ctrl);
 
         node.type = 'nj_' + ctrl;
         if (refer != null) {
-          node.refer = tools.compiledProp(refer);
+          node.refer = tranParam.compiledProp(refer);
         }
 
-        if (tools.isControlCloseTag(last, ctrl)) {  //判断是否有流程控制块闭合标签
+        if (tranElem.isControlCloseTag(last, ctrl)) {  //判断是否有流程控制块闭合标签
           hasCloseTag = true;
         }
         isElemNode = true;
@@ -169,11 +171,11 @@ function checkElem(obj, parent) {
       var params = obj[1];
       if (tools.isObject(params)) {  //如果第二个参数为对象,则为节点参数
         if (!control) {  //为元素节点时取各参数
-          node.params = tools.compiledParams(params);
+          node.params = tranParam.compiledParams(params);
         }
         else {  //为特殊节点时取refer
-          var retR = tools.getInsideBraceParam(params.refer);
-          node.refer = tools.compiledProp(retR ? retR[1] : params.refer);
+          var retR = tranElem.getInsideBraceParam(params.refer);
+          node.refer = tranParam.compiledProp(retR ? retR[1] : params.refer);
         }
 
         hasParams = true;
@@ -183,20 +185,20 @@ function checkElem(obj, parent) {
         node.type = openTagName;
 
         //If open tag has a brace,add the typeRefer param.
-        var typeRefer = tools.getInsideBraceParam(openTagName);
+        var typeRefer = tranElem.getInsideBraceParam(openTagName);
         if (typeRefer) {
-          node.typeRefer = tools.compiledProp(typeRefer[1]);
+          node.typeRefer = tranParam.compiledProp(typeRefer[1]);
         }
 
         //获取openTag内参数
-        var tagParams = tools.getOpenTagParams(first, !xmlOpenTag);
+        var tagParams = tranElem.getOpenTagParams(first, !xmlOpenTag);
         if (tagParams) {
           if (!node.params) {
             node.params = tools.lightObj();
           }
 
           tools.each(tagParams, function (param) {
-            node.params[param.key] = tools.compiledParam(param.value);
+            node.params[param.key] = tranParam.compiledParam(param.value);
           }, false, true);
         }
       }
@@ -205,7 +207,7 @@ function checkElem(obj, parent) {
           pushContent = false;
 
           //将模板添加到父节点的params中
-          tools.addTmpl(node, parent);
+          tranElem.addTmpl(node, parent);
         }
         else {
           elseIndex = tools.inArray(obj, '$else');
@@ -262,7 +264,7 @@ module.exports = {
   checkElem: checkElem,
   checkTagElem: checkTagElem
 };
-},{"../core":9,"../utils/tools":15,"./checkTagElem":5}],4:[function(require,module,exports){
+},{"../core":9,"../utils/tools":15,"../utils/transformElement":17,"../utils/transformParam":18,"./checkTagElem":5}],4:[function(require,module,exports){
 'use strict';
 
 var nj = require('../core'),
@@ -430,7 +432,9 @@ module.exports = compileStringTmpl;
 'use strict';
 
 var nj = require('../core'),
-  tools = require('../utils/tools');
+  tools = require('../utils/tools'),
+  tranParam = require('../utils/transformParam'),
+  tranElem = require('../utils/transformElement');
 
 //检测标签元素节点
 function checkTagElem(obj, parent) {
@@ -446,7 +450,7 @@ function checkTagElem(obj, parent) {
     }
 
     node.type = 'nj_plaintext';
-    node.content = [tools.compiledParam(nodeValue)];
+    node.content = [tranParam.compiledParam(nodeValue)];
     parent[parentContent].push(node);
 
     return;
@@ -454,9 +458,9 @@ function checkTagElem(obj, parent) {
 
   //处理元素节点
   if (nodeType === 1) {
-    var tagName = tools.getTagComponentName(obj),
-      params = tools.getTagComponentAttrs(obj),
-      isControl = tools.isTagControl(tagName),
+    var tagName = tranElem.getTagComponentName(obj),
+      params = tranElem.getTagComponentAttrs(obj),
+      isControl = tranElem.isTagControl(tagName),
       pushContent = true,
       isTmpl;
 
@@ -464,16 +468,16 @@ function checkTagElem(obj, parent) {
       if (tagName !== 'else') {
         node.type = 'nj_' + tagName;
 
-        isTmpl = tools.isTmpl(tagName);
+        isTmpl = tranElem.isTmpl(tagName);
         if (isTmpl) {  //模板元素
           pushContent = false;
 
           //将模板添加到父节点的params中
-          tools.addTmpl(node, parent);
+          tranElem.addTmpl(node, parent);
         }
         else {  //流程控制块
-          var retR = tools.getInsideBraceParam(params.refer);
-          node.refer = tools.compiledProp(retR ? retR[1] : params.refer);
+          var retR = tranElem.getInsideBraceParam(params.refer);
+          node.refer = tranParam.compiledProp(retR ? retR[1] : params.refer);
         }
       }
       else {  //else节点
@@ -487,7 +491,7 @@ function checkTagElem(obj, parent) {
     else {  //元素节点
       node.type = tagName;
       if (params) {
-        node.params = tools.compiledParams(params);
+        node.params = tranParam.compiledParams(params);
       }
     }
 
@@ -524,7 +528,7 @@ nj.setInitTagData = function (data) {
 };
 
 module.exports = checkTagElem;
-},{"../core":9,"../utils/tools":15}],6:[function(require,module,exports){
+},{"../core":9,"../utils/tools":15,"../utils/transformElement":17,"../utils/transformParam":18}],6:[function(require,module,exports){
 'use strict';
 
 var nj = require('../core'),
@@ -629,7 +633,7 @@ module.exports = {
   renderTagComponent: renderTagComponent,
   precompile: precompile
 };
-},{"../checkElem/checkStringElem":4,"../core":9,"../utils/utils":16,"./transformToComponent":7,"./transformToString":8}],7:[function(require,module,exports){
+},{"../checkElem/checkStringElem":4,"../core":9,"../utils/utils":19,"./transformToComponent":7,"./transformToString":8}],7:[function(require,module,exports){
 'use strict';
 
 var nj = require('../core'),
@@ -724,7 +728,7 @@ module.exports = {
   transformToComponent: transformToComponent,
   transformContentToComponent: transformContentToComponent
 };
-},{"../core":9,"../utils/utils":16}],8:[function(require,module,exports){
+},{"../core":9,"../utils/utils":19}],8:[function(require,module,exports){
 'use strict';
 
 var utils = require('../utils/utils');
@@ -808,7 +812,7 @@ module.exports = {
   transformContentToString: transformContentToString
 };
 
-},{"../utils/utils":16}],9:[function(require,module,exports){
+},{"../utils/utils":19}],9:[function(require,module,exports){
 'use strict';
 
 function nj() {
@@ -851,36 +855,26 @@ var ESCAPE_LOOKUP = {
   '"': '&quot;',
   '\'': '&#x27;'
 },
-ESCAPE_REGEX = /[&><"']/g,
-ESCAPE_LOOKUP_BRACKETS = {
-  '(': '\\(',
-  ')': '\\)'
-},
-ESCAPE_REGEX_BRACKETS = /[()]/g;
+ESCAPE_REGEX = /[&><"']/g;
 
-function _escape(regex, lookup) {
-  return function (text) {
-    if (text == null) {
-      return;
-    }
+function escape(text) {
+  if (text == null) {
+    return;
+  }
 
-    return ('' + text).replace(regex, function (match) {
-      return lookup[match];
-    });
-  };
+  return ('' + text).replace(ESCAPE_REGEX, function (match) {
+    return ESCAPE_LOOKUP[match];
+  });
 }
 
-module.exports = {
-  escape: _escape(ESCAPE_REGEX, ESCAPE_LOOKUP),
-  escapeBrackets: _escape(ESCAPE_REGEX_BRACKETS, ESCAPE_LOOKUP_BRACKETS)
-};
+module.exports = escape;
 },{}],12:[function(require,module,exports){
 'use strict';
 
 var nj = require('../core'),
   tools = require('./tools');
 
-//过滤器对象
+//Global filter list
 nj.filters = {
   //Get param properties
   prop: function (obj, props) {
@@ -908,7 +902,7 @@ nj.filters = {
   }
 };
 
-//注册过滤器
+//Register filter and also can batch add
 function registerFilter(name, filter) {
   var params = name;
   if (!tools.isObject(name)) {
@@ -924,6 +918,7 @@ function registerFilter(name, filter) {
 module.exports = {
   registerFilter: registerFilter
 };
+
 },{"../core":9,"./tools":15}],13:[function(require,module,exports){
 'use strict';
 
@@ -998,7 +993,6 @@ module.exports = {
 'use strict';
 
 var nj = require('../core'),
-  escape = require('./escape'),
   assign = require('object-assign'),
   arrayProto = Array.prototype,
   arrayEvery = arrayProto.every,
@@ -1041,18 +1035,18 @@ function isArrayLike(obj) {
 }
 
 //遍历数组或对象
-function each(obj, func, context, isArray) {
+function each(obj, func, context, isArr) {
   if (!obj) {
     return;
   }
-  if (isArray == null) {
-    isArray = isArrayLike(obj);
+  if (isArr == null) {
+    isArr = isArrayLike(obj);
   }
 
   //设置回调函数上下文
   context = context ? context : obj;
 
-  if (isArray) {
+  if (isArr) {
     arrayEvery.call(obj, function (o, i, arr) {
       var ret = func.call(context, o, i, arr);
 
@@ -1097,10 +1091,58 @@ function throwIf(val, msg) {
   }
 }
 
+//create a unique key
+function uniqueKey(str) {
+  var len = str.length;
+  if (len == 0) {
+    return str;
+  }
+
+  var hash = 0, i, chr;
+  for (i = 0, len = str.length; i < len; i++) {
+    chr = str.charCodeAt(i);
+    hash = ((hash << 5) - hash) + chr;
+    hash |= 0;
+  }
+
+  return hash;
+}
+
+//create light weight object
+function lightObj() {
+  return Object.create(null);
+}
+
+var tools = {
+  isArray: isArray,
+  isArrayLike: isArrayLike,
+  isObject: isObject,
+  isString: isString,
+  each: each,
+  inArray: inArray,
+  trim: trim,
+  throwIf: throwIf,
+  assign: assign,
+  uniqueKey: uniqueKey,
+  lightObj: lightObj,
+  listPush: listPush
+};
+
+//绑定到nj对象
+assign(nj, tools);
+
+module.exports = tools;
+},{"../core":9,"object-assign":1}],16:[function(require,module,exports){
+'use strict';
+
+var nj = require('../core'),
+  tools = require('./tools'),
+  escape = require('./escape');
+
 //转换节点参数为字符串
 function transformParams(obj, data, parent) {
   var ret = '';
-  each(obj, function (v, k) {
+  tools.each(obj, function (v, k) {
     ret += ' ' + k + '="' + replaceParams(v, data, false, false, parent) + '"';
   }, false, false);
 
@@ -1110,7 +1152,7 @@ function transformParams(obj, data, parent) {
 //转换节点参数为对象
 function transformParamsToObj(obj, data, parent) {
   var ret = obj ? {} : null;
-  each(obj, function (v, k) {
+  tools.each(obj, function (v, k) {
     replaceParams(v, data, ret, k, parent);
   }, false, false);
 
@@ -1131,7 +1173,7 @@ function setObjParam(obj, key, value, notTran) {
       case 'style':
       case nj.tagStyle:
         key = 'style';
-        style = getStyleParams(value);
+        style = _getStyleParams(value);
         break;
     }
   }
@@ -1139,11 +1181,44 @@ function setObjParam(obj, key, value, notTran) {
   obj[key] = style != null ? style : value;
 }
 
+//提取style内参数
+var REGEX_STYLE_PARAMS = /([^\s:]+)[\s]?:[\s]?([^\s;]+)[;]?/g;
+function _getStyleParams(obj) {
+  //If the parameter is a style object,then direct return.
+  if(tools.isObject(obj)) {
+    return obj;
+  }
+
+  //参数为字符串
+  var matchArr,
+    ret;
+
+  while ((matchArr = REGEX_STYLE_PARAMS.exec(obj))) {
+    var key = matchArr[1].toLowerCase(),
+      value = matchArr[2];
+
+    if (!ret) {
+      ret = {};
+    }
+
+    //将连字符转为驼峰命名
+    if (key.indexOf('-') > -1) {
+      key = key.replace(/-\w/g, function (letter) {
+        return letter.substr(1).toUpperCase();
+      });
+    }
+
+    ret[key] = value;
+  }
+
+  return ret;
+}
+
 //Use filters
 function _useFilters(filters, ret, data, parent, index) {
   if (filters) {
     var filtersObj = nj.filters;
-    each(filters, function (filterObj) {
+    tools.each(filters, function (filterObj) {
       var filter = filtersObj[filterObj.name];  //Get filter function
       if(!filter) {
         console.warn(nj.errorTitle + 'A filter called ' + filterObj.name + ' is undefined.');
@@ -1152,10 +1227,10 @@ function _useFilters(filters, ret, data, parent, index) {
 
       var params,
         paramsF = filterObj.params,
-        thisObj = lightObj(); 
+        thisObj = tools.lightObj(); 
 
       if (paramsF) {
-        params = listPush([ret], paramsF);
+        params = tools.listPush([ret], paramsF);
       }
       else {
         params = [ret];
@@ -1177,7 +1252,7 @@ function getDataValue(data, propObj, parent, defaultEmpty) {
     return;
   }
 
-  var isArr = isArray(data),
+  var isArr = tools.isArray(data),
     prop = propObj.name,
     filters = propObj.filters,
     parentNum = propObj.parentNum,
@@ -1193,7 +1268,7 @@ function getDataValue(data, propObj, parent, defaultEmpty) {
   if (parent && parentNum) {
     for (var i = 0; i < parentNum; i++) {
       var _parent = parent.parent;
-      throwIf(_parent, 'Parent data is undefined, please check the param path declare.');
+      tools.throwIf(_parent, 'Parent data is undefined, please check the param path declare.');
       parent = _parent;
       datas = [parent.data];
     }
@@ -1212,7 +1287,7 @@ function getDataValue(data, propObj, parent, defaultEmpty) {
     return _useFilters(filters, index, datas, dataP, index);
   }
 
-  each(datas, function (obj) {
+  tools.each(datas, function (obj) {
     if (obj) {
       ret = obj[prop];
 
@@ -1236,8 +1311,8 @@ function getDataValue(data, propObj, parent, defaultEmpty) {
 //获取each块中的item参数
 function getItemParam(item, data) {
   var ret = item;
-  if (isArray(data)) {
-    ret = listPush([item], data.slice(1));
+  if (tools.isArray(data)) {
+    ret = tools.listPush([item], data.slice(1));
   }
 
   return ret;
@@ -1248,18 +1323,18 @@ function replaceParams(valueObj, data, newObj, newKey, parent) {
   var props = valueObj.props,
     strs = valueObj.strs,
     isAll = valueObj.isAll,
-    useObj = isObject(newObj),  //newObj的值可能为对象或布尔值,此处判断是否为对象
+    useObj = tools.isObject(newObj),  //newObj的值可能为对象或布尔值,此处判断是否为对象
     value = strs[0];
 
   if (props) {
-    each(props, function (propObj, i) {
+    tools.each(props, function (propObj, i) {
       var dataProp = getDataValue(data, propObj.prop, parent, !newObj);
 
       //参数为字符串时,须做特殊字符转义
       if (dataProp
         && !newObj            //Only in transform to string need escape
         && propObj.escape) {  //Only in the opening brace's length less than 2 need escape
-        dataProp = escape.escape(dataProp);
+        dataProp = escape(dataProp);
       }
 
       //如果参数只存在占位符,则可传引用参数
@@ -1284,119 +1359,20 @@ function replaceParams(valueObj, data, newObj, newKey, parent) {
   return value;
 }
 
-//提取替换参数
-var REGEX_REPLACE_PARAM = /({{1,2})([^"'\s{}]+)}{1,2}/g;
-function getReplaceParam(obj) {
-  var matchArr,
-    ret;
+module.exports = {
+  transformParams: transformParams,
+  transformParamsToObj: transformParamsToObj,
+  replaceParams: replaceParams,
+  getDataValue: getDataValue,
+  getItemParam: getItemParam,
+  setObjParam: setObjParam
+};
+},{"../core":9,"./escape":11,"./tools":15}],17:[function(require,module,exports){
+'use strict';
 
-  while ((matchArr = REGEX_REPLACE_PARAM.exec(obj))) {
-    if (!ret) {
-      ret = [];
-    }
-    ret.push(matchArr);
-  }
-
-  return ret;
-}
-
-//Get compiled parameter
-var REGEX_REPLACE_SPLIT = /{{1,2}[^"'\s{}]+}{1,2}/g;
-function compiledParam(value) {
-  var ret = lightObj(),
-    strs = isString(value) ? value.split(REGEX_REPLACE_SPLIT) : [value],
-    props = null,
-    isAll = false;
-
-  //If have placehorder
-  if (strs.length > 1) {
-    var params = getReplaceParam(value);
-    props = [];
-
-    each(params, function (param) {
-      var retP = lightObj();
-      isAll = param[0] === value;
-
-      retP.prop = compiledProp(param[2]);
-      retP.escape = param[1].length < 2;
-      props.push(retP);
-    }, false, true);
-  }
-
-  ret.props = props;
-  ret.strs = strs;
-  ret.isAll = isAll;
-  return ret;
-}
-
-//Get compiled parameters from a object
-function compiledParams(obj) {
-  var ret = lightObj();
-  each(obj, function (v, k) {
-    ret[k] = compiledParam(v);
-  }, false, false);
-
-  return ret;
-}
-
-//Get compiled property
-function compiledProp(prop) {
-  var ret = lightObj();
-
-  //If there are colons in the property,then use filter
-  if (prop.indexOf(':') >= 0) {
-    var filters = [],
-      filtersTmp;
-    filtersTmp = prop.split(':');
-    prop = filtersTmp[0];  //Extract property
-
-    filtersTmp = filtersTmp.slice(1);
-    each(filtersTmp, function (filter) {
-      var retF = _getFilterParam(filter),
-        filterObj = lightObj(),
-        filterName = retF[1].toLowerCase();  //Get filter name
-
-      if (filterName) {
-        var paramsF = retF[3];  //Get filter param
-
-        //Multiple params are separated by commas.
-        if (paramsF) {
-          var params = [];
-          each(paramsF.split(','), function (p) {
-            params[params.length] = p;
-          }, false, true);
-
-          filterObj.params = params;
-        }
-
-        filterObj.name = filterName;
-        filters.push(filterObj);
-      }
-    }, false, true);
-
-    ret.filters = filters;
-  }
-
-  //Extract the parent data path
-  if (prop.indexOf('../') > -1) {
-    var n = 0;
-    prop = prop.replace(/\.\.\//g, function () {
-      n++;
-      return '';
-    });
-
-    ret.parentNum = n;
-  }
-
-  ret.name = prop;
-  return ret;
-}
-
-//Get filter param
-var REGEX_FILTER_PARAM = /([\w$]+)(\(([^()]+)\))*/;
-function _getFilterParam(obj) {
-  return REGEX_FILTER_PARAM.exec(obj);
-}
+var nj = require('../core'),
+  tools = require('./tools'),
+  tranData = require('./transformData');
 
 //提取xml open tag
 var REGEX_XML_OPEN_TAG = /^<([a-z{][-a-z0-9_:.}]*)[^>]*>$/i;
@@ -1442,7 +1418,7 @@ function getOpenTagParams(obj, noXml) {
 
 //判断xml close tag
 function isXmlCloseTag(obj, tagName) {
-  return isString(obj) && obj.toLowerCase() === '</' + tagName + '>';
+  return tools.isString(obj) && obj.toLowerCase() === '</' + tagName + '>';
 }
 
 //提取open tag
@@ -1459,7 +1435,7 @@ function isSelfCloseTag(obj) {
 
 //判断close tag
 function isCloseTag(obj, tagName) {
-  return isString(obj) && obj.toLowerCase() === '/' + tagName.toLowerCase();
+  return tools.isString(obj) && obj.toLowerCase() === '/' + tagName.toLowerCase();
 }
 
 //get inside brace param
@@ -1486,7 +1462,7 @@ function isControl(obj) {
 
 //判断流程控制块close tag
 function isControlCloseTag(obj, tagName) {
-  return isString(obj) && obj === '/$' + tagName;
+  return tools.isString(obj) && obj === '/$' + tagName;
 }
 
 //判断是否模板元素
@@ -1524,45 +1500,17 @@ function getTagComponentName(el) {
   return tagName;
 }
 
-//提取style内参数
-var REGEX_STYLE_PARAMS = /([^\s:]+)[\s]?:[\s]?([^\s;]+)[;]?/g;
-function getStyleParams(obj) {
-  //参数为字符串
-  var matchArr,
-    ret;
-
-  while ((matchArr = REGEX_STYLE_PARAMS.exec(obj))) {
-    var key = matchArr[1].toLowerCase(),
-      value = matchArr[2];
-
-    if (!ret) {
-      ret = {};
-    }
-
-    //将连字符转为驼峰命名
-    if (key.indexOf('-') > -1) {
-      key = key.replace(/-\w/g, function (letter) {
-        return letter.substr(1).toUpperCase();
-      });
-    }
-
-    ret[key] = value;
-  }
-
-  return ret;
-}
-
 //获取标签组件所有属性
 function getTagComponentAttrs(el) {
   var attrs = el.attributes,
     ret;
 
-  each(attrs, function (obj) {
+  tools.each(attrs, function (obj) {
     var attrName = obj.nodeName;
     if (attrName !== nj.tagId && obj.specified) {  //此处如不判断specified属性,则低版本IE中会列出所有可能的属性
       var val = obj.nodeValue;
       if (!ret) {
-        ret = lightObj();
+        ret = tools.lightObj();
       }
 
       if (attrName === 'style') {  //style属性使用cssText
@@ -1574,7 +1522,7 @@ function getTagComponentAttrs(el) {
         });
       }
 
-      setObjParam(ret, attrName, val, true);
+      tranData.setObjParam(ret, attrName, val, true);
     }
   });
 
@@ -1599,95 +1547,171 @@ function getTagComponents(el, selector) {
   return el.querySelectorAll(selector);
 }
 
-//create a unique key
-function uniqueKey(str) {
-  var len = str.length;
-  if (len == 0) {
-    return str;
-  }
-
-  var hash = 0, i, chr;
-  for (i = 0, len = str.length; i < len; i++) {
-    chr = str.charCodeAt(i);
-    hash = ((hash << 5) - hash) + chr;
-    hash |= 0;
-  }
-
-  return hash;
-}
-
-//create light weight object
-function lightObj() {
-  return Object.create(null);
-}
-
-var tools = {
-  isArray: isArray,
-  isArrayLike: isArrayLike,
-  isObject: isObject,
-  isString: isString,
-  each: each,
-  inArray: inArray,
-  trim: trim,
-  throwIf: throwIf,
-  replaceParams: replaceParams,
-  transformParams: transformParams,
-  transformParamsToObj: transformParamsToObj,
+module.exports = {
   getXmlOpenTag: getXmlOpenTag,
+  isXmlSelfCloseTag: isXmlSelfCloseTag,
+  getOpenTagParams: getOpenTagParams,
   isXmlCloseTag: isXmlCloseTag,
   getOpenTag: getOpenTag,
-  isCloseTag: isCloseTag,
-  getOpenTagParams: getOpenTagParams,
-  isXmlSelfCloseTag: isXmlSelfCloseTag,
   isSelfCloseTag: isSelfCloseTag,
+  isCloseTag: isCloseTag,
   getInsideBraceParam: getInsideBraceParam,
   isControl: isControl,
   isControlCloseTag: isControlCloseTag,
+  isTmpl: isTmpl,
+  addTmpl: addTmpl,
   getTagComponentName: getTagComponentName,
   getTagComponentAttrs: getTagComponentAttrs,
   isTagControl: isTagControl,
-  getTagComponents: getTagComponents,
-  getDataValue: getDataValue,
-  getItemParam: getItemParam,
-  isTmpl: isTmpl,
-  addTmpl: addTmpl,
-  assign: assign,
-  uniqueKey: uniqueKey,
-  lightObj: lightObj,
-  listPush: listPush,
+  getTagComponents: getTagComponents
+};
+},{"../core":9,"./tools":15,"./transformData":16}],18:[function(require,module,exports){
+'use strict';
+
+var tools = require('./tools');
+
+//Get compiled parameters from a object
+function compiledParams(obj) {
+  var ret = tools.lightObj();
+  tools.each(obj, function (v, k) {
+    ret[k] = compiledParam(v);
+  }, false, false);
+
+  return ret;
+}
+
+//Get compiled property
+function compiledProp(prop) {
+  var ret = tools.lightObj();
+
+  //If there are colons in the property,then use filter
+  if (prop.indexOf(':') >= 0) {
+    var filters = [],
+      filtersTmp;
+    filtersTmp = prop.split(':');
+    prop = filtersTmp[0];  //Extract property
+
+    filtersTmp = filtersTmp.slice(1);
+    tools.each(filtersTmp, function (filter) {
+      var retF = _getFilterParam(filter),
+        filterObj = tools.lightObj(),
+        filterName = retF[1].toLowerCase();  //Get filter name
+
+      if (filterName) {
+        var paramsF = retF[3];  //Get filter param
+
+        //Multiple params are separated by commas.
+        if (paramsF) {
+          var params = [];
+          tools.each(paramsF.split(','), function (p) {
+            params[params.length] = p;
+          }, false, true);
+
+          filterObj.params = params;
+        }
+
+        filterObj.name = filterName;
+        filters.push(filterObj);
+      }
+    }, false, true);
+
+    ret.filters = filters;
+  }
+
+  //Extract the parent data path
+  if (prop.indexOf('../') > -1) {
+    var n = 0;
+    prop = prop.replace(/\.\.\//g, function () {
+      n++;
+      return '';
+    });
+
+    ret.parentNum = n;
+  }
+
+  ret.name = prop;
+  return ret;
+}
+
+//Get filter param
+var REGEX_FILTER_PARAM = /([\w$]+)(\(([^()]+)\))*/;
+function _getFilterParam(obj) {
+  return REGEX_FILTER_PARAM.exec(obj);
+}
+
+//提取替换参数
+var REGEX_REPLACE_PARAM = /({{1,2})([^"'\s{}]+)}{1,2}/g;
+function _getReplaceParam(obj) {
+  var matchArr,
+    ret;
+
+  while ((matchArr = REGEX_REPLACE_PARAM.exec(obj))) {
+    if (!ret) {
+      ret = [];
+    }
+    ret.push(matchArr);
+  }
+
+  return ret;
+}
+
+//Get compiled parameter
+var REGEX_REPLACE_SPLIT = /{{1,2}[^"'\s{}]+}{1,2}/g;
+function compiledParam(value) {
+  var ret = tools.lightObj(),
+    strs = tools.isString(value) ? value.split(REGEX_REPLACE_SPLIT) : [value],
+    props = null,
+    isAll = false;
+
+  //If have placehorder
+  if (strs.length > 1) {
+    var params = _getReplaceParam(value);
+    props = [];
+
+    tools.each(params, function (param) {
+      var retP = tools.lightObj();
+      isAll = param[0] === value;
+
+      retP.prop = compiledProp(param[2]);
+      retP.escape = param[1].length < 2;
+      props.push(retP);
+    }, false, true);
+  }
+
+  ret.props = props;
+  ret.strs = strs;
+  ret.isAll = isAll;
+  return ret;
+}
+
+module.exports = {
   compiledParam: compiledParam,
   compiledParams: compiledParams,
   compiledProp: compiledProp
 };
-assign(tools, escape);
-
-//部分函数绑定到nj对象
-nj.isArray = isArray;
-nj.isArrayLike = isArrayLike;
-nj.isObject = isObject;
-nj.isString = isString;
-nj.each = each;
-nj.inArray = inArray;
-nj.trim = trim;
-nj.assign = assign;
-
-module.exports = tools;
-},{"../core":9,"./escape":11,"object-assign":1}],16:[function(require,module,exports){
+},{"./tools":15}],19:[function(require,module,exports){
 'use strict';
 
 var tools = require('./tools'),
+  transformElement = require('./transformElement'),
+  transformParam = require('./transformParam'),
+  transformData = require('./transformData'),
+  escape = require('./escape'),
   checkElem = require('../checkElem/checkElem'),
   setComponentEngine = require('./setComponentEngine'),
   registerComponent = require('./registerComponent'),
   filter = require('./filter');
 
 module.exports = tools.assign(
-  {},
+  { escape: escape },
   checkElem,
   setComponentEngine,
   registerComponent,
   filter,
-  tools
+  tools,
+  transformElement,
+  transformParam,
+  transformData
 );
-},{"../checkElem/checkElem":3,"./filter":12,"./registerComponent":13,"./setComponentEngine":14,"./tools":15}]},{},[2])(2)
+},{"../checkElem/checkElem":3,"./escape":11,"./filter":12,"./registerComponent":13,"./setComponentEngine":14,"./tools":15,"./transformData":16,"./transformElement":17,"./transformParam":18}]},{},[2])(2)
 });

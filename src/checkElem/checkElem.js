@@ -2,6 +2,8 @@
 
 var nj = require('../core'),
   tools = require('../utils/tools'),
+  tranParam = require('../utils/transformParam'),
+  tranElem = require('../utils/transformElement'),
   checkTagElem = require('./checkTagElem');
 
 //检测元素节点
@@ -12,7 +14,7 @@ function checkElem(obj, parent) {
   if (!tools.isArray(obj)) {
     if (tools.isString(obj)) {  //判断是否为文本节点
       node.type = 'nj_plaintext';
-      node.content = [tools.compiledParam(obj)];
+      node.content = [tranParam.compiledParam(obj)];
       parent[parentContent].push(node);
     }
 
@@ -28,7 +30,7 @@ function checkElem(obj, parent) {
       control;
 
     //判断是否为xml标签
-    var xmlOpenTag = tools.getXmlOpenTag(first),
+    var xmlOpenTag = tranElem.getXmlOpenTag(first),
       openTagName,
       hasCloseTag = false,
       isTmpl;
@@ -36,8 +38,8 @@ function checkElem(obj, parent) {
     if (xmlOpenTag) {  //tagname为xml标签时,则认为是元素节点
       openTagName = xmlOpenTag[1];
 
-      if (!tools.isXmlSelfCloseTag(first)) {  //非自闭合标签才验证是否存在关闭标签
-        hasCloseTag = tools.isXmlCloseTag(last, openTagName);
+      if (!tranElem.isXmlSelfCloseTag(first)) {  //非自闭合标签才验证是否存在关闭标签
+        hasCloseTag = tranElem.isXmlCloseTag(last, openTagName);
       }
       else {  //自闭合标签
         node.selfCloseTag = true;
@@ -45,14 +47,14 @@ function checkElem(obj, parent) {
       isElemNode = true;
     }
     else {
-      control = tools.isControl(first);
+      control = tranElem.isControl(first);
       if (!control) {  //tagname不为xml标签时,必须有结束标签才认为是元素节点
-        var openTag = tools.getOpenTag(first);
+        var openTag = tranElem.getOpenTag(first);
         if (openTag) {
           openTagName = openTag[0];
 
-          if (!tools.isSelfCloseTag(first)) {  //非自闭合标签
-            hasCloseTag = tools.isCloseTag(last, openTagName);
+          if (!tranElem.isSelfCloseTag(first)) {  //非自闭合标签
+            hasCloseTag = tranElem.isCloseTag(last, openTagName);
             if (hasCloseTag) {
               isElemNode = true;
             }
@@ -66,14 +68,14 @@ function checkElem(obj, parent) {
       else {  //为特殊节点,也可视为一个元素节点
         var ctrl = control[0].toLowerCase(),
           refer = control[1];
-        isTmpl = tools.isTmpl(ctrl);
+        isTmpl = tranElem.isTmpl(ctrl);
 
         node.type = 'nj_' + ctrl;
         if (refer != null) {
-          node.refer = tools.compiledProp(refer);
+          node.refer = tranParam.compiledProp(refer);
         }
 
-        if (tools.isControlCloseTag(last, ctrl)) {  //判断是否有流程控制块闭合标签
+        if (tranElem.isControlCloseTag(last, ctrl)) {  //判断是否有流程控制块闭合标签
           hasCloseTag = true;
         }
         isElemNode = true;
@@ -89,11 +91,11 @@ function checkElem(obj, parent) {
       var params = obj[1];
       if (tools.isObject(params)) {  //如果第二个参数为对象,则为节点参数
         if (!control) {  //为元素节点时取各参数
-          node.params = tools.compiledParams(params);
+          node.params = tranParam.compiledParams(params);
         }
         else {  //为特殊节点时取refer
-          var retR = tools.getInsideBraceParam(params.refer);
-          node.refer = tools.compiledProp(retR ? retR[1] : params.refer);
+          var retR = tranElem.getInsideBraceParam(params.refer);
+          node.refer = tranParam.compiledProp(retR ? retR[1] : params.refer);
         }
 
         hasParams = true;
@@ -103,20 +105,20 @@ function checkElem(obj, parent) {
         node.type = openTagName;
 
         //If open tag has a brace,add the typeRefer param.
-        var typeRefer = tools.getInsideBraceParam(openTagName);
+        var typeRefer = tranElem.getInsideBraceParam(openTagName);
         if (typeRefer) {
-          node.typeRefer = tools.compiledProp(typeRefer[1]);
+          node.typeRefer = tranParam.compiledProp(typeRefer[1]);
         }
 
         //获取openTag内参数
-        var tagParams = tools.getOpenTagParams(first, !xmlOpenTag);
+        var tagParams = tranElem.getOpenTagParams(first, !xmlOpenTag);
         if (tagParams) {
           if (!node.params) {
             node.params = tools.lightObj();
           }
 
           tools.each(tagParams, function (param) {
-            node.params[param.key] = tools.compiledParam(param.value);
+            node.params[param.key] = tranParam.compiledParam(param.value);
           }, false, true);
         }
       }
@@ -125,7 +127,7 @@ function checkElem(obj, parent) {
           pushContent = false;
 
           //将模板添加到父节点的params中
-          tools.addTmpl(node, parent);
+          tranElem.addTmpl(node, parent);
         }
         else {
           elseIndex = tools.inArray(obj, '$else');

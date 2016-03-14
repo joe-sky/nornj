@@ -16,9 +16,9 @@ describe('test compile string', function () {
   });
 
   describe('compile string template to html', function () {
-    xit('test compile 1', function () {
+    it('test compile 1', function () {
       var data = {
-        name: "joe_sky",
+        name: "<i>joe_sky1</i>",
         id: 100,
         test0: true,
         list: [0, 1, 2]
@@ -63,7 +63,7 @@ describe('test compile string', function () {
           <span>
             ${tmpl2}
             <img />
-            sky:{name},{id:filter2}
+            sky:{{name}},{id:filter2}
             ${['section',
               tmpl1,
             '/section']}

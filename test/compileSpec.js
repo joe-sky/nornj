@@ -19,7 +19,7 @@ describe('test compile', function () {
   });
 
   describe('compile template to html', function () {
-    it('test compile 1', function () {
+    xit('test compile 1', function () {
       var data = {
         name: "joe_sky",
         id: "joe",
@@ -123,7 +123,7 @@ describe('test compile', function () {
   });
 
   describe('compile precompiled template', function () {
-    it('test precompiled 1', function () {
+    xit('test precompiled 1', function () {
       var data = {
         name: "joe_sky",
         id: "joe",
