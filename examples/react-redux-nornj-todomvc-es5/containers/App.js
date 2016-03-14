@@ -27,8 +27,7 @@
         this.props,
         {
           addClick: this.addClick,
-          todoClick: this.todoClick,
-          filterChange: this.filterChange
+          todoClick: this.todoClick
         }
       ]
     );
