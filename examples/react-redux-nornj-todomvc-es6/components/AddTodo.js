@@ -1,6 +1,6 @@
 ﻿import nj from '../../../src/base.js';
 import { Component, PropTypes } from 'react';
-import tmpl from '../templates/AddTodoTmpl';
+import tmpl from '../templates/AddTodoTmpl.nornj';
 let template = nj.compileComponent(tmpl);
 
 class AddTodo extends Component {
@@ -16,7 +16,7 @@ class AddTodo extends Component {
   }
 
   render() {
-    return template({ this.handleClick });
+    return template({ handleClick: (e) => this.handleClick(e) });
   }
 }
 

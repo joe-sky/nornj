@@ -4,7 +4,7 @@ let nj = require('../../../src/base.js');
 
 module.exports = nj`
 <p>
-  Show:&nbsp;
+  ${['Show: ']}
   <$each {filters}>
     <$if {filter:isCurrent}>
       {name}
@@ -16,7 +16,7 @@ module.exports = nj`
     <$if {name:equal(Active)}>
       .
     <$else />
-      ,&nbsp;
+      ${[', ']}
     </$if>
   </$each>
 </p>`;

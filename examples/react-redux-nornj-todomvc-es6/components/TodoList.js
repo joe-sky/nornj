@@ -1,6 +1,6 @@
 ﻿import nj from '../../../src/base.js';
 import { Component, PropTypes } from 'react';
-import tmpl from '../templates/TodoListTmpl';
+import tmpl from '../templates/TodoListTmpl.nornj';
 let template = nj.compileComponent(tmpl);
 
 class TodoList extends Component {

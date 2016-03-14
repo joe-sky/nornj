@@ -2,7 +2,13 @@
 import { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { VisibilityFilters, addTodo, completeTodo } from '../actions/actions';
-import tmpl from '../templates/AppTmpl';
+import tmpl from '../templates/AppTmpl.nornj';
+import '../templates/templateFilters';
+import '../components/AddTodo';
+import '../components/Footer';
+import '../components/Todo';
+import '../components/TodoList';
+
 const { SHOW_ACTIVE, SHOW_COMPLETED, SHOW_ALL } = VisibilityFilters;
 let template = nj.compileComponent(tmpl);
 
