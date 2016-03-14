@@ -1,8 +1,8 @@
 ﻿import nj from '../../src/base.js';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { Provider, Router, Route, Redirect, Link } from 'react-redux';
-import { hashHistory } from 'react-router';
+import { Provider } from 'react-redux';
+import { Router, Route, Redirect, Link, hashHistory } from 'react-router';
 import store from './store/configureStore';
 import App from './containers/App';
 
