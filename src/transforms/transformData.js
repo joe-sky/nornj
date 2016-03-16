@@ -50,7 +50,7 @@ function setObjParam(obj, key, value, notTran) {
 var REGEX_STYLE_PARAMS = /([^\s:]+)[\s]?:[\s]?([^\s;]+)[;]?/g;
 function _getStyleParams(obj) {
   //If the parameter is a style object,then direct return.
-  if(tools.isObject(obj)) {
+  if (tools.isObject(obj)) {
     return obj;
   }
 
@@ -85,14 +85,14 @@ function _useFilters(filters, ret, data, parent, index) {
     var filtersObj = nj.filters;
     tools.each(filters, function (filterObj) {
       var filter = filtersObj[filterObj.name];  //Get filter function
-      if(!filter) {
+      if (!filter) {
         console.warn(nj.errorTitle + 'A filter called ' + filterObj.name + ' is undefined.');
         return;
       }
 
       var params,
         paramsF = filterObj.params,
-        thisObj = tools.lightObj(); 
+        thisObj = tools.lightObj();
 
       if (paramsF) {
         params = tools.listPush([ret], paramsF);
@@ -163,7 +163,7 @@ function getDataValue(data, propObj, parent, defaultEmpty) {
         return false;
       }
     }
-  }, false, true);
+  }, false, true, true);
 
   //Default set empty
   if (defaultEmpty && ret == null) {
@@ -174,9 +174,12 @@ function getDataValue(data, propObj, parent, defaultEmpty) {
 }
 
 //获取each块中的item参数
-function getItemParam(item, data) {
+function getItemParam(item, data, isArr) {
   var ret = item;
-  if (tools.isArray(data)) {
+  if (isArr == null) {
+    isArr = tools.isArray(data);
+  }
+  if (isArr) {
     ret = tools.listPush([item], data.slice(1));
   }
 

@@ -663,14 +663,16 @@ function transformToComponent(obj, data, parent) {
       case 'nj_each':
         if (dataRefer && dataRefer.length) {
           ret = [];
+
+          var itemIsArray = utils.isArray(data);
           utils.each(dataRefer, function (item, index) {
             var _parent = utils.lightObj();  //Create a parent data object
             _parent.data = item;
             _parent.parent = parent;
             _parent.index = index;
 
-            ret.push(transformContentToComponent(obj.content, utils.getItemParam(item, data), _parent));
-          });
+            ret.push(transformContentToComponent(obj.content, utils.getItemParam(item, data, itemIsArray), _parent));
+          }, false, utils.isArray(dataRefer));
         }
         else if (obj.hasElse) {
           ret = transformContentToComponent(obj.contentElse, data, parent);
@@ -683,7 +685,7 @@ function transformToComponent(obj, data, parent) {
     var componentClass = nj.componentClasses[obj.type.toLowerCase()],
       type = componentClass ? componentClass : obj.type;
 
-    //If typeRefer isn't undefined,use it replace the node type.
+    //If typeRefer isn't undefined,use it to replace the node type.
     if (obj.typeRefer) {
       var typeRefer = utils.getDataValue(data, obj.typeRefer, parent);
       if (typeRefer) {
@@ -751,14 +753,15 @@ function transformToString(obj, data, parent) {
         break;
       case 'nj_each':
         if (dataRefer && dataRefer.length) {
+          var itemIsArray = utils.isArray(data);
           utils.each(dataRefer, function (item, index) {
             var _parent = utils.lightObj();  //Create a parent data object
             _parent.data = item;
             _parent.parent = parent;
             _parent.index = index;
 
-            ret += transformContentToString(obj.content, utils.getItemParam(item, data), _parent);
-          });
+            ret += transformContentToString(obj.content, utils.getItemParam(item, data, itemIsArray), _parent);
+          }, false, utils.isArray(dataRefer));
         }
         else if (obj.hasElse) {
           ret = transformContentToString(obj.contentElse, data, parent);
@@ -769,7 +772,7 @@ function transformToString(obj, data, parent) {
   else {
     var type = obj.type;
 
-    //If typeRefer isn't undefined,use it replace the node type.
+    //If typeRefer isn't undefined,use it to replace the node type.
     if (obj.typeRefer) {
       var typeRefer = utils.escape(utils.getDataValue(data, obj.typeRefer, parent));
       if (typeRefer) {
@@ -886,7 +889,7 @@ function setObjParam(obj, key, value, notTran) {
 var REGEX_STYLE_PARAMS = /([^\s:]+)[\s]?:[\s]?([^\s;]+)[;]?/g;
 function _getStyleParams(obj) {
   //If the parameter is a style object,then direct return.
-  if(tools.isObject(obj)) {
+  if (tools.isObject(obj)) {
     return obj;
   }
 
@@ -921,14 +924,14 @@ function _useFilters(filters, ret, data, parent, index) {
     var filtersObj = nj.filters;
     tools.each(filters, function (filterObj) {
       var filter = filtersObj[filterObj.name];  //Get filter function
-      if(!filter) {
+      if (!filter) {
         console.warn(nj.errorTitle + 'A filter called ' + filterObj.name + ' is undefined.');
         return;
       }
 
       var params,
         paramsF = filterObj.params,
-        thisObj = tools.lightObj(); 
+        thisObj = tools.lightObj();
 
       if (paramsF) {
         params = tools.listPush([ret], paramsF);
@@ -999,7 +1002,7 @@ function getDataValue(data, propObj, parent, defaultEmpty) {
         return false;
       }
     }
-  }, false, true);
+  }, false, true, true);
 
   //Default set empty
   if (defaultEmpty && ret == null) {
@@ -1010,9 +1013,12 @@ function getDataValue(data, propObj, parent, defaultEmpty) {
 }
 
 //获取each块中的item参数
-function getItemParam(item, data) {
+function getItemParam(item, data, isArr) {
   var ret = item;
-  if (tools.isArray(data)) {
+  if (isArr == null) {
+    isArr = tools.isArray(data);
+  }
+  if (isArr) {
     ret = tools.listPush([item], data.slice(1));
   }
 
@@ -1553,6 +1559,7 @@ var nj = require('../core'),
   assign = require('object-assign'),
   arrayProto = Array.prototype,
   arrayEvery = arrayProto.every,
+  arrayForEach = arrayProto.forEach,
   arrayPush = arrayProto.push;
 
 //Array push
@@ -1592,9 +1599,17 @@ function isArrayLike(obj) {
 }
 
 //遍历数组或对象
-function each(obj, func, context, isArr) {
+function each(obj, func, context, isArr, useEvery) {
   if (!obj) {
     return;
+  }
+
+  var arrayEach;
+  if (useEvery) {
+    arrayEach = arrayEvery;
+  }
+  else {
+    arrayEach = arrayForEach;
   }
   if (isArr == null) {
     isArr = isArrayLike(obj);
@@ -1604,25 +1619,29 @@ function each(obj, func, context, isArr) {
   context = context ? context : obj;
 
   if (isArr) {
-    arrayEvery.call(obj, function (o, i, arr) {
+    arrayEach.call(obj, function (o, i, arr) {
       var ret = func.call(context, o, i, arr);
 
-      if (ret === false) {
-        return ret;
+      if (useEvery) {
+        if (ret === false) {
+          return ret;
+        }
+        return true;
       }
-      return true;
     });
   }
   else {
     var keys = Object.keys(obj);
-    arrayEvery.call(keys, function (o, i) {
+    arrayEach.call(keys, function (o, i) {
       var key = keys[i],
         ret = func.call(context, obj[key], key, obj);
 
-      if (ret === false) {
-        return ret;
+      if (useEvery) {
+        if (ret === false) {
+          return ret;
+        }
+        return true;
       }
-      return true;
     });
   }
 }

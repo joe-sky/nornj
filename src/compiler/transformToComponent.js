@@ -27,14 +27,16 @@ function transformToComponent(obj, data, parent) {
       case 'nj_each':
         if (dataRefer && dataRefer.length) {
           ret = [];
+
+          var itemIsArray = utils.isArray(data);
           utils.each(dataRefer, function (item, index) {
             var _parent = utils.lightObj();  //Create a parent data object
             _parent.data = item;
             _parent.parent = parent;
             _parent.index = index;
 
-            ret.push(transformContentToComponent(obj.content, utils.getItemParam(item, data), _parent));
-          });
+            ret.push(transformContentToComponent(obj.content, utils.getItemParam(item, data, itemIsArray), _parent));
+          }, false, utils.isArray(dataRefer));
         }
         else if (obj.hasElse) {
           ret = transformContentToComponent(obj.contentElse, data, parent);
@@ -47,7 +49,7 @@ function transformToComponent(obj, data, parent) {
     var componentClass = nj.componentClasses[obj.type.toLowerCase()],
       type = componentClass ? componentClass : obj.type;
 
-    //If typeRefer isn't undefined,use it replace the node type.
+    //If typeRefer isn't undefined,use it to replace the node type.
     if (obj.typeRefer) {
       var typeRefer = utils.getDataValue(data, obj.typeRefer, parent);
       if (typeRefer) {

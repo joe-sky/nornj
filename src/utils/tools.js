@@ -4,6 +4,7 @@ var nj = require('../core'),
   assign = require('object-assign'),
   arrayProto = Array.prototype,
   arrayEvery = arrayProto.every,
+  arrayForEach = arrayProto.forEach,
   arrayPush = arrayProto.push;
 
 //Array push
@@ -43,9 +44,17 @@ function isArrayLike(obj) {
 }
 
 //遍历数组或对象
-function each(obj, func, context, isArr) {
+function each(obj, func, context, isArr, useEvery) {
   if (!obj) {
     return;
+  }
+
+  var arrayEach;
+  if (useEvery) {
+    arrayEach = arrayEvery;
+  }
+  else {
+    arrayEach = arrayForEach;
   }
   if (isArr == null) {
     isArr = isArrayLike(obj);
@@ -55,25 +64,29 @@ function each(obj, func, context, isArr) {
   context = context ? context : obj;
 
   if (isArr) {
-    arrayEvery.call(obj, function (o, i, arr) {
+    arrayEach.call(obj, function (o, i, arr) {
       var ret = func.call(context, o, i, arr);
 
-      if (ret === false) {
-        return ret;
+      if (useEvery) {
+        if (ret === false) {
+          return ret;
+        }
+        return true;
       }
-      return true;
     });
   }
   else {
     var keys = Object.keys(obj);
-    arrayEvery.call(keys, function (o, i) {
+    arrayEach.call(keys, function (o, i) {
       var key = keys[i],
         ret = func.call(context, obj[key], key, obj);
 
-      if (ret === false) {
-        return ret;
+      if (useEvery) {
+        if (ret === false) {
+          return ret;
+        }
+        return true;
       }
-      return true;
     });
   }
 }
