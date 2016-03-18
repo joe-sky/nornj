@@ -3,8 +3,9 @@
 var path = require('path'),
   webpack = require('webpack'),
   precompiler = require('../../precompiler');
-  
-precompiler({source: __dirname + "/templates/**/*.nornj.js",esVersion:"es6"});
+
+//Precompile all nornj templates which use "nornj.js" names to the end.
+precompiler({ source: __dirname + '/templates/**/*.nornj.js', esVersion: 'es6' });
 
 module.exports = {
   entry: __dirname + '/index.js',
