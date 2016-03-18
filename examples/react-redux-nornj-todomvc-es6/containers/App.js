@@ -2,7 +2,7 @@
 import { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { VisibilityFilters, addTodo, completeTodo } from '../actions/actions';
-import tmpl from '../templates/AppTmpl.nornj';
+import tmpl from '../templates/AppTmpl';
 import '../templates/templateFilters';
 import '../components/AddTodo';
 import '../components/Footer';
