@@ -36,6 +36,7 @@
     "yargs": "^4.2.0"
   },
   "dependencies": {
-    "object-assign": "^4.0.1"
+    "object-assign": "^4.0.1",
+    "glob": "^6.0.1"
   }
 }

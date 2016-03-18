@@ -1,7 +1,10 @@
 'use strict';
 
 var path = require('path'),
-  webpack = require('webpack');
+  webpack = require('webpack'),
+  precompiler = require('../../precompiler');
+  
+precompiler({source: __dirname + "/templates/**/*.nornj.js",esVersion:"es6"});
 
 module.exports = {
   entry: __dirname + '/index.js',
