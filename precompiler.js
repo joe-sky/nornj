@@ -8,8 +8,8 @@ var nj = require('./src/base'),
 module.exports = function (param) {
   glob.sync(param.source).forEach(function (file) {
     var name = file.substr(0, file.lastIndexOf('.')),
-		  newName = name.substr(0, name.lastIndexOf('.')) + '.js',
-		  preTmpl,
+      newName = name.substr(0, name.lastIndexOf('.')) + '.js',
+      preTmpl,
       tmpl = require(name);  //Load original template
 
     preTmpl = param.esVersion === 'es6' ? 'export default ' : 'module.exports = ';
