@@ -1,0 +1,3 @@
+rootProject.name = 'ReactNativeNornjSimpleDemo'
+
+include ':app'
