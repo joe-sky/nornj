@@ -47,11 +47,14 @@ console.log(html);
 
 也可以替代JSX输出React组件：
 ```js
-import nj from 'nornj';
+import nj, {
+  compileComponent,
+  registerComponent
+} from 'nornj';
 import { Component } from 'react';
 import { render } from 'react-dom';
 
-let template = nj.compileComponent(nj`
+let template = compileComponent(nj`
 <div id=test1>
     this the test demo{no}.
     <i>test{no}</i>
@@ -59,15 +62,13 @@ let template = nj.compileComponent(nj`
 
 class TestComponent extends Component {
     render() {
-        return template({
-            no: this.props.no
-        });
+        return template(this.props);
     }
 }
 
-nj.registerComponent('TestComponent', TestComponent);
+registerComponent({ TestComponent });
 
-render(nj.compileComponent(
+render(compileComponent(
    nj`<TestComponent no=100 />`
 )(), document.body);
 
@@ -83,7 +84,7 @@ render(nj.compileComponent(
 ```html
 ...
 <body>
-    <nj:TestComponent class="nj-component" no="100" />
+    <nj-TestComponent class="nj-component" no="100" />
 </body>
 ```
 
