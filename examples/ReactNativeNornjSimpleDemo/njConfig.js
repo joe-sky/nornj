@@ -2,10 +2,10 @@
   Text,
   View
 } from 'react-native';
-import nj, {
+import {
   setComponentEngine,
   registerComponent
-} from '../../src/base.js';
+} from 'nornj';
 
 setComponentEngine('react', React);
 registerComponent({ View, Text });

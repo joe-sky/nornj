@@ -8,5 +8,8 @@
   },
   "dependencies": {
     "react-native": "^0.21.0"
+  },
+  "devDependencies": {
+    "nornj": "^0.2.3-rc2"
   }
 }
