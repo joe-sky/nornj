@@ -71,7 +71,7 @@ var inBrowser = typeof self !== 'undefined',
 //Init tag template
 if (inBrowser) {
   docReady(function () {
-    if (!nj.preventAutoRenderTag) {
+    if (nj.componentLib && nj.autoRenderTag) {
       nj.renderTagComponent(nj.initTagData);
     }
   });
@@ -836,6 +836,7 @@ nj.tagClassName = 'nj-component';
 nj.templates = {};
 nj.errorTitle = 'NornJ error:';
 nj.paramRule = {};
+nj.autoRenderTag = true;
 
 module.exports = nj;
 },{}],10:[function(require,module,exports){

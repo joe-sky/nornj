@@ -22,6 +22,6 @@ class TodoList extends Component {
   }
 }
 
-nj.registerComponent('TodoList', TodoList);
+nj.registerComponent({ TodoList });
 
 export default TodoList;

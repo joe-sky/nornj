@@ -29,7 +29,7 @@ var inBrowser = typeof self !== 'undefined',
 //Init tag template
 if (inBrowser) {
   docReady(function () {
-    if (!nj.preventAutoRenderTag) {
+    if (nj.componentLib && nj.autoRenderTag) {
       nj.renderTagComponent(nj.initTagData);
     }
   });

@@ -20,6 +20,6 @@ class AddTodo extends Component {
   }
 }
 
-nj.registerComponent('AddTodo', AddTodo);
+nj.registerComponent({ AddTodo });
 
 export default AddTodo;

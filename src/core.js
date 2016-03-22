@@ -17,5 +17,6 @@ nj.tagClassName = 'nj-component';
 nj.templates = {};
 nj.errorTitle = 'NornJ error:';
 nj.paramRule = {};
+nj.autoRenderTag = true;
 
 module.exports = nj;

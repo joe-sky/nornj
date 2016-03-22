@@ -26,6 +26,6 @@ class Footer extends Component {
   }
 }
 
-nj.registerComponent('Footer', Footer);
+nj.registerComponent({ Footer });
 
 export default Footer;

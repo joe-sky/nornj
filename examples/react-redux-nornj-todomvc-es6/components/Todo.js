@@ -20,6 +20,6 @@ class Todo extends Component {
   }
 }
 
-nj.registerComponent('Todo', Todo);
+nj.registerComponent({ Todo });
 
 export default Todo;
