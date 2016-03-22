@@ -1,7 +1,7 @@
 ﻿import nj from '../../../src/base.js';
 import { Component, PropTypes } from 'react';
 import tmpl from '../templates/TodoTmpl';
-let template = nj.compileComponent(tmpl);
+const template = nj.compileComponent(tmpl);
 
 class Todo extends Component {
   static propTypes = {

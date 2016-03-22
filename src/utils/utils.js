@@ -8,10 +8,17 @@ var tools = require('./tools'),
   checkElem = require('../checkElem/checkElem'),
   setComponentEngine = require('./setComponentEngine'),
   registerComponent = require('./registerComponent'),
-  filter = require('./filter');
+  filter = require('./filter'),
+  setParamRule = require('./setParamRule');
+
+//Set default param rule
+setParamRule();
 
 module.exports = tools.assign(
-  { escape: escape },
+  { 
+    escape: escape,
+    setParamRule: setParamRule
+  },
   checkElem,
   setComponentEngine,
   registerComponent,

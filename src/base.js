@@ -8,6 +8,7 @@ var nj = require('./core'),
   docReady = require('./utils/docReady');
 
 nj.setComponentEngine = setComponentEngine;
+nj.setParamRule = utils.setParamRule;
 nj.registerComponent = utils.registerComponent;
 nj.registerFilter = utils.registerFilter;
 nj.compileStringTmpl = compileStringTmpl;

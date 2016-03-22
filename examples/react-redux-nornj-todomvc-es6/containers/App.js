@@ -10,7 +10,7 @@ import '../components/Todo';
 import '../components/TodoList';
 
 const { SHOW_ACTIVE, SHOW_COMPLETED, SHOW_ALL } = VisibilityFilters;
-let template = nj.compileComponent(tmpl);
+const template = nj.compileComponent(tmpl);
 
 class _App extends Component {
   static propTypes = {

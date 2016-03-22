@@ -4,8 +4,8 @@ var nj = require('../core'),
   tools = require('../utils/tools'),
   REGEX_CLEAR_NOTES = /<!--[\s\S]*?-->/g,
   REGEX_CLEAR_BLANK = />\s+([^\s<]*)\s+</g,
-  REGEX_CHECK_ELEM = /([^>]*)(<([a-z{/$][-a-z0-9_:.{}$]*)[^>]*>)([^<]*)/ig,
-  REGEX_SPLIT = /\$\{\d+\}/;
+  REGEX_SPLIT = /\$\{\d+\}/,
+  paramRule = nj.paramRule;
 
 //Cache the string template by unique key
 nj.strTmpls = {};
@@ -83,7 +83,7 @@ function _checkStringElem(xml, params) {
     parent = null,
     matchArr;
 
-  while ((matchArr = REGEX_CHECK_ELEM.exec(xml))) {
+  while ((matchArr = paramRule.checkElem.exec(xml))) {
     var textBefore = matchArr[1],
       elem = matchArr[2],
       elemName = matchArr[3],

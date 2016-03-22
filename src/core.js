@@ -16,5 +16,6 @@ nj.tagStyle = 'nj-style';
 nj.tagClassName = 'nj-component';
 nj.templates = {};
 nj.errorTitle = 'NornJ error:';
+nj.paramRule = {};
 
 module.exports = nj;

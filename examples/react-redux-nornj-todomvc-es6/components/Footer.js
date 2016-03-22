@@ -3,7 +3,7 @@ import { Component, PropTypes } from 'react';
 import { VisibilityFilters } from '../actions/actions';
 import tmpl from '../templates/FooterTmpl';
 const { SHOW_ACTIVE, SHOW_COMPLETED, SHOW_ALL } = VisibilityFilters;
-let template = nj.compileComponent(tmpl);
+const template = nj.compileComponent(tmpl);
 
 class Footer extends Component {
   static propTypes = {

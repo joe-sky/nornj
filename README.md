@@ -54,7 +54,7 @@ import nj, {
 import { Component } from 'react';
 import { render } from 'react-dom';
 
-let template = compileComponent(nj`
+const template = compileComponent(nj`
 <div id=test1>
     this the test demo{no}.
     <i>test{no}</i>

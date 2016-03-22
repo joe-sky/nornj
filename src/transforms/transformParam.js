@@ -1,6 +1,8 @@
 ﻿'use strict';
 
-var tools = require('../utils/tools');
+var nj = require('../core'),
+  tools = require('../utils/tools'),
+  paramRule = nj.paramRule;
 
 //Get compiled parameters from a object
 function compiledParams(obj) {
@@ -72,12 +74,11 @@ function _getFilterParam(obj) {
 }
 
 //提取替换参数
-var REGEX_REPLACE_PARAM = /({{1,2})([^"'\s{}]+)}{1,2}/g;
 function _getReplaceParam(obj) {
   var matchArr,
     ret;
 
-  while ((matchArr = REGEX_REPLACE_PARAM.exec(obj))) {
+  while ((matchArr = paramRule.replaceParam.exec(obj))) {
     if (!ret) {
       ret = [];
     }
@@ -88,10 +89,9 @@ function _getReplaceParam(obj) {
 }
 
 //Get compiled parameter
-var REGEX_REPLACE_SPLIT = /{{1,2}[^"'\s{}]+}{1,2}/g;
 function compiledParam(value) {
   var ret = tools.lightObj(),
-    strs = tools.isString(value) ? value.split(REGEX_REPLACE_SPLIT) : [value],
+    strs = tools.isString(value) ? value.split(paramRule.replaceSplit) : [value],
     props = null,
     isAll = false;
 
@@ -103,9 +103,10 @@ function compiledParam(value) {
     tools.each(params, function (param) {
       var retP = tools.lightObj();
       isAll = param[0] === value;
+      retP.prop = compiledProp(param[3]);
 
-      retP.prop = compiledProp(param[2]);
-      retP.escape = param[1].length < 2;
+      //If parameter's open rules are several,then it need escape.
+      retP.escape = param[1].split(paramRule.openRule).length < 3;
       props.push(retP);
     }, false, true);
   }

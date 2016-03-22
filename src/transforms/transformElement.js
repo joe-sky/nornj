@@ -2,12 +2,12 @@
 
 var nj = require('../core'),
   tools = require('../utils/tools'),
-  tranData = require('./transformData');
+  tranData = require('./transformData'),
+  paramRule = nj.paramRule;
 
 //提取xml open tag
-var REGEX_XML_OPEN_TAG = /^<([a-z{][-a-z0-9_:.}]*)[^>]*>$/i;
 function getXmlOpenTag(obj) {
-  return REGEX_XML_OPEN_TAG.exec(obj);
+  return paramRule.xmlOpenTag.exec(obj);
 }
 
 //验证xml self close tag
@@ -52,9 +52,8 @@ function isXmlCloseTag(obj, tagName) {
 }
 
 //提取open tag
-var REGEX_OPEN_TAG = /^[a-z{][-a-z0-9_:.}]*/i;
 function getOpenTag(obj) {
-  return REGEX_OPEN_TAG.exec(obj);
+  return paramRule.openTag.exec(obj);
 }
 
 //验证self close tag
@@ -69,9 +68,8 @@ function isCloseTag(obj, tagName) {
 }
 
 //get inside brace param
-var REGEX_INSIDE_BRACE_PARAM = /{([^"'\s{}]+)}/i;
 function getInsideBraceParam(obj) {
-  return REGEX_INSIDE_BRACE_PARAM.exec(obj);
+  return paramRule.insideBraceParam.exec(obj);
 }
 
 //判断流程控制块并返回refer值

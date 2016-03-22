@@ -50,6 +50,7 @@ var nj = require('./core'),
   docReady = require('./utils/docReady');
 
 nj.setComponentEngine = setComponentEngine;
+nj.setParamRule = utils.setParamRule;
 nj.registerComponent = utils.registerComponent;
 nj.registerFilter = utils.registerFilter;
 nj.compileStringTmpl = compileStringTmpl;
@@ -77,7 +78,7 @@ if (inBrowser) {
 }
 
 module.exports = global.NornJ = global.nj = nj;
-},{"./checkElem/checkStringElem":4,"./compiler/compile":6,"./core":9,"./utils/docReady":13,"./utils/utils":19}],3:[function(require,module,exports){
+},{"./checkElem/checkStringElem":4,"./compiler/compile":6,"./core":9,"./utils/docReady":13,"./utils/utils":20}],3:[function(require,module,exports){
 'use strict';
 
 var nj = require('../core'),
@@ -264,15 +265,15 @@ module.exports = {
   checkElem: checkElem,
   checkTagElem: checkTagElem
 };
-},{"../core":9,"../transforms/transformElement":11,"../transforms/transformParam":12,"../utils/tools":18,"./checkTagElem":5}],4:[function(require,module,exports){
+},{"../core":9,"../transforms/transformElement":11,"../transforms/transformParam":12,"../utils/tools":19,"./checkTagElem":5}],4:[function(require,module,exports){
 'use strict';
 
 var nj = require('../core'),
   tools = require('../utils/tools'),
   REGEX_CLEAR_NOTES = /<!--[\s\S]*?-->/g,
   REGEX_CLEAR_BLANK = />\s+([^\s<]*)\s+</g,
-  REGEX_CHECK_ELEM = /([^>]*)(<([a-z{/$][-a-z0-9_:.{}$]*)[^>]*>)([^<]*)/ig,
-  REGEX_SPLIT = /\$\{\d+\}/;
+  REGEX_SPLIT = /\$\{\d+\}/,
+  paramRule = nj.paramRule;
 
 //Cache the string template by unique key
 nj.strTmpls = {};
@@ -350,7 +351,7 @@ function _checkStringElem(xml, params) {
     parent = null,
     matchArr;
 
-  while ((matchArr = REGEX_CHECK_ELEM.exec(xml))) {
+  while ((matchArr = paramRule.checkElem.exec(xml))) {
     var textBefore = matchArr[1],
       elem = matchArr[2],
       elemName = matchArr[3],
@@ -428,7 +429,7 @@ function _getSelfCloseElem(elem, elemName, params) {
 }
 
 module.exports = compileStringTmpl;
-},{"../core":9,"../utils/tools":18}],5:[function(require,module,exports){
+},{"../core":9,"../utils/tools":19}],5:[function(require,module,exports){
 'use strict';
 
 var nj = require('../core'),
@@ -528,7 +529,7 @@ nj.setInitTagData = function (data) {
 };
 
 module.exports = checkTagElem;
-},{"../core":9,"../transforms/transformElement":11,"../transforms/transformParam":12,"../utils/tools":18}],6:[function(require,module,exports){
+},{"../core":9,"../transforms/transformElement":11,"../transforms/transformParam":12,"../utils/tools":19}],6:[function(require,module,exports){
 'use strict';
 
 var nj = require('../core'),
@@ -633,7 +634,7 @@ module.exports = {
   renderTagComponent: renderTagComponent,
   precompile: precompile
 };
-},{"../checkElem/checkStringElem":4,"../core":9,"../utils/utils":19,"./transformToComponent":7,"./transformToString":8}],7:[function(require,module,exports){
+},{"../checkElem/checkStringElem":4,"../core":9,"../utils/utils":20,"./transformToComponent":7,"./transformToString":8}],7:[function(require,module,exports){
 'use strict';
 
 var nj = require('../core'),
@@ -730,7 +731,7 @@ module.exports = {
   transformToComponent: transformToComponent,
   transformContentToComponent: transformContentToComponent
 };
-},{"../core":9,"../utils/utils":19}],8:[function(require,module,exports){
+},{"../core":9,"../utils/utils":20}],8:[function(require,module,exports){
 'use strict';
 
 var utils = require('../utils/utils');
@@ -815,7 +816,7 @@ module.exports = {
   transformContentToString: transformContentToString
 };
 
-},{"../utils/utils":19}],9:[function(require,module,exports){
+},{"../utils/utils":20}],9:[function(require,module,exports){
 'use strict';
 
 function nj() {
@@ -834,6 +835,7 @@ nj.tagStyle = 'nj-style';
 nj.tagClassName = 'nj-component';
 nj.templates = {};
 nj.errorTitle = 'NornJ error:';
+nj.paramRule = {};
 
 module.exports = nj;
 },{}],10:[function(require,module,exports){
@@ -1074,17 +1076,17 @@ module.exports = {
   getItemParam: getItemParam,
   setObjParam: setObjParam
 };
-},{"../core":9,"../utils/escape":14,"../utils/tools":18}],11:[function(require,module,exports){
+},{"../core":9,"../utils/escape":14,"../utils/tools":19}],11:[function(require,module,exports){
 'use strict';
 
 var nj = require('../core'),
   tools = require('../utils/tools'),
-  tranData = require('./transformData');
+  tranData = require('./transformData'),
+  paramRule = nj.paramRule;
 
 //提取xml open tag
-var REGEX_XML_OPEN_TAG = /^<([a-z{][-a-z0-9_:.}]*)[^>]*>$/i;
 function getXmlOpenTag(obj) {
-  return REGEX_XML_OPEN_TAG.exec(obj);
+  return paramRule.xmlOpenTag.exec(obj);
 }
 
 //验证xml self close tag
@@ -1129,9 +1131,8 @@ function isXmlCloseTag(obj, tagName) {
 }
 
 //提取open tag
-var REGEX_OPEN_TAG = /^[a-z{][-a-z0-9_:.}]*/i;
 function getOpenTag(obj) {
-  return REGEX_OPEN_TAG.exec(obj);
+  return paramRule.openTag.exec(obj);
 }
 
 //验证self close tag
@@ -1146,9 +1147,8 @@ function isCloseTag(obj, tagName) {
 }
 
 //get inside brace param
-var REGEX_INSIDE_BRACE_PARAM = /{([^"'\s{}]+)}/i;
 function getInsideBraceParam(obj) {
-  return REGEX_INSIDE_BRACE_PARAM.exec(obj);
+  return paramRule.insideBraceParam.exec(obj);
 }
 
 //判断流程控制块并返回refer值
@@ -1272,10 +1272,12 @@ module.exports = {
   isTagControl: isTagControl,
   getTagComponents: getTagComponents
 };
-},{"../core":9,"../utils/tools":18,"./transformData":10}],12:[function(require,module,exports){
+},{"../core":9,"../utils/tools":19,"./transformData":10}],12:[function(require,module,exports){
 'use strict';
 
-var tools = require('../utils/tools');
+var nj = require('../core'),
+  tools = require('../utils/tools'),
+  paramRule = nj.paramRule;
 
 //Get compiled parameters from a object
 function compiledParams(obj) {
@@ -1347,12 +1349,11 @@ function _getFilterParam(obj) {
 }
 
 //提取替换参数
-var REGEX_REPLACE_PARAM = /({{1,2})([^"'\s{}]+)}{1,2}/g;
 function _getReplaceParam(obj) {
   var matchArr,
     ret;
 
-  while ((matchArr = REGEX_REPLACE_PARAM.exec(obj))) {
+  while ((matchArr = paramRule.replaceParam.exec(obj))) {
     if (!ret) {
       ret = [];
     }
@@ -1363,10 +1364,9 @@ function _getReplaceParam(obj) {
 }
 
 //Get compiled parameter
-var REGEX_REPLACE_SPLIT = /{{1,2}[^"'\s{}]+}{1,2}/g;
 function compiledParam(value) {
   var ret = tools.lightObj(),
-    strs = tools.isString(value) ? value.split(REGEX_REPLACE_SPLIT) : [value],
+    strs = tools.isString(value) ? value.split(paramRule.replaceSplit) : [value],
     props = null,
     isAll = false;
 
@@ -1378,9 +1378,10 @@ function compiledParam(value) {
     tools.each(params, function (param) {
       var retP = tools.lightObj();
       isAll = param[0] === value;
+      retP.prop = compiledProp(param[3]);
 
-      retP.prop = compiledProp(param[2]);
-      retP.escape = param[1].length < 2;
+      //If parameter's open rules are several,then it need escape.
+      retP.escape = param[1].split(paramRule.openRule).length < 3;
       props.push(retP);
     }, false, true);
   }
@@ -1396,7 +1397,7 @@ module.exports = {
   compiledParams: compiledParams,
   compiledProp: compiledProp
 };
-},{"../utils/tools":18}],13:[function(require,module,exports){
+},{"../core":9,"../utils/tools":19}],13:[function(require,module,exports){
 'use strict';
 
 module.exports = function (callback) {
@@ -1482,7 +1483,7 @@ module.exports = {
   registerFilter: registerFilter
 };
 
-},{"../core":9,"./tools":18}],16:[function(require,module,exports){
+},{"../core":9,"./tools":19}],16:[function(require,module,exports){
 'use strict';
 
 var nj = require('../core'),
@@ -1531,7 +1532,7 @@ module.exports = {
   registerTagNamespace: registerTagNamespace,
   createTagNamespace: createTagNamespace
 };
-},{"../core":9,"./tools":18}],17:[function(require,module,exports){
+},{"../core":9,"./tools":19}],17:[function(require,module,exports){
 'use strict';
 
 var nj = require('../core');
@@ -1553,6 +1554,58 @@ module.exports = {
   setComponentEngine: setComponentEngine
 };
 },{"../core":9}],18:[function(require,module,exports){
+'use strict';
+
+var nj = require('../core'),
+  tools = require('./tools');
+
+function _createRegExp(reg, mode) {
+  return new RegExp(reg, mode);
+}
+
+//Clear the repeated characters
+function _clearRepeat(str) {
+  var ret = '',
+    i = 0,
+    l = str.length,
+    char;
+
+  for (; i < l; i++) {
+    char = str.charAt(i);
+    if (ret.indexOf(char) < 0) {
+      ret += char;
+    }
+  }
+
+  return ret;
+}
+
+module.exports = function (obj) {
+  var openRule = '{',
+    closeRule = '}';
+
+  if (obj) {
+    openRule = obj.openRule,
+    closeRule = obj.closeRule;
+  }
+
+  var allRules = _clearRepeat(openRule + closeRule),
+    firstChar = openRule.charAt(0),
+    otherChars = allRules.substr(1);
+
+  //Reset the regexs to global list
+  tools.assign(nj.paramRule, {
+    openRule: openRule,
+    closeRule: closeRule,
+    xmlOpenTag: _createRegExp('^<([a-z' + firstChar + '][-a-z0-9_:.' + otherChars + ']*)[^>]*>$', 'i'),
+    openTag: _createRegExp('^[a-z' + firstChar + '][-a-z0-9_:.' + otherChars + ']*', 'i'),
+    insideBraceParam: _createRegExp(openRule + '([^\"\'\\s' + allRules + ']+)' + closeRule, 'i'),
+    replaceParam: _createRegExp('((' + openRule + '){1,2})([^\"\'\\s' + allRules + ']+)(' + closeRule + '){1,2}', 'g'),
+    replaceSplit: _createRegExp('(?:' + openRule + '){1,2}[^\"\'\\s' + allRules + ']+(?:' + closeRule + '){1,2}', 'g'),
+    checkElem: _createRegExp('([^>]*)(<([a-z' + firstChar + '/$][-a-z0-9_:.' + allRules + '$]*)[^>]*>)([^<]*)', 'ig')
+  });
+};
+},{"../core":9,"./tools":19}],19:[function(require,module,exports){
 'use strict';
 
 var nj = require('../core'),
@@ -1708,7 +1761,7 @@ var tools = {
 assign(nj, tools);
 
 module.exports = tools;
-},{"../core":9,"object-assign":1}],19:[function(require,module,exports){
+},{"../core":9,"object-assign":1}],20:[function(require,module,exports){
 'use strict';
 
 var tools = require('./tools'),
@@ -1719,10 +1772,17 @@ var tools = require('./tools'),
   checkElem = require('../checkElem/checkElem'),
   setComponentEngine = require('./setComponentEngine'),
   registerComponent = require('./registerComponent'),
-  filter = require('./filter');
+  filter = require('./filter'),
+  setParamRule = require('./setParamRule');
+
+//Set default param rule
+setParamRule();
 
 module.exports = tools.assign(
-  { escape: escape },
+  { 
+    escape: escape,
+    setParamRule: setParamRule
+  },
   checkElem,
   setComponentEngine,
   registerComponent,
@@ -1732,5 +1792,5 @@ module.exports = tools.assign(
   transformParam,
   transformData
 );
-},{"../checkElem/checkElem":3,"../transforms/transformData":10,"../transforms/transformElement":11,"../transforms/transformParam":12,"./escape":14,"./filter":15,"./registerComponent":16,"./setComponentEngine":17,"./tools":18}]},{},[2])(2)
+},{"../checkElem/checkElem":3,"../transforms/transformData":10,"../transforms/transformElement":11,"../transforms/transformParam":12,"./escape":14,"./filter":15,"./registerComponent":16,"./setComponentEngine":17,"./setParamRule":18,"./tools":19}]},{},[2])(2)
 });
