@@ -24,13 +24,12 @@ function _clearRepeat(str) {
   return ret;
 }
 
-module.exports = function (obj) {
-  var openRule = '{',
+module.exports = function (openRule, closeRule) {
+  if (!openRule) {
+    openRule = '{';
+  }
+  if (!closeRule) {
     closeRule = '}';
-
-  if (obj) {
-    openRule = obj.openRule,
-    closeRule = obj.closeRule;
   }
 
   var allRules = _clearRepeat(openRule + closeRule),
@@ -46,6 +45,6 @@ module.exports = function (obj) {
     insideBraceParam: _createRegExp(openRule + '([^\"\'\\s' + allRules + ']+)' + closeRule, 'i'),
     replaceParam: _createRegExp('((' + openRule + '){1,2})([^\"\'\\s' + allRules + ']+)(' + closeRule + '){1,2}', 'g'),
     replaceSplit: _createRegExp('(?:' + openRule + '){1,2}[^\"\'\\s' + allRules + ']+(?:' + closeRule + '){1,2}', 'g'),
-    checkElem: _createRegExp('([^>]*)(<([a-z' + firstChar + '/$][-a-z0-9_:.' + allRules + '$]*)[^>]*>)([^<]*)', 'ig')
+    checkElem: _createRegExp('([^>]*)(<([a-z' + firstChar + '\/$][-a-z0-9_:.' + allRules + '$]*)[^>]*>)([^<]*)', 'ig')
   });
 };

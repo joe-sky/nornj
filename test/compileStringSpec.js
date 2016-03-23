@@ -17,6 +17,8 @@ describe('test compile string', function () {
 
   describe('compile string template to html', function () {
     it('test compile 1', function () {
+      nj.setParamRule();
+
       var data = {
         name: "<i>joe_sky1</i>",
         id: 100,

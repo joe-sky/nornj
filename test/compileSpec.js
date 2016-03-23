@@ -19,11 +19,8 @@ describe('test compile', function () {
   });
 
   describe('compile template to html', function () {
-    xit('test compile 1', function () {
-      nj.setParamRule({
-        openRule: '{%',
-        closeRule: '%}'
-      });
+    it('test compile 1', function () {
+      nj.setParamRule('{%', '%}');
 
       var data = {
         name: "joe_sky",
@@ -33,7 +30,7 @@ describe('test compile', function () {
       };
 
       var tmpl =
-      ["<div name1=../111>", { name: "my name:{%name%},id:{%id%},name:{%name%}", id: "test1" },
+      ["<div checked name1=../111>", { name: "my name:{%name%},id:{%id%},name:{%name%}", id: "test1" },
         ["<span>", "sky:{%name%},{%{%id%}%}"],
         ["span1", "joe", "/span1"],
         ["div id=555", [

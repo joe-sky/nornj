@@ -1581,13 +1581,12 @@ function _clearRepeat(str) {
   return ret;
 }
 
-module.exports = function (obj) {
-  var openRule = '{',
+module.exports = function (openRule, closeRule) {
+  if (!openRule) {
+    openRule = '{';
+  }
+  if (!closeRule) {
     closeRule = '}';
-
-  if (obj) {
-    openRule = obj.openRule,
-    closeRule = obj.closeRule;
   }
 
   var allRules = _clearRepeat(openRule + closeRule),

@@ -17,7 +17,7 @@ function isXmlSelfCloseTag(obj) {
 }
 
 //提取xml open tag内参数
-var REGEX_OPEN_TAG_PARAMS = /([^\s=]+)=((['"][^"']+['"])|(['"]?[^"'\s]+['"]?))/g;
+var REGEX_OPEN_TAG_PARAMS = /[\s]+([^\s=]+)(=((['"][^"']+['"])|(['"]?[^"'\s]+['"]?)))?/g;
 function getOpenTagParams(obj, noXml) {
   var matchArr,
       ret;
@@ -28,8 +28,17 @@ function getOpenTagParams(obj, noXml) {
     }
 
     var key = matchArr[1],
-      value = matchArr[2].replace(/['"]+/g, ''),  //去除引号
-      len = value.length;
+      value = matchArr[3],
+      len;
+
+    if (value != null) {
+      value = value.replace(/['"]+/g, '');  //去除引号
+    }
+    else {
+      value = key;
+    }
+    console.log(value);
+    len = value.length;
 
     //去除末尾的"/>"或">"
     if (!noXml) {
