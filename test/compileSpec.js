@@ -1,18 +1,18 @@
-﻿var nj = require("../src/base"),
-    utils = require("../src/utils/utils"),
-    compiler = require("../src/compiler/compile"),
+﻿var nj = require('../src/base'),
+    utils = require('../src/utils/utils'),
+    compiler = require('../src/compiler/compile'),
     compile = compiler.compile;
 
 describe('test compile', function () {
   beforeAll(function () {
-    nj.registerFilter("filter1", function (v) {
+    nj.registerFilter('filter1', function (v) {
       return v * 2;
     });
-    nj.registerFilter("filter2", function (v) {
+    nj.registerFilter('filter2', function (v) {
       //console.log(this.data);
       return v + 5;
     });
-    nj.registerFilter("filter3", function (v) {
+    nj.registerFilter('filter3', function (v) {
       //console.log(this.index);
       return !!!v;
     });
@@ -30,16 +30,16 @@ describe('test compile', function () {
       };
 
       var tmpl =
-      ["<div checked name1=../111>", { name: "my name:{%name%},id:{%id%},name:{%name%}", id: "test1" },
-        ["<span>", "sky:{%name%},{%{%id%}%}"],
-        ["span1", "joe", "/span1"],
-        ["div id=555", [
-          ["<a class={%num:filter1(a,b):filter2%} />"],
-          ["input type=button /"],
-          ['$if key={%test0%}',
+      ['<div checked disabled="disabled" name1=../111>', { name: 'my name:{%name%},id:{%id%},name:{%name%}', id: 'test1' },
+        ['<span>", "sky:{%name%},{%{%id%}%}'],
+        ['span1', 'joe', '/span1'],
+        ['div id=555', [
+          ['<a class={%num:filter1(a,b):filter2%} />'],
+          ['input type=button /'],
+          ['$if {%test0%}',
               ['input id="test5" /']
           ]
-        ], "/div"]
+        ], '/div']
       ];
 
       var tmplFn = compile(tmpl, 'tmpl1'),
@@ -53,8 +53,8 @@ describe('test compile', function () {
 
     xit('test compile 2', function () {
       var data = {
-        name: "joe_sky<input>",
-        id: "joe",
+        name: 'joe_sky<input>',
+        id: 'joe',
         id2: 555,
         key: true,
         key2: [1, 2, 3],
@@ -63,31 +63,31 @@ describe('test compile', function () {
         ],
         key4: [1, 2, 3, 5],
         key6: [{ k: [1, 2] }, { k: [11, 12] }, { k: [21, 22] }],
-        divx: "testdiv<div>",
+        divx: 'testdiv<div>',
         names: {
-          name: "I am joe_sky<b>.",
+          name: 'I am joe_sky<b>.',
           my: {
-            name: "I am joe_sky<i>.",
-            name2: "I am joe_sky<p>."
+            name: 'I am joe_sky<i>.',
+            name2: 'I am joe_sky<p>.'
           }
         }
       };
 
       var tmplSon =
-      ["$each {key4}",
+      ['$each {key4}',
         ['<h1>', { ids: 'hello world333 !!!!!___{../id2:filter1}' },
           'test{{{../name}}}___',
           [
-            "aaa{.:filter1(1,2,3):filter2}",
-            "bbb{#}",
-            "ccc",
+            'aaa{.:filter1(1,2,3):filter2}',
+            'bbb{#}',
+            'ccc',
             ['$each {../key3}',
               ['$each {../../key2}', 'ddd{.}']
             ]
           ]
         ],
-      "$else",
-        "aaaaa!! {name}"
+      '$else',
+        'aaaaa!! {name}'
       ];
 
       var tmpl =
@@ -108,14 +108,14 @@ describe('test compile', function () {
             ]
           ],
         '/h2'],
-        ["$if {key:filter3}",
+        ['$if {key:filter3}',
           ['<h3>', 'hello world3 !!!'],
-        "$else",
+        '$else',
           tmplSon
         ],
       '</div>'];
 
-      var tmplFn = compile(tmpl, "tmpl2"),
+      var tmplFn = compile(tmpl, 'tmpl2'),
           html = tmplFn(data);
 
       console.log(html);
@@ -127,8 +127,8 @@ describe('test compile', function () {
   describe('compile precompiled template', function () {
     xit('test precompiled 1', function () {
       var data = {
-        name: "joe_sky",
-        id: "joe",
+        name: 'joe_sky',
+        id: 'joe',
         test0: true,
         num: 100
       };
@@ -239,7 +239,7 @@ describe('test compile', function () {
         ]
       };
 
-      var tmplFn = compile(preTmpl, "preTmpl"),
+      var tmplFn = compile(preTmpl, 'preTmpl'),
         html = tmplFn(data);
 
       console.log(html);
