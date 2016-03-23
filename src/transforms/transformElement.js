@@ -16,31 +16,32 @@ function isXmlSelfCloseTag(obj) {
   return REGEX_XML_SELF_CLOSE_TAG.test(obj);
 }
 
-//提取xml open tag内参数
+//Extract parameters inside the xml open tag
 var REGEX_OPEN_TAG_PARAMS = /[\s]+([^\s=]+)(=((['"][^"']+['"])|(['"]?[^"'\s]+['"]?)))?/g;
 function getOpenTagParams(obj, noXml) {
   var matchArr,
       ret;
 
   while ((matchArr = REGEX_OPEN_TAG_PARAMS.exec(obj))) {
+    var key = matchArr[1];
+    if (key === '/' || key === '/>') {  //If match to the last "/" or "/>",then continue the loop.
+      continue;
+    }
+
     if (!ret) {
       ret = [];
     }
 
-    var key = matchArr[1],
-      value = matchArr[3],
-      len;
-
+    var value = matchArr[3], len;
     if (value != null) {
-      value = value.replace(/['"]+/g, '');  //去除引号
+      value = value.replace(/['"]+/g, '');  //Remove quotation marks
     }
     else {
-      value = key;
+      value = key;  //Match to Similar to "checked" or "disabled" attribute.
     }
-    console.log(value);
     len = value.length;
 
-    //去除末尾的"/>"或">"
+    //Removed at the end of "/>" or ">".
     if (!noXml) {
       if (value.lastIndexOf('/>') === len - 2) {
         value = value.replace(/\/>/, '');
@@ -49,6 +50,7 @@ function getOpenTagParams(obj, noXml) {
         value = value.replace(/>/, '');
       }
     }
+
     ret.push({ key: key, value: value });
   }
 

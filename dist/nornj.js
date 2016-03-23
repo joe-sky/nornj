@@ -1096,22 +1096,32 @@ function isXmlSelfCloseTag(obj) {
   return REGEX_XML_SELF_CLOSE_TAG.test(obj);
 }
 
-//提取xml open tag内参数
-var REGEX_OPEN_TAG_PARAMS = /([^\s=]+)=((['"][^"']+['"])|(['"]?[^"'\s]+['"]?))/g;
+//Extract parameters inside the xml open tag
+var REGEX_OPEN_TAG_PARAMS = /[\s]+([^\s=]+)(=((['"][^"']+['"])|(['"]?[^"'\s]+['"]?)))?/g;
 function getOpenTagParams(obj, noXml) {
   var matchArr,
       ret;
 
   while ((matchArr = REGEX_OPEN_TAG_PARAMS.exec(obj))) {
+    var key = matchArr[1];
+    if (key === '/' || key === '/>') {  //If match to the last "/" or "/>",then continue the loop.
+      continue;
+    }
+
     if (!ret) {
       ret = [];
     }
 
-    var key = matchArr[1],
-      value = matchArr[2].replace(/['"]+/g, ''),  //去除引号
-      len = value.length;
+    var value = matchArr[3], len;
+    if (value != null) {
+      value = value.replace(/['"]+/g, '');  //Remove quotation marks
+    }
+    else {
+      value = key;  //Match to Similar to "checked" or "disabled" attribute.
+    }
+    len = value.length;
 
-    //去除末尾的"/>"或">"
+    //Removed at the end of "/>" or ">".
     if (!noXml) {
       if (value.lastIndexOf('/>') === len - 2) {
         value = value.replace(/\/>/, '');
@@ -1120,6 +1130,7 @@ function getOpenTagParams(obj, noXml) {
         value = value.replace(/>/, '');
       }
     }
+
     ret.push({ key: key, value: value });
   }
 
@@ -1602,7 +1613,7 @@ module.exports = function (openRule, closeRule) {
     insideBraceParam: _createRegExp(openRule + '([^\"\'\\s' + allRules + ']+)' + closeRule, 'i'),
     replaceParam: _createRegExp('((' + openRule + '){1,2})([^\"\'\\s' + allRules + ']+)(' + closeRule + '){1,2}', 'g'),
     replaceSplit: _createRegExp('(?:' + openRule + '){1,2}[^\"\'\\s' + allRules + ']+(?:' + closeRule + '){1,2}', 'g'),
-    checkElem: _createRegExp('([^>]*)(<([a-z' + firstChar + '/$][-a-z0-9_:.' + allRules + '$]*)[^>]*>)([^<]*)', 'ig')
+    checkElem: _createRegExp('([^>]*)(<([a-z' + firstChar + '\/$][-a-z0-9_:.' + allRules + '$]*)[^>]*>)([^<]*)', 'ig')
   });
 };
 },{"../core":9,"./tools":19}],19:[function(require,module,exports){
