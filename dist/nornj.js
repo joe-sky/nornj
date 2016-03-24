@@ -1083,6 +1083,7 @@ module.exports = {
 var nj = require('../core'),
   tools = require('../utils/tools'),
   tranData = require('./transformData'),
+  tranParam = require('./transformParam'),
   paramRule = nj.paramRule;
 
 //提取xml open tag
@@ -1193,15 +1194,16 @@ function isTmpl(obj) {
 function addTmpl(node, parent) {
   var paramsP = parent.params;
   if (!paramsP) {
-    paramsP = parent.params = {};
+    paramsP = parent.params = tools.lightObj();
   }
 
   var tmpls = paramsP.tmpls;
-  if (!paramsP.tmpls) {
-    tmpls = paramsP.tmpls = [];
+  if (!tmpls) {
+    paramsP.tmpls = tranParam.compiledParam([node]);
   }
-
-  tmpls.push(node);
+  else {
+    tmpls.strs[0].push(node);  //Insert the compiled template to the parameter name for "tmpls"'s "strs" array.
+  }
 }
 
 //获取标签组件名
@@ -1284,7 +1286,7 @@ module.exports = {
   isTagControl: isTagControl,
   getTagComponents: getTagComponents
 };
-},{"../core":9,"../utils/tools":19,"./transformData":10}],12:[function(require,module,exports){
+},{"../core":9,"../utils/tools":19,"./transformData":10,"./transformParam":12}],12:[function(require,module,exports){
 'use strict';
 
 var nj = require('../core'),
