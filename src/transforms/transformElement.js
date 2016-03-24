@@ -3,6 +3,7 @@
 var nj = require('../core'),
   tools = require('../utils/tools'),
   tranData = require('./transformData'),
+  tranParam = require('./transformParam'),
   paramRule = nj.paramRule;
 
 //提取xml open tag
@@ -113,15 +114,16 @@ function isTmpl(obj) {
 function addTmpl(node, parent) {
   var paramsP = parent.params;
   if (!paramsP) {
-    paramsP = parent.params = {};
+    paramsP = parent.params = tools.lightObj();
   }
 
   var tmpls = paramsP.tmpls;
-  if (!paramsP.tmpls) {
-    tmpls = paramsP.tmpls = [];
+  if (!tmpls) {
+    paramsP.tmpls = tranParam.compiledParam([node]);
   }
-
-  tmpls.push(node);
+  else {
+    tmpls.strs[0].push(node);  //Insert the compiled template to the parameter name for "tmpls"'s "strs" array.
+  }
 }
 
 //获取标签组件名
