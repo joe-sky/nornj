@@ -63,6 +63,6 @@ function select(state) {
 }
 
 //Wrap component,inject dispatch and state into its default connect(select)(App)
-var App = nj.registerComponent('App', connect(select)(_App));
+const App = nj.registerComponent('App', connect(select)(_App));
 
 export default App;
