@@ -16,13 +16,13 @@ describe('test compile string', function () {
   });
 
   describe('compile string template to html', function () {
-    xit('test compile 1', function () {
+    it('test compile 1', function () {
       nj.setParamRule();
 
       var data = {
         name: "<i>joe_sky1</i>",
         id: 100,
-        test0: true,
+        test0: false,
         list: [0, 1, 2]
       };
 
@@ -39,9 +39,9 @@ describe('test compile string', function () {
           ['a /'],
           [
             ['input type=button /'],
-            ['$if key={test0}',
+            ['$unless {test0}',
                 ['input id="test5" /'],
-            '/$if']
+            '/$unless']
           ],
         '/div'],
       '/div'];

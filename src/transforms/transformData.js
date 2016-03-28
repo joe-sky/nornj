@@ -47,7 +47,6 @@ function setObjParam(obj, key, value, notTran) {
 }
 
 //提取style内参数
-var REGEX_STYLE_PARAMS = /([^\s:]+)[\s]?:[\s]?([^\s;]+)[;]?/g;
 function _getStyleParams(obj) {
   //If the parameter is a style object,then direct return.
   if (tools.isObject(obj)) {
@@ -55,10 +54,10 @@ function _getStyleParams(obj) {
   }
 
   //参数为字符串
-  var matchArr,
-    ret;
+  var pattern = /([^\s:]+)[\s]?:[\s]?([^\s;]+)[;]?/g,
+    matchArr, ret;
 
-  while ((matchArr = REGEX_STYLE_PARAMS.exec(obj))) {
+  while ((matchArr = pattern.exec(obj))) {
     var key = matchArr[1].toLowerCase(),
       value = matchArr[2];
 
@@ -125,7 +124,7 @@ function getDataValue(data, propObj, parent, defaultEmpty) {
 
   //if inside each block,get the parent data and current index
   if (parent && parent.parent) {
-    dataP = parent.parent.data;
+    dataP = parent.parent;
     index = parent.index;
   }
 

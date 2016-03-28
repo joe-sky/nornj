@@ -11,6 +11,7 @@ nj.setComponentEngine = setComponentEngine;
 nj.setParamRule = utils.setParamRule;
 nj.registerComponent = utils.registerComponent;
 nj.registerFilter = utils.registerFilter;
+nj.registerExpr= utils.registerExpr;
 nj.compileStringTmpl = compileStringTmpl;
 nj.docReady = docReady;
 utils.assign(nj, compiler);

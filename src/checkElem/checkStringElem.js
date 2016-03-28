@@ -2,8 +2,6 @@
 
 var nj = require('../core'),
   tools = require('../utils/tools'),
-  REGEX_CLEAR_NOTES = /<!--[\s\S]*?-->/g,
-  REGEX_CLEAR_BLANK = />\s+([^\s<]*)\s+</g,
   REGEX_SPLIT = /\$\{\d+\}/,
   paramRule = nj.paramRule;
 
@@ -81,9 +79,10 @@ function _checkStringElem(xml, params) {
       parent: null
     },
     parent = null,
+    pattern = paramRule.checkElem(),
     matchArr;
 
-  while ((matchArr = paramRule.checkElem.exec(xml))) {
+  while ((matchArr = pattern.exec(xml))) {
     var textBefore = matchArr[1],
       elem = matchArr[2],
       elemName = matchArr[3],
@@ -133,7 +132,7 @@ function _checkStringElem(xml, params) {
 }
 
 function _clearNotesAndBlank(str) {
-  return str.replace(REGEX_CLEAR_NOTES, '').replace(REGEX_CLEAR_BLANK, '>$1<').trim();
+  return str.replace(/<!--[\s\S]*?-->/g, '').replace(/>\s+([^\s<]*)\s+</g, '>$1<').trim();
 }
 
 function _formatText(str) {
@@ -141,12 +140,11 @@ function _formatText(str) {
 }
 
 function _getElem(elem, elemName) {
-  switch (elemName) {
-    case '$if':
-    case '$each':
-      return elem.substring(1, elem.length - 1);
-    default:
-      return elem;
+  if(elemName[0] === '$') {
+    return elem.substring(1, elem.length - 1);
+  }
+  else {
+    return elem;
   }
 }
 

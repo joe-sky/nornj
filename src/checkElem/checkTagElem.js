@@ -34,8 +34,10 @@ function checkTagElem(obj, parent) {
       isTmpl;
 
     if (isControl) {  //特殊节点
-      if (tagName !== 'else') {
-        node.type = 'nj_' + tagName;
+      if (tagName !== '$else') {
+        tagName = tagName.substr(1);
+        node.type = 'nj_expr';
+        node.expr = tagName;
 
         isTmpl = tranElem.isTmpl(tagName);
         if (isTmpl) {  //模板元素

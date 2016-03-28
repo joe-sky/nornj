@@ -1,40 +1,50 @@
 ﻿'use strict';
 
-var utils = require('../utils/utils');
+var nj = require('../core'),
+  utils = require('../utils/utils');
 
 //转换节点为字符串
 function transformToString(obj, data, parent) {
-  var ret = '',
-    controlRefer = obj.refer;
+  var ret = '';
 
   if (obj.type === 'nj_plaintext') {
     //替换插入在文本中的参数
     ret = utils.replaceParams(obj.content[0], data, false, false, parent);
   }
-  else if (controlRefer != null) {  //流程控制块
-    var dataRefer = utils.getDataValue(data, controlRefer, parent);
+  else if (obj.type === 'nj_expr') {  //Block expression
+    var dataRefer = utils.getDataValue(data, obj.refer, parent),
+      hasElse = obj.hasElse,
+      expr = nj.exprs[obj.expr],
+      itemIsArray;
 
-    switch (obj.type) {
-      case 'nj_if':
-        ret = transformContentToString(!!dataRefer ? obj.content : obj.contentElse, data, parent);
-        break;
-      case 'nj_each':
-        if (dataRefer) {
-          var itemIsArray = utils.isArray(data);
-          utils.each(dataRefer, function (item, index) {
-            var _parent = utils.lightObj();  //Create a parent data object
-            _parent.data = item;
-            _parent.parent = parent;
-            _parent.index = index;
+    utils.throwIf(expr, 'Expression "' + obj.expr + '" is undefined, please check it has been registered.');
 
-            ret += transformContentToString(obj.content, utils.getItemParam(item, data, itemIsArray), _parent);
-          }, false, utils.isArray(dataRefer));
+    //Execute Block expression
+    expr(dataRefer, {
+      result: function (param) {
+        if(param && param.loop) {
+          if(itemIsArray == null) {
+            itemIsArray = utils.isArray(data);
+          }
+
+          //Create a parent data object
+          var _parent = utils.lightObj();
+          _parent.data = param.item;
+          _parent.parent = parent;
+          _parent.index = param.index;
+
+          ret += transformContentToString(obj.content, utils.getItemParam(param.item, data, itemIsArray), _parent);
         }
-        else if (obj.hasElse) {
+        else {
+          ret = transformContentToString(obj.content, data, parent);
+        }
+      },
+      inverse: function () {
+        if(hasElse) {
           ret = transformContentToString(obj.contentElse, data, parent);
         }
-        break;
-    }
+      }
+    });
   }
   else {
     var type = obj.type;

@@ -34,7 +34,7 @@ gulp.task("test", function () {
 });
 
 //Run eslint
-gulp.task('lint', function () {
+gulp.task('eslint', function () {
   return gulp.src(['./src/**/*.js'])
     .pipe(eslint({
       "rules":{

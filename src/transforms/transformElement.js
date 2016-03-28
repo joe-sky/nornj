@@ -18,12 +18,11 @@ function isXmlSelfCloseTag(obj) {
 }
 
 //Extract parameters inside the xml open tag
-var REGEX_OPEN_TAG_PARAMS = /[\s]+([^\s=]+)(=((['"][^"']+['"])|(['"]?[^"'\s]+['"]?)))?/g;
 function getOpenTagParams(obj, noXml) {
-  var matchArr,
-      ret;
+  var pattern = /[\s]+([^\s=]+)(=((['"][^"']+['"])|(['"]?[^"'\s]+['"]?)))?/g,
+    matchArr, ret;
 
-  while ((matchArr = REGEX_OPEN_TAG_PARAMS.exec(obj))) {
+  while ((matchArr = pattern.exec(obj))) {
     var key = matchArr[1];
     if (key === '/' || key === '/>') {  //If match to the last "/" or "/>",then continue the loop.
       continue;
@@ -85,7 +84,7 @@ function getInsideBraceParam(obj) {
 }
 
 //判断流程控制块并返回refer值
-var REGEX_CONTROL = /^\$(if|each|tmpl)/i;
+var REGEX_CONTROL = /^\$([^\s]+)/i;
 function isControl(obj) {
   var ret, ret1 = REGEX_CONTROL.exec(obj);
   if (ret1) {
@@ -171,9 +170,8 @@ function getTagComponentAttrs(el) {
 }
 
 //判断标签流程控制块
-var REGEX_TAG_CONTROL = /^(if|each|else|tmpl)$/i;
 function isTagControl(obj) {
-  return REGEX_TAG_CONTROL.test(obj);
+  return REGEX_CONTROL.test(obj);
 }
 
 //获取全部标签组件

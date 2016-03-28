@@ -70,7 +70,8 @@ function checkElem(obj, parent) {
           refer = control[1];
         isTmpl = tranElem.isTmpl(ctrl);
 
-        node.type = 'nj_' + ctrl;
+        node.type = 'nj_expr';
+        node.expr = ctrl;
         if (refer != null) {
           node.refer = tranParam.compiledProp(refer);
         }

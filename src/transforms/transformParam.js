@@ -75,10 +75,10 @@ function _getFilterParam(obj) {
 
 //提取替换参数
 function _getReplaceParam(obj) {
-  var matchArr,
-    ret;
+  var pattern = paramRule.replaceParam(),
+    matchArr, ret;
 
-  while ((matchArr = paramRule.replaceParam.exec(obj))) {
+  while ((matchArr = pattern.exec(obj))) {
     if (!ret) {
       ret = [];
     }

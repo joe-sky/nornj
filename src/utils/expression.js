@@ -15,18 +15,22 @@ nj.exprs = {
     }
   },
 
+  //Unless block
+  unless: function (refer, options) {
+    return nj.exprs.if(!refer, options);
+  },
+
   //Each block
   each: function (refer, options) {
     var ret = [];
 
     if (refer) {
       tools.each(refer, function (item, index) {
-        var _parent = tools.lightObj();  //Create a parent data object
-        _parent.data = item;
-        _parent.parent = parent;
-        _parent.index = index;
-
-        ret.push(options.result(item, _parent));
+        ret.push(options.result({
+          loop: true,
+          item: item,
+          index: index
+        }));
       }, false, tools.isArray(refer));
     }
     else {

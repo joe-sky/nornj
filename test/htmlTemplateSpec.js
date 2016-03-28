@@ -22,23 +22,23 @@ describe('test compile html', function () {
   });
 
   describe('compile html template', function () {
-    xit('test html 1', function (done) {
+    it('test html 1', function (done) {
       jsdom.env(
         `<div id="d1" name="{name}">
-          <nj-each refer="{list}">
-            <nj-if refer="{b}">
+          <nj-$each refer="{list}">
+            <nj-$if refer="{b}">
               {no:filter1:filter2}
-              <nj-else>
+              <nj-$else>
                 {no}
-              </nj-else>
-            </nj-if>
+              </nj-$else>
+            </nj-$if>
             <section nj-style="{../styles}" class="test">
-              <nj-each refer="{../list}">
+              <nj-$each refer="{../list}">
                 _{no}_
-              </nj-each>
+              </nj-$each>
             </section>
             <br />
-          </nj-each>
+          </nj-$each>
         </div>`,
         function (err, window) {
           var data = {

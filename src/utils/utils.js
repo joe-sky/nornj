@@ -9,6 +9,7 @@ var tools = require('./tools'),
   setComponentEngine = require('./setComponentEngine'),
   registerComponent = require('./registerComponent'),
   filter = require('./filter'),
+  expression = require('./expression'),
   setParamRule = require('./setParamRule');
 
 //Set default param rule
@@ -23,6 +24,7 @@ module.exports = tools.assign(
   setComponentEngine,
   registerComponent,
   filter,
+  expression,
   tools,
   transformElement,
   transformParam,

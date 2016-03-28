@@ -1,6 +1,6 @@
 ﻿nj.registerFilter({
   isCurrent: function (obj) {
-    return obj === this.parent.currentFilter;
+    return obj === this.parent.data.currentFilter;
   },
   todoState: function (obj) {
     switch (obj) {

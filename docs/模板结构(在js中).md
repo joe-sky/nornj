@@ -159,7 +159,7 @@ nj.compile(['div',
 ```js
 nj.registerFilter("test", function(obj) {
     console.log(this.data);    //输出1
-    console.log(this.parent);  //输出{ list: [1] }
+    console.log(this.parent.data);  //输出{ list: [1] }
     console.log(this.index);   //输出0
     return obj;
 });

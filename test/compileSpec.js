@@ -19,7 +19,7 @@ describe('test compile', function () {
   });
 
   describe('compile template to html', function () {
-    it('test compile 1', function () {
+    xit('test compile 1', function () {
       nj.setParamRule('{%', '%}');
 
       var data = {

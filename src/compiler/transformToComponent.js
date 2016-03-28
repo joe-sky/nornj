@@ -5,44 +5,49 @@ var nj = require('../core'),
 
 //转换节点为组件节点
 function transformToComponent(obj, data, parent) {
-  var ret = null,
-    controlRefer = obj.refer;
+  var ret = null;
 
   if (obj.type === 'nj_plaintext') {
     //替换插入在文本中的参数
     ret = utils.replaceParams(obj.content[0], data, true, false, parent);
 
     //执行模板数据
-    if (utils.isObject(ret) && ret.type === 'nj_tmpl') {
+    if (utils.isObject(ret) && ret.expr === 'tmpl') {
       ret = transformContentToComponent(ret.content, data, parent);
     }
   }
-  else if (controlRefer != null) {  //流程控制块
-    var dataRefer = utils.getDataValue(data, controlRefer, parent);
+  else if (obj.type === 'nj_expr') {  //Block expression
+    var dataRefer = utils.getDataValue(data, obj.refer, parent),
+      hasElse = obj.hasElse,
+      expr = nj.exprs[obj.expr],
+      itemIsArray;
 
-    switch (obj.type) {
-      case 'nj_if':
-        ret = transformContentToComponent(!!dataRefer ? obj.content : obj.contentElse, data, parent);
-        break;
-      case 'nj_each':
-        if (dataRefer) {
-          ret = [];
+    utils.throwIf(expr, 'Expression "' + obj.expr + '" is undefined, please check it has been registered.');
 
-          var itemIsArray = utils.isArray(data);
-          utils.each(dataRefer, function (item, index) {
-            var _parent = utils.lightObj();  //Create a parent data object
-            _parent.data = item;
-            _parent.parent = parent;
-            _parent.index = index;
+    //Execute Block expression
+    ret = expr(dataRefer, {
+      result: function (param) {
+        if(param && param.loop) {
+          if(itemIsArray == null) {
+            itemIsArray = utils.isArray(data);
+          }
 
-            ret.push(transformContentToComponent(obj.content, utils.getItemParam(item, data, itemIsArray), _parent));
-          }, false, utils.isArray(dataRefer));
+          //Create a parent data object
+          var _parent = utils.lightObj();
+          _parent.data = param.item;
+          _parent.parent = parent;
+          _parent.index = param.index;
+
+          return transformContentToComponent(obj.content, utils.getItemParam(param.item, data, itemIsArray), _parent);
         }
-        else if (obj.hasElse) {
-          ret = transformContentToComponent(obj.contentElse, data, parent);
+        else {
+          return transformContentToComponent(obj.content, data, parent);
         }
-        break;
-    }
+      },
+      inverse: function () {
+        return hasElse ? transformContentToComponent(obj.contentElse, data, parent) : null;
+      }
+    });
   }
   else {
     //如果有相应组件,则使用组件类作为type值
