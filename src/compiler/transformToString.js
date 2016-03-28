@@ -19,7 +19,7 @@ function transformToString(obj, data, parent) {
         ret = transformContentToString(!!dataRefer ? obj.content : obj.contentElse, data, parent);
         break;
       case 'nj_each':
-        if (dataRefer && dataRefer.length) {
+        if (dataRefer) {
           var itemIsArray = utils.isArray(data);
           utils.each(dataRefer, function (item, index) {
             var _parent = utils.lightObj();  //Create a parent data object

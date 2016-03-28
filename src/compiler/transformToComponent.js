@@ -25,7 +25,7 @@ function transformToComponent(obj, data, parent) {
         ret = transformContentToComponent(!!dataRefer ? obj.content : obj.contentElse, data, parent);
         break;
       case 'nj_each':
-        if (dataRefer && dataRefer.length) {
+        if (dataRefer) {
           ret = [];
 
           var itemIsArray = utils.isArray(data);
