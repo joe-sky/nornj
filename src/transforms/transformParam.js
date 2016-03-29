@@ -15,7 +15,7 @@ function compiledParams(obj) {
 }
 
 //Get compiled property
-function compiledProp(prop) {
+function compiledProp(prop, isString) {
   var ret = tools.lightObj();
 
   //If there are colons in the property,then use filter
@@ -23,11 +23,11 @@ function compiledProp(prop) {
     var filters = [],
       filtersTmp;
     filtersTmp = prop.split(':');
-    prop = filtersTmp[0];  //Extract property
+    prop = filtersTmp[0].trim();  //Extract property
 
     filtersTmp = filtersTmp.slice(1);
     tools.each(filtersTmp, function (filter) {
-      var retF = _getFilterParam(filter),
+      var retF = _getFilterParam(filter.trim()),
         filterObj = tools.lightObj(),
         filterName = retF[1].toLowerCase();  //Get filter name
 
@@ -53,7 +53,7 @@ function compiledProp(prop) {
   }
 
   //Extract the parent data path
-  if (prop.indexOf('../') > -1) {
+  if (!isString && prop.indexOf('../') > -1) {
     var n = 0;
     prop = prop.replace(/\.\.\//g, function () {
       n++;
@@ -64,6 +64,10 @@ function compiledProp(prop) {
   }
 
   ret.name = prop;
+  if(isString) {  //Sign the parameter is a pure string.
+    ret.isStr = true;
+  }
+
   return ret;
 }
 
@@ -76,6 +80,7 @@ function _getFilterParam(obj) {
 //提取替换参数
 function _getReplaceParam(obj) {
   var pattern = paramRule.replaceParam(),
+    quots = ['\'', '"'],
     matchArr, ret, prop;
 
   while ((matchArr = pattern.exec(obj))) {
@@ -83,10 +88,18 @@ function _getReplaceParam(obj) {
       ret = [];
     }
 
-    //Clear parameter at both ends of the space.
     prop = matchArr[3];
-    if(prop != null) {
-      matchArr[3] = prop.trim();
+    if (prop != null) {
+      //Clear parameter at both ends of the space.
+      prop = prop.trim();
+
+      //If parameter has quotation marks,this's a pure string parameter.
+      if(quots.indexOf(prop.charAt(0)) > -1) {
+        prop = tools.clearQuot(prop);
+        matchArr.isStr = true;
+      }
+
+      matchArr[3] = prop;
     }
 
     ret.push(matchArr);
@@ -110,7 +123,7 @@ function compiledParam(value) {
     tools.each(params, function (param) {
       var retP = tools.lightObj();
       isAll = param[0] === value;
-      retP.prop = compiledProp(param[3]);
+      retP.prop = compiledProp(param[3], param.isStr);
 
       //If parameter's open rules are several,then it need escape.
       retP.escape = param[1].split(paramRule.openRule).length < 3;

@@ -144,25 +144,29 @@ function getDataValue(data, propObj, parent, defaultEmpty) {
     datas = [data];
   }
 
-  if (prop === '.') {  //prop为点号时直接使用data作为返回值
-    return _useFilters(filters, isArr ? data[0] : data, datas, dataP, index);
+  if (propObj.isStr) {
+    ret = _useFilters(filters, prop, datas, dataP, index);
+  }
+  else if (prop === '.') {  //prop为点号时直接使用data作为返回值
+    ret = _useFilters(filters, isArr ? data[0] : data, datas, dataP, index);
   }
   else if (prop === '#') {  //Get current item index
-    return _useFilters(filters, index, datas, dataP, index);
+    ret = _useFilters(filters, index, datas, dataP, index);
   }
+  else {
+    tools.each(datas, function (obj) {
+      if (obj) {
+        ret = obj[prop];
 
-  tools.each(datas, function (obj) {
-    if (obj) {
-      ret = obj[prop];
+        //Use filters
+        ret = _useFilters(filters, ret, datas, dataP, index);
 
-      //Use filters
-      ret = _useFilters(filters, ret, datas, dataP, index);
-
-      if (ret != null) {
-        return false;
+        if (ret != null) {
+          return false;
+        }
       }
-    }
-  }, false, true, true);
+    }, false, true, true);
+  }
 
   //Default set empty
   if (defaultEmpty && ret == null) {

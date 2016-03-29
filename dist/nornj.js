@@ -1003,25 +1003,29 @@ function getDataValue(data, propObj, parent, defaultEmpty) {
     datas = [data];
   }
 
-  if (prop === '.') {  //prop为点号时直接使用data作为返回值
-    return _useFilters(filters, isArr ? data[0] : data, datas, dataP, index);
+  if (propObj.isStr) {
+    ret = _useFilters(filters, prop, datas, dataP, index);
+  }
+  else if (prop === '.') {  //prop为点号时直接使用data作为返回值
+    ret = _useFilters(filters, isArr ? data[0] : data, datas, dataP, index);
   }
   else if (prop === '#') {  //Get current item index
-    return _useFilters(filters, index, datas, dataP, index);
+    ret = _useFilters(filters, index, datas, dataP, index);
   }
+  else {
+    tools.each(datas, function (obj) {
+      if (obj) {
+        ret = obj[prop];
 
-  tools.each(datas, function (obj) {
-    if (obj) {
-      ret = obj[prop];
+        //Use filters
+        ret = _useFilters(filters, ret, datas, dataP, index);
 
-      //Use filters
-      ret = _useFilters(filters, ret, datas, dataP, index);
-
-      if (ret != null) {
-        return false;
+        if (ret != null) {
+          return false;
+        }
       }
-    }
-  }, false, true, true);
+    }, false, true, true);
+  }
 
   //Default set empty
   if (defaultEmpty && ret == null) {
@@ -1115,7 +1119,7 @@ function isXmlSelfCloseTag(obj) {
 
 //Extract parameters inside the xml open tag
 function getOpenTagParams(obj, noXml) {
-  var pattern = /[\s]+([^\s=]+)(=((['"][^"']+['"])|(['"]?[^"'\s]+['"]?)))?/g,
+  var pattern = /[\s]+([^\s=]+)(=(('[^']+')|("[^"]+")|([^"'\s]+)))?/g,
     matchArr, ret;
 
   while ((matchArr = pattern.exec(obj))) {
@@ -1128,9 +1132,10 @@ function getOpenTagParams(obj, noXml) {
       ret = [];
     }
 
-    var value = matchArr[3], len;
+    var value = matchArr[3],
+      charF, len, regex;
     if (value != null) {
-      value = value.replace(/['"]+/g, '');  //Remove quotation marks
+      value = tools.clearQuot(value);  //Remove quotation marks
     }
     else {
       value = key;  //Match to Similar to "checked" or "disabled" attribute.
@@ -1318,7 +1323,7 @@ function compiledParams(obj) {
 }
 
 //Get compiled property
-function compiledProp(prop) {
+function compiledProp(prop, isString) {
   var ret = tools.lightObj();
 
   //If there are colons in the property,then use filter
@@ -1326,11 +1331,11 @@ function compiledProp(prop) {
     var filters = [],
       filtersTmp;
     filtersTmp = prop.split(':');
-    prop = filtersTmp[0];  //Extract property
+    prop = filtersTmp[0].trim();  //Extract property
 
     filtersTmp = filtersTmp.slice(1);
     tools.each(filtersTmp, function (filter) {
-      var retF = _getFilterParam(filter),
+      var retF = _getFilterParam(filter.trim()),
         filterObj = tools.lightObj(),
         filterName = retF[1].toLowerCase();  //Get filter name
 
@@ -1341,7 +1346,7 @@ function compiledProp(prop) {
         if (paramsF) {
           var params = [];
           tools.each(paramsF.split(','), function (p) {
-            params[params.length] = p;
+            params[params.length] = p.trim();
           }, false, true);
 
           filterObj.params = params;
@@ -1356,7 +1361,7 @@ function compiledProp(prop) {
   }
 
   //Extract the parent data path
-  if (prop.indexOf('../') > -1) {
+  if (!isString && prop.indexOf('../') > -1) {
     var n = 0;
     prop = prop.replace(/\.\.\//g, function () {
       n++;
@@ -1367,6 +1372,10 @@ function compiledProp(prop) {
   }
 
   ret.name = prop;
+  if(isString) {  //Sign the parameter is a pure string.
+    ret.isStr = true;
+  }
+
   return ret;
 }
 
@@ -1379,12 +1388,28 @@ function _getFilterParam(obj) {
 //提取替换参数
 function _getReplaceParam(obj) {
   var pattern = paramRule.replaceParam(),
-    matchArr, ret;
+    quots = ['\'', '"'],
+    matchArr, ret, prop;
 
   while ((matchArr = pattern.exec(obj))) {
     if (!ret) {
       ret = [];
     }
+
+    prop = matchArr[3];
+    if (prop != null) {
+      //Clear parameter at both ends of the space.
+      prop = prop.trim();
+
+      //If parameter has quotation marks,this's a pure string parameter.
+      if(quots.indexOf(prop.charAt(0)) > -1) {
+        prop = tools.clearQuot(prop);
+        matchArr.isStr = true;
+      }
+
+      matchArr[3] = prop;
+    }
+
     ret.push(matchArr);
   }
 
@@ -1406,7 +1431,7 @@ function compiledParam(value) {
     tools.each(params, function (param) {
       var retP = tools.lightObj();
       isAll = param[0] === value;
-      retP.prop = compiledProp(param[3]);
+      retP.prop = compiledProp(param[3], param.isStr);
 
       //If parameter's open rules are several,then it need escape.
       retP.escape = param[1].split(paramRule.openRule).length < 3;
@@ -1684,10 +1709,10 @@ module.exports = function (openRule, closeRule) {
     closeRule: closeRule,
     xmlOpenTag: _createRegExp('^<([a-z' + firstChar + '][-a-z0-9_:.' + otherChars + ']*)[^>]*>$', 'i'),
     openTag: _createRegExp('^[a-z' + firstChar + '][-a-z0-9_:.' + otherChars + ']*', 'i'),
-    insideBraceParam: _createRegExp(openRule + '([^\"\'\\s' + allRules + ']+)' + closeRule, 'i'),
-    replaceSplit: _createRegExp('(?:' + openRule + '){1,2}[^\"\'\\s' + allRules + ']+(?:' + closeRule + '){1,2}'),
+    insideBraceParam: _createRegExp(openRule + '([^' + allRules + ']+)' + closeRule, 'i'),
+    replaceSplit: _createRegExp('(?:' + openRule + '){1,2}[^' + allRules + ']+(?:' + closeRule + '){1,2}'),
     replaceParam: function() {
-      return _createRegExp('((' + openRule + '){1,2})([^\"\'\\s' + allRules + ']+)(' + closeRule + '){1,2}', 'g');
+      return _createRegExp('((' + openRule + '){1,2})([^' + allRules + ']+)(' + closeRule + '){1,2}', 'g');
     },
     checkElem: function() {
       return _createRegExp('([^>]*)(<([a-z' + firstChar + '\/$][-a-z0-9_:.' + allRules + '$]*)[^>]*>)([^<]*)', 'ig');
@@ -1831,6 +1856,24 @@ function lightObj() {
   return Object.create(null);
 }
 
+//Clear quotation marks
+function clearQuot(value) {
+  var charF = value.charAt(0),
+    regex;
+
+  if (charF === '\'') {
+    regex = /[']+/g;
+  }
+  else if (charF === '"') {
+    regex = /["]+/g;
+  }
+  if (regex) {
+    value = value.replace(regex, '');
+  }
+
+  return value;
+}
+
 var tools = {
   isArray: isArray,
   isArrayLike: isArrayLike,
@@ -1843,7 +1886,8 @@ var tools = {
   assign: assign,
   uniqueKey: uniqueKey,
   lightObj: lightObj,
-  listPush: listPush
+  listPush: listPush,
+  clearQuot: clearQuot
 };
 
 //绑定到nj对象

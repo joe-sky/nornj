@@ -19,7 +19,7 @@ function isXmlSelfCloseTag(obj) {
 
 //Extract parameters inside the xml open tag
 function getOpenTagParams(obj, noXml) {
-  var pattern = /[\s]+([^\s=]+)(=((['"][^"']+['"])|(['"]?[^"'\s]+['"]?)))?/g,
+  var pattern = /[\s]+([^\s=]+)(=(('[^']+')|("[^"]+")|([^"'\s]+)))?/g,
     matchArr, ret;
 
   while ((matchArr = pattern.exec(obj))) {
@@ -32,9 +32,10 @@ function getOpenTagParams(obj, noXml) {
       ret = [];
     }
 
-    var value = matchArr[3], len;
+    var value = matchArr[3],
+      charF, len, regex;
     if (value != null) {
-      value = value.replace(/['"]+/g, '');  //Remove quotation marks
+      value = tools.clearQuot(value);  //Remove quotation marks
     }
     else {
       value = key;  //Match to Similar to "checked" or "disabled" attribute.

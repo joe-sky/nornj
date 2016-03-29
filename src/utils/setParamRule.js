@@ -42,10 +42,10 @@ module.exports = function (openRule, closeRule) {
     closeRule: closeRule,
     xmlOpenTag: _createRegExp('^<([a-z' + firstChar + '][-a-z0-9_:.' + otherChars + ']*)[^>]*>$', 'i'),
     openTag: _createRegExp('^[a-z' + firstChar + '][-a-z0-9_:.' + otherChars + ']*', 'i'),
-    insideBraceParam: _createRegExp(openRule + '([^\"\'' + allRules + ']+)' + closeRule, 'i'),
-    replaceSplit: _createRegExp('(?:' + openRule + '){1,2}[^\"\'' + allRules + ']+(?:' + closeRule + '){1,2}'),
+    insideBraceParam: _createRegExp(openRule + '([^' + allRules + ']+)' + closeRule, 'i'),
+    replaceSplit: _createRegExp('(?:' + openRule + '){1,2}[^' + allRules + ']+(?:' + closeRule + '){1,2}'),
     replaceParam: function() {
-      return _createRegExp('((' + openRule + '){1,2})([^\"\'' + allRules + ']+)(' + closeRule + '){1,2}', 'g');
+      return _createRegExp('((' + openRule + '){1,2})([^' + allRules + ']+)(' + closeRule + '){1,2}', 'g');
     },
     checkElem: function() {
       return _createRegExp('([^>]*)(<([a-z' + firstChar + '\/$][-a-z0-9_:.' + allRules + '$]*)[^>]*>)([^<]*)', 'ig');

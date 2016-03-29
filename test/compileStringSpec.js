@@ -24,12 +24,13 @@ describe('test compile string', function () {
         name: "<i>joe_sky1</i>",
         id: 100,
         test0: false,
-        list: [0, 1, 2]
+        list: [0, 1, 2],
+        c1: 100
       };
 
       //normal template
       var tmpl1 =
-      ['div name1=../111', { name: 'my name:{name},id:{id},name:{name}', id: 'test1' },
+      ['div name1=\'../111\' class="{\'5\':filter1} c2" id1=666 id2=777', { name: 'my name:{"name"},id:{id},name:{name}', id: 'test1' },
         ['span',
           'sky:{name},{id}',
         '/span'],
@@ -53,7 +54,7 @@ describe('test compile string', function () {
           '<div name1=../111>',
               '<span>',
                   '<img />',
-                  'sky:{name},{ id:filter2(1, 2) }',
+                  'sky:{name},{ id: filter2(1, 2) }',
                   '${0}',
               '</span>',
           '</div>'
@@ -66,7 +67,7 @@ describe('test compile string', function () {
           <span>
             ${tmpl2}
             <img />
-            sky:{{name}},{id:filter2}
+            sky:{{ name }},{ id: filter2 }
             ${['section',
               tmpl1,
             '/section']}

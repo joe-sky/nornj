@@ -134,6 +134,24 @@ function lightObj() {
   return Object.create(null);
 }
 
+//Clear quotation marks
+function clearQuot(value) {
+  var charF = value.charAt(0),
+    regex;
+
+  if (charF === '\'') {
+    regex = /[']+/g;
+  }
+  else if (charF === '"') {
+    regex = /["]+/g;
+  }
+  if (regex) {
+    value = value.replace(regex, '');
+  }
+
+  return value;
+}
+
 var tools = {
   isArray: isArray,
   isArrayLike: isArrayLike,
@@ -146,7 +164,8 @@ var tools = {
   assign: assign,
   uniqueKey: uniqueKey,
   lightObj: lightObj,
-  listPush: listPush
+  listPush: listPush,
+  clearQuot: clearQuot
 };
 
 //绑定到nj对象
