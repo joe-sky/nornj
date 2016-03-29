@@ -7,7 +7,8 @@ describe('test compile string', function () {
     nj.registerFilter('filter1', function (v) {
       return v * 2;
     });
-    nj.registerFilter('filter2', function (v) {
+    nj.registerFilter('filter2', function (v, p1, p2) {
+      console.log(p1 + '_' + p2);
       return v + 5;
     });
     nj.registerFilter('filter3', function (v) {
@@ -52,7 +53,7 @@ describe('test compile string', function () {
           '<div name1=../111>',
               '<span>',
                   '<img />',
-                  'sky:{name},{id:filter2}',
+                  'sky:{name},{ id:filter2(1, 2) }',
                   '${0}',
               '</span>',
           '</div>'

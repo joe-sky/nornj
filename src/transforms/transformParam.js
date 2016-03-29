@@ -38,7 +38,7 @@ function compiledProp(prop) {
         if (paramsF) {
           var params = [];
           tools.each(paramsF.split(','), function (p) {
-            params[params.length] = p;
+            params[params.length] = p.trim();
           }, false, true);
 
           filterObj.params = params;
@@ -76,12 +76,19 @@ function _getFilterParam(obj) {
 //提取替换参数
 function _getReplaceParam(obj) {
   var pattern = paramRule.replaceParam(),
-    matchArr, ret;
+    matchArr, ret, prop;
 
   while ((matchArr = pattern.exec(obj))) {
     if (!ret) {
       ret = [];
     }
+
+    //Clear parameter at both ends of the space.
+    prop = matchArr[3];
+    if(prop != null) {
+      matchArr[3] = prop.trim();
+    }
+
     ret.push(matchArr);
   }
 
