@@ -22,7 +22,7 @@ describe('test compile html', function () {
   });
 
   describe('compile html template', function () {
-    it('test html 1', function (done) {
+    xit('test html 1', function (done) {
       jsdom.env(
         `<div id="d1" name="{name}">
           <nj-$each refer="{list}">

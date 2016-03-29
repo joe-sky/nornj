@@ -1,16 +1,16 @@
-﻿var nj = require("../src/base"),
-  utils = require("../src/utils/utils"),
-  compile = require("../src/compiler/compile").compile;
+﻿var nj = require('../src/base'),
+  utils = require('../src/utils/utils'),
+  compile = require('../src/compiler/compile').compile;
 
 describe('test compile string', function () {
   beforeAll(function () {
-    nj.registerFilter("filter1", function (v) {
+    nj.registerFilter('filter1', function (v) {
       return v * 2;
     });
-    nj.registerFilter("filter2", function (v) {
+    nj.registerFilter('filter2', function (v) {
       return v + 5;
     });
-    nj.registerFilter("filter3", function (v) {
+    nj.registerFilter('filter3', function (v) {
       return !!!v;
     });
   });
@@ -28,8 +28,8 @@ describe('test compile string', function () {
 
       //normal template
       var tmpl1 =
-      ['div name1=../111', { name: "my name:{name},id:{id},name:{name}", id: "test1" },
-        ["span",
+      ['div name1=../111', { name: 'my name:{name},id:{id},name:{name}', id: 'test1' },
+        ['span',
           'sky:{name},{id}',
         '/span'],
         ['span1',
