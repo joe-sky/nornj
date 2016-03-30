@@ -81,7 +81,7 @@ function _getFilterParam(obj) {
 var _quots = ['\'', '"'];
 function _getReplaceParam(obj) {
   var pattern = paramRule.replaceParam(),
-    patternP = /[^\s:]+([\s]?:[\s]?[^\s\(\)]+(\([\s\S]+\))?){0,}/g,
+    patternP = /[^\s:]+([\s]?:[\s]?[^\s\(\)]+(\([^\(\)]+\))?){0,}/g,
     matchArr, ret, prop;
 
   while ((matchArr = pattern.exec(obj))) {
