@@ -47,11 +47,11 @@ describe('test convert template', function () {
     <div name1=../111>
       <$params>
         <$if {test0}>
-          <$param {"name"}>my name:jesy,id:1231,name:name</$param>
+          <$param {'name'}>my name:jesy,id:1231,name:name</$param>
         <$else />
-          <$param {"name2":filter1}>my name:jesy</$param>
+          <$param {'name2':filter1}>my name:jesy</$param>
         </$if>
-        <$param {"id"}>{test0:filter1 "test1":filter2 "test2"}</$param>
+        <$param {'id'}>{test0:filter1 'test1':filter2 'test2'}</$param>
       </$params>
       ${['<span>', 'sky:name,id']}
     </div>

@@ -67,7 +67,7 @@ describe('test compile string', function () {
           <span>
             ${tmpl2}
             <img />
-            sky:{{ name }},{ id: filter2 }
+            sky:{{ 'name555' }},{ id: filter2 }
             ${['section',
               tmpl1,
             '/section']}

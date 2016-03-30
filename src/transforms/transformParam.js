@@ -64,7 +64,7 @@ function compiledProp(prop, isString) {
   }
 
   ret.name = prop;
-  if(isString) {  //Sign the parameter is a pure string.
+  if (isString) {  //Sign the parameter is a pure string.
     ret.isStr = true;
   }
 
@@ -78,9 +78,10 @@ function _getFilterParam(obj) {
 }
 
 //提取替换参数
+var _quots = ['\'', '"'];
 function _getReplaceParam(obj) {
   var pattern = paramRule.replaceParam(),
-    quots = ['\'', '"'],
+    patternP = /[^\s:]+([\s]?:[\s]?[^\s\(\)]+(\([\s\S]+\))?){0,}/g,
     matchArr, ret, prop;
 
   while ((matchArr = pattern.exec(obj))) {
@@ -88,21 +89,22 @@ function _getReplaceParam(obj) {
       ret = [];
     }
 
-    prop = matchArr[3];
+    var item = [matchArr[0], matchArr[1], matchArr[3], false];
+    prop = item[2];
     if (prop != null) {
       //Clear parameter at both ends of the space.
       prop = prop.trim();
 
       //If parameter has quotation marks,this's a pure string parameter.
-      if(quots.indexOf(prop.charAt(0)) > -1) {
+      if (_quots.indexOf(prop.charAt(0)) > -1) {
         prop = tools.clearQuot(prop);
-        matchArr.isStr = true;
+        item[3] = true;
       }
 
-      matchArr[3] = prop;
+      item[2] = prop;
     }
 
-    ret.push(matchArr);
+    ret.push(item);
   }
 
   return ret;
@@ -123,7 +125,7 @@ function compiledParam(value) {
     tools.each(params, function (param) {
       var retP = tools.lightObj();
       isAll = param[0] === value;
-      retP.prop = compiledProp(param[3], param.isStr);
+      retP.prop = compiledProp(param[2], param[3]);
 
       //If parameter's open rules are several,then it need escape.
       retP.escape = param[1].split(paramRule.openRule).length < 3;
