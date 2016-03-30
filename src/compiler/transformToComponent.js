@@ -17,15 +17,15 @@ function transformToComponent(obj, data, parent) {
     }
   }
   else if (obj.type === 'nj_expr') {  //Block expression
-    var dataRefer = utils.getDataValue(data, obj.refer, parent),
+    var dataRefer = utils.getExprParam(obj.refer, data, parent),
       hasElse = obj.hasElse,
       expr = nj.exprs[obj.expr],
       itemIsArray;
 
     utils.throwIf(expr, 'Expression "' + obj.expr + '" is undefined, please check it has been registered.');
 
-    //Execute Block expression
-    ret = expr(dataRefer, {
+    //Create expression parameters
+    dataRefer.push({
       result: function (param) {
         if(param && param.loop) {
           if(itemIsArray == null) {
@@ -48,6 +48,9 @@ function transformToComponent(obj, data, parent) {
         return hasElse ? transformContentToComponent(obj.contentElse, data, parent) : null;
       }
     });
+
+    //Execute expression block
+    ret = expr.apply(null, dataRefer);
   }
   else {
     //如果有相应组件,则使用组件类作为type值
@@ -56,7 +59,7 @@ function transformToComponent(obj, data, parent) {
 
     //If typeRefer isn't undefined,use it to replace the node type.
     if (obj.typeRefer) {
-      var typeRefer = utils.getDataValue(data, obj.typeRefer, parent);
+      var typeRefer = utils.replaceParams(obj.typeRefer, data, true, false, parent);
       if (typeRefer) {
         type = typeRefer;
       }

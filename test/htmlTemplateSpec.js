@@ -22,18 +22,19 @@ describe('test compile html', function () {
   });
 
   describe('compile html template', function () {
-    xit('test html 1', function (done) {
+    it('test html 1', function (done) {
       jsdom.env(
         `<div id="d1" name="{name}">
-          <nj-$each refer="{list}">
+          <nj-{testCom}></nj-{testCom}>
+          <nj-$each refer="{ list }">
             <nj-$if refer="{b}">
-              {no:filter1:filter2}
+              { no:filter1:filter2 'id' }
               <nj-$else>
                 {no}
               </nj-$else>
             </nj-$if>
-            <section nj-style="{../styles}" class="test">
-              <nj-$each refer="{../list}">
+            <section nj-style="{ ../styles }" class="test">
+              <nj-$each refer="{ ../list }">
                 _{no}_
               </nj-$each>
             </section>
@@ -41,13 +42,28 @@ describe('test compile html', function () {
           </nj-$each>
         </div>`,
         function (err, window) {
+          var TestComponent = React.createClass({
+            render: function () {
+              return React.createElement('button', null, 'click me');
+            }
+          });
+
+          nj.registerComponent('TestComponent', TestComponent);
+
           var data = {
             name: 'joe_sky',
             id: 100,
             test0: true,
             list: [{ no: 1, b: 1 }, { no: 2, b: 0 }, { no: 3, b: 1 }],
-            styles: { color: 'blue', fontSize: '15px' }
+            styles: { color: 'blue', fontSize: '15px' },
+            testcom: TestComponent
           };
+
+          nj.registerComponent('TestComponent', React.createClass({
+            render: function () {
+              return React.createElement('button', null, 'click me');
+            }
+          }));
 
           var templateT = nj.compileTagComponent(window.document.querySelector('div'), 'testT1');
           //console.log(JSON.stringify(nj.templates['testT1']));

@@ -11,16 +11,16 @@ function transformToString(obj, data, parent) {
     //替换插入在文本中的参数
     ret = utils.replaceParams(obj.content[0], data, false, false, parent);
   }
-  else if (obj.type === 'nj_expr') {  //Block expression
-    var dataRefer = utils.getDataValue(data, obj.refer, parent),
+  else if (obj.type === 'nj_expr') {  //Expression block
+    var dataRefer = utils.getExprParam(obj.refer, data, parent),
       hasElse = obj.hasElse,
       expr = nj.exprs[obj.expr],
       itemIsArray;
 
     utils.throwIf(expr, 'Expression "' + obj.expr + '" is undefined, please check it has been registered.');
 
-    //Execute Block expression
-    expr(dataRefer, {
+    //Create expression parameters
+    dataRefer.push({
       result: function (param) {
         if(param && param.loop) {
           if(itemIsArray == null) {
@@ -45,13 +45,16 @@ function transformToString(obj, data, parent) {
         }
       }
     });
+
+    //Execute expression block
+    expr.apply(null, dataRefer);
   }
   else {
     var type = obj.type;
 
     //If typeRefer isn't undefined,use it to replace the node type.
     if (obj.typeRefer) {
-      var typeRefer = utils.escape(utils.getDataValue(data, obj.typeRefer, parent));
+      var typeRefer = utils.replaceParams(obj.typeRefer, data, false, false, parent);
       if (typeRefer) {
         type = typeRefer;
       }

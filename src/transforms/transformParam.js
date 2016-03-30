@@ -77,34 +77,46 @@ function _getFilterParam(obj) {
   return REGEX_FILTER_PARAM.exec(obj);
 }
 
-//提取替换参数
+//Extract replace parameters
 var _quots = ['\'', '"'];
-function _getReplaceParam(obj) {
+function _getReplaceParam(obj, strs) {
   var pattern = paramRule.replaceParam(),
     patternP = /[^\s:]+([\s]?:[\s]?[^\s\(\)]+(\([^\(\)]+\))?){0,}/g,
-    matchArr, ret, prop;
+    matchArr, matchArrP, ret, prop, i = 0;
 
   while ((matchArr = pattern.exec(obj))) {
     if (!ret) {
       ret = [];
     }
 
-    var item = [matchArr[0], matchArr[1], matchArr[3], false];
-    prop = item[2];
-    if (prop != null) {
-      //Clear parameter at both ends of the space.
-      prop = prop.trim();
+    var j = 0;
+    prop = matchArr[3];
 
-      //If parameter has quotation marks,this's a pure string parameter.
-      if (_quots.indexOf(prop.charAt(0)) > -1) {
-        prop = tools.clearQuot(prop);
+    //To extract parameters by interval space.
+    while ((matchArrP = patternP.exec(prop))) {
+      var propP = matchArrP[0],
+        item = [matchArr[0], matchArr[1], propP, false, true];
+
+      //Clear parameter at both ends of the space.
+      propP = propP.trim();
+
+      //If parameter has quotation marks, this's a pure string parameter.
+      if (_quots.indexOf(propP.charAt(0)) > -1) {
+        propP = tools.clearQuot(propP);
         item[3] = true;
       }
 
-      item[2] = prop;
-    }
+      item[2] = propP;
+      ret.push(item);
 
-    ret.push(item);
+      //If there are several parameters in a curly braces, fill the space for the "strs" array.
+      if (j > 0) {
+        item[4] = false;  //Sign not contain all of placehorder
+        strs.splice(++i, 0, '');
+      }
+      j++;
+    }
+    i++;
   }
 
   return ret;
@@ -119,12 +131,12 @@ function compiledParam(value) {
 
   //If have placehorder
   if (strs.length > 1) {
-    var params = _getReplaceParam(value);
+    var params = _getReplaceParam(value, strs);
     props = [];
 
     tools.each(params, function (param) {
       var retP = tools.lightObj();
-      isAll = param[0] === value;
+      isAll = param[4] ? param[0] === value : false;  //If there are several parameters in a curly braces, "isAll" must be false.
       retP.prop = compiledProp(param[2], param[3]);
 
       //If parameter's open rules are several,then it need escape.

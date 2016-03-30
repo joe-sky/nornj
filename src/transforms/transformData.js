@@ -230,11 +230,22 @@ function replaceParams(valueObj, data, newObj, newKey, parent) {
   return value;
 }
 
+//Get expression parameter
+function getExprParam(refer, data, parent) {
+  var ret = [];
+  tools.each(refer.props, function (propObj, i) {
+    ret.push(getDataValue(data, propObj.prop, parent));
+  }, false, true);
+
+  return ret;
+}
+
 module.exports = {
   transformParams: transformParams,
   transformParamsToObj: transformParamsToObj,
   replaceParams: replaceParams,
   getDataValue: getDataValue,
   getItemParam: getItemParam,
-  setObjParam: setObjParam
+  setObjParam: setObjParam,
+  getExprParam: getExprParam
 };

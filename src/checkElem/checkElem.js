@@ -73,7 +73,7 @@ function checkElem(obj, parent) {
         node.type = 'nj_expr';
         node.expr = ctrl;
         if (refer != null) {
-          node.refer = tranParam.compiledProp(refer);
+          node.refer = tranParam.compiledParam(refer);
         }
 
         if (tranElem.isControlCloseTag(last, ctrl)) {  //判断是否有流程控制块闭合标签
@@ -96,7 +96,7 @@ function checkElem(obj, parent) {
         }
         else {  //为特殊节点时取refer
           var retR = tranElem.getInsideBraceParam(params.refer);
-          node.refer = tranParam.compiledProp(retR ? retR[1] : params.refer);
+          node.refer = tranParam.compiledParam(retR ? retR[0] : params.refer);
         }
 
         hasParams = true;
@@ -108,7 +108,7 @@ function checkElem(obj, parent) {
         //If open tag has a brace,add the typeRefer param.
         var typeRefer = tranElem.getInsideBraceParam(openTagName);
         if (typeRefer) {
-          node.typeRefer = tranParam.compiledProp(typeRefer[1]);
+          node.typeRefer = tranParam.compiledParam(typeRefer[0]);
         }
 
         //获取openTag内参数

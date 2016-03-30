@@ -48,7 +48,7 @@ function checkTagElem(obj, parent) {
         }
         else {  //流程控制块
           var retR = tranElem.getInsideBraceParam(params.refer);
-          node.refer = tranParam.compiledProp(retR ? retR[1] : params.refer);
+          node.refer = tranParam.compiledParam(retR ? retR[0] : params.refer);
         }
       }
       else {  //else节点
@@ -61,6 +61,13 @@ function checkTagElem(obj, parent) {
     }
     else {  //元素节点
       node.type = tagName;
+
+      //If open tag has a brace,add the typeRefer param.
+      var typeRefer = tranElem.getInsideBraceParam(tagName);
+      if (typeRefer) {
+        node.typeRefer = tranParam.compiledParam(typeRefer[0]);
+      }
+
       if (params) {
         node.params = tranParam.compiledParams(params);
       }

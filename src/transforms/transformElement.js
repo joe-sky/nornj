@@ -19,7 +19,7 @@ function isXmlSelfCloseTag(obj) {
 
 //Extract parameters inside the xml open tag
 function getOpenTagParams(obj, noXml) {
-  var pattern = /[\s]+([^\s=]+)(=(('[^']+')|("[^"]+")|([^"'\s]+)))?/g,
+  var pattern = /[\s]+([^\s={}]+)(=(('[^']+')|("[^"]+")|([^"'\s]+)))?/g,
     matchArr, ret;
 
   while ((matchArr = pattern.exec(obj))) {
@@ -93,7 +93,7 @@ function isControl(obj) {
 
     var ret2 = getInsideBraceParam(obj);  //提取refer值
     if (ret2) {
-      ret.push(ret2[1]);
+      ret.push(ret2[0]);
     }
   }
 

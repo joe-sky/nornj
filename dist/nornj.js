@@ -155,7 +155,7 @@ function checkElem(obj, parent) {
         node.type = 'nj_expr';
         node.expr = ctrl;
         if (refer != null) {
-          node.refer = tranParam.compiledProp(refer);
+          node.refer = tranParam.compiledParam(refer);
         }
 
         if (tranElem.isControlCloseTag(last, ctrl)) {  //判断是否有流程控制块闭合标签
@@ -178,7 +178,7 @@ function checkElem(obj, parent) {
         }
         else {  //为特殊节点时取refer
           var retR = tranElem.getInsideBraceParam(params.refer);
-          node.refer = tranParam.compiledProp(retR ? retR[1] : params.refer);
+          node.refer = tranParam.compiledParam(retR ? retR[0] : params.refer);
         }
 
         hasParams = true;
@@ -190,7 +190,7 @@ function checkElem(obj, parent) {
         //If open tag has a brace,add the typeRefer param.
         var typeRefer = tranElem.getInsideBraceParam(openTagName);
         if (typeRefer) {
-          node.typeRefer = tranParam.compiledProp(typeRefer[1]);
+          node.typeRefer = tranParam.compiledParam(typeRefer[0]);
         }
 
         //获取openTag内参数
@@ -480,7 +480,7 @@ function checkTagElem(obj, parent) {
         }
         else {  //流程控制块
           var retR = tranElem.getInsideBraceParam(params.refer);
-          node.refer = tranParam.compiledProp(retR ? retR[1] : params.refer);
+          node.refer = tranParam.compiledParam(retR ? retR[0] : params.refer);
         }
       }
       else {  //else节点
@@ -493,6 +493,13 @@ function checkTagElem(obj, parent) {
     }
     else {  //元素节点
       node.type = tagName;
+
+      //If open tag has a brace,add the typeRefer param.
+      var typeRefer = tranElem.getInsideBraceParam(tagName);
+      if (typeRefer) {
+        node.typeRefer = tranParam.compiledParam(typeRefer[0]);
+      }
+
       if (params) {
         node.params = tranParam.compiledParams(params);
       }
@@ -656,15 +663,15 @@ function transformToComponent(obj, data, parent) {
     }
   }
   else if (obj.type === 'nj_expr') {  //Block expression
-    var dataRefer = utils.getDataValue(data, obj.refer, parent),
+    var dataRefer = utils.getExprParam(obj.refer, data, parent),
       hasElse = obj.hasElse,
       expr = nj.exprs[obj.expr],
       itemIsArray;
 
     utils.throwIf(expr, 'Expression "' + obj.expr + '" is undefined, please check it has been registered.');
 
-    //Execute Block expression
-    ret = expr(dataRefer, {
+    //Create expression parameters
+    dataRefer.push({
       result: function (param) {
         if(param && param.loop) {
           if(itemIsArray == null) {
@@ -687,6 +694,9 @@ function transformToComponent(obj, data, parent) {
         return hasElse ? transformContentToComponent(obj.contentElse, data, parent) : null;
       }
     });
+
+    //Execute expression block
+    ret = expr.apply(null, dataRefer);
   }
   else {
     //如果有相应组件,则使用组件类作为type值
@@ -695,7 +705,7 @@ function transformToComponent(obj, data, parent) {
 
     //If typeRefer isn't undefined,use it to replace the node type.
     if (obj.typeRefer) {
-      var typeRefer = utils.getDataValue(data, obj.typeRefer, parent);
+      var typeRefer = utils.replaceParams(obj.typeRefer, data, true, false, parent);
       if (typeRefer) {
         type = typeRefer;
       }
@@ -752,16 +762,16 @@ function transformToString(obj, data, parent) {
     //替换插入在文本中的参数
     ret = utils.replaceParams(obj.content[0], data, false, false, parent);
   }
-  else if (obj.type === 'nj_expr') {  //Block expression
-    var dataRefer = utils.getDataValue(data, obj.refer, parent),
+  else if (obj.type === 'nj_expr') {  //Expression block
+    var dataRefer = utils.getExprParam(obj.refer, data, parent),
       hasElse = obj.hasElse,
       expr = nj.exprs[obj.expr],
       itemIsArray;
 
     utils.throwIf(expr, 'Expression "' + obj.expr + '" is undefined, please check it has been registered.');
 
-    //Execute Block expression
-    expr(dataRefer, {
+    //Create expression parameters
+    dataRefer.push({
       result: function (param) {
         if(param && param.loop) {
           if(itemIsArray == null) {
@@ -786,13 +796,16 @@ function transformToString(obj, data, parent) {
         }
       }
     });
+
+    //Execute expression block
+    expr.apply(null, dataRefer);
   }
   else {
     var type = obj.type;
 
     //If typeRefer isn't undefined,use it to replace the node type.
     if (obj.typeRefer) {
-      var typeRefer = utils.escape(utils.getDataValue(data, obj.typeRefer, parent));
+      var typeRefer = utils.replaceParams(obj.typeRefer, data, false, false, parent);
       if (typeRefer) {
         type = typeRefer;
       }
@@ -832,7 +845,6 @@ module.exports = {
   transformToString: transformToString,
   transformContentToString: transformContentToString
 };
-
 },{"../core":9,"../utils/utils":21}],9:[function(require,module,exports){
 'use strict';
 
@@ -1089,13 +1101,24 @@ function replaceParams(valueObj, data, newObj, newKey, parent) {
   return value;
 }
 
+//Get expression parameter
+function getExprParam(refer, data, parent) {
+  var ret = [];
+  tools.each(refer.props, function (propObj, i) {
+    ret.push(getDataValue(data, propObj.prop, parent));
+  }, false, true);
+
+  return ret;
+}
+
 module.exports = {
   transformParams: transformParams,
   transformParamsToObj: transformParamsToObj,
   replaceParams: replaceParams,
   getDataValue: getDataValue,
   getItemParam: getItemParam,
-  setObjParam: setObjParam
+  setObjParam: setObjParam,
+  getExprParam: getExprParam
 };
 },{"../core":9,"../utils/escape":14,"../utils/tools":20}],11:[function(require,module,exports){
 'use strict';
@@ -1119,7 +1142,7 @@ function isXmlSelfCloseTag(obj) {
 
 //Extract parameters inside the xml open tag
 function getOpenTagParams(obj, noXml) {
-  var pattern = /[\s]+([^\s=]+)(=(('[^']+')|("[^"]+")|([^"'\s]+)))?/g,
+  var pattern = /[\s]+([^\s={}]+)(=(('[^']+')|("[^"]+")|([^"'\s]+)))?/g,
     matchArr, ret;
 
   while ((matchArr = pattern.exec(obj))) {
@@ -1193,7 +1216,7 @@ function isControl(obj) {
 
     var ret2 = getInsideBraceParam(obj);  //提取refer值
     if (ret2) {
-      ret.push(ret2[1]);
+      ret.push(ret2[0]);
     }
   }
 
@@ -1372,7 +1395,7 @@ function compiledProp(prop, isString) {
   }
 
   ret.name = prop;
-  if(isString) {  //Sign the parameter is a pure string.
+  if (isString) {  //Sign the parameter is a pure string.
     ret.isStr = true;
   }
 
@@ -1385,32 +1408,46 @@ function _getFilterParam(obj) {
   return REGEX_FILTER_PARAM.exec(obj);
 }
 
-//提取替换参数
-function _getReplaceParam(obj) {
+//Extract replace parameters
+var _quots = ['\'', '"'];
+function _getReplaceParam(obj, strs) {
   var pattern = paramRule.replaceParam(),
-    quots = ['\'', '"'],
-    matchArr, ret, prop;
+    patternP = /[^\s:]+([\s]?:[\s]?[^\s\(\)]+(\([^\(\)]+\))?){0,}/g,
+    matchArr, matchArrP, ret, prop, i = 0;
 
   while ((matchArr = pattern.exec(obj))) {
     if (!ret) {
       ret = [];
     }
 
+    var j = 0;
     prop = matchArr[3];
-    if (prop != null) {
-      //Clear parameter at both ends of the space.
-      prop = prop.trim();
 
-      //If parameter has quotation marks,this's a pure string parameter.
-      if(quots.indexOf(prop.charAt(0)) > -1) {
-        prop = tools.clearQuot(prop);
-        matchArr.isStr = true;
+    //To extract parameters by interval space.
+    while ((matchArrP = patternP.exec(prop))) {
+      var propP = matchArrP[0],
+        item = [matchArr[0], matchArr[1], propP, false, true];
+
+      //Clear parameter at both ends of the space.
+      propP = propP.trim();
+
+      //If parameter has quotation marks, this's a pure string parameter.
+      if (_quots.indexOf(propP.charAt(0)) > -1) {
+        propP = tools.clearQuot(propP);
+        item[3] = true;
       }
 
-      matchArr[3] = prop;
-    }
+      item[2] = propP;
+      ret.push(item);
 
-    ret.push(matchArr);
+      //If there are several parameters in a curly braces, fill the space for the "strs" array.
+      if (j > 0) {
+        item[4] = false;  //Sign not contain all of placehorder
+        strs.splice(++i, 0, '');
+      }
+      j++;
+    }
+    i++;
   }
 
   return ret;
@@ -1425,13 +1462,13 @@ function compiledParam(value) {
 
   //If have placehorder
   if (strs.length > 1) {
-    var params = _getReplaceParam(value);
+    var params = _getReplaceParam(value, strs);
     props = [];
 
     tools.each(params, function (param) {
       var retP = tools.lightObj();
-      isAll = param[0] === value;
-      retP.prop = compiledProp(param[3], param.isStr);
+      isAll = param[4] ? param[0] === value : false;  //If there are several parameters in a curly braces, "isAll" must be false.
+      retP.prop = compiledProp(param[2], param[3]);
 
       //If parameter's open rules are several,then it need escape.
       retP.escape = param[1].split(paramRule.openRule).length < 3;
@@ -1707,8 +1744,8 @@ module.exports = function (openRule, closeRule) {
   tools.assign(nj.paramRule, {
     openRule: openRule,
     closeRule: closeRule,
-    xmlOpenTag: _createRegExp('^<([a-z' + firstChar + '][-a-z0-9_:.' + otherChars + ']*)[^>]*>$', 'i'),
-    openTag: _createRegExp('^[a-z' + firstChar + '][-a-z0-9_:.' + otherChars + ']*', 'i'),
+    xmlOpenTag: _createRegExp('^<([a-z' + firstChar + '][-a-z0-9_:.\/' + otherChars + ']*)[^>]*>$', 'i'),
+    openTag: _createRegExp('^[a-z' + firstChar + '][-a-z0-9_:.\/' + otherChars + ']*', 'i'),
     insideBraceParam: _createRegExp(openRule + '([^' + allRules + ']+)' + closeRule, 'i'),
     replaceSplit: _createRegExp('(?:' + openRule + '){1,2}[^' + allRules + ']+(?:' + closeRule + '){1,2}'),
     replaceParam: function() {
