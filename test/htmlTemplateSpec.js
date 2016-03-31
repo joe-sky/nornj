@@ -29,9 +29,9 @@ describe('test compile html', function () {
           <nj-$each refer="{ list }">
             <nj-$if refer="{b}">
               { no:filter1:filter2 'id' }
-              <nj-$else>
-                {no}
-              </nj-$else>
+            <nj-$else />
+              {no}
+              <i>test{no}</i>
             </nj-$if>
             <section nj-style="{ ../styles }" class="test">
               <nj-$each refer="{ ../list }">
@@ -47,7 +47,7 @@ describe('test compile html', function () {
               return React.createElement('button', null, 'click me');
             }
           });
-
+          console.log(window.document.querySelector('div').innerHTML);
           //nj.registerComponent('TestComponent', TestComponent);
 
           var data = {

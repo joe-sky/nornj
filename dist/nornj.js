@@ -693,7 +693,8 @@ function transformToComponent(obj, data, parent) {
       },
       inverse: function () {
         return hasElse ? transformContentToComponent(obj.contentElse, data, parent) : null;
-      }
+      },
+      useString: false
     });
 
     //Create context object
@@ -794,17 +795,16 @@ function transformToString(obj, data, parent) {
           _parent.parent = parent;
           _parent.index = param.index;
 
-          ret += transformContentToString(obj.content, utils.getItemParam(param.item, data, itemIsArray), _parent);
+          return transformContentToString(obj.content, utils.getItemParam(param.item, data, itemIsArray), _parent);
         }
         else {
-          ret = transformContentToString(obj.content, data, parent);
+          return transformContentToString(obj.content, data, parent);
         }
       },
       inverse: function () {
-        if (hasElse) {
-          ret = transformContentToString(obj.contentElse, data, parent);
-        }
-      }
+        return hasElse ? transformContentToString(obj.contentElse, data, parent) : null;
+      },
+      useString: true
     });
 
     //Create context object
@@ -814,7 +814,7 @@ function transformToString(obj, data, parent) {
     thisObj.index = parent.index;
 
     //Execute expression block
-    expr.apply(thisObj, dataRefer);
+    ret = expr.apply(thisObj, dataRefer);
   }
   else {
     var type = obj.type;
@@ -1565,9 +1565,11 @@ nj.exprs = {
 
   //Each block
   each: function (refer, options) {
-    var ret = [];
+    var useString = options.useString,
+      ret;
 
     if (refer) {
+      ret = [];
       tools.each(refer, function (item, index) {
         ret.push(options.result({
           loop: true,
@@ -1575,9 +1577,26 @@ nj.exprs = {
           index: index
         }));
       }, false, tools.isArray(refer));
+
+      //May return connected string
+      var len = ret.length;
+      if (useString) {
+        if (len) {
+          ret = ret.join('');
+        }
+        else {
+          ret = '';
+        }
+      }
+      else if (!len) {
+        ret = null;
+      }
     }
     else {
       ret = options.inverse();
+      if (useString && ret == null) {
+        ret = '';
+      }
     }
 
     return ret;

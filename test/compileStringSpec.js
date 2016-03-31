@@ -54,15 +54,12 @@ describe('test compile string', function () {
 
       //string template by es5
       var tmpl2 =
-      [
-          '<div name1=../111>',
-              '<span>',
-                  '<img />',
-                  'sky:{name},{ id: filter2(1, 2) }',
-                  '${0}',
-              '</span>',
-          '</div>'
-      ].join('');
+      '<div name1=../111>\
+          <span>\
+              <img />\
+              sky:{name},{ id: filter2(1, 2) }${0}\
+          </span>\
+      </div>';
 
       //string template by es6
       var tmpl3 = nj`
