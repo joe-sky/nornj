@@ -22,9 +22,11 @@ nj.exprs = {
 
   //Each block
   each: function (refer, options) {
-    var ret = [];
+    var useString = options.useString,
+      ret;
 
     if (refer) {
+      ret = [];
       tools.each(refer, function (item, index) {
         ret.push(options.result({
           loop: true,
@@ -32,9 +34,26 @@ nj.exprs = {
           index: index
         }));
       }, false, tools.isArray(refer));
+
+      //May return connected string
+      var len = ret.length;
+      if (useString) {
+        if (len) {
+          ret = ret.join('');
+        }
+        else {
+          ret = '';
+        }
+      }
+      else if (!len) {
+        ret = null;
+      }
     }
     else {
       ret = options.inverse();
+      if (useString && ret == null) {
+        ret = '';
+      }
     }
 
     return ret;

@@ -34,17 +34,16 @@ function transformToString(obj, data, parent) {
           _parent.parent = parent;
           _parent.index = param.index;
 
-          ret += transformContentToString(obj.content, utils.getItemParam(param.item, data, itemIsArray), _parent);
+          return transformContentToString(obj.content, utils.getItemParam(param.item, data, itemIsArray), _parent);
         }
         else {
-          ret = transformContentToString(obj.content, data, parent);
+          return transformContentToString(obj.content, data, parent);
         }
       },
       inverse: function () {
-        if (hasElse) {
-          ret = transformContentToString(obj.contentElse, data, parent);
-        }
-      }
+        return hasElse ? transformContentToString(obj.contentElse, data, parent) : null;
+      },
+      useString: true
     });
 
     //Create context object
@@ -54,7 +53,7 @@ function transformToString(obj, data, parent) {
     thisObj.index = parent.index;
 
     //Execute expression block
-    expr.apply(thisObj, dataRefer);
+    ret = expr.apply(thisObj, dataRefer);
   }
   else {
     var type = obj.type;

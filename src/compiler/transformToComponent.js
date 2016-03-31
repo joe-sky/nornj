@@ -47,7 +47,8 @@ function transformToComponent(obj, data, parent) {
       },
       inverse: function () {
         return hasElse ? transformContentToComponent(obj.contentElse, data, parent) : null;
-      }
+      },
+      useString: false
     });
 
     //Create context object
