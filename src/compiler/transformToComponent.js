@@ -1,7 +1,8 @@
 ﻿'use strict';
 
 var nj = require('../core'),
-    utils = require('../utils/utils');
+  utils = require('../utils/utils'),
+  errorTitle = nj.errorTitle;
 
 //转换节点为组件节点
 function transformToComponent(obj, data, parent) {
@@ -16,13 +17,13 @@ function transformToComponent(obj, data, parent) {
       ret = transformContentToComponent(ret.content, data, parent);
     }
   }
-  else if (obj.type === 'nj_expr') {  //Block expression
+  else if (obj.type === 'nj_expr') {  //Expression block
     var dataRefer = utils.getExprParam(obj.refer, data, parent),
       hasElse = obj.hasElse,
       expr = nj.exprs[obj.expr],
       itemIsArray;
 
-    utils.throwIf(expr, 'Expression "' + obj.expr + '" is undefined, please check it has been registered.');
+    utils.throwIf(expr, errorTitle + 'Expression "' + obj.expr + '" is undefined, please check it has been registered.');
 
     //Create expression parameters
     dataRefer.push({
@@ -49,8 +50,14 @@ function transformToComponent(obj, data, parent) {
       }
     });
 
+    //Create context object
+    var thisObj = utils.lightObj();
+    thisObj.data = data;
+    thisObj.parent = parent.parent;
+    thisObj.index = parent.index;
+
     //Execute expression block
-    ret = expr.apply(null, dataRefer);
+    ret = expr.apply(thisObj, dataRefer);
   }
   else {
     //如果有相应组件,则使用组件类作为type值
@@ -85,9 +92,11 @@ function transformContentToComponent(content, data, parent) {
   if (!content) {
     return null;
   }
-  if (!parent && data) {  //Init a parent data object and cascade pass on the children node
+  if (!parent) {  //Init a parent data object and cascade pass on the children node
     parent = utils.lightObj();
-    parent.data = utils.isArray(data) ? data[0] : data;
+    if (data) {
+      parent.data = utils.isArray(data) ? data[0] : data;
+    }
   }
 
   var ret = [];

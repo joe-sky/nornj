@@ -1,7 +1,8 @@
 ﻿'use strict';
 
 var nj = require('../core'),
-  utils = require('../utils/utils');
+  utils = require('../utils/utils'),
+  errorTitle = nj.errorTitle;
 
 //转换节点为字符串
 function transformToString(obj, data, parent) {
@@ -17,13 +18,13 @@ function transformToString(obj, data, parent) {
       expr = nj.exprs[obj.expr],
       itemIsArray;
 
-    utils.throwIf(expr, 'Expression "' + obj.expr + '" is undefined, please check it has been registered.');
+    utils.throwIf(expr, errorTitle + 'Expression "' + obj.expr + '" is undefined, please check it has been registered.');
 
     //Create expression parameters
     dataRefer.push({
       result: function (param) {
-        if(param && param.loop) {
-          if(itemIsArray == null) {
+        if (param && param.loop) {
+          if (itemIsArray == null) {
             itemIsArray = utils.isArray(data);
           }
 
@@ -40,14 +41,20 @@ function transformToString(obj, data, parent) {
         }
       },
       inverse: function () {
-        if(hasElse) {
+        if (hasElse) {
           ret = transformContentToString(obj.contentElse, data, parent);
         }
       }
     });
 
+    //Create context object
+    var thisObj = utils.lightObj();
+    thisObj.data = data;
+    thisObj.parent = parent.parent;
+    thisObj.index = parent.index;
+
     //Execute expression block
-    expr.apply(null, dataRefer);
+    expr.apply(thisObj, dataRefer);
   }
   else {
     var type = obj.type;
@@ -78,9 +85,11 @@ function transformContentToString(content, data, parent) {
   if (!content) {
     return ret;
   }
-  if (!parent && data) {  //Init a parent data object and cascade pass on the children node
+  if (!parent) {  //Init a parent data object and cascade pass on the children node
     parent = utils.lightObj();
-    parent.data = utils.isArray(data) ? data[0] : data;
+    if (data) {
+      parent.data = utils.isArray(data) ? data[0] : data;
+    }
   }
 
   utils.each(content, function (obj) {

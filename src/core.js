@@ -15,7 +15,7 @@ nj.tagId = 'nj-id';
 nj.tagStyle = 'nj-style';
 nj.tagClassName = 'nj-component';
 nj.templates = {};
-nj.errorTitle = 'NornJ error:';
+nj.errorTitle = 'NornJ:';
 nj.paramRule = {};
 nj.autoRenderTag = true;
 

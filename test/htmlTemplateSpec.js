@@ -48,7 +48,7 @@ describe('test compile html', function () {
             }
           });
 
-          nj.registerComponent('TestComponent', TestComponent);
+          //nj.registerComponent('TestComponent', TestComponent);
 
           var data = {
             name: 'joe_sky',

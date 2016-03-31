@@ -8,7 +8,7 @@ describe('test compile string', function () {
       return v * 2;
     });
     nj.registerFilter('filter2', function (v, p1, p2) {
-      console.log(p1 + '_' + p2);
+      //console.log(p1 + '_' + p2);
       return v + 5;
     });
     nj.registerFilter('filter3', function (v) {
@@ -20,7 +20,7 @@ describe('test compile string', function () {
   });
 
   describe('compile string template to html', function () {
-    xit('test compile 1', function () {
+    it('test compile 1', function () {
       nj.setParamRule();
 
       var data = {

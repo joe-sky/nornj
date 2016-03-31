@@ -2,7 +2,8 @@
 
 var nj = require('../core'),
   tools = require('../utils/tools'),
-  escape = require('../utils/escape');
+  escape = require('../utils/escape'),
+  errorTitle = nj.errorTitle;
 
 //转换节点参数为字符串
 function transformParams(obj, data, parent) {
@@ -85,7 +86,7 @@ function _useFilters(filters, ret, data, parent, index) {
     tools.each(filters, function (filterObj) {
       var filter = filtersObj[filterObj.name];  //Get filter function
       if (!filter) {
-        console.warn(nj.errorTitle + 'A filter called ' + filterObj.name + ' is undefined.');
+        console.warn(errorTitle + 'A filter called ' + filterObj.name + ' is undefined.');
         return;
       }
 
@@ -132,7 +133,7 @@ function getDataValue(data, propObj, parent, defaultEmpty) {
   if (parent && parentNum) {
     for (var i = 0; i < parentNum; i++) {
       var _parent = parent.parent;
-      tools.throwIf(_parent, 'Parent data is undefined, please check the param path declare.');
+      tools.throwIf(_parent, errorTitle + 'Parent data is undefined, please check the param path declare.');
       parent = _parent;
       datas = [parent.data];
     }

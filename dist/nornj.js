@@ -647,7 +647,8 @@ module.exports = {
 'use strict';
 
 var nj = require('../core'),
-    utils = require('../utils/utils');
+  utils = require('../utils/utils'),
+  errorTitle = nj.errorTitle;
 
 //转换节点为组件节点
 function transformToComponent(obj, data, parent) {
@@ -662,13 +663,13 @@ function transformToComponent(obj, data, parent) {
       ret = transformContentToComponent(ret.content, data, parent);
     }
   }
-  else if (obj.type === 'nj_expr') {  //Block expression
+  else if (obj.type === 'nj_expr') {  //Expression block
     var dataRefer = utils.getExprParam(obj.refer, data, parent),
       hasElse = obj.hasElse,
       expr = nj.exprs[obj.expr],
       itemIsArray;
 
-    utils.throwIf(expr, 'Expression "' + obj.expr + '" is undefined, please check it has been registered.');
+    utils.throwIf(expr, errorTitle + 'Expression "' + obj.expr + '" is undefined, please check it has been registered.');
 
     //Create expression parameters
     dataRefer.push({
@@ -695,8 +696,14 @@ function transformToComponent(obj, data, parent) {
       }
     });
 
+    //Create context object
+    var thisObj = utils.lightObj();
+    thisObj.data = data;
+    thisObj.parent = parent.parent;
+    thisObj.index = parent.index;
+
     //Execute expression block
-    ret = expr.apply(null, dataRefer);
+    ret = expr.apply(thisObj, dataRefer);
   }
   else {
     //如果有相应组件,则使用组件类作为type值
@@ -731,9 +738,11 @@ function transformContentToComponent(content, data, parent) {
   if (!content) {
     return null;
   }
-  if (!parent && data) {  //Init a parent data object and cascade pass on the children node
+  if (!parent) {  //Init a parent data object and cascade pass on the children node
     parent = utils.lightObj();
-    parent.data = utils.isArray(data) ? data[0] : data;
+    if (data) {
+      parent.data = utils.isArray(data) ? data[0] : data;
+    }
   }
 
   var ret = [];
@@ -752,7 +761,8 @@ module.exports = {
 'use strict';
 
 var nj = require('../core'),
-  utils = require('../utils/utils');
+  utils = require('../utils/utils'),
+  errorTitle = nj.errorTitle;
 
 //转换节点为字符串
 function transformToString(obj, data, parent) {
@@ -768,13 +778,13 @@ function transformToString(obj, data, parent) {
       expr = nj.exprs[obj.expr],
       itemIsArray;
 
-    utils.throwIf(expr, 'Expression "' + obj.expr + '" is undefined, please check it has been registered.');
+    utils.throwIf(expr, errorTitle + 'Expression "' + obj.expr + '" is undefined, please check it has been registered.');
 
     //Create expression parameters
     dataRefer.push({
       result: function (param) {
-        if(param && param.loop) {
-          if(itemIsArray == null) {
+        if (param && param.loop) {
+          if (itemIsArray == null) {
             itemIsArray = utils.isArray(data);
           }
 
@@ -791,14 +801,20 @@ function transformToString(obj, data, parent) {
         }
       },
       inverse: function () {
-        if(hasElse) {
+        if (hasElse) {
           ret = transformContentToString(obj.contentElse, data, parent);
         }
       }
     });
 
+    //Create context object
+    var thisObj = utils.lightObj();
+    thisObj.data = data;
+    thisObj.parent = parent.parent;
+    thisObj.index = parent.index;
+
     //Execute expression block
-    expr.apply(null, dataRefer);
+    expr.apply(thisObj, dataRefer);
   }
   else {
     var type = obj.type;
@@ -829,9 +845,11 @@ function transformContentToString(content, data, parent) {
   if (!content) {
     return ret;
   }
-  if (!parent && data) {  //Init a parent data object and cascade pass on the children node
+  if (!parent) {  //Init a parent data object and cascade pass on the children node
     parent = utils.lightObj();
-    parent.data = utils.isArray(data) ? data[0] : data;
+    if (data) {
+      parent.data = utils.isArray(data) ? data[0] : data;
+    }
   }
 
   utils.each(content, function (obj) {
@@ -863,7 +881,7 @@ nj.tagId = 'nj-id';
 nj.tagStyle = 'nj-style';
 nj.tagClassName = 'nj-component';
 nj.templates = {};
-nj.errorTitle = 'NornJ error:';
+nj.errorTitle = 'NornJ:';
 nj.paramRule = {};
 nj.autoRenderTag = true;
 
@@ -873,7 +891,8 @@ module.exports = nj;
 
 var nj = require('../core'),
   tools = require('../utils/tools'),
-  escape = require('../utils/escape');
+  escape = require('../utils/escape'),
+  errorTitle = nj.errorTitle;
 
 //转换节点参数为字符串
 function transformParams(obj, data, parent) {
@@ -956,7 +975,7 @@ function _useFilters(filters, ret, data, parent, index) {
     tools.each(filters, function (filterObj) {
       var filter = filtersObj[filterObj.name];  //Get filter function
       if (!filter) {
-        console.warn(nj.errorTitle + 'A filter called ' + filterObj.name + ' is undefined.');
+        console.warn(errorTitle + 'A filter called ' + filterObj.name + ' is undefined.');
         return;
       }
 
@@ -1003,7 +1022,7 @@ function getDataValue(data, propObj, parent, defaultEmpty) {
   if (parent && parentNum) {
     for (var i = 0; i < parentNum; i++) {
       var _parent = parent.parent;
-      tools.throwIf(_parent, 'Parent data is undefined, please check the param path declare.');
+      tools.throwIf(_parent, errorTitle + 'Parent data is undefined, please check the param path declare.');
       parent = _parent;
       datas = [parent.data];
     }
