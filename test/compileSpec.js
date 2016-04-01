@@ -30,7 +30,7 @@ describe('test compile', function () {
       };
 
       var tmpl =
-      ['<div checked disabled="disabled" name1=../111>', { name: 'my name:{%name%},id:{%id%},name:{%name%}', id: 'test1' },
+      ['<div checked disabled="disabled" name1=../111 name="my name:{%name%},id:{%id%},name:{%name%}" id=test1>',
         ['<span>", "sky:{%name%},{%{%id%}%}'],
         ['span1', 'joe', '/span1'],
         ['div id=555', [
@@ -75,7 +75,7 @@ describe('test compile', function () {
 
       var tmplSon =
       ['$each {key4}',
-        ['<h1>', { ids: 'hello world333 !!!!!___{../id2:filter1}' },
+        ['<h1 ids="hello world333 !!!!!___{../id2:filter1}">',
           'test{{{../name}}}___',
           [
             'aaa{.:filter1(1,2,3):filter2}',
@@ -91,10 +91,10 @@ describe('test compile', function () {
       ];
 
       var tmpl =
-      ['<div>', { id: 1, name: 'test1{key5}2', fn: "fn" },
-        ['<h1 name=test10>', { id: 'testH1' },
+      ['<div id=1 name=test1{key5}2 fn=fn>',
+        ['<h1 name=test10 id=testH1>',
           'hello world1',
-          ['<div>', { id: 'test2' }],
+          ['<div id=test2>'],
           ['{divx} name={{names:prop(my.name2)}}', '/{divx}'],
           ['img/'],
           ['input id="test5" /'],

@@ -166,23 +166,8 @@ function checkElem(obj, parent) {
     }
 
     if (isElemNode) {  //判断是否为元素节点
-      var hasParams = false,
-        elseIndex = -1,
+      var elseIndex = -1,
         pushContent = true;
-
-      //取出节点参数
-      var params = obj[1];
-      if (tools.isObject(params)) {  //如果第二个参数为对象,则为节点参数
-        if (!control) {  //为元素节点时取各参数
-          node.params = tranParam.compiledParams(params);
-        }
-        else {  //为特殊节点时取refer
-          var retR = tranElem.getInsideBraceParam(params.refer);
-          node.refer = tranParam.compiledParam(retR ? retR[0] : params.refer);
-        }
-
-        hasParams = true;
-      }
 
       if (!control) {
         node.type = openTagName;
@@ -225,7 +210,7 @@ function checkElem(obj, parent) {
       //取出子节点集合
       // TODO 此处需要判断参数外是否包裹有流程控制块
       var end = len - (hasCloseTag ? 1 : 0),
-        content = obj.slice(hasParams ? 2 : 1, (elseIndex < 0 ? end : elseIndex));
+        content = obj.slice(1, (elseIndex < 0 ? end : elseIndex));
       if (content && content.length) {
         checkContentElem(content, node);
       }

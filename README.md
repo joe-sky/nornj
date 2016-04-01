@@ -1,12 +1,12 @@
 # NornJ
 一款轻量级且多用途的javascript模板引擎
 
-这款js模板的通常构建方式不是使用传统的字符串，而是使用javascript原生的数组与对象构成，就像这样：
+这款js模板的通常构建方式不是使用传统的字符串，而是使用javascript原生的数组构成，就像这样：
 ```js
 var tmpl =
 ['div',
     'this the test demo {msg}',
-    ['input onclick={click} /', { id: 'test' }],
+    ['input onclick={click} id=test /'],
 '/div'];
 ```
 除了这种方式外，模板还可以使用es6(es2015)提供的模板字符串来构建：
