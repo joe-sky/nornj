@@ -57,7 +57,34 @@ nj.exprs = {
     }
 
     return ret;
-  }
+  },
+
+  //Param block
+  param: function () {
+    var args = arguments,
+      len = args.length,
+      options = args[len - 1],
+      ret = options.result(),
+      name = '',
+      value;
+
+    //Make property name by multiple parameters
+    tools.each(args, function (item, i) {
+      if(i < len - 1) {
+        name += item;
+      }
+    }, false, true);
+
+    console.log(ret);
+    if (ret.length > 1) {
+      value = ret.join('');
+    }
+    else {
+      value = ret[0];
+    }
+
+    options.paramsExpr[name] = value;
+  },
 };
 
 //Register expression and also can batch add

@@ -6,7 +6,7 @@ var nj = require('../src/base'),
 describe('test convert template', function () {
   xit('test convert 1', function () {
     var tmpl =
-    ['<div name1=../111>', { name: 'my name:fanyj,id:1231,name:name', id: 'test1' },
+    ['<div name1=../111 name="my name:fanyj,id:1231,name:name" id=test1>',
       ['<span>', 'sky:name,id'],
       ['span1', 'joe', '/span1'],
       ['div id=555', [

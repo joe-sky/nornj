@@ -91,6 +91,20 @@ function each(obj, func, context, isArr, useEvery) {
   }
 }
 
+////
+//function cascase(obj, ret) {
+//  if(isArray(obj)) {
+//    each(obj, function(item) {
+
+//    }, false, true);
+
+
+//  }
+//  else {
+
+//  }
+//}
+
 //判断是否在数组内
 function inArray(obj, value) {
   return obj.indexOf(value);

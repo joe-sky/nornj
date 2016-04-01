@@ -64,6 +64,10 @@ describe('test compile string', function () {
       //string template by es6
       var tmpl3 = nj`
         <div name=test1>
+          <$params>
+            <$param {'id'}>{test0:filter1 'test1':filter2 'test2'}</$param>
+          </$params>
+          <br></br>
           test2
           <span>
             ${tmpl2}
@@ -86,6 +90,7 @@ describe('test compile string', function () {
       var tmplFn = compile(tmpl3, 'tmplEs6'),
         html = tmplFn(data);
 
+      //console.log(JSON.stringify(nj.templates['tmplEs6']));
       console.log(html);
       expect(html).toBeTruthy();
     });

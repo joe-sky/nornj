@@ -16,11 +16,15 @@ function transformParams(obj, data, parent) {
 }
 
 //转换节点参数为对象
-function transformParamsToObj(obj, data, parent) {
+function transformParamsToObj(obj, data, parent, paramsE) {
   var ret = obj ? {} : null;
   tools.each(obj, function (v, k) {
     replaceParams(v, data, ret, k, parent);
   }, false, false);
+
+  if(paramsE) {
+    tools.assign(ret, paramsE);
+  }
 
   return ret;
 }

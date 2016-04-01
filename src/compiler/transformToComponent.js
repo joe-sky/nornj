@@ -5,7 +5,7 @@ var nj = require('../core'),
   errorTitle = nj.errorTitle;
 
 //转换节点为组件节点
-function transformToComponent(obj, data, parent) {
+function transformToComponent(obj, data, parent, paramsExpr) {
   var ret = null;
 
   if (obj.type === 'nj_plaintext') {
@@ -28,8 +28,8 @@ function transformToComponent(obj, data, parent) {
     //Create expression parameters
     dataRefer.push({
       result: function (param) {
-        if(param && param.loop) {
-          if(itemIsArray == null) {
+        if (param && param.loop) {
+          if (itemIsArray == null) {
             itemIsArray = utils.isArray(data);
           }
 
@@ -39,16 +39,17 @@ function transformToComponent(obj, data, parent) {
           _parent.parent = parent;
           _parent.index = param.index;
 
-          return transformContentToComponent(obj.content, utils.getItemParam(param.item, data, itemIsArray), _parent);
+          return transformContentToComponent(obj.content, utils.getItemParam(param.item, data, itemIsArray), _parent, paramsExpr);
         }
         else {
-          return transformContentToComponent(obj.content, data, parent);
+          return transformContentToComponent(obj.content, data, parent, paramsExpr);
         }
       },
       inverse: function () {
-        return hasElse ? transformContentToComponent(obj.contentElse, data, parent) : null;
+        return hasElse ? transformContentToComponent(obj.contentElse, data, parent, paramsExpr) : null;
       },
-      useString: false
+      useString: false,
+      paramsExpr: paramsExpr
     });
 
     //Create context object
@@ -73,9 +74,17 @@ function transformToComponent(obj, data, parent) {
       }
     }
 
+    //Make parameters from the parameters expression.
+    var exprP = obj.paramsExpr,
+      paramsE;
+    if (exprP) {
+      paramsE = utils.lightObj();
+      transformContentToComponent(exprP.content, data, parent, paramsE);
+    }
+
     //Make React.createElement's parameters
     var params = [type,                                                  //组件名
-      utils.transformParamsToObj(obj.params, data, parent)],             //参数
+      utils.transformParamsToObj(obj.params, data, parent, paramsE)],    //参数
       content = transformContentToComponent(obj.content, data, parent);  //子组件
     if (content) {
       utils.listPush(params, content);
@@ -89,7 +98,7 @@ function transformToComponent(obj, data, parent) {
 }
 
 //转换子节点为组件节点
-function transformContentToComponent(content, data, parent) {
+function transformContentToComponent(content, data, parent, paramsExpr) {
   if (!content) {
     return null;
   }
@@ -102,7 +111,7 @@ function transformContentToComponent(content, data, parent) {
 
   var ret = [];
   utils.each(content, function (obj) {
-    ret.push(transformToComponent(obj, data, parent));
+    ret.push(transformToComponent(obj, data, parent, paramsExpr));
   }, false, true);
 
   return ret;

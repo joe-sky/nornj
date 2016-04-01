@@ -33,7 +33,7 @@ function checkElem(obj, parent) {
     var xmlOpenTag = tranElem.getXmlOpenTag(first),
       openTagName,
       hasCloseTag = false,
-      isTmpl;
+      isTmpl, isParamsExpr;
 
     if (xmlOpenTag) {  //tagname为xml标签时,则认为是元素节点
       openTagName = xmlOpenTag[1];
@@ -69,6 +69,7 @@ function checkElem(obj, parent) {
         var ctrl = control[0].toLowerCase(),
           refer = control[1];
         isTmpl = tranElem.isTmpl(ctrl);
+        isParamsExpr = tranElem.isParamsExpr(ctrl);
 
         node.type = 'nj_expr';
         node.expr = ctrl;
@@ -107,6 +108,11 @@ function checkElem(obj, parent) {
             node.params[param.key] = tranParam.compiledParam(param.value);
           }, false, true);
         }
+
+        //Verify if self closing tag again, because the tag may be similar to "<br></br>".
+        if(!node.selfCloseTag) {
+          node.selfCloseTag = tranElem.verifySelfCloseTag(openTagName);
+        }
       }
       else {  //为流程控制块时判断是否有$else
         if (isTmpl) {  //模板元素
@@ -114,6 +120,12 @@ function checkElem(obj, parent) {
 
           //将模板添加到父节点的params中
           tranElem.addTmpl(node, parent);
+        }
+        else if(isParamsExpr) {
+          pushContent = false;
+
+          //If this is params block, directly set on the "paramsExpr" property of the parent node.
+          tranElem.addParamsExpr(node, parent);
         }
         else {
           elseIndex = tools.inArray(obj, '$else');

@@ -25,6 +25,17 @@ describe('test compile html', function () {
     it('test html 1', function (done) {
       jsdom.env(
         `<div id="d1" name="{name}">
+          <nj-$params>
+            <nj-$param refer="{'name'}">{id:filter1 'test1' 'test2'}</nj-$param>
+            <nj-$each refer="{list}">
+              <nj-$param refer="{'data-name' no}">{no:filter1 'test1' 'test2'}</nj-$param>
+            </nj-$each>
+            <nj-$param refer="{'data-name10'}">
+              <nj-$each refer="{list}">
+                { no:filter2 }
+              </nj-$each>
+            </nj-$param>
+          </nj-$params>
           <nj-{testCom}></nj-{testCom}>
           <nj-$each refer="{ list }">
             <nj-$if refer="{b}">

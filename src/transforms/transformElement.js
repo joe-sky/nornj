@@ -17,6 +17,28 @@ function isXmlSelfCloseTag(obj) {
   return REGEX_XML_SELF_CLOSE_TAG.test(obj);
 }
 
+//Verify self close tag name
+var OMITTED_CLOSE_TAGS = {
+  'area': true,
+  'base': true,
+  'br': true,
+  'col': true,
+  'embed': true,
+  'hr': true,
+  'img': true,
+  'input': true,
+  'keygen': true,
+  'link': true,
+  'meta': true,
+  'param': true,
+  'source': true,
+  'track': true,
+  'wbr': true
+};
+function verifySelfCloseTag(tagName) {
+  return OMITTED_CLOSE_TAGS[tagName.toLowerCase()];
+}
+
 //Extract parameters inside the xml open tag
 function getOpenTagParams(obj, noXml) {
   var pattern = /[\s]+([^\s={}]+)(=(('[^']+')|("[^"]+")|([^"'\s]+)))?/g,
@@ -126,6 +148,16 @@ function addTmpl(node, parent) {
   }
 }
 
+//Test whether as parameters expression
+function isParamsExpr(obj) {
+  return obj === 'params';
+}
+
+//Add to the "paramsExpr" property of the parent node
+function addParamsExpr(node, parent) {
+  parent.paramsExpr = node;
+}
+
 //获取标签组件名
 function getTagComponentName(el) {
   var namespace = nj.tagNamespace,
@@ -190,6 +222,7 @@ function getTagComponents(el, selector) {
 module.exports = {
   getXmlOpenTag: getXmlOpenTag,
   isXmlSelfCloseTag: isXmlSelfCloseTag,
+  verifySelfCloseTag: verifySelfCloseTag,
   getOpenTagParams: getOpenTagParams,
   isXmlCloseTag: isXmlCloseTag,
   getOpenTag: getOpenTag,
@@ -200,6 +233,8 @@ module.exports = {
   isControlCloseTag: isControlCloseTag,
   isTmpl: isTmpl,
   addTmpl: addTmpl,
+  isParamsExpr: isParamsExpr,
+  addParamsExpr: addParamsExpr,
   getTagComponentName: getTagComponentName,
   getTagComponentAttrs: getTagComponentAttrs,
   isTagControl: isTagControl,
