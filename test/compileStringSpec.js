@@ -66,12 +66,12 @@ describe('test compile string', function () {
         <div name=test1>
           <$params>
             <$param {'name'}>{test0:filter1 'test1':filter2 'test2'}</$param>
-            <$each refer="{list}">
-              <$param refer="{'data-name' .}">{.:filter1 'test1' 'test2'}</$param>
+            <$each {list}>
+              <$param {'data-name' .}>{.:filter1 'test1' 'test2'}</$param>
             </$each>
-            <$param refer="{'data-name10'}">
-              <$each refer="{list}">
-                <$if refer="{.}">
+            <$param {'data-name10'}>
+              <$each {list}>
+                <$if {.}>
                   { #:filter2 }
                 <$else />
                   { '100':filter1 }
