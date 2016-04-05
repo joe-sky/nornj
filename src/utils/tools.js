@@ -91,19 +91,30 @@ function each(obj, func, context, isArr, useEvery) {
   }
 }
 
-////
-//function cascase(obj, ret) {
-//  if(isArray(obj)) {
-//    each(obj, function(item) {
+//Transform multidimensional array to one-dimensional array
+function flatten(obj) {
+  var output = [],
+    idx = 0;
 
-//    }, false, true);
+  if (isArray(obj)) {
+    for (var i = 0, l = _getLength(obj) ; i < l; i++) {
+      var value = obj[i];
+      //flatten current level of array or arguments object
+      value = flatten(value);
 
+      var j = 0, len = value.length;
+      output.length += len;
+      while (j < len) {
+        output[idx++] = value[j++];
+      }
+    }
+  }
+  else {
+    output[idx++] = obj;
+  }
 
-//  }
-//  else {
-
-//  }
-//}
+  return output;
+}
 
 //判断是否在数组内
 function inArray(obj, value) {
@@ -179,6 +190,7 @@ var tools = {
   uniqueKey: uniqueKey,
   lightObj: lightObj,
   listPush: listPush,
+  flatten: flatten,
   clearQuot: clearQuot
 };
 

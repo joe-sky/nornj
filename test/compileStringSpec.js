@@ -65,7 +65,19 @@ describe('test compile string', function () {
       var tmpl3 = nj`
         <div name=test1>
           <$params>
-            <$param {'id'}>{test0:filter1 'test1':filter2 'test2'}</$param>
+            <$param {'name'}>{test0:filter1 'test1':filter2 'test2'}</$param>
+            <$each refer="{list}">
+              <$param refer="{'data-name' .}">{.:filter1 'test1' 'test2'}</$param>
+            </$each>
+            <$param refer="{'data-name10'}">
+              <$each refer="{list}">
+                <$if refer="{.}">
+                  { #:filter2 }
+                <$else />
+                  { '100':filter1 }
+                </$if>
+              </$each>
+            </$param>
           </$params>
           <br></br>
           test2

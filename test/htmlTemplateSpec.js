@@ -32,7 +32,11 @@ describe('test compile html', function () {
             </nj-$each>
             <nj-$param refer="{'data-name10'}">
               <nj-$each refer="{list}">
-                { no:filter2 }
+                <nj-$if refer="{b}">
+                  { no:filter2 }
+                <nj-$else />
+                  { '100':filter1 }
+                </nj-$if>
               </nj-$each>
             </nj-$param>
           </nj-$params>

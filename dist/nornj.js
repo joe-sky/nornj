@@ -79,7 +79,7 @@ if (inBrowser) {
 }
 
 module.exports = global.NornJ = global.nj = nj;
-},{"./checkElem/checkStringElem":4,"./compiler/compile":6,"./core":9,"./utils/docReady":13,"./utils/utils":21}],3:[function(require,module,exports){
+},{"./checkElem/checkStringElem":4,"./compiler/compile":6,"./core":10,"./utils/docReady":14,"./utils/utils":22}],3:[function(require,module,exports){
 'use strict';
 
 var nj = require('../core'),
@@ -115,7 +115,7 @@ function checkElem(obj, parent) {
     var xmlOpenTag = tranElem.getXmlOpenTag(first),
       openTagName,
       hasCloseTag = false,
-      isTmpl;
+      isTmpl, isParamsExpr;
 
     if (xmlOpenTag) {  //tagname为xml标签时,则认为是元素节点
       openTagName = xmlOpenTag[1];
@@ -151,6 +151,7 @@ function checkElem(obj, parent) {
         var ctrl = control[0].toLowerCase(),
           refer = control[1];
         isTmpl = tranElem.isTmpl(ctrl);
+        isParamsExpr = tranElem.isParamsExpr(ctrl);
 
         node.type = 'nj_expr';
         node.expr = ctrl;
@@ -189,6 +190,11 @@ function checkElem(obj, parent) {
             node.params[param.key] = tranParam.compiledParam(param.value);
           }, false, true);
         }
+
+        //Verify if self closing tag again, because the tag may be similar to "<br></br>".
+        if(!node.selfCloseTag) {
+          node.selfCloseTag = tranElem.verifySelfCloseTag(openTagName);
+        }
       }
       else {  //为流程控制块时判断是否有$else
         if (isTmpl) {  //模板元素
@@ -196,6 +202,12 @@ function checkElem(obj, parent) {
 
           //将模板添加到父节点的params中
           tranElem.addTmpl(node, parent);
+        }
+        else if(isParamsExpr) {
+          pushContent = false;
+
+          //If this is params block, directly set on the "paramsExpr" property of the parent node.
+          tranElem.addParamsExpr(node, parent);
         }
         else {
           elseIndex = tools.inArray(obj, '$else');
@@ -208,7 +220,6 @@ function checkElem(obj, parent) {
       }
 
       //取出子节点集合
-      // TODO 此处需要判断参数外是否包裹有流程控制块
       var end = len - (hasCloseTag ? 1 : 0),
         content = obj.slice(1, (elseIndex < 0 ? end : elseIndex));
       if (content && content.length) {
@@ -252,7 +263,7 @@ module.exports = {
   checkElem: checkElem,
   checkTagElem: checkTagElem
 };
-},{"../core":9,"../transforms/transformElement":11,"../transforms/transformParam":12,"../utils/tools":20,"./checkTagElem":5}],4:[function(require,module,exports){
+},{"../core":10,"../transforms/transformElement":12,"../transforms/transformParam":13,"../utils/tools":21,"./checkTagElem":5}],4:[function(require,module,exports){
 'use strict';
 
 var nj = require('../core'),
@@ -414,7 +425,7 @@ function _getSelfCloseElem(elem, elemName, params) {
 }
 
 module.exports = compileStringTmpl;
-},{"../core":9,"../utils/tools":20}],5:[function(require,module,exports){
+},{"../core":10,"../utils/tools":21}],5:[function(require,module,exports){
 'use strict';
 
 var nj = require('../core'),
@@ -447,8 +458,7 @@ function checkTagElem(obj, parent) {
     var tagName = tranElem.getTagComponentName(obj),
       params = tranElem.getTagComponentAttrs(obj),
       isControl = tranElem.isTagControl(tagName),
-      pushContent = true,
-      isTmpl;
+      pushContent = true;
 
     if (isControl) {  //特殊节点
       if (tagName !== '$else') {
@@ -456,16 +466,23 @@ function checkTagElem(obj, parent) {
         node.type = 'nj_expr';
         node.expr = tagName;
 
-        isTmpl = tranElem.isTmpl(tagName);
-        if (isTmpl) {  //模板元素
+        if (tranElem.isTmpl(tagName)) {  //模板元素
           pushContent = false;
 
           //将模板添加到父节点的params中
           tranElem.addTmpl(node, parent);
         }
-        else {  //流程控制块
-          var retR = tranElem.getInsideBraceParam(params.refer);
-          node.refer = tranParam.compiledParam(retR ? retR[0] : params.refer);
+        else if (tranElem.isParamsExpr(tagName)) {
+          pushContent = false;
+
+          //If this is params block, directly set on the "paramsExpr" property of the parent node.
+          tranElem.addParamsExpr(node, parent);
+        }
+        else {  //Expression block
+          if (params && params.refer) {
+            var retR = tranElem.getInsideBraceParam(params.refer);
+            node.refer = tranParam.compiledParam(retR ? retR[0] : params.refer);
+          }
         }
       }
       else {  //else节点
@@ -523,7 +540,7 @@ nj.setInitTagData = function (data) {
 };
 
 module.exports = checkTagElem;
-},{"../core":9,"../transforms/transformElement":11,"../transforms/transformParam":12,"../utils/tools":20}],6:[function(require,module,exports){
+},{"../core":10,"../transforms/transformElement":12,"../transforms/transformParam":13,"../utils/tools":21}],6:[function(require,module,exports){
 'use strict';
 
 var nj = require('../core'),
@@ -628,15 +645,54 @@ module.exports = {
   renderTagComponent: renderTagComponent,
   precompile: precompile
 };
-},{"../checkElem/checkStringElem":4,"../core":9,"../utils/utils":21,"./transformToComponent":7,"./transformToString":8}],7:[function(require,module,exports){
+},{"../checkElem/checkStringElem":4,"../core":10,"../utils/utils":22,"./transformToComponent":8,"./transformToString":9}],7:[function(require,module,exports){
+'use strict';
+
+var utils = require('../utils/utils');
+
+module.exports = function (transformNode, useString) {
+  return function (content, data, parent, paramsExpr) {
+    var ret = null;
+    if (useString) {
+      ret = '';
+    }
+
+    if (!content) {
+      return ret;
+    }
+    if (!parent) {  //Init a parent data object and cascade pass on the children node
+      parent = utils.lightObj();
+      if (data) {
+        parent.data = utils.isArray(data) ? data[0] : data;
+      }
+    }
+
+    if (!useString) {
+      ret = [];
+    }
+    utils.each(content, function (obj) {
+      var retN = transformNode(obj, data, parent, paramsExpr);
+      if (!useString) {
+        ret[ret.length] = retN;
+      }
+      else {
+        ret += retN;
+      }
+    }, false, true);
+
+    return ret;
+  };
+};
+},{"../utils/utils":22}],8:[function(require,module,exports){
 'use strict';
 
 var nj = require('../core'),
   utils = require('../utils/utils'),
+  transformContentToComponent = require('./transformContent')(transformToComponent),  //转换子节点为组件节点
   errorTitle = nj.errorTitle;
 
 //转换节点为组件节点
-function transformToComponent(obj, data, parent) {
+function transformToComponent(obj, data, parent, paramsExpr) {
   var ret = null;
 
   if (obj.type === 'nj_plaintext') {
@@ -659,8 +715,8 @@ function transformToComponent(obj, data, parent) {
     //Create expression parameters
     dataRefer.push({
       result: function (param) {
-        if(param && param.loop) {
-          if(itemIsArray == null) {
+        if (param && param.loop) {
+          if (itemIsArray == null) {
             itemIsArray = utils.isArray(data);
           }
 
@@ -670,16 +726,17 @@ function transformToComponent(obj, data, parent) {
           _parent.parent = parent;
           _parent.index = param.index;
 
-          return transformContentToComponent(obj.content, utils.getItemParam(param.item, data, itemIsArray), _parent);
+          return transformContentToComponent(obj.content, utils.getItemParam(param.item, data, itemIsArray), _parent, paramsExpr);
         }
         else {
-          return transformContentToComponent(obj.content, data, parent);
+          return transformContentToComponent(obj.content, data, parent, paramsExpr);
         }
       },
       inverse: function () {
-        return hasElse ? transformContentToComponent(obj.contentElse, data, parent) : null;
+        return hasElse ? transformContentToComponent(obj.contentElse, data, parent, paramsExpr) : null;
       },
-      useString: false
+      useString: false,
+      paramsExpr: paramsExpr
     });
 
     //Create context object
@@ -704,9 +761,17 @@ function transformToComponent(obj, data, parent) {
       }
     }
 
+    //Make parameters from the parameters expression.
+    var exprP = obj.paramsExpr,
+      paramsE;
+    if (exprP) {
+      paramsE = utils.lightObj();
+      transformContentToComponent(exprP.content, data, parent, paramsE);
+    }
+
     //Make React.createElement's parameters
     var params = [type,                                                  //组件名
-      utils.transformParamsToObj(obj.params, data, parent)],             //参数
+      utils.transformParamsToObj(obj.params, data, parent, paramsE)],    //参数
       content = transformContentToComponent(obj.content, data, parent);  //子组件
     if (content) {
       utils.listPush(params, content);
@@ -719,39 +784,22 @@ function transformToComponent(obj, data, parent) {
   return ret;
 }
 
-//转换子节点为组件节点
-function transformContentToComponent(content, data, parent) {
-  if (!content) {
-    return null;
-  }
-  if (!parent) {  //Init a parent data object and cascade pass on the children node
-    parent = utils.lightObj();
-    if (data) {
-      parent.data = utils.isArray(data) ? data[0] : data;
-    }
-  }
-
-  var ret = [];
-  utils.each(content, function (obj) {
-    ret.push(transformToComponent(obj, data, parent));
-  }, false, true);
-
-  return ret;
-}
-
 module.exports = {
   transformToComponent: transformToComponent,
   transformContentToComponent: transformContentToComponent
 };
-},{"../core":9,"../utils/utils":21}],8:[function(require,module,exports){
+},{"../core":10,"../utils/utils":22,"./transformContent":7}],9:[function(require,module,exports){
 'use strict';
 
 var nj = require('../core'),
   utils = require('../utils/utils'),
+  transformContent = require('./transformContent'),
+  transformContentToString = transformContent(transformToString, true),  //转换子节点为字符串
+  transformContentToArray = transformContent(transformToString, false),  //转换子节点为数组
   errorTitle = nj.errorTitle;
 
 //转换节点为字符串
-function transformToString(obj, data, parent) {
+function transformToString(obj, data, parent, paramsExpr) {
   var ret = '';
 
   if (obj.type === 'nj_plaintext') {
@@ -780,16 +828,17 @@ function transformToString(obj, data, parent) {
           _parent.parent = parent;
           _parent.index = param.index;
 
-          return transformContentToString(obj.content, utils.getItemParam(param.item, data, itemIsArray), _parent);
+          return transformContentToString(obj.content, utils.getItemParam(param.item, data, itemIsArray), _parent, paramsExpr);
         }
         else {
-          return transformContentToString(obj.content, data, parent);
+          return transformContentToString(obj.content, data, parent, paramsExpr);
         }
       },
       inverse: function () {
-        return hasElse ? transformContentToString(obj.contentElse, data, parent) : null;
+        return hasElse ? transformContentToString(obj.contentElse, data, parent, paramsExpr) : null;
       },
-      useString: true
+      useString: true,
+      paramsExpr: paramsExpr
     });
 
     //Create context object
@@ -812,7 +861,15 @@ function transformToString(obj, data, parent) {
       }
     }
 
-    var openTag = '<' + type + utils.transformParams(obj.params, data, parent);
+    //Make parameters from the parameters expression.
+    var exprP = obj.paramsExpr,
+      paramsE;
+    if (exprP) {
+      paramsE = utils.lightObj();
+      transformContentToArray(exprP.content, data, parent, paramsE);
+    }
+
+    var openTag = '<' + type + utils.transformParams(obj.params, data, parent, paramsE);
     if (!obj.selfCloseTag) {
       ret = openTag + '>' + transformContentToString(obj.content, data, parent) + '</' + type + '>';
     }
@@ -824,31 +881,11 @@ function transformToString(obj, data, parent) {
   return ret;
 }
 
-//转换子节点为字符串
-function transformContentToString(content, data, parent) {
-  var ret = '';
-  if (!content) {
-    return ret;
-  }
-  if (!parent) {  //Init a parent data object and cascade pass on the children node
-    parent = utils.lightObj();
-    if (data) {
-      parent.data = utils.isArray(data) ? data[0] : data;
-    }
-  }
-
-  utils.each(content, function (obj) {
-    ret += transformToString(obj, data, parent);
-  }, false, true);
-
-  return ret;
-}
-
 module.exports = {
   transformToString: transformToString,
   transformContentToString: transformContentToString
 };
-},{"../core":9,"../utils/utils":21}],9:[function(require,module,exports){
+},{"../core":10,"../utils/utils":22,"./transformContent":7}],10:[function(require,module,exports){
 'use strict';
 
 function nj() {
@@ -871,7 +908,7 @@ nj.paramRule = {};
 nj.autoRenderTag = true;
 
 module.exports = nj;
-},{}],10:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 'use strict';
 
 var nj = require('../core'),
@@ -880,21 +917,37 @@ var nj = require('../core'),
   errorTitle = nj.errorTitle;
 
 //转换节点参数为字符串
-function transformParams(obj, data, parent) {
+function transformParams(obj, data, parent, paramsE) {
   var ret = '';
   tools.each(obj, function (v, k) {
-    ret += ' ' + k + '="' + replaceParams(v, data, false, false, parent) + '"';
+    if (!paramsE || paramsE[k] == null) {
+      ret += ' ' + k + '="' + replaceParams(v, data, false, false, parent) + '"';
+    }
   }, false, false);
+
+  //Attach parameters from "$param" expressions
+  if (paramsE) {
+    tools.each(paramsE, function (v, k) {
+      ret += ' ' + k + '="' + v + '"';
+    }, false, false);
+  }
 
   return ret;
 }
 
 //转换节点参数为对象
-function transformParamsToObj(obj, data, parent) {
-  var ret = obj ? {} : null;
+function transformParamsToObj(obj, data, parent, paramsE) {
+  var ret = obj || paramsE ? {} : null;
   tools.each(obj, function (v, k) {
-    replaceParams(v, data, ret, k, parent);
+    if (!paramsE || paramsE[k] == null) {
+      replaceParams(v, data, ret, k, parent);
+    }
   }, false, false);
+
+  //Attach parameters from "$param" expressions
+  if (paramsE) {
+    tools.assign(ret, paramsE);
+  }
 
   return ret;
 }
@@ -1124,7 +1177,7 @@ module.exports = {
   setObjParam: setObjParam,
   getExprParam: getExprParam
 };
-},{"../core":9,"../utils/escape":14,"../utils/tools":20}],11:[function(require,module,exports){
+},{"../core":10,"../utils/escape":15,"../utils/tools":21}],12:[function(require,module,exports){
 'use strict';
 
 var nj = require('../core'),
@@ -1142,6 +1195,28 @@ function getXmlOpenTag(obj) {
 var REGEX_XML_SELF_CLOSE_TAG = /^<[^>]+\/>$/i;
 function isXmlSelfCloseTag(obj) {
   return REGEX_XML_SELF_CLOSE_TAG.test(obj);
+}
+
+//Verify self close tag name
+var OMITTED_CLOSE_TAGS = {
+  'area': true,
+  'base': true,
+  'br': true,
+  'col': true,
+  'embed': true,
+  'hr': true,
+  'img': true,
+  'input': true,
+  'keygen': true,
+  'link': true,
+  'meta': true,
+  'param': true,
+  'source': true,
+  'track': true,
+  'wbr': true
+};
+function verifySelfCloseTag(tagName) {
+  return OMITTED_CLOSE_TAGS[tagName.toLowerCase()];
 }
 
 //Extract parameters inside the xml open tag
@@ -1253,6 +1328,16 @@ function addTmpl(node, parent) {
   }
 }
 
+//Test whether as parameters expression
+function isParamsExpr(obj) {
+  return obj === 'params';
+}
+
+//Add to the "paramsExpr" property of the parent node
+function addParamsExpr(node, parent) {
+  parent.paramsExpr = node;
+}
+
 //获取标签组件名
 function getTagComponentName(el) {
   var namespace = nj.tagNamespace,
@@ -1317,6 +1402,7 @@ function getTagComponents(el, selector) {
 module.exports = {
   getXmlOpenTag: getXmlOpenTag,
   isXmlSelfCloseTag: isXmlSelfCloseTag,
+  verifySelfCloseTag: verifySelfCloseTag,
   getOpenTagParams: getOpenTagParams,
   isXmlCloseTag: isXmlCloseTag,
   getOpenTag: getOpenTag,
@@ -1327,12 +1413,14 @@ module.exports = {
   isControlCloseTag: isControlCloseTag,
   isTmpl: isTmpl,
   addTmpl: addTmpl,
+  isParamsExpr: isParamsExpr,
+  addParamsExpr: addParamsExpr,
   getTagComponentName: getTagComponentName,
   getTagComponentAttrs: getTagComponentAttrs,
   isTagControl: isTagControl,
   getTagComponents: getTagComponents
 };
-},{"../core":9,"../utils/tools":20,"./transformData":10,"./transformParam":12}],12:[function(require,module,exports){
+},{"../core":10,"../utils/tools":21,"./transformData":11,"./transformParam":13}],13:[function(require,module,exports){
 'use strict';
 
 var nj = require('../core'),
@@ -1491,7 +1579,7 @@ module.exports = {
   compiledParams: compiledParams,
   compiledProp: compiledProp
 };
-},{"../core":9,"../utils/tools":20}],13:[function(require,module,exports){
+},{"../core":10,"../utils/tools":21}],14:[function(require,module,exports){
 'use strict';
 
 module.exports = function (callback) {
@@ -1503,7 +1591,7 @@ module.exports = function (callback) {
     self.attachEvent("onload", callback);
   }
 };
-},{}],14:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 'use strict';
 
 var ESCAPE_LOOKUP = {
@@ -1525,7 +1613,7 @@ function escape(text) {
 }
 
 module.exports = escape;
-},{}],15:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 'use strict';
 
 var nj = require('../core'),
@@ -1585,7 +1673,34 @@ nj.exprs = {
     }
 
     return ret;
-  }
+  },
+
+  //Param block
+  param: function () {
+    var args = arguments,
+      len = args.length,
+      options = args[len - 1],
+      ret = tools.flatten(options.result()),  //Get parameter value and flatten it.
+      name = '',
+      value;
+
+    //Make property name by multiple parameters
+    tools.each(args, function (item, i) {
+      if(i < len - 1) {
+        name += item;
+      }
+    }, false, true);
+
+    //If the value length greater than 1, it need to be connected to a whole string.
+    if (ret.length > 1) {
+      value = ret.join('');
+    }
+    else {
+      value = ret[0];
+    }
+
+    options.paramsExpr[name] = value;
+  },
 };
 
 //Register expression and also can batch add
@@ -1604,7 +1719,7 @@ function registerExpr(name, expr) {
 module.exports = {
   registerExpr: registerExpr
 };
-},{"../core":9,"./tools":20}],16:[function(require,module,exports){
+},{"../core":10,"./tools":21}],17:[function(require,module,exports){
 'use strict';
 
 var nj = require('../core'),
@@ -1654,7 +1769,7 @@ function registerFilter(name, filter) {
 module.exports = {
   registerFilter: registerFilter
 };
-},{"../core":9,"./tools":20}],17:[function(require,module,exports){
+},{"../core":10,"./tools":21}],18:[function(require,module,exports){
 'use strict';
 
 var nj = require('../core'),
@@ -1703,7 +1818,7 @@ module.exports = {
   registerTagNamespace: registerTagNamespace,
   createTagNamespace: createTagNamespace
 };
-},{"../core":9,"./tools":20}],18:[function(require,module,exports){
+},{"../core":10,"./tools":21}],19:[function(require,module,exports){
 'use strict';
 
 var nj = require('../core');
@@ -1724,7 +1839,7 @@ function setComponentEngine(name, obj, dom, port, render) {
 module.exports = {
   setComponentEngine: setComponentEngine
 };
-},{"../core":9}],19:[function(require,module,exports){
+},{"../core":10}],20:[function(require,module,exports){
 'use strict';
 
 var nj = require('../core'),
@@ -1779,7 +1894,7 @@ module.exports = function (openRule, closeRule) {
     }
   });
 };
-},{"../core":9,"./tools":20}],20:[function(require,module,exports){
+},{"../core":10,"./tools":21}],21:[function(require,module,exports){
 'use strict';
 
 var nj = require('../core'),
@@ -1873,6 +1988,31 @@ function each(obj, func, context, isArr, useEvery) {
   }
 }
 
+//Transform multidimensional array to one-dimensional array
+function flatten(obj) {
+  var output = [],
+    idx = 0;
+
+  if (isArray(obj)) {
+    for (var i = 0, l = _getLength(obj) ; i < l; i++) {
+      var value = obj[i];
+      //flatten current level of array or arguments object
+      value = flatten(value);
+
+      var j = 0, len = value.length;
+      output.length += len;
+      while (j < len) {
+        output[idx++] = value[j++];
+      }
+    }
+  }
+  else {
+    output[idx++] = obj;
+  }
+
+  return output;
+}
+
 //判断是否在数组内
 function inArray(obj, value) {
   return obj.indexOf(value);
@@ -1947,6 +2087,7 @@ var tools = {
   uniqueKey: uniqueKey,
   lightObj: lightObj,
   listPush: listPush,
+  flatten: flatten,
   clearQuot: clearQuot
 };
 
@@ -1954,7 +2095,7 @@ var tools = {
 assign(nj, tools);
 
 module.exports = tools;
-},{"../core":9,"object-assign":1}],21:[function(require,module,exports){
+},{"../core":10,"object-assign":1}],22:[function(require,module,exports){
 'use strict';
 
 var tools = require('./tools'),
@@ -1987,5 +2128,5 @@ module.exports = tools.assign(
   transformParam,
   transformData
 );
-},{"../checkElem/checkElem":3,"../transforms/transformData":10,"../transforms/transformElement":11,"../transforms/transformParam":12,"./escape":14,"./expression":15,"./filter":16,"./registerComponent":17,"./setComponentEngine":18,"./setParamRule":19,"./tools":20}]},{},[2])(2)
+},{"../checkElem/checkElem":3,"../transforms/transformData":11,"../transforms/transformElement":12,"../transforms/transformParam":13,"./escape":15,"./expression":16,"./filter":17,"./registerComponent":18,"./setComponentEngine":19,"./setParamRule":20,"./tools":21}]},{},[2])(2)
 });

@@ -2,10 +2,13 @@
 
 var nj = require('../core'),
   utils = require('../utils/utils'),
+  transformContent = require('./transformContent'),
+  transformContentToString = transformContent(transformToString, true),  //转换子节点为字符串
+  transformContentToArray = transformContent(transformToString, false),  //转换子节点为数组
   errorTitle = nj.errorTitle;
 
 //转换节点为字符串
-function transformToString(obj, data, parent) {
+function transformToString(obj, data, parent, paramsExpr) {
   var ret = '';
 
   if (obj.type === 'nj_plaintext') {
@@ -34,16 +37,17 @@ function transformToString(obj, data, parent) {
           _parent.parent = parent;
           _parent.index = param.index;
 
-          return transformContentToString(obj.content, utils.getItemParam(param.item, data, itemIsArray), _parent);
+          return transformContentToString(obj.content, utils.getItemParam(param.item, data, itemIsArray), _parent, paramsExpr);
         }
         else {
-          return transformContentToString(obj.content, data, parent);
+          return transformContentToString(obj.content, data, parent, paramsExpr);
         }
       },
       inverse: function () {
-        return hasElse ? transformContentToString(obj.contentElse, data, parent) : null;
+        return hasElse ? transformContentToString(obj.contentElse, data, parent, paramsExpr) : null;
       },
-      useString: true
+      useString: true,
+      paramsExpr: paramsExpr
     });
 
     //Create context object
@@ -66,7 +70,15 @@ function transformToString(obj, data, parent) {
       }
     }
 
-    var openTag = '<' + type + utils.transformParams(obj.params, data, parent);
+    //Make parameters from the parameters expression.
+    var exprP = obj.paramsExpr,
+      paramsE;
+    if (exprP) {
+      paramsE = utils.lightObj();
+      transformContentToArray(exprP.content, data, parent, paramsE);
+    }
+
+    var openTag = '<' + type + utils.transformParams(obj.params, data, parent, paramsE);
     if (!obj.selfCloseTag) {
       ret = openTag + '>' + transformContentToString(obj.content, data, parent) + '</' + type + '>';
     }
@@ -74,26 +86,6 @@ function transformToString(obj, data, parent) {
       ret = openTag + '/>';
     }
   }
-
-  return ret;
-}
-
-//转换子节点为字符串
-function transformContentToString(content, data, parent) {
-  var ret = '';
-  if (!content) {
-    return ret;
-  }
-  if (!parent) {  //Init a parent data object and cascade pass on the children node
-    parent = utils.lightObj();
-    if (data) {
-      parent.data = utils.isArray(data) ? data[0] : data;
-    }
-  }
-
-  utils.each(content, function (obj) {
-    ret += transformToString(obj, data, parent);
-  }, false, true);
 
   return ret;
 }

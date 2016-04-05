@@ -6,23 +6,35 @@ var nj = require('../core'),
   errorTitle = nj.errorTitle;
 
 //转换节点参数为字符串
-function transformParams(obj, data, parent) {
+function transformParams(obj, data, parent, paramsE) {
   var ret = '';
   tools.each(obj, function (v, k) {
-    ret += ' ' + k + '="' + replaceParams(v, data, false, false, parent) + '"';
+    if (!paramsE || paramsE[k] == null) {
+      ret += ' ' + k + '="' + replaceParams(v, data, false, false, parent) + '"';
+    }
   }, false, false);
+
+  //Attach parameters from "$param" expressions
+  if (paramsE) {
+    tools.each(paramsE, function (v, k) {
+      ret += ' ' + k + '="' + v + '"';
+    }, false, false);
+  }
 
   return ret;
 }
 
 //转换节点参数为对象
 function transformParamsToObj(obj, data, parent, paramsE) {
-  var ret = obj ? {} : null;
+  var ret = obj || paramsE ? {} : null;
   tools.each(obj, function (v, k) {
-    replaceParams(v, data, ret, k, parent);
+    if (!paramsE || paramsE[k] == null) {
+      replaceParams(v, data, ret, k, parent);
+    }
   }, false, false);
 
-  if(paramsE) {
+  //Attach parameters from "$param" expressions
+  if (paramsE) {
     tools.assign(ret, paramsE);
   }
 

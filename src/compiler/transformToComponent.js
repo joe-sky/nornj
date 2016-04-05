@@ -2,6 +2,7 @@
 
 var nj = require('../core'),
   utils = require('../utils/utils'),
+  transformContentToComponent = require('./transformContent')(transformToComponent),  //转换子节点为组件节点
   errorTitle = nj.errorTitle;
 
 //转换节点为组件节点
@@ -93,26 +94,6 @@ function transformToComponent(obj, data, parent, paramsExpr) {
     //调用创建组件接口,必须需要用apply以多个参数的形式传参,否则在react中,元素放在数组里时会报需要加key属性的警告
     ret = nj.componentLibObj[nj.componentPort].apply(nj.componentLibObj, params);
   }
-
-  return ret;
-}
-
-//转换子节点为组件节点
-function transformContentToComponent(content, data, parent, paramsExpr) {
-  if (!content) {
-    return null;
-  }
-  if (!parent) {  //Init a parent data object and cascade pass on the children node
-    parent = utils.lightObj();
-    if (data) {
-      parent.data = utils.isArray(data) ? data[0] : data;
-    }
-  }
-
-  var ret = [];
-  utils.each(content, function (obj) {
-    ret.push(transformToComponent(obj, data, parent, paramsExpr));
-  }, false, true);
 
   return ret;
 }

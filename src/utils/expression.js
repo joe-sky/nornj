@@ -64,7 +64,7 @@ nj.exprs = {
     var args = arguments,
       len = args.length,
       options = args[len - 1],
-      ret = options.result(),
+      ret = tools.flatten(options.result()),  //Get parameter value and flatten it.
       name = '',
       value;
 
@@ -75,7 +75,7 @@ nj.exprs = {
       }
     }, false, true);
 
-    console.log(ret);
+    //If the value length greater than 1, it need to be connected to a whole string.
     if (ret.length > 1) {
       value = ret.join('');
     }
