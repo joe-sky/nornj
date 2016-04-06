@@ -1623,12 +1623,19 @@ var nj = require('../core'),
 nj.exprs = {
   //If block
   'if': function (refer, options) {
+    var ret;
     if (!!refer) {
-      return options.result();
+      ret = options.result();
     }
     else {
-      return options.inverse();
+      ret = options.inverse();
     }
+
+    if(options.useString && ret == null) {
+      return '';
+    }
+
+    return ret;
   },
 
   //Unless block
@@ -1642,26 +1649,30 @@ nj.exprs = {
       ret;
 
     if (refer) {
-      ret = [];
+      if(useString) {
+        ret = '';
+      }
+      else {
+        ret = [];
+      }
+      
       tools.each(refer, function (item, index) {
-        ret.push(options.result({
+        var retI = options.result({
           loop: true,
           item: item,
           index: index
-        }));
-      }, false, tools.isArray(refer));
+        });
 
-      //May return connected string
-      var len = ret.length;
-      if (useString) {
-        if (len) {
-          ret = ret.join('');
+        if(useString) {
+          ret += retI;
         }
         else {
-          ret = '';
+          ret[ret.length] = retI;
         }
-      }
-      else if (!len) {
+      }, false, tools.isArray(refer));
+
+      //Return null when not use string and result is empty.
+      if(!useString && !ret.length) {
         ret = null;
       }
     }
