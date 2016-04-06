@@ -129,7 +129,7 @@ var data = {
   content: 'test'
 };
 ```
-例如执行模板函数时会输出："testcontent"。
+替换参数内放入多个值后会对所有值进行连接输出，如例中执行模板函数时会输出："testcontent"。
 
 ##### 过滤器
 
