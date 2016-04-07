@@ -220,9 +220,9 @@ NornJ模板中可使用内置表达式块来进行if、unless、each等流程控
 '/$if']
 ```
 
-* 内置表达式块
+###### 内置表达式块
 
- * if块
+* if块
 
 举例：
 ```js
@@ -236,7 +236,7 @@ NornJ模板中可使用内置表达式块来进行if、unless、each等流程控
 ```
 在执行模板函数时，如if块的参数计算结果为true，则会执行if块内的模板；如为false则不会执行if块内的模板。
 
- * else块
+* else块
 
 举例：
 ```js
@@ -254,7 +254,7 @@ NornJ模板中可使用内置表达式块来进行if、unless、each等流程控
 1. else标签须定义在if块内，格式为"$else"。如例中(1)处所示。
 2. 在执行模板函数时，如if块的参数计算结果为false，则会执行排在if块内的else标签之后的模板，如例中(2)处所示。
 
- * each块
+* each块
 
 举例：
 ```js
@@ -316,7 +316,26 @@ console.log(html2);
 5. each块内可以使用点号"{.}"设置替换参数，表示使用数组项渲染，如例中(6)处所示。
 6. each块内还可以使用#号"{#}"设置替换参数，表示使用数组项索引值渲染，如例中(7)处所示。
 
- * param块
+* param块
+
+举例：
+```js
+['div name=foo',
+  ['$params',
+    ['$param {"name"}', 'bar'],
+    ['$param {"id"}', '{test}'],
+    ['$param {"id2"}',
+      ['$each {refer}',
+        '{no}'
+      ]
+    ],
+    ['$each {refer}',
+    ['$param {"id"}', '{test}']
+    
+  ],
+  'this is a param block demo.',
+'/div']
+```
 
 ---
 #### 使用es6模板字符串语法糖
