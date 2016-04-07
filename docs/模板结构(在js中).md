@@ -320,21 +320,38 @@ console.log(html2);
 
 举例：
 ```js
+var tmpl =
 ['div name=foo',
   ['$params',
-    ['$param {"name"}', 'bar'],
-    ['$param {"id"}', '{test}'],
-    ['$param {"id2"}',
-      ['$each {refer}',
+    ['$param {"name"}', 'bar'],   //节点参数键为字符串，值也为字符串(1)
+    ['$param {"id"}', '{test}'],  //节点参数键为字符串，值为替换参数(2)
+    ['$param {"id2"}',  //节点参数值为表达式块的执行结果(3)
+      ['$each {list}',
         '{no}'
       ]
     ],
-    ['$each {refer}',
-    ['$param {"id"}', '{test}']
-    
+    ['$each {list}',  //根据表达式块的执行结果动态构建节点参数(4)
+      ['$param {"data-id(" no ")"}', '{"test" no}']
+    ]
   ],
   'this is a param block demo.',
-'/div']
+'/div'];
+
+var tmplFn = nj.compile(tmpl, "tmpl1");
+var html = tmplFn({
+  list: [
+    { no: 1 },
+    { no: 2 },
+    { no: 3 }
+  ]
+});
+
+console.log(html);
+/*输出html:
+<div name="bar" id="test" id2="123" data-id1="test1" data-id2="test2" data-id3="test3">
+this is a param block demo.
+</div>
+*/
 ```
 
 ---
