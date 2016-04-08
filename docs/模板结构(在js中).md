@@ -396,7 +396,7 @@ var html = tmplFn({
 
 console.log(html);
 /*输出html:
-<div name="bar" id="test" id2="123" data-id1="test1" data-id2="test2" data-id3="test3">
+<div name="bar" id="test" id2="123" data-id(1)="test1" data-id(2)="test2" data-id(3)="test3">
 this is a param block demo.
 </div>
 */
