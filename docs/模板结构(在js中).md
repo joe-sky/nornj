@@ -227,6 +227,33 @@ NornJ模板中可使用内置表达式块来进行if、unless、each等流程控
 
 * 自定义表达式块
 
+表达式块可支持自定义，这样就可以自行为模板实现各种各样的逻辑及功能。例如内置表达块if的实现如下：
+```js
+//测试模板：
+['$if {type:filter1}',
+  'test if',
+'$else',
+  'test else',
+'/$if']
+
+nj.registerExpr('if', function(refer, options) {
+  var ret;
+  if (!!refer) {  //refer即为替换参数"{type:filter1}"的执行结果
+    ret = options.result();  //执行options.result，即输出"test if"
+  }
+  else {
+    ret = options.inverse();  //执行options.inverse，即输出"test else"
+  }
+
+  if(options.useString && ret == null) {
+    return '';
+  }
+
+  return ret;
+});
+```
+本节未完待续...
+
 ###### 内置表达式块
 
 * if块
