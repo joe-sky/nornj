@@ -1704,7 +1704,10 @@ nj.exprs = {
 
     //If the value length greater than 1, it need to be connected to a whole string.
     if (ret.length > 1) {
-      value = ret.join('');
+      value = '';
+      tools.each(ret, function(item) {
+        value += item;
+      }, false, true);
     }
     else {
       value = ret[0];
