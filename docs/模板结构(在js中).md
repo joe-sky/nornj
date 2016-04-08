@@ -273,7 +273,7 @@ NornJ模板中可使用内置表达式块来进行if、unless、each等流程控
 ]
 ```
 
-unless块意义即为"除非"，它和if块取相反的值。例中如type参数为"false"，则会输出"<span>test1</span>"。
+unless块意义即为"除非"，它和if块取相反的值。例中如type参数为`false`，则会输出`<span>test1</span>`。
 
 * each块
 
