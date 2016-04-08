@@ -190,6 +190,10 @@ nj.compile(['each {list}',
 });
 ```
 
+* 如替换参数内有多个参数，则可为每个参数都设置各自的过滤器，如下所示：
+```js
+{test:filter1:filter2, 'test2':filter2 test3}
+```
 
 * 内置过滤器
 
@@ -256,6 +260,20 @@ NornJ模板中可使用内置表达式块来进行if、unless、each等流程控
 
 1. else标签须定义在if块内，格式为"$else"。如例中(1)处所示。
 2. 在执行模板函数时，如if块的参数计算结果为false，则会执行排在if块内的else标签之后的模板，如例中(2)处所示。
+
+* unless块
+
+举例：
+```js
+['$unless {type}',
+  'test unless block',
+  ['<span>', 'test1'],
+'$else',
+  ['<span>', 'test2']
+]
+```
+
+unless块意义即为"除非"，它和if块取相反的值。例中如type参数为"false"，则会输出"<span>test1</span>"。
 
 * each块
 
