@@ -192,7 +192,7 @@ nj.compile(['each {list}',
 
 * 如替换参数内有多个参数，则可为每个参数都设置各自的过滤器，如下所示：
 ```js
-{test:filter1:filter2, 'test2':filter2 test3}
+{test:filter1:filter2(1) 'test2':filter2 test3}
 ```
 
 * 内置过滤器
