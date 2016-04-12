@@ -46,17 +46,17 @@ var nj = require('./core'),
   utils = require('./utils/utils'),
   setComponentEngine = utils.setComponentEngine,
   compiler = require('./compiler/compile'),
+  registerComponent = require('./utils/registerComponent'),
   compileStringTmpl = require('./checkElem/checkStringElem'),
   docReady = require('./utils/docReady');
 
 nj.setComponentEngine = setComponentEngine;
 nj.setParamRule = utils.setParamRule;
-nj.registerComponent = utils.registerComponent;
 nj.registerFilter = utils.registerFilter;
 nj.registerExpr= utils.registerExpr;
 nj.compileStringTmpl = compileStringTmpl;
 nj.docReady = docReady;
-utils.assign(nj, compiler);
+utils.assign(nj, compiler, registerComponent);
 
 //Create vml tag namespace(primarily for IE8)
 utils.createTagNamespace();
@@ -79,7 +79,7 @@ if (inBrowser) {
 }
 
 module.exports = global.NornJ = global.nj = nj;
-},{"./checkElem/checkStringElem":4,"./compiler/compile":6,"./core":10,"./utils/docReady":14,"./utils/utils":22}],3:[function(require,module,exports){
+},{"./checkElem/checkStringElem":4,"./compiler/compile":6,"./core":10,"./utils/docReady":14,"./utils/registerComponent":18,"./utils/utils":22}],3:[function(require,module,exports){
 'use strict';
 
 var nj = require('../core'),
