@@ -1714,7 +1714,7 @@ nj.exprs = {
     }
 
     options.paramsExpr[name] = value;
-  },
+  }
 };
 
 //Register expression and also can batch add
