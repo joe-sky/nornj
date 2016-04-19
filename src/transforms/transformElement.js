@@ -189,10 +189,8 @@ function getTagComponentAttrs(el) {
       if (attrName === 'style') {  //style属性使用cssText
         val = el.style.cssText;
       }
-      else if (attrName.indexOf('on') === 0) {  //以on开头的属性统一转换为驼峰命名
-        attrName = attrName.replace(/on\w/, function (letter) {
-          return 'on' + letter.substr(2).toUpperCase();
-        });
+      else if (attrName.indexOf('data-') !== 0) {  //Transform to camel-case
+        attrName = tools.toCamelCase(attrName);
       }
 
       tranData.setObjParam(ret, attrName, val, true);

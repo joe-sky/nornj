@@ -177,6 +177,17 @@ function clearQuot(value) {
   return value;
 }
 
+//Transform to camel-case
+function toCamelCase(str) {
+  if (str.indexOf('-') > -1) {
+    str = str.replace(/-\w/g, function (letter) {
+      return letter.substr(1).toUpperCase();
+    });
+  }
+
+  return str;
+}
+
 var tools = {
   isArray: isArray,
   isArrayLike: isArrayLike,
@@ -191,7 +202,8 @@ var tools = {
   lightObj: lightObj,
   listPush: listPush,
   flatten: flatten,
-  clearQuot: clearQuot
+  clearQuot: clearQuot,
+  toCamelCase: toCamelCase
 };
 
 //绑定到nj对象

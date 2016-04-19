@@ -24,7 +24,7 @@ describe('test compile html', function () {
   describe('compile html template', function () {
     it('test html 1', function (done) {
       jsdom.env(
-        `<div id="d1" name="{name}">
+        `<div id="d1" data-test="1" name="{name}">
           <nj-$params>
             <nj-$param refer="{'name'}">{id:filter1 'test1' 'test2'}</nj-$param>
             <nj-$each refer="{list}">
@@ -40,7 +40,7 @@ describe('test compile html', function () {
               </nj-$each>
             </nj-$param>
           </nj-$params>
-          <nj-{testCom}></nj-{testCom}>
+          <nj-{testCom} one-click=2></nj-{testCom}>
           <nj-$each refer="{ list }">
             <nj-$if refer="{b}">
               { no:filter1:filter2 'id' }
@@ -61,7 +61,7 @@ describe('test compile html', function () {
         function (err, window) {
           var TestComponent = React.createClass({
             render: function () {
-              return React.createElement('button', null, 'click me');
+              return React.createElement('button', null, 'click me' + this.props.oneClick);
             }
           });
           //console.log(window.document.querySelector('div').innerHTML);
@@ -76,11 +76,7 @@ describe('test compile html', function () {
             testcom: TestComponent
           };
 
-          nj.registerComponent('TestComponent', React.createClass({
-            render: function () {
-              return React.createElement('button', null, 'click me');
-            }
-          }));
+          nj.registerComponent('TestComponent', TestComponent);
 
           var templateT = nj.compileTagComponent(window.document.querySelector('div'), 'testT1');
           //console.log(JSON.stringify(nj.templates['testT1']));

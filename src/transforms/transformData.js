@@ -83,11 +83,7 @@ function _getStyleParams(obj) {
     }
 
     //将连字符转为驼峰命名
-    if (key.indexOf('-') > -1) {
-      key = key.replace(/-\w/g, function (letter) {
-        return letter.substr(1).toUpperCase();
-      });
-    }
+    key = tools.toCamelCase(key);
 
     ret[key] = value;
   }

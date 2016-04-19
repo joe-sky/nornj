@@ -994,11 +994,7 @@ function _getStyleParams(obj) {
     }
 
     //将连字符转为驼峰命名
-    if (key.indexOf('-') > -1) {
-      key = key.replace(/-\w/g, function (letter) {
-        return letter.substr(1).toUpperCase();
-      });
-    }
+    key = tools.toCamelCase(key);
 
     ret[key] = value;
   }
@@ -1369,10 +1365,8 @@ function getTagComponentAttrs(el) {
       if (attrName === 'style') {  //style属性使用cssText
         val = el.style.cssText;
       }
-      else if (attrName.indexOf('on') === 0) {  //以on开头的属性统一转换为驼峰命名
-        attrName = attrName.replace(/on\w/, function (letter) {
-          return 'on' + letter.substr(2).toUpperCase();
-        });
+      else if (attrName.indexOf('data-') !== 0) {  //Transform to camel-case
+        attrName = tools.toCamelCase(attrName);
       }
 
       tranData.setObjParam(ret, attrName, val, true);
@@ -2088,6 +2082,17 @@ function clearQuot(value) {
   return value;
 }
 
+//Transform to camel-case
+function toCamelCase(str) {
+  if (str.indexOf('-') > -1) {
+    str = str.replace(/-\w/g, function (letter) {
+      return letter.substr(1).toUpperCase();
+    });
+  }
+
+  return str;
+}
+
 var tools = {
   isArray: isArray,
   isArrayLike: isArrayLike,
@@ -2102,7 +2107,8 @@ var tools = {
   lightObj: lightObj,
   listPush: listPush,
   flatten: flatten,
-  clearQuot: clearQuot
+  clearQuot: clearQuot,
+  toCamelCase: toCamelCase
 };
 
 //绑定到nj对象
