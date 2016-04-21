@@ -1366,7 +1366,8 @@ function getTagComponentAttrs(el) {
       if (attrName === 'style') {  //style属性使用cssText
         val = el.style.cssText;
       }
-      else if (attrName.indexOf('data-') !== 0) {  //Transform to camel-case
+      else if (attrName.indexOf('data-') !== 0  //Transform to camel-case
+        && attrName.indexOf(nj.tagNamespace + '-') !== 0) {
         attrName = tools.toCamelCase(attrName);
       }
 
