@@ -63,7 +63,7 @@ describe('test compile string', function () {
 
       //string template by es6
       var tmpl3 = nj`
-        <div name=test1>
+        <div name=test1 autofocus>
           <$params>
             <$param {'name'}>{test0:filter1 'test1':filter2 'test2'}</$param>
             <$each {list}>
@@ -79,6 +79,7 @@ describe('test compile string', function () {
               </$each>
             </$param>
           </$params>
+          <input autofocus>
           <br></br>
           test2
           <span>

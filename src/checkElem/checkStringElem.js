@@ -2,6 +2,7 @@
 
 var nj = require('../core'),
   tools = require('../utils/tools'),
+  tranElem = require('../transforms/transformElement'),
   REGEX_SPLIT = /\$\{\d+\}/,
   paramRule = nj.paramRule;
 
@@ -103,7 +104,7 @@ function _checkStringElem(xml, params) {
           current = current.parent;
         }
       }
-      else if (elem[elem.length - 2] === '/') {  //Self close tag
+      else if (elem[elem.length - 2] === '/' || tranElem.verifySelfCloseTag(elemName)) {  //Self close tag
         current.elem.push(_getSelfCloseElem(elem, elemName, params));
       }
       else {  //Open tag

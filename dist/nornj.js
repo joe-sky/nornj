@@ -268,6 +268,7 @@ module.exports = {
 
 var nj = require('../core'),
   tools = require('../utils/tools'),
+  tranElem = require('../transforms/transformElement'),
   REGEX_SPLIT = /\$\{\d+\}/,
   paramRule = nj.paramRule;
 
@@ -369,7 +370,7 @@ function _checkStringElem(xml, params) {
           current = current.parent;
         }
       }
-      else if (elem[elem.length - 2] === '/') {  //Self close tag
+      else if (elem[elem.length - 2] === '/' || tranElem.verifySelfCloseTag(elemName)) {  //Self close tag
         current.elem.push(_getSelfCloseElem(elem, elemName, params));
       }
       else {  //Open tag
@@ -425,7 +426,7 @@ function _getSelfCloseElem(elem, elemName, params) {
 }
 
 module.exports = compileStringTmpl;
-},{"../core":10,"../utils/tools":21}],5:[function(require,module,exports){
+},{"../core":10,"../transforms/transformElement":12,"../utils/tools":21}],5:[function(require,module,exports){
 'use strict';
 
 var nj = require('../core'),
@@ -1217,12 +1218,12 @@ function verifySelfCloseTag(tagName) {
 
 //Extract parameters inside the xml open tag
 function getOpenTagParams(obj, noXml) {
-  var pattern = /[\s]+([^\s={}]+)(=(('[^']+')|("[^"]+")|([^"'\s]+)))?/g,
+  var pattern = /[\s]+([^\s={}>]+)(=(('[^']+')|("[^"]+")|([^"'\s]+)))?/g,
     matchArr, ret;
 
   while ((matchArr = pattern.exec(obj))) {
     var key = matchArr[1];
-    if (key === '/' || key === '/>') {  //If match to the last "/" or "/>",then continue the loop.
+    if (key === '/' || key === '/>') {  //If match to the last "/" or "/>", then continue the loop.
       continue;
     }
 

@@ -41,12 +41,12 @@ function verifySelfCloseTag(tagName) {
 
 //Extract parameters inside the xml open tag
 function getOpenTagParams(obj, noXml) {
-  var pattern = /[\s]+([^\s={}]+)(=(('[^']+')|("[^"]+")|([^"'\s]+)))?/g,
+  var pattern = /[\s]+([^\s={}>]+)(=(('[^']+')|("[^"]+")|([^"'\s]+)))?/g,
     matchArr, ret;
 
   while ((matchArr = pattern.exec(obj))) {
     var key = matchArr[1];
-    if (key === '/' || key === '/>') {  //If match to the last "/" or "/>",then continue the loop.
+    if (key === '/' || key === '/>') {  //If match to the last "/" or "/>", then continue the loop.
       continue;
     }
 
