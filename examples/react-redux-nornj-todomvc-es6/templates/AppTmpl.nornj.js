@@ -1,8 +1,6 @@
-﻿'use strict';
+﻿import nj from '../../../src/base.js';
 
-let nj = require('../../../src/base.js');
-
-module.exports = nj`
+export default nj`
 <div>
   <AddTodo onAddClick={addClick} />
   <TodoList todos={visibleTodos} onTodoClick={todoClick} />

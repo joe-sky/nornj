@@ -1,8 +1,6 @@
-'use strict';
-
-var path = require('path'),
-  webpack = require('webpack'),
-  precompiler = require('../../precompiler');
+import path from 'path';
+import webpack from 'webpack';
+import precompiler from '../../precompiler';
 
 //Precompile all nornj templates which use "nornj.js" names to the end.
 precompiler({
@@ -10,7 +8,7 @@ precompiler({
   extension: '.nornj.js'
 });
 
-module.exports = {
+export default {
   entry: __dirname + '/index.js',
   output: {
     path: path.join(__dirname, 'assets'),

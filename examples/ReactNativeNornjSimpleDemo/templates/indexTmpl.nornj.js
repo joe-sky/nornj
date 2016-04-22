@@ -1,8 +1,6 @@
-﻿'use strict';
+﻿import nj from 'nornj';
 
-let nj = require('nornj');
-
-module.exports = nj`
+export default nj`
   <View style={styles:prop(container)}>
     <Text style={styles:prop(welcome)}>
       Welcome to React Native and NornJ!

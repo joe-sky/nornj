@@ -49,6 +49,11 @@ module.exports = function (param) {
       preTmpl = esVersion === 'es6' ? 'export default ' : 'module.exports = ',
       tmpl = require(file);  //Load original template
 
+    //Get the "default" object converted from babel.
+    if (tmpl.default) {
+      tmpl = tmpl.default;
+    }
+
     //Precompiling template
     preTmpl += JSON.stringify(precompile(tmpl));
 

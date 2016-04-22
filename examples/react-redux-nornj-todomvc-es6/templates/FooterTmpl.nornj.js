@@ -1,8 +1,6 @@
-﻿'use strict';
+﻿import nj from '../../../src/base.js';
 
-let nj = require('../../../src/base.js');
-
-module.exports = nj`
+export default nj`
 <p>
   ${['Show: ']}
   <$each {filters}>
