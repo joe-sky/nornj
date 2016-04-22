@@ -9,9 +9,9 @@ module.exports = nj`
     <$if {filter:isCurrent}>
       {name}
     <$else />
-      <Link to=/{filter:todoState}>
+      <Linkto to=/{filter:todoState}>
         {name}
-      </Link>
+      </Linkto>
     </$if>
     <$if {name:equal(Active)}>
       .

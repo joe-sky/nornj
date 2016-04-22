@@ -5,8 +5,8 @@ var nj = require('./src/base'),
   glob = require('glob'),
   fs = require('fs');
 
-function checkExtension(filePath, extension) {
-  return (filePath.length - filePath.lastIndexOf(extension)) === extension.length;
+function checkExtension(fileName, extension) {
+  return (fileName.length - fileName.lastIndexOf(extension)) === extension.length;
 }
 
 module.exports = function (param) {
@@ -15,31 +15,38 @@ module.exports = function (param) {
     sources = [param.source];
   }
 
-  //Only transform the files with specific extensions
   var extension = param.extension;
   if (!extension) {
     extension = '.nj.js';
   }
 
+  var esVersion = param.esVersion;
+  if (!esVersion) {
+    esVersion = 'es6';
+  }
+
   var needTransformFiles = [];
   sources.forEach(function (source) {
     glob.sync(source, param.options).forEach(function (file) {
+      //Convert to absolute path
+      var fileName = require.resolve(file);
+
+      //Only transform the files with specific extensions
       if (checkExtension(file, extension)) {
-        needTransformFiles.push(file);
+        needTransformFiles.push(fileName);
       }
 
       //First clear the module cache
-      delete require.cache[require.resolve(file)];
+      delete require.cache[fileName];
     });
   });
 
   needTransformFiles.forEach(function (file) {
-    var name = file.substr(0, file.lastIndexOf('.')),
-      newName = name.substr(0, name.lastIndexOf('.')) + '.js',
-      preTmpl = param.esVersion === 'es6' ? 'export default ' : 'module.exports = ',
-      tmpl = require(name);  //Load original template
+    var newName = file.substr(0, file.lastIndexOf(extension)) + '.js',
+      preTmpl = esVersion === 'es6' ? 'export default ' : 'module.exports = ',
+      tmpl = require(file);  //Load original template
 
-    //Precompile template
+    //Precompiling template
     preTmpl += JSON.stringify(precompile(tmpl));
 
     fs.writeFile(newName, preTmpl, function (err) {

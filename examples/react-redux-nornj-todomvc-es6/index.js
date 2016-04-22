@@ -12,7 +12,7 @@ nj.registerComponent({
   Router,
   Route,
   Redirect,
-  Link
+  Linkto: Link
 });
 
 //Set default data for first render NornJ html template.
