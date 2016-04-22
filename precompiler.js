@@ -46,16 +46,30 @@ module.exports = function (param) {
 
   needTransformFiles.forEach(function (file) {
     var newName = file.substr(0, file.lastIndexOf(extension)) + '.js',
-      preTmpl = esVersion === 'es6' ? 'export default ' : 'module.exports = ',
-      tmpl = require(file);  //Load original template
+      preTmpl = esVersion === 'es6' ? 'export default ' : 'module.exports = ';
 
-    //Get the "default" object converted from babel.
-    if (tmpl.default) {
-      tmpl = tmpl.default;
+    if (param.devMode) {  //Direct return the original template in development mode.
+      if (esVersion === 'es6') {
+        preTmpl += 'from ';
+      }
+      else {
+        preTmpl += 'require(';
+      }
+
+      preTmpl += '\'./' + file.substr(file.lastIndexOf('\\') + 1) + '\'' + (esVersion === 'es6' ? ';' : ');');
     }
+    else {
+      //Load original template
+      var tmpl = require(file);
 
-    //Precompiling template
-    preTmpl += JSON.stringify(precompile(tmpl));
+      //Get the "default" object converted from babel.
+      if (tmpl.default) {
+        tmpl = tmpl.default;
+      }
+
+      //Precompiling template
+      preTmpl += JSON.stringify(precompile(tmpl)) + ';';
+    }
 
     fs.writeFile(newName, preTmpl, function (err) {
       if (err) {
