@@ -25,6 +25,9 @@ module.exports = function (param) {
     esVersion = 'es6';
   }
 
+  //Clear the cache of string template
+  nj.strTmpls = {};
+
   var needTransformFiles = [];
   sources.forEach(function (source) {
     glob.sync(source, param.options).forEach(function (file) {
