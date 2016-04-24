@@ -44,7 +44,7 @@ function transformParamsToObj(obj, data, parent, paramsE) {
 //设置对象参数
 function setObjParam(obj, key, value, notTran) {
   var style;
-  if (!notTran && nj.componentLib === 'react') {
+  if (!notTran && nj.componentLib) {
     switch (key) {
       case 'class':
         key = 'className';

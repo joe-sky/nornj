@@ -81,7 +81,7 @@ function renderTagComponent(data, el, selector) {
 
   utils.each(tags, function (tag) {
     var tmpl = compileTagComponent(tag, tag.getAttribute(nj.tagId));
-    ret.push(nj.componentLibDom[nj.componentRender](tmpl(data), tag.parentNode));
+    ret.push(nj.componentRender(tmpl(data), tag.parentNode));
   }, false, true);
 
   return ret;

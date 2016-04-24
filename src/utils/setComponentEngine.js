@@ -1,18 +1,20 @@
 ﻿'use strict';
 
-var nj = require('../core');
+var nj = require('../core'),
+  tools = require('./tools');
 
 //设置组件引擎
 function setComponentEngine(name, obj, dom, port, render) {
   nj.componentLib = name;
   nj.componentLibObj = obj;
-  nj.componentLibDom = dom || obj;
+  dom = dom || obj;
+  nj.componentLibDom = dom;
   if (name === 'react') {
     port = 'createElement';
     render = 'render';
   }
-  nj.componentPort = port;
-  nj.componentRender = render;
+  nj.componentPort = tools.isString(port) ? obj[port] : port;
+  nj.componentRender = tools.isString(render) ? dom[render] : render;
 }
 
 module.exports = {

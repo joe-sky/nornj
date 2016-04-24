@@ -2,14 +2,12 @@
   utils = require('../src/utils/utils'),
   compile = require('../src/compiler/compile').compile,
   jsdom = require('jsdom'),
-  React = require('react'),
-  ReactDOM = require('react-dom'),
-  ReactDOMServer = require('react-dom/server');
+  Inferno = require('inferno'),
+  createElement = require('inferno/dist/inferno-create-element'),
+  InfernoServer = require('inferno-server');
 
 describe('test compile html', function () {
   beforeAll(function () {
-    nj.setComponentEngine('react', React, ReactDOM);
-
     nj.registerFilter('filter1', function (v) {
       return v * 2;
     });
@@ -22,7 +20,7 @@ describe('test compile html', function () {
   });
 
   describe('compile html template', function () {
-    xit('test html 1', function (done) {
+    it('test html 1', function (done) {
       jsdom.env(
         `<div id="d1" data-test="1" name="{name}">
           <nj-$params>
@@ -40,7 +38,7 @@ describe('test compile html', function () {
               </nj-$each>
             </nj-$param>
           </nj-$params>
-          <nj-{testCom} one-click=2></nj-{testCom}>
+          <!--<nj-{testCom} one-click=2></nj-{testCom}>-->
           <nj-$each refer="{ list }">
             <nj-$if refer="{b}">
               { no:filter1:filter2 'id' }
@@ -59,11 +57,15 @@ describe('test compile html', function () {
           </nj-$each>
         </div>`,
         function (err, window) {
-          var TestComponent = React.createClass({
-            render: function () {
-              return React.createElement('button', null, 'click me' + this.props.oneClick);
-            }
-          });
+          global.window = window;
+          var InfernoDOM = require('inferno-dom');
+          nj.setComponentEngine('inferno', Inferno, InfernoDOM, createElement, 'render');
+
+          //var TestComponent = React.createClass({
+          //  render: function () {
+          //    return React.createElement('button', null, 'click me' + this.props.oneClick);
+          //  }
+          //});
           //console.log(window.document.querySelector('div').innerHTML);
           //nj.registerComponent('TestComponent', TestComponent);
 
@@ -73,14 +75,16 @@ describe('test compile html', function () {
             test0: true,
             list: [{ no: 1, b: 1 }, { no: 2, b: 0 }, { no: 3, b: 1 }],
             styles: { color: 'blue', fontSize: '15px' },
-            testcom: TestComponent
+            //testcom: TestComponent
           };
 
-          nj.registerComponent('TestComponent', TestComponent);
+          //nj.registerComponent('TestComponent', TestComponent);
 
           var templateT = nj.compileTagComponent(window.document.querySelector('div'), 'testT1');
           //console.log(JSON.stringify(nj.templates['testT1']));
-          var html = ReactDOMServer.renderToStaticMarkup(templateT(data));
+          console.log(templateT(data));
+
+          var html = InfernoServer.renderToString(templateT(data));
 
           console.log(html);
           expect(html).toBeTruthy();

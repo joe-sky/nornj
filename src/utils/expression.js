@@ -51,7 +51,12 @@ nj.exprs = {
           ret += retI;
         }
         else {
-          ret[ret.length] = retI;
+          if (tools.isArray(retI)) {
+            tools.listPush(ret, retI);
+          }
+          else {
+            ret[ret.length] = retI;
+          }
         }
       }, false, tools.isArray(refer));
 
@@ -75,7 +80,7 @@ nj.exprs = {
     var args = arguments,
       len = args.length,
       options = args[len - 1],
-      ret = tools.flatten(options.result()),  //Get parameter value and flatten it.
+      ret = options.result(),  //Get parameter value
       name = '',
       value;
 

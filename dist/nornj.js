@@ -625,7 +625,7 @@ function renderTagComponent(data, el, selector) {
 
   utils.each(tags, function (tag) {
     var tmpl = compileTagComponent(tag, tag.getAttribute(nj.tagId));
-    ret.push(nj.componentLibDom[nj.componentRender](tmpl(data), tag.parentNode));
+    ret.push(nj.componentRender(tmpl(data), tag.parentNode));
   }, false, true);
 
   return ret;
@@ -674,7 +674,12 @@ module.exports = function (transformNode, useString) {
     utils.each(content, function (obj) {
       var retN = transformNode(obj, data, parent, paramsExpr);
       if (!useString) {
-        ret[ret.length] = retN;
+        if (utils.isArray(retN)) {
+          utils.listPush(ret, retN);
+        }
+        else {
+          ret[ret.length] = retN;
+        }
       }
       else {
         ret += retN;
@@ -775,11 +780,11 @@ function transformToComponent(obj, data, parent, paramsExpr) {
       utils.transformParamsToObj(obj.params, data, parent, paramsE)],    //参数
       content = transformContentToComponent(obj.content, data, parent);  //子组件
     if (content) {
-      utils.listPush(params, content);
+      utils.listPush(params, content, true);
     }
 
     //调用创建组件接口,必须需要用apply以多个参数的形式传参,否则在react中,元素放在数组里时会报需要加key属性的警告
-    ret = nj.componentLibObj[nj.componentPort].apply(nj.componentLibObj, params);
+    ret = nj.componentPort.apply(nj.componentLibObj, params);
   }
 
   return ret;
@@ -956,7 +961,7 @@ function transformParamsToObj(obj, data, parent, paramsE) {
 //设置对象参数
 function setObjParam(obj, key, value, notTran) {
   var style;
-  if (!notTran && nj.componentLib === 'react') {
+  if (!notTran && nj.componentLib) {
     switch (key) {
       case 'class':
         key = 'className';
@@ -1663,7 +1668,12 @@ nj.exprs = {
           ret += retI;
         }
         else {
-          ret[ret.length] = retI;
+          if (tools.isArray(retI)) {
+            tools.listPush(ret, retI);
+          }
+          else {
+            ret[ret.length] = retI;
+          }
         }
       }, false, tools.isArray(refer));
 
@@ -1687,7 +1697,7 @@ nj.exprs = {
     var args = arguments,
       len = args.length,
       options = args[len - 1],
-      ret = tools.flatten(options.result()),  //Get parameter value and flatten it.
+      ret = options.result(),  //Get parameter value
       name = '',
       value;
 
@@ -1831,25 +1841,27 @@ module.exports = {
 },{"../core":10,"./tools":21}],19:[function(require,module,exports){
 'use strict';
 
-var nj = require('../core');
+var nj = require('../core'),
+  tools = require('./tools');
 
 //设置组件引擎
 function setComponentEngine(name, obj, dom, port, render) {
   nj.componentLib = name;
   nj.componentLibObj = obj;
-  nj.componentLibDom = dom || obj;
+  dom = dom || obj;
+  nj.componentLibDom = dom;
   if (name === 'react') {
     port = 'createElement';
     render = 'render';
   }
-  nj.componentPort = port;
-  nj.componentRender = render;
+  nj.componentPort = tools.isString(port) ? obj[port] : port;
+  nj.componentRender = tools.isString(render) ? dom[render] : render;
 }
 
 module.exports = {
   setComponentEngine: setComponentEngine
 };
-},{"../core":10}],20:[function(require,module,exports){
+},{"../core":10,"./tools":21}],20:[function(require,module,exports){
 'use strict';
 
 var nj = require('../core'),
@@ -1911,12 +1923,21 @@ var nj = require('../core'),
   assign = require('object-assign'),
   arrayProto = Array.prototype,
   arrayEvery = arrayProto.every,
-  arrayForEach = arrayProto.forEach,
-  arrayPush = arrayProto.push;
+  arrayForEach = arrayProto.forEach;
 
-//Array push
-function listPush(arr1, arr2) {
-  arrayPush.apply(arr1, arr2);
+//Push one by one to array
+function listPush(arr1, arr2, noNull) {
+  var i = 0,
+    l = arr2.length,
+    item;
+
+  for (; i < l; i++) {
+    item = arr2[i];
+    if (!noNull || item != null) {
+      arr1[arr1.length] = item;
+    }
+  }
+
   return arr1;
 }
 
@@ -1996,31 +2017,6 @@ function each(obj, func, context, isArr, useEvery) {
       }
     });
   }
-}
-
-//Transform multidimensional array to one-dimensional array
-function flatten(obj) {
-  var output = [],
-    idx = 0;
-
-  if (isArray(obj)) {
-    for (var i = 0, l = _getLength(obj) ; i < l; i++) {
-      var value = obj[i];
-      //flatten current level of array or arguments object
-      value = flatten(value);
-
-      var j = 0, len = value.length;
-      output.length += len;
-      while (j < len) {
-        output[idx++] = value[j++];
-      }
-    }
-  }
-  else {
-    output[idx++] = obj;
-  }
-
-  return output;
 }
 
 //判断是否在数组内
@@ -2108,7 +2104,6 @@ var tools = {
   uniqueKey: uniqueKey,
   lightObj: lightObj,
   listPush: listPush,
-  flatten: flatten,
   clearQuot: clearQuot,
   toCamelCase: toCamelCase
 };

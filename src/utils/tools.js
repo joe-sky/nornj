@@ -4,12 +4,21 @@ var nj = require('../core'),
   assign = require('object-assign'),
   arrayProto = Array.prototype,
   arrayEvery = arrayProto.every,
-  arrayForEach = arrayProto.forEach,
-  arrayPush = arrayProto.push;
+  arrayForEach = arrayProto.forEach;
 
-//Array push
-function listPush(arr1, arr2) {
-  arrayPush.apply(arr1, arr2);
+//Push one by one to array
+function listPush(arr1, arr2, noNull) {
+  var i = 0,
+    l = arr2.length,
+    item;
+
+  for (; i < l; i++) {
+    item = arr2[i];
+    if (!noNull || item != null) {
+      arr1[arr1.length] = item;
+    }
+  }
+
   return arr1;
 }
 
@@ -89,31 +98,6 @@ function each(obj, func, context, isArr, useEvery) {
       }
     });
   }
-}
-
-//Transform multidimensional array to one-dimensional array
-function flatten(obj) {
-  var output = [],
-    idx = 0;
-
-  if (isArray(obj)) {
-    for (var i = 0, l = _getLength(obj) ; i < l; i++) {
-      var value = obj[i];
-      //flatten current level of array or arguments object
-      value = flatten(value);
-
-      var j = 0, len = value.length;
-      output.length += len;
-      while (j < len) {
-        output[idx++] = value[j++];
-      }
-    }
-  }
-  else {
-    output[idx++] = obj;
-  }
-
-  return output;
 }
 
 //判断是否在数组内
@@ -201,7 +185,6 @@ var tools = {
   uniqueKey: uniqueKey,
   lightObj: lightObj,
   listPush: listPush,
-  flatten: flatten,
   clearQuot: clearQuot,
   toCamelCase: toCamelCase
 };

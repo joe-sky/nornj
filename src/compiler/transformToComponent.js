@@ -88,11 +88,11 @@ function transformToComponent(obj, data, parent, paramsExpr) {
       utils.transformParamsToObj(obj.params, data, parent, paramsE)],    //参数
       content = transformContentToComponent(obj.content, data, parent);  //子组件
     if (content) {
-      utils.listPush(params, content);
+      utils.listPush(params, content, true);
     }
 
     //调用创建组件接口,必须需要用apply以多个参数的形式传参,否则在react中,元素放在数组里时会报需要加key属性的警告
-    ret = nj.componentLibObj[nj.componentPort].apply(nj.componentLibObj, params);
+    ret = nj.componentPort.apply(nj.componentLibObj, params);
   }
 
   return ret;
