@@ -637,8 +637,13 @@ function renderTagComponent(data, selector) {
     ret = [];
 
   utils.each(tags, function (tag) {
-    var tmpl = compileTagComponent(tag, tag.getAttribute(nj.tagId));
-    ret.push(nj.componentRender(tmpl(data), tag.parentNode));
+    var tmpl = compileTagComponent(tag, tag.getAttribute(nj.tagId)),
+      parentNode = tag.parentNode;
+
+    if (nj.componentLib === 'inferno') {
+      utils.removeChildNode(parentNode);
+    }
+    ret.push(nj.componentRender(tmpl(data), parentNode));
   }, false, true);
 
   return ret;
@@ -1396,7 +1401,7 @@ function getTagComponentAttrs(el) {
   return ret;
 }
 
-//判断标签流程控制块
+//判断标签表达式块
 function isTagControl(obj) {
   return REGEX_CONTROL.test(obj);
 }
@@ -1408,6 +1413,17 @@ function getTagComponents(selector) {
   }
 
   return document.querySelectorAll(selector);
+}
+
+//Remove all dom child node
+function removeChildNode(node) {
+  var children = node.childNodes,
+    len = children.length,
+    i = 0;
+
+  for (; i < len; i++) {
+    node.removeChild(node.firstChild);
+  }
 }
 
 module.exports = {
@@ -1429,7 +1445,8 @@ module.exports = {
   getTagComponentName: getTagComponentName,
   getTagComponentAttrs: getTagComponentAttrs,
   isTagControl: isTagControl,
-  getTagComponents: getTagComponents
+  getTagComponents: getTagComponents,
+  removeChildNode: removeChildNode
 };
 },{"../core":10,"../utils/tools":21,"./transformData":11,"./transformParam":13}],13:[function(require,module,exports){
 'use strict';
@@ -1856,16 +1873,31 @@ var nj = require('../core'),
 
 //设置组件引擎
 function setComponentEngine(name, obj, dom, port, render) {
+  //Component engine's name
   nj.componentLib = name;
+
+  //Component engine's object
   nj.componentLibObj = obj;
+
+  //Component engine's dom object
   dom = dom || obj;
   nj.componentLibDom = dom;
+
+  //Component engine's create element and render function
   if (name === 'react') {
     port = 'createElement';
     render = 'render';
   }
-  nj.componentPort = tools.isString(port) ? obj[port] : port;
-  nj.componentRender = tools.isString(render) ? dom[render] : render;
+  else {
+    if (tools.isString(port)) {
+      port = obj[port];
+    }
+    if (tools.isString(render)) {
+      render = dom[render];
+    }
+  }
+  nj.componentPort = port;
+  nj.componentRender = render;
 }
 
 module.exports = {

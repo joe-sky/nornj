@@ -93,8 +93,13 @@ function renderTagComponent(data, selector) {
     ret = [];
 
   utils.each(tags, function (tag) {
-    var tmpl = compileTagComponent(tag, tag.getAttribute(nj.tagId));
-    ret.push(nj.componentRender(tmpl(data), tag.parentNode));
+    var tmpl = compileTagComponent(tag, tag.getAttribute(nj.tagId)),
+      parentNode = tag.parentNode;
+
+    if (nj.componentLib === 'inferno') {
+      utils.removeChildNode(parentNode);
+    }
+    ret.push(nj.componentRender(tmpl(data), parentNode));
   }, false, true);
 
   return ret;

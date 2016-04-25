@@ -201,7 +201,7 @@ function getTagComponentAttrs(el) {
   return ret;
 }
 
-//判断标签流程控制块
+//判断标签表达式块
 function isTagControl(obj) {
   return REGEX_CONTROL.test(obj);
 }
@@ -213,6 +213,17 @@ function getTagComponents(selector) {
   }
 
   return document.querySelectorAll(selector);
+}
+
+//Remove all dom child node
+function removeChildNode(node) {
+  var children = node.childNodes,
+    len = children.length,
+    i = 0;
+
+  for (; i < len; i++) {
+    node.removeChild(node.firstChild);
+  }
 }
 
 module.exports = {
@@ -234,5 +245,6 @@ module.exports = {
   getTagComponentName: getTagComponentName,
   getTagComponentAttrs: getTagComponentAttrs,
   isTagControl: isTagControl,
-  getTagComponents: getTagComponents
+  getTagComponents: getTagComponents,
+  removeChildNode: removeChildNode
 };

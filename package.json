@@ -1,6 +1,6 @@
 {
   "name": "nornj",
-  "version": "0.3.1",
+  "version": "0.3.2-rc1",
   "description": "A multipurpose javascript template engine",
   "main": "src/base.js",
   "files": [
@@ -19,7 +19,7 @@
   "author": "Joe_Sky <hitomi_doax@sina.com>",
   "license": "MIT",
   "devDependencies": {
-    "babel-core": "^6.7.2",
+    "babel-core": "^6.7.7",
     "babel-loader": "^6.2.4",
     "browserify": "^11.2.0",
     "gulp": "^3.9.0",
@@ -28,14 +28,12 @@
     "gulp-jasmine": "^2.1.0",
     "gulp-rename": "^1.2.2",
     "gulp-uglify": "^1.4.2",
-    "inferno": "^0.7.3",
-    "inferno-dom": "^0.7.3",
-    "inferno-server": "^0.7.3",
     "jsdom": "^8.1.0",
     "react": "^0.14.7",
     "react-dom": "^0.14.7",
     "vinyl-buffer": "^1.0.0",
     "vinyl-source-stream": "^1.1.0",
+    "webpack": "^1.13.0",
     "yargs": "^4.2.0"
   },
   "dependencies": {
