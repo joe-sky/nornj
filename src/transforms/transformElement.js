@@ -207,15 +207,12 @@ function isTagControl(obj) {
 }
 
 //获取全部标签组件
-function getTagComponents(el, selector) {
-  if (!el) {
-    el = document;
-  }
+function getTagComponents(selector) {
   if (!selector) {
     selector = '.' + nj.tagClassName;
   }
 
-  return el.querySelectorAll(selector);
+  return document.querySelectorAll(selector);
 }
 
 module.exports = {

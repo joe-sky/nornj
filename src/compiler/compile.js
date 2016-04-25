@@ -44,9 +44,22 @@ function compile(obj, tmplName, isComponent, isTag) {
     }
   }
 
-  return function (data) {
-    if (!data) {
+  return function () {
+    var args = arguments,
+      len = args.length,
+      data;
+
+    if (len <= 0) {
       data = {};
+    }
+    else if (len === 1) {
+      data = args[0];
+    }
+    else {
+      data = [];
+      utils.each(args, function (item) {
+        data[data.length] = item;
+      }, false, true);
     }
 
     return !isComponent
@@ -75,8 +88,8 @@ function compileTagComponent(obj, tmplName) {
 }
 
 //渲染标签组件
-function renderTagComponent(data, el, selector) {
-  var tags = utils.getTagComponents(el, selector),
+function renderTagComponent(data, selector) {
+  var tags = utils.getTagComponents(selector),
     ret = [];
 
   utils.each(tags, function (tag) {

@@ -82,7 +82,7 @@ describe('test compile html', function () {
 
           var templateT = nj.compileTagComponent(window.document.querySelector('div'), 'testT1');
           //console.log(JSON.stringify(nj.templates['testT1']));
-          console.log(templateT(data));
+          //console.log(templateT(data));
 
           var html = InfernoServer.renderToString(templateT(data));
 

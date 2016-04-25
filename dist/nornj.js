@@ -588,9 +588,22 @@ function compile(obj, tmplName, isComponent, isTag) {
     }
   }
 
-  return function (data) {
-    if (!data) {
+  return function () {
+    var args = arguments,
+      len = args.length,
+      data;
+
+    if (len <= 0) {
       data = {};
+    }
+    else if (len === 1) {
+      data = args[0];
+    }
+    else {
+      data = [];
+      utils.each(args, function (item) {
+        data[data.length] = item;
+      }, false, true);
     }
 
     return !isComponent
@@ -619,8 +632,8 @@ function compileTagComponent(obj, tmplName) {
 }
 
 //渲染标签组件
-function renderTagComponent(data, el, selector) {
-  var tags = utils.getTagComponents(el, selector),
+function renderTagComponent(data, selector) {
+  var tags = utils.getTagComponents(selector),
     ret = [];
 
   utils.each(tags, function (tag) {
@@ -677,7 +690,7 @@ module.exports = function (transformNode, useString) {
         if (utils.isArray(retN)) {
           utils.listPush(ret, retN);
         }
-        else {
+        else if (retN != null) {
           ret[ret.length] = retN;
         }
       }
@@ -780,7 +793,7 @@ function transformToComponent(obj, data, parent, paramsExpr) {
       utils.transformParamsToObj(obj.params, data, parent, paramsE)],    //参数
       content = transformContentToComponent(obj.content, data, parent);  //子组件
     if (content) {
-      utils.listPush(params, content, true);
+      utils.listPush(params, content);
     }
 
     //调用创建组件接口,必须需要用apply以多个参数的形式传参,否则在react中,元素放在数组里时会报需要加key属性的警告
@@ -1389,15 +1402,12 @@ function isTagControl(obj) {
 }
 
 //获取全部标签组件
-function getTagComponents(el, selector) {
-  if (!el) {
-    el = document;
-  }
+function getTagComponents(selector) {
   if (!selector) {
     selector = '.' + nj.tagClassName;
   }
 
-  return el.querySelectorAll(selector);
+  return document.querySelectorAll(selector);
 }
 
 module.exports = {
@@ -1923,21 +1933,12 @@ var nj = require('../core'),
   assign = require('object-assign'),
   arrayProto = Array.prototype,
   arrayEvery = arrayProto.every,
-  arrayForEach = arrayProto.forEach;
+  arrayForEach = arrayProto.forEach,
+  arrayPush = arrayProto.push;
 
 //Push one by one to array
-function listPush(arr1, arr2, noNull) {
-  var i = 0,
-    l = arr2.length,
-    item;
-
-  for (; i < l; i++) {
-    item = arr2[i];
-    if (!noNull || item != null) {
-      arr1[arr1.length] = item;
-    }
-  }
-
+function listPush(arr1, arr2) {
+  arrayPush.apply(arr1, arr2);
   return arr1;
 }
 

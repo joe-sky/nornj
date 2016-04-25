@@ -28,7 +28,7 @@ module.exports = function (transformNode, useString) {
         if (utils.isArray(retN)) {
           utils.listPush(ret, retN);
         }
-        else {
+        else if (retN != null) {
           ret[ret.length] = retN;
         }
       }

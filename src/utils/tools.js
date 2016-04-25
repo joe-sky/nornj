@@ -4,21 +4,12 @@ var nj = require('../core'),
   assign = require('object-assign'),
   arrayProto = Array.prototype,
   arrayEvery = arrayProto.every,
-  arrayForEach = arrayProto.forEach;
+  arrayForEach = arrayProto.forEach,
+  arrayPush = arrayProto.push;
 
 //Push one by one to array
-function listPush(arr1, arr2, noNull) {
-  var i = 0,
-    l = arr2.length,
-    item;
-
-  for (; i < l; i++) {
-    item = arr2[i];
-    if (!noNull || item != null) {
-      arr1[arr1.length] = item;
-    }
-  }
-
+function listPush(arr1, arr2) {
+  arrayPush.apply(arr1, arr2);
   return arr1;
 }
 
