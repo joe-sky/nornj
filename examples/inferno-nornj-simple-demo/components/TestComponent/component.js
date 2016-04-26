@@ -15,7 +15,13 @@ class TestComponent extends Component {
     return template(
       this.props,
       this.state,
-      { onClick: ()=> this.setState({ counter: Date.now() }) }
+      {
+        params: {
+          'class': 'test',
+          style: 'color:blue;',
+          onClick: ()=> this.setState({ counter: Date.now() })
+        }
+      }
     );
   }
 }

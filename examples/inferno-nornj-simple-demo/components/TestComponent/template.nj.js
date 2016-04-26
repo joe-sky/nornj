@@ -1,7 +1,10 @@
 ﻿import nj from '../../../../src/base.js';
 
 export default nj`
-<div class=test onClick={onClick} style=color:blue;>
+<div>
+  <$params>
+    <$spreadParam {params} />
+  </$params>
   test{no}
   <br />
   <$each {list}>

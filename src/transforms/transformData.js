@@ -246,9 +246,11 @@ function replaceParams(valueObj, data, newObj, newKey, parent) {
 //Get expression parameter
 function getExprParam(refer, data, parent) {
   var ret = [];
-  tools.each(refer.props, function (propObj, i) {
-    ret.push(getDataValue(data, propObj.prop, parent));
-  }, false, true);
+  if (refer != null) {
+    tools.each(refer.props, function (propObj, i) {
+      ret.push(getDataValue(data, propObj.prop, parent));
+    }, false, true);
+  }
 
   return ret;
 }

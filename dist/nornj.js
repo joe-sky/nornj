@@ -1176,9 +1176,11 @@ function replaceParams(valueObj, data, newObj, newKey, parent) {
 //Get expression parameter
 function getExprParam(refer, data, parent) {
   var ret = [];
-  tools.each(refer.props, function (propObj, i) {
-    ret.push(getDataValue(data, propObj.prop, parent));
-  }, false, true);
+  if (refer != null) {
+    tools.each(refer.props, function (propObj, i) {
+      ret.push(getDataValue(data, propObj.prop, parent));
+    }, false, true);
+  }
 
   return ret;
 }
@@ -1654,7 +1656,7 @@ nj.exprs = {
       ret = options.inverse();
     }
 
-    if(options.useString && ret == null) {
+    if (options.useString && ret == null) {
       return '';
     }
 
@@ -1672,13 +1674,13 @@ nj.exprs = {
       ret;
 
     if (refer) {
-      if(useString) {
+      if (useString) {
         ret = '';
       }
       else {
         ret = [];
       }
-      
+
       tools.each(refer, function (item, index) {
         var retI = options.result({
           loop: true,
@@ -1686,7 +1688,7 @@ nj.exprs = {
           index: index
         });
 
-        if(useString) {
+        if (useString) {
           ret += retI;
         }
         else {
@@ -1695,7 +1697,7 @@ nj.exprs = {
       }, false, tools.isArray(refer));
 
       //Return null when not use string and result is empty.
-      if(!useString && !ret.length) {
+      if (!useString && !ret.length) {
         ret = null;
       }
     }
@@ -1709,7 +1711,7 @@ nj.exprs = {
     return ret;
   },
 
-  //Param block
+  //Parameter block
   param: function () {
     var args = arguments,
       len = args.length,
@@ -1720,23 +1722,39 @@ nj.exprs = {
 
     //Make property name by multiple parameters
     tools.each(args, function (item, i) {
-      if(i < len - 1) {
+      if (i < len - 1) {
         name += item;
       }
     }, false, true);
 
     //If the value length greater than 1, it need to be connected to a whole string.
-    if (ret.length > 1) {
-      value = '';
-      tools.each(ret, function(item) {
-        value += item;
-      }, false, true);
+    if (ret != null) {
+      if (ret.length > 1) {
+        value = '';
+        tools.each(ret, function (item) {
+          value += item;
+        }, false, true);
+      }
+      else {
+        value = ret[0];
+      }
     }
-    else {
-      value = ret[0];
+    else {  //Match to Similar to "checked" or "disabled" attribute.
+      value = name;
     }
 
     options.paramsExpr[name] = value;
+  },
+
+  //Spread parameters block
+  spreadparam: function (refer, options) {
+    if (!refer) {
+      return;
+    }
+
+    tools.each(refer, function (v, k) {
+      options.paramsExpr[k] = v;
+    }, false, false);
   }
 };
 
@@ -2021,8 +2039,8 @@ function each(obj, func, context, isArr, useEvery) {
   context = context ? context : obj;
 
   if (isArr) {
-    arrayEach.call(obj, function (o, i, arr) {
-      var ret = func.call(context, o, i, arr);
+    arrayEach.call(obj, function (o, i) {
+      var ret = func.call(context, o, i);
 
       if (useEvery) {
         if (ret === false) {
@@ -2034,9 +2052,8 @@ function each(obj, func, context, isArr, useEvery) {
   }
   else {
     var keys = Object.keys(obj);
-    arrayEach.call(keys, function (o, i) {
-      var key = keys[i],
-        ret = func.call(context, obj[key], key, obj);
+    arrayEach.call(keys, function (key) {
+      var ret = func.call(context, obj[key], key);
 
       if (useEvery) {
         if (ret === false) {
