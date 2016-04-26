@@ -1,7 +1,7 @@
 ﻿import nj from '../../src/base.js';
 import Inferno from 'inferno';
 import InfernoDOM from 'inferno-dom';
-import createElement from 'inferno/dist/inferno-create-element';
+import createElement from 'inferno-create-element';
 import './components/TestComponent/component';
 
 nj.setComponentEngine('inferno', Inferno, InfernoDOM, createElement, 'render');

@@ -692,17 +692,7 @@ module.exports = function (transformNode, useString) {
     utils.each(content, function (obj) {
       var retN = transformNode(obj, data, parent, paramsExpr);
       if (!useString) {
-        if (utils.isArray(retN)) {
-          if (ret.length) {
-            utils.listPush(ret, retN);
-          }
-          else {
-            ret = retN;
-          }
-        }
-        else if (retN != null) {
-          ret[ret.length] = retN;
-        }
+        ret = utils.listPush(ret, retN, true, true);
       }
       else {
         ret += retN;
@@ -1700,17 +1690,7 @@ nj.exprs = {
           ret += retI;
         }
         else {
-          if (tools.isArray(retI)) {
-            if (ret.length) {
-              tools.listPush(ret, retI);
-            }
-            else {
-              ret = retI;
-            }
-          }
-          else {
-            ret[ret.length] = retI;
-          }
+          ret = tools.listPush(ret, retI, true);
         }
       }, false, tools.isArray(refer));
 
@@ -1971,7 +1951,21 @@ var nj = require('../core'),
   arrayPush = arrayProto.push;
 
 //Push one by one to array
-function listPush(arr1, arr2) {
+function listPush(arr1, arr2, checkIsArr, checkNotNull) {
+  if (checkIsArr) {
+    if (isArray(arr2)) {
+      if (!arr1.length) {  //If the first array is empty, return the second array directly.
+        return arr2;
+      }
+    }
+    else {  //Put the value at the end of the first array only when the second parameter is not null.
+      if (!checkNotNull || arr2 != null) {
+        arr1[arr1.length] = arr2;
+      }
+      return arr1;
+    }
+  }
+
   arrayPush.apply(arr1, arr2);
   return arr1;
 }

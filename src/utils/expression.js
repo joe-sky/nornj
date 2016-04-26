@@ -51,17 +51,7 @@ nj.exprs = {
           ret += retI;
         }
         else {
-          if (tools.isArray(retI)) {
-            if (ret.length) {
-              tools.listPush(ret, retI);
-            }
-            else {
-              ret = retI;
-            }
-          }
-          else {
-            ret[ret.length] = retI;
-          }
+          ret = tools.listPush(ret, retI, true);
         }
       }, false, tools.isArray(refer));
 

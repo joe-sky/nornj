@@ -8,17 +8,20 @@ var nj = require('../core'),
   arrayPush = arrayProto.push;
 
 //Push one by one to array
-function listPush(arr1, arr2, checkArr, replaceEmpty) {
-  //var arrR = arr2;
-  //if (checkArr && !isArray(arr2)) {
-  //  arrR = [arr2];
-  //}
-
-  //if (replaceEmpty) {
-  //  if (!arr1.length) {
-  //    return arr2;
-  //  }
-  //}
+function listPush(arr1, arr2, checkIsArr, checkNotNull) {
+  if (checkIsArr) {
+    if (isArray(arr2)) {
+      if (!arr1.length) {  //If the first array is empty, return the second array directly.
+        return arr2;
+      }
+    }
+    else {  //Put the value at the end of the first array only when the second parameter is not null.
+      if (!checkNotNull || arr2 != null) {
+        arr1[arr1.length] = arr2;
+      }
+      return arr1;
+    }
+  }
 
   arrayPush.apply(arr1, arr2);
   return arr1;

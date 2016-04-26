@@ -25,17 +25,7 @@ module.exports = function (transformNode, useString) {
     utils.each(content, function (obj) {
       var retN = transformNode(obj, data, parent, paramsExpr);
       if (!useString) {
-        if (utils.isArray(retN)) {
-          if (ret.length) {
-            utils.listPush(ret, retN);
-          }
-          else {
-            ret = retN;
-          }
-        }
-        else if (retN != null) {
-          ret[ret.length] = retN;
-        }
+        ret = utils.listPush(ret, retN, true, true);
       }
       else {
         ret += retN;
