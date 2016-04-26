@@ -52,7 +52,12 @@ nj.exprs = {
         }
         else {
           if (tools.isArray(retI)) {
-            tools.listPush(ret, retI);
+            if (ret.length) {
+              tools.listPush(ret, retI);
+            }
+            else {
+              ret = retI;
+            }
           }
           else {
             ret[ret.length] = retI;

@@ -693,7 +693,12 @@ module.exports = function (transformNode, useString) {
       var retN = transformNode(obj, data, parent, paramsExpr);
       if (!useString) {
         if (utils.isArray(retN)) {
-          utils.listPush(ret, retN);
+          if (ret.length) {
+            utils.listPush(ret, retN);
+          }
+          else {
+            ret = retN;
+          }
         }
         else if (retN != null) {
           ret[ret.length] = retN;
@@ -1696,7 +1701,12 @@ nj.exprs = {
         }
         else {
           if (tools.isArray(retI)) {
-            tools.listPush(ret, retI);
+            if (ret.length) {
+              tools.listPush(ret, retI);
+            }
+            else {
+              ret = retI;
+            }
           }
           else {
             ret[ret.length] = retI;
@@ -1871,7 +1881,7 @@ module.exports = {
 var nj = require('../core'),
   tools = require('./tools');
 
-//设置组件引擎
+//Set component engine
 function setComponentEngine(name, obj, dom, port, render) {
   //Component engine's name
   nj.componentLib = name;
@@ -1888,16 +1898,8 @@ function setComponentEngine(name, obj, dom, port, render) {
     port = 'createElement';
     render = 'render';
   }
-  else {
-    if (tools.isString(port)) {
-      port = obj[port];
-    }
-    if (tools.isString(render)) {
-      render = dom[render];
-    }
-  }
-  nj.componentPort = port;
-  nj.componentRender = render;
+  nj.componentPort = tools.isString(port) ? obj[port] : port;
+  nj.componentRender = tools.isString(render) ? dom[render] : render;
 }
 
 module.exports = {

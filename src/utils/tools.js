@@ -8,7 +8,18 @@ var nj = require('../core'),
   arrayPush = arrayProto.push;
 
 //Push one by one to array
-function listPush(arr1, arr2) {
+function listPush(arr1, arr2, checkArr, replaceEmpty) {
+  //var arrR = arr2;
+  //if (checkArr && !isArray(arr2)) {
+  //  arrR = [arr2];
+  //}
+
+  //if (replaceEmpty) {
+  //  if (!arr1.length) {
+  //    return arr2;
+  //  }
+  //}
+
   arrayPush.apply(arr1, arr2);
   return arr1;
 }

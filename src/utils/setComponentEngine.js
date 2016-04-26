@@ -3,7 +3,7 @@
 var nj = require('../core'),
   tools = require('./tools');
 
-//设置组件引擎
+//Set component engine
 function setComponentEngine(name, obj, dom, port, render) {
   //Component engine's name
   nj.componentLib = name;
@@ -20,16 +20,8 @@ function setComponentEngine(name, obj, dom, port, render) {
     port = 'createElement';
     render = 'render';
   }
-  else {
-    if (tools.isString(port)) {
-      port = obj[port];
-    }
-    if (tools.isString(render)) {
-      render = dom[render];
-    }
-  }
-  nj.componentPort = port;
-  nj.componentRender = render;
+  nj.componentPort = tools.isString(port) ? obj[port] : port;
+  nj.componentRender = tools.isString(render) ? dom[render] : render;
 }
 
 module.exports = {
