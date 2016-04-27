@@ -6,16 +6,16 @@ var nj = require('../core'),
 //Global expression list
 nj.exprs = {
   //If block
-  'if': function (refer, options) {
+  'if': function (refer) {
     var ret;
     if (!!refer) {
-      ret = options.result();
+      ret = this.result();
     }
     else {
-      ret = options.inverse();
+      ret = this.inverse();
     }
 
-    if (options.useString && ret == null) {
+    if (this.useString && ret == null) {
       return '';
     }
 
@@ -23,13 +23,14 @@ nj.exprs = {
   },
 
   //Unless block
-  unless: function (refer, options) {
-    return nj.exprs.if(!refer, options);
+  unless: function (refer) {
+    return nj.exprs.if.call(this, !refer);
   },
 
   //Each block
-  each: function (refer, options) {
-    var useString = options.useString,
+  each: function (refer) {
+    var thiz = this,
+      useString = thiz.useString,
       ret;
 
     if (refer) {
@@ -41,7 +42,7 @@ nj.exprs = {
       }
 
       tools.each(refer, function (item, index) {
-        var retI = options.result({
+        var retI = thiz.result({
           loop: true,
           item: item,
           index: index
@@ -61,7 +62,7 @@ nj.exprs = {
       }
     }
     else {
-      ret = options.inverse();
+      ret = thiz.inverse();
       if (useString && ret == null) {
         ret = '';
       }
@@ -72,18 +73,13 @@ nj.exprs = {
 
   //Parameter block
   param: function () {
-    var args = arguments,
-      len = args.length,
-      options = args[len - 1],
-      ret = options.result(),  //Get parameter value
+    var ret = this.result(),  //Get parameter value
       name = '',
       value;
 
     //Make property name by multiple parameters
-    tools.each(args, function (item, i) {
-      if (i < len - 1) {
-        name += item;
-      }
+    tools.each(arguments, function (item, i) {
+      name += item;
     }, false, true);
 
     //If the value length greater than 1, it need to be connected to a whole string.
@@ -102,17 +98,18 @@ nj.exprs = {
       value = name;
     }
 
-    options.paramsExpr[name] = value;
+    this.paramsExpr[name] = value;
   },
 
   //Spread parameters block
-  spreadparam: function (refer, options) {
+  spreadparam: function (refer) {
     if (!refer) {
       return;
     }
 
+    var thiz = this;
     tools.each(refer, function (v, k) {
-      options.paramsExpr[k] = v;
+      thiz.paramsExpr[k] = v;
     }, false, false);
   }
 };

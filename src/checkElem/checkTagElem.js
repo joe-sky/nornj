@@ -77,6 +77,9 @@ function checkTagElem(obj, parent) {
       if (params) {
         node.params = tranParam.compiledParams(params);
       }
+
+      //Verify if self closing tag again, because the tag may be similar to "<br></br>".
+      node.selfCloseTag = tranElem.verifySelfCloseTag(tagName);
     }
 
     //放入父节点content内

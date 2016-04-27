@@ -5,6 +5,7 @@
 describe('test compile string', function () {
   beforeAll(function () {
     nj.registerFilter('filter1', function (v) {
+      console.log(this.useString);
       return v * 2;
     });
     nj.registerFilter('filter2', function (v, p1, p2) {

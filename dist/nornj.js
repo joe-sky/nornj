@@ -506,6 +506,9 @@ function checkTagElem(obj, parent) {
       if (params) {
         node.params = tranParam.compiledParams(params);
       }
+
+      //Verify if self closing tag again, because the tag may be similar to "<br></br>".
+      node.selfCloseTag = tranElem.verifySelfCloseTag(tagName);
     }
 
     //放入父节点content内
@@ -716,7 +719,7 @@ function transformToComponent(obj, data, parent, paramsExpr) {
 
   if (obj.type === 'nj_plaintext') {
     //替换插入在文本中的参数
-    ret = utils.replaceParams(obj.content[0], data, true, false, parent);
+    ret = utils.replaceParams(obj.content[0], data, true, false, parent, false);
 
     //执行模板数据
     if (utils.isObject(ret) && ret.expr === 'tmpl') {
@@ -724,45 +727,41 @@ function transformToComponent(obj, data, parent, paramsExpr) {
     }
   }
   else if (obj.type === 'nj_expr') {  //Expression block
-    var dataRefer = utils.getExprParam(obj.refer, data, parent),
+    var dataRefer = utils.getExprParam(obj.refer, data, parent, false),
       hasElse = obj.hasElse,
       expr = nj.exprs[obj.expr],
       itemIsArray;
 
     utils.throwIf(expr, errorTitle + 'Expression "' + obj.expr + '" is undefined, please check it has been registered.');
 
-    //Create expression parameters
-    dataRefer.push({
-      result: function (param) {
-        if (param && param.loop) {
-          if (itemIsArray == null) {
-            itemIsArray = utils.isArray(data);
-          }
-
-          //Create a parent data object
-          var _parent = utils.lightObj();
-          _parent.data = param.item;
-          _parent.parent = parent;
-          _parent.index = param.index;
-
-          return transformContentToComponent(obj.content, utils.getItemParam(param.item, data, itemIsArray), _parent, paramsExpr);
-        }
-        else {
-          return transformContentToComponent(obj.content, data, parent, paramsExpr);
-        }
-      },
-      inverse: function () {
-        return hasElse ? transformContentToComponent(obj.contentElse, data, parent, paramsExpr) : null;
-      },
-      useString: false,
-      paramsExpr: paramsExpr
-    });
-
-    //Create context object
+    //Create expression's context object and set parameters
     var thisObj = utils.lightObj();
     thisObj.data = data;
     thisObj.parent = parent.parent;
     thisObj.index = parent.index;
+    thisObj.useString = false;
+    thisObj.paramsExpr = paramsExpr;
+    thisObj.result = function (param) {
+      if (param && param.loop) {
+        if (itemIsArray == null) {
+          itemIsArray = utils.isArray(data);
+        }
+
+        //Create a parent data object
+        var _parent = utils.lightObj();
+        _parent.data = param.item;
+        _parent.parent = parent;
+        _parent.index = param.index;
+
+        return transformContentToComponent(obj.content, utils.getItemParam(param.item, data, itemIsArray), _parent, paramsExpr);
+      }
+      else {
+        return transformContentToComponent(obj.content, data, parent, paramsExpr);
+      }
+    };
+    thisObj.inverse = function () {
+      return hasElse ? transformContentToComponent(obj.contentElse, data, parent, paramsExpr) : null;
+    };
 
     //Execute expression block
     ret = expr.apply(thisObj, dataRefer);
@@ -774,7 +773,7 @@ function transformToComponent(obj, data, parent, paramsExpr) {
 
     //If typeRefer isn't undefined,use it to replace the node type.
     if (obj.typeRefer) {
-      var typeRefer = utils.replaceParams(obj.typeRefer, data, true, false, parent);
+      var typeRefer = utils.replaceParams(obj.typeRefer, data, true, false, parent, false);
       if (typeRefer) {
         type = typeRefer;
       }
@@ -823,48 +822,44 @@ function transformToString(obj, data, parent, paramsExpr) {
 
   if (obj.type === 'nj_plaintext') {
     //替换插入在文本中的参数
-    ret = utils.replaceParams(obj.content[0], data, false, false, parent);
+    ret = utils.replaceParams(obj.content[0], data, false, false, parent, true);
   }
   else if (obj.type === 'nj_expr') {  //Expression block
-    var dataRefer = utils.getExprParam(obj.refer, data, parent),
+    var dataRefer = utils.getExprParam(obj.refer, data, parent, true),
       hasElse = obj.hasElse,
       expr = nj.exprs[obj.expr],
       itemIsArray;
 
     utils.throwIf(expr, errorTitle + 'Expression "' + obj.expr + '" is undefined, please check it has been registered.');
 
-    //Create expression parameters
-    dataRefer.push({
-      result: function (param) {
-        if (param && param.loop) {
-          if (itemIsArray == null) {
-            itemIsArray = utils.isArray(data);
-          }
-
-          //Create a parent data object
-          var _parent = utils.lightObj();
-          _parent.data = param.item;
-          _parent.parent = parent;
-          _parent.index = param.index;
-
-          return transformContentToString(obj.content, utils.getItemParam(param.item, data, itemIsArray), _parent, paramsExpr);
-        }
-        else {
-          return transformContentToString(obj.content, data, parent, paramsExpr);
-        }
-      },
-      inverse: function () {
-        return hasElse ? transformContentToString(obj.contentElse, data, parent, paramsExpr) : null;
-      },
-      useString: true,
-      paramsExpr: paramsExpr
-    });
-
-    //Create context object
+    //Create expression's context object and set parameters
     var thisObj = utils.lightObj();
     thisObj.data = data;
     thisObj.parent = parent.parent;
     thisObj.index = parent.index;
+    thisObj.useString = true;
+    thisObj.paramsExpr = paramsExpr;
+    thisObj.result = function (param) {
+      if (param && param.loop) {
+        if (itemIsArray == null) {
+          itemIsArray = utils.isArray(data);
+        }
+
+        //Create a parent data object
+        var _parent = utils.lightObj();
+        _parent.data = param.item;
+        _parent.parent = parent;
+        _parent.index = param.index;
+
+        return transformContentToString(obj.content, utils.getItemParam(param.item, data, itemIsArray), _parent, paramsExpr);
+      }
+      else {
+        return transformContentToString(obj.content, data, parent, paramsExpr);
+      }
+    };
+    thisObj.inverse = function () {
+      return hasElse ? transformContentToString(obj.contentElse, data, parent, paramsExpr) : null;
+    };
 
     //Execute expression block
     ret = expr.apply(thisObj, dataRefer);
@@ -874,7 +869,7 @@ function transformToString(obj, data, parent, paramsExpr) {
 
     //If typeRefer isn't undefined,use it to replace the node type.
     if (obj.typeRefer) {
-      var typeRefer = utils.replaceParams(obj.typeRefer, data, false, false, parent);
+      var typeRefer = utils.replaceParams(obj.typeRefer, data, false, false, parent, true);
       if (typeRefer) {
         type = typeRefer;
       }
@@ -940,7 +935,7 @@ function transformParams(obj, data, parent, paramsE) {
   var ret = '';
   tools.each(obj, function (v, k) {
     if (!paramsE || paramsE[k] == null) {
-      ret += ' ' + k + '="' + replaceParams(v, data, false, false, parent) + '"';
+      ret += ' ' + k + '="' + replaceParams(v, data, false, false, parent, true) + '"';
     }
   }, false, false);
 
@@ -959,7 +954,7 @@ function transformParamsToObj(obj, data, parent, paramsE) {
   var ret = obj || paramsE ? {} : null;
   tools.each(obj, function (v, k) {
     if (!paramsE || paramsE[k] == null) {
-      replaceParams(v, data, ret, k, parent);
+      replaceParams(v, data, ret, k, parent, false);
     }
   }, false, false);
 
@@ -1022,7 +1017,7 @@ function _getStyleParams(obj) {
 }
 
 //Use filters
-function _useFilters(filters, ret, data, parent, index) {
+function _useFilters(filters, ret, data, parent, index, useString) {
   if (filters) {
     var filtersObj = nj.filters;
     tools.each(filters, function (filterObj) {
@@ -1046,6 +1041,7 @@ function _useFilters(filters, ret, data, parent, index) {
       thisObj.data = data;
       thisObj.parent = parent;
       thisObj.index = index;
+      thisObj.useString = useString;
       ret = filter.apply(thisObj, params);
     }, false, true);
   }
@@ -1054,7 +1050,7 @@ function _useFilters(filters, ret, data, parent, index) {
 }
 
 //获取data值
-function getDataValue(data, propObj, parent, defaultEmpty) {
+function getDataValue(data, propObj, parent, defaultEmpty, useString) {
   if (data == null) {
     return;
   }
@@ -1088,13 +1084,13 @@ function getDataValue(data, propObj, parent, defaultEmpty) {
   }
 
   if (propObj.isStr) {
-    ret = _useFilters(filters, prop, datas, dataP, index);
+    ret = _useFilters(filters, prop, datas, dataP, index, useString);
   }
   else if (prop === '.') {  //prop为点号时直接使用data作为返回值
-    ret = _useFilters(filters, isArr ? data[0] : data, datas, dataP, index);
+    ret = _useFilters(filters, isArr ? data[0] : data, datas, dataP, index, useString);
   }
   else if (prop === '#') {  //Get current item index
-    ret = _useFilters(filters, index, datas, dataP, index);
+    ret = _useFilters(filters, index, datas, dataP, index, useString);
   }
   else {
     tools.each(datas, function (obj) {
@@ -1102,7 +1098,7 @@ function getDataValue(data, propObj, parent, defaultEmpty) {
         ret = obj[prop];
 
         //Use filters
-        ret = _useFilters(filters, ret, datas, dataP, index);
+        ret = _useFilters(filters, ret, datas, dataP, index, useString);
 
         if (ret != null) {
           return false;
@@ -1133,7 +1129,7 @@ function getItemParam(item, data, isArr) {
 }
 
 //替换参数字符串
-function replaceParams(valueObj, data, newObj, newKey, parent) {
+function replaceParams(valueObj, data, newObj, newKey, parent, useString) {
   var props = valueObj.props,
     strs = valueObj.strs,
     isAll = valueObj.isAll,
@@ -1142,7 +1138,7 @@ function replaceParams(valueObj, data, newObj, newKey, parent) {
 
   if (props) {
     tools.each(props, function (propObj, i) {
-      var dataProp = getDataValue(data, propObj.prop, parent, !newObj);
+      var dataProp = getDataValue(data, propObj.prop, parent, !newObj, useString);
 
       //参数为字符串时,须做特殊字符转义
       if (dataProp
@@ -1174,11 +1170,11 @@ function replaceParams(valueObj, data, newObj, newKey, parent) {
 }
 
 //Get expression parameter
-function getExprParam(refer, data, parent) {
+function getExprParam(refer, data, parent, useString) {
   var ret = [];
   if (refer != null) {
     tools.each(refer.props, function (propObj, i) {
-      ret.push(getDataValue(data, propObj.prop, parent));
+      ret.push(getDataValue(data, propObj.prop, parent, false, useString));
     }, false, true);
   }
 
@@ -1647,16 +1643,16 @@ var nj = require('../core'),
 //Global expression list
 nj.exprs = {
   //If block
-  'if': function (refer, options) {
+  'if': function (refer) {
     var ret;
     if (!!refer) {
-      ret = options.result();
+      ret = this.result();
     }
     else {
-      ret = options.inverse();
+      ret = this.inverse();
     }
 
-    if (options.useString && ret == null) {
+    if (this.useString && ret == null) {
       return '';
     }
 
@@ -1664,13 +1660,14 @@ nj.exprs = {
   },
 
   //Unless block
-  unless: function (refer, options) {
-    return nj.exprs.if(!refer, options);
+  unless: function (refer) {
+    return nj.exprs.if.call(this, !refer);
   },
 
   //Each block
-  each: function (refer, options) {
-    var useString = options.useString,
+  each: function (refer) {
+    var thiz = this,
+      useString = thiz.useString,
       ret;
 
     if (refer) {
@@ -1682,7 +1679,7 @@ nj.exprs = {
       }
 
       tools.each(refer, function (item, index) {
-        var retI = options.result({
+        var retI = thiz.result({
           loop: true,
           item: item,
           index: index
@@ -1702,7 +1699,7 @@ nj.exprs = {
       }
     }
     else {
-      ret = options.inverse();
+      ret = thiz.inverse();
       if (useString && ret == null) {
         ret = '';
       }
@@ -1713,18 +1710,13 @@ nj.exprs = {
 
   //Parameter block
   param: function () {
-    var args = arguments,
-      len = args.length,
-      options = args[len - 1],
-      ret = options.result(),  //Get parameter value
+    var ret = this.result(),  //Get parameter value
       name = '',
       value;
 
     //Make property name by multiple parameters
-    tools.each(args, function (item, i) {
-      if (i < len - 1) {
-        name += item;
-      }
+    tools.each(arguments, function (item, i) {
+      name += item;
     }, false, true);
 
     //If the value length greater than 1, it need to be connected to a whole string.
@@ -1743,17 +1735,18 @@ nj.exprs = {
       value = name;
     }
 
-    options.paramsExpr[name] = value;
+    this.paramsExpr[name] = value;
   },
 
   //Spread parameters block
-  spreadparam: function (refer, options) {
+  spreadparam: function (refer) {
     if (!refer) {
       return;
     }
 
+    var thiz = this;
     tools.each(refer, function (v, k) {
-      options.paramsExpr[k] = v;
+      thiz.paramsExpr[k] = v;
     }, false, false);
   }
 };

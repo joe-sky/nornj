@@ -11,7 +11,7 @@ function transformToComponent(obj, data, parent, paramsExpr) {
 
   if (obj.type === 'nj_plaintext') {
     //替换插入在文本中的参数
-    ret = utils.replaceParams(obj.content[0], data, true, false, parent);
+    ret = utils.replaceParams(obj.content[0], data, true, false, parent, false);
 
     //执行模板数据
     if (utils.isObject(ret) && ret.expr === 'tmpl') {
@@ -19,45 +19,41 @@ function transformToComponent(obj, data, parent, paramsExpr) {
     }
   }
   else if (obj.type === 'nj_expr') {  //Expression block
-    var dataRefer = utils.getExprParam(obj.refer, data, parent),
+    var dataRefer = utils.getExprParam(obj.refer, data, parent, false),
       hasElse = obj.hasElse,
       expr = nj.exprs[obj.expr],
       itemIsArray;
 
     utils.throwIf(expr, errorTitle + 'Expression "' + obj.expr + '" is undefined, please check it has been registered.');
 
-    //Create expression parameters
-    dataRefer.push({
-      result: function (param) {
-        if (param && param.loop) {
-          if (itemIsArray == null) {
-            itemIsArray = utils.isArray(data);
-          }
-
-          //Create a parent data object
-          var _parent = utils.lightObj();
-          _parent.data = param.item;
-          _parent.parent = parent;
-          _parent.index = param.index;
-
-          return transformContentToComponent(obj.content, utils.getItemParam(param.item, data, itemIsArray), _parent, paramsExpr);
-        }
-        else {
-          return transformContentToComponent(obj.content, data, parent, paramsExpr);
-        }
-      },
-      inverse: function () {
-        return hasElse ? transformContentToComponent(obj.contentElse, data, parent, paramsExpr) : null;
-      },
-      useString: false,
-      paramsExpr: paramsExpr
-    });
-
-    //Create context object
+    //Create expression's context object and set parameters
     var thisObj = utils.lightObj();
     thisObj.data = data;
     thisObj.parent = parent.parent;
     thisObj.index = parent.index;
+    thisObj.useString = false;
+    thisObj.paramsExpr = paramsExpr;
+    thisObj.result = function (param) {
+      if (param && param.loop) {
+        if (itemIsArray == null) {
+          itemIsArray = utils.isArray(data);
+        }
+
+        //Create a parent data object
+        var _parent = utils.lightObj();
+        _parent.data = param.item;
+        _parent.parent = parent;
+        _parent.index = param.index;
+
+        return transformContentToComponent(obj.content, utils.getItemParam(param.item, data, itemIsArray), _parent, paramsExpr);
+      }
+      else {
+        return transformContentToComponent(obj.content, data, parent, paramsExpr);
+      }
+    };
+    thisObj.inverse = function () {
+      return hasElse ? transformContentToComponent(obj.contentElse, data, parent, paramsExpr) : null;
+    };
 
     //Execute expression block
     ret = expr.apply(thisObj, dataRefer);
@@ -69,7 +65,7 @@ function transformToComponent(obj, data, parent, paramsExpr) {
 
     //If typeRefer isn't undefined,use it to replace the node type.
     if (obj.typeRefer) {
-      var typeRefer = utils.replaceParams(obj.typeRefer, data, true, false, parent);
+      var typeRefer = utils.replaceParams(obj.typeRefer, data, true, false, parent, false);
       if (typeRefer) {
         type = typeRefer;
       }

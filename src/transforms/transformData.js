@@ -10,7 +10,7 @@ function transformParams(obj, data, parent, paramsE) {
   var ret = '';
   tools.each(obj, function (v, k) {
     if (!paramsE || paramsE[k] == null) {
-      ret += ' ' + k + '="' + replaceParams(v, data, false, false, parent) + '"';
+      ret += ' ' + k + '="' + replaceParams(v, data, false, false, parent, true) + '"';
     }
   }, false, false);
 
@@ -29,7 +29,7 @@ function transformParamsToObj(obj, data, parent, paramsE) {
   var ret = obj || paramsE ? {} : null;
   tools.each(obj, function (v, k) {
     if (!paramsE || paramsE[k] == null) {
-      replaceParams(v, data, ret, k, parent);
+      replaceParams(v, data, ret, k, parent, false);
     }
   }, false, false);
 
@@ -92,7 +92,7 @@ function _getStyleParams(obj) {
 }
 
 //Use filters
-function _useFilters(filters, ret, data, parent, index) {
+function _useFilters(filters, ret, data, parent, index, useString) {
   if (filters) {
     var filtersObj = nj.filters;
     tools.each(filters, function (filterObj) {
@@ -116,6 +116,7 @@ function _useFilters(filters, ret, data, parent, index) {
       thisObj.data = data;
       thisObj.parent = parent;
       thisObj.index = index;
+      thisObj.useString = useString;
       ret = filter.apply(thisObj, params);
     }, false, true);
   }
@@ -124,7 +125,7 @@ function _useFilters(filters, ret, data, parent, index) {
 }
 
 //获取data值
-function getDataValue(data, propObj, parent, defaultEmpty) {
+function getDataValue(data, propObj, parent, defaultEmpty, useString) {
   if (data == null) {
     return;
   }
@@ -158,13 +159,13 @@ function getDataValue(data, propObj, parent, defaultEmpty) {
   }
 
   if (propObj.isStr) {
-    ret = _useFilters(filters, prop, datas, dataP, index);
+    ret = _useFilters(filters, prop, datas, dataP, index, useString);
   }
   else if (prop === '.') {  //prop为点号时直接使用data作为返回值
-    ret = _useFilters(filters, isArr ? data[0] : data, datas, dataP, index);
+    ret = _useFilters(filters, isArr ? data[0] : data, datas, dataP, index, useString);
   }
   else if (prop === '#') {  //Get current item index
-    ret = _useFilters(filters, index, datas, dataP, index);
+    ret = _useFilters(filters, index, datas, dataP, index, useString);
   }
   else {
     tools.each(datas, function (obj) {
@@ -172,7 +173,7 @@ function getDataValue(data, propObj, parent, defaultEmpty) {
         ret = obj[prop];
 
         //Use filters
-        ret = _useFilters(filters, ret, datas, dataP, index);
+        ret = _useFilters(filters, ret, datas, dataP, index, useString);
 
         if (ret != null) {
           return false;
@@ -203,7 +204,7 @@ function getItemParam(item, data, isArr) {
 }
 
 //替换参数字符串
-function replaceParams(valueObj, data, newObj, newKey, parent) {
+function replaceParams(valueObj, data, newObj, newKey, parent, useString) {
   var props = valueObj.props,
     strs = valueObj.strs,
     isAll = valueObj.isAll,
@@ -212,7 +213,7 @@ function replaceParams(valueObj, data, newObj, newKey, parent) {
 
   if (props) {
     tools.each(props, function (propObj, i) {
-      var dataProp = getDataValue(data, propObj.prop, parent, !newObj);
+      var dataProp = getDataValue(data, propObj.prop, parent, !newObj, useString);
 
       //参数为字符串时,须做特殊字符转义
       if (dataProp
@@ -244,11 +245,11 @@ function replaceParams(valueObj, data, newObj, newKey, parent) {
 }
 
 //Get expression parameter
-function getExprParam(refer, data, parent) {
+function getExprParam(refer, data, parent, useString) {
   var ret = [];
   if (refer != null) {
     tools.each(refer.props, function (propObj, i) {
-      ret.push(getDataValue(data, propObj.prop, parent));
+      ret.push(getDataValue(data, propObj.prop, parent, false, useString));
     }, false, true);
   }
 
