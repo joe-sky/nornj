@@ -24,37 +24,38 @@ function _clearRepeat(str) {
   return ret;
 }
 
-module.exports = function (openRule, closeRule, exprRule) {
-  if (!openRule) {
-    openRule = '{';
+module.exports = function (beginRule, endRule, exprRule) {
+  if (!beginRule) {
+    beginRule = '{';
   }
-  if (!closeRule) {
-    closeRule = '}';
+  if (!endRule) {
+    endRule = '}';
   }
   if (!exprRule) {
     exprRule = '$';
   }
 
-  var allRules = _clearRepeat(openRule + closeRule),
-    firstChar = openRule.charAt(0),
+  var allRules = _clearRepeat(beginRule + endRule),
+    firstChar = beginRule.charAt(0),
     otherChars = allRules.substr(1),
-    exprRules = _clearRepeat(exprRule);
+    exprRules = _clearRepeat(exprRule),
+    escapeExprRule = exprRule.replace(/\$/g, '\\$');
 
   //Reset the regexs to global list
-  tools.assign(nj.paramRule, {
-    openRule: openRule,
-    closeRule: closeRule,
+  tools.assign(nj.tmplRule, {
+    beginRule: beginRule,
+    endRule: endRule,
     exprRule: exprRule,
     xmlOpenTag: _createRegExp('^<([a-z' + firstChar + '][-a-z0-9_:.\/' + otherChars + ']*)[^>]*>$', 'i'),
     openTag: _createRegExp('^[a-z' + firstChar + '][-a-z0-9_:.\/' + otherChars + ']*', 'i'),
-    insideBraceParam: _createRegExp(openRule + '([^' + allRules + ']+)' + closeRule, 'i'),
-    replaceSplit: _createRegExp('(?:' + openRule + '){1,2}[^' + allRules + ']+(?:' + closeRule + '){1,2}'),
+    insideBraceParam: _createRegExp(beginRule + '([^' + allRules + ']+)' + endRule, 'i'),
+    replaceSplit: _createRegExp('(?:' + beginRule + '){1,2}[^' + allRules + ']+(?:' + endRule + '){1,2}'),
     replaceParam: function() {
-      return _createRegExp('((' + openRule + '){1,2})([^' + allRules + ']+)(' + closeRule + '){1,2}', 'g');
+      return _createRegExp('((' + beginRule + '){1,2})([^' + allRules + ']+)(' + endRule + '){1,2}', 'g');
     },
     checkElem: function() {
       return _createRegExp('([^>]*)(<([a-z' + firstChar + '\/' + exprRules + '][-a-z0-9_:.' + allRules + exprRules + ']*)[^>]*>)([^<]*)', 'ig');
     },
-    expr: _createRegExp('^\\' + exprRule + '([^\\s]+)', 'i')
+    expr: _createRegExp('^' + escapeExprRule + '([^\\s]+)', 'i')
   });
 };

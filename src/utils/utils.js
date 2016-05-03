@@ -10,15 +10,15 @@ var tools = require('./tools'),
   registerComponent = require('./registerComponent'),
   filter = require('./filter'),
   expression = require('./expression'),
-  setParamRule = require('./setParamRule');
+  setTmplRule = require('./setTmplRule');
 
 //Set default param rule
-setParamRule();
+setTmplRule();
 
 module.exports = tools.assign(
   { 
     escape: escape,
-    setParamRule: setParamRule
+    setTmplRule: setTmplRule
   },
   checkElem,
   setComponentEngine,

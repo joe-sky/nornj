@@ -4,12 +4,11 @@ var nj = require('../core'),
   tools = require('../utils/tools'),
   tranData = require('./transformData'),
   tranParam = require('./transformParam'),
-  paramRule = nj.paramRule,
-  exprRule = paramRule.exprRule;
+  tmplRule = nj.tmplRule;
 
 //提取xml open tag
 function getXmlOpenTag(obj) {
-  return paramRule.xmlOpenTag.exec(obj);
+  return tmplRule.xmlOpenTag.exec(obj);
 }
 
 //验证xml self close tag
@@ -88,7 +87,7 @@ function isXmlCloseTag(obj, tagName) {
 
 //提取open tag
 function getOpenTag(obj) {
-  return paramRule.openTag.exec(obj);
+  return tmplRule.openTag.exec(obj);
 }
 
 //验证self close tag
@@ -104,13 +103,12 @@ function isCloseTag(obj, tagName) {
 
 //get inside brace param
 function getInsideBraceParam(obj) {
-  return paramRule.insideBraceParam.exec(obj);
+  return tmplRule.insideBraceParam.exec(obj);
 }
 
 //判断流程控制块并返回refer值
-var REGEX_CONTROL = /^\$([^\s]+)/i;
 function isControl(obj) {
-  var ret, ret1 = REGEX_CONTROL.exec(obj);
+  var ret, ret1 = tmplRule.expr.exec(obj);
   if (ret1) {
     ret = [ret1[1]];
 
@@ -125,7 +123,7 @@ function isControl(obj) {
 
 //判断流程控制块close tag
 function isControlCloseTag(obj, tagName) {
-  return tools.isString(obj) && obj === '/' + exprRule + tagName;
+  return tools.isString(obj) && obj === '/' + tmplRule.exprRule + tagName;
 }
 
 //判断是否模板元素
@@ -204,7 +202,7 @@ function getTagComponentAttrs(el) {
 
 //判断标签表达式块
 function isTagControl(obj) {
-  return REGEX_CONTROL.test(obj);
+  return tmplRule.expr.test(obj);
 }
 
 //获取全部标签组件

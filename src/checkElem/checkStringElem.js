@@ -4,8 +4,7 @@ var nj = require('../core'),
   tools = require('../utils/tools'),
   tranElem = require('../transforms/transformElement'),
   REGEX_SPLIT = /\$\{\d+\}/,
-  paramRule = nj.paramRule,
-  exprRule = paramRule.exprRule;
+  tmplRule = nj.tmplRule;
 
 //Cache the string template by unique key
 nj.strTmpls = {};
@@ -81,7 +80,7 @@ function _checkStringElem(xml, params) {
       parent: null
     },
     parent = null,
-    pattern = paramRule.checkElem(),
+    pattern = tmplRule.checkElem(),
     matchArr;
 
   while ((matchArr = pattern.exec(xml))) {
@@ -142,7 +141,7 @@ function _formatText(str) {
 }
 
 function _getElem(elem, elemName) {
-  if (elemName[0] === exprRule) {
+  if (elemName[0] === tmplRule.exprRule) {
     return elem.substring(1, elem.length - 1);
   }
   else {
@@ -156,7 +155,7 @@ function _getSelfCloseElem(elem, elemName, params) {
     return params[elemName.split('_')[1]];
   }
   else {
-    return elemName === exprRule + 'else' ? elem.substr(1, 5) : [_getElem(elem, elemName)];
+    return elemName === tmplRule.exprRule + 'else' ? elem.substr(1, 5) : [_getElem(elem, elemName)];
   }
 }
 

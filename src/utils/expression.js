@@ -24,7 +24,7 @@ nj.exprs = {
 
   //Unless block
   unless: function (refer) {
-    return nj.exprs.if.call(this, !refer);
+    return nj.exprs['if'].call(this, !refer);
   },
 
   //Each block

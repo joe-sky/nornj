@@ -5,7 +5,7 @@ var nj = require('../core'),
   tranParam = require('../transforms/transformParam'),
   tranElem = require('../transforms/transformElement'),
   checkTagElem = require('./checkTagElem'),
-  exprRule = nj.paramRule.exprRule;
+  tmplRule = nj.tmplRule;
 
 //检测元素节点
 function checkElem(obj, parent) {
@@ -129,7 +129,7 @@ function checkElem(obj, parent) {
           tranElem.addParamsExpr(node, parent);
         }
         else {
-          elseIndex = tools.inArray(obj, exprRule + 'else');
+          elseIndex = tools.inArray(obj, tmplRule.exprRule + 'else');
         }
       }
 

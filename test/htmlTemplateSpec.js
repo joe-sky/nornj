@@ -24,6 +24,8 @@ describe('test compile html', function () {
 
   describe('compile html template', function () {
     it('test html 1', function (done) {
+      nj.setTmplRule();
+
       jsdom.env(
         `<div id="d1" data-test="1" name="{name}">
           <nj-$params>

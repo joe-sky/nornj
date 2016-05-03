@@ -1,6 +1,6 @@
 {
   "name": "nornj",
-  "version": "0.3.3-rc1",
+  "version": "0.3.3-rc2",
   "description": "A multipurpose javascript template engine",
   "main": "src/base.js",
   "files": [
@@ -33,7 +33,6 @@
     "react-dom": "^0.14.7",
     "vinyl-buffer": "^1.0.0",
     "vinyl-source-stream": "^1.1.0",
-    "webpack": "^1.13.0",
     "yargs": "^4.2.0"
   },
   "dependencies": {

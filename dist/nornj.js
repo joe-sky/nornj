@@ -51,7 +51,7 @@ var nj = require('./core'),
   docReady = require('./utils/docReady');
 
 nj.setComponentEngine = setComponentEngine;
-nj.setParamRule = utils.setParamRule;
+nj.setTmplRule = utils.setTmplRule;
 nj.registerFilter = utils.registerFilter;
 nj.registerExpr= utils.registerExpr;
 nj.compileStringTmpl = compileStringTmpl;
@@ -86,7 +86,8 @@ var nj = require('../core'),
   tools = require('../utils/tools'),
   tranParam = require('../transforms/transformParam'),
   tranElem = require('../transforms/transformElement'),
-  checkTagElem = require('./checkTagElem');
+  checkTagElem = require('./checkTagElem'),
+  tmplRule = nj.tmplRule;
 
 //检测元素节点
 function checkElem(obj, parent) {
@@ -196,7 +197,7 @@ function checkElem(obj, parent) {
           node.selfCloseTag = tranElem.verifySelfCloseTag(openTagName);
         }
       }
-      else {  //为流程控制块时判断是否有$else
+      else {  //为表达式块时判断是否有$else
         if (isTmpl) {  //模板元素
           pushContent = false;
 
@@ -210,7 +211,7 @@ function checkElem(obj, parent) {
           tranElem.addParamsExpr(node, parent);
         }
         else {
-          elseIndex = tools.inArray(obj, '$else');
+          elseIndex = tools.inArray(obj, tmplRule.exprRule + 'else');
         }
       }
 
@@ -270,7 +271,7 @@ var nj = require('../core'),
   tools = require('../utils/tools'),
   tranElem = require('../transforms/transformElement'),
   REGEX_SPLIT = /\$\{\d+\}/,
-  paramRule = nj.paramRule;
+  tmplRule = nj.tmplRule;
 
 //Cache the string template by unique key
 nj.strTmpls = {};
@@ -346,7 +347,7 @@ function _checkStringElem(xml, params) {
       parent: null
     },
     parent = null,
-    pattern = paramRule.checkElem(),
+    pattern = tmplRule.checkElem(),
     matchArr;
 
   while ((matchArr = pattern.exec(xml))) {
@@ -407,7 +408,7 @@ function _formatText(str) {
 }
 
 function _getElem(elem, elemName) {
-  if(elemName[0] === '$') {
+  if (elemName[0] === tmplRule.exprRule) {
     return elem.substring(1, elem.length - 1);
   }
   else {
@@ -421,7 +422,7 @@ function _getSelfCloseElem(elem, elemName, params) {
     return params[elemName.split('_')[1]];
   }
   else {
-    return elemName === '$else' ? elem.substr(1, 5) : [_getElem(elem, elemName)];
+    return elemName === tmplRule.exprRule + 'else' ? elem.substr(1, 5) : [_getElem(elem, elemName)];
   }
 }
 
@@ -432,7 +433,8 @@ module.exports = compileStringTmpl;
 var nj = require('../core'),
   tools = require('../utils/tools'),
   tranParam = require('../transforms/transformParam'),
-  tranElem = require('../transforms/transformElement');
+  tranElem = require('../transforms/transformElement'),
+  tmplRule = nj.tmplRule;
 
 //检测标签元素节点
 function checkTagElem(obj, parent) {
@@ -462,7 +464,7 @@ function checkTagElem(obj, parent) {
       pushContent = true;
 
     if (isControl) {  //特殊节点
-      if (tagName !== '$else') {
+      if (tagName !== tmplRule.exprRule + 'else') {
         tagName = tagName.substr(1);
         node.type = 'nj_expr';
         node.expr = tagName;
@@ -918,7 +920,7 @@ nj.tagStyle = 'nj-style';
 nj.tagClassName = 'nj-component';
 nj.templates = {};
 nj.errorTitle = 'NornJ:';
-nj.paramRule = {};
+nj.tmplRule = {};
 nj.autoRenderTag = true;
 
 module.exports = nj;
@@ -1197,11 +1199,11 @@ var nj = require('../core'),
   tools = require('../utils/tools'),
   tranData = require('./transformData'),
   tranParam = require('./transformParam'),
-  paramRule = nj.paramRule;
+  tmplRule = nj.tmplRule;
 
 //提取xml open tag
 function getXmlOpenTag(obj) {
-  return paramRule.xmlOpenTag.exec(obj);
+  return tmplRule.xmlOpenTag.exec(obj);
 }
 
 //验证xml self close tag
@@ -1280,7 +1282,7 @@ function isXmlCloseTag(obj, tagName) {
 
 //提取open tag
 function getOpenTag(obj) {
-  return paramRule.openTag.exec(obj);
+  return tmplRule.openTag.exec(obj);
 }
 
 //验证self close tag
@@ -1296,13 +1298,12 @@ function isCloseTag(obj, tagName) {
 
 //get inside brace param
 function getInsideBraceParam(obj) {
-  return paramRule.insideBraceParam.exec(obj);
+  return tmplRule.insideBraceParam.exec(obj);
 }
 
 //判断流程控制块并返回refer值
-var REGEX_CONTROL = /^\$([^\s]+)/i;
 function isControl(obj) {
-  var ret, ret1 = REGEX_CONTROL.exec(obj);
+  var ret, ret1 = tmplRule.expr.exec(obj);
   if (ret1) {
     ret = [ret1[1]];
 
@@ -1317,7 +1318,7 @@ function isControl(obj) {
 
 //判断流程控制块close tag
 function isControlCloseTag(obj, tagName) {
-  return tools.isString(obj) && obj === '/$' + tagName;
+  return tools.isString(obj) && obj === '/' + tmplRule.exprRule + tagName;
 }
 
 //判断是否模板元素
@@ -1396,7 +1397,7 @@ function getTagComponentAttrs(el) {
 
 //判断标签表达式块
 function isTagControl(obj) {
-  return REGEX_CONTROL.test(obj);
+  return tmplRule.expr.test(obj);
 }
 
 //获取全部标签组件
@@ -1446,7 +1447,7 @@ module.exports = {
 
 var nj = require('../core'),
   tools = require('../utils/tools'),
-  paramRule = nj.paramRule;
+  tmplRule = nj.tmplRule;
 
 //Get compiled parameters from a object
 function compiledParams(obj) {
@@ -1524,7 +1525,7 @@ function _getFilterParam(obj) {
 //Extract replace parameters
 var _quots = ['\'', '"'];
 function _getReplaceParam(obj, strs) {
-  var pattern = paramRule.replaceParam(),
+  var pattern = tmplRule.replaceParam(),
     patternP = /[^\s:]+([\s]?:[\s]?[^\s\(\)]+(\([^\(\)]+\))?){0,}/g,
     matchArr, matchArrP, ret, prop, i = 0;
 
@@ -1569,7 +1570,7 @@ function _getReplaceParam(obj, strs) {
 //Get compiled parameter
 function compiledParam(value) {
   var ret = tools.lightObj(),
-    strs = tools.isString(value) ? value.split(paramRule.replaceSplit) : [value],
+    strs = tools.isString(value) ? value.split(tmplRule.replaceSplit) : [value],
     props = null,
     isAll = false;
 
@@ -1584,7 +1585,7 @@ function compiledParam(value) {
       retP.prop = compiledProp(param[2], param[3]);
 
       //If parameter's open rules are several,then it need escape.
-      retP.escape = param[1].split(paramRule.openRule).length < 3;
+      retP.escape = param[1].split(tmplRule.beginRule).length < 3;
       props.push(retP);
     }, false, true);
   }
@@ -1661,7 +1662,7 @@ nj.exprs = {
 
   //Unless block
   unless: function (refer) {
-    return nj.exprs.if.call(this, !refer);
+    return nj.exprs['if'].call(this, !refer);
   },
 
   //Each block
@@ -1923,32 +1924,39 @@ function _clearRepeat(str) {
   return ret;
 }
 
-module.exports = function (openRule, closeRule) {
-  if (!openRule) {
-    openRule = '{';
+module.exports = function (beginRule, endRule, exprRule) {
+  if (!beginRule) {
+    beginRule = '{';
   }
-  if (!closeRule) {
-    closeRule = '}';
+  if (!endRule) {
+    endRule = '}';
+  }
+  if (!exprRule) {
+    exprRule = '$';
   }
 
-  var allRules = _clearRepeat(openRule + closeRule),
-    firstChar = openRule.charAt(0),
-    otherChars = allRules.substr(1);
+  var allRules = _clearRepeat(beginRule + endRule),
+    firstChar = beginRule.charAt(0),
+    otherChars = allRules.substr(1),
+    exprRules = _clearRepeat(exprRule),
+    escapeExprRule = exprRule.replace(/\$/g, '\\$');
 
   //Reset the regexs to global list
-  tools.assign(nj.paramRule, {
-    openRule: openRule,
-    closeRule: closeRule,
+  tools.assign(nj.tmplRule, {
+    beginRule: beginRule,
+    endRule: endRule,
+    exprRule: exprRule,
     xmlOpenTag: _createRegExp('^<([a-z' + firstChar + '][-a-z0-9_:.\/' + otherChars + ']*)[^>]*>$', 'i'),
     openTag: _createRegExp('^[a-z' + firstChar + '][-a-z0-9_:.\/' + otherChars + ']*', 'i'),
-    insideBraceParam: _createRegExp(openRule + '([^' + allRules + ']+)' + closeRule, 'i'),
-    replaceSplit: _createRegExp('(?:' + openRule + '){1,2}[^' + allRules + ']+(?:' + closeRule + '){1,2}'),
+    insideBraceParam: _createRegExp(beginRule + '([^' + allRules + ']+)' + endRule, 'i'),
+    replaceSplit: _createRegExp('(?:' + beginRule + '){1,2}[^' + allRules + ']+(?:' + endRule + '){1,2}'),
     replaceParam: function() {
-      return _createRegExp('((' + openRule + '){1,2})([^' + allRules + ']+)(' + closeRule + '){1,2}', 'g');
+      return _createRegExp('((' + beginRule + '){1,2})([^' + allRules + ']+)(' + endRule + '){1,2}', 'g');
     },
     checkElem: function() {
-      return _createRegExp('([^>]*)(<([a-z' + firstChar + '\/$][-a-z0-9_:.' + allRules + '$]*)[^>]*>)([^<]*)', 'ig');
-    }
+      return _createRegExp('([^>]*)(<([a-z' + firstChar + '\/' + exprRules + '][-a-z0-9_:.' + allRules + exprRules + ']*)[^>]*>)([^<]*)', 'ig');
+    },
+    expr: _createRegExp('^' + escapeExprRule + '([^\\s]+)', 'i')
   });
 };
 },{"../core":10,"./tools":21}],21:[function(require,module,exports){
@@ -2164,15 +2172,15 @@ var tools = require('./tools'),
   registerComponent = require('./registerComponent'),
   filter = require('./filter'),
   expression = require('./expression'),
-  setParamRule = require('./setParamRule');
+  setTmplRule = require('./setTmplRule');
 
 //Set default param rule
-setParamRule();
+setTmplRule();
 
 module.exports = tools.assign(
   { 
     escape: escape,
-    setParamRule: setParamRule
+    setTmplRule: setTmplRule
   },
   checkElem,
   setComponentEngine,
@@ -2184,5 +2192,5 @@ module.exports = tools.assign(
   transformParam,
   transformData
 );
-},{"../checkElem/checkElem":3,"../transforms/transformData":11,"../transforms/transformElement":12,"../transforms/transformParam":13,"./escape":15,"./expression":16,"./filter":17,"./registerComponent":18,"./setComponentEngine":19,"./setParamRule":20,"./tools":21}]},{},[2])(2)
+},{"../checkElem/checkElem":3,"../transforms/transformData":11,"../transforms/transformElement":12,"../transforms/transformParam":13,"./escape":15,"./expression":16,"./filter":17,"./registerComponent":18,"./setComponentEngine":19,"./setTmplRule":20,"./tools":21}]},{},[2])(2)
 });

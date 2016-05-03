@@ -2,7 +2,7 @@
 
 var nj = require('../core'),
   tools = require('../utils/tools'),
-  paramRule = nj.paramRule;
+  tmplRule = nj.tmplRule;
 
 //Get compiled parameters from a object
 function compiledParams(obj) {
@@ -80,7 +80,7 @@ function _getFilterParam(obj) {
 //Extract replace parameters
 var _quots = ['\'', '"'];
 function _getReplaceParam(obj, strs) {
-  var pattern = paramRule.replaceParam(),
+  var pattern = tmplRule.replaceParam(),
     patternP = /[^\s:]+([\s]?:[\s]?[^\s\(\)]+(\([^\(\)]+\))?){0,}/g,
     matchArr, matchArrP, ret, prop, i = 0;
 
@@ -125,7 +125,7 @@ function _getReplaceParam(obj, strs) {
 //Get compiled parameter
 function compiledParam(value) {
   var ret = tools.lightObj(),
-    strs = tools.isString(value) ? value.split(paramRule.replaceSplit) : [value],
+    strs = tools.isString(value) ? value.split(tmplRule.replaceSplit) : [value],
     props = null,
     isAll = false;
 
@@ -140,7 +140,7 @@ function compiledParam(value) {
       retP.prop = compiledProp(param[2], param[3]);
 
       //If parameter's open rules are several,then it need escape.
-      retP.escape = param[1].split(paramRule.openRule).length < 3;
+      retP.escape = param[1].split(tmplRule.beginRule).length < 3;
       props.push(retP);
     }, false, true);
   }

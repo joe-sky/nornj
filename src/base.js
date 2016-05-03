@@ -9,7 +9,7 @@ var nj = require('./core'),
   docReady = require('./utils/docReady');
 
 nj.setComponentEngine = setComponentEngine;
-nj.setParamRule = utils.setParamRule;
+nj.setTmplRule = utils.setTmplRule;
 nj.registerFilter = utils.registerFilter;
 nj.registerExpr= utils.registerExpr;
 nj.compileStringTmpl = compileStringTmpl;

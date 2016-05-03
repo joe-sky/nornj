@@ -20,7 +20,7 @@ describe('test compile', function () {
 
   describe('compile template to html', function () {
     xit('test compile 1', function () {
-      nj.setParamRule('{%', '%}');
+      nj.setTmplRule('{%', '%}');
 
       var data = {
         name: "joe_sky",

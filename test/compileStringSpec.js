@@ -22,7 +22,7 @@ describe('test compile string', function () {
 
   describe('compile string template to html', function () {
     it('test compile 1', function () {
-      nj.setParamRule();
+      nj.setTmplRule(null, null, '#');
 
       var data = {
         name: "<i>joe_sky1</i>",
@@ -46,9 +46,9 @@ describe('test compile string', function () {
           ['a /'],
           [
             ['input type=button /'],
-            ['$unless {test0}',
+            ['#unless {test0}',
                 ['input id="test5" /'],
-            '/$unless']
+            '/#unless']
           ],
         '/div'],
       '/div'];
@@ -65,21 +65,21 @@ describe('test compile string', function () {
       //string template by es6
       var tmpl3 = nj`
         <div name=test1 autofocus>
-          <$params>
-            <$param {'name'}>{test0:filter1 'test1':filter2 'test2'}</$param>
-            <$each {list}>
-              <$param {'data-name' .}>{.:filter1 'test1' 'test2'}</$param>
-            </$each>
-            <$param {'data-name10'}>
-              <$each {list}>
-                <$if {.}>
+          <#params>
+            <#param {'name'}>{test0:filter1 'test1':filter2 'test2'}</#param>
+            <#each {list}>
+              <#param {'data-name' .}>{.:filter1 'test1' 'test2'}</#param>
+            </#each>
+            <#param {'data-name10'}>
+              <#each {list}>
+                <#if {.}>
                   { #:filter2 }
-                <$else />
+                <#else />
                   { '100':filter1 }
-                </$if>
-              </$each>
-            </$param>
-          </$params>
+                </#if>
+              </#each>
+            </#param>
+          </#params>
           <input autofocus>
           <br></br>
           test2
@@ -92,11 +92,11 @@ describe('test compile string', function () {
             '/section']}
             <input type=button />
             ${nj`
-              <$each { list }>
+              <#each { list }>
                 <slider>
                   <{../sliderItem:tagName} checked no='{ ../sliderItem }' />
                 </slider>
-              </$each>
+              </#each>
             `}
           </span>
         </div>`;
