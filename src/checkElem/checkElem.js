@@ -4,7 +4,8 @@ var nj = require('../core'),
   tools = require('../utils/tools'),
   tranParam = require('../transforms/transformParam'),
   tranElem = require('../transforms/transformElement'),
-  checkTagElem = require('./checkTagElem');
+  checkTagElem = require('./checkTagElem'),
+  exprRule = nj.paramRule.exprRule;
 
 //检测元素节点
 function checkElem(obj, parent) {
@@ -114,7 +115,7 @@ function checkElem(obj, parent) {
           node.selfCloseTag = tranElem.verifySelfCloseTag(openTagName);
         }
       }
-      else {  //为流程控制块时判断是否有$else
+      else {  //为表达式块时判断是否有$else
         if (isTmpl) {  //模板元素
           pushContent = false;
 
@@ -128,7 +129,7 @@ function checkElem(obj, parent) {
           tranElem.addParamsExpr(node, parent);
         }
         else {
-          elseIndex = tools.inArray(obj, '$else');
+          elseIndex = tools.inArray(obj, exprRule + 'else');
         }
       }
 

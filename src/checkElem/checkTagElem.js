@@ -3,7 +3,8 @@
 var nj = require('../core'),
   tools = require('../utils/tools'),
   tranParam = require('../transforms/transformParam'),
-  tranElem = require('../transforms/transformElement');
+  tranElem = require('../transforms/transformElement'),
+  exprRule = nj.paramRule.exprRule;
 
 //检测标签元素节点
 function checkTagElem(obj, parent) {
@@ -33,7 +34,7 @@ function checkTagElem(obj, parent) {
       pushContent = true;
 
     if (isControl) {  //特殊节点
-      if (tagName !== '$else') {
+      if (tagName !== exprRule + 'else') {
         tagName = tagName.substr(1);
         node.type = 'nj_expr';
         node.expr = tagName;

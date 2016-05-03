@@ -4,7 +4,8 @@ var nj = require('../core'),
   tools = require('../utils/tools'),
   tranElem = require('../transforms/transformElement'),
   REGEX_SPLIT = /\$\{\d+\}/,
-  paramRule = nj.paramRule;
+  paramRule = nj.paramRule,
+  exprRule = paramRule.exprRule;
 
 //Cache the string template by unique key
 nj.strTmpls = {};
@@ -141,7 +142,7 @@ function _formatText(str) {
 }
 
 function _getElem(elem, elemName) {
-  if(elemName[0] === '$') {
+  if (elemName[0] === exprRule) {
     return elem.substring(1, elem.length - 1);
   }
   else {
@@ -155,7 +156,7 @@ function _getSelfCloseElem(elem, elemName, params) {
     return params[elemName.split('_')[1]];
   }
   else {
-    return elemName === '$else' ? elem.substr(1, 5) : [_getElem(elem, elemName)];
+    return elemName === exprRule + 'else' ? elem.substr(1, 5) : [_getElem(elem, elemName)];
   }
 }
 

@@ -11,7 +11,7 @@ describe('test compile html', function () {
     nj.setComponentEngine('react', React, ReactDOM);
 
     nj.registerFilter('filter1', function (v) {
-      console.log(this.useString);
+      //console.log(this.useString);
       return v * 2;
     });
     nj.registerFilter('filter2', function (v) {

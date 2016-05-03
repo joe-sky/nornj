@@ -4,7 +4,8 @@ var nj = require('../core'),
   tools = require('../utils/tools'),
   tranData = require('./transformData'),
   tranParam = require('./transformParam'),
-  paramRule = nj.paramRule;
+  paramRule = nj.paramRule,
+  exprRule = paramRule.exprRule;
 
 //提取xml open tag
 function getXmlOpenTag(obj) {
@@ -124,7 +125,7 @@ function isControl(obj) {
 
 //判断流程控制块close tag
 function isControlCloseTag(obj, tagName) {
-  return tools.isString(obj) && obj === '/$' + tagName;
+  return tools.isString(obj) && obj === '/' + exprRule + tagName;
 }
 
 //判断是否模板元素

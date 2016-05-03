@@ -24,22 +24,27 @@ function _clearRepeat(str) {
   return ret;
 }
 
-module.exports = function (openRule, closeRule) {
+module.exports = function (openRule, closeRule, exprRule) {
   if (!openRule) {
     openRule = '{';
   }
   if (!closeRule) {
     closeRule = '}';
   }
+  if (!exprRule) {
+    exprRule = '$';
+  }
 
   var allRules = _clearRepeat(openRule + closeRule),
     firstChar = openRule.charAt(0),
-    otherChars = allRules.substr(1);
+    otherChars = allRules.substr(1),
+    exprRules = _clearRepeat(exprRule);
 
   //Reset the regexs to global list
   tools.assign(nj.paramRule, {
     openRule: openRule,
     closeRule: closeRule,
+    exprRule: exprRule,
     xmlOpenTag: _createRegExp('^<([a-z' + firstChar + '][-a-z0-9_:.\/' + otherChars + ']*)[^>]*>$', 'i'),
     openTag: _createRegExp('^[a-z' + firstChar + '][-a-z0-9_:.\/' + otherChars + ']*', 'i'),
     insideBraceParam: _createRegExp(openRule + '([^' + allRules + ']+)' + closeRule, 'i'),
@@ -48,7 +53,8 @@ module.exports = function (openRule, closeRule) {
       return _createRegExp('((' + openRule + '){1,2})([^' + allRules + ']+)(' + closeRule + '){1,2}', 'g');
     },
     checkElem: function() {
-      return _createRegExp('([^>]*)(<([a-z' + firstChar + '\/$][-a-z0-9_:.' + allRules + '$]*)[^>]*>)([^<]*)', 'ig');
-    }
+      return _createRegExp('([^>]*)(<([a-z' + firstChar + '\/' + exprRules + '][-a-z0-9_:.' + allRules + exprRules + ']*)[^>]*>)([^<]*)', 'ig');
+    },
+    expr: _createRegExp('^\\' + exprRule + '([^\\s]+)', 'i')
   });
 };
