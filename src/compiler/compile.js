@@ -118,5 +118,6 @@ module.exports = {
   compileComponent: compileComponent,
   compileTagComponent: compileTagComponent,
   renderTagComponent: renderTagComponent,
-  precompile: precompile
+  precompile: precompile,
+  renderTmplExpr: compileComponent(['{tmpl}'], 'tmplExpr')
 };

@@ -667,7 +667,8 @@ module.exports = {
   compileComponent: compileComponent,
   compileTagComponent: compileTagComponent,
   renderTagComponent: renderTagComponent,
-  precompile: precompile
+  precompile: precompile,
+  renderTmplExpr: compileComponent(['{tmpl}'], 'tmplExpr')
 };
 },{"../checkElem/checkStringElem":4,"../core":10,"../utils/utils":22,"./transformToComponent":8,"./transformToString":9}],7:[function(require,module,exports){
 'use strict';
