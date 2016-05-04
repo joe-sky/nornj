@@ -654,12 +654,33 @@ function renderTagComponent(data, selector) {
   return ret;
 }
 
-//precompile template
+//Precompile template
 function precompile(obj) {
   var root = _createRoot();
   utils.checkElem(obj, root);
 
   return root;
+}
+
+//Render tmpl expression block
+var _renderTmplExpr = compileComponent(['<{container}>', '{tmpl}'], 'tmplExpr');
+function renderTmplExpr(tmpl, data, container) {
+  if (!container) {
+    container = 'div';
+  }
+
+  var extra = { tmpl: tmpl, container: container },
+    datas;
+
+  if (utils.isArray(data)) {
+    datas = data;
+    datas[datas.length] = extra;
+  }
+  else {
+    datas = [data, extra];
+  }
+
+  return _renderTmplExpr(datas);
 }
 
 module.exports = {
@@ -668,7 +689,7 @@ module.exports = {
   compileTagComponent: compileTagComponent,
   renderTagComponent: renderTagComponent,
   precompile: precompile,
-  renderTmplExpr: compileComponent(['{tmpl}'], 'tmplExpr')
+  renderTmplExpr: renderTmplExpr
 };
 },{"../checkElem/checkStringElem":4,"../core":10,"../utils/utils":22,"./transformToComponent":8,"./transformToString":9}],7:[function(require,module,exports){
 'use strict';

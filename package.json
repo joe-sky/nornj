@@ -1,6 +1,6 @@
 {
   "name": "nornj",
-  "version": "0.3.3-rc4",
+  "version": "0.3.3-rc6",
   "description": "A multipurpose javascript template engine",
   "main": "src/base.js",
   "files": [
