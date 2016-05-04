@@ -1666,9 +1666,19 @@ var nj = require('../core'),
 //Global expression list
 nj.exprs = {
   //If block
-  'if': function (refer) {
-    var ret;
-    if (!!refer) {
+  'if': function (refer, useUnless) {
+    if (refer === 'false') {
+      refer = false;
+    }
+
+    var referR, ret;
+    if(!useUnless) {
+      referR = !!refer;
+    }
+    else {
+      referR = !!!refer;
+    }
+    if (referR) {
       ret = this.result();
     }
     else {
@@ -1684,7 +1694,7 @@ nj.exprs = {
 
   //Unless block
   unless: function (refer) {
-    return nj.exprs['if'].call(this, !refer);
+    return nj.exprs['if'].call(this, refer, true);
   },
 
   //Each block
@@ -1771,6 +1781,19 @@ nj.exprs = {
     tools.each(refer, function (v, k) {
       thiz.paramsExpr[k] = v;
     }, false, false);
+  },
+
+  //Equal block
+  equal: function (value1, value2) {
+    var ret;
+    if (value1 == value2) {
+      ret = this.result();
+    }
+    else {
+      ret = this.inverse();
+    }
+
+    return ret;
   }
 };
 

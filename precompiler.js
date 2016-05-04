@@ -15,18 +15,17 @@ module.exports = function (param) {
     sources = [param.source];
   }
 
-  var extension = param.extension;
-  if (!extension) {
-    extension = '.nj.js';
-  }
-
-  var esVersion = param.esVersion;
-  if (!esVersion) {
-    esVersion = 'es6';
-  }
+  var extension = param.extension || '.nj.js',
+    esVersion = param.esVersion || 'es6',
+    beginRule = param.beginRule || '{',
+    endRule = param.endRule || '}',
+    exprRule = param.exprRule || '$';
 
   //Clear the cache of string template
   nj.strTmpls = {};
+
+  //Set template rules
+  nj.setTmplRule(beginRule, endRule, exprRule);
 
   var needTransformFiles = [];
   sources.forEach(function (source) {
