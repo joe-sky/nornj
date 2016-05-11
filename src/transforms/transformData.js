@@ -171,11 +171,10 @@ function getDataValue(data, propObj, parent, defaultEmpty, useString) {
     tools.each(datas, function (obj) {
       if (obj) {
         ret = obj[prop];
-
-        //Use filters
-        ret = _useFilters(filters, ret, datas, dataP, index, useString);
-
         if (ret != null) {
+          //Use filters
+          ret = _useFilters(filters, ret, datas, dataP, index, useString);
+
           return false;
         }
       }
