@@ -20,7 +20,7 @@ function registerComponent(name, component) {
 
 //注册组件标签命名空间
 function registerTagNamespace(name) {
-  nj.tagNamespace = name;
+  nj.namespace = name;
   createTagNamespace();
 
   //修改标签组件id及类名
@@ -30,14 +30,19 @@ function registerTagNamespace(name) {
 }
 
 //创建标签命名空间
-function createTagNamespace() {
+function createTagNamespace(name) {
+  if (!name) {
+    name = 'nj';
+  }
+  nj.tagNamespaces[name] = true;
+
   if (typeof document === 'undefined') {
     return;
   }
 
   var doc = document;
   if (doc && doc.namespaces) {
-    doc.namespaces.add(nj.tagNamespace, 'urn:schemas-microsoft-com:vml', '#default#VML');
+    doc.namespaces.add(name, 'urn:schemas-microsoft-com:vml', '#default#VML');
   }
 }
 
