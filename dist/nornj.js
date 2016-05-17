@@ -1407,18 +1407,9 @@ function getTagComponentAttrs(el) {
       if (attrName === 'style') {  //style属性使用cssText
         val = el.style.cssText;
       }
-      else if (attrName.indexOf('data-') !== 0) {  //Transform to camel-case
-        var notTagNamespace = true;
-        tools.each(nj.tagNamespaces, function (tagNamespace) {
-          if (attrName.indexOf(tagNamespace + '-') === 0) {
-            notTagNamespace = false;
-            return false;
-          }
-        }, false, false, true);
-
-        if(notTagNamespace) {
-          attrName = tools.toCamelCase(attrName);
-        }
+      else if (attrName.indexOf('data-') !== 0  //Transform to camel-case
+        && attrName.indexOf(nj.namespace + '-') !== 0) {
+        attrName = tools.toCamelCase(attrName);
       }
 
       tranData.setObjParam(ret, attrName, val, true);
