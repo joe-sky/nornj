@@ -19,9 +19,8 @@ function registerComponent(name, component) {
 }
 
 //注册组件标签命名空间
-function registerTagNamespace(name) {
+function setNamespace(name) {
   nj.namespace = name;
-  createTagNamespace();
 
   //修改标签组件id及类名
   nj.tagId = name + '-id';
@@ -30,11 +29,11 @@ function registerTagNamespace(name) {
 }
 
 //创建标签命名空间
-function createTagNamespace(name) {
+function registerTagNamespace(name) {
   if (!name) {
     name = 'nj';
   }
-  nj.tagNamespaces[name] = true;
+  nj.tagNamespaces[name] = name;
 
   if (typeof document === 'undefined') {
     return;
@@ -48,6 +47,6 @@ function createTagNamespace(name) {
 
 module.exports = {
   registerComponent: registerComponent,
-  registerTagNamespace: registerTagNamespace,
-  createTagNamespace: createTagNamespace
+  setNamespace: setNamespace,
+  registerTagNamespace: registerTagNamespace
 };

@@ -59,7 +59,7 @@ nj.docReady = docReady;
 utils.assign(nj, compiler, registerComponent);
 
 //Create vml tag namespace(primarily for IE8)
-utils.createTagNamespace();
+utils.registerTagNamespace();
 
 //Default use React as component engine
 if (typeof React !== 'undefined') {
@@ -936,7 +936,8 @@ nj.componentLibDom = null;
 nj.componentPort = null;
 nj.componentRender = null;
 nj.componentClasses = {};
-nj.tagNamespace = 'nj';
+nj.namespace = 'nj';
+nj.tagNamespaces = { nj: 'nj' };
 nj.tagId = 'nj-id';
 nj.tagStyle = 'nj-style';
 nj.tagClassName = 'nj-component';
@@ -1375,15 +1376,17 @@ function addParamsExpr(node, parent) {
 
 //获取标签组件名
 function getTagComponentName(el) {
-  var namespace = nj.tagNamespace,
-    tagName = el.tagName.toLowerCase();
-
-  if (tagName.indexOf(namespace + ':') === 0) {
-    tagName = tagName.split(':')[1];
-  }
-  else if (tagName.indexOf(namespace + '-') === 0) {
-    tagName = tagName.split('-')[1];
-  }
+  var tagName = el.tagName.toLowerCase();
+  tools.each(nj.tagNamespaces, function (tagNamespace) {
+    if (tagName.indexOf(tagNamespace + ':') === 0) {
+      tagName = tagName.split(':')[1];
+      return false;
+    }
+    else if (tagName.indexOf(tagNamespace + '-') === 0) {
+      tagName = tagName.split('-')[1];
+      return false;
+    }
+  }, false, false, true);
 
   return tagName;
 }
@@ -1404,9 +1407,18 @@ function getTagComponentAttrs(el) {
       if (attrName === 'style') {  //style属性使用cssText
         val = el.style.cssText;
       }
-      else if (attrName.indexOf('data-') !== 0  //Transform to camel-case
-        && attrName.indexOf(nj.tagNamespace + '-') !== 0) {
-        attrName = tools.toCamelCase(attrName);
+      else if (attrName.indexOf('data-') !== 0) {  //Transform to camel-case
+        var notTagNamespace = true;
+        tools.each(nj.tagNamespaces, function (tagNamespace) {
+          if (attrName.indexOf(tagNamespace + '-') === 0) {
+            notTagNamespace = false;
+            return false;
+          }
+        }, false, false, true);
+
+        if(notTagNamespace) {
+          attrName = tools.toCamelCase(attrName);
+        }
       }
 
       tranData.setObjParam(ret, attrName, val, true);
@@ -1884,9 +1896,8 @@ function registerComponent(name, component) {
 }
 
 //注册组件标签命名空间
-function registerTagNamespace(name) {
-  nj.tagNamespace = name;
-  createTagNamespace();
+function setNamespace(name) {
+  nj.namespace = name;
 
   //修改标签组件id及类名
   nj.tagId = name + '-id';
@@ -1895,21 +1906,26 @@ function registerTagNamespace(name) {
 }
 
 //创建标签命名空间
-function createTagNamespace() {
+function registerTagNamespace(name) {
+  if (!name) {
+    name = 'nj';
+  }
+  nj.tagNamespaces[name] = name;
+
   if (typeof document === 'undefined') {
     return;
   }
 
   var doc = document;
   if (doc && doc.namespaces) {
-    doc.namespaces.add(nj.tagNamespace, 'urn:schemas-microsoft-com:vml', '#default#VML');
+    doc.namespaces.add(name, 'urn:schemas-microsoft-com:vml', '#default#VML');
   }
 }
 
 module.exports = {
   registerComponent: registerComponent,
-  registerTagNamespace: registerTagNamespace,
-  createTagNamespace: createTagNamespace
+  setNamespace: setNamespace,
+  registerTagNamespace: registerTagNamespace
 };
 },{"../core":10,"./tools":21}],19:[function(require,module,exports){
 'use strict';

@@ -17,7 +17,7 @@ nj.docReady = docReady;
 utils.assign(nj, compiler, registerComponent);
 
 //Create vml tag namespace(primarily for IE8)
-utils.createTagNamespace();
+utils.registerTagNamespace();
 
 //Default use React as component engine
 if (typeof React !== 'undefined') {

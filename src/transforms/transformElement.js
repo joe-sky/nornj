@@ -159,15 +159,17 @@ function addParamsExpr(node, parent) {
 
 //获取标签组件名
 function getTagComponentName(el) {
-  var namespace = nj.tagNamespace,
-    tagName = el.tagName.toLowerCase();
-
-  if (tagName.indexOf(namespace + ':') === 0) {
-    tagName = tagName.split(':')[1];
-  }
-  else if (tagName.indexOf(namespace + '-') === 0) {
-    tagName = tagName.split('-')[1];
-  }
+  var tagName = el.tagName.toLowerCase();
+  tools.each(nj.tagNamespaces, function (tagNamespace) {
+    if (tagName.indexOf(tagNamespace + ':') === 0) {
+      tagName = tagName.split(':')[1];
+      return false;
+    }
+    else if (tagName.indexOf(tagNamespace + '-') === 0) {
+      tagName = tagName.split('-')[1];
+      return false;
+    }
+  }, false, false, true);
 
   return tagName;
 }
@@ -188,9 +190,18 @@ function getTagComponentAttrs(el) {
       if (attrName === 'style') {  //style属性使用cssText
         val = el.style.cssText;
       }
-      else if (attrName.indexOf('data-') !== 0  //Transform to camel-case
-        && attrName.indexOf(nj.tagNamespace + '-') !== 0) {
-        attrName = tools.toCamelCase(attrName);
+      else if (attrName.indexOf('data-') !== 0) {  //Transform to camel-case
+        var notTagNamespace = true;
+        tools.each(nj.tagNamespaces, function (tagNamespace) {
+          if (attrName.indexOf(tagNamespace + '-') === 0) {
+            notTagNamespace = false;
+            return false;
+          }
+        }, false, false, true);
+
+        if(notTagNamespace) {
+          attrName = tools.toCamelCase(attrName);
+        }
       }
 
       tranData.setObjParam(ret, attrName, val, true);
