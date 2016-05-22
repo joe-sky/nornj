@@ -24,11 +24,8 @@ if (typeof React !== 'undefined') {
   setComponentEngine('react', React, typeof ReactDOM !== 'undefined' ? ReactDOM : null);
 }
 
-var inBrowser = typeof self !== 'undefined',
-  global = inBrowser ? self : this;
-
 //Init tag template
-if (inBrowser) {
+if (typeof self !== 'undefined') {
   docReady(function () {
     if (nj.componentLib && nj.autoRenderTag) {
       nj.renderTagComponent(nj.initTagData);
@@ -36,4 +33,4 @@ if (inBrowser) {
   });
 }
 
-module.exports = global.NornJ = global.nj = nj;
+module.exports = nj;

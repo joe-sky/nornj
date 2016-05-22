@@ -1,4 +1,4 @@
-(function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.NornJ = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+(function(_g) {(function(f) {if (typeof exports === 'object' && typeof module !== 'undefined') { module.exports = f() } else if (typeof define === 'function' && define.amd) { define([], f.bind(_g)) } else { f() } })(function(define, module,exports) { var _m = (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 /* eslint-disable no-unused-vars */
 'use strict';
 var hasOwnProperty = Object.prototype.hasOwnProperty;
@@ -66,11 +66,8 @@ if (typeof React !== 'undefined') {
   setComponentEngine('react', React, typeof ReactDOM !== 'undefined' ? ReactDOM : null);
 }
 
-var inBrowser = typeof self !== 'undefined',
-  global = inBrowser ? self : this;
-
 //Init tag template
-if (inBrowser) {
+if (typeof self !== 'undefined') {
   docReady(function () {
     if (nj.componentLib && nj.autoRenderTag) {
       nj.renderTagComponent(nj.initTagData);
@@ -78,7 +75,7 @@ if (inBrowser) {
   });
 }
 
-module.exports = global.NornJ = global.nj = nj;
+module.exports = nj;
 },{"./checkElem/checkStringElem":4,"./compiler/compile":6,"./core":10,"./utils/docReady":14,"./utils/registerComponent":18,"./utils/utils":22}],3:[function(require,module,exports){
 'use strict';
 
@@ -2243,5 +2240,5 @@ module.exports = tools.assign(
   transformParam,
   transformData
 );
-},{"../checkElem/checkElem":3,"../transforms/transformData":11,"../transforms/transformElement":12,"../transforms/transformParam":13,"./escape":15,"./expression":16,"./filter":17,"./registerComponent":18,"./setComponentEngine":19,"./setTmplRule":20,"./tools":21}]},{},[2])(2)
-});
+},{"../checkElem/checkElem":3,"../transforms/transformData":11,"../transforms/transformElement":12,"../transforms/transformParam":13,"./escape":15,"./expression":16,"./filter":17,"./registerComponent":18,"./setComponentEngine":19,"./setTmplRule":20,"./tools":21}]},{},[2]);
+var _r = _m(2);_g.nj = _g.NornJ = _r;return _r;})})(typeof window!=='undefined' ? window : (typeof global!=='undefined' ? global : (typeof self!=='undefined' ? self : this)));

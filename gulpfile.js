@@ -1,5 +1,6 @@
 ﻿var gulp = require('gulp'),
   browserify = require('browserify'),
+  standalonify = require('standalonify'),
   uglify = require('gulp-uglify'),
   source = require('vinyl-source-stream'),
   buffer = require('vinyl-buffer'),
@@ -18,8 +19,11 @@ gulp.task('build', function () {
 
   return browserify({
     entries: './src/base.js',
-    standalone: 'NornJ'
+    //standalone: 'NornJ'
   })
+    .plugin(standalonify, {  //Build UMD standalone bundle and support dependencies.
+      name: ['nj', 'NornJ']
+    })
     .bundle()
     .pipe(source(libName))
     .pipe(buffer())
