@@ -192,6 +192,11 @@ function getTagComponentAttrs(el) {
       }
       else if (attrName.indexOf('data-') !== 0  //Transform to camel-case
         && attrName.indexOf(nj.namespace + '-') !== 0) {
+        //Can be marked with an exclamation mark to distinguish the attribute name beginning with "data-".
+        if(attrName.indexOf('!') === 0) {
+          attrName = attrName.substr(1);
+        }
+
         attrName = tools.toCamelCase(attrName);
       }
 
