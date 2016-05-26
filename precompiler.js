@@ -67,7 +67,16 @@ module.exports = function (param) {
       }
 
       //Precompiling template
-      preTmpl += JSON.stringify(precompile(tmpl)) + ';';
+      if (Array.isArray(tmpl)) {
+        preTmpl += JSON.stringify(precompile(tmpl)) + ';';
+      }
+      else {  //Export multiple templates
+        var tmpls = '';
+        nj.each(tmpl, function(v, k) {
+          tmpls += ', ' + k + ': ' + JSON.stringify(precompile(v));
+        });
+        preTmpl += '{ ' + tmpls.substr(2) + ' };';
+      }
     }
 
     fs.writeFile(newName, preTmpl, function (err) {
