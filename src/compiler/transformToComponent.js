@@ -29,8 +29,10 @@ function transformToComponent(obj, data, parent, paramsExpr) {
     //Create expression's context object and set parameters
     var thisObj = utils.lightObj();
     thisObj.data = data;
-    thisObj.parent = parent.parent;
-    thisObj.index = parent.index;
+    if (parent) {
+      thisObj.parent = parent.parent;
+      thisObj.index = parent.index;
+    }
     thisObj.useString = false;
     thisObj.paramsExpr = paramsExpr;
     thisObj.result = function (param) {

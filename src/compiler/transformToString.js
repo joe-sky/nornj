@@ -26,8 +26,10 @@ function transformToString(obj, data, parent, paramsExpr) {
     //Create expression's context object and set parameters
     var thisObj = utils.lightObj();
     thisObj.data = data;
-    thisObj.parent = parent.parent;
-    thisObj.index = parent.index;
+    if (parent) {
+      thisObj.parent = parent.parent;
+      thisObj.index = parent.index;
+    }
     thisObj.useString = true;
     thisObj.paramsExpr = paramsExpr;
     thisObj.result = function (param) {
