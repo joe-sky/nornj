@@ -13,7 +13,7 @@
 //Build js
 gulp.task('build', function () {
   var libName = 'nornj.js';
-  if (argv.min) {
+  if (argv.p) {
     libName = 'nornj.min.js';
   }
 
@@ -27,7 +27,7 @@ gulp.task('build', function () {
     .bundle()
     .pipe(source(libName))
     .pipe(buffer())
-    .pipe(gulpif(argv.min, uglify()))
+    .pipe(gulpif(argv.p, uglify()))
     .pipe(gulp.dest('./dist'));
 });
 

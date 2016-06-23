@@ -148,6 +148,7 @@ function getDataValue(data, propObj, parent, defaultEmpty, useString) {
       var _parent = parent.parent;
       tools.throwIf(_parent, errorTitle + 'Parent data is undefined, please check the param path declare.');
       parent = _parent;
+      index = parent.index;
       datas = [parent.data];
     }
   }

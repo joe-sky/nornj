@@ -724,7 +724,7 @@ module.exports = function (transformNode, useString) {
     utils.each(content, function (obj) {
       var retN = transformNode(obj, data, parent, paramsExpr);
       if (!useString) {
-        ret = utils.listPush(ret, retN, true, true);
+        utils.listPush(ret, retN, true, true);
       }
       else {
         ret += retN;
@@ -1107,6 +1107,7 @@ function getDataValue(data, propObj, parent, defaultEmpty, useString) {
       var _parent = parent.parent;
       tools.throwIf(_parent, errorTitle + 'Parent data is undefined, please check the param path declare.');
       parent = _parent;
+      index = parent.index;
       datas = [parent.data];
     }
   }
@@ -1738,7 +1739,7 @@ nj.exprs = {
           ret += retI;
         }
         else {
-          ret = tools.listPush(ret, retI, true);
+          tools.listPush(ret, retI, true);
         }
       }, false, tools.isArray(refer));
 
@@ -2036,18 +2037,12 @@ var nj = require('../core'),
 
 //Push one by one to array
 function listPush(arr1, arr2, checkIsArr, checkNotNull) {
-  if (checkIsArr) {
-    if (isArray(arr2)) {
-      if (!arr1.length) {  //If the first array is empty, return the second array directly.
-        return arr2;
-      }
+  if (checkIsArr && !isArray(arr2)) {
+    //Put the value at the end of the first array only when the second parameter is not null.
+    if (!checkNotNull || arr2 != null) {
+      arr1[arr1.length] = arr2;
     }
-    else {  //Put the value at the end of the first array only when the second parameter is not null.
-      if (!checkNotNull || arr2 != null) {
-        arr1[arr1.length] = arr2;
-      }
-      return arr1;
-    }
+    return arr1;
   }
 
   arrayPush.apply(arr1, arr2);
