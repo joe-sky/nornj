@@ -30,7 +30,21 @@ describe('test compile string', function () {
         test0: false,
         list: [0, 1, 2],
         c1: 100,
-        sliderItem: 'sliderItem'
+        sliderItem: {
+          a: 'sliderItem',
+          b: 'sliderItem1'
+        },
+        a: {
+          b: '__abc',
+          c: {
+            d: 'bcd'
+          },
+          e: {
+            f: {
+              g: 'efg'
+            }
+          }
+        }
       };
 
       //normal template
@@ -64,7 +78,7 @@ describe('test compile string', function () {
 
       //string template by es6
       var tmpl3 = nj`
-        <div name=test1 autofocus>
+        <div name=test1 autofocus name1={a.c.d} name2={a.e:prop(f).g}>
           <#params>
             <#param {'name'}>{test0:filter1 'test1':filter2 'test2'}</#param>
             <#each {list}>
@@ -94,7 +108,7 @@ describe('test compile string', function () {
             ${nj`
               <#each { list }>
                 <slider>
-                  <{../sliderItem:tagName} checked no='{ ../sliderItem }' />
+                  <{../sliderItem.a:tagName} checked no='{ ../sliderItem.b }' />
                 </slider>
               </#each>
             `}

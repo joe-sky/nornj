@@ -8,6 +8,8 @@
   ReactDOMServer = require('react-dom/server');
 
 describe('test speed', function () {
+  nj.setTmplRule(null, null, '$');
+
   var tmpl = nj`
   <div>
     <$each {arr}>
@@ -73,7 +75,7 @@ describe('test speed', function () {
     expect(html).toBeTruthy();
   });
 
-  it('test render to component', function () {
+  xit('test render to component', function () {
     var start;
 
     var TestComponent1 = React.createClass({

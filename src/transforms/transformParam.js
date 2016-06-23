@@ -18,6 +18,11 @@ function compiledParams(obj) {
 function compiledProp(prop, isString) {
   var ret = tools.lightObj();
 
+  //Extract the dot data path to the 'prop' filter.
+  if (!isString && prop.indexOf('.') > -1) {
+    prop = prop.replace(/\.([^\s.:\/]+)/g, ':prop($1)');
+  }
+
   //If there are colons in the property,then use filter
   if (prop.indexOf(':') >= 0) {
     var filters = [],
@@ -81,7 +86,7 @@ function _getFilterParam(obj) {
 var _quots = ['\'', '"'];
 function _getReplaceParam(obj, strs) {
   var pattern = tmplRule.replaceParam(),
-    patternP = /[^\s:]+([\s]?:[\s]?[^\s\(\)]+(\([^\(\)]+\))?){0,}/g,
+    patternP = /[^\s:]+([\s]?:[\s]?[^\s\(\)]+(\([^\(\)]+\))?(\.[^\s.]+)?){0,}/g,
     matchArr, matchArrP, ret, prop, i = 0;
 
   while ((matchArr = pattern.exec(obj))) {
