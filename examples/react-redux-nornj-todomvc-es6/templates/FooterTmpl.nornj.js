@@ -3,18 +3,18 @@
 export default nj`
 <p>
   ${['Show: ']}
-  <$each {filters}>
-    <$if {filter:isCurrent}>
+  <#each {filters}>
+    <#if {filter:isCurrent}>
       {name}
-    <$else />
+    <#else />
       <Linkto to=/{filter:todoState}>
         {name}
       </Linkto>
-    </$if>
-    <$if {name:equal(Active)}>
+    </#if>
+    <#if {name:equal(Active)}>
       .
-    <$else />
+    <#else />
       ${[', ']}
-    </$if>
-  </$each>
+    </#if>
+  </#each>
 </p>`;

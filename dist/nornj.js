@@ -1998,7 +1998,7 @@ module.exports = function (beginRule, endRule, exprRule) {
     endRule = '}';
   }
   if (!exprRule) {
-    exprRule = '$';
+    exprRule = '#';
   }
 
   var allRules = _clearRepeat(beginRule + endRule),

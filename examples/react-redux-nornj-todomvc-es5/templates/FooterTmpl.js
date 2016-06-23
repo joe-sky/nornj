@@ -1,18 +1,19 @@
-﻿var FooterTmpl =
-['p',
-  'Show: ',
-  ['$each {filters}',
-    ['$if {filter:isCurrent}',
-      '{name}',
-    '$else',
-      ['Link to=/{filter:todoState}',
-        '{name}',
-      '/Link'],
-    '/$if'],
-    ['$if {name:equal(Active)}',
-      '.',
-    '$else',
-      ', ',
-    '/$if'],
-  '/$each'],
-'/p'];
+﻿var FooterTmpl = nj('\
+<p>\
+  ${0}\
+  <$each {filters}>\
+    <$if {filter:isCurrent}>\
+      {name}\
+    <$else />\
+      <Linkto to=/{filter:todoState}>\
+        {name}\
+      </Linkto>\
+    </$if>\
+    <$if {name:equal(Active)}>\
+      .\
+    <$else />\
+      ${1}\
+    </$if>\
+  </$each>\
+</p>\
+', ['Show: '], [', ']);

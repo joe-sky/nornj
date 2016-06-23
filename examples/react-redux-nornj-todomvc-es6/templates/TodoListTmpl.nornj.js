@@ -2,7 +2,7 @@
 
 export default nj`
 <ul>
-  <$each {todos}>
+  <#each {todos}>
     <Todo text={text} completed={completed} key={#} index={#} onClick={todoClick} />
-  </$each>
+  </#each>
 </ul>`;

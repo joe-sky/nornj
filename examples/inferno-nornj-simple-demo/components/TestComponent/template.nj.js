@@ -2,13 +2,13 @@
 
 export default nj`
 <div>
-  <$params>
-    <$spreadParam {params} />
-  </$params>
+  <#params>
+    <#spreadParam {params} />
+  </#params>
   test{no}
   <br />
-  <$each {list}>
+  <#each {list}>
     <i key=i_{#}>list{.} + {counter}</i>
-  </$each>
+  </#each>
 </div>
 `;
