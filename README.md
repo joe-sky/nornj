@@ -1,15 +1,7 @@
 # NornJ
-一款轻量级且多用途的javascript模板引擎
+一款轻量级且多用途的javascript模板引擎，可输出字符串也可配合React等组件框架使用
 
-这款js模板的通常构建方式不是使用传统的字符串，而是使用javascript原生的数组构成，就像这样：
-```js
-var tmpl =
-['div',
-    'this the test demo {msg}',
-    ['input onclick={click} id=test /'],
-'/div'];
-```
-除了这种方式外，模板还可以使用es6(es2015)提供的模板字符串来构建：
+###模板基本示例
 ```js
 var tmpl = nj`
 <div>
@@ -17,65 +9,58 @@ var tmpl = nj`
     <input id=test onclick={click} />
 </div>`;
 ```
-当然，也可以支持在es5环境下使用普通的字符串：
-```html
-<script id="template" type="text/nornj">
-    <div>
-        this the test demo Hello {msg}
-        <input id=test onclick={click} />
-    </div>
-</script>
-<script type="text/javascript">
-    var tmpl = document.querySelector('#template').innerHTML;
-</script>
-```
-然后可以这样编译后输出html字符串：
-```js
-var html = nj.compile(tmpl)({
-    msg: 'Hello world!',
-    click: "alert('test')"
-});
 
-console.log(html);
-/*输出：
-<div>
-    this the test demo Hello world!
-    <input id='test' onclick="alert('test')" />
+### 用途
+传统js模板引擎如`Handlebars`、`Jade`等通常只支持输出html字符串，`NornJ`与它们相比，相同点和不同点都有：
+
+* 支持`React`、`Inferno`等组件框架，可作为JSX的替代模板语言；可支持模板预编译，也可以直接在浏览器中运行。
+* 支持处理数据并输出html字符串，故它也可以像传统js模板一样支持`Backbone`或`Express`等。
+* 它是弱逻辑的模板引擎，语法和`Handlebars`更类似一些，但也有自己独特的地方。
+
+###与React配合示例
+NornJ可以替代JSX输出React组件，用它可以将React组件的逻辑与结构更优雅地实现解藕：
+```js
+/* tmpl.js */
+import nj from 'nornj';
+
+export default nj`
+<div id=test1>
+  this the test demo{no}.
+  <#for {'1' no}>
+    <i>test{#}</i>
+  </#for>
 </div>
-*/
-```
+`;
 
-也可以替代JSX输出React组件：
-```js
-import nj, {
+/* comp.js */
+import {
   compileComponent,
   registerComponent
 } from 'nornj';
 import { Component } from 'react';
 import { render } from 'react-dom';
-
-const template = compileComponent(nj`
-<div id=test1>
-    this the test demo{no}.
-    <i>test{no}</i>
-</div>`);
+const template = compileComponent('./tmpl');
 
 class TestComponent extends Component {
-    render() {
-        return template(this.props);
-    }
+  render() {
+    return template(this.props);
+  }
 }
 
 registerComponent({ TestComponent });
 
 render(compileComponent(
-   nj`<TestComponent no=100 />`
+  nj`<TestComponent no=100 />`
 )(), document.body);
 
 /* output:
 <div id="test1">
-    this the test demo100.
-    <i>test100</i>
+  this the test demo100.
+  <i>test0</i>
+  <i>test1</i>
+  <i>test2</i>
+  ...
+  <i>test99</i>
 </div>
 */
 ```
@@ -84,15 +69,38 @@ render(compileComponent(
 ```html
 ...
 <body>
-    <nj-TestComponent class="nj-component" no="100" />
+  <nj-TestComponent class="nj-component" no="100" />
 </body>
 ```
 
-### 用途
+###在ES5环境下使用
+除了使用ES6模板字符串外，NornJ也可以支持在es5环境下使用普通的字符串：
+```html
+<script id="template" type="text/nornj">
+  <div>
+    this the test demo Hello {msg}
+    <input id=test onclick={click} />
+  </div>
+</script>
+<script type="text/javascript">
+  var tmpl = document.querySelector('#template').innerHTML;
+</script>
+```
+然后可以这样编译后输出html字符串：
+```js
+var html = nj.compile(tmpl)({
+  msg: 'Hello world!',
+  click: "alert('test')"
+});
 
-* 它可以作为Backbone.js等传统MVC框架的模板引擎，职责是接受数据输出html字符串;
-* 它也可以支持React.js，作为JSX的替代模板语言，并且使用它开发的React程序无需编译转换也可运行在浏览器环境中;
-* 由于它可以输出html字符串，所以也可以作为node.js服务器框架Express.js的模板引擎。
+console.log(html);
+/*输出：
+<div>
+  this the test demo Hello world!
+  <input id='test' onclick="alert('test')" />
+</div>
+*/
+```
 
 ### 安装
 
