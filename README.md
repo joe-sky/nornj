@@ -1,5 +1,5 @@
 # NornJ
-一款基于ES6模板字符串的javascript模板引擎
+一款轻量级且多用途的javascript模板引擎，可输出字符串也可配合React等组件框架使用
 
 ###模板基本示例
 ```js
@@ -29,7 +29,7 @@ export default nj`
   <#for {'1' no}>
     <i>test{#}</i>
   </#for>
-</div>`);
+</div>
 `;
 
 /* comp.js */
