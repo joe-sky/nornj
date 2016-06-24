@@ -75,11 +75,16 @@ function _getStyleParams(obj) {
     matchArr, ret;
 
   while ((matchArr = pattern.exec(obj))) {
-    var key = matchArr[1].toLowerCase(),
+    var key = matchArr[1],
       value = matchArr[2];
 
     if (!ret) {
       ret = {};
+    }
+
+    //Convert to lowercase when style name is all capital.
+    if(/^[A-Z-]+$/.test(key)) {
+      key = key.toLowerCase();
     }
 
     //将连字符转为驼峰命名
