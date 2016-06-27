@@ -89,13 +89,13 @@ nj`<{element}>this is content</{element}>`
 
 * 替换参数内可放入字符串：
 ```js
-nj`<div>{{'content'}}</div>`
+nj`<div>{'content'}</div>`
 ```
 放入字符串语法为使用引号包裹，例中执行模板函数时会直接输出"content"。
 
 * 替换参数内也可放入多个值：
 ```js
-nj`<div>{{content 'content'}}</div>`
+nj`<div>{content 'content'}</div>`
 
 let data = {
   content: 'test'
@@ -107,58 +107,53 @@ let data = {
 
 * 在替换参数中可以定义过滤器，来对数据进行一些定制化操作。语法为"{替换参数:过滤器1:过滤器2...}"，如使用多个过滤器则会按顺序依次执行，如下所示：
 ```js
-nj.registerFilter("format", function(obj) {
-    return obj + 1;
-});
+nj.registerFilter('format', obj => obj + 1);
 
-['div',
-    '{list:count}',        //获取总数
-    '{list:count:format}', //先获取总数,然后格式化
-'/div']
+nj`
+<div>
+  {list:count}        //获取总数
+  {list:count:format} //先获取总数,然后格式化
+</div>`
 ```
 
 * 也可以一次定义多个过滤器：
 ```js
 nj.registerFilter({
-    format: function(obj) {
-        return obj.trim();
-    },
-    replace: function(obj) {
-        return obj.replace(/id/g, "test1");
-    }
+    format: obj => obj.trim(),
+    replace: obj => obj.replace(/id/g, 'test1')
 });
 ```
 
 * 过滤器也可以添加参数，语法为"{替换参数:过滤器1(参数1,参数2...):过滤器2(参数1,参数2...)...}"。在过滤器方法中第一个参数是当前传入的数据；从第二个参数开始依次为这些模板中传入的参数，如下所示：
 ```js
-nj.registerFilter("test", function(obj, p1, p2) {
+nj.registerFilter('test', (obj, p1, p2) => {
     console.log(obj);  //输出test
     console.log(p1);   //输出1
     console.log(p2);   //输出2
     return obj;
 });
 
-nj.compile(['div',
-    '{data:test(1, 2)}',
-'/div'])({
-    data: 'test'
-});
+nj.compile(nj`
+<div>
+  {data:test(1, 2)}
+/div>
+`)({ data: 'test'});
 ```
 
 * 在过滤器方法内，可以通过this.x的方式获取一些参数，如下所示：
 ```js
-nj.registerFilter("test", function(obj) {
+nj.registerFilter('test', function(obj) {
     console.log(this.data);    //输出1
     console.log(this.parent.data);  //输出{ list: [1] }
     console.log(this.index);   //输出0
     return obj;
 });
 
-nj.compile(['each {list}',
-    '{#:test}',
-'/each'])({
-    list: [1]
-});
+nj.compile(nj`
+<each {list}>
+  {#:test}
+</each>
+`)({ list: [1] });
 ```
 
 * 如替换参数内有多个参数，则可为每个参数都设置各自的过滤器，如下所示：
