@@ -13,11 +13,11 @@
 举例：
 ```js
 //定义模板
-var tmpl =
-['div id=test1',
-    'this the test demo{no}.'
-    ['<i>', 'test{no}'],
-'/div'];
+var tmpl = nj`
+<div id=test1>
+  this the test demo{no}.
+  <i>test{no}</i>
+</div>`
 
 //编译为组件模板函数
 var tmplFn = nj.compileComponent(tmpl, 'tmpl1');
@@ -35,10 +35,10 @@ var React = require("react"),
 
 //定义模板
 var tmpl =
-['div id=test1',
-    'this the test demo{no}.'
-    ['<i>', 'test{no}'],
-'/div'];
+'<div id=test1>\
+  this the test demo{no}.\
+  <i>test{no}</i>\
+</div>'
 
 //注册NornJ模板组件
 nj.registerComponent('TestComponent', React.createClass({
@@ -115,11 +115,11 @@ console.log(html);
 2. 模板函数的参数也可以传入1个任意长度的数组，如下所示：
 ```js
 //定义模板
-var tmpl =
-['div id=test1',
-    'this the test demo{no}.'
-    ['<i>', 'test{no2}'],
-'/div'];
+var tmpl = nj`
+<div id=test1>
+  this the test demo{no}.
+  <i>test{no2}</i>
+</div>`
 
 //编译为模板函数
 var tmplFn = nj.compile(tmpl, 'tmpl1');
