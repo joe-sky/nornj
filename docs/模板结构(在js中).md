@@ -21,6 +21,8 @@ NornJ模板可以在js或html中构建，分别有不同的用途：
 #### 在ES6环境下构建模板
 NornJ模板的结构与html非常相似，基本示例如下：
 ```js
+import nj from nornj;
+
 nj`   <!--模板字符串前须要加nj标签函数-->
 <slider>
   this the test slider {msg}.
@@ -119,18 +121,18 @@ nj`
 * 也可以一次定义多个过滤器：
 ```js
 nj.registerFilter({
-    format: obj => obj.trim(),
-    replace: obj => obj.replace(/id/g, 'test1')
+  format: obj => obj.trim(),
+  replace: obj => obj.replace(/id/g, 'test1')
 });
 ```
 
 * 过滤器也可以添加参数，语法为"{替换参数:过滤器1(参数1,参数2...):过滤器2(参数1,参数2...)...}"。在过滤器方法中第一个参数是当前传入的数据；从第二个参数开始依次为这些模板中传入的参数，如下所示：
 ```js
 nj.registerFilter('test', (obj, p1, p2) => {
-    console.log(obj);  //输出test
-    console.log(p1);   //输出1
-    console.log(p2);   //输出2
-    return obj;
+  console.log(obj);  //输出test
+  console.log(p1);   //输出1
+  console.log(p2);   //输出2
+  return obj;
 });
 
 nj.compile(nj`
@@ -143,16 +145,16 @@ nj.compile(nj`
 * 在过滤器方法内，可以通过this.x的方式获取一些参数，如下所示：
 ```js
 nj.registerFilter('test', function(obj) {
-    console.log(this.data);    //输出1
-    console.log(this.parent.data);  //输出{ list: [1] }
-    console.log(this.index);   //输出0
-    return obj;
+  console.log(this.data);    //输出1
+  console.log(this.parent.data);  //输出{ list: [1] }
+  console.log(this.index);   //输出0
+  return obj;
 });
 
 nj.compile(nj`
-<each {list}>
+<#each {list}>
   {#:test}
-</each>
+</#each>
 `)({ list: [1] });
 ```
 
@@ -176,34 +178,37 @@ NornJ模板中可使用内置表达式块来进行if、unless、each等流程控
 
 * 表达式块语法
 
-在模板中表达式块使用封闭的节点元素形式定义，节点名称为`$`+`表达式块名称`。在表达式块节点开始标签内可以定义一个替换参数，不用加属性名。另外，表达式块的结束标签也可以省略不写。格式例如：
+在模板中表达式块使用封闭的节点元素形式定义，节点名称为`#`+`表达式块名称`。在表达式块节点开始标签内可以定义一个替换参数，不用加属性名。格式例如：
 ```js
-['$each {refer}',
+nj`
+<#each {refer}>
   ...
-'/$each']  //此处的"/each"可省略
+</#each>`
 ```
 例中的refer参数也可以传入多个值，如`{foo 'and' bar}`。
 
 表达式块内每个参数也都可以添加过滤器，这样就可以实现更复杂的逻辑，例如：
 ```js
-['$if {type:filter1 type2:filter2}',
-    'test if block',
-'/$if']
+nj`
+<#if {type:filter1 type2:filter2}>
+  test if block
+</#if>`
 ```
 
 * 自定义表达式块
 
-表达式块可支持自定义，这样就可以自行为模板实现各种各样的逻辑及功能。例如内置表达块if的实现如下：
+表达式块可支持自定义，这样就可以自行为模板实现各种各样的逻辑及功能。例如实现一个customIf表达块：
 ```js
 //测试模板：
-['$if {type:filter1}',
-  'test if',
-'$else',
-  'test else',
-'/$if']
+nj`
+<#customIf {type:filter1}>
+  test if
+<#else />
+  test else
+</#customIf>`
 
-nj.registerExpr('if', function(refer, options) {
-  var ret;
+nj.registerExpr('customIf', (refer, options) => {
+  let ret;
   if (!!refer) {  //refer即为替换参数"{type:filter1}"的执行结果
     ret = options.result();  //执行options.result，即输出"test if"
   }
@@ -218,7 +223,6 @@ nj.registerExpr('if', function(refer, options) {
   return ret;
 });
 ```
-本节未完待续...
 
 ###### 内置表达式块
 
@@ -226,13 +230,14 @@ nj.registerExpr('if', function(refer, options) {
 
 举例：
 ```js
-['div',
-    'this is the if block demo.',
-    ['$if {type}',
-        'test if block',
-        ['<span>', 'test1'],
-    '/$if'],
-'/div']
+nj`
+<div>
+  this is the if block demo.
+  <#if {type}>
+    test if block
+    <span>test1</span>
+  </#if>
+</div>`
 ```
 在执行模板函数时，如if块的参数计算结果为true，则会执行if块内的模板；如为false则不会执行if块内的模板。
 
@@ -240,18 +245,19 @@ nj.registerExpr('if', function(refer, options) {
 
 举例：
 ```js
-['div',
-    'this is the if block demo.',
-    ['$if {type}',
-        'test if block',
-        ['<span>', 'test1'],
-    '$else',  //else标签(1)
-        ['<span>', 'test2']  //type参数计算结果为false时执行此处的模板(2)
-    ],
-'/div']
+nj`
+<div>
+  this is the if block demo
+  <#if {type}>
+    test if block
+    <span>test1</span>
+  <#else />  //else标签(1)
+    <span>test2</span>  //type参数计算结果为false时执行此处的模板(2)
+  </#if>
+</div>`
 ```
 
-1. else标签须定义在if块内，格式为"$else"。如例中(1)处所示。
+1. else标签须定义在if块内，格式为`<#else />`。如例中(1)处所示。
 2. 在执行模板函数时，如if块的参数计算结果为false，则会执行排在if块内的else标签之后的模板，如例中(2)处所示。
 
 * unless块
