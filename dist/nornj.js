@@ -1419,6 +1419,11 @@ function getTagComponentAttrs(el) {
         ret = tools.lightObj();
       }
 
+      //Deal with the attribute only has key.
+      if(val === '') {
+        val = attrName;
+      }
+
       if (attrName === 'style') {  //style属性使用cssText
         val = el.style.cssText;
       }
