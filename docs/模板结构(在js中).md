@@ -8,11 +8,7 @@ NornJ模板可以在js或html中构建，分别有不同的用途：
     * [过滤器](#过滤器)
     * [表达式块](#表达式块)
     * [内置表达式块](#内置表达式块)
-  * [使用es6模板字符串语法糖](#使用es6模板字符串语法糖)
-    * [模板字符串语法糖模板结构](#模板字符串语法糖模板结构)
-    * [模板字符串语法糖与数组模板的不同点](#模板字符串语法糖与数组模板的不同点)
-    * [模板字符串语法糖与数组模板相互嵌套](#模板字符串语法糖与数组模板相互嵌套)
-    * [模板字符串语法糖的es5兼容写法](#模板字符串语法糖的es5兼容写法)
+  * [在ES5环境下构建模板](#在ES5环境下构建模板)
 * [构建在html中的模板](https://github.com/joe-sky/nornj/blob/master/docs/模板结构(在html中).md)
 
 ### 构建在js中的模板
@@ -197,7 +193,7 @@ nj`
 
 * 自定义表达式块
 
-表达式块可支持自定义，这样就可以自行为模板实现各种各样的逻辑及功能。例如实现一个customIf表达块：
+表达式块可支持自定义，这样就可以自行为模板实现各种各样的逻辑及功能。例如实现一个`customIf`表达块：
 ```js
 //测试模板：
 nj`
@@ -264,12 +260,13 @@ nj`
 
 举例：
 ```js
-['$unless {type}',
-  'test unless block',
-  ['<span>', 'test1'],
-'$else',
-  ['<span>', 'test2']
-]
+nj`
+<#unless {type}>
+  test unless block
+  <span>test1</span>
+<#else />
+  <span>test2</span>
+</#unless>`
 ```
 
 unless块意义即为"除非"，它和if块取相反的值。例中如type参数为`false`，则会输出`<span>test1</span>`。
@@ -278,53 +275,54 @@ unless块意义即为"除非"，它和if块取相反的值。例中如type参数
 
 举例：
 ```js
-var tmpl = ['div',
-    'this is the if block demo{no}.',
-    ['$each {items}',  //each块开始标签(1)
-        'test if block{no}',  //items数组每项的no属性(2)
-        ['<span>', 'test{../no}'],  //与items数组同一层的no属性(3)
-    '$else',
-        ['<span>', 'test else{no}'],  //排在else标签后的模板(4)
-    '/$each'],  //each块结束标签,此处可省略(5)
-    ['$each {numbers}',
-        'num:{.},',  //点号表示使用数组项渲染(6)
-        'no:{#} '   //#号表示使用数组项索引值渲染(7)
-    ]
-'/div'];
+var tmpl = nj`
+<div>
+  this is the if block demo{no}.
+  <#each {items}>  //each块开始标签(1)
+    test if block{no}  //items数组每项的no属性(2)
+    <span>test{../no}</span>  //与items数组同一层的no属性(3)
+  <#else />
+    <span>test else{no}</span>  //排在else标签后的模板(4)
+  </#each>
+  <#each {numbers}>
+    num:{.},  //点号表示使用数组项渲染(5)
+    ['no:{#} ']  //#号表示使用数组项索引值渲染(6)
+  </#each>
+</div>`
 
-var tmplFn = nj.compile(tmpl, "tmpl1");
+var tmplFn = nj.compile(tmpl, 'tmpl1');
 var html = tmplFn({
-    no: 100,
-    items: [
-        { no: 200 },
-        { no: 300 }
-    ],
-    numbers: [10, 20, 30]
+  no: 100,
+  items: [
+    { no: 200 },
+    { no: 300 }
+  ],
+  numbers: [10, 20, 30]
 });
 
 console.log(html);
 /*输出html:
 <div>
-    this is the if block demo100.
-    test if block200
-    <span>test100</span>
-    test if block300
-    <span>test100</span>
-    num:10,no:0 num:20,no:1 num:30,no:2
+  this is the if block demo100.
+  test if block200
+  <span>test100</span>
+  test if block300
+  <span>test100</span>
+  num:10,no:0 num:20,no:1 num:30,no:2
 </div>
 */
 
 var html2 = tmplFn({
-    no: 100,
-    items: null,
-    numbers: null
+  no: 100,
+  items: null,
+  numbers: null
 });
 
 console.log(html2);
 /*输出html:
 <div>
-    this is the if block demo100.
-    <span>test else100</span>
+  this is the if block demo100.
+  <span>test else100</span>
 </div>
 */
 ```
@@ -333,31 +331,31 @@ console.log(html2);
 2. each块会遍历参数数组中的数据，将数组中的每一项数据都执行渲染。在遍历每个数组项时，会使用每项的数据作为当前节点的数据，相当于生成了一个上下文。如例中(2)处所示，"{no}"参数为items数组内各项的no值。
 3. 在遍历每个数组项时也可以使用父级上下文的数据，如例中(3)处所示，"{../no}"表示获取和items参数同一级的no值。和一般的目录描述方法类似，"../"可以写多次，每次代表向上退一级上下文。
 4. 在each块中也可以使用else标签，如"{items}"参数为null或false时，则会执行排在else标签后面的模板。如例中(4)处所示，在else标签后面的模板并不会产生上下文，"{no}"参数为items参数同一级的no值。
-5. each块内可以使用点号"{.}"设置替换参数，表示使用数组项渲染，如例中(6)处所示。
-6. each块内还可以使用#号"{#}"设置替换参数，表示使用数组项索引值渲染，如例中(7)处所示。
+5. each块内可以使用点号"{.}"设置替换参数，表示使用数组项渲染，如例中(5)处所示。
+6. each块内还可以使用#号"{#}"设置替换参数，表示使用数组项索引值渲染，如例中(6)处所示。
 
 * param块
 
 param块可以提供另外一种定义元素节点参数的方式。用param块定义的节点参数可以内嵌或包裹其他表达式块，能够提供更丰富的动态生成逻辑。举例如下：
 ```js
-var tmpl =
-['div name=foo',
-  ['$params',  //定义params块
-    ['$param {"name"}', 'bar'],   //节点参数键为字符串，值也为字符串(1)
-    ['$param {"id"}', '{test}'],  //节点参数键为字符串，值为替换参数(2)
-    ['$param {"id2"}',  //节点参数值为表达式块的执行结果(3)
-      ['$each {list}',
-        '{no}'
-      ]
-    ],
-    ['$each {list}',  //根据表达式块的执行结果动态构建节点参数(4)
-      ['$param {"data-id(" no ")"}', '{"test" no}']
-    ]
-  ],
-  'this is a param block demo.',
-'/div'];
+var tmpl = nj`
+<div name=foo>
+  <#params>  //定义params块
+    <#param {"name"}>bar</#param>  //节点参数键为字符串，值也为字符串(1)
+    <#param {"id"}>{test}</#param>  //节点参数键为字符串，值为替换参数(2)
+    <#param {"id2"}>  //节点参数值为表达式块的执行结果(3)
+      <#each {list}>
+        {no}
+      </#each>
+    </#param>
+    <#each {list}>  //根据表达式块的执行结果动态构建节点参数(4)
+      <#param {"data-id(" no ")"}>{"test" no}</#param>
+    </#each>
+  </#params>
+  this is a param block demo.
+</div>`
 
-var tmplFn = nj.compile(tmpl, "tmpl1");
+var tmplFn = nj.compile(tmpl, 'tmpl1');
 var html = tmplFn({
   list: [
     { no: 1 },
@@ -379,154 +377,44 @@ this is a param block demo.
 3. param块的子节点为节点参数值。如果有多个子节点，则节点参数值为这些子节点值连成的一个完整字符串。如例中(3)处所示。
 4. param块也可以用each块等其他表达式块包裹，这样就可以动态生成多个节点参数。如例中(4)处所示。
 5. 使用param块定义节点参数的优先级会高于直接定义在节点的开始标签内，如例中(2)处的name属性就覆盖了节点标签中定义的name属性。
-
 ---
-#### 使用es6模板字符串语法糖
 
-NornJ模板还有一种使用es6(es2015)提供的模板字符串来描述模板的功能，可以使用类似xml标签嵌套的方式来构建模板，结构就像这样：
-```js
-nj`   <!--模板字符串前须要加nj标签函数-->
-<slider>
-    this the test slider {msg}.
-    <sliderItem id=test onsliderend={event} />
-</slider>`
-```
+#### 在ES5环境下构建模板
 
-##### 模板字符串语法糖模板结构
-
-这种es6模板字符串构建的模板，实际上是数组模板的语法糖形式，如下所示：
-```js
-nj`
-<div>
-    <slider />
-</div>`
-
-//以上模板完全等价于：
-
-['div',
-    ['slider /'],
-'/div']
-```
-
-模板字符串语法糖也可以嵌套使用，语法即为es6模板字符串提供的"${}"占位符：
-```js
-var tmpl1 = nj`
-<div>
-    <slider />
-</div>`;
-
-var tmpl2 = nj`
-<section>
-    ${tmpl1}
-</section>`;
-
-//嵌套多个元素：
-var tmpl3 = nj`
-<span>
-    <slider />
-</span>`;
-
-var tmpl4 = nj`
-<section>
-    ${[tmpl2, tmpl3]}
-</section>`;
-```
-##### 模板字符串语法糖与数组模板的不同点
-
-模板字符串语法糖与数组模板的语法几乎完全一样，如替换参数、过滤器的定义方式等等。但也有一些细微差别，如下所示：
-
-* 表达式块
-
-表达式块的构建形式与普通模板略有不同，如下所示：
-```js
-//数组模板结构：
-['$if {refer}',
-...
-'/$if']
-
-['$each {refer}',
-...
-'$else',
-...
-'/$each']
-
-//模板字符串语法糖结构：
-nj`
-<$if {refer}>  <!--if块须要写成一对xml标签-->
-...
-</$if>`
-
-nj`
-<$each {refer}>  <!--each块须要写成一对xml标签-->
-...
-<$else />  <!--else块须要写成一个自闭合xml标签-->
-...
-</$each>`
-```
-
-##### 模板字符串语法糖与数组模板相互嵌套
-
-举例：
-```js
-var tmpl1 =
-['<div>',
-    ['<slider />'],
-'</div>'];
-
-var tmpl2 = nj`
-<section>
-    ${tmpl1}
-</section>`;
-
-//嵌套多个元素：
-var tmpl3 =
-['<span>',
-    ['<slider />'],
-    tmpl2,
-'</span>'];
-
-var tmpl4 = nj`
-<section>
-    ${[tmpl1, tmpl3]}
-</section>`;
-```
-
-##### 模板字符串语法糖的es5兼容写法
-
-es6模板字符串语法糖可以使用es5兼容写法。如果模板需要嵌套，则须要使用${x}的方式来定义替换参数，x为从0开始的整数。如下所示：
+NornJ模板字符串也可以支持es5兼容写法。如果模板需要嵌套，则须要使用${x}的方式来定义替换参数，x为从0开始的整数。如下所示：
 ```html
 <script id="tmpl1" type="text/nornj">
-    <div>
-        <slider />
-    </div>
+  <div>
+    <slider />
+  </div>
 </script>
 
 <script id="tmpl2" type="text/nornj">
-    <span>
-        <slider />
-    </span>
+  <span>
+    <slider />
+  </span>
 </script>
 
 <script id="tmpl3" type="text/nornj">
-    <section>
-        ${0}
-        <br />
-        ${1}
-        ${2}
-    </section>
+  <section>
+    ${0}
+    <br />
+    ${1}
+    ${2}
+  </section>
 </script>
 ```
 ```js
 var tmplStr1 = document.getElementById('tmpl1').innerHTML,
-    tmplStr2 = document.getElementById('tmpl2').innerHTML,
-    tmplStr3 = document.getElementById('tmpl3').innerHTML,
-    tmpl4 = ['<input type=button />'];
+  tmplStr2 = document.getElementById('tmpl2').innerHTML,
+  tmplStr3 = document.getElementById('tmpl3').innerHTML,
+  tmpl4 = nj('<input type=button />');
 
-var tmpl = nj(     //须使用nj函数处理字符串
-    tmplStr3,      //第一个参数为html字符串，其中可以用${x}的方式来定义任意个替换参数
-    nj(tmplStr1),  //从第二个参数开始为填充模板中的"${x}"占位符，可以使用nj函数返回的模板对象
-    tmplStr2,      //占位符替换参数也可以直接传入字符串
-    tmpl4          //占位符替换参数也可以传入数组模板对象
+var tmpl = nj(   //须使用nj函数处理字符串
+  tmplStr3,      //第一个参数为html字符串，其中可以用${x}的方式来定义任意个替换参数
+  nj(tmplStr1),  //从第二个参数开始为填充模板中的"${x}"占位符，可以使用nj函数返回的模板对象
+  tmplStr2,      //占位符替换参数也可以直接传入字符串
+  tmpl4          //占位符替换参数也可以传入nj函数返回的模板
 );
 
 //编译并执行模板
@@ -535,14 +423,14 @@ var html = nj.compile(tmpl)();
 console.log(html);
 /* 输出html:
 <section>
-    <div>
-        <slider />
-    </div>
-    <br />
-    <span>
-        <slider />
-    </span>
-    <input type=button />
+  <div>
+    <slider />
+  </div>
+  <br />
+  <span>
+    <slider />
+  </span>
+  <input type=button />
 </section>
 */
 ```
