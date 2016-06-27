@@ -967,18 +967,19 @@ var nj = require('../core'),
 //转换节点参数为字符串
 function transformParams(obj, data, parent, paramsE) {
   var ret = '';
-  tools.each(obj, function (v, k) {
-    if (!paramsE || paramsE[k] == null) {
-      ret += ' ' + k + '="' + replaceParams(v, data, false, false, parent, true) + '"';
-    }
-  }, false, false);
 
   //Attach parameters from "$param" expressions
   if (paramsE) {
     tools.each(paramsE, function (v, k) {
-      ret += ' ' + k + '="' + v + '"';
+      if (!obj || obj[k] == null) {
+        ret += ' ' + k + '="' + v + '"';
+      }
     }, false, false);
   }
+
+  tools.each(obj, function (v, k) {
+    ret += ' ' + k + '="' + replaceParams(v, data, false, false, parent, true) + '"';
+  }, false, false);
 
   return ret;
 }
@@ -986,16 +987,15 @@ function transformParams(obj, data, parent, paramsE) {
 //转换节点参数为对象
 function transformParamsToObj(obj, data, parent, paramsE) {
   var ret = obj || paramsE ? {} : null;
-  tools.each(obj, function (v, k) {
-    if (!paramsE || paramsE[k] == null) {
-      replaceParams(v, data, ret, k, parent, false);
-    }
-  }, false, false);
 
   //Attach parameters from "$param" expressions
   if (paramsE) {
     tools.assign(ret, paramsE);
   }
+
+  tools.each(obj, function (v, k) {
+    replaceParams(v, data, ret, k, parent, false);
+  }, false, false);
 
   return ret;
 }
@@ -1090,9 +1090,9 @@ function _useFilters(filters, ret, data, parent, index, useString) {
 
 //获取data值
 function getDataValue(data, propObj, parent, defaultEmpty, useString) {
-  if (data == null) {
-    return;
-  }
+  //if (data == null) {
+  //  return;
+  //}
 
   var isArr = tools.isArray(data),
     prop = propObj.name,
