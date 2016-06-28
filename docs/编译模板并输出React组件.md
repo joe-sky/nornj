@@ -53,7 +53,7 @@ nj.registerComponent('TestComponent', React.createClass({
 
 //输出React组件
 var comp = nj.compileComponent(
- nj('<TestComponent no=100 />),
+ nj('<TestComponent no=100 />'),
  'tmpl2'
 )();
 
