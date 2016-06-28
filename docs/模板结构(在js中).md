@@ -23,7 +23,7 @@ nj`   <!--模板字符串前须要加nj标签函数-->
 <slider>
   this the test slider {msg}.
   <sliderItem id=test onsliderend={event} />
-</slider>`
+</slider>`;
 ```
 
 ##### 模板嵌套
@@ -32,29 +32,29 @@ nj`   <!--模板字符串前须要加nj标签函数-->
 let tmpl1 = nj`
 <div>
   <slider />
-</div>`
+</div>`;
 
 let tmpl2 = nj`
 <section>
   ${tmpl1}
-</section>`
+</section>`;
 
 //嵌套多个元素，可使用数组：
 let tmpl3 = nj`
 <span>
   <slider />
-</span>`
+</span>`;
 
 let tmpl4 = nj`
 <section>
   ${[tmpl2, tmpl3]}
-</section>`
+</section>`;
 
 //数组也可以嵌套多层：
 let tmpl5 = nj`
 <section>
   ${[tmpl1, [tmpl2, tmpl3]]}
-</section>`
+</section>`;
 ```
 
 ##### 模板替换参数
@@ -64,36 +64,36 @@ let tmpl5 = nj`
 * 在元素节点参数中定义替换参数
 
 ```js
-nj'<div id={id} name={name}>'
+nj'<div id={id} name={name}>';
 ```
 
 * 在文本节点中定义替换参数
 
 ```js
-nj`<div>{content}</div>`
+nj`<div>{content}</div>`;
 ```
 
 * 使用1个花括号形式的参数，在生成html数据时是会自动进行字符转义的，这样的目的是为了防止xss攻击等。但是也可以设置不进行转义，就须要用两个花括号的形式定义替换参数，如下所示：
 
 ```js
-nj`<div>{{content}}</div'>`
+nj`<div>{{content}}</div'>`;
 ```
 
 * 元素节点名称也可以设置为替换参数，如下所示：
 ```js
-nj`<{element}>this is content</{element}>`
+nj`<{element}>this is content</{element}>`;
 ```
 元素节点名称作为替换参数时，不支持使用2个花括号形式的字符转义，但是会自动进行转义。生成html字符串时，这样替换时则一定会执行转义；生成React组件时，这样替换则不会进行转义，因为React会替我们进行转义。
 
 * 替换参数内可放入字符串：
 ```js
-nj`<div>{'content'}</div>`
+nj`<div>{'content'}</div>`;
 ```
 放入字符串语法为使用引号包裹，例中执行模板函数时会直接输出"content"。
 
 * 替换参数内也可放入多个值：
 ```js
-nj`<div>{content 'content'}</div>`
+nj`<div>{content 'content'}</div>`;
 
 let data = {
   content: 'test'
@@ -201,7 +201,7 @@ nj`
   test if
 <#else />
   test else
-</#customIf>`
+</#customIf>`;
 
 nj.registerExpr('customIf', (refer, options) => {
   let ret;
@@ -233,7 +233,7 @@ nj`
     test if block
     <span>test1</span>
   </#if>
-</div>`
+</div>`;
 ```
 在执行模板函数时，如if块的参数计算结果为true，则会执行if块内的模板；如为false则不会执行if块内的模板。
 
@@ -250,7 +250,7 @@ nj`
   <#else />  //else标签(1)
     <span>test2</span>  //type参数计算结果为false时执行此处的模板(2)
   </#if>
-</div>`
+</div>`;
 ```
 
 1. else标签须定义在if块内，格式为`<#else />`。如例中(1)处所示。
@@ -266,7 +266,7 @@ nj`
   <span>test1</span>
 <#else />
   <span>test2</span>
-</#unless>`
+</#unless>`;
 ```
 
 unless块意义即为"除非"，它和if块取相反的值。例中如type参数为`false`，则会输出`<span>test1</span>`。
@@ -275,7 +275,7 @@ unless块意义即为"除非"，它和if块取相反的值。例中如type参数
 
 举例：
 ```js
-var tmpl = nj`
+const tmpl = nj`
 <div>
   this is the if block demo{no}.
   <#each {items}>  //each块开始标签(1)
@@ -288,10 +288,10 @@ var tmpl = nj`
     num:{.},  //点号表示使用数组项渲染(5)
     ${['no:{#} ']}  //#号表示使用数组项索引值渲染(6)
   </#each>
-</div>`
+</div>`;
 
-var tmplFn = nj.compile(tmpl, 'tmpl1');
-var html = tmplFn({
+const tmplFn = nj.compile(tmpl, 'tmpl1');
+let html = tmplFn({
   no: 100,
   items: [
     { no: 200 },
@@ -312,7 +312,7 @@ console.log(html);
 </div>
 */
 
-var html2 = tmplFn({
+let html2 = tmplFn({
   no: 100,
   items: null,
   numbers: null
@@ -338,7 +338,7 @@ console.log(html2);
 
 param块可以提供另外一种定义元素节点参数的方式。用param块定义的节点参数可以内嵌或包裹其他表达式块，能够提供更丰富的动态生成逻辑。举例如下：
 ```js
-var tmpl = nj`
+const tmpl = nj`
 <div name=foo>
   <#params>  //定义params块
     <#param {"name"}>bar</#param>  //节点参数键为字符串，值也为字符串(1)
@@ -353,10 +353,10 @@ var tmpl = nj`
     </#each>
   </#params>
   this is a param block demo.
-</div>`
+</div>`;
 
-var tmplFn = nj.compile(tmpl, 'tmpl1');
-var html = tmplFn({
+const tmplFn = nj.compile(tmpl, 'tmpl1');
+let html = tmplFn({
   list: [
     { no: 1 },
     { no: 2 },
