@@ -3,10 +3,10 @@
 
 ###模板基本示例
 ```js
-var tmpl = nj`
+const tmpl = nj`
 <div>
-    this the test demo Hello {msg}
-    <input id=test onclick={click} />
+  this the test demo Hello {msg}
+  <input id=test onclick={click} />
 </div>`;
 ```
 
@@ -29,8 +29,7 @@ export default nj`
   <#for {'1' no}>
     <i>test{#}</i>
   </#for>
-</div>
-`;
+</div>`;
 
 /* comp.js */
 import {
@@ -88,7 +87,7 @@ render(compileComponent(
 ```
 然后可以这样编译后输出html字符串：
 ```js
-var html = nj.compile(tmpl)({
+let html = nj.compile(tmpl)({
   msg: 'Hello world!',
   click: "alert('test')"
 });
