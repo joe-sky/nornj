@@ -1,6 +1,6 @@
 {
   "name": "nornj",
-  "version": "0.3.4-rc.6",
+  "version": "0.3.4",
   "description": "A multipurpose javascript template engine",
   "main": "src/base.js",
   "files": [
@@ -32,7 +32,7 @@
     "lodash": "^4.13.1",
     "react": "^0.14.7",
     "react-dom": "^0.14.7",
-    "standalonify": "^0.1.1",
+    "standalonify": "^0.1.2",
     "vinyl-buffer": "^1.0.0",
     "vinyl-source-stream": "^1.1.0",
     "yargs": "^4.2.0"
