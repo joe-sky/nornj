@@ -1697,14 +1697,13 @@ var nj = require('../core'),
 
 //Global expression list
 nj.exprs = {
-  //If block
   'if': function (refer, useUnless) {
     if (refer === 'false') {
       refer = false;
     }
 
     var referR, ret;
-    if(!useUnless) {
+    if (!useUnless) {
       referR = !!refer;
     }
     else {
@@ -1724,12 +1723,10 @@ nj.exprs = {
     return ret;
   },
 
-  //Unless block
   unless: function (refer) {
     return nj.exprs['if'].call(this, refer, true);
   },
 
-  //Each block
   each: function (refer) {
     var thiz = this,
       useString = thiz.useString,
@@ -1773,7 +1770,7 @@ nj.exprs = {
     return ret;
   },
 
-  //Parameter block
+  //Parameter
   param: function () {
     var ret = this.result(),  //Get parameter value
       name = '',
@@ -1803,7 +1800,7 @@ nj.exprs = {
     this.paramsExpr[name] = value;
   },
 
-  //Spread parameters block
+  //Spread parameters
   spreadparam: function (refer) {
     if (!refer) {
       return;
@@ -1815,7 +1812,6 @@ nj.exprs = {
     }, false, false);
   },
 
-  //Equal block
   equal: function (value1, value2) {
     var ret;
     if (value1 == value2) {
@@ -1823,6 +1819,40 @@ nj.exprs = {
     }
     else {
       ret = this.inverse();
+    }
+
+    return ret;
+  },
+
+  'for': function (start, end) {
+    var ret, useString = this.useString;
+    if (useString) {
+      ret = '';
+    }
+    else {
+      ret = [];
+    }
+
+    if (end == null) {
+      end = start;
+      start = 0;
+    }
+    start = parseInt(start, 10);
+    end = parseInt(end, 10);
+
+    for (; start <= end; start++) {
+      var retI = this.result({
+        loop: true,
+        item: this.data[0],
+        index: start
+      });
+
+      if (useString) {
+        ret += retI;
+      }
+      else {
+        tools.listPush(ret, retI, true);
+      }
     }
 
     return ret;
@@ -1876,6 +1906,62 @@ nj.filters = {
   //Judge equal
   equal: function (obj, val) {
     return obj == val;
+  },
+
+  //Less than
+  lt: function (val1, val2, noEqual) {
+    var ret;
+    val1 = parseFloat(val1);
+    val2 = parseFloat(val2);
+
+    if (noEqual) {
+      ret = val1 < val2;
+    }
+    else {
+      ret = val1 <= val2;
+    }
+
+    return ret;
+  },
+
+  //Greater than
+  gt: function (val1, val2, noEqual) {
+    var ret;
+    val1 = parseFloat(val1);
+    val2 = parseFloat(val2);
+
+    if (noEqual) {
+      ret = val1 > val2;
+    }
+    else {
+      ret = val1 >= val2;
+    }
+
+    return ret;
+  },
+
+  //Addition
+  add: function (val1, val2, isFloat) {
+    return val1 + (isFloat ? parseFloat(val2) : parseInt(val2, 10));
+  },
+
+  //Convert to int 
+  int: function (val) {
+    return parseInt(val, 10);
+  },
+
+  //Convert to float 
+  float: function (val) {
+    return parseFloat(val);
+  },
+
+  //Convert to boolean 
+  bool: function (val) {
+    if (val === 'false') {
+      return false;
+    }
+
+    return Boolean(val);
   }
 };
 
