@@ -12,7 +12,7 @@ function checkElem(obj, parent) {
   var node = {},
     parentContent = !parent.hasElse ? 'content' : 'contentElse';
 
-  if (!tools.isNjArray(obj)) {  //判断是否为文本节点
+  if (!tools.isArray(obj)) {  //判断是否为文本节点
     //if (tools.isString(obj)) {
     node.type = 'nj_plaintext';
     node.content = [tranParam.compiledParam(obj)];
@@ -142,7 +142,6 @@ function checkElem(obj, parent) {
       var end = len - (hasCloseTag ? 1 : 0),
         content = obj.slice(1, (elseIndex < 0 ? end : elseIndex));
       if (content && content.length) {
-        content._nj = true;
         checkContentElem(content, node);
       }
 
@@ -152,7 +151,6 @@ function checkElem(obj, parent) {
         node.hasElse = true;
 
         if (contentElse && contentElse.length) {
-          contentElse._nj = true;
           checkContentElem(contentElse, node);
         }
       }
@@ -161,7 +159,7 @@ function checkElem(obj, parent) {
       checkContentElem(obj, parent);
     }
   }
-  else if (tools.isNjArray(first)) {  //如果第一个子节点为数组,则该节点一定为节点集合(可以是多层数组嵌套的集合)
+  else if (tools.isArray(first)) {  //如果第一个子节点为数组,则该节点一定为节点集合(可以是多层数组嵌套的集合)
     checkContentElem(obj, parent);
   }
 }

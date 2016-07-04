@@ -122,7 +122,7 @@ function precompile(obj) {
 }
 
 //Render tmpl expression block
-var _renderTmplExpr = compileComponent(compileStringTmpl('<{container}>{tmpl}</{container}>'), 'tmplExpr');
+var _renderTmplExpr = compileComponent(['<{container}>', '{tmpl}'], 'tmplExpr');
 function renderTmplExpr(tmpl, data, container) {
   if (!container) {
     container = 'div';

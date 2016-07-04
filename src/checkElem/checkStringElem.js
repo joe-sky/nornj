@@ -73,10 +73,8 @@ function compileStringTmpl(tmpl) {
 
 //Resolve string to element
 function _checkStringElem(xml, params) {
-  var root = [];
-  root._nj = true;
-
-  var current = {
+  var root = [],
+    current = {
       elem: root,
       elemName: 'root',
       parent: null
@@ -111,11 +109,8 @@ function _checkStringElem(xml, params) {
       }
       else {  //Open tag
         parent = current;
-        var _elem = [];
-        _elem._nj = true;
-
         current = {
-          elem: _elem,
+          elem: [],
           elemName: elemName,
           parent: parent
         };
@@ -159,14 +154,8 @@ function _getSelfCloseElem(elem, elemName, params) {
   if (elemName.indexOf('nj-split') >= 0) {
     return params[elemName.split('_')[1]];
   }
-  else if(elemName === tmplRule.exprRule + 'else') {
-    return elem.substr(1, 5);
-  }
   else {
-    var _elem = [_getElem(elem, elemName)];
-    _elem._nj = true;
-
-    return _elem;
+    return elemName === tmplRule.exprRule + 'else' ? elem.substr(1, 5) : [_getElem(elem, elemName)];
   }
 }
 
