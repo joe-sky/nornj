@@ -12,12 +12,12 @@ function checkElem(obj, parent) {
   var node = {},
     parentContent = !parent.hasElse ? 'content' : 'contentElse';
 
-  if (!tools.isArray(obj)) {
-    if (tools.isString(obj)) {  //判断是否为文本节点
-      node.type = 'nj_plaintext';
-      node.content = [tranParam.compiledParam(obj)];
-      parent[parentContent].push(node);
-    }
+  if (!tools.isNjArray(obj)) {  //判断是否为文本节点
+    //if (tools.isString(obj)) {
+    node.type = 'nj_plaintext';
+    node.content = [tranParam.compiledParam(obj)];
+    parent[parentContent].push(node);
+    //}
 
     return;
   }
@@ -111,7 +111,7 @@ function checkElem(obj, parent) {
         }
 
         //Verify if self closing tag again, because the tag may be similar to "<br></br>".
-        if(!node.selfCloseTag) {
+        if (!node.selfCloseTag) {
           node.selfCloseTag = tranElem.verifySelfCloseTag(openTagName);
         }
       }
@@ -122,7 +122,7 @@ function checkElem(obj, parent) {
           //将模板添加到父节点的params中
           tranElem.addTmpl(node, parent);
         }
-        else if(isParamsExpr) {
+        else if (isParamsExpr) {
           pushContent = false;
 
           //If this is params block, directly set on the "paramsExpr" property of the parent node.
@@ -142,6 +142,7 @@ function checkElem(obj, parent) {
       var end = len - (hasCloseTag ? 1 : 0),
         content = obj.slice(1, (elseIndex < 0 ? end : elseIndex));
       if (content && content.length) {
+        content._nj = true;
         checkContentElem(content, node);
       }
 
@@ -151,6 +152,7 @@ function checkElem(obj, parent) {
         node.hasElse = true;
 
         if (contentElse && contentElse.length) {
+          contentElse._nj = true;
           checkContentElem(contentElse, node);
         }
       }
@@ -159,7 +161,7 @@ function checkElem(obj, parent) {
       checkContentElem(obj, parent);
     }
   }
-  else if (tools.isArray(first)) {  //如果第一个子节点为数组,则该节点一定为节点集合(可以是多层数组嵌套的集合)
+  else if (tools.isNjArray(first)) {  //如果第一个子节点为数组,则该节点一定为节点集合(可以是多层数组嵌套的集合)
     checkContentElem(obj, parent);
   }
 }

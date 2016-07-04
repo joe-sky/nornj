@@ -26,6 +26,11 @@ function isArray(obj) {
   return Array.isArray(obj);
 }
 
+//判断是否为nj模板结构数组
+function isNjArray(obj) {
+  return obj && obj._nj;
+}
+
 //判断是否为对象
 function isObject(obj) {
   var type = typeof obj;
@@ -172,6 +177,7 @@ function toCamelCase(str) {
 
 var tools = {
   isArray: isArray,
+  isNjArray: isNjArray,
   isArrayLike: isArrayLike,
   isObject: isObject,
   isString: isString,
