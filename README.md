@@ -111,8 +111,7 @@ npm install --save nornj
 
 ### 浏览器支持
 
-* 输出html字符串功能可支持所有现代浏览器以及Internet Explorer 6+。
-* 配合React作为JSX替代模板语言时以及使用es6模板字符串构建的模板可支持所有现代浏览器以及Internet Explorer 8+。
+* 可支持所有现代浏览器以及Internet Explorer 8+。
 
 ### 技术文档
 
