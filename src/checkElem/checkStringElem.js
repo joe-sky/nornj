@@ -4,7 +4,8 @@ var nj = require('../core'),
   tools = require('../utils/tools'),
   tranElem = require('../transforms/transformElement'),
   REGEX_SPLIT = /\$\{\d+\}/,
-  tmplRule = nj.tmplRule;
+  tmplRule = nj.tmplRule,
+  shim = require('../utils/shim');
 
 //Cache the string template by unique key
 nj.strTmpls = {};
@@ -49,14 +50,24 @@ function compileStringTmpl(tmpl) {
   tools.each(xmls, function (xml, i) {
     var split = '';
     if (i < l - 1) {
-      var arg = args[i + 1];
-      if (tools.isString(arg)) {
-        split = arg;
-      }
-      else {
-        split = '<nj-split_' + splitNo + ' />';
+      var arg = args[i + 1],
+        last = xml.length - 1,
+        useShim = xml[last] === '@';
+
+      if (!tools.isString(arg) || useShim) {
+        split = '_nj-split' + splitNo + '_';
+
+        //Use the shim function to convert the parameter when the front of it with a "@" mark.
+        if (useShim) {
+          xml = xml.substr(0, last);
+          arg = shim(arg);
+        }
+
         params.push(arg);
         splitNo++;
+      }
+      else {
+        split = arg;
       }
     }
 
@@ -94,7 +105,7 @@ function _checkStringElem(xml, params) {
       if (/\s/.test(textBefore[textBefore.length - 1])) {
         textBefore = _formatText(textBefore);
       }
-      current.elem.push(textBefore);
+      _setText(textBefore, current.elem, params);
     }
 
     //Element tag
@@ -104,8 +115,8 @@ function _checkStringElem(xml, params) {
           current = current.parent;
         }
       }
-      else if (elem[elem.length - 2] === '/' || tranElem.verifySelfCloseTag(elemName)) {  //Self close tag
-        current.elem.push(_getSelfCloseElem(elem, elemName, params));
+      else if (elem[elem.length - 2] === '/') {  //Self close tag
+        _setSelfCloseElem(elem, elemName, current.elem, params);
       }
       else {  //Open tag
         parent = current;
@@ -116,7 +127,7 @@ function _checkStringElem(xml, params) {
         };
 
         parent.elem.push(current.elem);
-        current.elem.push(_getElem(elem, elemName));
+        _setElem(elem, elemName, current.elem, params);
       }
     }
 
@@ -125,7 +136,7 @@ function _checkStringElem(xml, params) {
       if (/\s/.test(textAfter[0])) {
         textAfter = _formatText(textAfter);
       }
-      current.elem.push(textAfter);
+      _setText(textAfter, current.elem, params);
     }
   }
 
@@ -140,22 +151,57 @@ function _formatText(str) {
   return str.replace(/\n/g, '').trim();
 }
 
-function _getElem(elem, elemName) {
+//Set element node
+function _setElem(elem, elemName, elemArr, params, bySelfClose) {
+  var ret;
   if (elemName[0] === tmplRule.exprRule) {
-    return elem.substring(1, elem.length - 1);
+    ret = elem.substring(1, elem.length - 1);
   }
   else {
-    return elem;
+    ret = elem;
+  }
+
+  if (bySelfClose) {
+    elemArr.push([ret]);
+  }
+  else {
+    elemArr.push(ret);
   }
 }
 
-//Get self close element
-function _getSelfCloseElem(elem, elemName, params) {
-  if (elemName.indexOf('nj-split') >= 0) {
-    return params[elemName.split('_')[1]];
+//Set self close element node
+function _setSelfCloseElem(elem, elemName, elemArr, params) {
+  if (elemName === tmplRule.exprRule + 'else') {
+    elemArr.push(elem.substr(1, 5));
   }
   else {
-    return elemName === tmplRule.exprRule + 'else' ? elem.substr(1, 5) : [_getElem(elem, elemName)];
+    _setElem(elem, elemName, elemArr, params, true);
+  }
+}
+
+//Set text node
+function _setText(text, elemArr, params) {
+  var pattern = /_nj-split(\d+)_/g, matchArr,
+    splitNos = [];
+
+  while ((matchArr = pattern.exec(text))) {
+    splitNos.push(matchArr[1]);
+  }
+
+  if (splitNos.length) {
+    tools.each(text.split(/_nj-split(?:\d+)_/), function (t) {
+      if (t !== '') {
+        elemArr.push(t);
+      }
+
+      var no = splitNos.shift();
+      if (no != null) {
+        elemArr.push(params[no]);
+      }
+    }, false, true);
+  }
+  else {
+    elemArr.push(text);
   }
 }
 

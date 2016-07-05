@@ -8,33 +8,45 @@
   ReactDOMServer = require('react-dom/server');
 
 describe('test speed', function () {
-  nj.setTmplRule(null, null, '$');
+  nj.setTmplRule(null, null, '#');
 
   var tmpl = nj`
   <div>
-    <$each {arr}>
+    <#each {arr}>
       <span class=test_{#}
             style={../styles}
             onClick={../onClick}>
         test_{../num}
-        <$each {../list2}>
+        <#each {../list2}>
           <div>
-            <$params>
-              <$if {../#:five}>
-                <$param {'name'}>five</$param>
-              </$if>
-            </$params>
+            <#params>
+              <#if {../#:five}>
+                <#param {'name'}>five</#param>
+              </#if>
+            </#params>
             <span>span{#}</span>
             <i>{#}</i>
+            <span>
+              <#params>
+                <#param {'dangerouslySetInnerHTML'}>
+                  ${{__html: '>'}}
+                </#param>
+              </#params>
+            </span>
+            @${' space > space '}
           </div>
-        </$each>
+        </#each>
       </span>
-      <$if {#:five(1):test}>
+      <#if {#:five(1):test}>
         <br />
-      <$else />
-        <img />
-      </$if>
-    </$each>
+      <#else />
+        <img>
+          <#params>
+            <#param {'src'}>test.jpg</#param>
+          </#params>
+        </img>
+      </#if>
+    </#each>
   </div>
   `;
 
@@ -75,7 +87,7 @@ describe('test speed', function () {
     expect(html).toBeTruthy();
   });
 
-  xit('test render to component', function () {
+  it('test render to component', function () {
     var start;
 
     var TestComponent1 = React.createClass({
@@ -159,7 +171,7 @@ describe('test speed', function () {
     });
 
     var html = ReactDOMServer.renderToStaticMarkup(React.createElement(TestComponent, {
-      arr: _.times(500, function (n) {
+      arr: _.times(5, function (n) {
         return n;
       }),
       a: 1,
@@ -167,7 +179,7 @@ describe('test speed', function () {
     }));
 
     //console.log(JSON.stringify(nj.templates['tmpl1']));
-    //console.log(html);
+    console.log(html);
     expect(html).toBeTruthy();
   });
 });

@@ -21,7 +21,7 @@ describe('test compile string', function () {
   });
 
   describe('compile string template to html', function () {
-    it('test compile 1', function () {
+    xit('test compile 1', function () {
       nj.setTmplRule(null, null, '#');
 
       var data = {
@@ -94,7 +94,7 @@ describe('test compile string', function () {
               </#each>
             </#param>
           </#params>
-          <input autofocus>
+          <input autofocus />
           <br></br>
           test2
           <span>

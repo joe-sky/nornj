@@ -76,7 +76,7 @@ if (typeof self !== 'undefined') {
 }
 
 module.exports = nj;
-},{"./checkElem/checkStringElem":4,"./compiler/compile":6,"./core":10,"./utils/docReady":14,"./utils/registerComponent":18,"./utils/utils":22}],3:[function(require,module,exports){
+},{"./checkElem/checkStringElem":4,"./compiler/compile":6,"./core":10,"./utils/docReady":14,"./utils/registerComponent":18,"./utils/utils":23}],3:[function(require,module,exports){
 'use strict';
 
 var nj = require('../core'),
@@ -91,12 +91,16 @@ function checkElem(obj, parent) {
   var node = {},
     parentContent = !parent.hasElse ? 'content' : 'contentElse';
 
-  if (!tools.isArray(obj)) {
-    if (tools.isString(obj)) {  //判断是否为文本节点
-      node.type = 'nj_plaintext';
-      node.content = [tranParam.compiledParam(obj)];
-      parent[parentContent].push(node);
+  if (!tools.isArray(obj)) {  //判断是否为文本节点
+    if(tools.isObject(obj) && '_njShim' in obj) {  //Get the shim value
+      obj = obj._njShim;
     }
+
+    //if (tools.isString(obj)) {
+    node.type = 'nj_plaintext';
+    node.content = [tranParam.compiledParam(obj)];
+    parent[parentContent].push(node);
+    //}
 
     return;
   }
@@ -190,7 +194,7 @@ function checkElem(obj, parent) {
         }
 
         //Verify if self closing tag again, because the tag may be similar to "<br></br>".
-        if(!node.selfCloseTag) {
+        if (!node.selfCloseTag) {
           node.selfCloseTag = tranElem.verifySelfCloseTag(openTagName);
         }
       }
@@ -201,7 +205,7 @@ function checkElem(obj, parent) {
           //将模板添加到父节点的params中
           tranElem.addTmpl(node, parent);
         }
-        else if(isParamsExpr) {
+        else if (isParamsExpr) {
           pushContent = false;
 
           //If this is params block, directly set on the "paramsExpr" property of the parent node.
@@ -261,14 +265,15 @@ module.exports = {
   checkElem: checkElem,
   checkTagElem: checkTagElem
 };
-},{"../core":10,"../transforms/transformElement":12,"../transforms/transformParam":13,"../utils/tools":21,"./checkTagElem":5}],4:[function(require,module,exports){
+},{"../core":10,"../transforms/transformElement":12,"../transforms/transformParam":13,"../utils/tools":22,"./checkTagElem":5}],4:[function(require,module,exports){
 'use strict';
 
 var nj = require('../core'),
   tools = require('../utils/tools'),
   tranElem = require('../transforms/transformElement'),
   REGEX_SPLIT = /\$\{\d+\}/,
-  tmplRule = nj.tmplRule;
+  tmplRule = nj.tmplRule,
+  shim = require('../utils/shim');
 
 //Cache the string template by unique key
 nj.strTmpls = {};
@@ -313,14 +318,24 @@ function compileStringTmpl(tmpl) {
   tools.each(xmls, function (xml, i) {
     var split = '';
     if (i < l - 1) {
-      var arg = args[i + 1];
-      if (tools.isString(arg)) {
-        split = arg;
-      }
-      else {
-        split = '<nj-split_' + splitNo + ' />';
+      var arg = args[i + 1],
+        last = xml.length - 1,
+        useShim = xml[last] === '@';
+
+      if (!tools.isString(arg) || useShim) {
+        split = '_nj-split' + splitNo + '_';
+
+        //Use the shim function to convert the parameter when the front of it with a "@" mark.
+        if (useShim) {
+          xml = xml.substr(0, last);
+          arg = shim(arg);
+        }
+
         params.push(arg);
         splitNo++;
+      }
+      else {
+        split = arg;
       }
     }
 
@@ -358,7 +373,7 @@ function _checkStringElem(xml, params) {
       if (/\s/.test(textBefore[textBefore.length - 1])) {
         textBefore = _formatText(textBefore);
       }
-      current.elem.push(textBefore);
+      _setText(textBefore, current.elem, params);
     }
 
     //Element tag
@@ -368,8 +383,8 @@ function _checkStringElem(xml, params) {
           current = current.parent;
         }
       }
-      else if (elem[elem.length - 2] === '/' || tranElem.verifySelfCloseTag(elemName)) {  //Self close tag
-        current.elem.push(_getSelfCloseElem(elem, elemName, params));
+      else if (elem[elem.length - 2] === '/') {  //Self close tag
+        _setSelfCloseElem(elem, elemName, current.elem, params);
       }
       else {  //Open tag
         parent = current;
@@ -380,7 +395,7 @@ function _checkStringElem(xml, params) {
         };
 
         parent.elem.push(current.elem);
-        current.elem.push(_getElem(elem, elemName));
+        _setElem(elem, elemName, current.elem, params);
       }
     }
 
@@ -389,7 +404,7 @@ function _checkStringElem(xml, params) {
       if (/\s/.test(textAfter[0])) {
         textAfter = _formatText(textAfter);
       }
-      current.elem.push(textAfter);
+      _setText(textAfter, current.elem, params);
     }
   }
 
@@ -404,27 +419,62 @@ function _formatText(str) {
   return str.replace(/\n/g, '').trim();
 }
 
-function _getElem(elem, elemName) {
+//Set element node
+function _setElem(elem, elemName, elemArr, params, bySelfClose) {
+  var ret;
   if (elemName[0] === tmplRule.exprRule) {
-    return elem.substring(1, elem.length - 1);
+    ret = elem.substring(1, elem.length - 1);
   }
   else {
-    return elem;
+    ret = elem;
+  }
+
+  if (bySelfClose) {
+    elemArr.push([ret]);
+  }
+  else {
+    elemArr.push(ret);
   }
 }
 
-//Get self close element
-function _getSelfCloseElem(elem, elemName, params) {
-  if (elemName.indexOf('nj-split') >= 0) {
-    return params[elemName.split('_')[1]];
+//Set self close element node
+function _setSelfCloseElem(elem, elemName, elemArr, params) {
+  if (elemName === tmplRule.exprRule + 'else') {
+    elemArr.push(elem.substr(1, 5));
   }
   else {
-    return elemName === tmplRule.exprRule + 'else' ? elem.substr(1, 5) : [_getElem(elem, elemName)];
+    _setElem(elem, elemName, elemArr, params, true);
+  }
+}
+
+//Set text node
+function _setText(text, elemArr, params) {
+  var pattern = /_nj-split(\d+)_/g, matchArr,
+    splitNos = [];
+
+  while ((matchArr = pattern.exec(text))) {
+    splitNos.push(matchArr[1]);
+  }
+
+  if (splitNos.length) {
+    tools.each(text.split(/_nj-split(?:\d+)_/), function (t) {
+      if (t !== '') {
+        elemArr.push(t);
+      }
+
+      var no = splitNos.shift();
+      if (no != null) {
+        elemArr.push(params[no]);
+      }
+    }, false, true);
+  }
+  else {
+    elemArr.push(text);
   }
 }
 
 module.exports = compileStringTmpl;
-},{"../core":10,"../transforms/transformElement":12,"../utils/tools":21}],5:[function(require,module,exports){
+},{"../core":10,"../transforms/transformElement":12,"../utils/shim":21,"../utils/tools":22}],5:[function(require,module,exports){
 'use strict';
 
 var nj = require('../core'),
@@ -543,7 +593,7 @@ nj.setInitTagData = function (data) {
 };
 
 module.exports = checkTagElem;
-},{"../core":10,"../transforms/transformElement":12,"../transforms/transformParam":13,"../utils/tools":21}],6:[function(require,module,exports){
+},{"../core":10,"../transforms/transformElement":12,"../transforms/transformParam":13,"../utils/tools":22}],6:[function(require,module,exports){
 'use strict';
 
 var nj = require('../core'),
@@ -696,7 +746,7 @@ module.exports = {
   precompile: precompile,
   renderTmplExpr: renderTmplExpr
 };
-},{"../checkElem/checkStringElem":4,"../core":10,"../utils/utils":22,"./transformToComponent":8,"./transformToString":9}],7:[function(require,module,exports){
+},{"../checkElem/checkStringElem":4,"../core":10,"../utils/utils":23,"./transformToComponent":8,"./transformToString":9}],7:[function(require,module,exports){
 'use strict';
 
 var utils = require('../utils/utils');
@@ -734,7 +784,7 @@ module.exports = function (transformNode, useString) {
     return ret;
   };
 };
-},{"../utils/utils":22}],8:[function(require,module,exports){
+},{"../utils/utils":23}],8:[function(require,module,exports){
 'use strict';
 
 var nj = require('../core'),
@@ -837,7 +887,7 @@ module.exports = {
   transformToComponent: transformToComponent,
   transformContentToComponent: transformContentToComponent
 };
-},{"../core":10,"../utils/utils":22,"./transformContent":7}],9:[function(require,module,exports){
+},{"../core":10,"../utils/utils":23,"./transformContent":7}],9:[function(require,module,exports){
 'use strict';
 
 var nj = require('../core'),
@@ -932,7 +982,7 @@ module.exports = {
   transformToString: transformToString,
   transformContentToString: transformContentToString
 };
-},{"../core":10,"../utils/utils":22,"./transformContent":7}],10:[function(require,module,exports){
+},{"../core":10,"../utils/utils":23,"./transformContent":7}],10:[function(require,module,exports){
 'use strict';
 
 function nj() {
@@ -1229,7 +1279,7 @@ module.exports = {
   setObjParam: setObjParam,
   getExprParam: getExprParam
 };
-},{"../core":10,"../utils/escape":15,"../utils/tools":21}],12:[function(require,module,exports){
+},{"../core":10,"../utils/escape":15,"../utils/tools":22}],12:[function(require,module,exports){
 'use strict';
 
 var nj = require('../core'),
@@ -1491,7 +1541,7 @@ module.exports = {
   getTagComponents: getTagComponents,
   removeChildNode: removeChildNode
 };
-},{"../core":10,"../utils/tools":21,"./transformData":11,"./transformParam":13}],13:[function(require,module,exports){
+},{"../core":10,"../utils/tools":22,"./transformData":11,"./transformParam":13}],13:[function(require,module,exports){
 'use strict';
 
 var nj = require('../core'),
@@ -1655,7 +1705,7 @@ module.exports = {
   compiledParams: compiledParams,
   compiledProp: compiledProp
 };
-},{"../core":10,"../utils/tools":21}],14:[function(require,module,exports){
+},{"../core":10,"../utils/tools":22}],14:[function(require,module,exports){
 'use strict';
 
 module.exports = function (callback) {
@@ -1875,7 +1925,7 @@ function registerExpr(name, expr) {
 module.exports = {
   registerExpr: registerExpr
 };
-},{"../core":10,"./tools":21}],17:[function(require,module,exports){
+},{"../core":10,"./tools":22}],17:[function(require,module,exports){
 'use strict';
 
 var nj = require('../core'),
@@ -1981,7 +2031,7 @@ function registerFilter(name, filter) {
 module.exports = {
   registerFilter: registerFilter
 };
-},{"../core":10,"./tools":21}],18:[function(require,module,exports){
+},{"../core":10,"./tools":22}],18:[function(require,module,exports){
 'use strict';
 
 var nj = require('../core'),
@@ -2034,7 +2084,7 @@ module.exports = {
   setNamespace: setNamespace,
   registerTagNamespace: registerTagNamespace
 };
-},{"../core":10,"./tools":21}],19:[function(require,module,exports){
+},{"../core":10,"./tools":22}],19:[function(require,module,exports){
 'use strict';
 
 var nj = require('../core'),
@@ -2064,7 +2114,7 @@ function setComponentEngine(name, obj, dom, port, render) {
 module.exports = {
   setComponentEngine: setComponentEngine
 };
-},{"../core":10,"./tools":21}],20:[function(require,module,exports){
+},{"../core":10,"./tools":22}],20:[function(require,module,exports){
 'use strict';
 
 var nj = require('../core'),
@@ -2126,7 +2176,16 @@ module.exports = function (beginRule, endRule, exprRule) {
     expr: _createRegExp('^' + escapeExprRule + '([^\\s]+)', 'i')
   });
 };
-},{"../core":10,"./tools":21}],21:[function(require,module,exports){
+},{"../core":10,"./tools":22}],21:[function(require,module,exports){
+'use strict';
+
+//Converts any value to the parameter of NornJ template can be parsed.
+module.exports = function (obj) {
+  return {
+    _njShim: obj
+  };
+};
+},{}],22:[function(require,module,exports){
 'use strict';
 
 var nj = require('../core'),
@@ -2320,7 +2379,7 @@ var tools = {
 assign(nj, tools);
 
 module.exports = tools;
-},{"../core":10,"object-assign":1}],22:[function(require,module,exports){
+},{"../core":10,"object-assign":1}],23:[function(require,module,exports){
 'use strict';
 
 var tools = require('./tools'),
@@ -2353,5 +2412,5 @@ module.exports = tools.assign(
   transformParam,
   transformData
 );
-},{"../checkElem/checkElem":3,"../transforms/transformData":11,"../transforms/transformElement":12,"../transforms/transformParam":13,"./escape":15,"./expression":16,"./filter":17,"./registerComponent":18,"./setComponentEngine":19,"./setTmplRule":20,"./tools":21}]},{},[2]);
+},{"../checkElem/checkElem":3,"../transforms/transformData":11,"../transforms/transformElement":12,"../transforms/transformParam":13,"./escape":15,"./expression":16,"./filter":17,"./registerComponent":18,"./setComponentEngine":19,"./setTmplRule":20,"./tools":22}]},{},[2]);
 var _r = _m(2);_g.nj = _g.NornJ = _r;return _r;})})(typeof window!=='undefined' ? window : (typeof global!=='undefined' ? global : (typeof self!=='undefined' ? self : this)));
