@@ -13,6 +13,10 @@ function checkElem(obj, parent) {
     parentContent = !parent.hasElse ? 'content' : 'contentElse';
 
   if (!tools.isArray(obj)) {  //判断是否为文本节点
+    if(obj && '_njShim' in obj) {  //Get the shim value
+      obj = obj._njShim;
+    }
+
     //if (tools.isString(obj)) {
     node.type = 'nj_plaintext';
     node.content = [tranParam.compiledParam(obj)];

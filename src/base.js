@@ -6,7 +6,8 @@ var nj = require('./core'),
   compiler = require('./compiler/compile'),
   registerComponent = require('./utils/registerComponent'),
   compileStringTmpl = require('./checkElem/checkStringElem'),
-  docReady = require('./utils/docReady');
+  docReady = require('./utils/docReady'),
+  shim = require('./utils/shim');
 
 nj.setComponentEngine = setComponentEngine;
 nj.setTmplRule = utils.setTmplRule;
@@ -14,6 +15,7 @@ nj.registerFilter = utils.registerFilter;
 nj.registerExpr= utils.registerExpr;
 nj.compileStringTmpl = compileStringTmpl;
 nj.docReady = docReady;
+nj.shim = shim;
 utils.assign(nj, compiler, registerComponent);
 
 //Create vml tag namespace(primarily for IE8)
