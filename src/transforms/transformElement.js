@@ -154,7 +154,12 @@ function isParamsExpr(obj) {
 
 //Add to the "paramsExpr" property of the parent node
 function addParamsExpr(node, parent) {
-  parent.paramsExpr = node;
+  if (!parent.paramsExpr) {
+    parent.paramsExpr = node;
+  }
+  else {
+    tools.listPush(parent.paramsExpr.content, node.content);
+  }
 }
 
 //获取标签组件名
@@ -188,7 +193,7 @@ function getTagComponentAttrs(el) {
       }
 
       //Deal with the attribute only has key.
-      if(val === '') {
+      if (val === '') {
         val = attrName;
       }
 
@@ -198,7 +203,7 @@ function getTagComponentAttrs(el) {
       else if (attrName.indexOf('data-') !== 0  //Transform to camel-case
         && attrName.indexOf(nj.namespace + '-') !== 0) {
         //Can be marked with an exclamation mark to distinguish the attribute name beginning with "data-".
-        if(attrName.indexOf('!') === 0) {
+        if (attrName.indexOf('!') === 0) {
           attrName = attrName.substr(1);
         }
 

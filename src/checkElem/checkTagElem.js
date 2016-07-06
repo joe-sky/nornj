@@ -31,13 +31,15 @@ function checkTagElem(obj, parent) {
     var tagName = tranElem.getTagComponentName(obj),
       params = tranElem.getTagComponentAttrs(obj),
       isControl = tranElem.isTagControl(tagName),
-      pushContent = true;
+      pushContent = true,
+      isParamsExpr;
 
     if (isControl) {  //特殊节点
       if (tagName !== tmplRule.exprRule + 'else') {
         tagName = tagName.substr(1);
         node.type = 'nj_expr';
         node.expr = tagName;
+        isParamsExpr = tranElem.isParamsExpr(tagName);
 
         if (tranElem.isTmpl(tagName)) {  //模板元素
           pushContent = false;
@@ -45,11 +47,8 @@ function checkTagElem(obj, parent) {
           //将模板添加到父节点的params中
           tranElem.addTmpl(node, parent);
         }
-        else if (tranElem.isParamsExpr(tagName)) {
+        else if (isParamsExpr) {
           pushContent = false;
-
-          //If this is params block, directly set on the "paramsExpr" property of the parent node.
-          tranElem.addParamsExpr(node, parent);
         }
         else {  //Expression block
           if (params && params.refer) {
@@ -92,6 +91,11 @@ function checkTagElem(obj, parent) {
     var childNodes = obj.childNodes;
     if (childNodes && childNodes.length) {
       checkTagContentElem(childNodes, node);
+    }
+
+    //If this is params block, set on the "paramsExpr" property of the parent node.
+    if (isParamsExpr) {
+      tranElem.addParamsExpr(node, parent);
     }
   }
 }

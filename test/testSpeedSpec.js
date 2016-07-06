@@ -44,6 +44,9 @@ describe('test speed', function () {
           <#params>
             <#param {'src'}>test.jpg</#param>
           </#params>
+          <#params>
+            <#param {'alt'}>test.jpg</#param>
+          </#params>
         </img>
       </#if>
     </#each>

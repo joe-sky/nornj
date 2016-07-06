@@ -13,7 +13,7 @@ function checkElem(obj, parent) {
     parentContent = !parent.hasElse ? 'content' : 'contentElse';
 
   if (!tools.isArray(obj)) {  //判断是否为文本节点
-    if(tools.isObject(obj) && '_njShim' in obj) {  //Get the shim value
+    if (tools.isObject(obj) && '_njShim' in obj) {  //Get the shim value
       obj = obj._njShim;
     }
 
@@ -128,9 +128,6 @@ function checkElem(obj, parent) {
         }
         else if (isParamsExpr) {
           pushContent = false;
-
-          //If this is params block, directly set on the "paramsExpr" property of the parent node.
-          tranElem.addParamsExpr(node, parent);
         }
         else {
           elseIndex = tools.inArray(obj, tmplRule.exprRule + 'else');
@@ -157,6 +154,11 @@ function checkElem(obj, parent) {
         if (contentElse && contentElse.length) {
           checkContentElem(contentElse, node);
         }
+      }
+
+      //If this is params block, set on the "paramsExpr" property of the parent node.
+      if (isParamsExpr) {
+        tranElem.addParamsExpr(node, parent);
       }
     }
     else {  //如果不是元素节点,则为节点集合
