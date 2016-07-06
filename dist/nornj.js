@@ -92,7 +92,7 @@ function checkElem(obj, parent) {
     parentContent = !parent.hasElse ? 'content' : 'contentElse';
 
   if (!tools.isArray(obj)) {  //判断是否为文本节点
-    if(tools.isObject(obj) && '_njShim' in obj) {  //Get the shim value
+    if (tools.isObject(obj) && '_njShim' in obj) {  //Get the shim value
       obj = obj._njShim;
     }
 
@@ -207,9 +207,6 @@ function checkElem(obj, parent) {
         }
         else if (isParamsExpr) {
           pushContent = false;
-
-          //If this is params block, directly set on the "paramsExpr" property of the parent node.
-          tranElem.addParamsExpr(node, parent);
         }
         else {
           elseIndex = tools.inArray(obj, tmplRule.exprRule + 'else');
@@ -236,6 +233,11 @@ function checkElem(obj, parent) {
         if (contentElse && contentElse.length) {
           checkContentElem(contentElse, node);
         }
+      }
+
+      //If this is params block, set on the "paramsExpr" property of the parent node.
+      if (isParamsExpr) {
+        tranElem.addParamsExpr(node, parent);
       }
     }
     else {  //如果不是元素节点,则为节点集合
@@ -421,20 +423,50 @@ function _formatText(str) {
 
 //Set element node
 function _setElem(elem, elemName, elemArr, params, bySelfClose) {
-  var ret;
+  var ret, paramsExpr;
   if (elemName[0] === tmplRule.exprRule) {
     ret = elem.substring(1, elem.length - 1);
   }
   else {
-    ret = elem;
+    var retS = _getSplitParams(elem, params);
+    ret = retS.elem;
+    paramsExpr = retS.params;
   }
 
   if (bySelfClose) {
-    elemArr.push([ret]);
+    var retC = [ret];
+    if(paramsExpr) {
+      retC.push(paramsExpr);
+    }
+
+    elemArr.push(retC);
   }
   else {
     elemArr.push(ret);
+    if(paramsExpr) {
+      elemArr.push(paramsExpr);
+    }
   }
+}
+
+//Extract split parameters
+function _getSplitParams(elem, params) {
+  var exprRule = tmplRule.exprRule,
+    paramsExpr;
+
+  elem = elem.replace(/([^\s={}>]+)=['"]?_nj-split(\d+)_['"]?/g, function(all, key, no) {
+    if(!paramsExpr) {
+      paramsExpr = [exprRule + 'params'];
+    }
+
+    paramsExpr.push([exprRule + "param {'" + key + "'}", params[no]]);
+    return '';
+  });
+
+  return {
+    elem: elem,
+    params: paramsExpr
+  };
 }
 
 //Set self close element node
@@ -508,13 +540,15 @@ function checkTagElem(obj, parent) {
     var tagName = tranElem.getTagComponentName(obj),
       params = tranElem.getTagComponentAttrs(obj),
       isControl = tranElem.isTagControl(tagName),
-      pushContent = true;
+      pushContent = true,
+      isParamsExpr;
 
     if (isControl) {  //特殊节点
       if (tagName !== tmplRule.exprRule + 'else') {
         tagName = tagName.substr(1);
         node.type = 'nj_expr';
         node.expr = tagName;
+        isParamsExpr = tranElem.isParamsExpr(tagName);
 
         if (tranElem.isTmpl(tagName)) {  //模板元素
           pushContent = false;
@@ -522,11 +556,8 @@ function checkTagElem(obj, parent) {
           //将模板添加到父节点的params中
           tranElem.addTmpl(node, parent);
         }
-        else if (tranElem.isParamsExpr(tagName)) {
+        else if (isParamsExpr) {
           pushContent = false;
-
-          //If this is params block, directly set on the "paramsExpr" property of the parent node.
-          tranElem.addParamsExpr(node, parent);
         }
         else {  //Expression block
           if (params && params.refer) {
@@ -569,6 +600,11 @@ function checkTagElem(obj, parent) {
     var childNodes = obj.childNodes;
     if (childNodes && childNodes.length) {
       checkTagContentElem(childNodes, node);
+    }
+
+    //If this is params block, set on the "paramsExpr" property of the parent node.
+    if (isParamsExpr) {
+      tranElem.addParamsExpr(node, parent);
     }
   }
 }
@@ -1436,7 +1472,12 @@ function isParamsExpr(obj) {
 
 //Add to the "paramsExpr" property of the parent node
 function addParamsExpr(node, parent) {
-  parent.paramsExpr = node;
+  if (!parent.paramsExpr) {
+    parent.paramsExpr = node;
+  }
+  else {
+    tools.listPush(parent.paramsExpr.content, node.content);
+  }
 }
 
 //获取标签组件名
@@ -1470,7 +1511,7 @@ function getTagComponentAttrs(el) {
       }
 
       //Deal with the attribute only has key.
-      if(val === '') {
+      if (val === '') {
         val = attrName;
       }
 
@@ -1480,7 +1521,7 @@ function getTagComponentAttrs(el) {
       else if (attrName.indexOf('data-') !== 0  //Transform to camel-case
         && attrName.indexOf(nj.namespace + '-') !== 0) {
         //Can be marked with an exclamation mark to distinguish the attribute name beginning with "data-".
-        if(attrName.indexOf('!') === 0) {
+        if (attrName.indexOf('!') === 0) {
           attrName = attrName.substr(1);
         }
 

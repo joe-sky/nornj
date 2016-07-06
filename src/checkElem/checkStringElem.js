@@ -153,20 +153,50 @@ function _formatText(str) {
 
 //Set element node
 function _setElem(elem, elemName, elemArr, params, bySelfClose) {
-  var ret;
+  var ret, paramsExpr;
   if (elemName[0] === tmplRule.exprRule) {
     ret = elem.substring(1, elem.length - 1);
   }
   else {
-    ret = elem;
+    var retS = _getSplitParams(elem, params);
+    ret = retS.elem;
+    paramsExpr = retS.params;
   }
 
   if (bySelfClose) {
-    elemArr.push([ret]);
+    var retC = [ret];
+    if(paramsExpr) {
+      retC.push(paramsExpr);
+    }
+
+    elemArr.push(retC);
   }
   else {
     elemArr.push(ret);
+    if(paramsExpr) {
+      elemArr.push(paramsExpr);
+    }
   }
+}
+
+//Extract split parameters
+function _getSplitParams(elem, params) {
+  var exprRule = tmplRule.exprRule,
+    paramsExpr;
+
+  elem = elem.replace(/([^\s={}>]+)=['"]?_nj-split(\d+)_['"]?/g, function(all, key, no) {
+    if(!paramsExpr) {
+      paramsExpr = [exprRule + 'params'];
+    }
+
+    paramsExpr.push([exprRule + "param {'" + key + "'}", params[no]]);
+    return '';
+  });
+
+  return {
+    elem: elem,
+    params: paramsExpr
+  };
 }
 
 //Set self close element node

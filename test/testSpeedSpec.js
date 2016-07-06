@@ -26,7 +26,9 @@ describe('test speed', function () {
             </#params>
             <span>span{#}</span>
             <i>{#}</i>
-            <span>
+            <span id=@${'sp100'}
+                  name=@${'name100'}
+                  data-id=sp200>
               <#params>
                 <#param {'dangerouslySetInnerHTML'}>
                   ${{__html: '>'}}
@@ -40,12 +42,12 @@ describe('test speed', function () {
       <#if {#:five(1):test}>
         <br />
       <#else />
-        <img>
+        <img alt=@${'test.jpg'}>
           <#params>
             <#param {'src'}>test.jpg</#param>
           </#params>
           <#params>
-            <#param {'alt'}>test.jpg</#param>
+            <#param {'data-alt'}>test.jpg</#param>
           </#params>
         </img>
       </#if>
