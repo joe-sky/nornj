@@ -49,6 +49,9 @@ module.exports = function (beginRule, endRule, exprRule) {
     xmlOpenTag: _createRegExp('^<([a-z' + firstChar + '][-a-z0-9_:.\/' + otherChars + ']*)[^>]*>$', 'i'),
     openTag: _createRegExp('^[a-z' + firstChar + '][-a-z0-9_:.\/' + otherChars + ']*', 'i'),
     insideBraceParam: _createRegExp(beginRule + '([^' + allRules + ']+)' + endRule, 'i'),
+    replaceBraceParam: function() {
+      return _createRegExp('[\\s]+[' + beginRule + ']{1,2}([^' + allRules + ']+)[' + endRule + ']{1,2}', 'g')
+    },
     replaceSplit: _createRegExp('(?:' + beginRule + '){1,2}[^' + allRules + ']+(?:' + endRule + '){1,2}'),
     replaceParam: function() {
       return _createRegExp('((' + beginRule + '){1,2})([^' + allRules + ']+)(' + endRule + '){1,2}', 'g');

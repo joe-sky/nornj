@@ -165,7 +165,7 @@ function _setElem(elem, elemName, elemArr, params, bySelfClose) {
 
   if (bySelfClose) {
     var retC = [ret];
-    if(paramsExpr) {
+    if (paramsExpr) {
       retC.push(paramsExpr);
     }
 
@@ -173,7 +173,7 @@ function _setElem(elem, elemName, elemArr, params, bySelfClose) {
   }
   else {
     elemArr.push(ret);
-    if(paramsExpr) {
+    if (paramsExpr) {
       elemArr.push(paramsExpr);
     }
   }
@@ -184,13 +184,32 @@ function _getSplitParams(elem, params) {
   var exprRule = tmplRule.exprRule,
     paramsExpr;
 
-  elem = elem.replace(/([^\s={}>]+)=['"]?_nj-split(\d+)_['"]?/g, function(all, key, no) {
-    if(!paramsExpr) {
+  //Replace the parameter like "prop=_nj-split0_".
+  elem = elem.replace(/([^\s={}>]+)=['"]?_nj-split(\d+)_['"]?/g, function (all, key, no) {
+    if (!paramsExpr) {
       paramsExpr = [exprRule + 'params'];
     }
 
     paramsExpr.push([exprRule + "param {'" + key + "'}", params[no]]);
     return '';
+  });
+
+  //Replace the parameter like "{...props}" and "{prop}".
+  elem = elem.replace(tmplRule.replaceBraceParam(), function (all, prop) {
+    prop = prop.trim();
+    var propN = prop.replace(/\.\.\//g, '');
+
+    if (propN.indexOf('...') === 0) {
+      if (!paramsExpr) {
+        paramsExpr = [exprRule + 'params'];
+      }
+
+      paramsExpr.push([exprRule + 'spreadParam {' + prop.replace(/\.\.\./g, '') + '}/']);
+      return ' ';
+    }
+    else {
+      return ' ' + propN + '=' + all.trim();
+    }
   });
 
   return {

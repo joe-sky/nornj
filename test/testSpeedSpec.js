@@ -26,14 +26,11 @@ describe('test speed', function () {
             </#params>
             <span>span{#}</span>
             <i>{#}</i>
-            <span id=@${'sp100'}
+            <span {../../id}
+                  data-a={../../obj.a}
                   name=@${'name100'}
-                  data-id=sp200>
-              <#params>
-                <#param {'dangerouslySetInnerHTML'}>
-                  ${{__html: '>'}}
-                </#param>
-              </#params>
+                  data-id=sp200
+                  dangerouslySetInnerHTML=${{__html: '>'}}>
             </span>
             @${' space > space '}
           </div>
@@ -42,14 +39,15 @@ describe('test speed', function () {
       <#if {#:five(1):test}>
         <br />
       <#else />
-        <img alt=@${'test.jpg'}>
+        <img alt=@${'test.jpg'} {../...b.spread}>
           <#params>
             <#param {'src'}>test.jpg</#param>
           </#params>
           <#params>
-            <#param {'data-alt'}>test.jpg</#param>
+            <#param {'data-alt'}>{../id}</#param>
           </#params>
         </img>
+        <input {../...b.spread}/>
       </#if>
     </#each>
   </div>
@@ -81,7 +79,8 @@ describe('test speed', function () {
         'data-a': 1,
         'data-b': 2
       },
-      styles: "color:blue"
+      styles: "color:blue",
+      id: 'sp100'
     };
 
     var tmplFn = compile(tmpl, 'tmpl1'),
@@ -105,7 +104,7 @@ describe('test speed', function () {
       },
       onClick: function () {
         start = Date.now();
-        this.setState({ num: Date.now() }, function() {
+        this.setState({ num: Date.now() }, function () {
           console.log('total:' + (Date.now() - start));
         });
       },
@@ -117,7 +116,7 @@ describe('test speed', function () {
           return [
               React.createElement('span', { className: 'test_' + i, style: { color: 'blue' }, onClick: this.onClick },
                 'test_' + this.state.num,
-                list2.map(function(p, j) {
+                list2.map(function (p, j) {
                   return [React.createElement('div', i % 5 == 0 ? { name: 'five' } : null,
                     React.createElement('span', null, 'span' + j),
                     React.createElement('i', null, j)
@@ -166,6 +165,17 @@ describe('test speed', function () {
           },
           styles: {
             color: 'blue'
+          },
+          id: 'sp100',
+          obj: {
+            a: 'a100'
+          },
+          b: {
+            spread: {
+              'data-a': 1,
+              'data-b': 2,
+              'data-c': 3
+            }
           }
         };
 
