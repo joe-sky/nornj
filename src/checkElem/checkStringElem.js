@@ -182,6 +182,8 @@ function _setElem(elem, elemName, elemArr, params, bySelfClose) {
 //Extract split parameters
 function _getSplitParams(elem, params) {
   var exprRule = tmplRule.exprRule,
+    beginRule = tmplRule.beginRule,
+    endRule = tmplRule.endRule,
     paramsExpr;
 
   //Replace the parameter like "prop=_nj-split0_".
@@ -190,12 +192,12 @@ function _getSplitParams(elem, params) {
       paramsExpr = [exprRule + 'params'];
     }
 
-    paramsExpr.push([exprRule + "param {'" + key + "'}", params[no]]);
+    paramsExpr.push([exprRule + "param " + beginRule + "'" + key + "'" + endRule, params[no]]);
     return '';
   });
 
   //Replace the parameter like "{...props}" and "{prop}".
-  elem = elem.replace(tmplRule.replaceBraceParam(), function (all, prop) {
+  elem = elem.replace(tmplRule.replaceBraceParam(), function (all, begin, prop) {
     prop = prop.trim();
     var propN = prop.replace(/\.\.\//g, '');
 
@@ -204,7 +206,7 @@ function _getSplitParams(elem, params) {
         paramsExpr = [exprRule + 'params'];
       }
 
-      paramsExpr.push([exprRule + 'spreadParam {' + prop.replace(/\.\.\./g, '') + '}/']);
+      paramsExpr.push([exprRule + 'spreadParam ' + beginRule + prop.replace(/\.\.\./g, '') + endRule + '/']);
       return ' ';
     }
     else {

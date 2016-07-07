@@ -20,17 +20,24 @@ describe('test compile', function () {
 
   describe('compile template to html', function () {
     xit('test compile 1', function () {
-      nj.setTmplRule('{%', '%}');
+      nj.setTmplRule('{%', '%}', '$');
 
       var data = {
         name: "joe_sky",
         id: "<joe/>",
         test0: true,
-        num: 100
+        num: 100,
+        name2: {
+          a: 1,
+          b: 2
+        }
       };
+
+      var tmplS = nj`<i {%name%} {%...name2%} c=3>test</i>`;
 
       var tmpl =
       ['<div checked disabled="disabled" name1=../111 name="my name:{%name%},id:{%id%},name:{%name%}" id=test1>',
+        tmplS,
         ['<span>", "sky:{%name%},{%{%id%}%}'],
         ['span1', 'joe', '/span1'],
         ['div id=555', [

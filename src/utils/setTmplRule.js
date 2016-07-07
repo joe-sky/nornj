@@ -50,7 +50,7 @@ module.exports = function (beginRule, endRule, exprRule) {
     openTag: _createRegExp('^[a-z' + firstChar + '][-a-z0-9_:.\/' + otherChars + ']*', 'i'),
     insideBraceParam: _createRegExp(beginRule + '([^' + allRules + ']+)' + endRule, 'i'),
     replaceBraceParam: function() {
-      return _createRegExp('[\\s]+[' + beginRule + ']{1,2}([^' + allRules + ']+)[' + endRule + ']{1,2}', 'g')
+      return _createRegExp('[\\s]+(' + beginRule + '){1,2}([^' + allRules + ']+)(' + endRule + '){1,2}', 'g')
     },
     replaceSplit: _createRegExp('(?:' + beginRule + '){1,2}[^' + allRules + ']+(?:' + endRule + '){1,2}'),
     replaceParam: function() {
