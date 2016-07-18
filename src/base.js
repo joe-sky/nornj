@@ -24,13 +24,19 @@ if (typeof React !== 'undefined') {
   setComponentEngine('react', React, typeof ReactDOM !== 'undefined' ? ReactDOM : null);
 }
 
-//Init tag template
+var global;
 if (typeof self !== 'undefined') {
+  global = self;
+
+  //Init tag template
   docReady(function () {
     if (nj.componentLib && nj.autoRenderTag) {
       nj.renderTagComponent(nj.initTagData);
     }
   });
 }
+else {
+  global = this;
+}
 
-module.exports = nj;
+module.exports = global.NornJ = global.nj = nj;

@@ -1,14 +1,26 @@
 ﻿var gulp = require('gulp'),
-  browserify = require('browserify'),
-  standalonify = require('standalonify'),
-  uglify = require('gulp-uglify'),
-  source = require('vinyl-source-stream'),
-  buffer = require('vinyl-buffer'),
+  webpack = require('webpack'),
+  webpackStream = require('webpack-stream'),
   jasmine = require('gulp-jasmine'),
   rename = require('gulp-rename'),
   gulpif = require('gulp-if'),
   eslint = require('gulp-eslint'),
+  notify = require('gulp-notify'),
   argv = require('yargs').argv;
+
+//Handle error
+function handlebuildError() {
+  var args = Array.prototype.slice.call(arguments);
+
+  // Send error to notification center with gulp-notify
+  notify.onError({
+    title: "Compile Error",
+    message: "<%= error.message %>"
+  }).apply(this, args);
+
+  // Keep gulp from hanging on this task
+  this.emit('end');
+}
 
 //Build js
 gulp.task('build', function () {
@@ -17,17 +29,31 @@ gulp.task('build', function () {
     libName = 'nornj.min.js';
   }
 
-  return browserify({
-    entries: './src/base.js',
-    //standalone: 'NornJ'
-  })
-    .plugin(standalonify, {  //Build UMD standalone bundle and support dependencies.
-      name: ['nj', 'NornJ']
-    })
-    .bundle()
-    .pipe(source(libName))
-    .pipe(buffer())
-    .pipe(gulpif(argv.p, uglify()))
+  var plugins = [];
+  if (argv.p) {
+    plugins.push(new webpack.optimize.UglifyJsPlugin({
+      compressor: {
+        pure_getters: true,
+        unsafe: true,
+        unsafe_comps: true,
+        screw_ie8: true,
+        warnings: false
+      }
+    }));
+  }
+
+  return gulp.src('./src/base.js')
+    .pipe(webpackStream({
+      devtool: argv.p ? 'source-map' : null,
+      watch: argv.w ? true : false,
+      output: {
+        filename: libName,
+        library: 'NornJ',
+        libraryTarget: 'umd'
+      },
+      plugins: plugins
+    }))
+    .on('error', handlebuildError)
     .pipe(gulp.dest('./dist'));
 });
 
@@ -41,8 +67,8 @@ gulp.task("test", function () {
 gulp.task('eslint', function () {
   return gulp.src(['./src/**/*.js'])
     .pipe(eslint({
-      "rules":{
-        "camelcase": [2, {"properties": "always"}],
+      "rules": {
+        "camelcase": [2, { "properties": "always" }],
         "comma-dangle": [2, "never"],
         "semi": [2, "always"],
         "quotes": [2, "single"],
