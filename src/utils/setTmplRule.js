@@ -57,7 +57,7 @@ module.exports = function (beginRule, endRule, exprRule) {
       return _createRegExp('((' + beginRule + '){1,2})([^' + allRules + ']+)(' + endRule + '){1,2}', 'g');
     },
     checkElem: function() {
-      return _createRegExp('([^>]*)(<([a-z' + firstChar + '\/' + exprRules + '][-a-z0-9_:.' + allRules + exprRules + ']*)[^>]*>)([^<]*)', 'ig');
+      return _createRegExp('([^>]*)(<([a-z' + firstChar + '\/' + exprRules + '!][-a-z0-9_:.' + allRules + exprRules + ']*)[^>]*>)([^<]*)', 'ig');
     },
     expr: _createRegExp('^' + escapeExprRule + '([^\\s]+)', 'i')
   });
