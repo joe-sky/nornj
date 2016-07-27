@@ -10,8 +10,14 @@
 describe('test speed', function () {
   nj.setTmplRule(null, null, '#');
 
+  var tmpl1 = nj`
+  <div>test1</div>
+  `;
+
   var tmpl = nj`
   <div>
+    ${[tmpl1, ['{num}', tmpl1]]}
+    ${tmpl1}
     <#each {arr}>
       <span class=test_{#}
             style={../styles}
@@ -52,6 +58,8 @@ describe('test speed', function () {
     </#each>
   </div>
   `;
+  
+  //console.log(tmpl.njKey);
 
   beforeAll(function () {
     nj.setComponentEngine('react', React, ReactDOM);
@@ -179,7 +187,8 @@ describe('test speed', function () {
           }
         };
 
-        var ret = this.template(params);
+        //var ret = this.template(params);
+        var ret = tmpl.renderComponent(params);
         console.log('render:' + (Date.now() - start));
         return ret;
       }

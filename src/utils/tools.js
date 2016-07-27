@@ -120,13 +120,16 @@ function throwIf(val, msg) {
 }
 
 //create a unique key
-function uniqueKey(str) {
+function uniqueKey(str, hash) {
   var len = str.length;
   if (len == 0) {
     return str;
   }
+  if (hash == null) {
+    hash = 0;
+  }
 
-  var hash = 0, i, chr;
+  var i, chr;
   for (i = 0, len = str.length; i < len; i++) {
     chr = str.charCodeAt(i);
     hash = ((hash << 5) - hash) + chr;

@@ -288,13 +288,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 	//create a unique key
-	function uniqueKey(str) {
+	function uniqueKey(str, hash) {
 	  var len = str.length;
 	  if (len == 0) {
 	    return str;
 	  }
+	  if (hash == null) {
+	    hash = 0;
+	  }
 
-	  var hash = 0, i, chr;
+	  var i, chr;
 	  for (i = 0, len = str.length; i < len; i++) {
 	    chr = str.charCodeAt(i);
 	    hash = ((hash << 5) - hash) + chr;
@@ -2353,34 +2356,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	//Compile string template
 	function compileStringTmpl(tmpl) {
 	  var isStr = tools.isString(tmpl),
-	    tmplKey;
-
-	  //Get unique key
-	  if (isStr) {
-	    tmpl = _clearNotesAndBlank(tmpl);
-	    tmplKey = tools.uniqueKey(tmpl);
-	  }
-	  else {
-	    var fullXml = '';
-	    tools.each(tmpl, function (xml) {
-	      fullXml += xml;
-	    }, false, true);
-
-	    tmplKey = tools.uniqueKey(_clearNotesAndBlank(fullXml));
-	  }
-
-	  //If the cache already has template data,then return the template
-	  var ret = nj.strTmpls[tmplKey];
-	  if (ret) {
-	    return ret;
-	  }
-
-	  var xmls = tmpl,
+	    xmls = tmpl,
 	    args = arguments,
 	    splitNo = 0,
-	    params = [];
+	    params = [],
+	    fullXml = '';
 
-	  ret = '';
 	  if (isStr) {
 	    xmls = tmpl.split(REGEX_SPLIT);
 	  }
@@ -2411,14 +2392,29 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }
 	    }
 
-	    ret += xml + split;
+	    fullXml += xml + split;
 	  }, false, true);
 
+	  fullXml = _clearNotesAndBlank(fullXml);
+
+	  //Get unique key
+	  var tmplKey = tools.uniqueKey(fullXml + _paramsStr(params));
+
+	  //If the cache already has template data, direct return the template.
+	  var ret = nj.strTmpls[tmplKey];
+	  if (ret) {
+	    return ret;
+	  }
+
 	  //Resolve string to element
-	  ret = _checkStringElem(isStr ? ret : _clearNotesAndBlank(ret), params);
+	  ret = _checkStringElem(fullXml, params);
+
+	  //Set the properties for the template object
+	  _setTmplProps(ret, tmplKey);
 
 	  //Save to the cache
 	  nj.strTmpls[tmplKey] = ret;
+
 	  return ret;
 	}
 
@@ -2489,6 +2485,41 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function _formatText(str) {
 	  return str.replace(/\n/g, '').trim();
+	}
+
+	//Merge parameters to string
+	function _paramsStr(params) {
+	  var str = '';
+	  tools.each(params, function (p) {
+	    if (tools.isArray(p)) {
+	      str += _cascadeArr(p, true);
+	    }
+	    else {
+	      str += JSON.stringify(p);
+	    }
+	  }, false, true);
+
+	  return str;
+	}
+
+	function _cascadeArr(p, isArr) {
+	  var str;
+	  if (isArr || tools.isArray(p)) {
+	    if (p.njKey != null) {
+	      str = p.njKey;
+	    }
+	    else {
+	      str = '';
+	      for (var i = 0, l = p.length; i < l; i++) {
+	        str += _cascadeArr(p[i]);
+	      }
+	    }
+	  }
+	  else {
+	    str = p;
+	  }
+
+	  return str;
 	}
 
 	//Set element node
@@ -2594,6 +2625,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	  else {
 	    elemArr.push(text);
 	  }
+	}
+
+	//Set template props
+	function _setTmplProps(tmpl, key) {
+	  tmpl.njKey = key;
+
+	  tmpl.render = function () {
+	    return nj.compile(this, this.njKey).apply(null, arguments);
+	  };
+
+	  tmpl.renderComponent = function () {
+	    return nj.compileComponent(this, this.njKey).apply(null, arguments);
+	  };
 	}
 
 	module.exports = compileStringTmpl;
