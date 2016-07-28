@@ -188,7 +188,7 @@ describe('test speed', function () {
         };
 
         //var ret = this.template(params);
-        var ret = tmpl.renderComponent(params);
+        var ret = tmpl.renderComp(params);
         console.log('render:' + (Date.now() - start));
         return ret;
       }

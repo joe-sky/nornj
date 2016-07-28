@@ -2635,7 +2635,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return nj.compile(this, this.njKey).apply(null, arguments);
 	  };
 
-	  tmpl.renderComponent = function () {
+	  tmpl.renderComp = function () {
 	    return nj.compileComponent(this, this.njKey).apply(null, arguments);
 	  };
 	}
