@@ -149,10 +149,10 @@ function _paramsStr(params) {
   var str = '';
   tools.each(params, function (p) {
     if (tools.isArray(p)) {
-      str += _cascadeArr(p, true);
+      str += '|' + _cascadeArr(p, true);
     }
     else {
-      str += JSON.stringify(p);
+      str += '|' + JSON.stringify(p);
     }
   }, false, true);
 
@@ -163,7 +163,7 @@ function _cascadeArr(p, isArr) {
   var str;
   if (isArr || tools.isArray(p)) {
     if (p.njKey != null) {
-      str = p.njKey;
+      str = '+' + p.njKey;
     }
     else {
       str = '';
@@ -173,7 +173,7 @@ function _cascadeArr(p, isArr) {
     }
   }
   else {
-    str = p;
+    str = '+' + p;
   }
 
   return str;
