@@ -1,13 +1,14 @@
 {
   "name": "nornj",
-  "version": "0.3.6-rc.9",
+  "version": "0.3.6-rc.10",
   "description": "A multipurpose javascript template engine",
   "main": "src/base.js",
   "files": [
     "dist/",
     "src/",
     "precompiler.js",
-    "LICENSE"
+    "LICENSE",
+    "README.md"
   ],
   "scripts": {
     "test": "gulp test"
