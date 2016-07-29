@@ -113,10 +113,12 @@ npm install --save nornj
 
 * 可支持所有现代浏览器以及Internet Explorer 8+。
 
-### 技术文档
+### API文档
 
-* [模板结构](https://github.com/joe-sky/nornj/blob/master/docs/模板结构(在js中).md)
-* [编译模板并输出html](https://github.com/joe-sky/nornj/blob/master/docs/编译模板并输出html字符串.md)
+* [使用字符串构建模板](https://github.com/joe-sky/nornj/blob/master/docs/使用字符串构建模板.md)
+* [使用dom构建模板](https://github.com/joe-sky/nornj/blob/master/docs/使用dom构建模板.md)
+* [编译模板并输出html字符串](https://github.com/joe-sky/nornj/blob/master/docs/编译模板并输出html字符串.md)
+* [编译模板并输出React组件](https://github.com/joe-sky/nornj/blob/master/docs/编译模板并输出React组件.md)
 
 ### License
 
