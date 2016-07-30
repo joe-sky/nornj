@@ -145,11 +145,11 @@ console.log(html);
 ### 链式API
 NornJ模板还支持类似`jQuery`的链式调用方式。
 
-#### render方法
-执行`render`方法就和执行使用`compileComponent`方法编译出来的模板函数的效果相同，如下所示：
+#### renderComp方法
+执行`renderComp`方法就和执行使用`compileComponent`方法编译出来的模板函数的效果相同，如下所示：
 
 ```js
-let comp = nj`<span>test{no}</span>`.render({ no: 1 });
+let comp = nj`<span>test{no}</span>`.renderComp({ no: 1 });
 let html = renderToStaticMarkup(comp);
 
 console.log(html);
@@ -158,4 +158,4 @@ console.log(html);
 */
 ```
 
-不过这种使用方式比使用编译后的模板函数性能稍差，一般可以在单元测试中多使用这种渲染方式。
+这种渲染方式比使用模板函数性能稍差，一般可以在单元测试中多使用这种渲染方式。
