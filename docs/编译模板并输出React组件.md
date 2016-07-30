@@ -111,8 +111,8 @@ console.log(html);
 */
 ```
 
-1. 模板函数只有一个参数，值为json格式的数据。模板中和传入数据中对应的值会自动进行相应替换，最后输出结果为替换后的React组件。
-2. 模板函数的参数也可以传入1个任意长度的数组，如下所示：
+1. 模板函数一般只传入一个参数，值为json格式的数据。模板中和传入数据中对应的值会自动进行相应替换，最后输出结果为替换后的React组件。
+2. 模板函数的参数也可以传入1个任意长度的json数组(或传入多个json参数，效果和传入一个json数组相同)，如下所示：
 ```js
 //定义模板
 const tmpl = nj`
@@ -122,15 +122,16 @@ const tmpl = nj`
 </div>`;
 
 //编译为模板函数
-const tmplFn = nj.compile(tmpl, 'tmpl1');
+const tmplFn = nj.compileComponent(tmpl, 'tmpl1');
 
-//输出html
-let html = tmplFn([{
+//渲染
+let comp = tmplFn([{
   no: 100
 }, {
   no: 200,  //相同的值优先采用顺序靠前的参数中的(1)
   no2: 300  //如果数组第一个参数没有no2属性，就会尝试从后面的参数中获取(2)
 }]);
+let html = renderToStaticMarkup(comp);
 
 console.log(html);
 /*输出html:
@@ -140,3 +141,8 @@ console.log(html);
 </div>
 ```
 以数组形式传入多个参数后，NornJ模板在编译时会按顺序检测每个数据对象是否有和模板中对应的值。如果检测到前面的参数有对应值，那么就会停止继续检测后面的参数是否有该对应值，如例中(1)处所示；如果靠前面的参数中没有对应值，那么就按顺序寻找后面的参数中是否存在，如例中(2)处所示。
+
+### 链式API
+NornJ模板还支持类似`jQuery`的链式调用方式。
+
+#### render方法
