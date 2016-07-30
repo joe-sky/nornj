@@ -68,7 +68,7 @@ render(compileComponent(
 ```html
 ...
 <body>
-  <nj-TestComponent class="nj-component" no="100" />
+  <TestComponent class="nj-component" no="100" />
 </body>
 ```
 
