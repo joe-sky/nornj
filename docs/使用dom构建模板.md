@@ -7,10 +7,10 @@ NornJ模板可以使用字符串或html dom构建：
 
 结构例如:
 ```html
-<nj:slider>
+<Slider>
     'this the test slider {msg}.'
-    <nj:sliderItem id='test' onsliderend={event} />
-</nj:slider>
+    <SliderItem id='test' on-slider-end={event} />
+</Slider>
 ```
 
 #### 用途
