@@ -32,7 +32,8 @@ function checkElem(obj, parent) {
       len = obj.length,
       last = obj[len - 1],
       isElemNode = false,
-      control;
+      control,
+      refer;
 
     //判断是否为xml标签
     var xmlOpenTag = tranElem.getXmlOpenTag(first),
@@ -71,14 +72,14 @@ function checkElem(obj, parent) {
         }
       }
       else {  //为特殊节点,也可视为一个元素节点
-        var ctrl = control[0].toLowerCase(),
-          refer = control[1];
+        var ctrl = control[0].toLowerCase();
+        refer = control[1];
         isTmpl = tranElem.isTmpl(ctrl);
         isParamsExpr = tranElem.isParamsExpr(ctrl);
 
         node.type = 'nj_expr';
         node.expr = ctrl;
-        if (refer != null) {
+        if (refer != null && !isTmpl) {
           node.refer = tranParam.compiledParam(refer);
         }
 
@@ -122,9 +123,10 @@ function checkElem(obj, parent) {
       else {  //为表达式块时判断是否有$else
         if (isTmpl) {  //模板元素
           pushContent = false;
+          var retR = tranElem.getInsideBraceParam(refer);
 
           //将模板添加到父节点的params中
-          tranElem.addTmpl(node, parent);
+          tranElem.addTmpl(node, parent, retR ? tools.clearQuot(retR[1]) : null);
         }
         else if (isParamsExpr) {
           pushContent = false;

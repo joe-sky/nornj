@@ -146,7 +146,7 @@ function lightObj() {
 
 //Clear quotation marks
 function clearQuot(value) {
-  var charF = value.charAt(0),
+  var charF = value[0],
     regex;
 
   if (charF === '\'') {

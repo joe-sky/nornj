@@ -43,9 +43,13 @@ function checkTagElem(obj, parent) {
 
         if (tranElem.isTmpl(tagName)) {  //模板元素
           pushContent = false;
+          var retR;
+          if (params && params.refer) {
+            retR = tranElem.getInsideBraceParam(params.refer);
+          }
 
           //将模板添加到父节点的params中
-          tranElem.addTmpl(node, parent);
+          tranElem.addTmpl(node, parent, retR ? tools.clearQuot(retR[1]) : null);
         }
         else if (isParamsExpr) {
           pushContent = false;

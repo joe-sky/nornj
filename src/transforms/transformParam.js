@@ -106,7 +106,7 @@ function _getReplaceParam(obj, strs) {
       propP = propP.trim();
 
       //If parameter has quotation marks, this's a pure string parameter.
-      if (_quots.indexOf(propP.charAt(0)) > -1) {
+      if (_quots.indexOf(propP[0]) > -1) {
         propP = tools.clearQuot(propP);
         item[3] = true;
       }

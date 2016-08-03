@@ -132,7 +132,7 @@ function isTmpl(obj) {
 }
 
 //加入到模板集合中
-function addTmpl(node, parent) {
+function addTmpl(node, parent, name) {
   var paramsP = parent.params;
   if (!paramsP) {
     paramsP = parent.params = tools.lightObj();
@@ -140,10 +140,28 @@ function addTmpl(node, parent) {
 
   var tmpls = paramsP.tmpls;
   if (!tmpls) {
-    paramsP.tmpls = tranParam.compiledParam([node]);
+    var objT = { length: 0 };
+    if(name != null) {
+      objT[name] = node;
+    }
+    else {
+      objT['0'] = node;
+      objT.length = 1;
+    }
+
+    paramsP.tmpls = tranParam.compiledParam(objT);
   }
-  else {
-    tmpls.strs[0].push(node);  //Insert the compiled template to the parameter name for "tmpls"'s "strs" array.
+  else {  //Insert the compiled template to the parameter name for "tmpls"'s "strs" array.
+    var objT = tmpls.strs[0],
+      len = objT.length;
+
+    if(name != null) {
+      objT[name] = node;
+    }
+    else {
+      objT[len] = node;
+      objT.length = ++len;
+    }
   }
 }
 

@@ -15,7 +15,7 @@ function _clearRepeat(str) {
     char;
 
   for (; i < l; i++) {
-    char = str.charAt(i);
+    char = str[i];
     if (ret.indexOf(char) < 0) {
       ret += char;
     }
@@ -36,7 +36,7 @@ module.exports = function (beginRule, endRule, exprRule) {
   }
 
   var allRules = _clearRepeat(beginRule + endRule),
-    firstChar = beginRule.charAt(0),
+    firstChar = beginRule[0],
     otherChars = allRules.substr(1),
     exprRules = _clearRepeat(exprRule),
     escapeExprRule = exprRule.replace(/\$/g, '\\$');

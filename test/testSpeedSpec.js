@@ -58,7 +58,7 @@ describe('test speed', function () {
     </#each>
   </div>
   `;
-  
+
   //console.log(tmpl.njKey);
 
   beforeAll(function () {
@@ -162,6 +162,7 @@ describe('test speed', function () {
         });
       },
       render: function () {
+        console.log(this.props.tmpls);
         var params = {
           arr: this.props.arr,
           num: this.state.num,
@@ -193,13 +194,35 @@ describe('test speed', function () {
         return ret;
       }
     });
+    nj.registerComponent({ TestComponent });
 
-    var html = ReactDOMServer.renderToStaticMarkup(React.createElement(TestComponent, {
-      arr: _.times(5, function (n) {
-        return n;
-      }),
-      a: 1,
-      list: [{ no: 1, b: 1 }, { no: 2, b: 0 }, { no: 3, b: 1 }]
+    //var html = ReactDOMServer.renderToStaticMarkup(React.createElement(TestComponent, {
+    //  arr: _.times(5, function (n) {
+    //    return n;
+    //  }),
+    //  a: 1,
+    //  list: [{ no: 1, b: 1 }, { no: 2, b: 0 }, { no: 3, b: 1 }]
+    //}));
+    var html = ReactDOMServer.renderToStaticMarkup(nj`
+      <TestComponent {...props}>
+        <#tmpl>
+          {test123}
+        </#tmpl>
+        <#tmpl {t1}>
+          {test123}
+        </#tmpl>
+        <#tmpl>
+          {test123}
+        </#tmpl>
+      </TestComponent>
+      `.renderComp({
+      props: {
+        arr: _.times(5, function (n) {
+          return n;
+        }),
+        a: 1,
+        list: [{ no: 1, b: 1 }, { no: 2, b: 0 }, { no: 3, b: 1 }]
+      }
     }));
 
     //console.log(JSON.stringify(nj.templates['tmpl1']));

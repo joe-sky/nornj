@@ -314,7 +314,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	//Clear quotation marks
 	function clearQuot(value) {
-	  var charF = value.charAt(0),
+	  var charF = value[0],
 	    regex;
 
 	  if (charF === '\'') {
@@ -546,7 +546,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 	//加入到模板集合中
-	function addTmpl(node, parent) {
+	function addTmpl(node, parent, name) {
 	  var paramsP = parent.params;
 	  if (!paramsP) {
 	    paramsP = parent.params = tools.lightObj();
@@ -554,10 +554,28 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  var tmpls = paramsP.tmpls;
 	  if (!tmpls) {
-	    paramsP.tmpls = tranParam.compiledParam([node]);
+	    var objT = { length: 0 };
+	    if(name != null) {
+	      objT[name] = node;
+	    }
+	    else {
+	      objT['0'] = node;
+	      objT.length = 1;
+	    }
+
+	    paramsP.tmpls = tranParam.compiledParam(objT);
 	  }
-	  else {
-	    tmpls.strs[0].push(node);  //Insert the compiled template to the parameter name for "tmpls"'s "strs" array.
+	  else {  //Insert the compiled template to the parameter name for "tmpls"'s "strs" array.
+	    var objT = tmpls.strs[0],
+	      len = objT.length;
+
+	    if(name != null) {
+	      objT[name] = node;
+	    }
+	    else {
+	      objT[len] = node;
+	      objT.length = ++len;
+	    }
 	  }
 	}
 
@@ -1094,7 +1112,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      propP = propP.trim();
 
 	      //If parameter has quotation marks, this's a pure string parameter.
-	      if (_quots.indexOf(propP.charAt(0)) > -1) {
+	      if (_quots.indexOf(propP[0]) > -1) {
 	        propP = tools.clearQuot(propP);
 	        item[3] = true;
 	      }
@@ -1188,7 +1206,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	      len = obj.length,
 	      last = obj[len - 1],
 	      isElemNode = false,
-	      control;
+	      control,
+	      refer;
 
 	    //判断是否为xml标签
 	    var xmlOpenTag = tranElem.getXmlOpenTag(first),
@@ -1227,14 +1246,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	      }
 	      else {  //为特殊节点,也可视为一个元素节点
-	        var ctrl = control[0].toLowerCase(),
-	          refer = control[1];
+	        var ctrl = control[0].toLowerCase();
+	        refer = control[1];
 	        isTmpl = tranElem.isTmpl(ctrl);
 	        isParamsExpr = tranElem.isParamsExpr(ctrl);
 
 	        node.type = 'nj_expr';
 	        node.expr = ctrl;
-	        if (refer != null) {
+	        if (refer != null && !isTmpl) {
 	          node.refer = tranParam.compiledParam(refer);
 	        }
 
@@ -1278,9 +1297,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	      else {  //为表达式块时判断是否有$else
 	        if (isTmpl) {  //模板元素
 	          pushContent = false;
+	          var retR = tranElem.getInsideBraceParam(refer);
 
 	          //将模板添加到父节点的params中
-	          tranElem.addTmpl(node, parent);
+	          tranElem.addTmpl(node, parent, retR ? tools.clearQuot(retR[1]) : null);
 	        }
 	        else if (isParamsExpr) {
 	          pushContent = false;
@@ -1394,9 +1414,13 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        if (tranElem.isTmpl(tagName)) {  //模板元素
 	          pushContent = false;
+	          var retR;
+	          if (params && params.refer) {
+	            retR = tranElem.getInsideBraceParam(params.refer);
+	          }
 
 	          //将模板添加到父节点的params中
-	          tranElem.addTmpl(node, parent);
+	          tranElem.addTmpl(node, parent, retR ? tools.clearQuot(retR[1]) : null);
 	        }
 	        else if (isParamsExpr) {
 	          pushContent = false;
@@ -1884,7 +1908,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    char;
 
 	  for (; i < l; i++) {
-	    char = str.charAt(i);
+	    char = str[i];
 	    if (ret.indexOf(char) < 0) {
 	      ret += char;
 	    }
@@ -1905,7 +1929,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 
 	  var allRules = _clearRepeat(beginRule + endRule),
-	    firstChar = beginRule.charAt(0),
+	    firstChar = beginRule[0],
 	    otherChars = allRules.substr(1),
 	    exprRules = _clearRepeat(exprRule),
 	    escapeExprRule = exprRule.replace(/\$/g, '\\$');
