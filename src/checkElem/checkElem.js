@@ -13,7 +13,7 @@ function checkElem(obj, parent) {
     parentContent = !parent.hasElse ? 'content' : 'contentElse';
 
   if (!tools.isArray(obj)) {  //判断是否为文本节点
-    if (tools.isObject(obj) && '_njShim' in obj) {  //Get the shim value
+    if (tools.isObject(obj) && '_njShim' in obj && !tools.isArray(obj._njShim)) {  //Get the shim value
       obj = obj._njShim;
     }
 

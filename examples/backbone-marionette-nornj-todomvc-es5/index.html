@@ -42,7 +42,7 @@
     <button id="clear-completed">
       <#params>
         <#unless {completedCount}>
-          <#param {'class'}>hidden</#param>
+          <#p {'class'}>hidden</#p>
         </#unless>
       </#params>
       Clear completed
@@ -57,7 +57,7 @@
       <input class="toggle" type="checkbox">
         <#params>
           <#if {completed}>
-            <#param {'checked'} />
+            <#p {'checked'} />
           </#if>
         </#params>
       </input>

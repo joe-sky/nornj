@@ -99,6 +99,11 @@ nj.exprs = {
       }
       else {
         value = ret[0];
+
+        //The "_njShim" property is used to distinguish whether the incoming is an normal array.
+        if (value && value._njShim) {
+          value = value._njShim;
+        }
       }
     }
     else {  //Match to Similar to "checked" or "disabled" attribute.
@@ -166,6 +171,9 @@ nj.exprs = {
     return ret;
   }
 };
+
+//Expression alias
+nj.exprs.p = nj.exprs.param;
 
 //Register expression and also can batch add
 function registerExpr(name, expr) {

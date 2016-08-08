@@ -1187,7 +1187,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    parentContent = !parent.hasElse ? 'content' : 'contentElse';
 
 	  if (!tools.isArray(obj)) {  //判断是否为文本节点
-	    if (tools.isObject(obj) && '_njShim' in obj) {  //Get the shim value
+	    if (tools.isObject(obj) && '_njShim' in obj && !tools.isArray(obj._njShim)) {  //Get the shim value
 	      obj = obj._njShim;
 	    }
 
@@ -1802,6 +1802,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }
 	      else {
 	        value = ret[0];
+
+	        //The "_njShim" property is used to distinguish whether the incoming is an normal array.
+	        if (value && value._njShim) {
+	          value = value._njShim;
+	        }
 	      }
 	    }
 	    else {  //Match to Similar to "checked" or "disabled" attribute.
@@ -1869,6 +1874,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return ret;
 	  }
 	};
+
+	//Expression alias
+	nj.exprs.p = nj.exprs.param;
 
 	//Register expression and also can batch add
 	function registerExpr(name, expr) {

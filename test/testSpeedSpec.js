@@ -27,7 +27,7 @@ describe('test speed', function () {
           <div>
             <#params>
               <#if {../#:five}>
-                <#param {'name'}>five</#param>
+                <#p {'name'}>five</#p>
               </#if>
             </#params>
             <span>span{#}</span>
@@ -47,10 +47,10 @@ describe('test speed', function () {
       <#else />
         <img alt=@${'test.jpg'} {../...b.spread}>
           <#params>
-            <#param {'src'}>test.jpg</#param>
+            <#p {'src'}>test.jpg</#p>
           </#params>
           <#params>
-            <#param {'data-alt'}>{../id}</#param>
+            <#p {'data-alt'}>{../id}</#p>
           </#params>
         </img>
         <input {../...b.spread}/>
@@ -162,7 +162,7 @@ describe('test speed', function () {
         });
       },
       render: function () {
-        console.log(this.props.tmpls);
+        console.log(this.props.test1);
         var params = {
           arr: this.props.arr,
           num: this.state.num,
@@ -204,7 +204,7 @@ describe('test speed', function () {
     //  list: [{ no: 1, b: 1 }, { no: 2, b: 0 }, { no: 3, b: 1 }]
     //}));
     var html = ReactDOMServer.renderToStaticMarkup(nj`
-      <TestComponent {...props}>
+      <TestComponent {...props} test1=@${[1, 2]}>
         <#tmpl>
           {test123}
         </#tmpl>
