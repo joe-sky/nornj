@@ -174,6 +174,7 @@ nj.exprs = {
 
 //Expression alias
 nj.exprs.p = nj.exprs.param;
+nj.exprs.spread = nj.exprs.spreadparam;
 
 //Register expression and also can batch add
 function registerExpr(name, expr) {
