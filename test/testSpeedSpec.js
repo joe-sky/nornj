@@ -22,7 +22,7 @@ describe('test speed', function () {
       <span class=test_{#}
             style={../styles}
             onClick={../onClick}>
-        test_{../num}
+        &nbsp;&ensp;test_{../num}
         <#each {../list2}>
           <div>
             <#params>
