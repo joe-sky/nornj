@@ -3,6 +3,7 @@
 var nj = require('../core'),
   tools = require('../utils/tools'),
   escape = require('../utils/escape'),
+  replaceSpace = require('../utils/replaceSpace'),
   errorTitle = nj.errorTitle;
 
 //转换节点参数为字符串
@@ -83,7 +84,7 @@ function _getStyleParams(obj) {
     }
 
     //Convert to lowercase when style name is all capital.
-    if(/^[A-Z-]+$/.test(key)) {
+    if (/^[A-Z-]+$/.test(key)) {
       key = key.toLowerCase();
     }
 
@@ -246,6 +247,10 @@ function replaceParams(valueObj, data, newObj, newKey, parent, useString) {
     setObjParam(newObj, newKey, value);
   }
 
+  //Replace space symbols such as "&nbsp;" when output component.
+  if (newObj && !useObj && tools.isString(value)) {
+    value = replaceSpace(value);
+  }
   return value;
 }
 

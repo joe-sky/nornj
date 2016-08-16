@@ -133,7 +133,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var tools = __webpack_require__(3),
 	  transformElement = __webpack_require__(5),
-	  transformParam = __webpack_require__(8),
+	  transformParam = __webpack_require__(9),
 	  transformData = __webpack_require__(6),
 	  escape = __webpack_require__(7),
 	  checkElem = __webpack_require__(10),
@@ -417,7 +417,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var nj = __webpack_require__(1),
 	  tools = __webpack_require__(3),
 	  tranData = __webpack_require__(6),
-	  tranParam = __webpack_require__(8),
+	  tranParam = __webpack_require__(9),
 	  tmplRule = nj.tmplRule;
 
 	//提取xml open tag
@@ -706,6 +706,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var nj = __webpack_require__(1),
 	  tools = __webpack_require__(3),
 	  escape = __webpack_require__(7),
+	  replaceSpace = __webpack_require__(8),
 	  errorTitle = nj.errorTitle;
 
 	//转换节点参数为字符串
@@ -786,7 +787,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 
 	    //Convert to lowercase when style name is all capital.
-	    if(/^[A-Z-]+$/.test(key)) {
+	    if (/^[A-Z-]+$/.test(key)) {
 	      key = key.toLowerCase();
 	    }
 
@@ -949,6 +950,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    setObjParam(newObj, newKey, value);
 	  }
 
+	  //Replace space symbols such as "&nbsp;" when output component.
+	  if (newObj && !useObj && tools.isString(value)) {
+	    value = replaceSpace(value);
+	  }
 	  return value;
 	}
 
@@ -1002,13 +1007,35 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 8 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	var SPACE_SYMBOLS = {
+	  nbsp: '\u00A0',
+	  ensp: '\u2002',
+	  emsp: '\u2003',
+	  thinsp: '\u2009',
+	  zwnj: '\u200C',
+	  zwj: '\u200D'
+	};
+
+	function replaceSpace(str) {
+	  return str.replace(/&(nbsp|ensp|emsp|thinsp|zwnj|zwj);/g, function (all, match) {
+	    return SPACE_SYMBOLS[match];
+	  });
+	}
+
+	module.exports = replaceSpace;
+
+/***/ },
+/* 9 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
 	var nj = __webpack_require__(1),
 	  tools = __webpack_require__(3),
-	  replaceSpace = __webpack_require__(9),
 	  tmplRule = nj.tmplRule;
 
 	//Get compiled parameters from a object
@@ -1137,7 +1164,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//Get compiled parameter
 	function compiledParam(value) {
 	  var ret = tools.lightObj(),
-	    strs = tools.isString(value) ? replaceSpace(value).split(tmplRule.replaceSplit) : [value],
+	    strs = tools.isString(value) ? value.split(tmplRule.replaceSplit) : [value],
 	    props = null,
 	    isAll = false;
 
@@ -1170,29 +1197,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 9 */
-/***/ function(module, exports) {
-
-	'use strict';
-
-	var SPACE_SYMBOLS = {
-	  nbsp: '\u00A0',
-	  ensp: '\u2002',
-	  emsp: '\u2003',
-	  thinsp: '\u2009',
-	  zwnj: '\u200C',
-	  zwj: '\u200D'
-	};
-
-	function replaceSpace(str) {
-	  return str.replace(/&(nbsp|ensp|emsp|thinsp|zwnj|zwj);/g, function (all, match) {
-	    return SPACE_SYMBOLS[match];
-	  });
-	}
-
-	module.exports = replaceSpace;
-
-/***/ },
 /* 10 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -1200,7 +1204,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var nj = __webpack_require__(1),
 	  tools = __webpack_require__(3),
-	  tranParam = __webpack_require__(8),
+	  tranParam = __webpack_require__(9),
 	  tranElem = __webpack_require__(5),
 	  checkTagElem = __webpack_require__(11),
 	  tmplRule = nj.tmplRule;
@@ -1397,7 +1401,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var nj = __webpack_require__(1),
 	  tools = __webpack_require__(3),
-	  tranParam = __webpack_require__(8),
+	  tranParam = __webpack_require__(9),
 	  tranElem = __webpack_require__(5),
 	  tmplRule = nj.tmplRule;
 

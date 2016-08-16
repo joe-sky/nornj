@@ -2,7 +2,6 @@
 
 var nj = require('../core'),
   tools = require('../utils/tools'),
-  replaceSpace = require('../utils/replaceSpace'),
   tmplRule = nj.tmplRule;
 
 //Get compiled parameters from a object
@@ -131,7 +130,7 @@ function _getReplaceParam(obj, strs) {
 //Get compiled parameter
 function compiledParam(value) {
   var ret = tools.lightObj(),
-    strs = tools.isString(value) ? replaceSpace(value).split(tmplRule.replaceSplit) : [value],
+    strs = tools.isString(value) ? value.split(tmplRule.replaceSplit) : [value],
     props = null,
     isAll = false;
 
