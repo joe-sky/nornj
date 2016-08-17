@@ -706,7 +706,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var nj = __webpack_require__(1),
 	  tools = __webpack_require__(3),
 	  escape = __webpack_require__(7),
-	  replaceSpace = __webpack_require__(8),
+	  replaceSpecialSymbol = __webpack_require__(8),
 	  errorTitle = nj.errorTitle;
 
 	//转换节点参数为字符串
@@ -952,7 +952,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  //Replace space symbols such as "&nbsp;" when output component.
 	  if (newObj && !useObj && tools.isString(value)) {
-	    value = replaceSpace(value);
+	    value = replaceSpecialSymbol(value);
 	  }
 	  return value;
 	}
@@ -1011,22 +1011,24 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 
-	var SPACE_SYMBOLS = {
+	var SPACIAL_SYMBOLS = {
 	  nbsp: '\u00A0',
 	  ensp: '\u2002',
 	  emsp: '\u2003',
 	  thinsp: '\u2009',
 	  zwnj: '\u200C',
-	  zwj: '\u200D'
+	  zwj: '\u200D',
+	  lt: '<',
+	  gt: '>'
 	};
 
-	function replaceSpace(str) {
-	  return str.replace(/&(nbsp|ensp|emsp|thinsp|zwnj|zwj);/g, function (all, match) {
-	    return SPACE_SYMBOLS[match];
+	function replace(str) {
+	  return str.replace(/&(nbsp|ensp|emsp|thinsp|zwnj|zwj|lt|gt);/g, function (all, match) {
+	    return SPACIAL_SYMBOLS[match];
 	  });
 	}
 
-	module.exports = replaceSpace;
+	module.exports = replace;
 
 /***/ },
 /* 9 */

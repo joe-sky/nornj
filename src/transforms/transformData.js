@@ -3,7 +3,7 @@
 var nj = require('../core'),
   tools = require('../utils/tools'),
   escape = require('../utils/escape'),
-  replaceSpace = require('../utils/replaceSpace'),
+  replaceSpecialSymbol = require('../utils/replaceSpecialSymbol'),
   errorTitle = nj.errorTitle;
 
 //转换节点参数为字符串
@@ -249,7 +249,7 @@ function replaceParams(valueObj, data, newObj, newKey, parent, useString) {
 
   //Replace space symbols such as "&nbsp;" when output component.
   if (newObj && !useObj && tools.isString(value)) {
-    value = replaceSpace(value);
+    value = replaceSpecialSymbol(value);
   }
   return value;
 }
