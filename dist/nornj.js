@@ -1022,8 +1022,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  gt: '>'
 	};
 
+	var REGEX_SYMBOLS = new RegExp('&(' + Object.keys(SPACIAL_SYMBOLS).join('|') + ');', 'g');
 	function replace(str) {
-	  return str.replace(/&(nbsp|ensp|emsp|thinsp|zwnj|zwj|lt|gt);/g, function (all, match) {
+	  return str.replace(REGEX_SYMBOLS, function (all, match) {
 	    return SPACIAL_SYMBOLS[match];
 	  });
 	}
