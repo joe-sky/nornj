@@ -62,13 +62,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	  compiler = __webpack_require__(17),
 	  registerComponent = __webpack_require__(13),
 	  compileStringTmpl = __webpack_require__(21),
-	  docReady = __webpack_require__(23);
+	  tmplByKey = __webpack_require__(23),
+	  docReady = __webpack_require__(24);
 
 	nj.setComponentEngine = setComponentEngine;
 	nj.setTmplRule = utils.setTmplRule;
 	nj.registerFilter = utils.registerFilter;
 	nj.registerExpr= utils.registerExpr;
 	nj.compileStringTmpl = compileStringTmpl;
+	nj.tmplByKey = tmplByKey;
 	nj.docReady = docReady;
 	utils.assign(nj, compiler, registerComponent);
 
@@ -2419,6 +2421,18 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	//Compile string template
 	function compileStringTmpl(tmpl) {
+	  var tmplKey, ret;
+	  if (this) {  //The "tmplKey" parameter can be passed by the "this" object.
+	    tmplKey = this.tmplKey;
+	  }
+
+	  if (tmplKey) {  //If the cache already has template data, direct return the template.
+	    ret = nj.strTmpls[tmplKey];
+	    if (ret) {
+	      return ret;
+	    }
+	  }
+
 	  var isStr = tools.isString(tmpl),
 	    xmls = tmpl,
 	    args = arguments,
@@ -2461,13 +2475,14 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  fullXml = _clearNotesAndBlank(fullXml);
 
-	  //Get unique key
-	  var tmplKey = tools.uniqueKey(fullXml + _paramsStr(params));
+	  if (tmplKey == null) {
+	    //Get unique key
+	    tmplKey = tools.uniqueKey(fullXml + _paramsStr(params));
 
-	  //If the cache already has template data, direct return the template.
-	  var ret = nj.strTmpls[tmplKey];
-	  if (ret) {
-	    return ret;
+	    ret = nj.strTmpls[tmplKey];
+	    if (ret) {
+	      return ret;
+	    }
 	  }
 
 	  //Resolve string to element
@@ -2721,6 +2736,20 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 23 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var checkStringElem = __webpack_require__(21);
+
+	module.exports = function (key) {
+	  return function() {
+	    return checkStringElem.apply({ tmplKey: key }, arguments);
+	  };
+	};
+
+/***/ },
+/* 24 */
 /***/ function(module, exports) {
 
 	'use strict';

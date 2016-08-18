@@ -6,6 +6,7 @@ var nj = require('./core'),
   compiler = require('./compiler/compile'),
   registerComponent = require('./utils/registerComponent'),
   compileStringTmpl = require('./checkElem/checkStringElem'),
+  tmplByKey = require('./utils/tmplByKey'),
   docReady = require('./utils/docReady');
 
 nj.setComponentEngine = setComponentEngine;
@@ -13,6 +14,7 @@ nj.setTmplRule = utils.setTmplRule;
 nj.registerFilter = utils.registerFilter;
 nj.registerExpr= utils.registerExpr;
 nj.compileStringTmpl = compileStringTmpl;
+nj.tmplByKey = tmplByKey;
 nj.docReady = docReady;
 utils.assign(nj, compiler, registerComponent);
 

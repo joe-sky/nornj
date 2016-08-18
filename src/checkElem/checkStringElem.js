@@ -12,6 +12,18 @@ nj.strTmpls = {};
 
 //Compile string template
 function compileStringTmpl(tmpl) {
+  var tmplKey, ret;
+  if (this) {  //The "tmplKey" parameter can be passed by the "this" object.
+    tmplKey = this.tmplKey;
+  }
+
+  if (tmplKey) {  //If the cache already has template data, direct return the template.
+    ret = nj.strTmpls[tmplKey];
+    if (ret) {
+      return ret;
+    }
+  }
+
   var isStr = tools.isString(tmpl),
     xmls = tmpl,
     args = arguments,
@@ -54,13 +66,14 @@ function compileStringTmpl(tmpl) {
 
   fullXml = _clearNotesAndBlank(fullXml);
 
-  //Get unique key
-  var tmplKey = tools.uniqueKey(fullXml + _paramsStr(params));
+  if (tmplKey == null) {
+    //Get unique key
+    tmplKey = tools.uniqueKey(fullXml + _paramsStr(params));
 
-  //If the cache already has template data, direct return the template.
-  var ret = nj.strTmpls[tmplKey];
-  if (ret) {
-    return ret;
+    ret = nj.strTmpls[tmplKey];
+    if (ret) {
+      return ret;
+    }
   }
 
   //Resolve string to element
