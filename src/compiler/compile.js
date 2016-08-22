@@ -64,13 +64,15 @@ function compile(obj, tmplName, isComponent, isTag) {
 
     var ret;
     if (isComponent) {  //转换组件
-      ret = tranComponent.transformToComponent(root.content[0], data);
+      //ret = tranComponent.transformToComponent(root.content[0], data);
+      ret = tranComponent.__transformToComponent(data);
       if (utils.isArray(ret)) {  //组件最外层必须是单一节点对象
         ret = ret[0];
       }
     }
     else {  //转换字符串
       ret = tranString.transformContentToString(root.content, data);
+      //ret = tranString.__transformToString(data);
     }
     return ret;
   };

@@ -88,7 +88,30 @@ function transformToString(obj, data, parent, paramsExpr) {
   return ret;
 }
 
+function __transformToString(data0) {
+  var ret = '';
+
+  var parent0 = utils.lightObj();
+  if (data0) {
+    parent0.data = utils.isArray(data0) ? data0[0] : data0;
+  }
+
+  var useString = true;
+
+  var type0 = 'div';
+
+  var openTag0 = '<' + type0 + ' checked disabled="disabled" name1="../111" name="my name:' + data0.name + ',id:' + data0.id + ',name:' + data0.name + '" id="test1"';
+  ret += openTag0 + '>';
+
+  //子节点
+
+  ret += '</' + type0 + '>';
+
+  return ret;
+}
+
 module.exports = {
   transformToString: transformToString,
-  transformContentToString: transformContentToString
+  transformContentToString: transformContentToString,
+  __transformToString: __transformToString
 };

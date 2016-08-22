@@ -8,58 +8,35 @@
   ReactDOMServer = require('react-dom/server');
 
 describe('test speed', function () {
-  nj.setTmplRule(null, null, '#');
-
-  var tmpl1 = nj`
-  <div>test1</div>
-  `;
+  nj.setTmplRule(null, null, '$');
 
   var tmpl = nj`
   <div>
-    ${[tmpl1, ['{num}', tmpl1]]}
-    ${tmpl1}
-    <#each {arr}>
+    <$each {arr}>
       <span class=test_{#}
             style={../styles}
             onClick={../onClick}>
-        &nbsp;&ensp;test_{../num}
-        <#each {../list2}>
+        test_{../num}
+        <$each {../list2}>
           <div>
-            <#params>
-              <#if {../#:five}>
-                <#p {'name'}>five</#p>
-              </#if>
-            </#params>
+            <$params>
+              <$if {../#:five}>
+                <$param {'name'}>five</$param>
+              </$if>
+            </$params>
             <span>span{#}</span>
             <i>{#}</i>
-            <span {../../id}
-                  data-a={../../obj.a}
-                  name=@${'name100'}
-                  data-id=sp200
-                  dangerouslySetInnerHTML=${{__html: '>'}}>
-            </span>
-            @${' space > space '}
           </div>
-        </#each>
+        </$each>
       </span>
-      <#if {#:five(1):test}>
+      <$if {#:five(1):test}>
         <br />
-      <#else />
-        <img alt=@${'test.jpg'} {../...b.spread}>
-          <#params>
-            <#p {'src'}>test.jpg</#p>
-          </#params>
-          <#params>
-            <#p {'data-alt'}>{../id}</#p>
-          </#params>
-        </img>
-        <input {../...b.spread}/>
-      </#if>
-    </#each>
+      <$else />
+        <img />
+      </$if>
+    </$each>
   </div>
   `;
-
-  //console.log(tmpl.njKey);
 
   beforeAll(function () {
     nj.setComponentEngine('react', React, ReactDOM);
@@ -87,8 +64,7 @@ describe('test speed', function () {
         'data-a': 1,
         'data-b': 2
       },
-      styles: "color:blue",
-      id: 'sp100'
+      styles: "color:blue"
     };
 
     var tmplFn = compile(tmpl, 'tmpl1'),
@@ -112,7 +88,7 @@ describe('test speed', function () {
       },
       onClick: function () {
         start = Date.now();
-        this.setState({ num: Date.now() }, function () {
+        this.setState({ num: Date.now() }, function() {
           console.log('total:' + (Date.now() - start));
         });
       },
@@ -124,7 +100,7 @@ describe('test speed', function () {
           return [
               React.createElement('span', { className: 'test_' + i, style: { color: 'blue' }, onClick: this.onClick },
                 'test_' + this.state.num,
-                list2.map(function (p, j) {
+                list2.map(function(p, j) {
                   return [React.createElement('div', i % 5 == 0 ? { name: 'five' } : null,
                     React.createElement('span', null, 'span' + j),
                     React.createElement('i', null, j)
@@ -162,7 +138,6 @@ describe('test speed', function () {
         });
       },
       render: function () {
-        console.log(this.props.test1);
         var params = {
           arr: this.props.arr,
           num: this.state.num,
@@ -174,59 +149,25 @@ describe('test speed', function () {
           },
           styles: {
             color: 'blue'
-          },
-          id: 'sp100',
-          obj: {
-            a: 'a100'
-          },
-          b: {
-            spread: {
-              'data-a': 1,
-              'data-b': 2,
-              'data-c': 3
-            }
           }
         };
 
-        //var ret = this.template(params);
-        var ret = tmpl.renderComp(params);
+        var ret = this.template(params);
         console.log('render:' + (Date.now() - start));
         return ret;
       }
     });
-    nj.registerComponent({ TestComponent });
 
-    //var html = ReactDOMServer.renderToStaticMarkup(React.createElement(TestComponent, {
-    //  arr: _.times(5, function (n) {
-    //    return n;
-    //  }),
-    //  a: 1,
-    //  list: [{ no: 1, b: 1 }, { no: 2, b: 0 }, { no: 3, b: 1 }]
-    //}));
-    var html = ReactDOMServer.renderToStaticMarkup(nj`
-      <TestComponent {...props} test1=@${[1, 2]}>
-        <#tmpl>
-          {test123}
-        </#tmpl>
-        <#tmpl {t1}>
-          {test123}
-        </#tmpl>
-        <#tmpl>
-          {test123}
-        </#tmpl>
-      </TestComponent>
-      `.renderComp({
-      props: {
-        arr: _.times(5, function (n) {
-          return n;
-        }),
-        a: 1,
-        list: [{ no: 1, b: 1 }, { no: 2, b: 0 }, { no: 3, b: 1 }]
-      }
+    var html = ReactDOMServer.renderToStaticMarkup(React.createElement(TestComponent, {
+      arr: _.times(500, function (n) {
+        return n;
+      }),
+      a: 1,
+      list: [{ no: 1, b: 1 }, { no: 2, b: 0 }, { no: 3, b: 1 }]
     }));
 
     //console.log(JSON.stringify(nj.templates['tmpl1']));
-    console.log(html);
+    //console.log(html);
     expect(html).toBeTruthy();
   });
 });
