@@ -5,7 +5,8 @@ var nj = require('../core'),
   arrayProto = Array.prototype,
   arrayEvery = arrayProto.every,
   arrayForEach = arrayProto.forEach,
-  arrayPush = arrayProto.push;
+  arrayPush = arrayProto.push,
+  errorTitle = nj.errorTitle;
 
 //Push one by one to array
 function listPush(arr1, arr2, checkIsArr, checkNotNull) {
@@ -113,10 +114,28 @@ function trim(str) {
 }
 
 //抛出异常
-function throwIf(val, msg) {
+function throwIf(val, msg, type) {
   if (!val) {
-    throw Error(msg || val);
+    switch (type) {
+      case 'expr':
+        throw Error(errorTitle + 'Expression "' + msg + '" is undefined, please check it has been registered.');
+      default:
+        throw Error(errorTitle + (msg || val));
+    }
   }
+}
+
+//Print warn
+function warn(msg, type) {
+  var ret = errorTitle;
+  switch (type) {
+    case 'filter':
+      ret += 'A filter called "' + msg + '" is undefined.';
+    default:
+      ret += msg;
+  }
+
+  return ret;
 }
 
 //create a unique key
@@ -187,10 +206,8 @@ var tools = {
   lightObj: lightObj,
   listPush: listPush,
   clearQuot: clearQuot,
-  toCamelCase: toCamelCase
+  toCamelCase: toCamelCase,
+  warn: warn
 };
-
-//绑定到nj对象
-assign(nj, tools);
 
 module.exports = tools;

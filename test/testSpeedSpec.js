@@ -8,33 +8,31 @@
   ReactDOMServer = require('react-dom/server');
 
 describe('test speed', function () {
-  nj.setTmplRule(null, null, '$');
-
   var tmpl = nj`
   <div>
-    <$each {arr}>
+    <#each {arr}>
       <span class=test_{#}
             style={../styles}
             onClick={../onClick}>
         test_{../num}
-        <$each {../list2}>
+        <#each {../list2}>
           <div>
-            <$params>
+            <#params>
               <$if {../#:five}>
-                <$param {'name'}>five</$param>
+                <#p {'name'}>five</p>
               </$if>
-            </$params>
+            </#params>
             <span>span{#}</span>
             <i>{#}</i>
           </div>
-        </$each>
+        </#each>
       </span>
-      <$if {#:five(1):test}>
+      <#if {#:five(1):test}>
         <br />
-      <$else />
+      <#else />
         <img />
-      </$if>
-    </$each>
+      </#if>
+    </#each>
   </div>
   `;
 

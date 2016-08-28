@@ -97,264 +97,249 @@ function transformToComponent(obj, data, parent, paramsExpr) {
 }
 
 function __transformToComponent(data) {
-  var useString = false;
-  var compPort = nj.componentPort,
-    compLib = nj.componentLibObj;
+  var useString = false,
+    compPort = nj.componentPort,
+    compLib = nj.componentLibObj,
+    compClass = nj.componentClasses,
+    exprs = nj.exprs,
+    filters = nj.filters;
 
-  var parent = utils.lightObj();
-  var __parent_0 = parent;
+  var parent = nj.lightObj(),
+    __parent_0 = parent;
   var __data_0 = data;
   if (data) {
-    parent.data = utils.isArray(data) ? data[0] : data;
+    parent.data = nj.isArray(data) ? data[0] : data;
   }
 
-  var compType0 = nj.componentClasses.div,
-    type0 = compType0 ? compType0 : 'div';
-
-  var compParam0 = [type0, null];
+  var _type0 = compClass['div'] ? compClass['div'] : 'div',
+    _compParam0 = [_type0, null];
 
   /* div子节点开始 */
-  var dataRefer0 = data.arr;
-
-  var expr0 = nj.exprs['each'],
+  var _expr0 = exprs['each'],
+    _dataRefer0 = data['arr'],
     __itemIsArray0_0;
 
-  utils.throwIf(expr0, errorTitle + 'Expression "each" is undefined, please check it has been registered.');
+  nj.throwIf(_expr0, 'each', 'expr');
 
-  var thisObj0 = utils.lightObj();
-  thisObj0.data = data;
-  thisObj0.parent = parent.parent;
-  thisObj0.index = parent.index;
-  thisObj0.useString = useString;
-  thisObj0.result = function (param) {
+  var _this0 = nj.lightObj();
+  _this0.data = data;
+  _this0.parent = parent.parent;
+  _this0.index = parent.index;
+  _this0.useString = useString;
+  _this0.result = function (param) {
     if (__itemIsArray0_0 == null) {
-      __itemIsArray0_0 = utils.isArray(__data_0);
+      __itemIsArray0_0 = nj.isArray(__data_0);
     }
     
-    var parent = utils.lightObj();
-    var __parent_1 = parent;
+    var parent = nj.lightObj(),
+      __parent_1 = parent;
     parent.data = param.item;
     parent.parent = __parent_0;
     parent.index = param.index;
-    var data = utils.getItemParam(param.item, __data_0, __itemIsArray0_0);
-    var __data_1 = data;
+    var data = nj.getItemParam(param.item, __data_0, __itemIsArray0_0),
+      __data_1 = data;
 
     var ret = [];
 
     /* span开始 */
-    var compType0 = nj.componentClasses.span,
-      type0 = compType0 ? compType0 : 'span';
-
-    var params0 = {
-      className: 'test_' + parent.index,
-      style: parent.parent.data.styles,
-      onClick: parent.parent.data.onClick
-    };
-
-    var compParam0 = [type0, params0];
+    var _type0 = compClass['span'] ? compClass['span'] : 'span',
+      _params0 = {
+        className: 'test_' + parent.index,
+        style: __data_0['styles'],
+        onClick: __data_0['onClick']
+      },
+      _compParam0 = [_type0, _params0];
 
     /* test_{../num} */
-    compParam0.push('test_' + parent.parent.data.num);
+    _compParam0.push('test_' + __data_0['num']);
 
     /* <$each {../list2}>开始 */
-    var dataRefer0 = parent.parent.data.list2;
-
-    var expr0 = nj.exprs['each'],
+    var _expr0 = exprs['each'],
+      _dataRefer0 = __data_0['list2'],
       __itemIsArray0_1;
 
-    utils.throwIf(expr0, errorTitle + 'Expression "each" is undefined, please check it has been registered.');
+    nj.throwIf(_expr0, 'each', 'expr');
 
-    var thisObj0 = utils.lightObj();
-    thisObj0.data = data;
-    thisObj0.parent = parent.parent;
-    thisObj0.index = parent.index;
-    thisObj0.useString = useString;
-    thisObj0.result = function (param) {
+    var _this0 = nj.lightObj();
+    _this0.data = data;
+    _this0.parent = parent.parent;
+    _this0.index = parent.index;
+    _this0.useString = useString;
+    _this0.result = function (param) {
       if (__itemIsArray0_1 == null) {
-        __itemIsArray0_1 = utils.isArray(__data_1);
+        __itemIsArray0_1 = nj.isArray(__data_1);
       }
 
-      var parent = utils.lightObj();
-      var __parent_2 = parent;
+      var parent = nj.lightObj(),
+        __parent_2 = parent;
       parent.data = param.item;
       parent.parent = __parent_1;
       parent.index = param.index;
-      var data = utils.getItemParam(param.item, __data_1, __itemIsArray0_1);
-      var __data_2 = data;
+      var data = nj.getItemParam(param.item, __data_1, __itemIsArray0_1),
+        __data_2 = data;
 
-      var compType0 = nj.componentClasses.div,
-        type0 = compType0 ? compType0 : 'div';
-
-      var params0 = {};
-      var __paramsE0_2 = utils.lightObj();
+      var _type0 = compClass['div'] ? compClass['div'] : 'div',
+        _params0 = {},
+        __paramsE0_2 = nj.lightObj();
 
       /* $params块开始 */
-      var valueF0 = parent.parent.index;
-
-      var filter0 = nj.filters['five'];
-      if (!filter0) {
-        console.warn(errorTitle + 'A filter called five is undefined.');
+      var _filter0 = filters['five'],
+        _valueF0 = __parent_1.index;
+      if (!_filter0) {
+        nj.warn('five', 'filter');
       }
       else {
-        var thisObjF0 = utils.lightObj();
-        thisObjF0.data = data;
-        thisObjF0.parent = parent.parent;
-        thisObjF0.index = parent.index;
-        thisObjF0.useString = useString;
+        var _thisF0 = nj.lightObj();
+        _thisF0.data = data;
+        _thisF0.parent = parent.parent;
+        _thisF0.index = parent.index;
+        _thisF0.useString = useString;
 
-        valueF0 = filter0.apply(thisObjF0, [valueF0]);
+        _valueF0 = _filter0.apply(_thisF0, [_valueF0]);
       }
 
-      var dataRefer0 = valueF0;
-
-      var expr0 = nj.exprs['if'],
+      var _expr0 = exprs['if'],
+        _dataRefer0 = _valueF0,
         __itemIsArray0_2;
 
-      utils.throwIf(expr0, errorTitle + 'Expression "if" is undefined, please check it has been registered.');
+      nj.throwIf(_expr0, 'if', 'expr');
 
-      var thisObj0 = utils.lightObj();
-      thisObj0.data = data;
-      thisObj0.parent = parent.parent;
-      thisObj0.index = parent.index;
-      thisObj0.useString = useString;
-      thisObj0.result = function (param) {
-        var dataRefer0 = 'name';
-
-        var expr0 = nj.exprs['param'],
+      var _this0 = nj.lightObj();
+      _this0.data = data;
+      _this0.parent = parent.parent;
+      _this0.index = parent.index;
+      _this0.useString = useString;
+      _this0.result = function (param) {
+        var _expr0 = exprs['param'],
+          _dataRefer0 = 'name',
           __itemIsArray0_3;
 
-        utils.throwIf(expr0, errorTitle + 'Expression "param" is undefined, please check it has been registered.');
+        nj.throwIf(_expr0, 'param', 'expr');
 
-        var thisObj0 = utils.lightObj();
-        thisObj0.data = data;
-        thisObj0.parent = parent.parent;
-        thisObj0.index = parent.index;
-        thisObj0.useString = useString;
-        thisObj0.paramsExpr = __paramsE0_2;
-        thisObj0.result = function (param) {
+        var _this0 = nj.lightObj();
+        _this0.data = data;
+        _this0.parent = parent.parent;
+        _this0.index = parent.index;
+        _this0.useString = useString;
+        _this0.paramsExpr = __paramsE0_2;
+        _this0.result = function (param) {
           return 'five';
         };
 
-        return expr0.apply(thisObj0, [dataRefer0]);
+        return _expr0.apply(_this0, [_dataRefer0]);
       };
-      thisObj0.inverse = function () {
+      _this0.inverse = function () {
         return null;
       };
 
-      expr0.apply(thisObj0, [dataRefer0]);
+      _expr0.apply(_this0, [_dataRefer0]);
       /* $params块结束 */
 
       if (__paramsE0_2) {
-        utils.assign(params0, __paramsE0_2);
+        nj.assign(_params0, __paramsE0_2);
       }
 
-      var compParam0 = [type0, params0];
+      var _compParam0 = [_type0, _params0];
 
       /* span开始 */
-      var compType1 = nj.componentClasses.span,
-        type1 = compType1 ? compType1 : 'span';
+      var _type1 = compClass['span'] ? compClass['span'] : 'span',
+        _compParam1 = [_type1, null];
 
-      var compParam1 = [type1, null];
-      compParam1.push('span' + parent.index);
+      _compParam1.push('span' + parent.index);
 
-      compParam0.push(compPort.apply(compLib, compParam1));
+      _compParam0.push(compPort.apply(compLib, _compParam1));
       /* span结束 */
 
       /* i开始 */
-      var compType2 = nj.componentClasses.i,
-        type2 = compType2 ? compType2 : 'i';
+      var _type2 = compClass['i'] ? compClass['i'] : 'i',
+        _compParam2 = [_type2, null];
 
-      var compParam2 = [type2, null];
-      compParam2.push(parent.index);
+      _compParam2.push(parent.index);
 
-      compParam0.push(compPort.apply(compLib, compParam2));
+      _compParam0.push(compPort.apply(compLib, _compParam2));
       /* i结束 */
 
-      return compPort.apply(compLib, compParam0);
+      return compPort.apply(compLib, _compParam0);
     };
-    thisObj0.inverse = function () {
+    _this0.inverse = function () {
       return null;
     };
 
-    utils.listPush(compParam0, expr0.apply(thisObj0, [dataRefer0]), true, true);
+    nj.listPush(_compParam0, _expr0.apply(_this0, [_dataRefer0]), true, true);
     /* <$each {../list2}>结束 */
 
-    ret.push(compPort.apply(compLib, compParam0));
+    ret.push(compPort.apply(compLib, _compParam0));
     /* span结束 */
 
     /* if开始 */
-    var valueF0 = parent.index;
+    var _valueF0 = parent.index;
 
-    var filter0 = nj.filters['five'];
-    if (!filter0) {
-      console.warn(errorTitle + 'A filter called five is undefined.');
+    var _filter0 = filters['five'];
+    if (!_filter0) {
+      nj.warn('five', 'filter');
     }
     else {
-      var thisObjF0 = utils.lightObj();
-      thisObjF0.data = data;
-      thisObjF0.parent = parent.parent;
-      thisObjF0.index = parent.index;
-      thisObjF0.useString = useString;
+      var _thisF0 = nj.lightObj();
+      _thisF0.data = data;
+      _thisF0.parent = parent.parent;
+      _thisF0.index = parent.index;
+      _thisF0.useString = useString;
 
-      valueF0 = filter0.apply(thisObjF0, [valueF0, '1']);
+      _valueF0 = _filter0.apply(_thisF0, [_valueF0, '1']);
     }
 
-    var filter1 = nj.filters['test'];
-    if (!filter1) {
-      console.warn(errorTitle + 'A filter called test is undefined.');
+    var _filter1 = filters['test'];
+    if (!_filter1) {
+      nj.warn('test', 'filter');
     }
     else {
-      var thisObjF1 = utils.lightObj();
-      thisObjF1.data = data;
-      thisObjF1.parent = parent.parent;
-      thisObjF1.index = parent.index;
-      thisObjF1.useString = useString;
+      var _thisF1 = nj.lightObj();
+      _thisF1.data = data;
+      _thisF1.parent = parent.parent;
+      _thisF1.index = parent.index;
+      _thisF1.useString = useString;
 
-      valueF0 = filter1.apply(thisObjF1, [valueF0]);
+      _valueF0 = _filter1.apply(_thisF1, [_valueF0]);
     }
 
-    var dataRefer1 = valueF0;
+    var _dataRefer1 = _valueF0;
 
-    var expr1 = nj.exprs['if'],
+    var _expr1 = exprs['if'],
       __itemIsArray1_1;
 
-    utils.throwIf(expr1, errorTitle + 'Expression "if" is undefined, please check it has been registered.');
+    nj.throwIf(_expr1, 'if', 'expr');
 
-    var thisObj1 = utils.lightObj();
-    thisObj1.data = data;
-    thisObj1.parent = parent.parent;
-    thisObj1.index = parent.index;
-    thisObj1.useString = useString;
-    thisObj1.result = function (param) {
-      var compType0 = nj.componentClasses.br,
-        type0 = compType0 ? compType0 : 'br';
+    var _this1 = nj.lightObj();
+    _this1.data = data;
+    _this1.parent = parent.parent;
+    _this1.index = parent.index;
+    _this1.useString = useString;
+    _this1.result = function (param) {
+      var _type0 = compClass['br'] ? compClass['br'] : 'br',
+        _compParam0 = [_type0, null];
 
-      var compParam0 = [type0, null];
-
-      return compPort.apply(compLib, compParam0);
+      return compPort.apply(compLib, _compParam0);
     };
-    thisObj1.inverse = function () {
-      var compType0 = nj.componentClasses.img,
-        type0 = compType0 ? compType0 : 'img';
+    _this1.inverse = function () {
+      var _type0 = compClass['img'] ? compClass['img'] : 'img',
+        _compParam0 = [_type0, null];
 
-      var compParam0 = [type0, null];
-
-      return compPort.apply(compLib, compParam0);
+      return compPort.apply(compLib, _compParam0);
     };
 
-    utils.listPush(ret, expr1.apply(thisObj1, [dataRefer1]), true, true);
+    nj.listPush(ret, _expr1.apply(_this1, [_dataRefer1]), true, true);
     /* if结束 */
 
     return ret;
   };
-  thisObj0.inverse = function () {
+  _this0.inverse = function () {
     return null;
   };
 
-  utils.listPush(compParam0, expr0.apply(thisObj0, [dataRefer0]), true, true);
+  nj.listPush(_compParam0, _expr0.apply(_this0, [_dataRefer0]), true, true);
   /* div子节点结束 */
 
-  return compPort.apply(compLib, compParam0);
+  return compPort.apply(compLib, _compParam0);
 }
 
 module.exports = {
