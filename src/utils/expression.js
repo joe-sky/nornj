@@ -169,6 +169,10 @@ nj.exprs = {
     }
 
     return ret;
+  },
+
+  blank: function () {
+    return this.result();
   }
 };
 
