@@ -9,7 +9,7 @@
 
 describe('test speed', function () {
   var tmpl = nj`
-  <div>
+  <div id={num}>
     <#each {arr}>
       <span class=test_{#}
             style={../styles}
@@ -22,8 +22,8 @@ describe('test speed', function () {
                 <#p {'name'}>five</p>
               </$if>
             </#params>
-            <span>span{#}</span>
-            <i>{#}</i>
+            <span>span{no}</span>
+            <i>{no}</i>
           </div>
         </#each>
       </span>
@@ -91,17 +91,17 @@ describe('test speed', function () {
         });
       },
       render: function () {
-        var list2 = [1, 2, 3];
+        var list2 = [{ no: 1 }, { no: 2 }, { no: 3 }];
 
         var start = Date.now();
-        var ret = React.createElement('div', null, this.props.arr.map(function (o, i) {
+        var ret = React.createElement('div', { id: this.state.num }, this.props.arr.map(function (o, i) {
           return [
               React.createElement('span', { className: 'test_' + i, style: { color: 'blue' }, onClick: this.onClick },
                 'test_' + this.state.num,
                 list2.map(function(p, j) {
                   return [React.createElement('div', i % 5 == 0 ? { name: 'five' } : null,
-                    React.createElement('span', null, 'span' + j),
-                    React.createElement('i', null, j)
+                    React.createElement('span', null, 'span' + p.no),
+                    React.createElement('i', null, p.no)
                   )];
                 })
               ),
@@ -139,7 +139,7 @@ describe('test speed', function () {
         var params = {
           arr: this.props.arr,
           num: this.state.num,
-          list2: [1, 2, 3],
+          list2: [{ no: 1 }, { no: 2 }, { no: 3 }],
           onClick: this.onClick,
           params: {
             'data-a': 1,

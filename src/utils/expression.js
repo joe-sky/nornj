@@ -180,8 +180,37 @@ nj.exprs = {
 nj.exprs.p = nj.exprs.param;
 nj.exprs.spread = nj.exprs.spreadparam;
 
+function _commonConfig(params) {
+  var ret = {
+    data: false,
+    parent: false,
+    index: false,
+    useString: true,
+    paramsExpr: false,
+    result: true,
+    inverse: true,
+    newContext: false
+  };
+
+  if(params) {
+    ret = tools.assign(ret, params);
+  }
+  return ret;
+}
+
+nj.exprConfig = {
+  'if': _commonConfig(),
+  unless: _commonConfig(),
+  each: _commonConfig({ newContext: true }),
+  param: _commonConfig({ paramsExpr: true }),
+  spreadparam: _commonConfig({ useString: false, inverse: false, paramsExpr: true }),
+  equal: _commonConfig({ useString: false }),
+  'for': _commonConfig({ newContext: true }),
+  blank: _commonConfig({ useString: false, inverse: false })
+};
+
 //Register expression and also can batch add
-function registerExpr(name, expr) {
+function registerExpr(name, expr, options) {
   var params = name;
   if (!tools.isObject(name)) {
     params = {};

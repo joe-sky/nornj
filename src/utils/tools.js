@@ -113,6 +113,9 @@ function trim(str) {
   return str.trim();
 }
 
+//Noop function
+function noop() { }
+
 //抛出异常
 function throwIf(val, msg, type) {
   if (!val) {
@@ -207,7 +210,8 @@ var tools = {
   listPush: listPush,
   clearQuot: clearQuot,
   toCamelCase: toCamelCase,
-  warn: warn
+  warn: warn,
+  noop: noop
 };
 
 module.exports = tools;

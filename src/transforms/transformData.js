@@ -196,6 +196,20 @@ function getDataValue(data, propObj, parent, defaultEmpty, useString) {
   return ret;
 }
 
+//Get value from multiple datas
+function getDatasValue(datas, prop) {
+  var ret, obj;
+  for (var i = 0, l = datas.length; i < l; i++) {
+    obj = datas[i];
+    if (obj) {
+      ret = obj[prop];
+      if (ret != null) {
+        return ret;
+      }
+    }
+  }
+}
+
 //获取each块中的item参数
 function getItemParam(item, data, isArr) {
   var ret = item;
@@ -273,5 +287,6 @@ module.exports = {
   getDataValue: getDataValue,
   getItemParam: getItemParam,
   setObjParam: setObjParam,
-  getExprParam: getExprParam
+  getExprParam: getExprParam,
+  getDatasValue: getDatasValue
 };
