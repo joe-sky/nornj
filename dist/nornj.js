@@ -1905,6 +1905,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 
 	    return ret;
+	  },
+
+	  blank: function () {
+	    return this.result();
 	  }
 	};
 
