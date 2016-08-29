@@ -145,17 +145,17 @@ function __transformToComponent(data) {
     var _type0 = compClass['span'] ? compClass['span'] : 'span',
       _params0 = {
         className: 'test_' + parent.index,
-        style: __data_0['styles'],
-        onClick: __data_0['onClick']
+        style: __parent_0.data['styles'],
+        onClick: __parent_0.data['onClick']
       },
       _compParam0 = [_type0, _params0];
 
     /* test_{../num} */
-    _compParam0.push('test_' + __data_0['num']);
+    _compParam0.push('test_' + __parent_0.data['num']);
 
     /* <$each {../list2}>开始 */
     var _expr0 = exprs['each'],
-      _dataRefer0 = __data_0['list2'],
+      _dataRefer0 = __parent_0.data['list2'],
       __itemIsArray0_1;
 
     nj.throwIf(_expr0, 'each', 'expr');
