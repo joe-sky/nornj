@@ -45,17 +45,17 @@ module.exports = function (param) {
 
   needTransformFiles.forEach(function (file) {
     var newName = file.substr(0, file.lastIndexOf(extension)) + '.js',
-      preTmpl = esVersion === 'es6' ? 'export default ' : 'module.exports = ';
+      preTmpl = esVersion === 'es6' ? 'exports default ' : 'module.exports = ';
 
     if (param.devMode) {  //Direct return the original template in development mode.
       if (esVersion === 'es6') {
-        preTmpl += 'from ';
+        preTmpl = 'import tmpl from ';
       }
       else {
         preTmpl += 'require(';
       }
 
-      preTmpl += '\'./' + file.substr(file.lastIndexOf('\\') + 1) + '\'' + (esVersion === 'es6' ? ';' : ');');
+      preTmpl += '\'./' + file.substr(file.lastIndexOf('\\') + 1) + '\'' + (esVersion === 'es6' ? ';\nexport default tmpl;' : ');');
     }
     else {
       //Load original template
