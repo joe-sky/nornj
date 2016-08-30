@@ -45,7 +45,7 @@ module.exports = function (param) {
 
   needTransformFiles.forEach(function (file) {
     var newName = file.substr(0, file.lastIndexOf(extension)) + '.js',
-      preTmpl = esVersion === 'es6' ? 'exports default ' : 'module.exports = ';
+      preTmpl = esVersion === 'es6' ? 'const tmpl = ' : 'module.exports = ';
 
     if (param.devMode) {  //Direct return the original template in development mode.
       if (esVersion === 'es6') {
@@ -77,6 +77,7 @@ module.exports = function (param) {
         });
         preTmpl += '{ ' + tmpls.substr(2) + ' };';
       }
+      preTmpl += '\nexport default tmpl;'
     }
 
     fs.writeFile(newName, preTmpl, function (err) {
