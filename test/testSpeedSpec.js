@@ -9,7 +9,7 @@
 
 describe('test speed', function () {
   var tmpl = nj`
-  <div id={num}>
+  <{div} id={num '_100'}>
     <#each {arr}>
       <span class=test_{#}
             style={../styles}
@@ -33,7 +33,7 @@ describe('test speed', function () {
         <img />
       </#if>
     </#each>
-  </div>
+  </{div}>
   `;
 
   beforeAll(function () {
@@ -94,7 +94,7 @@ describe('test speed', function () {
         var list2 = [{ no: 1 }, { no: 2 }, { no: 3 }];
 
         var start = Date.now();
-        var ret = React.createElement('div', { id: this.state.num }, this.props.arr.map(function (o, i) {
+        var ret = React.createElement('div', { id: this.state.num + '_100' }, this.props.arr.map(function (o, i) {
           return [
               React.createElement('span', { className: 'test_' + i, style: { color: 'blue' }, onClick: this.onClick },
                 'test_' + this.state.num,
@@ -147,7 +147,8 @@ describe('test speed', function () {
           },
           styles: {
             color: 'blue'
-          }
+          },
+          div: 'div'
         };
 
         var ret = this.template(params);
@@ -157,7 +158,7 @@ describe('test speed', function () {
     });
 
     var html = ReactDOMServer.renderToStaticMarkup(React.createElement(TestComponent, {
-      arr: _.times(500, function (n) {
+      arr: _.times(5, function (n) {
         return n;
       }),
       a: 1,
@@ -165,7 +166,7 @@ describe('test speed', function () {
     }));
 
     //console.log(JSON.stringify(nj.templates['tmpl1']));
-    //console.log(html);
+    console.log(html);
     expect(html).toBeTruthy();
   });
 });

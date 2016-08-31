@@ -1,10 +1,9 @@
 ﻿'use strict';
 
-var nj = require('../core'),
-  tools = require('./tools');
+var tools = require('./tools');
 
 //Global expression list
-nj.exprs = {
+var exprs = {
   'if': function (refer, useUnless) {
     if (refer === 'false') {
       refer = false;
@@ -32,7 +31,7 @@ nj.exprs = {
   },
 
   unless: function (refer) {
-    return nj.exprs['if'].call(this, refer, true);
+    return exprs['if'].call(this, refer, true);
   },
 
   each: function (refer) {
@@ -177,8 +176,8 @@ nj.exprs = {
 };
 
 //Expression alias
-nj.exprs.p = nj.exprs.param;
-nj.exprs.spread = nj.exprs.spreadparam;
+exprs.p = exprs.param;
+exprs.spread = exprs.spreadparam;
 
 function _commonConfig(params) {
   var ret = {
@@ -192,13 +191,14 @@ function _commonConfig(params) {
     newContext: false
   };
 
-  if(params) {
+  if (params) {
     ret = tools.assign(ret, params);
   }
   return ret;
 }
 
-nj.exprConfig = {
+//Expression default config
+var exprConfig = {
   'if': _commonConfig(),
   unless: _commonConfig(),
   each: _commonConfig({ newContext: true }),
@@ -214,14 +214,28 @@ function registerExpr(name, expr, options) {
   var params = name;
   if (!tools.isObject(name)) {
     params = {};
-    params[name] = expr;
+    params[name] = {
+      expr: expr,
+      options: options
+    };
   }
 
   tools.each(params, function (v, k) {
-    nj.exprs[k.toLowerCase()] = v;
+    var name = k.toLowerCase();
+    if (v && v.expr) {
+      exprs[name] = v.expr;
+      if(v.options) {
+        exprConfig[name] = tools.assign({}, exprConfig[name], v.options);
+      }
+    }
+    else {
+      exprs[name] = v;
+    }
   }, false, false);
 }
 
 module.exports = {
+  exprs: exprs,
+  exprConfig: exprConfig,
   registerExpr: registerExpr
 };

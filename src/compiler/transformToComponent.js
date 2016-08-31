@@ -105,18 +105,26 @@ function __transformToComponent(data) {
     filters = nj.filters,
     multiData = nj.isArray(data),
     getDatasValue = nj.getDatasValue,
-    noop = nj.noop;
+    noop = nj.noop,
+    lightObj = nj.lightObj,
+    throwIf = nj.throwIf,
+    warn = nj.warn,
+    getItemParam = nj.getItemParam,
+    listPush = nj.listPush,
+    assign = nj.assign;
 
-  var parent = nj.lightObj(),
+  var parent = lightObj(),
     __parent_0 = parent;
   var __data_0 = data;
   if (data) {
     parent.data = multiData ? data[0] : data;
   }
 
-  var _type0 = compClass['div'] ? compClass['div'] : 'div';
+  var _typeRefer0 = !multiData ? data['div'] : getDatasValue(data, 'div');
+
+  var _type0 = _typeRefer0 ? _typeRefer0 : (compClass['div'] ? compClass['div'] : 'div');
   var _params0 = {
-    id: (!multiData ? data['num'] : getDatasValue(data, 'num'))
+    id: (!multiData ? data['num'] : getDatasValue(data, 'num')) + '_100'
   };
   var _compParam0 = [_type0, _params0];
 
@@ -124,20 +132,20 @@ function __transformToComponent(data) {
   var _expr0 = exprs['each'],
     _dataRefer0 = (!multiData ? data['arr'] : getDatasValue(data, 'arr'));
 
-  nj.throwIf(_expr0, 'each', 'expr');
+  throwIf(_expr0, 'each', 'expr');
 
-  var _this0 = nj.lightObj();
+  var _this0 = lightObj();
   //_this0.data = data;
   //_this0.parent = parent.parent;
   //_this0.index = parent.index;
   _this0.useString = useString;
   _this0.result = function (param) {
-    var parent = nj.lightObj(),
+    var parent = lightObj(),
       __parent_1 = parent;
     parent.data = param.item;
     parent.parent = __parent_0;
     parent.index = param.index;
-    var data = nj.getItemParam(param.item, __data_0, multiData),
+    var data = getItemParam(param.item, __data_0, multiData),
       __data_1 = data;
 
     var ret = [];
@@ -158,31 +166,31 @@ function __transformToComponent(data) {
     var _expr0 = exprs['each'],
       _dataRefer0 = __parent_0.data['list2'];
 
-    nj.throwIf(_expr0, 'each', 'expr');
+    throwIf(_expr0, 'each', 'expr');
 
-    var _this0 = nj.lightObj();
+    var _this0 = lightObj();
     _this0.useString = useString;
     _this0.result = function (param) {
-      var parent = nj.lightObj(),
+      var parent = lightObj(),
         __parent_2 = parent;
       parent.data = param.item;
       parent.parent = __parent_1;
       parent.index = param.index;
-      var data = nj.getItemParam(param.item, __data_1, multiData),
+      var data = getItemParam(param.item, __data_1, multiData),
         __data_2 = data;
 
       var _type0 = compClass['div'] ? compClass['div'] : 'div',
         _params0 = {},
-        __paramsE0_2 = nj.lightObj();
+        __paramsE0_2 = lightObj();
 
       /* $params块开始 */
       var _filter0 = filters['five'],
         _valueF0 = __parent_1.index;
       if (!_filter0) {
-        nj.warn('five', 'filter');
+        warn('five', 'filter');
       }
       else {
-        var _thisF0 = nj.lightObj();
+        var _thisF0 = lightObj();
         _thisF0.useString = useString;
 
         _valueF0 = _filter0.apply(_thisF0, [_valueF0]);
@@ -191,17 +199,17 @@ function __transformToComponent(data) {
       var _expr0 = exprs['if'],
         _dataRefer0 = _valueF0;
 
-      nj.throwIf(_expr0, 'if', 'expr');
+      throwIf(_expr0, 'if', 'expr');
 
-      var _this0 = nj.lightObj();
+      var _this0 = lightObj();
       _this0.useString = useString;
       _this0.result = function (param) {
         var _expr0 = exprs['param'],
           _dataRefer0 = 'name';
 
-        nj.throwIf(_expr0, 'param', 'expr');
+        throwIf(_expr0, 'param', 'expr');
 
-        var _this0 = nj.lightObj();
+        var _this0 = lightObj();
         _this0.useString = useString;
         _this0.paramsExpr = __paramsE0_2;
         _this0.result = function (param) {
@@ -216,7 +224,7 @@ function __transformToComponent(data) {
       /* $params块结束 */
 
       if (__paramsE0_2) {
-        nj.assign(_params0, __paramsE0_2);
+        assign(_params0, __paramsE0_2);
       }
 
       var _compParam0 = [_type0, _params0];
@@ -243,7 +251,7 @@ function __transformToComponent(data) {
     };
     _this0.inverse = noop;
 
-    nj.listPush(_compParam0, _expr0.apply(_this0, [_dataRefer0]), true, true);
+    listPush(_compParam0, _expr0.apply(_this0, [_dataRefer0]), true, true);
     /* <$each {../list2}>结束 */
 
     ret.push(compPort.apply(compLib, _compParam0));
@@ -254,10 +262,10 @@ function __transformToComponent(data) {
 
     var _filter0 = filters['five'];
     if (!_filter0) {
-      nj.warn('five', 'filter');
+      warn('five', 'filter');
     }
     else {
-      var _thisF0 = nj.lightObj();
+      var _thisF0 = lightObj();
       _thisF0.useString = useString;
 
       _valueF0 = _filter0.apply(_thisF0, [_valueF0, '1']);
@@ -265,10 +273,10 @@ function __transformToComponent(data) {
 
     var _filter1 = filters['test'];
     if (!_filter1) {
-      nj.warn('test', 'filter');
+      warn('test', 'filter');
     }
     else {
-      var _thisF1 = nj.lightObj();
+      var _thisF1 = lightObj();
       _thisF1.useString = useString;
 
       _valueF0 = _filter1.apply(_thisF1, [_valueF0]);
@@ -277,9 +285,9 @@ function __transformToComponent(data) {
     var _expr1 = exprs['if'],
       _dataRefer1 = _valueF0;
 
-    nj.throwIf(_expr1, 'if', 'expr');
+    throwIf(_expr1, 'if', 'expr');
 
-    var _this1 = nj.lightObj();
+    var _this1 = lightObj();
     _this1.useString = useString;
     _this1.result = function (param) {
       var _type0 = compClass['br'] ? compClass['br'] : 'br',
@@ -294,14 +302,14 @@ function __transformToComponent(data) {
       return compPort.apply(compLib, _compParam0);
     };
 
-    nj.listPush(ret, _expr1.apply(_this1, [_dataRefer1]), true, true);
+    listPush(ret, _expr1.apply(_this1, [_dataRefer1]), true, true);
     /* if结束 */
 
     return ret;
   };
   _this0.inverse = noop;
 
-  nj.listPush(_compParam0, _expr0.apply(_this0, [_dataRefer0]), true, true);
+  listPush(_compParam0, _expr0.apply(_this0, [_dataRefer0]), true, true);
   /* div子节点结束 */
 
   return compPort.apply(compLib, _compParam0);

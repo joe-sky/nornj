@@ -1,10 +1,9 @@
 ﻿'use strict';
 
-var nj = require('../core'),
-  tools = require('./tools');
+var tools = require('./tools');
 
 //Global filter list
-nj.filters = {
+var filters = {
   //Get param properties
   prop: function (obj, props) {
     var ret = obj;
@@ -87,19 +86,61 @@ nj.filters = {
   }
 };
 
+function _commonConfig(params) {
+  var ret = {
+    data: false,
+    parent: false,
+    index: false,
+    useString: true
+  };
+
+  if (params) {
+    ret = tools.assign(ret, params);
+  }
+  return ret;
+}
+
+//Filter default config
+var filterConfig = {
+  prop: _commonConfig(),
+  count: _commonConfig(),
+  item: _commonConfig(),
+  equal: _commonConfig(),
+  lt: _commonConfig(),
+  gt: _commonConfig(),
+  add: _commonConfig(),
+  int: _commonConfig(),
+  float: _commonConfig(),
+  bool: _commonConfig()
+};
+
 //Register filter and also can batch add
-function registerFilter(name, filter) {
+function registerFilter(name, filter, options) {
   var params = name;
   if (!tools.isObject(name)) {
     params = {};
-    params[name] = filter;
+    params[name] = {
+      filter: filter,
+      options: options
+    };
   }
 
   tools.each(params, function (v, k) {
-    nj.filters[k.toLowerCase()] = v;
+    var name = k.toLowerCase();
+    if (v && v.filter) {
+      filters[name] = v.filter;
+      if(v.options) {
+        filterConfig[name] = tools.assign({}, filterConfig[name], v.options);
+      }
+    }
+    else {
+      filters[name] = v;
+    }
   }, false, false);
 }
 
 module.exports = {
+  filters: filters,
+  filterConfig: filterConfig,
   registerFilter: registerFilter
 };
