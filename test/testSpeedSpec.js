@@ -9,7 +9,7 @@
 
 describe('test speed', function () {
   var tmpl = nj`
-  <{div} id={num '_100'}>
+  <{div} id="{num '_100'}">
     <#each {arr}>
       <span class=test_{#}
             style={../styles}
@@ -19,7 +19,7 @@ describe('test speed', function () {
           <div>
             <#params>
               <$if {../#:five}>
-                <#p {'name'}>five</p>
+                <#p {'name'}>five</#p>
               </$if>
             </#params>
             <span>span{no}</span>
@@ -158,7 +158,7 @@ describe('test speed', function () {
     });
 
     var html = ReactDOMServer.renderToStaticMarkup(React.createElement(TestComponent, {
-      arr: _.times(5, function (n) {
+      arr: _.times(500, function (n) {
         return n;
       }),
       a: 1,
@@ -166,7 +166,7 @@ describe('test speed', function () {
     }));
 
     //console.log(JSON.stringify(nj.templates['tmpl1']));
-    console.log(html);
+    //console.log(html);
     expect(html).toBeTruthy();
   });
 });
