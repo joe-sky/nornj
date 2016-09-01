@@ -8,6 +8,19 @@
   ReactDOMServer = require('react-dom/server');
 
 describe('test speed', function () {
+  //var s1 = Date.now();
+  //var str = '';
+  //var fn = function (str, i) {
+  //    str += i;
+  //  };
+  //for (var i = 0; i < 500000; i++) {
+  //  (function (str, i) {
+  //    str += i;
+  //  })(str, i);
+  //  //fn(str, i);
+  //}
+  //console.log(Date.now() - s1);
+
   var tmpl = nj`
   <{div} id="{num '_100'}">
     <#each {arr}>
@@ -18,9 +31,9 @@ describe('test speed', function () {
         <#each {../list2}>
           <div>
             <#params>
-              <$if {../#:five}>
+              <#if {../#:five}>
                 <#p {'name'}>five</#p>
-              </$if>
+              </#if>
             </#params>
             <span>span{no}</span>
             <i>{no}</i>
@@ -86,7 +99,7 @@ describe('test speed', function () {
       },
       onClick: function () {
         start = Date.now();
-        this.setState({ num: Date.now() }, function() {
+        this.setState({ num: Date.now() }, function () {
           console.log('total:' + (Date.now() - start));
         });
       },
@@ -98,7 +111,7 @@ describe('test speed', function () {
           return [
               React.createElement('span', { className: 'test_' + i, style: { color: 'blue' }, onClick: this.onClick },
                 'test_' + this.state.num,
-                list2.map(function(p, j) {
+                list2.map(function (p, j) {
                   return [React.createElement('div', i % 5 == 0 ? { name: 'five' } : null,
                     React.createElement('span', null, 'span' + p.no),
                     React.createElement('i', null, p.no)
@@ -158,7 +171,7 @@ describe('test speed', function () {
     });
 
     var html = ReactDOMServer.renderToStaticMarkup(React.createElement(TestComponent, {
-      arr: _.times(500, function (n) {
+      arr: _.times(5000, function (n) {
         return n;
       }),
       a: 1,

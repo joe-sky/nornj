@@ -2,7 +2,6 @@
 
 var nj = require('../core'),
   tools = require('../utils/tools'),
-  tranData = require('./transformData'),
   tranParam = require('./transformParam'),
   tmplRule = nj.tmplRule;
 
@@ -228,7 +227,7 @@ function getTagComponentAttrs(el) {
         attrName = tools.toCamelCase(attrName);
       }
 
-      tranData.setObjParam(ret, attrName, val, true);
+      ret[attrName] = val;
     }
   });
 

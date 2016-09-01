@@ -58,21 +58,15 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var nj = __webpack_require__(1),
 	  utils = __webpack_require__(2),
-	  setComponentEngine = utils.setComponentEngine,
 	  compiler = __webpack_require__(17),
-	  registerComponent = __webpack_require__(13),
 	  compileStringTmpl = __webpack_require__(21),
 	  tmplByKey = __webpack_require__(23),
 	  docReady = __webpack_require__(24);
 
-	nj.setComponentEngine = setComponentEngine;
-	nj.setTmplRule = utils.setTmplRule;
-	nj.registerFilter = utils.registerFilter;
-	nj.registerExpr= utils.registerExpr;
 	nj.compileStringTmpl = compileStringTmpl;
 	nj.tmplByKey = tmplByKey;
 	nj.docReady = docReady;
-	utils.assign(nj, compiler, registerComponent);
+	utils.assign(nj, compiler, utils);
 
 	//Create vml tag namespace(primarily for IE8)
 	utils.registerTagNamespace();
@@ -135,9 +129,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var tools = __webpack_require__(3),
 	  transformElement = __webpack_require__(5),
-	  transformParam = __webpack_require__(9),
-	  transformData = __webpack_require__(6),
-	  escape = __webpack_require__(7),
+	  transformParam = __webpack_require__(6),
+	  transformData = __webpack_require__(7),
+	  escape = __webpack_require__(8),
 	  checkElem = __webpack_require__(10),
 	  setComponentEngine = __webpack_require__(12),
 	  registerComponent = __webpack_require__(13),
@@ -175,7 +169,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	  arrayProto = Array.prototype,
 	  arrayEvery = arrayProto.every,
 	  arrayForEach = arrayProto.forEach,
-	  arrayPush = arrayProto.push;
+	  arrayPush = arrayProto.push,
+	  errorTitle = nj.errorTitle;
 
 	//Push one by one to array
 	function listPush(arr1, arr2, checkIsArr, checkNotNull) {
@@ -282,11 +277,32 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return str.trim();
 	}
 
+	//Noop function
+	function noop() { }
+
 	//抛出异常
-	function throwIf(val, msg) {
+	function throwIf(val, msg, type) {
 	  if (!val) {
-	    throw Error(msg || val);
+	    switch (type) {
+	      case 'expr':
+	        throw Error(errorTitle + 'Expression "' + msg + '" is undefined, please check it has been registered.');
+	      default:
+	        throw Error(errorTitle + (msg || val));
+	    }
 	  }
+	}
+
+	//Print warn
+	function warn(msg, type) {
+	  var ret = errorTitle;
+	  switch (type) {
+	    case 'filter':
+	      ret += 'A filter called "' + msg + '" is undefined.';
+	    default:
+	      ret += msg;
+	  }
+
+	  return ret;
 	}
 
 	//create a unique key
@@ -357,11 +373,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	  lightObj: lightObj,
 	  listPush: listPush,
 	  clearQuot: clearQuot,
-	  toCamelCase: toCamelCase
+	  toCamelCase: toCamelCase,
+	  warn: warn,
+	  noop: noop
 	};
-
-	//绑定到nj对象
-	assign(nj, tools);
 
 	module.exports = tools;
 
@@ -369,8 +384,8 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 4 */
 /***/ function(module, exports) {
 
-	/* eslint-disable no-unused-vars */
 	'use strict';
+	/* eslint-disable no-unused-vars */
 	var hasOwnProperty = Object.prototype.hasOwnProperty;
 	var propIsEnumerable = Object.prototype.propertyIsEnumerable;
 
@@ -382,7 +397,51 @@ return /******/ (function(modules) { // webpackBootstrap
 		return Object(val);
 	}
 
-	module.exports = Object.assign || function (target, source) {
+	function shouldUseNative() {
+		try {
+			if (!Object.assign) {
+				return false;
+			}
+
+			// Detect buggy property enumeration order in older V8 versions.
+
+			// https://bugs.chromium.org/p/v8/issues/detail?id=4118
+			var test1 = new String('abc');  // eslint-disable-line
+			test1[5] = 'de';
+			if (Object.getOwnPropertyNames(test1)[0] === '5') {
+				return false;
+			}
+
+			// https://bugs.chromium.org/p/v8/issues/detail?id=3056
+			var test2 = {};
+			for (var i = 0; i < 10; i++) {
+				test2['_' + String.fromCharCode(i)] = i;
+			}
+			var order2 = Object.getOwnPropertyNames(test2).map(function (n) {
+				return test2[n];
+			});
+			if (order2.join('') !== '0123456789') {
+				return false;
+			}
+
+			// https://bugs.chromium.org/p/v8/issues/detail?id=3056
+			var test3 = {};
+			'abcdefghijklmnopqrst'.split('').forEach(function (letter) {
+				test3[letter] = letter;
+			});
+			if (Object.keys(Object.assign({}, test3)).join('') !==
+					'abcdefghijklmnopqrst') {
+				return false;
+			}
+
+			return true;
+		} catch (e) {
+			// We don't expect any of the above to throw, but better to be safe.
+			return false;
+		}
+	}
+
+	module.exports = shouldUseNative() ? Object.assign : function (target, source) {
 		var from;
 		var to = toObject(target);
 		var symbols;
@@ -418,8 +477,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var nj = __webpack_require__(1),
 	  tools = __webpack_require__(3),
-	  tranData = __webpack_require__(6),
-	  tranParam = __webpack_require__(9),
+	  tranParam = __webpack_require__(6),
 	  tmplRule = nj.tmplRule;
 
 	//提取xml open tag
@@ -644,7 +702,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        attrName = tools.toCamelCase(attrName);
 	      }
 
-	      tranData.setObjParam(ret, attrName, val, true);
+	      ret[attrName] = val;
 	    }
 	  });
 
@@ -707,8 +765,176 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var nj = __webpack_require__(1),
 	  tools = __webpack_require__(3),
-	  escape = __webpack_require__(7),
-	  replaceSpecialSymbol = __webpack_require__(8),
+	  tmplRule = nj.tmplRule;
+
+	//Get compiled parameters from a object
+	function compiledParams(obj) {
+	  var ret = tools.lightObj();
+	  tools.each(obj, function (v, k) {
+	    ret[k] = compiledParam(v);
+	  }, false, false);
+
+	  return ret;
+	}
+
+	//Get compiled property
+	function compiledProp(prop, isString) {
+	  var ret = tools.lightObj();
+
+	  //Extract the dot data path to the 'prop' filter.
+	  if (!isString && prop.indexOf('.') > -1) {
+	    prop = prop.replace(/\.([^\s.:\/]+)/g, ':prop($1)');
+	  }
+
+	  //If there are colons in the property,then use filter
+	  if (prop.indexOf(':') >= 0) {
+	    var filters = [],
+	      filtersTmp;
+	    filtersTmp = prop.split(':');
+	    prop = filtersTmp[0].trim();  //Extract property
+
+	    filtersTmp = filtersTmp.slice(1);
+	    tools.each(filtersTmp, function (filter) {
+	      var retF = _getFilterParam(filter.trim()),
+	        filterObj = tools.lightObj(),
+	        filterName = retF[1].toLowerCase();  //Get filter name
+
+	      if (filterName) {
+	        var paramsF = retF[3];  //Get filter param
+
+	        //Multiple params are separated by commas.
+	        if (paramsF) {
+	          var params = [];
+	          tools.each(paramsF.split(','), function (p) {
+	            params[params.length] = p.trim();
+	          }, false, true);
+
+	          filterObj.params = params;
+	        }
+
+	        filterObj.name = filterName;
+	        filters.push(filterObj);
+	      }
+	    }, false, true);
+
+	    ret.filters = filters;
+	  }
+
+	  //Extract the parent data path
+	  if (!isString && prop.indexOf('../') > -1) {
+	    var n = 0;
+	    prop = prop.replace(/\.\.\//g, function () {
+	      n++;
+	      return '';
+	    });
+
+	    ret.parentNum = n;
+	  }
+
+	  ret.name = prop;
+	  if (isString) {  //Sign the parameter is a pure string.
+	    ret.isStr = true;
+	  }
+
+	  return ret;
+	}
+
+	//Get filter param
+	var REGEX_FILTER_PARAM = /([\w$]+)(\(([^()]+)\))*/;
+	function _getFilterParam(obj) {
+	  return REGEX_FILTER_PARAM.exec(obj);
+	}
+
+	//Extract replace parameters
+	var _quots = ['\'', '"'];
+	function _getReplaceParam(obj, strs) {
+	  var pattern = tmplRule.replaceParam(),
+	    patternP = /[^\s:]+([\s]?:[\s]?[^\s\(\)]+(\([^\(\)]+\))?(\.[^\s.]+)?){0,}/g,
+	    matchArr, matchArrP, ret, prop, i = 0;
+
+	  while ((matchArr = pattern.exec(obj))) {
+	    if (!ret) {
+	      ret = [];
+	    }
+
+	    var j = 0;
+	    prop = matchArr[3];
+
+	    //To extract parameters by interval space.
+	    while ((matchArrP = patternP.exec(prop))) {
+	      var propP = matchArrP[0],
+	        item = [matchArr[0], matchArr[1], propP, false, true];
+
+	      //Clear parameter at both ends of the space.
+	      propP = propP.trim();
+
+	      //If parameter has quotation marks, this's a pure string parameter.
+	      if (_quots.indexOf(propP[0]) > -1) {
+	        propP = tools.clearQuot(propP);
+	        item[3] = true;
+	      }
+
+	      item[2] = propP;
+	      ret.push(item);
+
+	      //If there are several parameters in a curly braces, fill the space for the "strs" array.
+	      if (j > 0) {
+	        item[4] = false;  //Sign not contain all of placehorder
+	        strs.splice(++i, 0, '');
+	      }
+	      j++;
+	    }
+	    i++;
+	  }
+
+	  return ret;
+	}
+
+	//Get compiled parameter
+	function compiledParam(value) {
+	  var ret = tools.lightObj(),
+	    strs = tools.isString(value) ? value.split(tmplRule.replaceSplit) : [value],
+	    props = null,
+	    isAll = false;
+
+	  //If have placehorder
+	  if (strs.length > 1) {
+	    var params = _getReplaceParam(value, strs);
+	    props = [];
+
+	    tools.each(params, function (param) {
+	      var retP = tools.lightObj();
+	      isAll = param[4] ? param[0] === value : false;  //If there are several parameters in a curly braces, "isAll" must be false.
+	      retP.prop = compiledProp(param[2], param[3]);
+
+	      //If parameter's open rules are several,then it need escape.
+	      retP.escape = param[1].split(tmplRule.beginRule).length < 3;
+	      props.push(retP);
+	    }, false, true);
+	  }
+
+	  ret.props = props;
+	  ret.strs = strs;
+	  ret.isAll = isAll;
+	  return ret;
+	}
+
+	module.exports = {
+	  compiledParam: compiledParam,
+	  compiledParams: compiledParams,
+	  compiledProp: compiledProp
+	};
+
+/***/ },
+/* 7 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var nj = __webpack_require__(1),
+	  tools = __webpack_require__(3),
+	  escape = __webpack_require__(8),
+	  replaceSpecialSymbol = __webpack_require__(9),
 	  errorTitle = nj.errorTitle;
 
 	//转换节点参数为字符串
@@ -901,6 +1127,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return ret;
 	}
 
+	//Get value from multiple datas
+	function getDatasValue(datas, prop) {
+	  var ret, obj;
+	  for (var i = 0, l = datas.length; i < l; i++) {
+	    obj = datas[i];
+	    if (obj) {
+	      ret = obj[prop];
+	      if (ret != null) {
+	        return ret;
+	      }
+	    }
+	  }
+	}
+
 	//获取each块中的item参数
 	function getItemParam(item, data, isArr) {
 	  var ret = item;
@@ -978,11 +1218,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	  getDataValue: getDataValue,
 	  getItemParam: getItemParam,
 	  setObjParam: setObjParam,
-	  getExprParam: getExprParam
+	  getExprParam: getExprParam,
+	  getDatasValue: getDatasValue
 	};
 
 /***/ },
-/* 7 */
+/* 8 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -1008,7 +1249,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = escape;
 
 /***/ },
-/* 8 */
+/* 9 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -1034,174 +1275,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = replace;
 
 /***/ },
-/* 9 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	var nj = __webpack_require__(1),
-	  tools = __webpack_require__(3),
-	  tmplRule = nj.tmplRule;
-
-	//Get compiled parameters from a object
-	function compiledParams(obj) {
-	  var ret = tools.lightObj();
-	  tools.each(obj, function (v, k) {
-	    ret[k] = compiledParam(v);
-	  }, false, false);
-
-	  return ret;
-	}
-
-	//Get compiled property
-	function compiledProp(prop, isString) {
-	  var ret = tools.lightObj();
-
-	  //Extract the dot data path to the 'prop' filter.
-	  if (!isString && prop.indexOf('.') > -1) {
-	    prop = prop.replace(/\.([^\s.:\/]+)/g, ':prop($1)');
-	  }
-
-	  //If there are colons in the property,then use filter
-	  if (prop.indexOf(':') >= 0) {
-	    var filters = [],
-	      filtersTmp;
-	    filtersTmp = prop.split(':');
-	    prop = filtersTmp[0].trim();  //Extract property
-
-	    filtersTmp = filtersTmp.slice(1);
-	    tools.each(filtersTmp, function (filter) {
-	      var retF = _getFilterParam(filter.trim()),
-	        filterObj = tools.lightObj(),
-	        filterName = retF[1].toLowerCase();  //Get filter name
-
-	      if (filterName) {
-	        var paramsF = retF[3];  //Get filter param
-
-	        //Multiple params are separated by commas.
-	        if (paramsF) {
-	          var params = [];
-	          tools.each(paramsF.split(','), function (p) {
-	            params[params.length] = p.trim();
-	          }, false, true);
-
-	          filterObj.params = params;
-	        }
-
-	        filterObj.name = filterName;
-	        filters.push(filterObj);
-	      }
-	    }, false, true);
-
-	    ret.filters = filters;
-	  }
-
-	  //Extract the parent data path
-	  if (!isString && prop.indexOf('../') > -1) {
-	    var n = 0;
-	    prop = prop.replace(/\.\.\//g, function () {
-	      n++;
-	      return '';
-	    });
-
-	    ret.parentNum = n;
-	  }
-
-	  ret.name = prop;
-	  if (isString) {  //Sign the parameter is a pure string.
-	    ret.isStr = true;
-	  }
-
-	  return ret;
-	}
-
-	//Get filter param
-	var REGEX_FILTER_PARAM = /([\w$]+)(\(([^()]+)\))*/;
-	function _getFilterParam(obj) {
-	  return REGEX_FILTER_PARAM.exec(obj);
-	}
-
-	//Extract replace parameters
-	var _quots = ['\'', '"'];
-	function _getReplaceParam(obj, strs) {
-	  var pattern = tmplRule.replaceParam(),
-	    patternP = /[^\s:]+([\s]?:[\s]?[^\s\(\)]+(\([^\(\)]+\))?(\.[^\s.]+)?){0,}/g,
-	    matchArr, matchArrP, ret, prop, i = 0;
-
-	  while ((matchArr = pattern.exec(obj))) {
-	    if (!ret) {
-	      ret = [];
-	    }
-
-	    var j = 0;
-	    prop = matchArr[3];
-
-	    //To extract parameters by interval space.
-	    while ((matchArrP = patternP.exec(prop))) {
-	      var propP = matchArrP[0],
-	        item = [matchArr[0], matchArr[1], propP, false, true];
-
-	      //Clear parameter at both ends of the space.
-	      propP = propP.trim();
-
-	      //If parameter has quotation marks, this's a pure string parameter.
-	      if (_quots.indexOf(propP[0]) > -1) {
-	        propP = tools.clearQuot(propP);
-	        item[3] = true;
-	      }
-
-	      item[2] = propP;
-	      ret.push(item);
-
-	      //If there are several parameters in a curly braces, fill the space for the "strs" array.
-	      if (j > 0) {
-	        item[4] = false;  //Sign not contain all of placehorder
-	        strs.splice(++i, 0, '');
-	      }
-	      j++;
-	    }
-	    i++;
-	  }
-
-	  return ret;
-	}
-
-	//Get compiled parameter
-	function compiledParam(value) {
-	  var ret = tools.lightObj(),
-	    strs = tools.isString(value) ? value.split(tmplRule.replaceSplit) : [value],
-	    props = null,
-	    isAll = false;
-
-	  //If have placehorder
-	  if (strs.length > 1) {
-	    var params = _getReplaceParam(value, strs);
-	    props = [];
-
-	    tools.each(params, function (param) {
-	      var retP = tools.lightObj();
-	      isAll = param[4] ? param[0] === value : false;  //If there are several parameters in a curly braces, "isAll" must be false.
-	      retP.prop = compiledProp(param[2], param[3]);
-
-	      //If parameter's open rules are several,then it need escape.
-	      retP.escape = param[1].split(tmplRule.beginRule).length < 3;
-	      props.push(retP);
-	    }, false, true);
-	  }
-
-	  ret.props = props;
-	  ret.strs = strs;
-	  ret.isAll = isAll;
-	  return ret;
-	}
-
-	module.exports = {
-	  compiledParam: compiledParam,
-	  compiledParams: compiledParams,
-	  compiledProp: compiledProp
-	};
-
-/***/ },
 /* 10 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -1209,7 +1282,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var nj = __webpack_require__(1),
 	  tools = __webpack_require__(3),
-	  tranParam = __webpack_require__(9),
+	  tranParam = __webpack_require__(6),
 	  tranElem = __webpack_require__(5),
 	  checkTagElem = __webpack_require__(11),
 	  tmplRule = nj.tmplRule;
@@ -1406,7 +1479,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var nj = __webpack_require__(1),
 	  tools = __webpack_require__(3),
-	  tranParam = __webpack_require__(9),
+	  tranParam = __webpack_require__(6),
 	  tranElem = __webpack_require__(5),
 	  tmplRule = nj.tmplRule;
 
@@ -1626,11 +1699,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 
-	var nj = __webpack_require__(1),
-	  tools = __webpack_require__(3);
+	var tools = __webpack_require__(3);
 
 	//Global filter list
-	nj.filters = {
+	var filters = {
 	  //Get param properties
 	  prop: function (obj, props) {
 	    var ret = obj;
@@ -1713,20 +1785,62 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	};
 
+	function _commonConfig(params) {
+	  var ret = {
+	    data: false,
+	    parent: false,
+	    index: false,
+	    useString: true
+	  };
+
+	  if (params) {
+	    ret = tools.assign(ret, params);
+	  }
+	  return ret;
+	}
+
+	//Filter default config
+	var filterConfig = {
+	  prop: _commonConfig(),
+	  count: _commonConfig(),
+	  item: _commonConfig(),
+	  equal: _commonConfig(),
+	  lt: _commonConfig(),
+	  gt: _commonConfig(),
+	  add: _commonConfig(),
+	  int: _commonConfig(),
+	  float: _commonConfig(),
+	  bool: _commonConfig()
+	};
+
 	//Register filter and also can batch add
-	function registerFilter(name, filter) {
+	function registerFilter(name, filter, options) {
 	  var params = name;
 	  if (!tools.isObject(name)) {
 	    params = {};
-	    params[name] = filter;
+	    params[name] = {
+	      filter: filter,
+	      options: options
+	    };
 	  }
 
 	  tools.each(params, function (v, k) {
-	    nj.filters[k.toLowerCase()] = v;
+	    var name = k.toLowerCase();
+	    if (v && v.filter) {
+	      filters[name] = v.filter;
+	      if(v.options) {
+	        filterConfig[name] = tools.assign({}, filterConfig[name], v.options);
+	      }
+	    }
+	    else {
+	      filters[name] = v;
+	    }
 	  }, false, false);
 	}
 
 	module.exports = {
+	  filters: filters,
+	  filterConfig: filterConfig,
 	  registerFilter: registerFilter
 	};
 
@@ -1736,11 +1850,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 
-	var nj = __webpack_require__(1),
-	  tools = __webpack_require__(3);
+	var tools = __webpack_require__(3);
 
 	//Global expression list
-	nj.exprs = {
+	var exprs = {
 	  'if': function (refer, useUnless) {
 	    if (refer === 'false') {
 	      refer = false;
@@ -1768,7 +1881,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  },
 
 	  unless: function (refer) {
-	    return nj.exprs['if'].call(this, refer, true);
+	    return exprs['if'].call(this, refer, true);
 	  },
 
 	  each: function (refer) {
@@ -1913,23 +2026,67 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 	//Expression alias
-	nj.exprs.p = nj.exprs.param;
-	nj.exprs.spread = nj.exprs.spreadparam;
+	exprs.p = exprs.param;
+	exprs.spread = exprs.spreadparam;
+
+	function _commonConfig(params) {
+	  var ret = {
+	    data: false,
+	    parent: false,
+	    index: false,
+	    useString: true,
+	    paramsExpr: false,
+	    result: true,
+	    inverse: true,
+	    newContext: false
+	  };
+
+	  if (params) {
+	    ret = tools.assign(ret, params);
+	  }
+	  return ret;
+	}
+
+	//Expression default config
+	var exprConfig = {
+	  'if': _commonConfig(),
+	  unless: _commonConfig(),
+	  each: _commonConfig({ newContext: true }),
+	  param: _commonConfig({ paramsExpr: true }),
+	  spreadparam: _commonConfig({ useString: false, inverse: false, paramsExpr: true }),
+	  equal: _commonConfig({ useString: false }),
+	  'for': _commonConfig({ newContext: true }),
+	  blank: _commonConfig({ useString: false, inverse: false })
+	};
 
 	//Register expression and also can batch add
-	function registerExpr(name, expr) {
+	function registerExpr(name, expr, options) {
 	  var params = name;
 	  if (!tools.isObject(name)) {
 	    params = {};
-	    params[name] = expr;
+	    params[name] = {
+	      expr: expr,
+	      options: options
+	    };
 	  }
 
 	  tools.each(params, function (v, k) {
-	    nj.exprs[k.toLowerCase()] = v;
+	    var name = k.toLowerCase();
+	    if (v && v.expr) {
+	      exprs[name] = v.expr;
+	      if(v.options) {
+	        exprConfig[name] = tools.assign({}, exprConfig[name], v.options);
+	      }
+	    }
+	    else {
+	      exprs[name] = v;
+	    }
 	  }, false, false);
 	}
 
 	module.exports = {
+	  exprs: exprs,
+	  exprConfig: exprConfig,
 	  registerExpr: registerExpr
 	};
 
@@ -2073,12 +2230,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var ret;
 	    if (isComponent) {  //转换组件
 	      ret = tranComponent.transformToComponent(root.content[0], data);
+	      //ret = tranComponent.__transformToComponent(data);
 	      if (utils.isArray(ret)) {  //组件最外层必须是单一节点对象
 	        ret = ret[0];
 	      }
 	    }
 	    else {  //转换字符串
 	      ret = tranString.transformContentToString(root.content, data);
+	      //ret = tranString.__transformToString(data);
 	    }
 	    return ret;
 	  };
@@ -2253,9 +2412,32 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return ret;
 	}
 
+	function __transformToString(data0) {
+	  var ret = '';
+
+	  var parent0 = utils.lightObj();
+	  if (data0) {
+	    parent0.data = utils.isArray(data0) ? data0[0] : data0;
+	  }
+
+	  var useString = true;
+
+	  var type0 = 'div';
+
+	  var openTag0 = '<' + type0 + ' checked disabled="disabled" name1="../111" name="my name:' + data0.name + ',id:' + data0.id + ',name:' + data0.name + '" id="test1"';
+	  ret += openTag0 + '>';
+
+	  //子节点
+
+	  ret += '</' + type0 + '>';
+
+	  return ret;
+	}
+
 	module.exports = {
 	  transformToString: transformToString,
-	  transformContentToString: transformContentToString
+	  transformContentToString: transformContentToString,
+	  __transformToString: __transformToString
 	};
 
 /***/ },
@@ -2402,9 +2584,229 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return ret;
 	}
 
+	function __transformToComponent(data) {
+	  var useString = false,
+	    compPort = nj.componentPort,
+	    compLib = nj.componentLibObj,
+	    compClass = nj.componentClasses,
+	    exprs = nj.exprs,
+	    filters = nj.filters,
+	    multiData = nj.isArray(data),
+	    getDatasValue = nj.getDatasValue,
+	    noop = nj.noop,
+	    lightObj = nj.lightObj,
+	    throwIf = nj.throwIf,
+	    warn = nj.warn,
+	    getItemParam = nj.getItemParam,
+	    listPush = nj.listPush,
+	    assign = nj.assign;
+
+	  var parent = lightObj(),
+	    __parent_0 = parent;
+	  var __data_0 = data;
+	  if (data) {
+	    parent.data = multiData ? data[0] : data;
+	  }
+
+	  var _typeRefer0 = !multiData ? data['div'] : getDatasValue(data, 'div');
+
+	  var _type0 = _typeRefer0 ? _typeRefer0 : (compClass['div'] ? compClass['div'] : 'div');
+	  var _params0 = {
+	    id: (!multiData ? data['num'] : getDatasValue(data, 'num')) + '_100'
+	  };
+	  var _compParam0 = [_type0, _params0];
+
+	  /* div子节点开始 */
+	  var _expr0 = exprs['each'],
+	    _dataRefer0 = (!multiData ? data['arr'] : getDatasValue(data, 'arr'));
+
+	  throwIf(_expr0, 'each', 'expr');
+
+	  var _this0 = lightObj();
+	  //_this0.data = data;
+	  //_this0.parent = parent.parent;
+	  //_this0.index = parent.index;
+	  _this0.useString = useString;
+	  _this0.result = function (param) {
+	    var parent = lightObj(),
+	      __parent_1 = parent;
+	    parent.data = param.item;
+	    parent.parent = __parent_0;
+	    parent.index = param.index;
+	    var data = getItemParam(param.item, __data_0, multiData),
+	      __data_1 = data;
+
+	    var ret = [];
+
+	    /* span开始 */
+	    var _type0 = compClass['span'] ? compClass['span'] : 'span';
+	    var _params0 = {
+	      className: 'test_' + parent.index,
+	      style: __parent_0.data['styles'],
+	      onClick: __parent_0.data['onClick']
+	    };
+	    var _compParam0 = [_type0, _params0];
+
+	    /* test_{../num} */
+	    _compParam0.push('test_' + __parent_0.data['num']);
+
+	    /* <$each {../list2}>开始 */
+	    var _expr0 = exprs['each'],
+	      _dataRefer0 = __parent_0.data['list2'];
+
+	    throwIf(_expr0, 'each', 'expr');
+
+	    var _this0 = lightObj();
+	    _this0.useString = useString;
+	    _this0.result = function (param) {
+	      var parent = lightObj(),
+	        __parent_2 = parent;
+	      parent.data = param.item;
+	      parent.parent = __parent_1;
+	      parent.index = param.index;
+	      var data = getItemParam(param.item, __data_1, multiData),
+	        __data_2 = data;
+
+	      var _type0 = compClass['div'] ? compClass['div'] : 'div',
+	        _params0 = {},
+	        __paramsE0_2 = lightObj();
+
+	      /* $params块开始 */
+	      var _filter0 = filters['five'],
+	        _valueF0 = __parent_1.index;
+	      if (!_filter0) {
+	        warn('five', 'filter');
+	      }
+	      else {
+	        var _thisF0 = lightObj();
+	        _thisF0.useString = useString;
+
+	        _valueF0 = _filter0.apply(_thisF0, [_valueF0]);
+	      }
+
+	      var _expr0 = exprs['if'],
+	        _dataRefer0 = _valueF0;
+
+	      throwIf(_expr0, 'if', 'expr');
+
+	      var _this0 = lightObj();
+	      _this0.useString = useString;
+	      _this0.result = function (param) {
+	        var _expr0 = exprs['param'],
+	          _dataRefer0 = 'name';
+
+	        throwIf(_expr0, 'param', 'expr');
+
+	        var _this0 = lightObj();
+	        _this0.useString = useString;
+	        _this0.paramsExpr = __paramsE0_2;
+	        _this0.result = function (param) {
+	          return 'five';
+	        };
+
+	        return _expr0.apply(_this0, [_dataRefer0]);
+	      };
+	      _this0.inverse = noop;
+
+	      _expr0.apply(_this0, [_dataRefer0]);
+	      /* $params块结束 */
+
+	      if (__paramsE0_2) {
+	        assign(_params0, __paramsE0_2);
+	      }
+
+	      var _compParam0 = [_type0, _params0];
+
+	      /* span开始 */
+	      var _type1 = compClass['span'] ? compClass['span'] : 'span',
+	        _compParam1 = [_type1, null];
+
+	      _compParam1.push('span' + (!multiData ? data['no'] : getDatasValue(data, 'no')));
+
+	      _compParam0.push(compPort.apply(compLib, _compParam1));
+	      /* span结束 */
+
+	      /* i开始 */
+	      var _type2 = compClass['i'] ? compClass['i'] : 'i',
+	        _compParam2 = [_type2, null];
+
+	      _compParam2.push((!multiData ? data['no'] : getDatasValue(data, 'no')));
+
+	      _compParam0.push(compPort.apply(compLib, _compParam2));
+	      /* i结束 */
+
+	      return compPort.apply(compLib, _compParam0);
+	    };
+	    _this0.inverse = noop;
+
+	    listPush(_compParam0, _expr0.apply(_this0, [_dataRefer0]), true, true);
+	    /* <$each {../list2}>结束 */
+
+	    ret.push(compPort.apply(compLib, _compParam0));
+	    /* span结束 */
+
+	    /* if开始 */
+	    var _valueF0 = parent.index;
+
+	    var _filter0 = filters['five'];
+	    if (!_filter0) {
+	      warn('five', 'filter');
+	    }
+	    else {
+	      var _thisF0 = lightObj();
+	      _thisF0.useString = useString;
+
+	      _valueF0 = _filter0.apply(_thisF0, [_valueF0, '1']);
+	    }
+
+	    var _filter1 = filters['test'];
+	    if (!_filter1) {
+	      warn('test', 'filter');
+	    }
+	    else {
+	      var _thisF1 = lightObj();
+	      _thisF1.useString = useString;
+
+	      _valueF0 = _filter1.apply(_thisF1, [_valueF0]);
+	    }
+
+	    var _expr1 = exprs['if'],
+	      _dataRefer1 = _valueF0;
+
+	    throwIf(_expr1, 'if', 'expr');
+
+	    var _this1 = lightObj();
+	    _this1.useString = useString;
+	    _this1.result = function (param) {
+	      var _type0 = compClass['br'] ? compClass['br'] : 'br',
+	        _compParam0 = [_type0, null];
+
+	      return compPort.apply(compLib, _compParam0);
+	    };
+	    _this1.inverse = function () {
+	      var _type0 = compClass['img'] ? compClass['img'] : 'img',
+	        _compParam0 = [_type0, null];
+
+	      return compPort.apply(compLib, _compParam0);
+	    };
+
+	    listPush(ret, _expr1.apply(_this1, [_dataRefer1]), true, true);
+	    /* if结束 */
+
+	    return ret;
+	  };
+	  _this0.inverse = noop;
+
+	  listPush(_compParam0, _expr0.apply(_this0, [_dataRefer0]), true, true);
+	  /* div子节点结束 */
+
+	  return compPort.apply(compLib, _compParam0);
+	}
+
 	module.exports = {
 	  transformToComponent: transformToComponent,
-	  transformContentToComponent: transformContentToComponent
+	  transformContentToComponent: transformContentToComponent,
+	  __transformToComponent: __transformToComponent
 	};
 
 /***/ },
