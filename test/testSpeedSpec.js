@@ -104,8 +104,6 @@ describe('test speed', function () {
         });
       },
       render: function () {
-        var list2 = [{ no: 1 }, { no: 2 }, { no: 3 }];
-
         var start = Date.now();
         var ret = React.createElement('div', { id: this.state.num + '_100' }, this.props.arr.map(function (o, i) {
           return [
@@ -152,7 +150,7 @@ describe('test speed', function () {
         var params = {
           arr: this.props.arr,
           num: this.state.num,
-          list2: [{ no: 1 }, { no: 2 }, { no: 3 }],
+          list2: list2,
           onClick: this.onClick,
           params: {
             'data-a': 1,
@@ -170,8 +168,12 @@ describe('test speed', function () {
       }
     });
 
+    var list2 = _.times(100, function (n) {
+      return { no: n + 1 };
+    });
+
     var html = ReactDOMServer.renderToStaticMarkup(React.createElement(TestComponent, {
-      arr: _.times(5000, function (n) {
+      arr: _.times(1000, function (n) {
         return n;
       }),
       a: 1,
