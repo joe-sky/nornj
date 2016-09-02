@@ -29,7 +29,7 @@ describe('test speed', function () {
             onClick={../onClick}>
         test_{../num}
         <#each {../list2}>
-          <div>
+          <div key={#}>
             <#params>
               <#if {../#:five}>
                 <#p {'name'}>five</#p>
@@ -110,10 +110,10 @@ describe('test speed', function () {
               React.createElement('span', { className: 'test_' + i, style: { color: 'blue' }, onClick: this.onClick },
                 'test_' + this.state.num,
                 list2.map(function (p, j) {
-                  return [React.createElement('div', i % 5 == 0 ? { name: 'five' } : null,
+                  return React.createElement('div', i % 5 == 0 ? { name: 'five', key: j } : { key: j },
                     React.createElement('span', null, 'span' + p.no),
                     React.createElement('i', null, p.no)
-                  )];
+                  );
                 })
               ),
               i % 5 == 0 ? React.createElement('br') : React.createElement('img')

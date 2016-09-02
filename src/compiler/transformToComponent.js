@@ -180,7 +180,7 @@ function __transformToComponent(data) {
         __data_2 = data;
 
       var _type0 = compClass['div'] ? compClass['div'] : 'div',
-        _params0 = {},
+        _params0 = { key: param.index },
         __paramsE0_2 = lightObj();
 
       /* $params块开始 */
@@ -251,7 +251,8 @@ function __transformToComponent(data) {
     };
     _this0.inverse = noop;
 
-    listPush(_compParam0, _expr0.apply(_this0, [_dataRefer0]), true, true);
+    _compParam0.push(_expr0.apply(_this0, [_dataRefer0]));
+    //listPush(_compParam0, _expr0.apply(_this0, [_dataRefer0]), true, true);
     /* <$each {../list2}>结束 */
 
     ret.push(compPort.apply(compLib, _compParam0));
@@ -302,14 +303,16 @@ function __transformToComponent(data) {
       return compPort.apply(compLib, _compParam0);
     };
 
-    listPush(ret, _expr1.apply(_this1, [_dataRefer1]), true, true);
+    ret.push(_expr1.apply(_this1, [_dataRefer1]));
+    //listPush(ret, _expr1.apply(_this1, [_dataRefer1]), true, true);
     /* if结束 */
 
     return ret;
   };
   _this0.inverse = noop;
 
-  listPush(_compParam0, _expr0.apply(_this0, [_dataRefer0]), true, true);
+  _compParam0.push(_expr0.apply(_this0, [_dataRefer0]));
+  //listPush(_compParam0, _expr0.apply(_this0, [_dataRefer0]), true, true);
   /* div子节点结束 */
 
   return compPort.apply(compLib, _compParam0);
@@ -356,7 +359,8 @@ function fn1(p, p2, param) {
   _this0.result = program(p, _p2, fn2);
   _this0.inverse = p.noop;
 
-  p.listPush(_compParam0, _expr0.apply(_this0, [_dataRefer0]), true, true);
+  _compParam0.push(_expr0.apply(_this0, [_dataRefer0]));
+  //p.listPush(_compParam0, _expr0.apply(_this0, [_dataRefer0]), true, true);
   /* <$each {../list2}>结束 */
 
   ret.push(p.compPort.apply(p.compLib, _compParam0));
@@ -397,7 +401,8 @@ function fn1(p, p2, param) {
   _this1.result = program(p, _p2, fn3);
   _this1.inverse = program(p, _p2, fn4);
 
-  p.listPush(ret, _expr1.apply(_this1, [_dataRefer1]), true, true);
+  ret.push(_expr1.apply(_this1, [_dataRefer1]));
+  //p.listPush(ret, _expr1.apply(_this1, [_dataRefer1]), true, true);
   /* if结束 */
 
   return ret;
@@ -414,7 +419,7 @@ function fn2(p, p2, param) {
   _p2.data = data;
 
   var _type0 = p.compClass['div'] ? p.compClass['div'] : 'div',
-    _params0 = {};
+    _params0 = { key: parent.index };
   _p2.paramsE = p.lightObj();
 
   /* $params块开始 */
@@ -515,7 +520,7 @@ function __transformToComponent2(data) {
     throwIf: nj.throwIf,
     warn: nj.warn,
     getItemParam: nj.getItemParam,
-    listPush: nj.listPush,
+    //listPush: nj.listPush,
     assign: nj.assign
   };
 
@@ -549,7 +554,8 @@ function __transformToComponent2(data) {
   _this0.result = program(p, p2, fn1);
   _this0.inverse = p.noop;
 
-  p.listPush(_compParam0, _expr0.apply(_this0, [_dataRefer0]), true, true);
+  _compParam0.push(_expr0.apply(_this0, [_dataRefer0]));
+  //p.listPush(_compParam0, _expr0.apply(_this0, [_dataRefer0]), true, true);
   /* div子节点结束 */
 
   return p.compPort.apply(p.compLib, _compParam0);

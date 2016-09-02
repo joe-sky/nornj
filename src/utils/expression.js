@@ -47,20 +47,37 @@ var exprs = {
         ret = [];
       }
 
-      tools.each(refer, function (item, index) {
+      for(var i = 0;i < refer.length;i++) {
         var retI = thiz.result({
           loop: true,
-          item: item,
-          index: index
+          item: refer[i],
+          index: i
         });
 
         if (useString) {
           ret += retI;
         }
         else {
-          tools.listPush(ret, retI, true);
+          ret.push(retI);
+          //tools.listPush(ret, retI, true);
         }
-      }, false, tools.isArray(refer));
+      }
+
+      //tools.each(refer, function (item, index) {
+      //  var retI = thiz.result({
+      //    loop: true,
+      //    item: item,
+      //    index: index
+      //  });
+
+      //  if (useString) {
+      //    ret += retI;
+      //  }
+      //  else {
+      //    //ret.push(retI);
+      //    tools.listPush(ret, retI, true);
+      //  }
+      //}, false, tools.isArray(refer));
 
       //Return null when not use string and result is empty.
       if (!useString && !ret.length) {
