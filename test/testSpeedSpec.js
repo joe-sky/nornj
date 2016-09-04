@@ -5,22 +5,10 @@
   _ = require('lodash'),
   React = require('react'),
   ReactDOM = require('react-dom'),
-  ReactDOMServer = require('react-dom/server');
+  ReactDOMServer = require('react-dom/server'),
+  Handlebars = require('handlebars');
 
 describe('test speed', function () {
-  //var s1 = Date.now();
-  //var str = '';
-  //var fn = function (str, i) {
-  //    str += i;
-  //  };
-  //for (var i = 0; i < 500000; i++) {
-  //  (function (str, i) {
-  //    str += i;
-  //  })(str, i);
-  //  //fn(str, i);
-  //}
-  //console.log(Date.now() - s1);
-
   var tmpl = nj`
   <{div} id="{num '_100'}">
     <#each {arr}>
@@ -40,13 +28,34 @@ describe('test speed', function () {
           </div>
         </#each>
       </span>
-      <#if {#:five(1):test}>
+      <#if {#:five:test}>
         <br />
       <#else />
         <img />
       </#if>
     </#each>
   </{div}>
+  `;
+
+  var tmplHbs = `
+  <{{div}} id="{{num}}_100">
+    {{#each arr}}
+      <span class="test_{{@index}}">
+        test_{{../num}}
+        {{#each ../list2}}
+          <div key="{{@index}}"{{#five @../index}} name="five"{{/five}}>
+            <span>span{{no}}</span>
+            <i>{{no}}</i>
+          </div>
+        {{/each}}
+      </span>
+      {{#five @index}}
+        <br />
+      {{else}}
+        <img
+      {{/five}}
+    {{/each}}
+  </{{div}}>
   `;
 
   beforeAll(function () {
@@ -60,6 +69,15 @@ describe('test speed', function () {
 
     nj.registerFilter('test', function (obj) {
       return obj;
+    });
+
+    Handlebars.registerHelper('five', function (num, options) {
+      if (num % 5 == 0) {
+        return options.fn(this);
+      }
+      else {
+        return options.inverse(this);
+      }
     });
   });
 
@@ -86,7 +104,7 @@ describe('test speed', function () {
     expect(html).toBeTruthy();
   });
 
-  it('test render to component', function () {
+  xit('test render to component', function () {
     var start;
 
     var TestComponent1 = React.createClass({
@@ -173,7 +191,7 @@ describe('test speed', function () {
     });
 
     var html = ReactDOMServer.renderToStaticMarkup(React.createElement(TestComponent, {
-      arr: _.times(1000, function (n) {
+      arr: _.times(100, function (n) {
         return n;
       }),
       a: 1,
@@ -183,5 +201,20 @@ describe('test speed', function () {
     //console.log(JSON.stringify(nj.templates['tmpl1']));
     //console.log(html);
     expect(html).toBeTruthy();
+  });
+
+  it('test render to string', function () {
+    var data = {
+      div: 'div',
+      num: 100,
+      arr: _.times(6, function (n) {
+        return n;
+      }),
+      list2: _.times(2, function (n) {
+        return { no: n + 1 };
+      })
+    };
+    var tmplFn = Handlebars.compile(tmplHbs);
+    console.log(tmplFn(data));
   });
 });
