@@ -52,7 +52,7 @@ describe('test speed', function () {
       {{#five @index}}
         <br />
       {{else}}
-        <img
+        <img />
       {{/five}}
     {{/each}}
   </{{div}}>
