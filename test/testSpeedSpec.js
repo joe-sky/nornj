@@ -107,24 +107,61 @@ describe('test speed', function () {
     });
   });
 
+  xit('test render to string by hbs', function () {
+    var data = {
+      div: 'div',
+      num: 100,
+      arr: _.times(1000, function (n) {
+        return n;
+      }),
+      list2: _.times(100, function (n) {
+        return { no: n + 1 };
+      })
+    };
+
+    var tmplFn = Handlebars.compile(tmplHbs);
+    var start = Date.now();
+    var ret = tmplFn(data);
+    //console.log(ret);
+    console.log('hbs:' + (Date.now() - start));
+    expect(ret).toBeTruthy();
+  });
+
+  xit('test render to string by nj', function () {
+    var data = {
+      div: 'div',
+      num: 100,
+      arr: _.times(1000, function (n) {
+        return n;
+      }),
+      list2: _.times(100, function (n) {
+        return { no: n + 1 };
+      })
+    };
+
+    var tmplFn = nj.compile(tmplNj);
+    var start = Date.now();
+    var ret = tmplFn(data);
+    //console.log(ret);
+    console.log('nj:' + (Date.now() - start));
+    expect(ret).toBeTruthy();
+  });
+
   it('test render to component by jsx', function () {
     var start;
     var TestComponent = React.createClass({
       getInitialState: function () {
-        start = Date.now();
-
         return {
           num: 100
         };
       },
       onClick: function () {
-        start = Date.now();
         this.setState({ num: Date.now() }, function () {
           console.log('total:' + (Date.now() - start));
         });
       },
       render: function () {
-        var start = Date.now();
+        start = Date.now();
         var ret = React.createElement('div', { id: this.state.num + '_100' }, this.props.arr.map(function (o, i) {
           return [
               React.createElement('span', { className: 'test_' + i, style: { color: 'blue' }, onClick: this.onClick },
@@ -172,20 +209,18 @@ describe('test speed', function () {
     var start;
     var TestComponent = React.createClass({
       getInitialState: function () {
-        start = Date.now();
-
         return {
           num: 100
         };
       },
       template: nj.compileComponent(tmpl, 'tmpl1'),
       onClick: function () {
-        start = Date.now();
         this.setState({ num: Date.now() }, function () {
           console.log('total:' + (Date.now() - start));
         });
       },
       render: function () {
+        start = Date.now();
         var params = {
           arr: this.props.arr,
           num: this.state.num,
@@ -222,43 +257,5 @@ describe('test speed', function () {
     //console.log(JSON.stringify(nj.templates['tmpl1']));
     //console.log(html);
     expect(html).toBeTruthy();
-  });
-
-  it('test render to string by hbs', function () {
-    var data = {
-      div: 'div',
-      num: 100,
-      arr: _.times(1000, function (n) {
-        return n;
-      }),
-      list2: _.times(100, function (n) {
-        return { no: n + 1 };
-      })
-    };
-    var tmplFn = Handlebars.compile(tmplHbs);
-    var start = Date.now();
-    var ret = tmplFn(data);
-    //console.log(ret);
-    console.log('hbs:' + (Date.now() - start));
-    expect(ret).toBeTruthy();
-  });
-
-  it('test render to string by nj', function () {
-    var data = {
-      div: 'div',
-      num: 100,
-      arr: _.times(1000, function (n) {
-        return n;
-      }),
-      list2: _.times(100, function (n) {
-        return { no: n + 1 };
-      })
-    };
-    var tmplFn = nj.compile(tmplNj);
-    var start = Date.now();
-    var ret = tmplFn(data);
-    //console.log(ret);
-    console.log('nj:' + (Date.now() - start));
-    expect(ret).toBeTruthy();
   });
 });
