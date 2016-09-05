@@ -58,6 +58,32 @@ describe('test speed', function () {
   </{{div}}>
   `;
 
+  var tmplNj = nj`
+  <{div} id="{num}_100">
+    <#each {arr}>
+      <span class="test_{#}">
+        test_{../num}
+        <#each {../list2}>
+          <div key="{#}">
+            <#params>
+              <#if {../#:five}>
+                <#p {'name'}>five</#p>
+              </#if>
+            </#params>
+            <span>span{no}</span>
+            <i>{no}</i>
+          </div>
+        </#each>
+      </span>
+      <#if {#:five}>
+        <br />
+      <#else />
+        <img />
+      </#if>
+    </#each>
+  </{div}>
+  `;
+
   beforeAll(function () {
     nj.setComponentEngine('react', React, ReactDOM);
 
@@ -203,18 +229,39 @@ describe('test speed', function () {
     expect(html).toBeTruthy();
   });
 
-  it('test render to string', function () {
+  it('test render to string by hbs', function () {
     var data = {
       div: 'div',
       num: 100,
-      arr: _.times(6, function (n) {
+      arr: _.times(100, function (n) {
         return n;
       }),
-      list2: _.times(2, function (n) {
+      list2: _.times(1000, function (n) {
         return { no: n + 1 };
       })
     };
     var tmplFn = Handlebars.compile(tmplHbs);
-    console.log(tmplFn(data));
+    var start = Date.now();
+    var ret = tmplFn(data);
+    //console.log(ret);
+    console.log(Date.now() - start);
+  });
+
+  it('test render to string by nj', function () {
+    var data = {
+      div: 'div',
+      num: 100,
+      arr: _.times(100, function (n) {
+        return n;
+      }),
+      list2: _.times(1000, function (n) {
+        return { no: n + 1 };
+      })
+    };
+    var tmplFn = nj.compile(tmplNj);
+    var start = Date.now();
+    var ret = tmplFn(data);
+    //console.log(ret);
+    console.log(Date.now() - start);
   });
 });
