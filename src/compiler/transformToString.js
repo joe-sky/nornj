@@ -88,26 +88,201 @@ function transformToString(obj, data, parent, paramsExpr) {
   return ret;
 }
 
-function __transformToString(data0) {
+function program(p, p2, fn, pE) {
+  return function(param) {
+    return fn(p, p2, param, pE);
+  };
+}
+
+function fn1(p, p2, param) {
+  var parent = p.lightObj();
+  parent.data = param.item;
+  parent.parent = p2.parent;
+  parent.index = param.index;
+  var data = p.getItemParam(param.item, p2.data, p.multiData);
+  var _p2 = p.lightObj();
+  _p2.parent = parent;
+  _p2.data = data;
+
   var ret = '';
 
-  var parent0 = utils.lightObj();
-  if (data0) {
-    parent0.data = utils.isArray(data0) ? data0[0] : data0;
+  /* span开始 */
+  var _params0 = ' class="test_' + parent.index + '"';
+
+  /* <$each {../list2}>开始 */
+  var _expr0 = p.exprs['each'],
+    _dataRefer0 = parent.parent.data['list2'];
+
+  p.throwIf(_expr0, 'each', 'expr');
+
+  var _this0 = p.lightObj();
+  _this0.useString = p.useString;
+  _this0.result = program(p, _p2, fn2);
+  _this0.inverse = p.noop;
+  /* <$each {../list2}>结束 */
+
+  ret += '<span' + _params0 + '>'
+    + ('test_' + parent.parent.data['num'])
+    + _expr0.apply(_this0, [_dataRefer0])
+    + '</span>';
+  /* span结束 */
+
+  /* if开始 */
+  var _valueF0 = parent.index;
+
+  var _filter0 = p.filters['five'];
+  if (!_filter0) {
+    p.warn('five', 'filter');
+  }
+  else {
+    var _thisF0 = p.lightObj();
+    _thisF0.useString = p.useString;
+
+    _valueF0 = _filter0.apply(_thisF0, [_valueF0, '1']);
   }
 
-  var useString = true;
+  var _expr1 = p.exprs['if'],
+    _dataRefer1 = _valueF0;
 
-  var type0 = 'div';
+  p.throwIf(_expr1, 'if', 'expr');
 
-  var openTag0 = '<' + type0 + ' checked disabled="disabled" name1="../111" name="my name:' + data0.name + ',id:' + data0.id + ',name:' + data0.name + '" id="test1"';
-  ret += openTag0 + '>';
+  var _this1 = p.lightObj();
+  _this1.useString = p.useString;
+  _this1.result = program(p, _p2, fn3);
+  _this1.inverse = program(p, _p2, fn4);
 
-  //子节点
-
-  ret += '</' + type0 + '>';
+  ret += _expr1.apply(_this1, [_dataRefer1]);
+  /* if结束 */
 
   return ret;
+}
+
+function fn2(p, p2, param) {
+  var parent = p.lightObj();
+  parent.data = param.item;
+  parent.parent = p2.parent;
+  parent.index = param.index;
+  var data = p.getItemParam(param.item, p2.data, p.multiData);
+  var _p2 = p.lightObj();
+  _p2.parent = parent;
+  _p2.data = data;
+
+  var _params0 = '';
+  var _paramsE0 = p.lightObj();
+
+  /* $params块开始 */
+  var _filter0 = p.filters['five'],
+    _valueF0 = p2.parent.index;
+  if (!_filter0) {
+    p.warn('five', 'filter');
+  }
+  else {
+    var _thisF0 = p.lightObj();
+    _thisF0.useString = p.useString;
+
+    _valueF0 = _filter0.apply(_thisF0, [_valueF0]);
+  }
+
+  var _expr0 = p.exprs['if'],
+    _dataRefer0 = _valueF0;
+
+  p.throwIf(_expr0, 'if', 'expr');
+
+  var _this0 = p.lightObj();
+  _this0.useString = p.useString;
+  _this0.result = program(p, _p2, fn5, _paramsE0);
+  _this0.inverse = p.noop;
+
+  _expr0.apply(_this0, [_dataRefer0]);
+  /* $params块结束 */
+
+  var _k0,
+    _keys0 = { key: 1 };
+  for(var _k0 in _paramsE0) {
+    if(!_keys0 || !_keys0[_k0]) {
+      _params0 += ' ' + _k0 + '="' + _paramsE0[_k0] + '"';
+    }
+  }
+  _params0 += ' key="' + parent.index + '"';
+
+  return '<div' + _params0 + '>'
+    + '<span>span' + (!p.multiData ? data['no'] : p.getDatasValue(data, 'no')) + '</span>'
+    + '<i>' + (!p.multiData ? data['no'] : p.getDatasValue(data, 'no')) + '</i>'
+    + '</div>';
+}
+
+function fn3(p, p2, param) {
+  return '<br />';
+}
+
+function fn4(p, p2, param) {
+  return '<img />';
+}
+
+function fn5(p, p2, param, pE) {
+  var _expr0 = p.exprs['param'],
+    _dataRefer0 = 'name';
+
+  p.throwIf(_expr0, 'param', 'expr');
+
+  var _this0 = p.lightObj();
+  _this0.useString = p.useString;
+  _this0.paramsExpr = pE;
+  _this0.result = program(p, p2, fn6);
+
+  return _expr0.apply(_this0, [_dataRefer0]);
+}
+
+function fn6(p, p2, param){
+  return 'five';
+}
+
+function __transformToString(data) {
+  var p = {
+    useString: true,
+    exprs: nj.exprs,
+    filters: nj.filters,
+    multiData: nj.isArray(data),
+    getDatasValue: nj.getDatasValue,
+    noop: nj.noop,
+    lightObj: nj.lightObj,
+    throwIf: nj.throwIf,
+    warn: nj.warn,
+    getItemParam: nj.getItemParam,
+    //listPush: nj.listPush,
+    assign: nj.assign
+  };
+
+  var parent = p.lightObj();
+  if (data) {
+    parent.data = p.multiData ? data[0] : data;
+  }
+  var p2 = p.lightObj();
+  p2.parent = parent;
+  p2.data = data;
+
+  var _typeRefer0 = !p.multiData ? data['div'] : p.getDatasValue(data, 'div');
+  var _type0 = _typeRefer0 ? _typeRefer0 : 'div';
+  var _params0 = ' id="' + (!p.multiData ? data['num'] : p.getDatasValue(data, 'num')) + '_100"';
+
+  /* div子节点开始 */
+  var _expr0 = p.exprs['each'],
+    _dataRefer0 = (!p.multiData ? data['arr'] : p.getDatasValue(data, 'arr'));
+
+  p.throwIf(_expr0, 'each', 'expr');
+
+  var _this0 = p.lightObj();
+  //_this0.data = data;
+  //_this0.parent = parent.parent;
+  //_this0.index = parent.index;
+  _this0.useString = p.useString;
+  _this0.result = program(p, p2, fn1);
+  _this0.inverse = p.noop;
+  /* div子节点结束 */
+
+  return '<' + _type0 + _params0 + '>'
+    + _expr0.apply(_this0, [_dataRefer0])
+    + '</' + _type0 + '>';
 }
 
 module.exports = {

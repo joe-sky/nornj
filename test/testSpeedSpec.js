@@ -107,33 +107,9 @@ describe('test speed', function () {
     });
   });
 
-  xit('test render to string', function () {
-    var data = {
-      arr: _.times(5, function (n) {
-        return n;
-      }),
-      num: Date.now(),
-      list2: [1, 2, 3],
-      onClick: 'onClick',
-      params: {
-        'data-a': 1,
-        'data-b': 2
-      },
-      styles: "color:blue"
-    };
-
-    var tmplFn = compile(tmpl, 'tmpl1'),
-        html = tmplFn(data);
-
-    //console.log(JSON.stringify(nj.templates['tmpl1']));
-    console.log(html);
-    expect(html).toBeTruthy();
-  });
-
-  xit('test render to component', function () {
+  it('test render to component by jsx', function () {
     var start;
-
-    var TestComponent1 = React.createClass({
+    var TestComponent = React.createClass({
       getInitialState: function () {
         start = Date.now();
 
@@ -170,11 +146,30 @@ describe('test speed', function () {
         //});
         //ret = React.createElement.apply(React, params);
 
-        console.log('render:' + (Date.now() - start));
+        console.log('jsx:' + (Date.now() - start));
         return ret;
       }
     });
 
+    var list2 = _.times(100, function (n) {
+      return { no: n + 1 };
+    });
+
+    var html = ReactDOMServer.renderToStaticMarkup(React.createElement(TestComponent, {
+      arr: _.times(100, function (n) {
+        return n;
+      }),
+      a: 1,
+      list: [{ no: 1, b: 1 }, { no: 2, b: 0 }, { no: 3, b: 1 }]
+    }));
+
+
+    //console.log(html);
+    expect(html).toBeTruthy();
+  });
+
+  it('test render to component by nj', function () {
+    var start;
     var TestComponent = React.createClass({
       getInitialState: function () {
         start = Date.now();
@@ -207,7 +202,7 @@ describe('test speed', function () {
         };
 
         var ret = this.template(params);
-        console.log('render:' + (Date.now() - start));
+        console.log('nj:' + (Date.now() - start));
         return ret;
       }
     });
@@ -233,10 +228,10 @@ describe('test speed', function () {
     var data = {
       div: 'div',
       num: 100,
-      arr: _.times(100, function (n) {
+      arr: _.times(1000, function (n) {
         return n;
       }),
-      list2: _.times(1000, function (n) {
+      list2: _.times(100, function (n) {
         return { no: n + 1 };
       })
     };
@@ -244,17 +239,18 @@ describe('test speed', function () {
     var start = Date.now();
     var ret = tmplFn(data);
     //console.log(ret);
-    console.log(Date.now() - start);
+    console.log('hbs:' + (Date.now() - start));
+    expect(ret).toBeTruthy();
   });
 
   it('test render to string by nj', function () {
     var data = {
       div: 'div',
       num: 100,
-      arr: _.times(100, function (n) {
+      arr: _.times(1000, function (n) {
         return n;
       }),
-      list2: _.times(1000, function (n) {
+      list2: _.times(100, function (n) {
         return { no: n + 1 };
       })
     };
@@ -262,6 +258,7 @@ describe('test speed', function () {
     var start = Date.now();
     var ret = tmplFn(data);
     //console.log(ret);
-    console.log(Date.now() - start);
+    console.log('nj:' + (Date.now() - start));
+    expect(ret).toBeTruthy();
   });
 });

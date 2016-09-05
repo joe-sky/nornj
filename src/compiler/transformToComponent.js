@@ -318,9 +318,9 @@ function __transformToComponent(data) {
   return compPort.apply(compLib, _compParam0);
 }
 
-function program(p, p2, fn) {
+function program(p, p2, fn, pE) {
   return function(param) {
-    return fn(p, p2, param);
+    return fn(p, p2, param, pE);
   };
 }
 
@@ -419,8 +419,8 @@ function fn2(p, p2, param) {
   _p2.data = data;
 
   var _type0 = p.compClass['div'] ? p.compClass['div'] : 'div',
-    _params0 = { key: parent.index };
-  _p2.paramsE = p.lightObj();
+    _params0 = {};
+  var _paramsE0 = p.lightObj();
 
   /* $params块开始 */
   var _filter0 = p.filters['five'],
@@ -442,13 +442,14 @@ function fn2(p, p2, param) {
 
   var _this0 = p.lightObj();
   _this0.useString = p.useString;
-  _this0.result = program(p, _p2, fn5);
+  _this0.result = program(p, _p2, fn5, _paramsE0);
   _this0.inverse = p.noop;
 
   _expr0.apply(_this0, [_dataRefer0]);
   /* $params块结束 */
 
-  p.assign(_params0, _p2.paramsE);
+  p.assign(_params0, _paramsE0);
+  _params0.key = parent.index;
 
   var _compParam0 = [_type0, _params0];
 
@@ -487,7 +488,7 @@ function fn4(p, p2, param) {
   return p.compPort.apply(p.compLib, _compParam0);
 }
 
-function fn5(p, p2, param) {
+function fn5(p, p2, param, pE) {
   var _expr0 = p.exprs['param'],
     _dataRefer0 = 'name';
 
@@ -495,7 +496,7 @@ function fn5(p, p2, param) {
 
   var _this0 = p.lightObj();
   _this0.useString = p.useString;
-  _this0.paramsExpr = p2.paramsE;
+  _this0.paramsExpr = pE;
   _this0.result = program(p, p2, fn6);
 
   return _expr0.apply(_this0, [_dataRefer0]);
@@ -533,7 +534,6 @@ function __transformToComponent2(data) {
   p2.data = data;
 
   var _typeRefer0 = !p.multiData ? data['div'] : p.getDatasValue(data, 'div');
-
   var _type0 = _typeRefer0 ? _typeRefer0 : (p.compClass['div'] ? p.compClass['div'] : 'div');
   var _params0 = {
     id: (!p.multiData ? data['num'] : p.getDatasValue(data, 'num')) + '_100'
