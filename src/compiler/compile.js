@@ -12,9 +12,10 @@ function compile(obj, tmplName, isComponent, isTag) {
     return;
   }
 
+  //编译AST
   var root;
   if (tmplName) {
-    root = nj.templates[tmplName];
+    root = nj.asts[tmplName];
   }
   if (!root) {
     //If obj is Object,we think obj is a precompiled template
@@ -22,7 +23,7 @@ function compile(obj, tmplName, isComponent, isTag) {
       root = obj;
     }
     else {
-      root = _createRoot();
+      root = _createAstRoot();
 
       //Auto transform string template to array
       if (utils.isString(obj)) {
@@ -38,48 +39,38 @@ function compile(obj, tmplName, isComponent, isTag) {
       }
     }
 
-    //保存模板编译结果到全局集合中
+    //保存模板AST编译结果到全局集合中
     if (tmplName) {
-      nj.templates[tmplName] = root;
+      nj.asts[tmplName] = root;
     }
   }
 
-  return function () {
-    var args = arguments,
-      len = args.length,
-      data;
-
-    if (len <= 0) {
-      data = {};
-    }
-    else if (len === 1) {
-      data = args[0];
+  //编译模板函数
+  var tmplFn;
+  if (tmplName) {
+    tmplFn = nj.templates[tmplName];
+  }
+  if (!tmplFn) {
+    var tmplFns;
+    if (isComponent) {
+      tmplFns = tranComponent(root);
     }
     else {
-      data = [];
-      utils.each(args, function (item) {
-        data[data.length] = item;
-      }, false, true);
+      tmplFns = tranString(root);
     }
+    tmplFn = utils.template(tmplFns);
 
-    var ret;
-    if (isComponent) {  //转换组件
-      //ret = tranComponent.transformToComponent(root.content[0], data);
-      ret = tranComponent.__transformToComponent(data);
-      if (utils.isArray(ret)) {  //组件最外层必须是单一节点对象
-        ret = ret[0];
-      }
+    //保存模板函数编译结果到全局集合中
+    if (tmplName) {
+      nj.templates[tmplName] = tmplFn;
     }
-    else {  //转换字符串
-      //ret = tranString.transformContentToString(root.content, data);
-      ret = tranString.__transformToString(data);
-    }
-    return ret;
-  };
+  }
+
+  return tmplFn;
 }
 
 //Create template root object
-function _createRoot() {
+function _createAstRoot() {
   var root = utils.lightObj();
   root.type = 'nj_root';
   root.content = [];
@@ -117,7 +108,7 @@ function renderTagComponent(data, selector) {
 
 //Precompile template
 function precompile(obj) {
-  var root = _createRoot();
+  var root = _createAstRoot();
   utils.checkElem(obj, root);
 
   return root;

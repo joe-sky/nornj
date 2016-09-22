@@ -15,6 +15,7 @@ nj.tagNamespaces = { nj: 'nj' };
 nj.tagId = 'nj-id';
 nj.tagStyle = 'nj-style';
 nj.tagClassName = 'nj-component';
+nj.asts = {};
 nj.templates = {};
 nj.errorTitle = 'NornJ:';
 nj.tmplRule = {};

@@ -9,6 +9,243 @@
   Handlebars = require('handlebars');
 
 describe('test speed', function () {
+  var ast = {
+    "type": "nj_root",
+    "content": [{
+      "type": "{div}",
+      "typeRefer": {
+        "props": [{
+          "prop": {
+            "name": "div"
+          },
+          "escape": true
+        }],
+        "strs": ["", ""],
+        "isAll": true
+      },
+      "params": {
+        "id": {
+          "props": [{
+            "prop": {
+              "name": "num"
+            },
+            "escape": true
+          },
+          {
+            "prop": {
+              "name": "_100",
+              "isStr": true
+            },
+            "escape": true
+          }],
+          "strs": ["", "", ""],
+          "isAll": false
+        }
+      },
+      "content": [{
+        "type": "nj_expr",
+        "expr": "each",
+        "refer": {
+          "props": [{
+            "prop": {
+              "name": "arr"
+            },
+            "escape": true
+          }],
+          "strs": ["", ""],
+          "isAll": true
+        },
+        "content": [{
+          "type": "span",
+          "params": {
+            "class": {
+              "props": [{
+                "prop": {
+                  "name": "#"
+                },
+                "escape": true
+              }],
+              "strs": ["test_", ""],
+              "isAll": false
+            },
+            "style": {
+              "props": [{
+                "prop": {
+                  "parentNum": 1,
+                  "name": "styles"
+                },
+                "escape": true
+              }],
+              "strs": ["", ""],
+              "isAll": true
+            },
+            "onClick": {
+              "props": [{
+                "prop": {
+                  "parentNum": 1,
+                  "name": "onClick"
+                },
+                "escape": true
+              }],
+              "strs": ["", ""],
+              "isAll": true
+            }
+          },
+          "content": [{
+            "type": "nj_plaintext",
+            "content": [{
+              "props": [{
+                "prop": {
+                  "parentNum": 1,
+                  "name": "num"
+                },
+                "escape": true
+              }],
+              "strs": ["test_", ""],
+              "isAll": false
+            }]
+          },
+          {
+            "type": "nj_expr",
+            "expr": "each",
+            "refer": {
+              "props": [{
+                "prop": {
+                  "parentNum": 1,
+                  "name": "list2"
+                },
+                "escape": true
+              }],
+              "strs": ["", ""],
+              "isAll": true
+            },
+            "content": [{
+              "type": "div",
+              "params": {
+                "key": {
+                  "props": [{
+                    "prop": {
+                      "name": "#"
+                    },
+                    "escape": true
+                  }],
+                  "strs": ["", ""],
+                  "isAll": true
+                }
+              },
+              "content": [{
+                "type": "span",
+                "content": [{
+                  "type": "nj_plaintext",
+                  "content": [{
+                    "props": [{
+                      "prop": {
+                        "name": "no"
+                      },
+                      "escape": true
+                    }],
+                    "strs": ["span", ""],
+                    "isAll": false
+                  }]
+                }]
+              },
+              {
+                "type": "i",
+                "content": [{
+                  "type": "nj_plaintext",
+                  "content": [{
+                    "props": [{
+                      "prop": {
+                        "name": "no"
+                      },
+                      "escape": true
+                    }],
+                    "strs": ["", ""],
+                    "isAll": true
+                  }]
+                }]
+              }],
+              "paramsExpr": {
+                "type": "nj_expr",
+                "expr": "params",
+                "content": [{
+                  "type": "nj_expr",
+                  "expr": "if",
+                  "refer": {
+                    "props": [{
+                      "prop": {
+                        "filters": [{
+                          "name": "five"
+                        }],
+                        "parentNum": 1,
+                        "name": "#"
+                      },
+                      "escape": true
+                    }],
+                    "strs": ["", ""],
+                    "isAll": true
+                  },
+                  "content": [{
+                    "type": "nj_expr",
+                    "expr": "p",
+                    "refer": {
+                      "props": [{
+                        "prop": {
+                          "name": "name",
+                          "isStr": true
+                        },
+                        "escape": true
+                      }],
+                      "strs": ["", ""],
+                      "isAll": true
+                    },
+                    "content": [{
+                      "type": "nj_plaintext",
+                      "content": [{
+                        "props": null,
+                        "strs": ["five"],
+                        "isAll": false
+                      }]
+                    }]
+                  }]
+                }]
+              }
+            }]
+          }]
+        },
+        {
+          "type": "nj_expr",
+          "expr": "if",
+          "refer": {
+            "props": [{
+              "prop": {
+                "filters": [{
+                  "name": "five"
+                },
+                {
+                  "name": "test"
+                }],
+                "name": "#"
+              },
+              "escape": true
+            }],
+            "strs": ["", ""],
+            "isAll": true
+          },
+          "content": [{
+            "selfCloseTag": true,
+            "type": "br"
+          }],
+          "hasElse": true,
+          "contentElse": [{
+            "selfCloseTag": true,
+            "type": "img"
+          }]
+        }]
+      }]
+    }]
+  };
+
   var tmpl = nj`
   <{div} id="{num '_100'}">
     <#each {arr}>

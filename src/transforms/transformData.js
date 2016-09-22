@@ -280,6 +280,68 @@ function getExprParam(refer, data, parent, useString) {
   return ret;
 }
 
+//创建表达式块结果函数
+function exprRet(p1, p2, p3, fn, p5) {
+  return function (param) {
+    return fn(p1, p2, p3, param, p5);
+  };
+}
+
+//创建模板函数
+function template(fns) {
+  var configs = {
+    useString: fns.useString,
+    exprs: nj.exprs,
+    filters: nj.filters,
+    getDatasValue: nj.getDatasValue,
+    noop: nj.noop,
+    lightObj: nj.lightObj,
+    throwIf: nj.throwIf,
+    warn: nj.warn,
+    getItemParam: nj.getItemParam,
+    assign: nj.assign,
+    exprRet: nj.exprRet
+  };
+
+  if (!configs.useString) {
+    configs.compPort = nj.componentPort;
+    configs.compLib = nj.componentLibObj;
+    configs.compClass = nj.componentClasses;
+  }
+
+  tools.each(fns, function (v, k) {
+    if (k.indexOf('fn') === 0) {
+      configs[k] = v;
+    }
+  }, false, false);
+
+  return function (data) {
+    var args = arguments,
+      len = args.length,
+      data;
+
+    if (len <= 0) {
+      data = {};
+    }
+    else if (len === 1) {
+      data = args[0];
+    }
+    else {
+      data = [];
+      utils.each(args, function (item) {
+        data[data.length] = item;
+      }, false, true);
+    }
+
+    var ret = fns.main(configs, { data: data }, { multiData: nj.isArray(data) });
+    if (!configs.useString && tools.isArray(ret)) {  //组件最外层必须是单一节点对象
+      ret = ret[0];
+    }
+
+    return ret;
+  };
+}
+
 module.exports = {
   transformParams: transformParams,
   transformParamsToObj: transformParamsToObj,
@@ -288,5 +350,7 @@ module.exports = {
   getItemParam: getItemParam,
   setObjParam: setObjParam,
   getExprParam: getExprParam,
-  getDatasValue: getDatasValue
+  getDatasValue: getDatasValue,
+  exprRet: exprRet,
+  template: template
 };

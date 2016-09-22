@@ -47,11 +47,11 @@ var exprs = {
         ret = [];
       }
 
-      for(var i = 0;i < refer.length;i++) {
+      tools.each(refer, function (item, index) {
         var retI = thiz.result({
           loop: true,
-          item: refer[i],
-          index: i
+          item: item,
+          index: index
         });
 
         if (useString) {
@@ -61,23 +61,7 @@ var exprs = {
           ret.push(retI);
           //tools.listPush(ret, retI, true);
         }
-      }
-
-      //tools.each(refer, function (item, index) {
-      //  var retI = thiz.result({
-      //    loop: true,
-      //    item: item,
-      //    index: index
-      //  });
-
-      //  if (useString) {
-      //    ret += retI;
-      //  }
-      //  else {
-      //    //ret.push(retI);
-      //    tools.listPush(ret, retI, true);
-      //  }
-      //}, false, tools.isArray(refer));
+      }, false, tools.isArray(refer));
 
       //Return null when not use string and result is empty.
       if (!useString && !ret.length) {
