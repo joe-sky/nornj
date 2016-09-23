@@ -9,6 +9,34 @@
   Handlebars = require('handlebars');
 
 describe('test speed', function () {
+  var tmpl = nj`
+  <{div} id="{num '_100'}">
+    <#each {arr}>
+      <span class=test_{#}
+            style={../styles}
+            onClick={../onClick}>
+        test_{../num}
+        <#each {../list2}>
+          <div key={#}>
+            <#params>
+              <#if {../#:five}>
+                <#p {'name'}>five</#p>
+              </#if>
+            </#params>
+            <span>span{no}</span>
+            <i>{no}</i>
+          </div>
+        </#each>
+      </span>
+      <#if {#:five:test}>
+        <br />
+      <#else />
+        <img />
+      </#if>
+    </#each>
+  </{div}>
+  `;
+
   var ast = {
     "type": "nj_root",
     "content": [{
@@ -245,34 +273,6 @@ describe('test speed', function () {
       }]
     }]
   };
-
-  var tmpl = nj`
-  <{div} id="{num '_100'}">
-    <#each {arr}>
-      <span class=test_{#}
-            style={../styles}
-            onClick={../onClick}>
-        test_{../num}
-        <#each {../list2}>
-          <div key={#}>
-            <#params>
-              <#if {../#:five}>
-                <#p {'name'}>five</#p>
-              </#if>
-            </#params>
-            <span>span{no}</span>
-            <i>{no}</i>
-          </div>
-        </#each>
-      </span>
-      <#if {#:five:test}>
-        <br />
-      <#else />
-        <img />
-      </#if>
-    </#each>
-  </{div}>
-  `;
 
   var tmplHbs = `
   <{{div}} id="{{num}}_100">

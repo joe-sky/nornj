@@ -53,7 +53,7 @@ function compile(obj, tmplName, isComponent, isTag) {
   if (!tmplFn) {
     var tmplFns;
     if (isComponent) {
-      tmplFns = tranComponent(root);
+      tmplFns = tranComponent(root.content);
     }
     else {
       tmplFns = tranString(root);

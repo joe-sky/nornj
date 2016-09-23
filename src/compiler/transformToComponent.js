@@ -412,7 +412,7 @@ var __tmplFns = {
 
     var _type0 = p1.compClass['div'] ? p1.compClass['div'] : 'div',
       _params0 = {};
-    var _p50 = p1.lightObj();
+    var _paramsE0 = p1.lightObj();
 
     /* $params块开始 */
     var _filter0 = p1.filters['five'],
@@ -434,13 +434,13 @@ var __tmplFns = {
 
     var _this0 = p1.lightObj();
     _this0.useString = p1.useString;
-    _this0.result = p1.exprRet(p1, _p2, p3, p1.fn5, _p50);
+    _this0.result = p1.exprRet(p1, _p2, p3, p1.fn5, _paramsE0);
     _this0.inverse = p1.noop;
 
     _expr0.apply(_this0, [_dataRefer0]);
     /* $params块结束 */
 
-    p1.assign(_params0, _p50);
+    p1.assign(_params0, _paramsE0);
     _params0.key = parent.index;
 
     var _compParam0 = [_type0, _params0];
@@ -530,11 +530,67 @@ var __tmplFns = {
   }
 };
 
+function _buildFn(content, fns, no, newContext) {
+  var fnStr = '',
+    main = no === 0,
+    counter = {
+      _type: 0,
+      _typeRefer: 0,
+      _params: 0,
+      _compParam: 0,
+      _expr: 0,
+      _dataRefer: 0,
+      _this: 0,
+      _thisF: 0,
+      _paramsE: 0
+    };
+
+  if (main) {
+    fnStr += 'var parent = p1.lightObj();\n';
+    fnStr += 'var data = p2.data;\n';
+    fnStr += 'if (data) {\n';
+    fnStr += '  parent.data = p3.multiData ? data[0] : data;\n';
+    fnStr += '}\n';
+    fnStr += 'p2.parent = parent;\n\n';
+  }
+  else if (newContext) {
+
+  }
+
+  fnStr += _transformContent(content, fns, counter);
+
+  //构建函数
+  fns[main ? 'main' : 'fn' + no] = new Function('p1', 'p2', 'p3', 'p4', 'p5', fnStr);
+}
+
+function _transformNode(node, fns, counter) {
+
+}
+
+function _transformContent(content, fns, counter) {
+  var ret = '';
+  if (!content) {
+    return ret;
+  }
+
+  utils.each(content, function (node) {
+    ret += _transformNode(node, fns, counter);
+  }, false, true);
+
+  return ret;
+}
+
 //module.exports = {
 //  transformToComponent: transformToComponent,
 //  transformContentToComponent: transformContentToComponent,
 //  __transformToComponent: __transformToComponent2
 //};
-module.exports = function(ast) {
-  return __tmplFns;
+module.exports = function (ast) {
+  //return __tmplFns;
+  var fns = {
+    useString: false,
+    _no: 0
+  };
+
+  return _buildFn(ast, fns, 0);
 };
