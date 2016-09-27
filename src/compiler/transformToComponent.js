@@ -344,8 +344,10 @@ var __tmplFns = {
     _compParam0.push('test_' + parent.parent.data['num']);
 
     /* <$each {../list2}>开始 */
-    var _expr0 = p1.exprs['each'],
-      _dataRefer0 = parent.parent.data['list2'];
+    var _expr0 = p1.exprs['each'];
+    var _dataRefer0 = [
+      parent.parent.data['list2']
+    ];
 
     p1.throwIf(_expr0, 'each', 'expr');
 
@@ -354,7 +356,7 @@ var __tmplFns = {
     _this0.result = p1.exprRet(p1, _p2, p3, p1.fn2);
     _this0.inverse = p1.noop;
 
-    _compParam0.push(_expr0.apply(_this0, [_dataRefer0]));
+    _compParam0.push(_expr0.apply(_this0, _dataRefer0));
     /* <$each {../list2}>结束 */
 
     ret.push(p1.compPort.apply(p1.compLib, _compParam0));
@@ -385,8 +387,10 @@ var __tmplFns = {
       _valueF0 = _filter1.apply(_thisF1, [_valueF0]);
     }
 
-    var _expr1 = p1.exprs['if'],
-      _dataRefer1 = _valueF0;
+    var _expr1 = p1.exprs['if'];
+    var _dataRefer1 = [
+      _valueF0
+    ];
 
     p1.throwIf(_expr1, 'if', 'expr');
 
@@ -395,7 +399,7 @@ var __tmplFns = {
     _this1.result = p1.exprRet(p1, _p2, p3, p1.fn3);
     _this1.inverse = p1.exprRet(p1, _p2, p3, p1.fn4);
 
-    ret.push(_expr1.apply(_this1, [_dataRefer1]));
+    ret.push(_expr1.apply(_this1, _dataRefer1));
     /* if结束 */
 
     return ret;
@@ -410,13 +414,13 @@ var __tmplFns = {
     _p2.parent = parent;
     _p2.data = data;
 
-    var _type0 = p1.compClass['div'] ? p1.compClass['div'] : 'div',
-      _params0 = {};
+    var _type0 = p1.compClass['div'] ? p1.compClass['div'] : 'div';
+    var _params0 = {};
     var _paramsE0 = p1.lightObj();
 
     /* $params块开始 */
-    var _filter0 = p1.filters['five'],
-      _valueF0 = p2.parent.index;
+    var _filter0 = p1.filters['five'];
+    var _valueF0 = p2.parent.index;
     if (!_filter0) {
       p1.warn('five', 'filter');
     }
@@ -427,8 +431,10 @@ var __tmplFns = {
       _valueF0 = _filter0.apply(_thisF0, [_valueF0]);
     }
 
-    var _expr0 = p1.exprs['if'],
-      _dataRefer0 = _valueF0;
+    var _expr0 = p1.exprs['if'];
+    var _dataRefer0 = [
+      _valueF0
+    ];
 
     p1.throwIf(_expr0, 'if', 'expr');
 
@@ -437,7 +443,7 @@ var __tmplFns = {
     _this0.result = p1.exprRet(p1, _p2, p3, p1.fn5, _paramsE0);
     _this0.inverse = p1.noop;
 
-    _expr0.apply(_this0, [_dataRefer0]);
+    _expr0.apply(_this0, _dataRefer0);
     /* $params块结束 */
 
     p1.assign(_params0, _paramsE0);
@@ -446,8 +452,8 @@ var __tmplFns = {
     var _compParam0 = [_type0, _params0];
 
     /* span开始 */
-    var _type1 = p1.compClass['span'] ? p1.compClass['span'] : 'span',
-      _compParam1 = [_type1, null];
+    var _type1 = p1.compClass['span'] ? p1.compClass['span'] : 'span';
+    var _compParam1 = [_type1, null];
 
     _compParam1.push('span' + (!p3.multiData ? data['no'] : p1.getDatasValue(data, 'no')));
 
@@ -455,8 +461,8 @@ var __tmplFns = {
     /* span结束 */
 
     /* i开始 */
-    var _type2 = p1.compClass['i'] ? p1.compClass['i'] : 'i',
-      _compParam2 = [_type2, null];
+    var _type2 = p1.compClass['i'] ? p1.compClass['i'] : 'i';
+    var _compParam2 = [_type2, null];
 
     _compParam2.push((!p3.multiData ? data['no'] : p1.getDatasValue(data, 'no')));
 
@@ -466,20 +472,22 @@ var __tmplFns = {
     return p1.compPort.apply(p1.compLib, _compParam0);
   },
   fn3: function (p1, p2, p3, p4, p5) {
-    var _type0 = p1.compClass['br'] ? p1.compClass['br'] : 'br',
-      _compParam0 = [_type0, null];
+    var _type0 = p1.compClass['br'] ? p1.compClass['br'] : 'br';
+    var _compParam0 = [_type0, null];
 
     return p1.compPort.apply(p1.compLib, _compParam0);
   },
   fn4: function (p1, p2, p3, p4, p5) {
-    var _type0 = p1.compClass['img'] ? p1.compClass['img'] : 'img',
-      _compParam0 = [_type0, null];
+    var _type0 = p1.compClass['img'] ? p1.compClass['img'] : 'img';
+    var _compParam0 = [_type0, null];
 
     return p1.compPort.apply(p1.compLib, _compParam0);
   },
   fn5: function (p1, p2, p3, p4, p5) {
-    var _expr0 = p1.exprs['param'],
-      _dataRefer0 = 'name';
+    var _expr0 = p1.exprs['param'];
+    var _dataRefer0 = [
+      'name'
+    ];
 
     p1.throwIf(_expr0, 'param', 'expr');
 
@@ -488,7 +496,7 @@ var __tmplFns = {
     _this0.paramsExpr = p5;
     _this0.result = p1.exprRet(p1, p2, p3, p1.fn6);
 
-    return _expr0.apply(_this0, [_dataRefer0]);
+    return _expr0.apply(_this0, _dataRefer0);
   },
   fn6: function (p1, p2, p3, p4, p5) {
     return 'five';
@@ -510,8 +518,10 @@ var __tmplFns = {
     var _compParam0 = [_type0, _params0];
 
     /* div子节点开始 */
-    var _expr0 = p1.exprs['each'],
-      _dataRefer0 = (!p3.multiData ? data['arr'] : p1.getDatasValue(data, 'arr'));
+    var _expr0 = p1.exprs['each'];
+    var _dataRefer0 = [
+      (!p3.multiData ? data['arr'] : p1.getDatasValue(data, 'arr'))
+    ];
 
     p1.throwIf(_expr0, 'each', 'expr');
 
@@ -523,7 +533,7 @@ var __tmplFns = {
     _this0.result = p1.exprRet(p1, p2, p3, p1.fn1);
     _this0.inverse = p1.noop;
 
-    _compParam0.push(_expr0.apply(_this0, [_dataRefer0]));
+    _compParam0.push(_expr0.apply(_this0, _dataRefer0));
     /* div子节点结束 */
 
     return p1.compPort.apply(p1.compLib, _compParam0);
@@ -533,6 +543,11 @@ var __tmplFns = {
 function _buildFn(content, fns, no, newContext) {
   var fnStr = '',
     main = no === 0,
+    retType = content.length === 1 ? '1' : '2',  /*
+                                                  1: 只有单个子节点
+                                                  2: 有多个子节点
+                                                  object: 非构建函数时
+                                                  */
     counter = {
       _type: 0,
       _typeRefer: 0,
@@ -557,27 +572,146 @@ function _buildFn(content, fns, no, newContext) {
 
   }
 
-  fnStr += _transformContent(content, fns, counter);
+  if (retType === 2) {
+    fnStr += 'var ret = [];\n\n';
+  }
+
+  fnStr += _transformContent(content, fns, counter, retType);
+
+  if (retType === 2) {
+    fnStr += 'return ret;';
+  }
 
   //构建函数
   fns[main ? 'main' : 'fn' + no] = new Function('p1', 'p2', 'p3', 'p4', 'p5', fnStr);
 }
 
-function _transformNode(node, fns, counter) {
-
+function _buildPropData(obj) {
+  return (!obj.prop.isStr
+      ? '!p3.multiData ? data[\'' + obj.prop.name + '\'] : p1.getDatasValue(data, \'' + obj.prop.name + '\')'
+      : '\'' + obj.prop.name + '\'');
 }
 
-function _transformContent(content, fns, counter) {
-  var ret = '';
+function _buildProps(obj) {
+  var str0 = obj.strs[0];
+  var fnStr = !obj.isAll && str0 !== '' ? ('\'' + str0 + '\' + ') : '';
+
+  utils.each(obj.props, function (o, i) {
+    var dataStr = _buildPropData(o);
+
+    if (!obj.isAll) {
+      var strI = obj.strs[i + 1];
+      dataStr = (i > 0 ? ' + ' : '')
+        + '(' + dataStr + ')'
+        + (strI !== '' ? ' + \'' + strI + '\'' : '');
+    }
+    fnStr += dataStr;
+
+    if (obj.isAll) {
+      return false;
+    }
+  }, false, true, true);
+
+  return fnStr;
+}
+
+function _transformNode(node, fns, counter, retType) {
+  var fnStr = '';
+
+  if (node.type === 'nj_plaintext') {  //文本节点
+
+  }
+  else if (node.type === 'nj_expr') {  //Expression block node
+    var _exprC = counter._expr++,
+      _dataReferC = counter._dataRefer++,
+      dataReferStr = '';
+    fnStr += '\nvar _expr' + _exprC + ' = p1.exprs[\'' + node.expr + '\'];\n';
+
+    if (node.refer) {
+      dataReferStr += 'var _dataRefer' + _dataReferC + ' = [\n';
+      var props = node.refer.props,
+        len = props.length;
+
+      utils.each(props, function (o, i) {
+        dataReferStr += '  ' + _buildPropData(o) + (i < len - 1 ? ',' : '');
+      }, false, true);
+      dataReferStr += '\n];\n';
+      fnStr += dataReferStr;
+    }
+
+    //警告信息
+    fnStr += 'p1.throwIf(_expr' + _exprC + ', \'' + node.expr + '\', \'expr\');\n';
+  }
+  else {  //元素节点
+    //节点类型和typeRefer
+    var _typeC = counter._type++,
+      _type;
+    if (node.typeRefer) {
+      _type = node.typeRefer.props[0].prop.name;
+    }
+    else {
+      _type = node.type.toLowerCase();
+    }
+    var typeStr = 'p1.compClass[\'' + _type + '\'] ? p1.compClass[\'' + _type + '\'] : \'' + _type + '\'';
+
+    if (node.typeRefer) {
+      var _typeReferC = counter._typeRefer++;
+      fnStr += 'var _typeRefer' + _typeReferC + ' = ' + _buildProps(node.typeRefer) + ';\n';
+      fnStr += 'var _type' + _typeC + ' = _typeRefer' + _typeReferC + ' ? _typeRefer' + _typeReferC + ' : (' + typeStr + ');\n';
+    }
+    else {
+      fnStr += 'var _type' + _typeC + ' = ' + typeStr + ';\n';
+    }
+
+    //节点参数
+    var _paramsC = counter._params++,
+      paramsStr = '';
+    if (node.params) {
+      paramsStr += 'var _params' + _paramsC + ' = {\n';
+      utils.each(node.params, function (v, k) {
+        paramsStr += '  ' + k + ': ' + _buildProps(v) + ',';
+      }, false, false);
+      paramsStr += '\n};\n';
+      fnStr += paramsStr;
+    }
+
+    //组件引擎参数
+    var _compParamC = counter._compParam++;
+    fnStr += 'var _compParam' + _compParamC + ' = [_type' + _typeC + ', ' + (paramsStr !== '' ? '_params' + _paramsC : 'null') + '];\n';
+
+    //子节点
+    fnStr += _transformContent(node.content, fns, counter, { compParam: '_compParam' + _compParamC });
+
+    //返回值
+    if (utils.isString(retType)) {
+      fnStr += _buildRetInFn(retType, _compParamC);
+    }
+  }
+
+  return fnStr;
+}
+
+function _transformContent(content, fns, counter, retType) {
+  var fnStr = '';
   if (!content) {
-    return ret;
+    return fnStr;
   }
 
   utils.each(content, function (node) {
-    ret += _transformNode(node, fns, counter);
+    fnStr += _transformNode(node, fns, counter, retType);
   }, false, true);
 
-  return ret;
+  return fnStr;
+}
+
+function _buildRetInFn(retType, _compParamC) {
+  var retStr = 'p1.compPort.apply(p1.compLib, _compParam' + _compParamC + ')';
+  if (retType === '1') {
+    return '\nreturn ' + retStr + ';';
+  }
+  else {
+    return '\nret.push(' + retStr + ');';
+  }
 }
 
 //module.exports = {
@@ -592,5 +726,7 @@ module.exports = function (ast) {
     _no: 0
   };
 
-  return _buildFn(ast, fns, 0);
+  _buildFn(ast, fns, 0);
+  console.log(fns.main.toString());
+  return fns;
 };
