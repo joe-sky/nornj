@@ -3,7 +3,8 @@
 var nj = require('../core'),
   utils = require('../utils/utils'),
   transformContentToComponent = require('./transformContent')(transformToComponent),  //转换子节点为组件节点
-  errorTitle = nj.errorTitle;
+  errorTitle = nj.errorTitle,
+  exprConfig = utils.exprConfig;
 
 //转换节点为组件节点
 function transformToComponent(obj, data, parent, paramsExpr) {
@@ -566,17 +567,17 @@ function _buildFn(content, fns, no, newContext) {
     fnStr += 'if (data) {\n';
     fnStr += '  parent.data = p3.multiData ? data[0] : data;\n';
     fnStr += '}\n';
-    fnStr += 'p2.parent = parent;\n\n';
+    fnStr += 'p2.parent = parent;\n';
   }
   else if (newContext) {
 
   }
 
   if (retType === 2) {
-    fnStr += 'var ret = [];\n\n';
+    fnStr += 'var ret = [];\n';
   }
 
-  fnStr += _transformContent(content, fns, counter, retType);
+  fnStr += _buildContent(content, fns, counter, retType);
 
   if (retType === 2) {
     fnStr += 'return ret;';
@@ -584,6 +585,7 @@ function _buildFn(content, fns, no, newContext) {
 
   //构建函数
   fns[main ? 'main' : 'fn' + no] = new Function('p1', 'p2', 'p3', 'p4', 'p5', fnStr);
+  return no;
 }
 
 function _buildPropData(obj) {
@@ -615,7 +617,7 @@ function _buildProps(obj) {
   return fnStr;
 }
 
-function _transformNode(node, fns, counter, retType) {
+function _buildNode(node, fns, counter, retType) {
   var fnStr = '';
 
   if (node.type === 'nj_plaintext') {  //文本节点
@@ -639,8 +641,24 @@ function _transformNode(node, fns, counter, retType) {
       fnStr += dataReferStr;
     }
 
-    //警告信息
+    //如果表达式不存在则打印警告信息
     fnStr += 'p1.throwIf(_expr' + _exprC + ', \'' + node.expr + '\', \'expr\');\n';
+
+    var _thisC = counter._this++,
+      configE = exprConfig[node.expr];
+    fnStr += '\nvar _this' + _thisC + ' = p1.lightObj();\n';
+    if(configE.useString) {
+      fnStr += '_this' + _thisC + '.useString = p1.useString;\n';
+    }
+    fnStr += '_this' + _thisC + '.result = ' + (node.content ? 'p1.exprRet(p1, p2, p3, p1.fn' + _buildFn(node.content, fns, ++fns._no, true) + ')' : 'p1.noop') + ';\n';
+    fnStr += '_this' + _thisC + '.inverse = ' + (node.contentElse ? 'p1.exprRet(p1, p2, p3, p1.fn' + _buildFn(node.contentElse, fns, ++fns._no, true) + ')' : 'p1.noop') + ';\n';
+
+    //渲染
+    fnStr += _buildRender(2, retType, {
+      _expr: _exprC,
+      _dataRefer: _dataReferC,
+      _this: _thisC
+    });
   }
   else {  //元素节点
     //节点类型和typeRefer
@@ -656,20 +674,23 @@ function _transformNode(node, fns, counter, retType) {
 
     if (node.typeRefer) {
       var _typeReferC = counter._typeRefer++;
-      fnStr += 'var _typeRefer' + _typeReferC + ' = ' + _buildProps(node.typeRefer) + ';\n';
+      fnStr += '\nvar _typeRefer' + _typeReferC + ' = ' + _buildProps(node.typeRefer) + ';\n';
       fnStr += 'var _type' + _typeC + ' = _typeRefer' + _typeReferC + ' ? _typeRefer' + _typeReferC + ' : (' + typeStr + ');\n';
     }
     else {
-      fnStr += 'var _type' + _typeC + ' = ' + typeStr + ';\n';
+      fnStr += '\nvar _type' + _typeC + ' = ' + typeStr + ';\n';
     }
 
     //节点参数
     var _paramsC = counter._params++,
       paramsStr = '';
     if (node.params) {
+      var paramKeys = Object.keys(node.params),
+        len = paramKeys.length;
+
       paramsStr += 'var _params' + _paramsC + ' = {\n';
-      utils.each(node.params, function (v, k) {
-        paramsStr += '  ' + k + ': ' + _buildProps(v) + ',';
+      utils.each(paramKeys, function (k, i) {
+        paramsStr += '  ' + k + ': ' + _buildProps(node.params[k]) + (i < len - 1 ? ',\n' : '');
       }, false, false);
       paramsStr += '\n};\n';
       fnStr += paramsStr;
@@ -680,37 +701,47 @@ function _transformNode(node, fns, counter, retType) {
     fnStr += 'var _compParam' + _compParamC + ' = [_type' + _typeC + ', ' + (paramsStr !== '' ? '_params' + _paramsC : 'null') + '];\n';
 
     //子节点
-    fnStr += _transformContent(node.content, fns, counter, { compParam: '_compParam' + _compParamC });
+    fnStr += _buildContent(node.content, fns, counter, { _compParam: '_compParam' + _compParamC });
 
-    //返回值
-    if (utils.isString(retType)) {
-      fnStr += _buildRetInFn(retType, _compParamC);
-    }
+    //渲染
+    fnStr += _buildRender(1, retType, { _compParam: _compParamC });
   }
 
   return fnStr;
 }
 
-function _transformContent(content, fns, counter, retType) {
+function _buildContent(content, fns, counter, retType) {
   var fnStr = '';
   if (!content) {
     return fnStr;
   }
 
   utils.each(content, function (node) {
-    fnStr += _transformNode(node, fns, counter, retType);
+    fnStr += _buildNode(node, fns, counter, retType);
   }, false, true);
 
   return fnStr;
 }
 
-function _buildRetInFn(retType, _compParamC) {
-  var retStr = 'p1.compPort.apply(p1.compLib, _compParam' + _compParamC + ')';
+function _buildRender(nodeType, retType, counter) {
+  var retStr;
+  switch(nodeType) {
+    case 1:  //元素节点
+      retStr = 'p1.compPort.apply(p1.compLib, _compParam' + counter._compParam + ')';
+      break;
+    case 2:  //表达式块
+      retStr = '_expr' + counter._expr + '.apply(_this' + counter._this + ', _dataRefer' + counter._dataRefer + ')';
+      break;
+  }
+
   if (retType === '1') {
     return '\nreturn ' + retStr + ';';
   }
+  else if (retType === '2') {
+    return '\nret.push(' + retStr + ');\n';
+  }
   else {
-    return '\nret.push(' + retStr + ');';
+    return '\n' + retType._compParam + '.push(' + retStr + ');\n';
   }
 }
 
@@ -728,5 +759,6 @@ module.exports = function (ast) {
 
   _buildFn(ast, fns, 0);
   console.log(fns.main.toString());
+  console.log(fns.fn2.toString());
   return fns;
 };
