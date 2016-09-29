@@ -186,7 +186,7 @@ function __transformToComponent(data) {
 
       /* $params块开始 */
       var _filter0 = filters['five'],
-        _valueF0 = __parent_1.index;
+        _value0 = __parent_1.index;
       if (!_filter0) {
         warn('five', 'filter');
       }
@@ -194,11 +194,11 @@ function __transformToComponent(data) {
         var _thisF0 = lightObj();
         _thisF0.useString = useString;
 
-        _valueF0 = _filter0.apply(_thisF0, [_valueF0]);
+        _value0 = _filter0.apply(_thisF0, [_value0]);
       }
 
       var _expr0 = exprs['if'],
-        _dataRefer0 = _valueF0;
+        _dataRefer0 = _value0;
 
       throwIf(_expr0, 'if', 'expr');
 
@@ -260,7 +260,7 @@ function __transformToComponent(data) {
     /* span结束 */
 
     /* if开始 */
-    var _valueF0 = parent.index;
+    var _value0 = parent.index;
 
     var _filter0 = filters['five'];
     if (!_filter0) {
@@ -270,7 +270,7 @@ function __transformToComponent(data) {
       var _thisF0 = lightObj();
       _thisF0.useString = useString;
 
-      _valueF0 = _filter0.apply(_thisF0, [_valueF0, '1']);
+      _value0 = _filter0.apply(_thisF0, [_value0, '1']);
     }
 
     var _filter1 = filters['test'];
@@ -281,11 +281,11 @@ function __transformToComponent(data) {
       var _thisF1 = lightObj();
       _thisF1.useString = useString;
 
-      _valueF0 = _filter1.apply(_thisF1, [_valueF0]);
+      _value0 = _filter1.apply(_thisF1, [_value0]);
     }
 
     var _expr1 = exprs['if'],
-      _dataRefer1 = _valueF0;
+      _dataRefer1 = _value0;
 
     throwIf(_expr1, 'if', 'expr');
 
@@ -364,7 +364,7 @@ var __tmplFns = {
     /* span结束 */
 
     /* if开始 */
-    var _valueF0 = parent.index;
+    var _value0 = parent.index;
 
     var _filter0 = p1.filters['five'];
     if (!_filter0) {
@@ -374,7 +374,7 @@ var __tmplFns = {
       var _thisF0 = p1.lightObj();
       _thisF0.useString = p1.useString;
 
-      _valueF0 = _filter0.apply(_thisF0, [_valueF0, '1']);
+      _value0 = _filter0.apply(_thisF0, [_value0, '1']);
     }
 
     var _filter1 = p1.filters['test'];
@@ -385,12 +385,12 @@ var __tmplFns = {
       var _thisF1 = p1.lightObj();
       _thisF1.useString = p1.useString;
 
-      _valueF0 = _filter1.apply(_thisF1, [_valueF0]);
+      _value0 = _filter1.apply(_thisF1, [_value0]);
     }
 
     var _expr1 = p1.exprs['if'];
     var _dataRefer1 = [
-      _valueF0
+      _value0
     ];
 
     p1.throwIf(_expr1, 'if', 'expr');
@@ -421,7 +421,7 @@ var __tmplFns = {
 
     /* $params块开始 */
     var _filter0 = p1.filters['five'];
-    var _valueF0 = p2.parent.index;
+    var _value0 = p2.parent.index;
     if (!_filter0) {
       p1.warn('five', 'filter');
     }
@@ -429,12 +429,12 @@ var __tmplFns = {
       var _thisF0 = p1.lightObj();
       _thisF0.useString = p1.useString;
 
-      _valueF0 = _filter0.apply(_thisF0, [_valueF0]);
+      _value0 = _filter0.apply(_thisF0, [_value0]);
     }
 
     var _expr0 = p1.exprs['if'];
     var _dataRefer0 = [
-      _valueF0
+      _value0
     ];
 
     p1.throwIf(_expr0, 'if', 'expr');
@@ -544,21 +544,23 @@ var __tmplFns = {
 function _buildFn(content, fns, no, newContext) {
   var fnStr = '',
     main = no === 0,
-    retType = content.length === 1 ? '1' : '2',  /*
-                                                  1: 只有单个子节点
-                                                  2: 有多个子节点
-                                                  object: 非构建函数时
-                                                  */
+    /* retType
+     1: 只有单个子节点
+     2: 有多个子节点
+     object: 非构建函数时
+    */
+    retType = content.length === 1 ? '1' : '2',
     counter = {
       _type: 0,
       _typeRefer: 0,
       _params: 0,
+      _paramsE: 0,
       _compParam: 0,
-      _expr: 0,
+      _value0: 0,
       _dataRefer: 0,
+      _expr: 0,
       _this: 0,
-      _thisF: 0,
-      _paramsE: 0
+      _thisF: 0
     };
 
   if (main) {
@@ -570,7 +572,18 @@ function _buildFn(content, fns, no, newContext) {
     fnStr += 'p2.parent = parent;\n';
   }
   else if (newContext) {
-
+    fnStr += 'var parent = p1.lightObj();\n';
+    fnStr += 'parent.data = p4.item;\n';
+    fnStr += 'parent.parent = p2.parent;\n';
+    fnStr += 'parent.index = p4.index;\n';
+    fnStr += 'var data = p1.getItemParam(p4.item, p2.data, p3.multiData);\n';
+    fnStr += 'var _p2 = p1.lightObj();\n';
+    fnStr += '_p2.parent = parent;\n';
+    fnStr += '_p2.data = data;\n';
+  }
+  else {
+    fnStr += 'var parent = p2.parent;\n';
+    fnStr += 'var data = p2.data;\n';
   }
 
   if (retType === 2) {
@@ -583,7 +596,13 @@ function _buildFn(content, fns, no, newContext) {
     fnStr += 'return ret;';
   }
 
-  //构建函数
+  /* 构建表达式块函数
+   p1: 全局模板成员,不可改变
+   p2: 当前模板的局部成员
+   p3: 当前模板的全局成员
+   p4: 表格式块内调用result及inverse方法传递的参数
+   p5: #param块变量
+  */
   fns[main ? 'main' : 'fn' + no] = new Function('p1', 'p2', 'p3', 'p4', 'p5', fnStr);
   return no;
 }
@@ -621,7 +640,7 @@ function _buildNode(node, fns, counter, retType) {
   var fnStr = '';
 
   if (node.type === 'nj_plaintext') {  //文本节点
-
+    fnStr += _buildRender(1, retType, { text: _buildProps(node.content[0]) });
   }
   else if (node.type === 'nj_expr') {  //Expression block node
     var _exprC = counter._expr++,
@@ -644,14 +663,26 @@ function _buildNode(node, fns, counter, retType) {
     //如果表达式不存在则打印警告信息
     fnStr += 'p1.throwIf(_expr' + _exprC + ', \'' + node.expr + '\', \'expr\');\n';
 
+    //执行表达式块
     var _thisC = counter._this++,
-      configE = exprConfig[node.expr];
+      configE = exprConfig[node.expr],
+      newContext = configE.newContext;
+
     fnStr += '\nvar _this' + _thisC + ' = p1.lightObj();\n';
     if(configE.useString) {
       fnStr += '_this' + _thisC + '.useString = p1.useString;\n';
     }
-    fnStr += '_this' + _thisC + '.result = ' + (node.content ? 'p1.exprRet(p1, p2, p3, p1.fn' + _buildFn(node.content, fns, ++fns._no, true) + ')' : 'p1.noop') + ';\n';
-    fnStr += '_this' + _thisC + '.inverse = ' + (node.contentElse ? 'p1.exprRet(p1, p2, p3, p1.fn' + _buildFn(node.contentElse, fns, ++fns._no, true) + ')' : 'p1.noop') + ';\n';
+    if(configE.data) {
+      fnStr += '_this' + _thisC + '.data = data;\n';
+    }
+    if(configE.parent) {
+      fnStr += '_this' + _thisC + '.parent = parent.parent;\n';
+    }
+    if(configE.index) {
+      fnStr += '_this' + _thisC + '.index = parent.index;\n';
+    }
+    fnStr += '_this' + _thisC + '.result = ' + (node.content ? 'p1.exprRet(p1, p2, p3, p1.fn' + _buildFn(node.content, fns, ++fns._no, newContext) + ')' : 'p1.noop') + ';\n';
+    fnStr += '_this' + _thisC + '.inverse = ' + (node.contentElse ? 'p1.exprRet(p1, p2, p3, p1.fn' + _buildFn(node.contentElse, fns, ++fns._no, newContext) + ')' : 'p1.noop') + ';\n';
 
     //渲染
     fnStr += _buildRender(2, retType, {
@@ -704,7 +735,7 @@ function _buildNode(node, fns, counter, retType) {
     fnStr += _buildContent(node.content, fns, counter, { _compParam: '_compParam' + _compParamC });
 
     //渲染
-    fnStr += _buildRender(1, retType, { _compParam: _compParamC });
+    fnStr += _buildRender(3, retType, { _compParam: _compParamC });
   }
 
   return fnStr;
@@ -723,14 +754,17 @@ function _buildContent(content, fns, counter, retType) {
   return fnStr;
 }
 
-function _buildRender(nodeType, retType, counter) {
+function _buildRender(nodeType, retType, params) {
   var retStr;
   switch(nodeType) {
-    case 1:  //元素节点
-      retStr = 'p1.compPort.apply(p1.compLib, _compParam' + counter._compParam + ')';
+    case 1:  //文本节点
+      retStr = params.text;
       break;
     case 2:  //表达式块
-      retStr = '_expr' + counter._expr + '.apply(_this' + counter._this + ', _dataRefer' + counter._dataRefer + ')';
+      retStr = '_expr' + params._expr + '.apply(_this' + params._this + ', _dataRefer' + params._dataRefer + ')';
+      break;
+    case 3:  //元素节点
+      retStr = 'p1.compPort.apply(p1.compLib, _compParam' + params._compParam + ')';
       break;
   }
 
@@ -759,6 +793,7 @@ module.exports = function (ast) {
 
   _buildFn(ast, fns, 0);
   console.log(fns.main.toString());
+  console.log('\n');
   console.log(fns.fn2.toString());
   return fns;
 };
