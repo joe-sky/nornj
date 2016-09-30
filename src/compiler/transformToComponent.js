@@ -560,7 +560,8 @@ function _buildFn(content, fns, no, newContext) {
       _dataRefer: 0,
       _expr: 0,
       _this: 0,
-      _thisF: 0
+      _thisF: 0,
+      newContext: newContext
     };
 
   if (main) {
@@ -608,9 +609,45 @@ function _buildFn(content, fns, no, newContext) {
 }
 
 function _buildPropData(obj) {
-  return (!obj.prop.isStr
-      ? '!p3.multiData ? data[\'' + obj.prop.name + '\'] : p1.getDatasValue(data, \'' + obj.prop.name + '\')'
-      : '\'' + obj.prop.name + '\'');
+  if (!obj.prop.isStr) {
+    var name = obj.prop.name,
+      parentNum = obj.prop.parentNum,
+      data = '',
+      special = false;
+
+    if (name === '#') {
+      data = 'parent.index';
+      special = true;
+    }
+    else if (name === '.') {
+      data = 'parent.data';
+      special = true;
+    }
+
+    if (parentNum) {
+      if(!data) {
+        data = 'parent.data';
+      }
+      for (var i = 0; i < parentNum; i++) {
+        data = 'parent.' + data;
+      }
+
+      if(!special) {
+        data += '[\'' + name + '\']';
+        special = true;
+      }
+    }
+
+    if (!special) {
+      return '!p3.multiData ? data[\'' + name + '\'] : p1.getDatasValue(data, \'' + name + '\')';
+    }
+    else {
+      return data;
+    }
+  }
+  else {
+    return '\'' + obj.prop.name + '\'';
+  }
 }
 
 function _buildProps(obj) {
@@ -666,23 +703,24 @@ function _buildNode(node, fns, counter, retType) {
     //执行表达式块
     var _thisC = counter._this++,
       configE = exprConfig[node.expr],
-      newContext = configE.newContext;
+      newContext = configE.newContext,
+      newContextP = counter.newContext;
 
     fnStr += '\nvar _this' + _thisC + ' = p1.lightObj();\n';
-    if(configE.useString) {
+    if (configE.useString) {
       fnStr += '_this' + _thisC + '.useString = p1.useString;\n';
     }
-    if(configE.data) {
+    if (configE.data) {
       fnStr += '_this' + _thisC + '.data = data;\n';
     }
-    if(configE.parent) {
+    if (configE.parent) {
       fnStr += '_this' + _thisC + '.parent = parent.parent;\n';
     }
-    if(configE.index) {
+    if (configE.index) {
       fnStr += '_this' + _thisC + '.index = parent.index;\n';
     }
-    fnStr += '_this' + _thisC + '.result = ' + (node.content ? 'p1.exprRet(p1, p2, p3, p1.fn' + _buildFn(node.content, fns, ++fns._no, newContext) + ')' : 'p1.noop') + ';\n';
-    fnStr += '_this' + _thisC + '.inverse = ' + (node.contentElse ? 'p1.exprRet(p1, p2, p3, p1.fn' + _buildFn(node.contentElse, fns, ++fns._no, newContext) + ')' : 'p1.noop') + ';\n';
+    fnStr += '_this' + _thisC + '.result = ' + (node.content ? 'p1.exprRet(p1, ' + (newContextP ? '_' : '') + 'p2, p3, p1.fn' + _buildFn(node.content, fns, ++fns._no, newContext) + ')' : 'p1.noop') + ';\n';
+    fnStr += '_this' + _thisC + '.inverse = ' + (node.contentElse ? 'p1.exprRet(p1, ' + (newContextP ? '_' : '') + 'p2, p3, p1.fn' + _buildFn(node.contentElse, fns, ++fns._no, newContext) + ')' : 'p1.noop') + ';\n';
 
     //渲染
     fnStr += _buildRender(2, retType, {
@@ -756,7 +794,7 @@ function _buildContent(content, fns, counter, retType) {
 
 function _buildRender(nodeType, retType, params) {
   var retStr;
-  switch(nodeType) {
+  switch (nodeType) {
     case 1:  //文本节点
       retStr = params.text;
       break;
@@ -794,6 +832,6 @@ module.exports = function (ast) {
   _buildFn(ast, fns, 0);
   console.log(fns.main.toString());
   console.log('\n');
-  console.log(fns.fn2.toString());
+  console.log(fns.fn1.toString());
   return fns;
 };
