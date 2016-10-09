@@ -4,7 +4,8 @@ var nj = require('../core'),
   utils = require('../utils/utils'),
   transformContentToComponent = require('./transformContent')(transformToComponent),  //转换子节点为组件节点
   errorTitle = nj.errorTitle,
-  exprConfig = utils.exprConfig;
+  exprConfig = utils.exprConfig,
+  filterConfig = utils.filterConfig;
 
 //转换节点为组件节点
 function transformToComponent(obj, data, parent, paramsExpr) {
@@ -556,10 +557,11 @@ function _buildFn(content, fns, no, newContext) {
       _params: 0,
       _paramsE: 0,
       _compParam: 0,
-      _value0: 0,
       _dataRefer: 0,
       _expr: 0,
       _this: 0,
+      _value: 0,
+      _filter: 0,
       _thisF: 0,
       newContext: newContext
     };
@@ -608,7 +610,10 @@ function _buildFn(content, fns, no, newContext) {
   return no;
 }
 
-function _buildPropData(obj) {
+function _buildPropData(obj, counter) {
+  var dataValueStr;
+
+  //先生成数据值
   if (!obj.prop.isStr) {
     var name = obj.prop.name,
       parentNum = obj.prop.parentNum,
@@ -625,59 +630,134 @@ function _buildPropData(obj) {
     }
 
     if (parentNum) {
-      if(!data) {
+      if (!data) {
         data = 'parent.data';
       }
       for (var i = 0; i < parentNum; i++) {
         data = 'parent.' + data;
       }
 
-      if(!special) {
+      if (!special) {
         data += '[\'' + name + '\']';
         special = true;
       }
     }
 
     if (!special) {
-      return '!p3.multiData ? data[\'' + name + '\'] : p1.getDatasValue(data, \'' + name + '\')';
+      dataValueStr = '!p3.multiData ? data[\'' + name + '\'] : p1.getDatasValue(data, \'' + name + '\')';
     }
     else {
-      return data;
+      dataValueStr = data;
     }
   }
   else {
-    return '\'' + obj.prop.name + '\'';
+    dataValueStr = '\'' + obj.prop.name + '\'';
+  }
+
+  //有过滤器时需要生成"_value"值
+  var filters = obj.prop.filters;
+  if (filters) {
+    var valueStr = '_value' + counter._value++,
+      filterStr = 'var ' + valueStr + ' = ' + dataValueStr + ';\n';
+
+    utils.each(filters, function (o) {
+      var _filterC = counter._filter++,
+        _thisFC = counter._thisF++,
+        configF = filterConfig[o.name];
+
+      filterStr += '\nvar _filter' + _filterC + ' = p1.filters[\'' + o.name + '\'];\n';
+      filterStr += 'if (!_filter' + _filterC + ') {\n';
+      filterStr += '  p1.warn(\'' + o.name + '\', \'filter\');\n';
+      filterStr += '}\n';
+      filterStr += 'else {\n';
+      filterStr += '  var _thisF' + _thisFC + ' = p1.lightObj();\n';
+      if (configF.useString) {
+        filterStr += '  _thisF' + _thisFC + '.useString = p1.useString;\n';
+      }
+      if (configF.data) {
+        filterStr += '  _thisF' + _thisFC + '.data = data;\n';
+      }
+      if (configF.parent) {
+        filterStr += '  _thisF' + _thisFC + '.parent = parent.parent;\n';
+      }
+      if (configF.index) {
+        filterStr += '  _thisF' + _thisFC + '.index = parent.index;\n';
+      }
+      filterStr += '\n  ' + valueStr + ' = _filter' + _filterC + '.apply(_thisF' + _thisFC + ', [' + valueStr
+        + (o.params ? o.params.reduce(function (p, c) {
+          return p + ', \'' + c + '\'';
+        }, '') : '')
+        + ']);\n';
+      filterStr += '}\n';
+    }, false, true);
+
+    return {
+      valueStr: valueStr,
+      filterStr: filterStr
+    };
+  }
+  else {
+    return dataValueStr;
   }
 }
 
-function _buildProps(obj) {
-  var str0 = obj.strs[0];
-  var fnStr = !obj.isAll && str0 !== '' ? ('\'' + str0 + '\' + ') : '';
+function _buildProps(obj, counter) {
+  var str0 = obj.strs[0],
+    valueStr = !obj.isAll && str0 !== '' ? ('\'' + str0 + '\' + ') : '',
+    filterStr = '';
 
   utils.each(obj.props, function (o, i) {
-    var dataStr = _buildPropData(o);
+    var propData = _buildPropData(o, counter),
+      dataValueStr;
+    if (utils.isString(propData)) {
+      dataValueStr = propData;
+    }
+    else {
+      dataValueStr = propData.valueStr;
+      filterStr += propData.filterStr;
+    }
 
     if (!obj.isAll) {
       var strI = obj.strs[i + 1];
-      dataStr = (i > 0 ? ' + ' : '')
-        + '(' + dataStr + ')'
+      dataValueStr = (i > 0 ? ' + ' : '')
+        + '(' + dataValueStr + ')'
         + (strI !== '' ? ' + \'' + strI + '\'' : '');
     }
-    fnStr += dataStr;
+    valueStr += dataValueStr;
 
     if (obj.isAll) {
       return false;
     }
   }, false, true, true);
 
-  return fnStr;
+  if (filterStr === '') {
+    return valueStr;
+  }
+  else {  //包含过滤器
+    return {
+      valueStr: valueStr,
+      filterStr: filterStr
+    };
+  }
 }
 
 function _buildNode(node, fns, counter, retType) {
   var fnStr = '';
 
   if (node.type === 'nj_plaintext') {  //文本节点
-    fnStr += _buildRender(1, retType, { text: _buildProps(node.content[0]) });
+    var valueStr = _buildProps(node.content[0], counter),
+      filterStr;
+    if (utils.isObject(valueStr)) {
+      filterStr = valueStr.filterStr;
+      valueStr = valueStr.valueStr;
+    }
+
+    var textStr = _buildRender(1, retType, { text: valueStr });
+    if (filterStr) {
+      textStr = filterStr + textStr;
+    }
+
+    fnStr += textStr;
   }
   else if (node.type === 'nj_expr') {  //Expression block node
     var _exprC = counter._expr++,
@@ -688,12 +768,24 @@ function _buildNode(node, fns, counter, retType) {
     if (node.refer) {
       dataReferStr += 'var _dataRefer' + _dataReferC + ' = [\n';
       var props = node.refer.props,
-        len = props.length;
+        len = props.length,
+        filterStr = '';
 
       utils.each(props, function (o, i) {
-        dataReferStr += '  ' + _buildPropData(o) + (i < len - 1 ? ',' : '');
+        var valueStr = _buildPropData(o, counter);
+        if (utils.isObject(valueStr)) {
+          filterStr += valueStr.filterStr;
+          valueStr = valueStr.valueStr;
+        }
+
+        dataReferStr += '  ' + valueStr + (i < len - 1 ? ',' : '');
       }, false, true);
       dataReferStr += '\n];\n';
+
+      if(filterStr !== '') {
+        dataReferStr = filterStr + dataReferStr;
+      }
+
       fnStr += dataReferStr;
     }
 
@@ -743,7 +835,7 @@ function _buildNode(node, fns, counter, retType) {
 
     if (node.typeRefer) {
       var _typeReferC = counter._typeRefer++;
-      fnStr += '\nvar _typeRefer' + _typeReferC + ' = ' + _buildProps(node.typeRefer) + ';\n';
+      fnStr += '\nvar _typeRefer' + _typeReferC + ' = ' + _buildProps(node.typeRefer, counter) + ';\n';
       fnStr += 'var _type' + _typeC + ' = _typeRefer' + _typeReferC + ' ? _typeRefer' + _typeReferC + ' : (' + typeStr + ');\n';
     }
     else {
@@ -755,13 +847,25 @@ function _buildNode(node, fns, counter, retType) {
       paramsStr = '';
     if (node.params) {
       var paramKeys = Object.keys(node.params),
-        len = paramKeys.length;
+        len = paramKeys.length,
+        filterStr = '';
 
       paramsStr += 'var _params' + _paramsC + ' = {\n';
       utils.each(paramKeys, function (k, i) {
-        paramsStr += '  ' + k + ': ' + _buildProps(node.params[k]) + (i < len - 1 ? ',\n' : '');
+        var valueStr = _buildProps(node.params[k], counter);
+        if (utils.isObject(valueStr)) {
+          filterStr += valueStr.filterStr;
+          valueStr = valueStr.valueStr;
+        }
+
+        paramsStr += '  ' + k + ': ' + valueStr + (i < len - 1 ? ',\n' : '');
       }, false, false);
       paramsStr += '\n};\n';
+
+      if(filterStr !== '') {
+        paramsStr = filterStr + paramsStr;
+      }
+
       fnStr += paramsStr;
     }
 

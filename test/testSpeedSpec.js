@@ -28,7 +28,7 @@ describe('test speed', function () {
           </div>
         </#each>
       </span>
-      <#if {#:five:test}>
+      <#if {#:five(1):test}>
         <br />
       <#else />
         <img />
@@ -248,6 +248,7 @@ describe('test speed', function () {
             "props": [{
               "prop": {
                 "filters": [{
+                  "params": ["1"],
                   "name": "five"
                 },
                 {
@@ -498,5 +499,6 @@ describe('test speed', function () {
 
   it('test compile', function () {
     nj.compileComponent(tmpl, 'tmpl1');
+    //console.log(JSON.stringify(nj.asts['tmpl1']));
   });
 });

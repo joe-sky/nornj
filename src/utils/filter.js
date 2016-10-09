@@ -126,16 +126,18 @@ function registerFilter(name, filter, options) {
   }
 
   tools.each(params, function (v, k) {
-    var name = k.toLowerCase();
+    var name = k.toLowerCase(),
+      options;
+
     if (v && v.filter) {
       filters[name] = v.filter;
-      if(v.options) {
-        filterConfig[name] = tools.assign({}, filterConfig[name], v.options);
-      }
+      options = v.options;
     }
     else {
       filters[name] = v;
     }
+
+    filterConfig[name] = _commonConfig(options);
   }, false, false);
 }
 
