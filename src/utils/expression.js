@@ -176,10 +176,6 @@ var exprs = {
   }
 };
 
-//Expression alias
-exprs.p = exprs.param;
-exprs.spread = exprs.spreadparam;
-
 function _commonConfig(params) {
   var ret = {
     data: false,
@@ -209,6 +205,12 @@ var exprConfig = {
   'for': _commonConfig({ newContext: true }),
   blank: _commonConfig({ useString: false, inverse: false })
 };
+
+//Expression alias
+exprs.p = exprs.param;
+exprConfig.p = exprConfig.param;
+exprs.spread = exprs.spreadparam;
+exprConfig.spread = exprConfig.spreadparam;
 
 //Register expression and also can batch add
 function registerExpr(name, expr, options) {
