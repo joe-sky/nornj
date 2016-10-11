@@ -443,7 +443,7 @@ describe('test speed', function () {
     expect(html).toBeTruthy();
   });
 
-  xit('test render to component by nj', function () {
+  it('test render to component by nj', function () {
     var start;
     var TestComponent = React.createClass({
       getInitialState: function () {
@@ -497,7 +497,7 @@ describe('test speed', function () {
     expect(html).toBeTruthy();
   });
 
-  it('test compile', function () {
+  xit('test compile', function () {
     nj.compileComponent(tmpl, 'tmpl1');
     //console.log(JSON.stringify(nj.asts['tmpl1']));
   });

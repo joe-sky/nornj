@@ -589,13 +589,13 @@ function _buildFn(content, fns, no, newContext) {
     fnStr += 'var data = p2.data;\n';
   }
 
-  if (retType === 2) {
+  if (retType === '2') {
     fnStr += 'var ret = [];\n';
   }
 
   fnStr += _buildContent(content, fns, counter, retType);
 
-  if (retType === 2) {
+  if (retType === '2') {
     fnStr += 'return ret;';
   }
 
@@ -606,8 +606,7 @@ function _buildFn(content, fns, no, newContext) {
    p4: 表格式块内调用result及inverse方法传递的参数
    p5: #param块变量
   */
-  //fns[main ? 'main' : 'fn' + no] = new Function('p1', 'p2', 'p3', 'p4', 'p5', fnStr);
-  fns[main ? 'main' : 'fn' + no] = fnStr;
+  fns[main ? 'main' : 'fn' + no] = new Function('p1', 'p2', 'p3', 'p4', 'p5', fnStr);
   return no;
 }
 
@@ -704,7 +703,7 @@ function _buildPropData(obj, counter) {
 
 function _buildProps(obj, counter) {
   var str0 = obj.strs[0],
-    valueStr = !obj.isAll && str0 !== '' ? ('\'' + str0 + '\' + ') : '',
+    valueStr = !obj.isAll && str0 !== '' ? ('\'' + str0 + '\'') : '',
     filterStr = '';
 
   utils.each(obj.props, function (o, i) {
@@ -720,7 +719,7 @@ function _buildProps(obj, counter) {
 
     if (!obj.isAll) {
       var strI = obj.strs[i + 1];
-      dataValueStr = (i > 0 ? ' + ' : '')
+      dataValueStr = (str0 === '' && i == 0 ? '' : ' + ')
         + '(' + dataValueStr + ')'
         + (strI !== '' ? ' + \'' + strI + '\'' : '');
     }
@@ -812,9 +811,12 @@ function _buildNode(node, fns, counter, retType) {
     if (configE.index) {
       fnStr += '_this' + _thisC + '.index = parent.index;\n';
     }
+    if (configE.paramsExpr) {
+      fnStr += '_this' + _thisC + '.paramsExpr = p5;\n';
+    }
 
     var paramsEStr = 'p5';
-    if(retType && retType._paramsE) {
+    if (retType && retType._paramsE) {
       paramsEStr = retType._paramsE;
     }
     fnStr += '_this' + _thisC + '.result = ' + (node.content ? 'p1.exprRet(p1, ' + (newContextP ? '_' : '') + 'p2, p3, p1.fn' + _buildFn(node.content, fns, ++fns._no, newContext) + ', ' + paramsEStr + ')' : 'p1.noop') + ';\n';
@@ -856,10 +858,11 @@ function _buildNode(node, fns, counter, retType) {
 
     //节点参数
     var params = node.params,
-      paramsExpr = node.paramsExpr;
+      paramsExpr = node.paramsExpr,
+      paramsStr = '';
     if (params || paramsExpr) {
-      var _paramsC = counter._params++,
-        paramsStr = 'var _params' + _paramsC + ' = ';
+      var _paramsC = counter._params++;
+      paramsStr = 'var _params' + _paramsC + ' = ';
 
       //params块
       if (paramsExpr) {
@@ -869,6 +872,9 @@ function _buildNode(node, fns, counter, retType) {
 
         //params块的子节点
         paramsStr += _buildContent(paramsExpr.content, fns, counter, { _paramsE: '_paramsE' + _paramsEC });
+
+        //合并params块的值
+        paramsStr += '\np1.assign(_params' + _paramsC + ', _paramsE' + _paramsEC + ');\n';
       }
 
       if (params) {
@@ -887,7 +893,7 @@ function _buildNode(node, fns, counter, retType) {
             valueStr = valueStr.valueStr;
           }
 
-          if(!paramsExpr) {
+          if (!paramsExpr) {
             paramsStr += '  ' + k + ': ' + valueStr + (i < len - 1 ? ',\n' : '');
           }
           else {
@@ -954,6 +960,9 @@ function _buildRender(nodeType, retType, params) {
   else if (retType === '2') {
     return '\nret.push(' + retStr + ');\n';
   }
+  else if (retType._paramsE) {
+    return '\n' + retStr + ';\n';
+  }
   else {
     return '\n' + retType._compParam + '.push(' + retStr + ');\n';
   }
@@ -974,6 +983,6 @@ module.exports = function (ast) {
   _buildFn(ast, fns, 0);
   //console.log(fns.main.toString());
   //console.log('\n');
-  console.log(fns.fn2.toString());
+  console.log(fns.fn3.toString());
   return fns;
 };
