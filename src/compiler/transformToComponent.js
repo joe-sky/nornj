@@ -5,7 +5,8 @@ var nj = require('../core'),
   transformContentToComponent = require('./transformContent')(transformToComponent),  //转换子节点为组件节点
   errorTitle = nj.errorTitle,
   exprConfig = utils.exprConfig,
-  filterConfig = utils.filterConfig;
+  filterConfig = utils.filterConfig,
+  replaceSpecialSymbol = require('../utils/replaceSpecialSymbol');
 
 //转换节点为组件节点
 function transformToComponent(obj, data, parent, paramsExpr) {
@@ -757,7 +758,8 @@ function _buildNode(node, fns, counter, retType) {
       textStr = filterStr + textStr;
     }
 
-    fnStr += textStr;
+    //文本中的特殊字符需转义
+    fnStr += replaceSpecialSymbol(textStr);
   }
   else if (node.type === 'nj_expr') {  //块表达式节点
     var _exprC = counter._expr++,
@@ -811,16 +813,22 @@ function _buildNode(node, fns, counter, retType) {
     if (configE.index) {
       fnStr += '_this' + _thisC + '.index = parent.index;\n';
     }
-    if (configE.paramsExpr) {
-      fnStr += '_this' + _thisC + '.paramsExpr = p5;\n';
-    }
 
+    //params块
     var paramsEStr = 'p5';
     if (retType && retType._paramsE) {
       paramsEStr = retType._paramsE;
     }
-    fnStr += '_this' + _thisC + '.result = ' + (node.content ? 'p1.exprRet(p1, ' + (newContextP ? '_' : '') + 'p2, p3, p1.fn' + _buildFn(node.content, fns, ++fns._no, newContext) + ', ' + paramsEStr + ')' : 'p1.noop') + ';\n';
-    fnStr += '_this' + _thisC + '.inverse = ' + (node.contentElse ? 'p1.exprRet(p1, ' + (newContextP ? '_' : '') + 'p2, p3, p1.fn' + _buildFn(node.contentElse, fns, ++fns._no, newContext) + ', ' + paramsEStr + ')' : 'p1.noop') + ';\n';
+    if (configE.paramsExpr) {
+      fnStr += '_this' + _thisC + '.paramsExpr = ' + paramsEStr + ';\n';
+    }
+
+    if (configE.result) {
+      fnStr += '_this' + _thisC + '.result = ' + (node.content ? 'p1.exprRet(p1, ' + (newContextP ? '_' : '') + 'p2, p3, p1.fn' + _buildFn(node.content, fns, ++fns._no, newContext) + ', ' + paramsEStr + ')' : 'p1.noop') + ';\n';
+    }
+    if (configE.inverse) {
+      fnStr += '_this' + _thisC + '.inverse = ' + (node.contentElse ? 'p1.exprRet(p1, ' + (newContextP ? '_' : '') + 'p2, p3, p1.fn' + _buildFn(node.contentElse, fns, ++fns._no, newContext) + ', ' + paramsEStr + ')' : 'p1.noop') + ';\n';
+    }
 
     //渲染
     fnStr += _buildRender(2, retType, {
@@ -893,11 +901,15 @@ function _buildNode(node, fns, counter, retType) {
             valueStr = valueStr.valueStr;
           }
 
+          if (k === 'style') {  //将style字符串转换为对象
+            valueStr = 'p1.styleProps(' + valueStr + ')';
+          }
+
           if (!paramsExpr) {
-            paramsStr += '  ' + k + ': ' + valueStr + (i < len - 1 ? ',\n' : '');
+            paramsStr += '  ' + utils.fixPropName(k) + ': ' + valueStr + (i < len - 1 ? ',\n' : '');
           }
           else {
-            paramsStr += '_params' + _paramsC + '.' + k + ' = ' + valueStr + ';\n';
+            paramsStr += '_params' + _paramsC + '.' + utils.fixPropName(k) + ' = ' + valueStr + ';\n';
           }
         }, false, false);
 
@@ -983,6 +995,6 @@ module.exports = function (ast) {
   _buildFn(ast, fns, 0);
   //console.log(fns.main.toString());
   //console.log('\n');
-  console.log(fns.fn3.toString());
+  //console.log(fns.fn5.toString());
   return fns;
 };

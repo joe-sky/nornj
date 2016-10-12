@@ -10,7 +10,8 @@
 
 describe('test speed', function () {
   var tmpl = nj`
-  <{div} id="{num '_100'}">
+  <{div} id="{num '_100'}" {...props}>
+    &nbsp;1&gt;2
     <#each {arr}>
       <span class=test_{#}
             style={../styles}
@@ -426,12 +427,12 @@ describe('test speed', function () {
       }
     });
 
-    var list2 = _.times(100, function (n) {
+    var list2 = _.times(5, function (n) {
       return { no: n + 1 };
     });
 
     var html = ReactDOMServer.renderToStaticMarkup(React.createElement(TestComponent, {
-      arr: _.times(100, function (n) {
+      arr: _.times(2, function (n) {
         return n;
       }),
       a: 1,
@@ -439,7 +440,7 @@ describe('test speed', function () {
     }));
 
 
-    //console.log(html);
+    console.log(html);
     expect(html).toBeTruthy();
   });
 
@@ -468,10 +469,15 @@ describe('test speed', function () {
             'data-a': 1,
             'data-b': 2
           },
-          styles: {
-            color: 'blue'
-          },
-          div: 'div'
+          //styles: {
+          //  color: 'blue'
+          //},
+          styles: 'color:blue',
+          div: 'div',
+          props: {
+            'data-a': 1,
+            'data-b': 2
+          }
         };
 
         var ret = this.template(params);
@@ -480,12 +486,12 @@ describe('test speed', function () {
       }
     });
 
-    var list2 = _.times(100, function (n) {
+    var list2 = _.times(5, function (n) {
       return { no: n + 1 };
     });
 
     var html = ReactDOMServer.renderToStaticMarkup(React.createElement(TestComponent, {
-      arr: _.times(100, function (n) {
+      arr: _.times(2, function (n) {
         return n;
       }),
       a: 1,
@@ -493,7 +499,7 @@ describe('test speed', function () {
     }));
 
     //console.log(JSON.stringify(nj.templates['tmpl1']));
-    //console.log(html);
+    console.log(html);
     expect(html).toBeTruthy();
   });
 

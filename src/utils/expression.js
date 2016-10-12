@@ -49,7 +49,6 @@ var exprs = {
 
       tools.each(refer, function (item, index) {
         var retI = thiz.result({
-          loop: true,
           item: item,
           index: index
         });
@@ -155,7 +154,6 @@ var exprs = {
 
     for (; start <= end; start++) {
       var retI = this.result({
-        loop: true,
         item: this.data[0],
         index: start
       });
@@ -199,8 +197,8 @@ var exprConfig = {
   'if': _commonConfig(),
   unless: _commonConfig(),
   each: _commonConfig({ newContext: true }),
-  param: _commonConfig({ paramsExpr: true }),
-  spreadparam: _commonConfig({ useString: false, inverse: false, paramsExpr: true }),
+  param: _commonConfig({ inverse: false, paramsExpr: true }),
+  spreadparam: _commonConfig({ useString: false, result: false, inverse: false, paramsExpr: true }),
   equal: _commonConfig({ useString: false }),
   'for': _commonConfig({ newContext: true }),
   blank: _commonConfig({ useString: false, inverse: false })

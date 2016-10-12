@@ -56,7 +56,7 @@ function setObjParam(obj, key, value, notTran) {
       case 'style':
       case nj.tagStyle:
         key = 'style';
-        style = _getStyleParams(value);
+        style = styleProps(value);
         break;
     }
   }
@@ -65,7 +65,7 @@ function setObjParam(obj, key, value, notTran) {
 }
 
 //提取style内参数
-function _getStyleParams(obj) {
+function styleProps(obj) {
   //If the parameter is a style object,then direct return.
   if (tools.isObject(obj)) {
     return obj;
@@ -280,10 +280,53 @@ function getExprParam(refer, data, parent, useString) {
   return ret;
 }
 
-//创建表达式块结果函数
+//修正属性名
+function fixPropName(name) {
+  switch (name) {
+    case 'class':
+      name = 'className';
+      break;
+    case 'for':
+      name = 'htmlFor';
+      break;
+  }
+
+  return name;
+}
+
+//创建块表达式子节点函数
 function exprRet(p1, p2, p3, fn, p5) {
   return function (param) {
     return fn(p1, p2, p3, param, p5);
+  };
+}
+
+//返回可直接执行的模板函数
+function tmplWrap(configs, main) {
+  return function (data) {
+    var args = arguments,
+      len = args.length,
+      data;
+
+    if (len <= 0) {
+      data = {};
+    }
+    else if (len === 1) {
+      data = args[0];
+    }
+    else {
+      data = [];
+      for (var i = 0; i < len; i++) {
+        data[data.length] = args[i];
+      }
+    }
+
+    var ret = main(configs, { data: data }, { multiData: nj.isArray(data) });
+    if (!configs.useString && tools.isArray(ret)) {  //组件最外层必须是单一节点对象
+      ret = ret[0];
+    }
+
+    return ret;
   };
 }
 
@@ -299,6 +342,7 @@ function template(fns) {
     throwIf: nj.throwIf,
     warn: nj.warn,
     getItemParam: nj.getItemParam,
+    styleProps: nj.styleProps,
     assign: nj.assign,
     exprRet: nj.exprRet
   };
@@ -315,31 +359,7 @@ function template(fns) {
     }
   }, false, false);
 
-  return function (data) {
-    var args = arguments,
-      len = args.length,
-      data;
-
-    if (len <= 0) {
-      data = {};
-    }
-    else if (len === 1) {
-      data = args[0];
-    }
-    else {
-      data = [];
-      utils.each(args, function (item) {
-        data[data.length] = item;
-      }, false, true);
-    }
-
-    var ret = fns.main(configs, { data: data }, { multiData: nj.isArray(data) });
-    if (!configs.useString && tools.isArray(ret)) {  //组件最外层必须是单一节点对象
-      ret = ret[0];
-    }
-
-    return ret;
-  };
+  return tmplWrap(configs, fns.main);
 }
 
 module.exports = {
@@ -351,6 +371,9 @@ module.exports = {
   setObjParam: setObjParam,
   getExprParam: getExprParam,
   getDatasValue: getDatasValue,
+  fixPropName: fixPropName,
+  styleProps: styleProps,
   exprRet: exprRet,
+  tmplWrap: tmplWrap,
   template: template
 };
