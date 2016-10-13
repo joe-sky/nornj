@@ -46,27 +46,22 @@ function compile(obj, tmplName, isComponent, isTag) {
   }
 
   //编译模板函数
-  var tmplFn;
+  var tmplFns;
   if (tmplName) {
-    tmplFn = nj.templates[tmplName];
+    tmplFns = nj.templates[tmplName];
   }
-  if (!tmplFn) {
-    var tmplFns;
-    if (isComponent) {
-      tmplFns = tranComponent(root.content);
-    }
-    else {
-      tmplFns = tranString(root);
-    }
-    tmplFn = utils.template(tmplFns);
+  if (!tmplFns) {
+    tmplFns = utils.template(isComponent
+      ? tranComponent(root.content)
+      : tranString(root));
 
     //保存模板函数编译结果到全局集合中
     if (tmplName) {
-      nj.templates[tmplName] = tmplFn;
+      nj.templates[tmplName] = tmplFns;
     }
   }
 
-  return tmplFn;
+  return tmplFns.main;
 }
 
 //Create template root object

@@ -10,9 +10,45 @@
 
 describe('test speed', function () {
   var tmpl = nj`
+  <{div} id="{num '_100'}">
+    <#each {arr}>
+      <span class=test_{#}
+            style={../styles}
+            onClick={../onClick}>
+        test_{../num}
+        <#each {../list2}>
+          <div key={#}>
+            <#params>
+              <#if {../#:five}>
+                <#p {'name'}>five</#p>
+              </#if>
+            </#params>
+            <span>span{no}</span>
+            <i>{no}</i>
+          </div>
+        </#each>
+      </span>
+      <#if {#:five(1):test}>
+        <br />
+      <#else />
+        <img />
+      </#if>
+    </#each>
+  </{div}>
+  `;
+
+  var _tmpl = nj`
   <{div} id="{num '_100'}" {...props}>
     &nbsp;1&gt;2
     <#each {arr}>
+      <TestComp id=@${'false'}>
+        <#tmpl>
+          <span>{text}</span>
+        </#tmpl>
+        <#tmpl {'t2'}>
+          <span key={#}>{.}test!</span>
+        </#tmpl>
+      </TestComp>
       <span class=test_{#}
             style={../styles}
             onClick={../onClick}>
@@ -72,6 +108,14 @@ describe('test speed', function () {
         }
       },
       "content": [{
+        "type": "nj_plaintext",
+        "content": [{
+          "props": null,
+          "strs": ["&nbsp;1&gt;2"],
+          "isAll": false
+        }]
+      },
+      {
         "type": "nj_expr",
         "expr": "each",
         "refer": {
@@ -85,6 +129,70 @@ describe('test speed', function () {
           "isAll": true
         },
         "content": [{
+          "type": "TestComp",
+          "content": [],
+          "paramsExpr": {
+            "type": "nj_expr",
+            "expr": "params",
+            "content": [{
+              "type": "nj_expr",
+              "expr": "param",
+              "refer": {
+                "props": [{
+                  "prop": {
+                    "name": "id",
+                    "isStr": true
+                  },
+                  "escape": true
+                }],
+                "strs": ["", ""],
+                "isAll": true
+              },
+              "content": [{
+                "type": "nj_plaintext",
+                "content": [{
+                  "props": null,
+                  "strs": [{
+                    "_njShim": [{
+                      "id": 1
+                    }]
+                  }],
+                  "isAll": false
+                }]
+              }]
+            }]
+          },
+          "params": {
+            "tmpls": {
+              "props": null,
+              "strs": [{
+                "0": {
+                  "type": "nj_expr",
+                  "expr": "tmpl",
+                  "content": [{
+                    "type": "span",
+                    "content": [{
+                      "type": "nj_plaintext",
+                      "content": [{
+                        "props": [{
+                          "prop": {
+                            "name": "test"
+                          },
+                          "escape": true
+                        }],
+                        "strs": ["", ""],
+                        "isAll": true
+                      }]
+                    }]
+                  }]
+                },
+                "length": 1
+              }],
+              "isAll": false
+            }
+          }
+        },
+        {
           "type": "span",
           "params": {
             "class": {
@@ -272,7 +380,25 @@ describe('test speed', function () {
             "type": "img"
           }]
         }]
-      }]
+      }],
+      "paramsExpr": {
+        "type": "nj_expr",
+        "expr": "params",
+        "content": [{
+          "type": "nj_expr",
+          "expr": "spreadparam",
+          "refer": {
+            "props": [{
+              "prop": {
+                "name": "props"
+              },
+              "escape": true
+            }],
+            "strs": ["", ""],
+            "isAll": true
+          }
+        }]
+      }
     }]
   };
 
@@ -445,14 +571,27 @@ describe('test speed', function () {
   });
 
   it('test render to component by nj', function () {
-    var start;
+    var start,
+      T = nj.tmplByKey('TestComp');
+
+    nj.registerComponent('TestComp', React.createClass({
+      render: function () {
+        return T`<div><#each {arr}>{!#../text}</#each></div>`.renderComp({
+          text: this.props.tmpls['t2'],
+          arr: _.times(2, function (n) {
+            return n;
+          })
+        });
+      }
+    }));
+
     var TestComponent = React.createClass({
       getInitialState: function () {
         return {
           num: 100
         };
       },
-      template: nj.compileComponent(tmpl, 'tmpl1'),
+      template: nj.compileComponent(_tmpl, 'tmpl1'),
       onClick: function () {
         this.setState({ num: Date.now() }, function () {
           console.log('total:' + (Date.now() - start));
@@ -498,7 +637,7 @@ describe('test speed', function () {
       list: [{ no: 1, b: 1 }, { no: 2, b: 0 }, { no: 3, b: 1 }]
     }));
 
-    //console.log(JSON.stringify(nj.templates['tmpl1']));
+    //console.log(JSON.stringify(nj.asts['tmpl1']));
     console.log(html);
     expect(html).toBeTruthy();
   });

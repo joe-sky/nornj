@@ -85,9 +85,10 @@ function each(obj, func, context, isArr, useEvery) {
     });
   }
   else {
-    var keys = Object.keys(obj);
-    arrayEach.call(keys, function (key) {
-      var ret = func.call(context, obj[key], key);
+    var keys = Object.keys(obj),
+      l = keys.length;
+    arrayEach.call(keys, function (k, i) {
+      var ret = func.call(context, obj[k], k, i, l);
 
       if (useEvery) {
         if (ret === false) {

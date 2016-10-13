@@ -301,9 +301,9 @@ function exprRet(p1, p2, p3, fn, p5) {
   };
 }
 
-//返回可直接执行的模板函数
+//构建可运行的模板函数
 function tmplWrap(configs, main) {
-  return function (data) {
+  var tmplFn = function (data) {
     var args = arguments,
       len = args.length,
       data;
@@ -321,13 +321,18 @@ function tmplWrap(configs, main) {
       }
     }
 
-    var ret = main(configs, { data: data }, { multiData: nj.isArray(data) });
+    var ret = main(configs, { data: data, parent: this ? this.parent : null }, { multiData: nj.isArray(data) });
     if (!configs.useString && tools.isArray(ret)) {  //组件最外层必须是单一节点对象
       ret = ret[0];
     }
 
     return ret;
   };
+
+  //标记为模板函数
+  tmplFn._njTmpl = 1;
+
+  return tmplFn;
 }
 
 //创建模板函数
@@ -354,12 +359,15 @@ function template(fns) {
   }
 
   tools.each(fns, function (v, k) {
-    if (k.indexOf('fn') === 0) {
+    if (k.indexOf('main') === 0) {  //将每个主函数构建为可运行的模板函数
+      configs[k] = tmplWrap(configs, v);
+    }
+    else if (k.indexOf('fn') === 0) {  //块表达式函数
       configs[k] = v;
     }
   }, false, false);
 
-  return tmplWrap(configs, fns.main);
+  return configs;
 }
 
 module.exports = {
