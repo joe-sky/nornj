@@ -2,8 +2,7 @@
 
 var nj = require('../core'),
   utils = require('../utils/utils'),
-  tranString = require('./transformToString'),
-  tranComponent = require('./transformToComponent'),
+  buildRuntime = require('./buildRuntime'),
   compileStringTmpl = require('../checkElem/checkStringElem');
 
 //编译模板并返回转换函数
@@ -51,9 +50,7 @@ function compile(obj, tmplName, isComponent, isTag) {
     tmplFns = nj.templates[tmplName];
   }
   if (!tmplFns) {
-    tmplFns = utils.template(isComponent
-      ? tranComponent(root.content)
-      : tranString(root));
+    tmplFns = utils.template(buildRuntime(root.content, !isComponent));
 
     //保存模板函数编译结果到全局集合中
     if (tmplName) {

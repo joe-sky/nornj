@@ -545,6 +545,7 @@ var __tmplFns = {
 
 function _buildFn(content, fns, no, newContext) {
   var fnStr = '',
+    useString = fns.useString,
     isTmplExpr = utils.isString(no),  //如果no为字符串, 则本次将构建tmpl块模板函数
     main = isTmplExpr || no === 0,
     /* retType
@@ -595,7 +596,12 @@ function _buildFn(content, fns, no, newContext) {
   }
 
   if (retType === '2') {
-    fnStr += 'var ret = [];\n';
+    if (!useString) {
+      fnStr += 'var ret = [];\n';
+    }
+    else {
+      fnStr += 'var ret = \'\';\n';
+    }
   }
 
   fnStr += _buildContent(content, fns, counter, retType);
@@ -612,6 +618,7 @@ function _buildFn(content, fns, no, newContext) {
    p5: #param块变量
   */
   fns[main ? 'main' + (isTmplExpr ? no : '') : 'fn' + no] = new Function('p1', 'p2', 'p3', 'p4', 'p5', fnStr);
+  //fns[main ? 'main' + (isTmplExpr ? no : '') : 'fn' + no] = fnStr;
   return no;
 }
 
@@ -732,7 +739,7 @@ function _buildProps(obj, counter, fns) {
           + '(' + dataValueStr + ')'
           + (strI !== '' ? ' + \'' + strI + '\'' : '');
       }
-      else if (obj.isTmplPlace) {
+      else if (obj.isTmplPlace) {  //执行tmpl块模板函数
         dataValueStr += '.call({ parent: parent }, data)';
       }
 
@@ -767,7 +774,8 @@ function _buildProps(obj, counter, fns) {
 }
 
 function _buildNode(node, fns, counter, retType) {
-  var fnStr = '';
+  var fnStr = '',
+    useString = fns.useString;
 
   if (node.type === 'nj_plaintext') {  //文本节点
     var valueStr = _buildProps(node.content[0], counter, fns),
@@ -782,8 +790,12 @@ function _buildNode(node, fns, counter, retType) {
       textStr = filterStr + textStr;
     }
 
-    //文本中的特殊字符需转义
-    fnStr += replaceSpecialSymbol(textStr);
+    if (useString) {
+      fnStr += textStr;
+    }
+    else {  //文本中的特殊字符需转义
+      fnStr += replaceSpecialSymbol(textStr);
+    }
   }
   else if (node.type === 'nj_expr') {  //块表达式节点
     var _exprC = counter._expr++,
@@ -871,7 +883,14 @@ function _buildNode(node, fns, counter, retType) {
     else {
       _type = node.type.toLowerCase();
     }
-    var typeStr = 'p1.compClass[\'' + _type + '\'] ? p1.compClass[\'' + _type + '\'] : \'' + _type + '\'';
+
+    var typeStr;
+    if (!useString) {
+      typeStr = 'p1.compClass[\'' + _type + '\'] ? p1.compClass[\'' + _type + '\'] : \'' + _type + '\'';
+    }
+    else {
+      typeStr = '\'' + _type + '\'';
+    }
 
     if (node.typeRefer) {
       var _typeReferC = counter._typeRefer++,
@@ -899,14 +918,33 @@ function _buildNode(node, fns, counter, retType) {
       //params块
       if (paramsExpr) {
         var _paramsEC = counter._paramsE++;
-        paramsStr += '{};\n';
+        paramsStr += (useString ? '\'\'' : '{}') + ';\n';
         paramsStr += 'var _paramsE' + _paramsEC + ' = p1.lightObj();\n';
 
         //params块的子节点
         paramsStr += _buildContent(paramsExpr.content, fns, counter, { _paramsE: '_paramsE' + _paramsEC });
 
         //合并params块的值
-        paramsStr += '\np1.assign(_params' + _paramsC + ', _paramsE' + _paramsEC + ');\n';
+        if (!useString) {
+          paramsStr += '\np1.assign(_params' + _paramsC + ', _paramsE' + _paramsEC + ');\n';
+        }
+        else {
+          var keys = '';
+          utils.each(params, function (v, k, i, l) {
+            if (i == 0) {
+              keys += '{ ';
+            }
+            keys += k + ': 1';
+
+            if (i < l - 1) {
+              keys += ', '
+            }
+            else {
+              keys += ' }';
+            }
+          }, false, false);
+          paramsStr += '_params' + _paramsC + ' += p1.assignStringProp(_paramsE' + _paramsEC + ', ' + (keys === '' ? 'null' : keys) + ');\n';
+        }
       }
 
       if (params) {
@@ -914,7 +952,7 @@ function _buildNode(node, fns, counter, retType) {
           len = paramKeys.length,
           filterStr = '';
 
-        if (!paramsExpr) {
+        if (!useString && !paramsExpr) {
           paramsStr += '{\n';
         }
 
@@ -925,19 +963,36 @@ function _buildNode(node, fns, counter, retType) {
             valueStr = valueStr.valueStr;
           }
 
-          if (k === 'style') {  //将style字符串转换为对象
+          if (!useString && k === 'style') {  //将style字符串转换为对象
             valueStr = 'p1.styleProps(' + valueStr + ')';
           }
 
-          if (!paramsExpr) {
-            paramsStr += '  ' + utils.fixPropName(k) + ': ' + valueStr + (i < len - 1 ? ',\n' : '');
+          var key;
+          if (useString) {
+            key = k;
           }
           else {
-            paramsStr += '_params' + _paramsC + '.' + utils.fixPropName(k) + ' = ' + valueStr + ';\n';
+            key = utils.fixPropName(k);
+          }
+          if (!paramsExpr) {
+            if (!useString) {
+              paramsStr += '  ' + key + ': ' + valueStr + (i < len - 1 ? ',\n' : '');
+            }
+            else {
+              paramsStr += (i > 0 ? '  + ' : '') + '\' ' + key + '="\' + ' + valueStr + ' + \'"\'' + (i == len - 1 ? ';' : '') + '\n';
+            }
+          }
+          else {
+            if (!useString) {
+              paramsStr += '_params' + _paramsC + '.' + key + ' = ' + valueStr + ';\n';
+            }
+            else {
+              paramsStr += '_params' + _paramsC + ' += \' ' + key + '="\' + ' + valueStr + ' + \'"\';\n';
+            }
           }
         }, false, false);
 
-        if (!paramsExpr) {
+        if (!useString && !paramsExpr) {
           paramsStr += '\n};\n';
         }
 
@@ -982,7 +1037,7 @@ function _buildRender(nodeType, retType, params) {
     case 1:  //文本节点
       retStr = params.text;
       break;
-    case 2:  //表达式块
+    case 2:  //块表达式
       retStr = '_expr' + params._expr + '.apply(_this' + params._this + ', _dataRefer' + params._dataRefer + ')';
       break;
     case 3:  //元素节点
@@ -1004,21 +1059,16 @@ function _buildRender(nodeType, retType, params) {
   }
 }
 
-//module.exports = {
-//  transformToComponent: transformToComponent,
-//  transformContentToComponent: transformContentToComponent,
-//  __transformToComponent: __transformToComponent2
-//};
-module.exports = function (ast) {
+module.exports = function (ast, useString) {
   //return __tmplFns;
   var fns = {
-    useString: false,
+    useString: useString,
     _no: 0,  //块表达式函数计数
     _noT: 0  //tmpl块模板函数计数
   };
 
   _buildFn(ast, fns, fns._no);
-  //console.log(fns.fn1.toString());
+  //console.log(fns.main.toString());
   //console.log('\n');
   //console.log(fns.mainT2.toString());
   return fns;

@@ -403,7 +403,7 @@ describe('test speed', function () {
   };
 
   var tmplHbs = `
-  <{{div}} id="{{num}}_100">
+  <{{div}} id="{{num}}_100" id2="2">
     {{#each arr}}
       <span class="test_{{@index}}">
         test_{{../num}}
@@ -424,7 +424,7 @@ describe('test speed', function () {
   `;
 
   var tmplNj = nj`
-  <{div} id="{num}_100">
+  <{div} id="{num}_100" id2="2">
     <#each {arr}>
       <span class="test_{#}">
         test_{../num}
@@ -496,10 +496,10 @@ describe('test speed', function () {
     var data = {
       div: 'div',
       num: 100,
-      arr: _.times(1000, function (n) {
+      arr: _.times(5, function (n) {
         return n;
       }),
-      list2: _.times(100, function (n) {
+      list2: _.times(2, function (n) {
         return { no: n + 1 };
       })
     };

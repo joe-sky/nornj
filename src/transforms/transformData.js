@@ -294,6 +294,17 @@ function fixPropName(name) {
   return name;
 }
 
+//合并字符串属性
+function assignStringProp(paramsE, keys) {
+  var ret = '';
+  for (var k in paramsE) {
+    if (!keys || !keys[k]) {
+      ret += ' ' + k + '="' + paramsE[k] + '"';
+    }
+  }
+  return ret;
+}
+
 //创建块表达式子节点函数
 function exprRet(p1, p2, p3, fn, p5) {
   return function (param) {
@@ -303,7 +314,7 @@ function exprRet(p1, p2, p3, fn, p5) {
 
 //构建可运行的模板函数
 function tmplWrap(configs, main) {
-  var tmplFn = function (data) {
+  return function (data) {
     var args = arguments,
       len = args.length,
       data;
@@ -328,11 +339,6 @@ function tmplWrap(configs, main) {
 
     return ret;
   };
-
-  //标记为模板函数
-  tmplFn._njTmpl = 1;
-
-  return tmplFn;
 }
 
 //创建模板函数
@@ -356,6 +362,10 @@ function template(fns) {
     configs.compPort = nj.componentPort;
     configs.compLib = nj.componentLibObj;
     configs.compClass = nj.componentClasses;
+  }
+  else {
+    configs.assignStringProp = nj.assignStringProp;
+    configs.escape = nj.escape;
   }
 
   tools.each(fns, function (v, k) {
@@ -381,6 +391,7 @@ module.exports = {
   getDatasValue: getDatasValue,
   fixPropName: fixPropName,
   styleProps: styleProps,
+  assignStringProp: assignStringProp,
   exprRet: exprRet,
   tmplWrap: tmplWrap,
   template: template
