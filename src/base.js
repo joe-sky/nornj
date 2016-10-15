@@ -2,21 +2,15 @@
 
 var nj = require('./core'),
   utils = require('./utils/utils'),
-  setComponentEngine = utils.setComponentEngine,
   compiler = require('./compiler/compile'),
-  registerComponent = require('./utils/registerComponent'),
   compileStringTmpl = require('./checkElem/checkStringElem'),
   tmplByKey = require('./utils/tmplByKey'),
   docReady = require('./utils/docReady');
 
-nj.setComponentEngine = setComponentEngine;
-nj.setTmplRule = utils.setTmplRule;
-nj.registerFilter = utils.registerFilter;
-nj.registerExpr= utils.registerExpr;
 nj.compileStringTmpl = compileStringTmpl;
 nj.tmplByKey = tmplByKey;
 nj.docReady = docReady;
-utils.assign(nj, compiler, registerComponent);
+utils.assign(nj, compiler, utils);
 
 //Create vml tag namespace(primarily for IE8)
 utils.registerTagNamespace();

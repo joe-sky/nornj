@@ -10,10 +10,13 @@ var ESCAPE_LOOKUP = {
 
 function escape(text) {
   if (text == null) {
-    return;
+    return '';
+  }
+  else if(!text.replace) {
+    return text;
   }
 
-  return ('' + text).replace(/[&><"']/g, function (match) {
+  return text.replace(/[&><"']/g, function (match) {
     return ESCAPE_LOOKUP[match];
   });
 }

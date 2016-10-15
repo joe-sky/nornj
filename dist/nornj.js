@@ -58,21 +58,15 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var nj = __webpack_require__(1),
 	  utils = __webpack_require__(2),
-	  setComponentEngine = utils.setComponentEngine,
-	  compiler = __webpack_require__(17),
-	  registerComponent = __webpack_require__(13),
-	  compileStringTmpl = __webpack_require__(21),
-	  tmplByKey = __webpack_require__(23),
-	  docReady = __webpack_require__(24);
+	  compiler = __webpack_require__(16),
+	  compileStringTmpl = __webpack_require__(19),
+	  tmplByKey = __webpack_require__(21),
+	  docReady = __webpack_require__(22);
 
-	nj.setComponentEngine = setComponentEngine;
-	nj.setTmplRule = utils.setTmplRule;
-	nj.registerFilter = utils.registerFilter;
-	nj.registerExpr= utils.registerExpr;
 	nj.compileStringTmpl = compileStringTmpl;
 	nj.tmplByKey = tmplByKey;
 	nj.docReady = docReady;
-	utils.assign(nj, compiler, registerComponent);
+	utils.assign(nj, compiler, utils);
 
 	//Create vml tag namespace(primarily for IE8)
 	utils.registerTagNamespace();
@@ -120,6 +114,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	nj.tagId = 'nj-id';
 	nj.tagStyle = 'nj-style';
 	nj.tagClassName = 'nj-component';
+	nj.asts = {};
 	nj.templates = {};
 	nj.errorTitle = 'NornJ:';
 	nj.tmplRule = {};
@@ -135,21 +130,21 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var tools = __webpack_require__(3),
 	  transformElement = __webpack_require__(5),
-	  transformParam = __webpack_require__(9),
-	  transformData = __webpack_require__(6),
-	  escape = __webpack_require__(7),
-	  checkElem = __webpack_require__(10),
-	  setComponentEngine = __webpack_require__(12),
-	  registerComponent = __webpack_require__(13),
-	  filter = __webpack_require__(14),
-	  expression = __webpack_require__(15),
-	  setTmplRule = __webpack_require__(16);
+	  transformParam = __webpack_require__(6),
+	  transformData = __webpack_require__(7),
+	  escape = __webpack_require__(8),
+	  checkElem = __webpack_require__(9),
+	  setComponentEngine = __webpack_require__(11),
+	  registerComponent = __webpack_require__(12),
+	  filter = __webpack_require__(13),
+	  expression = __webpack_require__(14),
+	  setTmplRule = __webpack_require__(15);
 
 	//Set default param rule
 	setTmplRule();
 
 	module.exports = tools.assign(
-	  { 
+	  {
 	    escape: escape,
 	    setTmplRule: setTmplRule
 	  },
@@ -175,7 +170,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	  arrayProto = Array.prototype,
 	  arrayEvery = arrayProto.every,
 	  arrayForEach = arrayProto.forEach,
-	  arrayPush = arrayProto.push;
+	  arrayPush = arrayProto.push,
+	  errorTitle = nj.errorTitle;
 
 	//Push one by one to array
 	function listPush(arr1, arr2, checkIsArr, checkNotNull) {
@@ -254,9 +250,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    });
 	  }
 	  else {
-	    var keys = Object.keys(obj);
-	    arrayEach.call(keys, function (key) {
-	      var ret = func.call(context, obj[key], key);
+	    var keys = Object.keys(obj),
+	      l = keys.length;
+	    arrayEach.call(keys, function (k, i) {
+	      var ret = func.call(context, obj[k], k, i, l);
 
 	      if (useEvery) {
 	        if (ret === false) {
@@ -282,11 +279,32 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return str.trim();
 	}
 
+	//Noop function
+	function noop() { }
+
 	//抛出异常
-	function throwIf(val, msg) {
+	function throwIf(val, msg, type) {
 	  if (!val) {
-	    throw Error(msg || val);
+	    switch (type) {
+	      case 'expr':
+	        throw Error(errorTitle + 'Expression "' + msg + '" is undefined, please check it has been registered.');
+	      default:
+	        throw Error(errorTitle + (msg || val));
+	    }
 	  }
+	}
+
+	//Print warn
+	function warn(msg, type) {
+	  var ret = errorTitle;
+	  switch (type) {
+	    case 'filter':
+	      ret += 'A filter called "' + msg + '" is undefined.';
+	    default:
+	      ret += msg;
+	  }
+
+	  return ret;
 	}
 
 	//create a unique key
@@ -357,11 +375,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	  lightObj: lightObj,
 	  listPush: listPush,
 	  clearQuot: clearQuot,
-	  toCamelCase: toCamelCase
+	  toCamelCase: toCamelCase,
+	  warn: warn,
+	  noop: noop
 	};
-
-	//绑定到nj对象
-	assign(nj, tools);
 
 	module.exports = tools;
 
@@ -369,8 +386,8 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 4 */
 /***/ function(module, exports) {
 
-	/* eslint-disable no-unused-vars */
 	'use strict';
+	/* eslint-disable no-unused-vars */
 	var hasOwnProperty = Object.prototype.hasOwnProperty;
 	var propIsEnumerable = Object.prototype.propertyIsEnumerable;
 
@@ -382,7 +399,51 @@ return /******/ (function(modules) { // webpackBootstrap
 		return Object(val);
 	}
 
-	module.exports = Object.assign || function (target, source) {
+	function shouldUseNative() {
+		try {
+			if (!Object.assign) {
+				return false;
+			}
+
+			// Detect buggy property enumeration order in older V8 versions.
+
+			// https://bugs.chromium.org/p/v8/issues/detail?id=4118
+			var test1 = new String('abc');  // eslint-disable-line
+			test1[5] = 'de';
+			if (Object.getOwnPropertyNames(test1)[0] === '5') {
+				return false;
+			}
+
+			// https://bugs.chromium.org/p/v8/issues/detail?id=3056
+			var test2 = {};
+			for (var i = 0; i < 10; i++) {
+				test2['_' + String.fromCharCode(i)] = i;
+			}
+			var order2 = Object.getOwnPropertyNames(test2).map(function (n) {
+				return test2[n];
+			});
+			if (order2.join('') !== '0123456789') {
+				return false;
+			}
+
+			// https://bugs.chromium.org/p/v8/issues/detail?id=3056
+			var test3 = {};
+			'abcdefghijklmnopqrst'.split('').forEach(function (letter) {
+				test3[letter] = letter;
+			});
+			if (Object.keys(Object.assign({}, test3)).join('') !==
+					'abcdefghijklmnopqrst') {
+				return false;
+			}
+
+			return true;
+		} catch (e) {
+			// We don't expect any of the above to throw, but better to be safe.
+			return false;
+		}
+	}
+
+	module.exports = shouldUseNative() ? Object.assign : function (target, source) {
 		var from;
 		var to = toObject(target);
 		var symbols;
@@ -418,8 +479,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var nj = __webpack_require__(1),
 	  tools = __webpack_require__(3),
-	  tranData = __webpack_require__(6),
-	  tranParam = __webpack_require__(9),
+	  tranParam = __webpack_require__(6),
 	  tmplRule = nj.tmplRule;
 
 	//提取xml open tag
@@ -583,7 +643,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	//Test whether as parameters expression
 	function isParamsExpr(obj) {
-	  return obj === 'params';
+	  return obj === 'params' || obj === 'props';
 	}
 
 	//Add to the "paramsExpr" property of the parent node
@@ -644,7 +704,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        attrName = tools.toCamelCase(attrName);
 	      }
 
-	      tranData.setObjParam(ret, attrName, val, true);
+	      ret[attrName] = val;
 	    }
 	  });
 
@@ -701,340 +761,6 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 6 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	var nj = __webpack_require__(1),
-	  tools = __webpack_require__(3),
-	  escape = __webpack_require__(7),
-	  replaceSpecialSymbol = __webpack_require__(8),
-	  errorTitle = nj.errorTitle;
-
-	//转换节点参数为字符串
-	function transformParams(obj, data, parent, paramsE) {
-	  var ret = '';
-
-	  //Attach parameters from "$param" expressions
-	  if (paramsE) {
-	    tools.each(paramsE, function (v, k) {
-	      if (!obj || obj[k] == null) {
-	        ret += ' ' + k + '="' + v + '"';
-	      }
-	    }, false, false);
-	  }
-
-	  tools.each(obj, function (v, k) {
-	    ret += ' ' + k + '="' + replaceParams(v, data, false, false, parent, true) + '"';
-	  }, false, false);
-
-	  return ret;
-	}
-
-	//转换节点参数为对象
-	function transformParamsToObj(obj, data, parent, paramsE) {
-	  var ret = obj || paramsE ? {} : null;
-
-	  //Attach parameters from "$param" expressions
-	  if (paramsE) {
-	    tools.assign(ret, paramsE);
-	  }
-
-	  tools.each(obj, function (v, k) {
-	    replaceParams(v, data, ret, k, parent, false);
-	  }, false, false);
-
-	  return ret;
-	}
-
-	//设置对象参数
-	function setObjParam(obj, key, value, notTran) {
-	  var style;
-	  if (!notTran && nj.componentLib) {
-	    switch (key) {
-	      case 'class':
-	        key = 'className';
-	        break;
-	      case 'for':
-	        key = 'htmlFor';
-	        break;
-	      case 'style':
-	      case nj.tagStyle:
-	        key = 'style';
-	        style = _getStyleParams(value);
-	        break;
-	    }
-	  }
-
-	  obj[key] = style != null ? style : value;
-	}
-
-	//提取style内参数
-	function _getStyleParams(obj) {
-	  //If the parameter is a style object,then direct return.
-	  if (tools.isObject(obj)) {
-	    return obj;
-	  }
-
-	  //参数为字符串
-	  var pattern = /([^\s:]+)[\s]?:[\s]?([^\s;]+)[;]?/g,
-	    matchArr, ret;
-
-	  while ((matchArr = pattern.exec(obj))) {
-	    var key = matchArr[1],
-	      value = matchArr[2];
-
-	    if (!ret) {
-	      ret = {};
-	    }
-
-	    //Convert to lowercase when style name is all capital.
-	    if (/^[A-Z-]+$/.test(key)) {
-	      key = key.toLowerCase();
-	    }
-
-	    //将连字符转为驼峰命名
-	    key = tools.toCamelCase(key);
-
-	    ret[key] = value;
-	  }
-
-	  return ret;
-	}
-
-	//Use filters
-	function _useFilters(filters, ret, data, parent, index, useString) {
-	  if (filters) {
-	    var filtersObj = nj.filters;
-	    tools.each(filters, function (filterObj) {
-	      var filter = filtersObj[filterObj.name];  //Get filter function
-	      if (!filter) {
-	        console.warn(errorTitle + 'A filter called ' + filterObj.name + ' is undefined.');
-	        return;
-	      }
-
-	      var params,
-	        paramsF = filterObj.params,
-	        thisObj = tools.lightObj();
-
-	      if (paramsF) {
-	        params = tools.listPush([ret], paramsF);
-	      }
-	      else {
-	        params = [ret];
-	      }
-
-	      thisObj.data = data;
-	      thisObj.parent = parent;
-	      thisObj.index = index;
-	      thisObj.useString = useString;
-	      ret = filter.apply(thisObj, params);
-	    }, false, true);
-	  }
-
-	  return ret;
-	}
-
-	//获取data值
-	function getDataValue(data, propObj, parent, defaultEmpty, useString) {
-	  //if (data == null) {
-	  //  return;
-	  //}
-
-	  var isArr = tools.isArray(data),
-	    prop = propObj.name,
-	    filters = propObj.filters,
-	    parentNum = propObj.parentNum,
-	    datas, ret, dataP, index;
-
-	  //if inside each block,get the parent data and current index
-	  if (parent && parent.parent) {
-	    dataP = parent.parent;
-	    index = parent.index;
-	  }
-
-	  //According to the param path to get data
-	  if (parent && parentNum) {
-	    for (var i = 0; i < parentNum; i++) {
-	      var _parent = parent.parent;
-	      tools.throwIf(_parent, errorTitle + 'Parent data is undefined, please check the param path declare.');
-	      parent = _parent;
-	      index = parent.index;
-	      datas = [parent.data];
-	    }
-	  }
-	  else if (isArr) {  //The data param is array
-	    datas = data;
-	  }
-	  else {
-	    datas = [data];
-	  }
-
-	  if (propObj.isStr) {
-	    ret = _useFilters(filters, prop, datas, dataP, index, useString);
-	  }
-	  else if (prop === '.') {  //prop为点号时直接使用data作为返回值
-	    ret = _useFilters(filters, isArr ? data[0] : data, datas, dataP, index, useString);
-	  }
-	  else if (prop === '#') {  //Get current item index
-	    ret = _useFilters(filters, index, datas, dataP, index, useString);
-	  }
-	  else {
-	    tools.each(datas, function (obj) {
-	      if (obj) {
-	        ret = obj[prop];
-	        if (ret != null) {
-	          //Use filters
-	          ret = _useFilters(filters, ret, datas, dataP, index, useString);
-
-	          return false;
-	        }
-	      }
-	    }, false, true, true);
-	  }
-
-	  //Default set empty
-	  if (defaultEmpty && ret == null) {
-	    ret = '';
-	  }
-
-	  return ret;
-	}
-
-	//获取each块中的item参数
-	function getItemParam(item, data, isArr) {
-	  var ret = item;
-	  if (isArr == null) {
-	    isArr = tools.isArray(data);
-	  }
-	  if (isArr) {
-	    ret = tools.listPush([item], data.slice(1));
-	  }
-
-	  return ret;
-	}
-
-	//替换参数字符串
-	function replaceParams(valueObj, data, newObj, newKey, parent, useString) {
-	  var props = valueObj.props,
-	    strs = valueObj.strs,
-	    isAll = valueObj.isAll,
-	    useObj = tools.isObject(newObj),  //newObj的值可能为对象或布尔值,此处判断是否为对象
-	    value = strs[0];
-
-	  if (props) {
-	    tools.each(props, function (propObj, i) {
-	      var dataProp = getDataValue(data, propObj.prop, parent, !newObj, useString);
-
-	      //参数为字符串时,须做特殊字符转义
-	      if (dataProp
-	        && !newObj            //Only in transform to string need escape
-	        && propObj.escape) {  //Only in the opening brace's length less than 2 need escape
-	        dataProp = escape(dataProp);
-	      }
-
-	      //如果参数只存在占位符,则可传引用参数
-	      if (isAll) {
-	        if (useObj) {  //在新对象上创建属性
-	          setObjParam(newObj, newKey, dataProp);
-	        }
-
-	        value = dataProp;
-	      }
-	      else {  //Splicing value by one by one
-	        value += dataProp + strs[i + 1];
-	      }
-	    }, false, true);
-	  }
-
-	  //存在多个占位符的情况
-	  if (useObj && !isAll) {
-	    setObjParam(newObj, newKey, value);
-	  }
-
-	  //Replace space symbols such as "&nbsp;" when output component.
-	  if (newObj && !useObj && tools.isString(value)) {
-	    value = replaceSpecialSymbol(value);
-	  }
-	  return value;
-	}
-
-	//Get expression parameter
-	function getExprParam(refer, data, parent, useString) {
-	  var ret = [];
-	  if (refer != null) {
-	    tools.each(refer.props, function (propObj, i) {
-	      ret.push(getDataValue(data, propObj.prop, parent, false, useString));
-	    }, false, true);
-	  }
-
-	  return ret;
-	}
-
-	module.exports = {
-	  transformParams: transformParams,
-	  transformParamsToObj: transformParamsToObj,
-	  replaceParams: replaceParams,
-	  getDataValue: getDataValue,
-	  getItemParam: getItemParam,
-	  setObjParam: setObjParam,
-	  getExprParam: getExprParam
-	};
-
-/***/ },
-/* 7 */
-/***/ function(module, exports) {
-
-	'use strict';
-
-	var ESCAPE_LOOKUP = {
-	  '&': '&amp;',
-	  '>': '&gt;',
-	  '<': '&lt;',
-	  '"': '&quot;',
-	  '\'': '&#x27;'
-	};
-
-	function escape(text) {
-	  if (text == null) {
-	    return;
-	  }
-
-	  return ('' + text).replace(/[&><"']/g, function (match) {
-	    return ESCAPE_LOOKUP[match];
-	  });
-	}
-
-	module.exports = escape;
-
-/***/ },
-/* 8 */
-/***/ function(module, exports) {
-
-	'use strict';
-
-	var SPACIAL_SYMBOLS = {
-	  nbsp: '\u00A0',
-	  ensp: '\u2002',
-	  emsp: '\u2003',
-	  thinsp: '\u2009',
-	  zwnj: '\u200C',
-	  zwj: '\u200D',
-	  lt: '<',
-	  gt: '>'
-	};
-
-	var REGEX_SYMBOLS = new RegExp('&(' + Object.keys(SPACIAL_SYMBOLS).join('|') + ');', 'g');
-	function replace(str) {
-	  return str.replace(REGEX_SYMBOLS, function (all, match) {
-	    return SPACIAL_SYMBOLS[match];
-	  });
-	}
-
-	module.exports = replace;
-
-/***/ },
-/* 9 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1171,7 +897,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  var ret = tools.lightObj(),
 	    strs = tools.isString(value) ? value.split(tmplRule.replaceSplit) : [value],
 	    props = null,
-	    isAll = false;
+	    isAll = false;  //此处指替换符是否占满整个属性值;若无替换符时为false
 
 	  //If have placehorder
 	  if (strs.length > 1) {
@@ -1192,6 +918,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	  ret.props = props;
 	  ret.strs = strs;
 	  ret.isAll = isAll;
+
+	  //标记为模板函数替换变量
+	  if(isAll) {
+	    var prop = props[0].prop;
+	    if(prop.name.indexOf('!#') === 0) {
+	      prop.name = prop.name.substr(2);
+	      ret.isTmplPlace = true;
+	    }
+	  }
+
 	  return ret;
 	}
 
@@ -1202,16 +938,226 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 10 */
+/* 7 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
 	var nj = __webpack_require__(1),
 	  tools = __webpack_require__(3),
-	  tranParam = __webpack_require__(9),
+	  errorTitle = nj.errorTitle;
+
+	//提取style内参数
+	function styleProps(obj) {
+	  //If the parameter is a style object,then direct return.
+	  if (tools.isObject(obj)) {
+	    return obj;
+	  }
+
+	  //参数为字符串
+	  var pattern = /([^\s:]+)[\s]?:[\s]?([^\s;]+)[;]?/g,
+	    matchArr, ret;
+
+	  while ((matchArr = pattern.exec(obj))) {
+	    var key = matchArr[1],
+	      value = matchArr[2];
+
+	    if (!ret) {
+	      ret = {};
+	    }
+
+	    //Convert to lowercase when style name is all capital.
+	    if (/^[A-Z-]+$/.test(key)) {
+	      key = key.toLowerCase();
+	    }
+
+	    //将连字符转为驼峰命名
+	    key = tools.toCamelCase(key);
+
+	    ret[key] = value;
+	  }
+
+	  return ret;
+	}
+
+	//Get value from multiple datas
+	function getDatasValue(datas, prop) {
+	  var ret, obj;
+	  for (var i = 0, l = datas.length; i < l; i++) {
+	    obj = datas[i];
+	    if (obj) {
+	      ret = obj[prop];
+	      if (ret != null) {
+	        return ret;
+	      }
+	    }
+	  }
+	}
+
+	//获取each块中的item参数
+	function getItemParam(item, data, isArr) {
+	  var ret = item;
+	  if (isArr == null) {
+	    isArr = tools.isArray(data);
+	  }
+	  if (isArr) {
+	    ret = tools.listPush([item], data.slice(1));
+	  }
+
+	  return ret;
+	}
+
+	//修正属性名
+	function fixPropName(name) {
+	  switch (name) {
+	    case 'class':
+	      name = 'className';
+	      break;
+	    case 'for':
+	      name = 'htmlFor';
+	      break;
+	  }
+
+	  return name;
+	}
+
+	//合并字符串属性
+	function assignStringProp(paramsE, keys) {
+	  var ret = '';
+	  for (var k in paramsE) {
+	    if (!keys || !keys[k]) {
+	      ret += ' ' + k + '="' + paramsE[k] + '"';
+	    }
+	  }
+	  return ret;
+	}
+
+	//创建块表达式子节点函数
+	function exprRet(p1, p2, p3, fn, p5) {
+	  return function (param) {
+	    return fn(p1, p2, p3, param, p5);
+	  };
+	}
+
+	//构建可运行的模板函数
+	function tmplWrap(configs, main) {
+	  return function (data) {
+	    var args = arguments,
+	      len = args.length,
+	      data;
+
+	    if (len <= 0) {
+	      data = {};
+	    }
+	    else if (len === 1) {
+	      data = args[0];
+	    }
+	    else {
+	      data = [];
+	      for (var i = 0; i < len; i++) {
+	        data[data.length] = args[i];
+	      }
+	    }
+
+	    var ret = main(configs, { data: data, parent: this ? this.parent : null }, { multiData: nj.isArray(data) });
+	    if (!configs.useString && tools.isArray(ret)) {  //组件最外层必须是单一节点对象
+	      ret = ret[0];
+	    }
+
+	    return ret;
+	  };
+	}
+
+	//创建模板函数
+	function template(fns) {
+	  var configs = {
+	    useString: fns.useString,
+	    exprs: nj.exprs,
+	    filters: nj.filters,
+	    getDatasValue: nj.getDatasValue,
+	    noop: nj.noop,
+	    lightObj: nj.lightObj,
+	    throwIf: nj.throwIf,
+	    warn: nj.warn,
+	    getItemParam: nj.getItemParam,
+	    styleProps: nj.styleProps,
+	    assign: nj.assign,
+	    exprRet: nj.exprRet
+	  };
+
+	  if (!configs.useString) {
+	    configs.compPort = nj.componentPort;
+	    configs.compLib = nj.componentLibObj;
+	    configs.compClass = nj.componentClasses;
+	  }
+	  else {
+	    configs.assignStringProp = nj.assignStringProp;
+	    configs.escape = nj.escape;
+	  }
+
+	  tools.each(fns, function (v, k) {
+	    if (k.indexOf('main') === 0) {  //将每个主函数构建为可运行的模板函数
+	      configs[k] = tmplWrap(configs, v);
+	    }
+	    else if (k.indexOf('fn') === 0) {  //块表达式函数
+	      configs[k] = v;
+	    }
+	  }, false, false);
+
+	  return configs;
+	}
+
+	module.exports = {
+	  getItemParam: getItemParam,
+	  getDatasValue: getDatasValue,
+	  fixPropName: fixPropName,
+	  styleProps: styleProps,
+	  assignStringProp: assignStringProp,
+	  exprRet: exprRet,
+	  tmplWrap: tmplWrap,
+	  template: template
+	};
+
+/***/ },
+/* 8 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	var ESCAPE_LOOKUP = {
+	  '&': '&amp;',
+	  '>': '&gt;',
+	  '<': '&lt;',
+	  '"': '&quot;',
+	  '\'': '&#x27;'
+	};
+
+	function escape(text) {
+	  if (text == null) {
+	    return '';
+	  }
+	  else if(!text.replace) {
+	    return text;
+	  }
+
+	  return text.replace(/[&><"']/g, function (match) {
+	    return ESCAPE_LOOKUP[match];
+	  });
+	}
+
+	module.exports = escape;
+
+/***/ },
+/* 9 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var nj = __webpack_require__(1),
+	  tools = __webpack_require__(3),
+	  tranParam = __webpack_require__(6),
 	  tranElem = __webpack_require__(5),
-	  checkTagElem = __webpack_require__(11),
+	  checkTagElem = __webpack_require__(10),
 	  tmplRule = nj.tmplRule;
 
 	//检测元素节点
@@ -1399,14 +1345,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 11 */
+/* 10 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
 	var nj = __webpack_require__(1),
 	  tools = __webpack_require__(3),
-	  tranParam = __webpack_require__(9),
+	  tranParam = __webpack_require__(6),
 	  tranElem = __webpack_require__(5),
 	  tmplRule = nj.tmplRule;
 
@@ -1530,7 +1476,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = checkTagElem;
 
 /***/ },
-/* 12 */
+/* 11 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1564,7 +1510,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 13 */
+/* 12 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1621,16 +1567,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 14 */
+/* 13 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var nj = __webpack_require__(1),
-	  tools = __webpack_require__(3);
+	var tools = __webpack_require__(3);
 
 	//Global filter list
-	nj.filters = {
+	var filters = {
 	  //Get param properties
 	  prop: function (obj, props) {
 	    var ret = obj;
@@ -1713,34 +1658,77 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	};
 
+	function _commonConfig(params) {
+	  var ret = {
+	    data: false,
+	    parent: false,
+	    index: false,
+	    useString: true
+	  };
+
+	  if (params) {
+	    ret = tools.assign(ret, params);
+	  }
+	  return ret;
+	}
+
+	//Filter default config
+	var filterConfig = {
+	  prop: _commonConfig(),
+	  count: _commonConfig(),
+	  item: _commonConfig(),
+	  equal: _commonConfig(),
+	  lt: _commonConfig(),
+	  gt: _commonConfig(),
+	  add: _commonConfig(),
+	  int: _commonConfig(),
+	  float: _commonConfig(),
+	  bool: _commonConfig()
+	};
+
 	//Register filter and also can batch add
-	function registerFilter(name, filter) {
+	function registerFilter(name, filter, options) {
 	  var params = name;
 	  if (!tools.isObject(name)) {
 	    params = {};
-	    params[name] = filter;
+	    params[name] = {
+	      filter: filter,
+	      options: options
+	    };
 	  }
 
 	  tools.each(params, function (v, k) {
-	    nj.filters[k.toLowerCase()] = v;
+	    var name = k.toLowerCase(),
+	      options;
+
+	    if (v && v.filter) {
+	      filters[name] = v.filter;
+	      options = v.options;
+	    }
+	    else {
+	      filters[name] = v;
+	    }
+
+	    filterConfig[name] = _commonConfig(options);
 	  }, false, false);
 	}
 
 	module.exports = {
+	  filters: filters,
+	  filterConfig: filterConfig,
 	  registerFilter: registerFilter
 	};
 
 /***/ },
-/* 15 */
+/* 14 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var nj = __webpack_require__(1),
-	  tools = __webpack_require__(3);
+	var tools = __webpack_require__(3);
 
 	//Global expression list
-	nj.exprs = {
+	var exprs = {
 	  'if': function (refer, useUnless) {
 	    if (refer === 'false') {
 	      refer = false;
@@ -1768,7 +1756,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  },
 
 	  unless: function (refer) {
-	    return nj.exprs['if'].call(this, refer, true);
+	    return exprs['if'].call(this, refer, true);
 	  },
 
 	  each: function (refer) {
@@ -1786,7 +1774,6 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	      tools.each(refer, function (item, index) {
 	        var retI = thiz.result({
-	          loop: true,
 	          item: item,
 	          index: index
 	        });
@@ -1795,7 +1782,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	          ret += retI;
 	        }
 	        else {
-	          tools.listPush(ret, retI, true);
+	          ret.push(retI);
+	          //tools.listPush(ret, retI, true);
 	        }
 	      }, false, tools.isArray(refer));
 
@@ -1891,7 +1879,6 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    for (; start <= end; start++) {
 	      var retI = this.result({
-	        loop: true,
 	        item: this.data[0],
 	        index: start
 	      });
@@ -1912,29 +1899,77 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	};
 
+	function _commonConfig(params) {
+	  var ret = {
+	    data: false,
+	    parent: false,
+	    index: false,
+	    useString: true,
+	    paramsExpr: false,
+	    result: true,
+	    inverse: true,
+	    newContext: false
+	  };
+
+	  if (params) {
+	    ret = tools.assign(ret, params);
+	  }
+	  return ret;
+	}
+
+	//Expression default config
+	var exprConfig = {
+	  'if': _commonConfig(),
+	  unless: _commonConfig(),
+	  each: _commonConfig({ newContext: true }),
+	  param: _commonConfig({ inverse: false, paramsExpr: true }),
+	  spreadparam: _commonConfig({ useString: false, result: false, inverse: false, paramsExpr: true }),
+	  equal: _commonConfig({ useString: false }),
+	  'for': _commonConfig({ newContext: true }),
+	  blank: _commonConfig({ useString: false, inverse: false })
+	};
+
 	//Expression alias
-	nj.exprs.p = nj.exprs.param;
-	nj.exprs.spread = nj.exprs.spreadparam;
+	exprs.prop = exprs.p = exprs.param;
+	exprConfig.prop = exprConfig.p = exprConfig.param;
+	exprs.spread = exprs.spreadparam;
+	exprConfig.spread = exprConfig.spreadparam;
 
 	//Register expression and also can batch add
-	function registerExpr(name, expr) {
+	function registerExpr(name, expr, options) {
 	  var params = name;
 	  if (!tools.isObject(name)) {
 	    params = {};
-	    params[name] = expr;
+	    params[name] = {
+	      expr: expr,
+	      options: options
+	    };
 	  }
 
 	  tools.each(params, function (v, k) {
-	    nj.exprs[k.toLowerCase()] = v;
+	    var name = k.toLowerCase(),
+	      options;
+
+	    if (v && v.expr) {
+	      exprs[name] = v.expr;
+	      options = v.options;
+	    }
+	    else {
+	      exprs[name] = v;
+	    }
+
+	    exprConfig[name] = _commonConfig(options);
 	  }, false, false);
 	}
 
 	module.exports = {
+	  exprs: exprs,
+	  exprConfig: exprConfig,
 	  registerExpr: registerExpr
 	};
 
 /***/ },
-/* 16 */
+/* 15 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -2003,16 +2038,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 17 */
+/* 16 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
 	var nj = __webpack_require__(1),
 	  utils = __webpack_require__(2),
-	  tranString = __webpack_require__(18),
-	  tranComponent = __webpack_require__(20),
-	  compileStringTmpl = __webpack_require__(21);
+	  buildRuntime = __webpack_require__(17),
+	  compileStringTmpl = __webpack_require__(19);
 
 	//编译模板并返回转换函数
 	function compile(obj, tmplName, isComponent, isTag) {
@@ -2020,9 +2054,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return;
 	  }
 
+	  //编译AST
 	  var root;
 	  if (tmplName) {
-	    root = nj.templates[tmplName];
+	    root = nj.asts[tmplName];
 	  }
 	  if (!root) {
 	    //If obj is Object,we think obj is a precompiled template
@@ -2030,7 +2065,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      root = obj;
 	    }
 	    else {
-	      root = _createRoot();
+	      root = _createAstRoot();
 
 	      //Auto transform string template to array
 	      if (utils.isString(obj)) {
@@ -2046,46 +2081,31 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }
 	    }
 
-	    //保存模板编译结果到全局集合中
+	    //保存模板AST编译结果到全局集合中
 	    if (tmplName) {
-	      nj.templates[tmplName] = root;
+	      nj.asts[tmplName] = root;
 	    }
 	  }
 
-	  return function () {
-	    var args = arguments,
-	      len = args.length,
-	      data;
+	  //编译模板函数
+	  var tmplFns;
+	  if (tmplName) {
+	    tmplFns = nj.templates[tmplName];
+	  }
+	  if (!tmplFns) {
+	    tmplFns = utils.template(buildRuntime(root.content, !isComponent));
 
-	    if (len <= 0) {
-	      data = {};
+	    //保存模板函数编译结果到全局集合中
+	    if (tmplName) {
+	      nj.templates[tmplName] = tmplFns;
 	    }
-	    else if (len === 1) {
-	      data = args[0];
-	    }
-	    else {
-	      data = [];
-	      utils.each(args, function (item) {
-	        data[data.length] = item;
-	      }, false, true);
-	    }
+	  }
 
-	    var ret;
-	    if (isComponent) {  //转换组件
-	      ret = tranComponent.transformToComponent(root.content[0], data);
-	      if (utils.isArray(ret)) {  //组件最外层必须是单一节点对象
-	        ret = ret[0];
-	      }
-	    }
-	    else {  //转换字符串
-	      ret = tranString.transformContentToString(root.content, data);
-	    }
-	    return ret;
-	  };
+	  return tmplFns.main;
 	}
 
 	//Create template root object
-	function _createRoot() {
+	function _createAstRoot() {
 	  var root = utils.lightObj();
 	  root.type = 'nj_root';
 	  root.content = [];
@@ -2123,32 +2143,32 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	//Precompile template
 	function precompile(obj) {
-	  var root = _createRoot();
+	  var root = _createAstRoot();
 	  utils.checkElem(obj, root);
 
 	  return root;
 	}
 
 	//Render tmpl expression block
-	var _renderTmplExpr = compileComponent(['<{container}>', '{tmpl}'], 'tmplExpr');
-	function renderTmplExpr(tmpl, data, container) {
-	  if (!container) {
-	    container = 'div';
-	  }
+	//var _renderTmplExpr = compileComponent(['<{container}>', '{tmpl}'], 'tmplExpr');
+	//function renderTmplExpr(tmpl, data, container) {
+	//  if (!container) {
+	//    container = 'div';
+	//  }
 
-	  var extra = { tmpl: tmpl, container: container },
-	    datas;
+	//  var extra = { tmpl: tmpl, container: container },
+	//    datas;
 
-	  if (utils.isArray(data)) {
-	    datas = data;
-	    datas[datas.length] = extra;
-	  }
-	  else {
-	    datas = [data, extra];
-	  }
+	//  if (utils.isArray(data)) {
+	//    datas = data;
+	//    datas[datas.length] = extra;
+	//  }
+	//  else {
+	//    datas = [data, extra];
+	//  }
 
-	  return _renderTmplExpr(datas);
-	}
+	//  return _renderTmplExpr(datas);
+	//}
 
 	module.exports = {
 	  compile: compile,
@@ -2156,259 +2176,638 @@ return /******/ (function(modules) { // webpackBootstrap
 	  compileTagComponent: compileTagComponent,
 	  renderTagComponent: renderTagComponent,
 	  precompile: precompile,
-	  renderTmplExpr: renderTmplExpr
+	  //renderTmplExpr: renderTmplExpr
 	};
+
+/***/ },
+/* 17 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var nj = __webpack_require__(1),
+	  utils = __webpack_require__(2),
+	  errorTitle = nj.errorTitle,
+	  exprConfig = utils.exprConfig,
+	  filterConfig = utils.filterConfig,
+	  replaceSpecialSymbol = __webpack_require__(18);
+
+	function _buildFn(content, fns, no, newContext) {
+	  var fnStr = '',
+	    useString = fns.useString,
+	    isTmplExpr = utils.isString(no),  //如果no为字符串, 则本次将构建tmpl块模板函数
+	    main = isTmplExpr || no === 0,
+	    /* retType
+	     1: 只有单个子节点
+	     2: 有多个子节点
+	     object: 非构建函数时
+	    */
+	    retType = content.length === 1 ? '1' : '2',
+	    counter = {
+	      _type: 0,
+	      _typeRefer: 0,
+	      _params: 0,
+	      _paramsE: 0,
+	      _compParam: 0,
+	      _dataRefer: 0,
+	      _expr: 0,
+	      _this: 0,
+	      _value: 0,
+	      _filter: 0,
+	      _thisF: 0,
+	      newContext: newContext
+	    };
+
+	  if (!useString) {
+	    counter._compParam = 0;
+	  }
+	  else {
+	    counter._children = 0;
+	  }
+
+	  if (main) {
+	    fnStr += 'var parent = p2.parent;\n';
+	    fnStr += 'var data = p2.data;\n';
+	    fnStr += 'if(!parent) {\n';
+	    fnStr += '  parent = p1.lightObj();\n';
+	    fnStr += '  if (data) {\n';
+	    fnStr += '    parent.data = p3.multiData ? data[0] : data;\n';
+	    fnStr += '  }\n';
+	    fnStr += '  p2.parent = parent;\n';
+	    fnStr += '};\n';
+	  }
+	  else if (newContext) {
+	    fnStr += 'var parent = p1.lightObj();\n';
+	    fnStr += 'parent.data = p4.item;\n';
+	    fnStr += 'parent.parent = p2.parent;\n';
+	    fnStr += 'parent.index = p4.index;\n';
+	    fnStr += 'var data = p1.getItemParam(p4.item, p2.data, p3.multiData);\n';
+	    fnStr += 'var _p2 = p1.lightObj();\n';
+	    fnStr += '_p2.parent = parent;\n';
+	    fnStr += '_p2.data = data;\n';
+	  }
+	  else {
+	    fnStr += 'var parent = p2.parent;\n';
+	    fnStr += 'var data = p2.data;\n';
+	  }
+
+	  if (retType === '2') {
+	    if (!useString) {
+	      fnStr += 'var ret = [];\n';
+	    }
+	    else {
+	      fnStr += 'var ret = \'\';\n';
+	    }
+	  }
+
+	  fnStr += _buildContent(content, fns, counter, retType);
+
+	  if (retType === '2') {
+	    fnStr += 'return ret;';
+	  }
+
+	  /* 构建表达式块函数
+	   p1: 全局模板成员,不可改变
+	   p2: 当前模板的局部成员
+	   p3: 当前模板的全局成员
+	   p4: 表格式块内调用result及inverse方法传递的参数
+	   p5: #param块变量
+	  */
+	  fns[main ? 'main' + (isTmplExpr ? no : '') : 'fn' + no] = new Function('p1', 'p2', 'p3', 'p4', 'p5', fnStr);
+	  return no;
+	}
+
+	function _buildPropData(obj, counter, fns, noEscape) {
+	  var dataValueStr,
+	    useString = fns.useString,
+	    escape = !noEscape ? obj.escape : false;
+
+	  //先生成数据值
+	  if (!obj.prop.isStr) {
+	    var name = obj.prop.name,
+	      parentNum = obj.prop.parentNum,
+	      data = '',
+	      special = false;
+
+	    if (name === '#') {
+	      data = 'parent.index';
+	      special = true;
+	    }
+	    else if (name === '.') {
+	      data = 'parent.data';
+	      special = true;
+	    }
+
+	    if (parentNum) {
+	      if (!data) {
+	        data = 'parent.data';
+	      }
+	      for (var i = 0; i < parentNum; i++) {
+	        data = 'parent.' + data;
+	      }
+
+	      if (!special) {
+	        data += '[\'' + name + '\']';
+	        special = true;
+	      }
+	    }
+
+	    if (!special) {
+	      dataValueStr = '(!p3.multiData ? data[\'' + name + '\'] : p1.getDatasValue(data, \'' + name + '\'))';
+	    }
+	    else {
+	      dataValueStr = data;
+	    }
+	  }
+	  else {
+	    dataValueStr = '\'' + obj.prop.name + '\'';
+	  }
+
+	  //有过滤器时需要生成"_value"值
+	  var filters = obj.prop.filters;
+	  if (filters) {
+	    var valueStr = '_value' + counter._value++,
+	      filterStr = 'var ' + valueStr + ' = ' + dataValueStr + ';\n';
+
+	    utils.each(filters, function (o) {
+	      var _filterC = counter._filter++,
+	        _thisFC = counter._thisF++,
+	        configF = filterConfig[o.name];
+
+	      filterStr += '\nvar _filter' + _filterC + ' = p1.filters[\'' + o.name + '\'];\n';
+	      filterStr += 'if (!_filter' + _filterC + ') {\n';
+	      filterStr += '  p1.warn(\'' + o.name + '\', \'filter\');\n';
+	      filterStr += '}\n';
+	      filterStr += 'else {\n';
+	      filterStr += '  var _thisF' + _thisFC + ' = p1.lightObj();\n';
+	      if (configF.useString) {
+	        filterStr += '  _thisF' + _thisFC + '.useString = p1.useString;\n';
+	      }
+	      if (configF.data) {
+	        filterStr += '  _thisF' + _thisFC + '.data = data;\n';
+	      }
+	      if (configF.parent) {
+	        filterStr += '  _thisF' + _thisFC + '.parent = parent.parent;\n';
+	      }
+	      if (configF.index) {
+	        filterStr += '  _thisF' + _thisFC + '.index = parent.index;\n';
+	      }
+	      filterStr += '\n  ' + valueStr + ' = _filter' + _filterC + '.apply(_thisF' + _thisFC + ', [' + valueStr
+	        + (o.params ? o.params.reduce(function (p, c) {
+	          return p + ', \'' + c + '\'';
+	        }, '') : '')
+	        + ']);\n';
+	      filterStr += '}\n';
+	    }, false, true);
+
+	    return {
+	      valueStr: _buildEscape(valueStr, useString, escape),
+	      filterStr: filterStr
+	    };
+	  }
+	  else {
+	    return _buildEscape(dataValueStr, useString, escape);
+	  }
+	}
+
+	function _buildEscape(valueStr, useString, escape) {
+	  if(useString && escape) {
+	    return 'p1.escape(' + valueStr + ')';
+	  }
+	  else {
+	    return valueStr;
+	  }
+	}
+
+	function _buildProps(obj, counter, fns) {
+	  var str0 = obj.strs[0],
+	    valueStr = '',
+	    filterStr = '';
+
+	  if (utils.isString(str0)) {  //常规属性
+	    valueStr = !obj.isAll && str0 !== '' ? ('\'' + str0 + '\'') : '';
+	    filterStr = '';
+
+	    utils.each(obj.props, function (o, i) {
+	      var propData = _buildPropData(o, counter, fns),
+	        dataValueStr;
+	      if (utils.isString(propData)) {
+	        dataValueStr = propData;
+	      }
+	      else {
+	        dataValueStr = propData.valueStr;
+	        filterStr += propData.filterStr;
+	      }
+
+	      if (!obj.isAll) {
+	        var strI = obj.strs[i + 1];
+	        dataValueStr = (str0 === '' && i == 0 ? '' : ' + ')
+	          + '(' + dataValueStr + ')'
+	          + (strI !== '' ? ' + \'' + strI + '\'' : '');
+	      }
+	      else if (obj.isTmplPlace) {  //执行tmpl块模板函数
+	        dataValueStr += '.call({ parent: parent }, data)';
+	      }
+
+	      valueStr += dataValueStr;
+	      if (obj.isAll) {
+	        return false;
+	      }
+	    }, false, true, true);
+	  }
+	  else if (utils.isObject(str0) && str0.length) {  //tmpl块表达式
+	    valueStr += '{\n';
+	    utils.each(str0, function (v, k, i, l) {
+	      if (k !== 'length') {
+	        valueStr += '  "' + k + '": p1.main' + _buildFn(v.content, fns, 'T' + ++fns._noT);
+	      }
+	      else {
+	        valueStr += '  length: ' + v;
+	      }
+	      if (i < l - 1) {
+	        valueStr += ',';
+	      }
+	      valueStr += '\n';
+	    }, false, false);
+	    valueStr += '}';
+	  }
+	  else {  //非字符串值
+	    valueStr = JSON.stringify(str0);
+	  }
+
+	  if (filterStr === '') {
+	    return valueStr;
+	  }
+	  else {  //包含过滤器
+	    return {
+	      valueStr: valueStr,
+	      filterStr: filterStr
+	    };
+	  }
+	}
+
+	function _buildNode(node, fns, counter, retType) {
+	  var fnStr = '',
+	    useString = fns.useString;
+
+	  if (node.type === 'nj_plaintext') {  //文本节点
+	    var valueStr = _buildProps(node.content[0], counter, fns),
+	      filterStr;
+	    if (utils.isObject(valueStr)) {
+	      filterStr = valueStr.filterStr;
+	      valueStr = valueStr.valueStr;
+	    }
+
+	    var textStr = _buildRender(1, retType, { text: valueStr }, fns);
+	    if (filterStr) {
+	      textStr = filterStr + textStr;
+	    }
+
+	    if (useString) {
+	      fnStr += textStr;
+	    }
+	    else {  //文本中的特殊字符需转义
+	      fnStr += replaceSpecialSymbol(textStr);
+	    }
+	  }
+	  else if (node.type === 'nj_expr') {  //块表达式节点
+	    var _exprC = counter._expr++,
+	      _dataReferC = counter._dataRefer++,
+	      dataReferStr = '';
+	    fnStr += '\nvar _expr' + _exprC + ' = p1.exprs[\'' + node.expr + '\'];\n';
+
+	    if (node.refer) {
+	      dataReferStr += 'var _dataRefer' + _dataReferC + ' = [\n';
+	      var props = node.refer.props,
+	        len = props.length,
+	        filterStr = '';
+
+	      utils.each(props, function (o, i) {
+	        var valueStr = _buildPropData(o, counter, fns, true);
+	        if (utils.isObject(valueStr)) {
+	          filterStr += valueStr.filterStr;
+	          valueStr = valueStr.valueStr;
+	        }
+
+	        dataReferStr += '  ' + valueStr + (i < len - 1 ? ',' : '');
+	      }, false, true);
+	      dataReferStr += '\n];\n';
+
+	      if (filterStr !== '') {
+	        dataReferStr = filterStr + dataReferStr;
+	      }
+
+	      fnStr += dataReferStr;
+	    }
+
+	    //如果表达式不存在则打印警告信息
+	    fnStr += 'p1.throwIf(_expr' + _exprC + ', \'' + node.expr + '\', \'expr\');\n';
+
+	    //执行表达式块
+	    var _thisC = counter._this++,
+	      configE = exprConfig[node.expr],
+	      newContext = configE.newContext,
+	      newContextP = counter.newContext;
+
+	    fnStr += '\nvar _this' + _thisC + ' = p1.lightObj();\n';
+	    if (configE.useString) {
+	      fnStr += '_this' + _thisC + '.useString = p1.useString;\n';
+	    }
+	    if (configE.data) {
+	      fnStr += '_this' + _thisC + '.data = data;\n';
+	    }
+	    if (configE.parent) {
+	      fnStr += '_this' + _thisC + '.parent = parent.parent;\n';
+	    }
+	    if (configE.index) {
+	      fnStr += '_this' + _thisC + '.index = parent.index;\n';
+	    }
+
+	    //params块
+	    var paramsEStr = 'p5';
+	    if (retType && retType._paramsE) {
+	      paramsEStr = retType._paramsE;
+	    }
+	    if (configE.paramsExpr) {
+	      fnStr += '_this' + _thisC + '.paramsExpr = ' + paramsEStr + ';\n';
+	    }
+
+	    if (configE.result) {
+	      fnStr += '_this' + _thisC + '.result = ' + (node.content ? 'p1.exprRet(p1, ' + (newContextP ? '_' : '') + 'p2, p3, p1.fn' + _buildFn(node.content, fns, ++fns._no, newContext) + ', ' + paramsEStr + ')' : 'p1.noop') + ';\n';
+	    }
+	    if (configE.inverse) {
+	      fnStr += '_this' + _thisC + '.inverse = ' + (node.contentElse ? 'p1.exprRet(p1, ' + (newContextP ? '_' : '') + 'p2, p3, p1.fn' + _buildFn(node.contentElse, fns, ++fns._no, newContext) + ', ' + paramsEStr + ')' : 'p1.noop') + ';\n';
+	    }
+
+	    //渲染
+	    fnStr += _buildRender(2, retType, {
+	      _expr: _exprC,
+	      _dataRefer: _dataReferC,
+	      _this: _thisC
+	    }, fns);
+	  }
+	  else {  //元素节点
+	    //节点类型和typeRefer
+	    var _typeC = counter._type++,
+	      _type;
+	    if (node.typeRefer) {
+	      _type = node.typeRefer.props[0].prop.name;
+	    }
+	    else {
+	      _type = node.type.toLowerCase();
+	    }
+
+	    var typeStr;
+	    if (!useString) {
+	      typeStr = 'p1.compClass[\'' + _type + '\'] ? p1.compClass[\'' + _type + '\'] : \'' + _type + '\'';
+	    }
+	    else {
+	      typeStr = '\'' + _type + '\'';
+	    }
+
+	    if (node.typeRefer) {
+	      var _typeReferC = counter._typeRefer++,
+	        valueStrT = _buildProps(node.typeRefer, counter, fns);
+	      if (utils.isObject(valueStrT)) {
+	        fnStr += valueStrT.filterStr;
+	        valueStrT = valueStrT.valueStr;
+	      }
+
+	      fnStr += '\nvar _typeRefer' + _typeReferC + ' = ' + valueStrT + ';\n';
+	      fnStr += 'var _type' + _typeC + ' = _typeRefer' + _typeReferC + ' ? _typeRefer' + _typeReferC + ' : (' + typeStr + ');\n';
+	    }
+	    else {
+	      fnStr += '\nvar _type' + _typeC + ' = ' + typeStr + ';\n';
+	    }
+
+	    //节点参数
+	    var params = node.params,
+	      paramsExpr = node.paramsExpr,
+	      paramsStr = '';
+	    if (params || paramsExpr) {
+	      var _paramsC = counter._params++;
+	      paramsStr = 'var _params' + _paramsC + ' = ';
+
+	      //params块
+	      if (paramsExpr) {
+	        var _paramsEC = counter._paramsE++;
+	        paramsStr += (useString ? '\'\'' : '{}') + ';\n';
+	        paramsStr += 'var _paramsE' + _paramsEC + ' = p1.lightObj();\n';
+
+	        //params块的子节点
+	        paramsStr += _buildContent(paramsExpr.content, fns, counter, { _paramsE: '_paramsE' + _paramsEC });
+
+	        //合并params块的值
+	        if (!useString) {
+	          paramsStr += '\np1.assign(_params' + _paramsC + ', _paramsE' + _paramsEC + ');\n';
+	        }
+	        else {
+	          var keys = '';
+	          utils.each(params, function (v, k, i, l) {
+	            if (i == 0) {
+	              keys += '{ ';
+	            }
+	            keys += k + ': 1';
+
+	            if (i < l - 1) {
+	              keys += ', '
+	            }
+	            else {
+	              keys += ' }';
+	            }
+	          }, false, false);
+	          paramsStr += '_params' + _paramsC + ' += p1.assignStringProp(_paramsE' + _paramsEC + ', ' + (keys === '' ? 'null' : keys) + ');\n';
+	        }
+	      }
+
+	      if (params) {
+	        var paramKeys = Object.keys(params),
+	          len = paramKeys.length,
+	          filterStr = '';
+
+	        if (!useString && !paramsExpr) {
+	          paramsStr += '{\n';
+	        }
+
+	        utils.each(paramKeys, function (k, i) {
+	          var valueStr = _buildProps(params[k], counter, fns);
+	          if (utils.isObject(valueStr)) {
+	            filterStr += valueStr.filterStr;
+	            valueStr = valueStr.valueStr;
+	          }
+
+	          if (!useString && k === 'style') {  //将style字符串转换为对象
+	            valueStr = 'p1.styleProps(' + valueStr + ')';
+	          }
+
+	          var key;
+	          if (useString) {
+	            key = k;
+	          }
+	          else {
+	            key = utils.fixPropName(k);
+	          }
+	          if (!paramsExpr) {
+	            if (!useString) {
+	              paramsStr += '  ' + key + ': ' + valueStr + (i < len - 1 ? ',\n' : '');
+	            }
+	            else {
+	              paramsStr += (i > 0 ? '  + ' : '') + '\' ' + key + '="\' + ' + valueStr + ' + \'"\'' + (i == len - 1 ? ';' : '') + '\n';
+	            }
+	          }
+	          else {
+	            if (!useString) {
+	              paramsStr += '_params' + _paramsC + '.' + key + ' = ' + valueStr + ';\n';
+	            }
+	            else {
+	              paramsStr += '_params' + _paramsC + ' += \' ' + key + '="\' + ' + valueStr + ' + \'"\';\n';
+	            }
+	          }
+	        }, false, false);
+
+	        if (!useString && !paramsExpr) {
+	          paramsStr += '\n};\n';
+	        }
+
+	        if (filterStr !== '') {
+	          paramsStr = filterStr + paramsStr;
+	        }
+
+	        fnStr += paramsStr;
+	      }
+	    }
+
+	    var _compParamC, _childrenC;
+	    if (!useString) {  //组件引擎参数
+	      _compParamC = counter._compParam++;
+	      fnStr += 'var _compParam' + _compParamC + ' = [_type' + _typeC + ', ' + (paramsStr !== '' ? '_params' + _paramsC : 'null') + '];\n';
+	    }
+	    else {  //子节点字符串
+	      _childrenC = counter._children++;
+	      fnStr += 'var _children' + _childrenC + ' = \'\';\n';
+	    }
+
+	    //子节点
+	    fnStr += _buildContent(node.content, fns, counter, !useString
+	      ? { _compParam: '_compParam' + _compParamC }
+	      : { _children: '_children' + _childrenC });
+
+	    //渲染
+	    fnStr += _buildRender(3, retType, !useString
+	      ? { _compParam: _compParamC }
+	      : { _type: _typeC, _params: paramsStr !== '' ? _paramsC : null, _children: _childrenC, _selfClose: node.selfCloseTag }, fns);
+	  }
+
+	  return fnStr;
+	}
+
+	function _buildContent(content, fns, counter, retType) {
+	  var fnStr = '';
+	  if (!content) {
+	    return fnStr;
+	  }
+
+	  utils.each(content, function (node) {
+	    fnStr += _buildNode(node, fns, counter, retType);
+	  }, false, true);
+
+	  return fnStr;
+	}
+
+	function _buildRender(nodeType, retType, params, fns) {
+	  var retStr,
+	    useString = fns.useString;
+
+	  switch (nodeType) {
+	    case 1:  //文本节点
+	      retStr = params.text;
+	      break;
+	    case 2:  //块表达式
+	      retStr = '_expr' + params._expr + '.apply(_this' + params._this + ', _dataRefer' + params._dataRefer + ')';
+	      break;
+	    case 3:  //元素节点
+	      if (!useString) {
+	        retStr = 'p1.compPort.apply(p1.compLib, _compParam' + params._compParam + ')';
+	      }
+	      else {
+	        retStr = '\'<\' + _type' + params._type + ' + ' + (params._params != null ? '_params' + params._params + ' + ' : '');
+	        if (!params._selfClose) {
+	          retStr += '\'>\'';
+	          retStr += ' + _children' + params._children + ' + ';
+	          retStr += '\'</\' + _type' + params._type + ' + \'>\'';
+	        }
+	        else {
+	          retStr += '\'/>\'';
+	        }
+	      }
+	      break;
+	  }
+
+	  //保存方式
+	  if (retType === '1') {
+	    return '\nreturn ' + retStr + ';';
+	  }
+	  else if (retType === '2') {
+	    if (!useString) {
+	      return '\nret.push(' + retStr + ');\n';
+	    }
+	    else {
+	      return '\nret += ' + retStr + ';\n';
+	    }
+	  }
+	  else if (retType._paramsE) {
+	    return '\n' + retStr + ';\n';
+	  }
+	  else {
+	    if (!useString) {
+	      return '\n' + retType._compParam + '.push(' + retStr + ');\n';
+	    }
+	    else {
+	      return '\n' + retType._children + ' += ' + retStr + ';\n';
+	    }
+	  }
+	}
+
+	module.exports = function (ast, useString) {
+	  var fns = {
+	    useString: useString,
+	    _no: 0,  //块表达式函数计数
+	    _noT: 0  //tmpl块模板函数计数
+	  };
+
+	  _buildFn(ast, fns, fns._no);
+	  return fns;
+	};
+
 
 /***/ },
 /* 18 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
 	'use strict';
 
-	var nj = __webpack_require__(1),
-	  utils = __webpack_require__(2),
-	  transformContent = __webpack_require__(19),
-	  transformContentToString = transformContent(transformToString, true),  //转换子节点为字符串
-	  transformContentToArray = transformContent(transformToString, false),  //转换子节点为数组
-	  errorTitle = nj.errorTitle;
+	var SPACIAL_SYMBOLS = {
+	  nbsp: '\u00A0',
+	  ensp: '\u2002',
+	  emsp: '\u2003',
+	  thinsp: '\u2009',
+	  zwnj: '\u200C',
+	  zwj: '\u200D',
+	  lt: '<',
+	  gt: '>'
+	};
 
-	//转换节点为字符串
-	function transformToString(obj, data, parent, paramsExpr) {
-	  var ret = '';
-
-	  if (obj.type === 'nj_plaintext') {
-	    //替换插入在文本中的参数
-	    ret = utils.replaceParams(obj.content[0], data, false, false, parent, true);
-	  }
-	  else if (obj.type === 'nj_expr') {  //Expression block
-	    var dataRefer = utils.getExprParam(obj.refer, data, parent, true),
-	      hasElse = obj.hasElse,
-	      expr = nj.exprs[obj.expr],
-	      itemIsArray;
-
-	    utils.throwIf(expr, errorTitle + 'Expression "' + obj.expr + '" is undefined, please check it has been registered.');
-
-	    //Create expression's context object and set parameters
-	    var thisObj = utils.lightObj();
-	    thisObj.data = data;
-	    if (parent) {
-	      thisObj.parent = parent.parent;
-	      thisObj.index = parent.index;
-	    }
-	    thisObj.useString = true;
-	    thisObj.paramsExpr = paramsExpr;
-	    thisObj.result = function (param) {
-	      if (param && param.loop) {
-	        if (itemIsArray == null) {
-	          itemIsArray = utils.isArray(data);
-	        }
-
-	        //Create a parent data object
-	        var _parent = utils.lightObj();
-	        _parent.data = param.item;
-	        _parent.parent = parent;
-	        _parent.index = param.index;
-
-	        return transformContentToString(obj.content, utils.getItemParam(param.item, data, itemIsArray), _parent, paramsExpr);
-	      }
-	      else {
-	        return transformContentToString(obj.content, data, parent, paramsExpr);
-	      }
-	    };
-	    thisObj.inverse = function () {
-	      return hasElse ? transformContentToString(obj.contentElse, data, parent, paramsExpr) : null;
-	    };
-
-	    //Execute expression block
-	    ret = expr.apply(thisObj, dataRefer);
-	  }
-	  else {
-	    var type = obj.type;
-
-	    //If typeRefer isn't undefined,use it to replace the node type.
-	    if (obj.typeRefer) {
-	      var typeRefer = utils.replaceParams(obj.typeRefer, data, false, false, parent, true);
-	      if (typeRefer) {
-	        type = typeRefer;
-	      }
-	    }
-
-	    //Make parameters from the parameters expression.
-	    var exprP = obj.paramsExpr,
-	      paramsE;
-	    if (exprP) {
-	      paramsE = utils.lightObj();
-	      transformContentToArray(exprP.content, data, parent, paramsE);
-	    }
-
-	    var openTag = '<' + type + utils.transformParams(obj.params, data, parent, paramsE);
-	    if (!obj.selfCloseTag) {
-	      ret = openTag + '>' + transformContentToString(obj.content, data, parent) + '</' + type + '>';
-	    }
-	    else {  //自闭合标签
-	      ret = openTag + '/>';
-	    }
-	  }
-
-	  return ret;
+	var REGEX_SYMBOLS = new RegExp('&(' + Object.keys(SPACIAL_SYMBOLS).join('|') + ');', 'g');
+	function replace(str) {
+	  return str.replace(REGEX_SYMBOLS, function (all, match) {
+	    return SPACIAL_SYMBOLS[match];
+	  });
 	}
 
-	module.exports = {
-	  transformToString: transformToString,
-	  transformContentToString: transformContentToString
-	};
+	module.exports = replace;
 
 /***/ },
 /* 19 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	var utils = __webpack_require__(2);
-
-	module.exports = function (transformNode, useString) {
-	  return function (content, data, parent, paramsExpr) {
-	    var ret = null;
-	    if (useString) {
-	      ret = '';
-	    }
-
-	    if (!content) {
-	      return ret;
-	    }
-	    if (!parent) {  //Init a parent data object and cascade pass on the children node
-	      parent = utils.lightObj();
-	      if (data) {
-	        parent.data = utils.isArray(data) ? data[0] : data;
-	      }
-	    }
-
-	    if (!useString) {
-	      ret = [];
-	    }
-	    utils.each(content, function (obj) {
-	      var retN = transformNode(obj, data, parent, paramsExpr);
-	      if (!useString) {
-	        utils.listPush(ret, retN, true, true);
-	      }
-	      else {
-	        ret += retN;
-	      }
-	    }, false, true);
-
-	    return ret;
-	  };
-	};
-
-/***/ },
-/* 20 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	var nj = __webpack_require__(1),
-	  utils = __webpack_require__(2),
-	  transformContentToComponent = __webpack_require__(19)(transformToComponent),  //转换子节点为组件节点
-	  errorTitle = nj.errorTitle;
-
-	//转换节点为组件节点
-	function transformToComponent(obj, data, parent, paramsExpr) {
-	  var ret = null;
-
-	  if (obj.type === 'nj_plaintext') {
-	    //替换插入在文本中的参数
-	    ret = utils.replaceParams(obj.content[0], data, true, false, parent, false);
-
-	    //执行模板数据
-	    if (utils.isObject(ret) && ret.expr === 'tmpl') {
-	      ret = transformContentToComponent(ret.content, data, parent);
-	    }
-	  }
-	  else if (obj.type === 'nj_expr') {  //Expression block
-	    var dataRefer = utils.getExprParam(obj.refer, data, parent, false),
-	      hasElse = obj.hasElse,
-	      expr = nj.exprs[obj.expr],
-	      itemIsArray;
-
-	    utils.throwIf(expr, errorTitle + 'Expression "' + obj.expr + '" is undefined, please check it has been registered.');
-
-	    //Create expression's context object and set parameters
-	    var thisObj = utils.lightObj();
-	    thisObj.data = data;
-	    if (parent) {
-	      thisObj.parent = parent.parent;
-	      thisObj.index = parent.index;
-	    }
-	    thisObj.useString = false;
-	    thisObj.paramsExpr = paramsExpr;
-	    thisObj.result = function (param) {
-	      if (param && param.loop) {
-	        if (itemIsArray == null) {
-	          itemIsArray = utils.isArray(data);
-	        }
-
-	        //Create a parent data object
-	        var _parent = utils.lightObj();
-	        _parent.data = param.item;
-	        _parent.parent = parent;
-	        _parent.index = param.index;
-
-	        return transformContentToComponent(obj.content, utils.getItemParam(param.item, data, itemIsArray), _parent, paramsExpr);
-	      }
-	      else {
-	        return transformContentToComponent(obj.content, data, parent, paramsExpr);
-	      }
-	    };
-	    thisObj.inverse = function () {
-	      return hasElse ? transformContentToComponent(obj.contentElse, data, parent, paramsExpr) : null;
-	    };
-
-	    //Execute expression block
-	    ret = expr.apply(thisObj, dataRefer);
-	  }
-	  else {
-	    //如果有相应组件,则使用组件类作为type值
-	    var componentClass = nj.componentClasses[obj.type.toLowerCase()],
-	      type = componentClass ? componentClass : obj.type;
-
-	    //If typeRefer isn't undefined,use it to replace the node type.
-	    if (obj.typeRefer) {
-	      var typeRefer = utils.replaceParams(obj.typeRefer, data, true, false, parent, false);
-	      if (typeRefer) {
-	        type = typeRefer;
-	      }
-	    }
-
-	    //Make parameters from the parameters expression.
-	    var exprP = obj.paramsExpr,
-	      paramsE;
-	    if (exprP) {
-	      paramsE = utils.lightObj();
-	      transformContentToComponent(exprP.content, data, parent, paramsE);
-	    }
-
-	    //Make React.createElement's parameters
-	    var params = [type,                                                  //组件名
-	      utils.transformParamsToObj(obj.params, data, parent, paramsE)],    //参数
-	      content = transformContentToComponent(obj.content, data, parent);  //子组件
-	    if (content) {
-	      utils.listPush(params, content);
-	    }
-
-	    //调用创建组件接口,必须需要用apply以多个参数的形式传参,否则在react中,元素放在数组里时会报需要加key属性的警告
-	    ret = nj.componentPort.apply(nj.componentLibObj, params);
-	  }
-
-	  return ret;
-	}
-
-	module.exports = {
-	  transformToComponent: transformToComponent,
-	  transformContentToComponent: transformContentToComponent
-	};
-
-/***/ },
-/* 21 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -2418,7 +2817,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  tranElem = __webpack_require__(5),
 	  REGEX_SPLIT = /\$\{\d+\}/,
 	  tmplRule = nj.tmplRule,
-	  shim = __webpack_require__(22);
+	  shim = __webpack_require__(20);
 
 	//Cache the string template by unique key
 	nj.strTmpls = {};
@@ -2726,7 +3125,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = compileStringTmpl;
 
 /***/ },
-/* 22 */
+/* 20 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -2739,12 +3138,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 23 */
+/* 21 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var checkStringElem = __webpack_require__(21);
+	var checkStringElem = __webpack_require__(19);
 
 	module.exports = function (key) {
 	  return function() {
@@ -2753,7 +3152,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 24 */
+/* 22 */
 /***/ function(module, exports) {
 
 	'use strict';

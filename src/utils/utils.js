@@ -16,7 +16,7 @@ var tools = require('./tools'),
 setTmplRule();
 
 module.exports = tools.assign(
-  { 
+  {
     escape: escape,
     setTmplRule: setTmplRule
   },

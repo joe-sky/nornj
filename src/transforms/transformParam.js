@@ -132,7 +132,7 @@ function compiledParam(value) {
   var ret = tools.lightObj(),
     strs = tools.isString(value) ? value.split(tmplRule.replaceSplit) : [value],
     props = null,
-    isAll = false;
+    isAll = false;  //此处指替换符是否占满整个属性值;若无替换符时为false
 
   //If have placehorder
   if (strs.length > 1) {
@@ -153,6 +153,16 @@ function compiledParam(value) {
   ret.props = props;
   ret.strs = strs;
   ret.isAll = isAll;
+
+  //标记为模板函数替换变量
+  if(isAll) {
+    var prop = props[0].prop;
+    if(prop.name.indexOf('!#') === 0) {
+      prop.name = prop.name.substr(2);
+      ret.isTmplPlace = true;
+    }
+  }
+
   return ret;
 }
 

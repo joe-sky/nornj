@@ -1,10 +1,9 @@
 ﻿'use strict';
 
-var nj = require('../core'),
-  tools = require('./tools');
+var tools = require('./tools');
 
 //Global expression list
-nj.exprs = {
+var exprs = {
   'if': function (refer, useUnless) {
     if (refer === 'false') {
       refer = false;
@@ -32,7 +31,7 @@ nj.exprs = {
   },
 
   unless: function (refer) {
-    return nj.exprs['if'].call(this, refer, true);
+    return exprs['if'].call(this, refer, true);
   },
 
   each: function (refer) {
@@ -50,7 +49,6 @@ nj.exprs = {
 
       tools.each(refer, function (item, index) {
         var retI = thiz.result({
-          loop: true,
           item: item,
           index: index
         });
@@ -59,7 +57,8 @@ nj.exprs = {
           ret += retI;
         }
         else {
-          tools.listPush(ret, retI, true);
+          ret.push(retI);
+          //tools.listPush(ret, retI, true);
         }
       }, false, tools.isArray(refer));
 
@@ -155,7 +154,6 @@ nj.exprs = {
 
     for (; start <= end; start++) {
       var retI = this.result({
-        loop: true,
         item: this.data[0],
         index: start
       });
@@ -176,23 +174,71 @@ nj.exprs = {
   }
 };
 
+function _commonConfig(params) {
+  var ret = {
+    data: false,
+    parent: false,
+    index: false,
+    useString: true,
+    paramsExpr: false,
+    result: true,
+    inverse: true,
+    newContext: false
+  };
+
+  if (params) {
+    ret = tools.assign(ret, params);
+  }
+  return ret;
+}
+
+//Expression default config
+var exprConfig = {
+  'if': _commonConfig(),
+  unless: _commonConfig(),
+  each: _commonConfig({ newContext: true }),
+  param: _commonConfig({ inverse: false, paramsExpr: true }),
+  spreadparam: _commonConfig({ useString: false, result: false, inverse: false, paramsExpr: true }),
+  equal: _commonConfig({ useString: false }),
+  'for': _commonConfig({ newContext: true }),
+  blank: _commonConfig({ useString: false, inverse: false })
+};
+
 //Expression alias
-nj.exprs.p = nj.exprs.param;
-nj.exprs.spread = nj.exprs.spreadparam;
+exprs.prop = exprs.p = exprs.param;
+exprConfig.prop = exprConfig.p = exprConfig.param;
+exprs.spread = exprs.spreadparam;
+exprConfig.spread = exprConfig.spreadparam;
 
 //Register expression and also can batch add
-function registerExpr(name, expr) {
+function registerExpr(name, expr, options) {
   var params = name;
   if (!tools.isObject(name)) {
     params = {};
-    params[name] = expr;
+    params[name] = {
+      expr: expr,
+      options: options
+    };
   }
 
   tools.each(params, function (v, k) {
-    nj.exprs[k.toLowerCase()] = v;
+    var name = k.toLowerCase(),
+      options;
+
+    if (v && v.expr) {
+      exprs[name] = v.expr;
+      options = v.options;
+    }
+    else {
+      exprs[name] = v;
+    }
+
+    exprConfig[name] = _commonConfig(options);
   }, false, false);
 }
 
 module.exports = {
+  exprs: exprs,
+  exprConfig: exprConfig,
   registerExpr: registerExpr
 };
