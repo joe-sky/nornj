@@ -472,7 +472,7 @@ describe('test speed', function () {
     });
   });
 
-  xit('test render to string by hbs', function () {
+  it('test render to string by hbs', function () {
     var data = {
       div: 'div',
       num: 100,
@@ -492,14 +492,14 @@ describe('test speed', function () {
     expect(ret).toBeTruthy();
   });
 
-  xit('test render to string by nj', function () {
+  it('test render to string by nj', function () {
     var data = {
       div: 'div',
       num: 100,
-      arr: _.times(5, function (n) {
+      arr: _.times(1000, function (n) {
         return n;
       }),
-      list2: _.times(2, function (n) {
+      list2: _.times(100, function (n) {
         return { no: n + 1 };
       })
     };
@@ -570,7 +570,7 @@ describe('test speed', function () {
     expect(html).toBeTruthy();
   });
 
-  it('test render to component by nj', function () {
+  xit('test render to component by nj', function () {
     var start,
       T = nj.tmplByKey('TestComp');
 

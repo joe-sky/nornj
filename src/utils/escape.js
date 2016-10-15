@@ -9,11 +9,11 @@ var ESCAPE_LOOKUP = {
 };
 
 function escape(text) {
-  if (text == null) {
-    return;
+  if (text == null || !text.replace) {
+    return '';
   }
 
-  return ('' + text).replace(/[&><"']/g, function (match) {
+  return text.replace(/[&><"']/g, function (match) {
     return ESCAPE_LOOKUP[match];
   });
 }

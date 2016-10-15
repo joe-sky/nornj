@@ -569,6 +569,13 @@ function _buildFn(content, fns, no, newContext) {
       newContext: newContext
     };
 
+  if (!useString) {
+    counter._compParam = 0;
+  }
+  else {
+    counter._children = 0;
+  }
+
   if (main) {
     fnStr += 'var parent = p2.parent;\n';
     fnStr += 'var data = p2.data;\n';
@@ -622,8 +629,10 @@ function _buildFn(content, fns, no, newContext) {
   return no;
 }
 
-function _buildPropData(obj, counter) {
-  var dataValueStr;
+function _buildPropData(obj, counter, fns, noEscape) {
+  var dataValueStr,
+    useString = fns.useString,
+    escape = !noEscape ? obj.escape : false;
 
   //先生成数据值
   if (!obj.prop.isStr) {
@@ -704,12 +713,21 @@ function _buildPropData(obj, counter) {
     }, false, true);
 
     return {
-      valueStr: valueStr,
+      valueStr: _buildEscape(valueStr, useString, escape),
       filterStr: filterStr
     };
   }
   else {
-    return dataValueStr;
+    return _buildEscape(dataValueStr, useString, escape);
+  }
+}
+
+function _buildEscape(valueStr, useString, escape) {
+  if(useString && escape) {
+    return 'p1.escape(' + valueStr + ')';
+  }
+  else {
+    return valueStr;
   }
 }
 
@@ -723,7 +741,7 @@ function _buildProps(obj, counter, fns) {
     filterStr = '';
 
     utils.each(obj.props, function (o, i) {
-      var propData = _buildPropData(o, counter),
+      var propData = _buildPropData(o, counter, fns),
         dataValueStr;
       if (utils.isString(propData)) {
         dataValueStr = propData;
@@ -753,8 +771,15 @@ function _buildProps(obj, counter, fns) {
     valueStr += '{\n';
     utils.each(str0, function (v, k, i, l) {
       if (k !== 'length') {
-        valueStr += '  "' + k + '": p1.main' + _buildFn(v.content, fns, 'T' + ++fns._noT) + (i < l - 2 ? ',' : '') + '\n';
+        valueStr += '  "' + k + '": p1.main' + _buildFn(v.content, fns, 'T' + ++fns._noT);
       }
+      else {
+        valueStr += '  length: ' + v;
+      }
+      if (i < l - 1) {
+        valueStr += ',';
+      }
+      valueStr += '\n';
     }, false, false);
     valueStr += '}';
   }
@@ -785,7 +810,7 @@ function _buildNode(node, fns, counter, retType) {
       valueStr = valueStr.valueStr;
     }
 
-    var textStr = _buildRender(1, retType, { text: valueStr });
+    var textStr = _buildRender(1, retType, { text: valueStr }, fns);
     if (filterStr) {
       textStr = filterStr + textStr;
     }
@@ -810,7 +835,7 @@ function _buildNode(node, fns, counter, retType) {
         filterStr = '';
 
       utils.each(props, function (o, i) {
-        var valueStr = _buildPropData(o, counter);
+        var valueStr = _buildPropData(o, counter, fns, true);
         if (utils.isObject(valueStr)) {
           filterStr += valueStr.filterStr;
           valueStr = valueStr.valueStr;
@@ -871,7 +896,7 @@ function _buildNode(node, fns, counter, retType) {
       _expr: _exprC,
       _dataRefer: _dataReferC,
       _this: _thisC
-    });
+    }, fns);
   }
   else {  //元素节点
     //节点类型和typeRefer
@@ -1004,15 +1029,25 @@ function _buildNode(node, fns, counter, retType) {
       }
     }
 
-    //组件引擎参数
-    var _compParamC = counter._compParam++;
-    fnStr += 'var _compParam' + _compParamC + ' = [_type' + _typeC + ', ' + (paramsStr !== '' ? '_params' + _paramsC : 'null') + '];\n';
+    var _compParamC, _childrenC;
+    if (!useString) {  //组件引擎参数
+      _compParamC = counter._compParam++;
+      fnStr += 'var _compParam' + _compParamC + ' = [_type' + _typeC + ', ' + (paramsStr !== '' ? '_params' + _paramsC : 'null') + '];\n';
+    }
+    else {  //子节点字符串
+      _childrenC = counter._children++;
+      fnStr += 'var _children' + _childrenC + ' = \'\';\n';
+    }
 
     //子节点
-    fnStr += _buildContent(node.content, fns, counter, { _compParam: '_compParam' + _compParamC });
+    fnStr += _buildContent(node.content, fns, counter, !useString
+      ? { _compParam: '_compParam' + _compParamC }
+      : { _children: '_children' + _childrenC });
 
     //渲染
-    fnStr += _buildRender(3, retType, { _compParam: _compParamC });
+    fnStr += _buildRender(3, retType, !useString
+      ? { _compParam: _compParamC }
+      : { _type: _typeC, _params: paramsStr !== '' ? _paramsC : null, _children: _childrenC, _selfClose: node.selfCloseTag }, fns);
   }
 
   return fnStr;
@@ -1031,8 +1066,10 @@ function _buildContent(content, fns, counter, retType) {
   return fnStr;
 }
 
-function _buildRender(nodeType, retType, params) {
-  var retStr;
+function _buildRender(nodeType, retType, params, fns) {
+  var retStr,
+    useString = fns.useString;
+
   switch (nodeType) {
     case 1:  //文本节点
       retStr = params.text;
@@ -1041,21 +1078,45 @@ function _buildRender(nodeType, retType, params) {
       retStr = '_expr' + params._expr + '.apply(_this' + params._this + ', _dataRefer' + params._dataRefer + ')';
       break;
     case 3:  //元素节点
-      retStr = 'p1.compPort.apply(p1.compLib, _compParam' + params._compParam + ')';
+      if (!useString) {
+        retStr = 'p1.compPort.apply(p1.compLib, _compParam' + params._compParam + ')';
+      }
+      else {
+        retStr = '\'<\' + _type' + params._type + ' + ' + (params._params != null ? '_params' + params._params + ' + ' : '');
+        if (!params._selfClose) {
+          retStr += '\'>\'';
+          retStr += ' + _children' + params._children + ' + ';
+          retStr += '\'</\' + _type' + params._type + ' + \'>\'';
+        }
+        else {
+          retStr += '\'/>\'';
+        }
+      }
       break;
   }
 
+  //保存方式
   if (retType === '1') {
     return '\nreturn ' + retStr + ';';
   }
   else if (retType === '2') {
-    return '\nret.push(' + retStr + ');\n';
+    if (!useString) {
+      return '\nret.push(' + retStr + ');\n';
+    }
+    else {
+      return '\nret += ' + retStr + ';\n';
+    }
   }
   else if (retType._paramsE) {
     return '\n' + retStr + ';\n';
   }
   else {
-    return '\n' + retType._compParam + '.push(' + retStr + ');\n';
+    if (!useString) {
+      return '\n' + retType._compParam + '.push(' + retStr + ');\n';
+    }
+    else {
+      return '\n' + retType._children + ' += ' + retStr + ';\n';
+    }
   }
 }
 
