@@ -166,7 +166,7 @@ function addTmpl(node, parent, name) {
 
 //Test whether as parameters expression
 function isParamsExpr(obj) {
-  return obj === 'params';
+  return obj === 'params' || obj === 'props';
 }
 
 //Add to the "paramsExpr" property of the parent node

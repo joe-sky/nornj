@@ -9,8 +9,11 @@ var ESCAPE_LOOKUP = {
 };
 
 function escape(text) {
-  if (text == null || !text.replace) {
+  if (text == null) {
     return '';
+  }
+  else if(!text.replace) {
+    return text;
   }
 
   return text.replace(/[&><"']/g, function (match) {

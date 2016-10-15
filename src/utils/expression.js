@@ -205,8 +205,8 @@ var exprConfig = {
 };
 
 //Expression alias
-exprs.p = exprs.param;
-exprConfig.p = exprConfig.param;
+exprs.prop = exprs.p = exprs.param;
+exprConfig.prop = exprConfig.p = exprConfig.param;
 exprs.spread = exprs.spreadparam;
 exprConfig.spread = exprConfig.spreadparam;
 
