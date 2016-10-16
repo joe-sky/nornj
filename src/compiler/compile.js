@@ -106,32 +106,10 @@ function precompile(obj) {
   return root;
 }
 
-//Render tmpl expression block
-//var _renderTmplExpr = compileComponent(['<{container}>', '{tmpl}'], 'tmplExpr');
-//function renderTmplExpr(tmpl, data, container) {
-//  if (!container) {
-//    container = 'div';
-//  }
-
-//  var extra = { tmpl: tmpl, container: container },
-//    datas;
-
-//  if (utils.isArray(data)) {
-//    datas = data;
-//    datas[datas.length] = extra;
-//  }
-//  else {
-//    datas = [data, extra];
-//  }
-
-//  return _renderTmplExpr(datas);
-//}
-
 module.exports = {
   compile: compile,
   compileComponent: compileComponent,
   compileTagComponent: compileTagComponent,
   renderTagComponent: renderTagComponent,
-  precompile: precompile,
-  //renderTmplExpr: renderTmplExpr
+  precompile: precompile
 };

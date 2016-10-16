@@ -1081,7 +1081,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    warn: nj.warn,
 	    getItemParam: nj.getItemParam,
 	    styleProps: nj.styleProps,
-	    assign: nj.assign,
 	    exprRet: nj.exprRet
 	  };
 
@@ -1089,6 +1088,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    configs.compPort = nj.componentPort;
 	    configs.compLib = nj.componentLibObj;
 	    configs.compClass = nj.componentClasses;
+	    //configs.assign = nj.assign;
 	  }
 	  else {
 	    configs.assignStringProp = nj.assignStringProp;
@@ -2149,34 +2149,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return root;
 	}
 
-	//Render tmpl expression block
-	//var _renderTmplExpr = compileComponent(['<{container}>', '{tmpl}'], 'tmplExpr');
-	//function renderTmplExpr(tmpl, data, container) {
-	//  if (!container) {
-	//    container = 'div';
-	//  }
-
-	//  var extra = { tmpl: tmpl, container: container },
-	//    datas;
-
-	//  if (utils.isArray(data)) {
-	//    datas = data;
-	//    datas[datas.length] = extra;
-	//  }
-	//  else {
-	//    datas = [data, extra];
-	//  }
-
-	//  return _renderTmplExpr(datas);
-	//}
-
 	module.exports = {
 	  compile: compile,
 	  compileComponent: compileComponent,
 	  compileTagComponent: compileTagComponent,
 	  renderTagComponent: renderTagComponent,
-	  precompile: precompile,
-	  //renderTmplExpr: renderTmplExpr
+	  precompile: precompile
 	};
 
 /***/ },
@@ -2591,15 +2569,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	      //params块
 	      if (paramsExpr) {
 	        var _paramsEC = counter._paramsE++;
-	        paramsStr += (useString ? '\'\'' : '{}') + ';\n';
-	        paramsStr += 'var _paramsE' + _paramsEC + ' = p1.lightObj();\n';
+	        paramsStr += (useString ? '\'\'' : 'null') + ';\n';
+	        paramsStr += 'var _paramsE' + _paramsEC + ' = {};\n';
 
 	        //params块的子节点
 	        paramsStr += _buildContent(paramsExpr.content, fns, counter, { _paramsE: '_paramsE' + _paramsEC });
 
 	        //合并params块的值
 	        if (!useString) {
-	          paramsStr += '\np1.assign(_params' + _paramsC + ', _paramsE' + _paramsEC + ');\n';
+	          paramsStr += '\n_params' + _paramsC + ' = _paramsE' + _paramsEC + ';\n';
+	          //paramsStr += '\np1.assign(_params' + _paramsC + ', _paramsE' + _paramsEC + ');\n';
 	        }
 	        else {
 	          var keys = '';

@@ -185,7 +185,7 @@ describe('test speed', function () {
       }
     });
 
-    var list2 = _.times(100, function (n) {
+    var list2 = _.times(50, function (n) {
       return { no: n + 1 };
     });
 
@@ -257,7 +257,7 @@ describe('test speed', function () {
       }
     });
 
-    var list2 = _.times(100, function (n) {
+    var list2 = _.times(50, function (n) {
       return { no: n + 1 };
     });
 
@@ -274,11 +274,11 @@ describe('test speed', function () {
     expect(html).toBeTruthy();
   });
 
-  it('test render to string by hbs', function () {
+  xit('test render to string by hbs', function () {
     var data = {
       div: 'div',
       num: 100,
-      arr: _.times(1000, function (n) {
+      arr: _.times(500, function (n) {
         return n;
       }),
       list2: _.times(100, function (n) {
@@ -294,11 +294,11 @@ describe('test speed', function () {
     expect(ret).toBeTruthy();
   });
 
-  it('test render to string by nj', function () {
+  xit('test render to string by nj', function () {
     var data = {
       div: 'div',
       num: 100,
-      arr: _.times(1000, function (n) {
+      arr: _.times(500, function (n) {
         return n;
       }),
       list2: _.times(100, function (n) {

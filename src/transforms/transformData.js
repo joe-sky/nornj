@@ -138,7 +138,6 @@ function template(fns) {
     warn: nj.warn,
     getItemParam: nj.getItemParam,
     styleProps: nj.styleProps,
-    assign: nj.assign,
     exprRet: nj.exprRet
   };
 
@@ -146,6 +145,7 @@ function template(fns) {
     configs.compPort = nj.componentPort;
     configs.compLib = nj.componentLibObj;
     configs.compClass = nj.componentClasses;
+    //configs.assign = nj.assign;
   }
   else {
     configs.assignStringProp = nj.assignStringProp;

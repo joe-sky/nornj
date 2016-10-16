@@ -406,15 +406,16 @@ function _buildNode(node, fns, counter, retType) {
       //params块
       if (paramsExpr) {
         var _paramsEC = counter._paramsE++;
-        paramsStr += (useString ? '\'\'' : '{}') + ';\n';
-        paramsStr += 'var _paramsE' + _paramsEC + ' = p1.lightObj();\n';
+        paramsStr += (useString ? '\'\'' : 'null') + ';\n';
+        paramsStr += 'var _paramsE' + _paramsEC + ' = {};\n';
 
         //params块的子节点
         paramsStr += _buildContent(paramsExpr.content, fns, counter, { _paramsE: '_paramsE' + _paramsEC });
 
         //合并params块的值
         if (!useString) {
-          paramsStr += '\np1.assign(_params' + _paramsC + ', _paramsE' + _paramsEC + ');\n';
+          paramsStr += '\n_params' + _paramsC + ' = _paramsE' + _paramsEC + ';\n';
+          //paramsStr += '\np1.assign(_params' + _paramsC + ', _paramsE' + _paramsEC + ');\n';
         }
         else {
           var keys = '';
