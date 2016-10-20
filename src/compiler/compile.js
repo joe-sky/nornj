@@ -11,46 +11,53 @@ function compile(obj, tmplName, isComponent, isTag) {
     return;
   }
 
-  //编译AST
-  var root;
-  if (tmplName) {
-    root = nj.asts[tmplName];
-  }
-  if (!root) {
-    //If obj is Object,we think obj is a precompiled template
-    if (utils.isObject(obj) && obj.type === 'nj_root') {
-      root = obj;
-    }
-    else {
-      root = _createAstRoot();
-
-      //Auto transform string template to array
-      if (utils.isString(obj)) {
-        obj = compileStringTmpl(obj);
-      }
-
-      //分析传入参数并转换为节点树对象
-      if (isTag) {
-        utils.checkTagElem(obj, root);
-      }
-      else {
-        utils.checkElem(obj, root);
-      }
-    }
-
-    //保存模板AST编译结果到全局集合中
-    if (tmplName) {
-      nj.asts[tmplName] = root;
-    }
-  }
-
   //编译模板函数
   var tmplFns;
   if (tmplName) {
     tmplFns = nj.templates[tmplName];
   }
   if (!tmplFns) {
-    tmplFns = utils.template(buildRuntime(root.content, !isComponent));
+    var isObj = utils.isObject(obj), fns;
+    if (isObj && obj.main) {  //直接传入预编译模板
+      fns = obj;
+    }
+    else {  //编译AST
+      var root;
+      if (tmplName) {
+        root = nj.asts[tmplName];
+      }
+      if (!root) {
+        //Can be directly introduced into the AST
+        if (isObj && obj.type === 'nj_root') {
+          root = obj;
+        }
+        else {
+          root = _createAstRoot();
+
+          //Auto transform string template to array
+          if (utils.isString(obj)) {
+            obj = compileStringTmpl(obj);
+          }
+
+          //分析传入参数并转换为节点树对象
+          if (isTag) {
+            utils.checkTagElem(obj, root);
+          }
+          else {
+            utils.checkElem(obj, root);
+          }
+        }
+
+        //保存模板AST编译结果到全局集合中
+        if (tmplName) {
+          nj.asts[tmplName] = root;
+        }
+      }
+
+      fns = buildRuntime(root.content, !isComponent);
+    }
+
+    tmplFns = utils.template(fns);
 
     //保存模板函数编译结果到全局集合中
     if (tmplName) {
