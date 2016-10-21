@@ -9,6 +9,16 @@ function checkExtension(fileName, extension) {
   return (fileName.length - fileName.lastIndexOf(extension)) === extension.length;
 }
 
+function buildTmplFns(fns) {
+  var ret = '{\n';
+  nj.each(fns, function(v, k, i, l) {
+    if(k.indexOf('_') != 0) {
+      ret += '  ' + k + ': ' + v.toString() + (i < l - 1 ? ',' : '') + '\n';
+    }
+  });
+  return ret + '}';
+}
+
 module.exports = function (param) {
   var sources = param.source;
   if (!Array.isArray(sources)) {
@@ -19,7 +29,8 @@ module.exports = function (param) {
     esVersion = param.esVersion || 'es6',
     beginRule = param.beginRule || '{',
     endRule = param.endRule || '}',
-    exprRule = param.exprRule || '$';
+    exprRule = param.exprRule || '#',
+    output = param.output || 'component';  //component, string
 
   //Clear the cache of string template
   nj.strTmpls = {};
@@ -67,15 +78,16 @@ module.exports = function (param) {
       }
 
       //Precompiling template
+      var outputComponent = output === 'component';
       if (Array.isArray(tmpl)) {
-        preTmpl += JSON.stringify(precompile(tmpl)) + ';';
+        preTmpl += buildTmplFns(precompile(tmpl, outputComponent)) + ';';
       }
       else {  //Export multiple templates
         var tmpls = '';
-        nj.each(tmpl, function(v, k) {
-          tmpls += ', ' + k + ': ' + JSON.stringify(precompile(v));
+        nj.each(tmpl, function(v, k, i, l) {
+          tmpls += '  ' + k + ': ' + buildTmplFns(precompile(v, outputComponent)) + (i < l - 1 ? ',' : '') + '\n';
         });
-        preTmpl += '{ ' + tmpls.substr(2) + ' };';
+        preTmpl += '{\n' + tmpls + '};';
       }
       preTmpl += '\nexport default tmpl;'
     }

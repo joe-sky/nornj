@@ -32,14 +32,14 @@ export default {
     new webpack.DefinePlugin({
       'process.env.NODE_ENV': '"production"'
     }),
-    new webpack.optimize.UglifyJsPlugin({
-      compressor: {
-        pure_getters: true,
-        unsafe: true,
-        unsafe_comps: true,
-        screw_ie8: true,
-        warnings: false
-      }
-    })
+    //new webpack.optimize.UglifyJsPlugin({
+    //  compressor: {
+    //    pure_getters: true,
+    //    unsafe: true,
+    //    unsafe_comps: true,
+    //    screw_ie8: true,
+    //    warnings: false
+    //  }
+    //})
   ]
 };

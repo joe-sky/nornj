@@ -106,11 +106,11 @@ function renderTagComponent(data, selector) {
 }
 
 //Precompile template
-function precompile(obj) {
+function precompile(obj, isComponent) {
   var root = _createAstRoot();
   utils.checkElem(obj, root);
 
-  return root;
+  return buildRuntime(root.content, !isComponent);
 }
 
 module.exports = {

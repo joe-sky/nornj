@@ -147,7 +147,8 @@ function _buildPropData(obj, counter, fns, noEscape) {
     utils.each(filters, function (o) {
       var _filterC = counter._filter++,
         _thisFC = counter._thisF++,
-        configF = filterConfig[o.name];
+        configF = filterConfig[o.name],
+        noConfig = !configF;
 
       filterStr += '\nvar _filter' + _filterC + ' = p1.filters[\'' + o.name + '\'];\n';
       filterStr += 'if (!_filter' + _filterC + ') {\n';
@@ -155,16 +156,16 @@ function _buildPropData(obj, counter, fns, noEscape) {
       filterStr += '}\n';
       filterStr += 'else {\n';
       filterStr += '  var _thisF' + _thisFC + ' = p1.lightObj();\n';
-      if (configF.useString) {
+      if (noConfig || configF.useString) {
         filterStr += '  _thisF' + _thisFC + '.useString = p1.useString;\n';
       }
-      if (configF.data) {
+      if (noConfig || configF.data) {
         filterStr += '  _thisF' + _thisFC + '.data = data;\n';
       }
-      if (configF.parent) {
+      if (noConfig || configF.parent) {
         filterStr += '  _thisF' + _thisFC + '.parent = parent.parent;\n';
       }
-      if (configF.index) {
+      if (noConfig || configF.index) {
         filterStr += '  _thisF' + _thisFC + '.index = parent.index;\n';
       }
       filterStr += '\n  ' + valueStr + ' = _filter' + _filterC + '.apply(_thisF' + _thisFC + ', [' + valueStr
@@ -321,20 +322,21 @@ function _buildNode(node, fns, counter, retType) {
     //执行表达式块
     var _thisC = counter._this++,
       configE = exprConfig[node.expr],
+      noConfig = !configE,
       newContext = configE.newContext,
       newContextP = counter.newContext;
 
     fnStr += '\nvar _this' + _thisC + ' = p1.lightObj();\n';
-    if (configE.useString) {
+    if (noConfig || configE.useString) {
       fnStr += '_this' + _thisC + '.useString = p1.useString;\n';
     }
-    if (configE.data) {
+    if (noConfig || configE.data) {
       fnStr += '_this' + _thisC + '.data = data;\n';
     }
-    if (configE.parent) {
+    if (noConfig || configE.parent) {
       fnStr += '_this' + _thisC + '.parent = parent.parent;\n';
     }
-    if (configE.index) {
+    if (noConfig || configE.index) {
       fnStr += '_this' + _thisC + '.index = parent.index;\n';
     }
 
@@ -342,15 +344,13 @@ function _buildNode(node, fns, counter, retType) {
     var paramsEStr = 'p5';
     if (retType && retType._paramsE) {
       paramsEStr = retType._paramsE;
-    }
-    if (configE.paramsExpr) {
       fnStr += '_this' + _thisC + '.paramsExpr = ' + paramsEStr + ';\n';
     }
 
-    if (configE.result) {
+    if (noConfig || configE.result) {
       fnStr += '_this' + _thisC + '.result = ' + (node.content ? 'p1.exprRet(p1, ' + (newContextP ? '_' : '') + 'p2, p3, p1.fn' + _buildFn(node.content, fns, ++fns._no, newContext) + ', ' + paramsEStr + ')' : 'p1.noop') + ';\n';
     }
-    if (configE.inverse) {
+    if (noConfig || configE.inverse) {
       fnStr += '_this' + _thisC + '.inverse = ' + (node.contentElse ? 'p1.exprRet(p1, ' + (newContextP ? '_' : '') + 'p2, p3, p1.fn' + _buildFn(node.contentElse, fns, ++fns._no, newContext) + ', ' + paramsEStr + ')' : 'p1.noop') + ';\n';
     }
 
