@@ -2,8 +2,7 @@
 import { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { VisibilityFilters, addTodo, completeTodo } from '../actions/actions';
-import tmpl from '../templates/AppTmpl';
-import '../templates/templateFilters';
+import tmpl from './App.tmpl';
 import '../components/AddTodo';
 import '../components/Footer';
 import '../components/Todo';
@@ -27,13 +26,11 @@ class _App extends Component {
 
   render() {
     return template(
-      [
-        this.props,
-        {
-          addClick: (text) => this.props.dispatch(addTodo(text)),
-          todoClick: (index) => this.props.dispatch(completeTodo(index))
-        }
-      ]
+      this.props,
+      {
+        addClick: (text) => this.props.dispatch(addTodo(text)),
+        todoClick: (index) => this.props.dispatch(completeTodo(index))
+      }
     );
   }
 }

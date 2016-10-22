@@ -1,6 +1,6 @@
 ﻿import nj from '../../../src/base.js';
 import { Component, PropTypes } from 'react';
-import tmpl from '../templates/TodoListTmpl';
+import tmpl from './TodoList.tmpl';
 const template = nj.compileComponent(tmpl);
 
 class TodoList extends Component {
@@ -14,10 +14,8 @@ class TodoList extends Component {
 
   render() {
     return template(
-      [
-        this.props,
-        { todoClick: (index) => this.props.onTodoClick(index) }
-      ]
+      this.props,
+      { todoClick: (index) => this.props.onTodoClick(index) }
     );
   }
 }

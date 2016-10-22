@@ -2,7 +2,7 @@
 
 export default nj`
 <p>
-  ${['Show: ']}
+  @${'Show: '}
   <#each {filters}>
     <#if {filter:isCurrent}>
       {name}
@@ -14,7 +14,7 @@ export default nj`
     <#if {name:equal(Active)}>
       .
     <#else />
-      ${[', ']}
+      @${', '}
     </#if>
   </#each>
 </p>`;

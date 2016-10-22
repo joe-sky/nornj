@@ -4,8 +4,9 @@ import precompiler from '../../precompiler';
 
 //Precompile all nornj templates which use "nornj.js" names to the end.
 precompiler({
-  source: __dirname + '/templates/**/*.nornj.js',
-  extension: '.nornj.js'
+  source: __dirname + '/**/*.nj.js',
+  options: { ignore: __dirname + '/node_modules/' },
+  extension: '.nj.js'
 });
 
 export default {
@@ -32,14 +33,14 @@ export default {
     new webpack.DefinePlugin({
       'process.env.NODE_ENV': '"production"'
     }),
-    //new webpack.optimize.UglifyJsPlugin({
-    //  compressor: {
-    //    pure_getters: true,
-    //    unsafe: true,
-    //    unsafe_comps: true,
-    //    screw_ie8: true,
-    //    warnings: false
-    //  }
-    //})
+    new webpack.optimize.UglifyJsPlugin({
+      compressor: {
+        pure_getters: true,
+        unsafe: true,
+        unsafe_comps: true,
+        screw_ie8: true,
+        warnings: false
+      }
+    })
   ]
 };
