@@ -1,7 +1,10 @@
-﻿import nj from '../../../src/base.js';
+﻿import {
+  compileComponent,
+  registerComponent
+} from '../../../src/base.js';
 import { Component, PropTypes } from 'react';
 import tmpl from './Todo.tmpl';
-const template = nj.compileComponent(tmpl);
+const template = compileComponent(tmpl);
 
 class Todo extends Component {
   static propTypes = {
@@ -10,14 +13,19 @@ class Todo extends Component {
     completed: PropTypes.bool.isRequired
   };
 
+  constructor(props) {
+    super(props);
+    this.handleClick = this.handleClick.bind(this);
+  }
+
+  handleClick() {
+    return this.props.onClick(this.props.index);
+  }
+
   render() {
-    return template(
-      this.props,
-      { click: (e) => this.props.onClick(this.props.index) }
-    );
+    return template(this.props, this);
   }
 }
 
-nj.registerComponent({ Todo });
-
+registerComponent({ Todo });
 export default Todo;

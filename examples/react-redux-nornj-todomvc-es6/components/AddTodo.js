@@ -1,12 +1,20 @@
-﻿import nj from '../../../src/base.js';
+﻿import {
+  compileComponent,
+  registerComponent
+} from '../../../src/base.js';
 import { Component, PropTypes } from 'react';
 import tmpl from './AddTodo.tmpl';
-const template = nj.compileComponent(tmpl);
+const template = compileComponent(tmpl);
 
 class AddTodo extends Component {
   static propTypes = {
     onAddClick: PropTypes.func.isRequired
   };
+
+  constructor(props) {
+    super(props);
+    this.handleClick = this.handleClick.bind(this);
+  }
 
   handleClick(e) {
     var node = this.refs.input;
@@ -16,10 +24,9 @@ class AddTodo extends Component {
   }
 
   render() {
-    return template({ handleClick: (e) => this.handleClick(e) });
+    return template(this);
   }
 }
 
-nj.registerComponent({ AddTodo });
-
+registerComponent({ AddTodo });
 export default AddTodo;

@@ -3,6 +3,6 @@
 export default nj`
 <ul>
   <#each {todos}>
-    <Todo {text} {completed} key={#} index={#} onClick={todoClick} />
+    <Todo {text} {completed} key={#} index={#} onClick={handleClick} />
   </#each>
 </ul>`;

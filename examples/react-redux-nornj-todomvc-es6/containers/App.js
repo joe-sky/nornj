@@ -1,4 +1,7 @@
-﻿import nj from '../../../src/base.js';
+﻿import {
+  compileComponent,
+  registerComponent
+} from '../../../src/base.js';
 import { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
 import { VisibilityFilters, addTodo, completeTodo } from '../actions/actions';
@@ -9,7 +12,7 @@ import '../components/Todo';
 import '../components/TodoList';
 
 const { SHOW_ACTIVE, SHOW_COMPLETED, SHOW_ALL } = VisibilityFilters;
-const template = nj.compileComponent(tmpl);
+const template = compileComponent(tmpl);
 
 class _App extends Component {
   static propTypes = {
@@ -24,14 +27,22 @@ class _App extends Component {
     ]).isRequired
   };
 
+  constructor(props) {
+    super(props);
+    this.addClick = this.addClick.bind(this);
+    this.todoClick = this.todoClick.bind(this);
+  }
+
+  addClick(text) {
+    return this.props.dispatch(addTodo(text));
+  }
+
+  todoClick(index) {
+    return this.props.dispatch(completeTodo(index));
+  }
+
   render() {
-    return template(
-      this.props,
-      {
-        addClick: (text) => this.props.dispatch(addTodo(text)),
-        todoClick: (index) => this.props.dispatch(completeTodo(index))
-      }
-    );
+    return template(this.props, this);
   }
 }
 
@@ -60,6 +71,5 @@ function select(state) {
 }
 
 //Wrap component,inject dispatch and state into its default connect(select)(App)
-const App = nj.registerComponent('App', connect(select)(_App));
-
+const App = registerComponent('App', connect(select)(_App));
 export default App;

@@ -1,9 +1,12 @@
-﻿import nj from '../../../src/base.js';
+﻿import {
+  compileComponent,
+  registerComponent
+} from '../../../src/base.js';
 import { Component, PropTypes } from 'react';
 import { VisibilityFilters } from '../actions/actions';
 import tmpl from './Footer.tmpl';
 const { SHOW_ACTIVE, SHOW_COMPLETED, SHOW_ALL } = VisibilityFilters;
-const template = nj.compileComponent(tmpl);
+const template = compileComponent(tmpl);
 
 class Footer extends Component {
   static propTypes = {
@@ -26,6 +29,5 @@ class Footer extends Component {
   }
 }
 
-nj.registerComponent({ Footer });
-
+registerComponent({ Footer });
 export default Footer;

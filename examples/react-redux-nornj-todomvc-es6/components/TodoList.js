@@ -1,7 +1,10 @@
-﻿import nj from '../../../src/base.js';
+﻿import {
+  compileComponent,
+  registerComponent
+} from '../../../src/base.js';
 import { Component, PropTypes } from 'react';
 import tmpl from './TodoList.tmpl';
-const template = nj.compileComponent(tmpl);
+const template = compileComponent(tmpl);
 
 class TodoList extends Component {
   static propTypes = {
@@ -12,14 +15,19 @@ class TodoList extends Component {
     }).isRequired).isRequired
   };
 
+  constructor(props) {
+    super(props);
+    this.handleClick = this.handleClick.bind(this);
+  }
+
+  handleClick(index) {
+    return this.props.onTodoClick(index);
+  }
+
   render() {
-    return template(
-      this.props,
-      { todoClick: (index) => this.props.onTodoClick(index) }
-    );
+    return template(this.props, this);
   }
 }
 
-nj.registerComponent({ TodoList });
-
+registerComponent({ TodoList });
 export default TodoList;
