@@ -34,6 +34,7 @@ describe('test speed', function () {
         <img />
       </#if>
     </#each>
+    {suffix}
   </{div}>
   `;
 

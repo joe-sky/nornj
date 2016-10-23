@@ -155,6 +155,7 @@ function template(fns) {
   tools.each(fns, function (v, k) {
     if (k.indexOf('main') === 0) {  //将每个主函数构建为可运行的模板函数
       configs[k] = tmplWrap(configs, v);
+      configs['_' + k] = v;
     }
     else if (k.indexOf('fn') === 0) {  //块表达式函数
       configs[k] = v;

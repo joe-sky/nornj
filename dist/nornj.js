@@ -70,7 +70,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	//Default use React as component engine
 	if (typeof React !== 'undefined') {
-	  setComponentEngine('react', React, typeof ReactDOM !== 'undefined' ? ReactDOM : null);
+	  nj.setComponentEngine('react', React, typeof ReactDOM !== 'undefined' ? ReactDOM : null);
 	}
 
 	var global;
@@ -1671,6 +1671,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    parent: false,
 	    index: false,
 	    useString: true,
+	    paramsExpr: false,
 	    result: true,
 	    inverse: true,
 	    newContext: false
@@ -1687,8 +1688,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	  'if': _commonConfig(),
 	  unless: _commonConfig(),
 	  each: _commonConfig({ newContext: true }),
-	  param: _commonConfig({ inverse: false }),
-	  spreadparam: _commonConfig({ useString: false, result: false, inverse: false }),
+	  param: _commonConfig({ inverse: false, paramsExpr: true }),
+	  spreadparam: _commonConfig({ useString: false, result: false, inverse: false, paramsExpr: true }),
 	  equal: _commonConfig({ useString: false }),
 	  'for': _commonConfig({ newContext: true }),
 	  blank: _commonConfig({ useString: false, inverse: false })
@@ -2118,7 +2119,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 	function _buildEscape(valueStr, useString, escape) {
-	  if(useString && escape) {
+	  if (useString && escape) {
 	    return 'p1.escape(' + valueStr + ')';
 	  }
 	  else {
@@ -2275,6 +2276,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var paramsEStr = 'p5';
 	    if (retType && retType._paramsE) {
 	      paramsEStr = retType._paramsE;
+	    }
+	    if (noConfig || configE.paramsExpr) {
 	      fnStr += '_this' + _thisC + '.paramsExpr = ' + paramsEStr + ';\n';
 	    }
 

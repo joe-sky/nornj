@@ -187,7 +187,7 @@ function _buildPropData(obj, counter, fns, noEscape) {
 }
 
 function _buildEscape(valueStr, useString, escape) {
-  if(useString && escape) {
+  if (useString && escape) {
     return 'p1.escape(' + valueStr + ')';
   }
   else {
@@ -344,6 +344,8 @@ function _buildNode(node, fns, counter, retType) {
     var paramsEStr = 'p5';
     if (retType && retType._paramsE) {
       paramsEStr = retType._paramsE;
+    }
+    if (noConfig || configE.paramsExpr) {
       fnStr += '_this' + _thisC + '.paramsExpr = ' + paramsEStr + ';\n';
     }
 

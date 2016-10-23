@@ -180,6 +180,7 @@ function _commonConfig(params) {
     parent: false,
     index: false,
     useString: true,
+    paramsExpr: false,
     result: true,
     inverse: true,
     newContext: false
@@ -196,8 +197,8 @@ var exprConfig = {
   'if': _commonConfig(),
   unless: _commonConfig(),
   each: _commonConfig({ newContext: true }),
-  param: _commonConfig({ inverse: false }),
-  spreadparam: _commonConfig({ useString: false, result: false, inverse: false }),
+  param: _commonConfig({ inverse: false, paramsExpr: true }),
+  spreadparam: _commonConfig({ useString: false, result: false, inverse: false, paramsExpr: true }),
   equal: _commonConfig({ useString: false }),
   'for': _commonConfig({ newContext: true }),
   blank: _commonConfig({ useString: false, inverse: false })

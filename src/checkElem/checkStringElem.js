@@ -108,9 +108,7 @@ function _checkStringElem(xml, params) {
 
     //Text before tag
     if (textBefore && textBefore !== '\n') {
-      if (/\s/.test(textBefore[textBefore.length - 1])) {
-        textBefore = _formatText(textBefore);
-      }
+      textBefore = _formatText(textBefore);
       _setText(textBefore, current.elem, params);
     }
 
@@ -139,9 +137,7 @@ function _checkStringElem(xml, params) {
 
     //Text after tag
     if (textAfter && textAfter !== '\n') {
-      if (/\s/.test(textAfter[0])) {
-        textAfter = _formatText(textAfter);
-      }
+      textAfter = _formatText(textAfter);
       _setText(textAfter, current.elem, params);
     }
   }

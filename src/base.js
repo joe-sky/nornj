@@ -14,7 +14,7 @@ utils.assign(nj, compiler, utils);
 
 //Default use React as component engine
 if (typeof React !== 'undefined') {
-  setComponentEngine('react', React, typeof ReactDOM !== 'undefined' ? ReactDOM : null);
+  nj.setComponentEngine('react', React, typeof ReactDOM !== 'undefined' ? ReactDOM : null);
 }
 
 var global;
