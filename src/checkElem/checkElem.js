@@ -4,7 +4,6 @@ var nj = require('../core'),
   tools = require('../utils/tools'),
   tranParam = require('../transforms/transformParam'),
   tranElem = require('../transforms/transformElement'),
-  checkTagElem = require('./checkTagElem'),
   tmplRule = nj.tmplRule;
 
 //检测元素节点
@@ -187,6 +186,5 @@ function checkContentElem(obj, parent) {
 }
 
 module.exports = {
-  checkElem: checkElem,
-  checkTagElem: checkTagElem
+  checkElem: checkElem
 };

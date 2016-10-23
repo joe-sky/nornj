@@ -5,7 +5,7 @@ import store from './store/configureStore';
 import App from './containers/App';
 
 //Set default data for first render NornJ html template.
-nj.setInitTagData({
+nj.setInitRenderData({
   store,
   hashHistory,
   App

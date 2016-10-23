@@ -7,16 +7,18 @@
 </head>
 <body>
   <div>
-    <nj-Provider class="nj-component" store={store}>
-      <nj-Router history={hashHistory}>
-        <nj-Route path="/" component={App}>
-          <nj-Route path="/all" />
-          <nj-Route path="/active" />
-          <nj-Route path="/completed" />
-          <nj-Redirect from="/" to="/all" />
-        </nj-Route>
-      </nj-Router>
-    </nj-Provider>
+    <script type="text/nornj" autoRender>
+      <Provider store={store}>
+        <Router history={hashHistory}>
+          <Route path="/" component={App}>
+            <Route path="/all" />
+            <Route path="/active" />
+            <Route path="/completed" />
+            <Redirect from="/" to="/all" />
+          </Route>
+        </Router>
+      </Provider>
+    </script>
   </div>
   <script src="assets/bundle.js"></script>
 </body>

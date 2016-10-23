@@ -12,9 +12,6 @@ nj.tmplByKey = tmplByKey;
 nj.docReady = docReady;
 utils.assign(nj, compiler, utils);
 
-//Create vml tag namespace(primarily for IE8)
-utils.registerTagNamespace();
-
 //Default use React as component engine
 if (typeof React !== 'undefined') {
   setComponentEngine('react', React, typeof ReactDOM !== 'undefined' ? ReactDOM : null);
@@ -26,8 +23,8 @@ if (typeof self !== 'undefined') {
 
   //Init tag template
   docReady(function () {
-    if (nj.componentLib && nj.autoRenderTag) {
-      nj.renderTagComponent(nj.initTagData);
+    if (nj.componentLib) {
+      nj.renderInlineComp(nj.initRenderData, null, true);
     }
   });
 }

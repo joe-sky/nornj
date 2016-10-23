@@ -6,7 +6,7 @@ var nj = require('../core'),
   compileStringTmpl = require('../checkElem/checkStringElem');
 
 //编译模板并返回转换函数
-function compile(obj, tmplName, isComponent, isTag) {
+function compile(obj, tmplName, isComponent) {
   if (!obj) {
     return;
   }
@@ -40,12 +40,7 @@ function compile(obj, tmplName, isComponent, isTag) {
           }
 
           //分析传入参数并转换为节点树对象
-          if (isTag) {
-            utils.checkTagElem(obj, root);
-          }
-          else {
-            utils.checkElem(obj, root);
-          }
+          utils.checkElem(obj, root);
         }
 
         //保存模板AST编译结果到全局集合中
@@ -82,18 +77,13 @@ function compileComponent(obj, tmplName) {
   return compile(obj, tmplName, true);
 }
 
-//编译标签并返回组件转换函数
-function compileTagComponent(obj, tmplName) {
-  return compile(obj, tmplName, true, true);
-}
-
-//渲染标签组件
-function renderTagComponent(data, selector) {
-  var tags = utils.getTagComponents(selector),
+//渲染内联标签组件
+function renderInlineComp(data, selector, isAuto) {
+  var tags = utils.getInlineComponents(selector, isAuto),
     ret = [];
 
   utils.each(tags, function (tag) {
-    var tmpl = compileTagComponent(tag, tag.getAttribute(nj.tagId)),
+    var tmpl = compileComponent(tag.innerHTML, tag.id),
       parentNode = tag.parentNode;
 
     if (nj.componentLib === 'inferno') {
@@ -104,6 +94,11 @@ function renderTagComponent(data, selector) {
 
   return ret;
 }
+
+//Set init data for inline component
+function setInitRenderData(data) {
+  nj.initRenderData = data;
+};
 
 //Precompile template
 function precompile(obj, isComponent) {
@@ -116,7 +111,8 @@ function precompile(obj, isComponent) {
 module.exports = {
   compile: compile,
   compileComponent: compileComponent,
-  compileTagComponent: compileTagComponent,
-  renderTagComponent: renderTagComponent,
+  compileComp: compileComponent,
+  renderInlineComp: renderInlineComp,
+  setInitRenderData: setInitRenderData,
   precompile: precompile
 };

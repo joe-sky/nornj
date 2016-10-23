@@ -179,70 +179,10 @@ function addParamsExpr(node, parent) {
   }
 }
 
-//获取标签组件名
-function getTagComponentName(el) {
-  var tagName = el.tagName.toLowerCase();
-  tools.each(nj.tagNamespaces, function (tagNamespace) {
-    if (tagName.indexOf(tagNamespace + ':') === 0) {
-      tagName = tagName.split(':')[1];
-      return false;
-    }
-    else if (tagName.indexOf(tagNamespace + '-') === 0) {
-      tagName = tagName.split('-')[1];
-      return false;
-    }
-  }, false, false, true);
-
-  return tagName;
-}
-
-//获取标签组件所有属性
-function getTagComponentAttrs(el) {
-  var attrs = el.attributes,
-    ret;
-
-  tools.each(attrs, function (obj) {
-    var attrName = obj.nodeName;
-    if (attrName !== nj.tagId && obj.specified) {  //此处如不判断specified属性,则低版本IE中会列出所有可能的属性
-      var val = obj.nodeValue;
-      if (!ret) {
-        ret = tools.lightObj();
-      }
-
-      //Deal with the attribute only has key.
-      if (val === '') {
-        val = attrName;
-      }
-
-      if (attrName === 'style') {  //style属性使用cssText
-        val = el.style.cssText;
-      }
-      else if (attrName.indexOf('data-') !== 0  //Transform to camel-case
-        && attrName.indexOf(nj.namespace + '-') !== 0) {
-        //Can be marked with an exclamation mark to distinguish the attribute name beginning with "data-".
-        if (attrName.indexOf('!') === 0) {
-          attrName = attrName.substr(1);
-        }
-
-        attrName = tools.toCamelCase(attrName);
-      }
-
-      ret[attrName] = val;
-    }
-  });
-
-  return ret;
-}
-
-//判断标签表达式块
-function isTagControl(obj) {
-  return tmplRule.expr.test(obj);
-}
-
-//获取全部标签组件
-function getTagComponents(selector) {
+//获取全部内联组件
+function getInlineComponents(selector, isAuto) {
   if (!selector) {
-    selector = '.' + nj.tagClassName;
+    selector = 'script[type="text/nornj"]' + (isAuto ? '[autorender]' : '');
   }
 
   return document.querySelectorAll(selector);
@@ -275,9 +215,6 @@ module.exports = {
   addTmpl: addTmpl,
   isParamsExpr: isParamsExpr,
   addParamsExpr: addParamsExpr,
-  getTagComponentName: getTagComponentName,
-  getTagComponentAttrs: getTagComponentAttrs,
-  isTagControl: isTagControl,
-  getTagComponents: getTagComponents,
+  getInlineComponents: getInlineComponents,
   removeChildNode: removeChildNode
 };

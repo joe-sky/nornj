@@ -58,18 +58,15 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var nj = __webpack_require__(1),
 	  utils = __webpack_require__(2),
-	  compiler = __webpack_require__(16),
-	  compileStringTmpl = __webpack_require__(19),
-	  tmplByKey = __webpack_require__(21),
-	  docReady = __webpack_require__(22);
+	  compiler = __webpack_require__(15),
+	  compileStringTmpl = __webpack_require__(18),
+	  tmplByKey = __webpack_require__(20),
+	  docReady = __webpack_require__(21);
 
 	nj.compileStringTmpl = compileStringTmpl;
 	nj.tmplByKey = tmplByKey;
 	nj.docReady = docReady;
 	utils.assign(nj, compiler, utils);
-
-	//Create vml tag namespace(primarily for IE8)
-	utils.registerTagNamespace();
 
 	//Default use React as component engine
 	if (typeof React !== 'undefined') {
@@ -82,8 +79,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  //Init tag template
 	  docReady(function () {
-	    if (nj.componentLib && nj.autoRenderTag) {
-	      nj.renderTagComponent(nj.initTagData);
+	    if (nj.componentLib) {
+	      nj.renderInlineComp(nj.initRenderData, null, true);
 	    }
 	  });
 	}
@@ -109,16 +106,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	nj.componentPort = null;
 	nj.componentRender = null;
 	nj.componentClasses = {};
-	nj.namespace = 'nj';
-	nj.tagNamespaces = { nj: 'nj' };
-	nj.tagId = 'nj-id';
-	nj.tagStyle = 'nj-style';
-	nj.tagClassName = 'nj-component';
 	nj.asts = {};
 	nj.templates = {};
 	nj.errorTitle = 'NornJ:';
 	nj.tmplRule = {};
-	nj.autoRenderTag = true;
 
 	module.exports = nj;
 
@@ -134,11 +125,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	  transformData = __webpack_require__(7),
 	  escape = __webpack_require__(8),
 	  checkElem = __webpack_require__(9),
-	  setComponentEngine = __webpack_require__(11),
-	  registerComponent = __webpack_require__(12),
-	  filter = __webpack_require__(13),
-	  expression = __webpack_require__(14),
-	  setTmplRule = __webpack_require__(15);
+	  setComponentEngine = __webpack_require__(10),
+	  registerComponent = __webpack_require__(11),
+	  filter = __webpack_require__(12),
+	  expression = __webpack_require__(13),
+	  setTmplRule = __webpack_require__(14);
 
 	//Set default param rule
 	setTmplRule();
@@ -656,70 +647,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	}
 
-	//获取标签组件名
-	function getTagComponentName(el) {
-	  var tagName = el.tagName.toLowerCase();
-	  tools.each(nj.tagNamespaces, function (tagNamespace) {
-	    if (tagName.indexOf(tagNamespace + ':') === 0) {
-	      tagName = tagName.split(':')[1];
-	      return false;
-	    }
-	    else if (tagName.indexOf(tagNamespace + '-') === 0) {
-	      tagName = tagName.split('-')[1];
-	      return false;
-	    }
-	  }, false, false, true);
-
-	  return tagName;
-	}
-
-	//获取标签组件所有属性
-	function getTagComponentAttrs(el) {
-	  var attrs = el.attributes,
-	    ret;
-
-	  tools.each(attrs, function (obj) {
-	    var attrName = obj.nodeName;
-	    if (attrName !== nj.tagId && obj.specified) {  //此处如不判断specified属性,则低版本IE中会列出所有可能的属性
-	      var val = obj.nodeValue;
-	      if (!ret) {
-	        ret = tools.lightObj();
-	      }
-
-	      //Deal with the attribute only has key.
-	      if (val === '') {
-	        val = attrName;
-	      }
-
-	      if (attrName === 'style') {  //style属性使用cssText
-	        val = el.style.cssText;
-	      }
-	      else if (attrName.indexOf('data-') !== 0  //Transform to camel-case
-	        && attrName.indexOf(nj.namespace + '-') !== 0) {
-	        //Can be marked with an exclamation mark to distinguish the attribute name beginning with "data-".
-	        if (attrName.indexOf('!') === 0) {
-	          attrName = attrName.substr(1);
-	        }
-
-	        attrName = tools.toCamelCase(attrName);
-	      }
-
-	      ret[attrName] = val;
-	    }
-	  });
-
-	  return ret;
-	}
-
-	//判断标签表达式块
-	function isTagControl(obj) {
-	  return tmplRule.expr.test(obj);
-	}
-
-	//获取全部标签组件
-	function getTagComponents(selector) {
+	//获取全部内联组件
+	function getInlineComponents(selector, isAuto) {
 	  if (!selector) {
-	    selector = '.' + nj.tagClassName;
+	    selector = 'script[type="text/nornj"]' + (isAuto ? '[autorender]' : '');
 	  }
 
 	  return document.querySelectorAll(selector);
@@ -752,10 +683,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  addTmpl: addTmpl,
 	  isParamsExpr: isParamsExpr,
 	  addParamsExpr: addParamsExpr,
-	  getTagComponentName: getTagComponentName,
-	  getTagComponentAttrs: getTagComponentAttrs,
-	  isTagControl: isTagControl,
-	  getTagComponents: getTagComponents,
+	  getInlineComponents: getInlineComponents,
 	  removeChildNode: removeChildNode
 	};
 
@@ -1157,7 +1085,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	  tools = __webpack_require__(3),
 	  tranParam = __webpack_require__(6),
 	  tranElem = __webpack_require__(5),
-	  checkTagElem = __webpack_require__(10),
 	  tmplRule = nj.tmplRule;
 
 	//检测元素节点
@@ -1340,143 +1267,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 	module.exports = {
-	  checkElem: checkElem,
-	  checkTagElem: checkTagElem
+	  checkElem: checkElem
 	};
 
 /***/ },
 /* 10 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	var nj = __webpack_require__(1),
-	  tools = __webpack_require__(3),
-	  tranParam = __webpack_require__(6),
-	  tranElem = __webpack_require__(5),
-	  tmplRule = nj.tmplRule;
-
-	//检测标签元素节点
-	function checkTagElem(obj, parent) {
-	  var node = {},
-	    nodeType = obj.nodeType,
-	    nodeValue = tools.trim(obj.nodeValue),
-	    parentContent = !parent.hasElse ? 'content' : 'contentElse';
-
-	  //处理文本节点
-	  if (nodeType === 3) {
-	    if (nodeValue === '') {
-	      return;
-	    }
-
-	    node.type = 'nj_plaintext';
-	    node.content = [tranParam.compiledParam(nodeValue)];
-	    parent[parentContent].push(node);
-
-	    return;
-	  }
-
-	  //处理元素节点
-	  if (nodeType === 1) {
-	    var tagName = tranElem.getTagComponentName(obj),
-	      params = tranElem.getTagComponentAttrs(obj),
-	      isControl = tranElem.isTagControl(tagName),
-	      pushContent = true,
-	      isParamsExpr;
-
-	    if (isControl) {  //特殊节点
-	      if (tagName !== tmplRule.exprRule + 'else') {
-	        tagName = tagName.substr(1);
-	        node.type = 'nj_expr';
-	        node.expr = tagName;
-	        isParamsExpr = tranElem.isParamsExpr(tagName);
-
-	        if (tranElem.isTmpl(tagName)) {  //模板元素
-	          pushContent = false;
-	          var retR;
-	          if (params && params.refer) {
-	            retR = tranElem.getInsideBraceParam(params.refer);
-	          }
-
-	          //将模板添加到父节点的params中
-	          tranElem.addTmpl(node, parent, retR ? tools.clearQuot(retR[1]) : null);
-	        }
-	        else if (isParamsExpr) {
-	          pushContent = false;
-	        }
-	        else {  //Expression block
-	          if (params && params.refer) {
-	            var retR = tranElem.getInsideBraceParam(params.refer);
-	            node.refer = tranParam.compiledParam(retR ? retR[0] : params.refer);
-	          }
-	        }
-	      }
-	      else {  //else节点
-	        pushContent = false;
-
-	        //将else标签内的子节点放入当前父节点的contentElse中
-	        node = parent;
-	        node.hasElse = true;
-	      }
-	    }
-	    else {  //元素节点
-	      node.type = tagName;
-
-	      //If open tag has a brace,add the typeRefer param.
-	      var typeRefer = tranElem.getInsideBraceParam(tagName);
-	      if (typeRefer) {
-	        node.typeRefer = tranParam.compiledParam(typeRefer[0]);
-	      }
-
-	      if (params) {
-	        node.params = tranParam.compiledParams(params);
-	      }
-
-	      //Verify if self closing tag again, because the tag may be similar to "<br></br>".
-	      node.selfCloseTag = tranElem.verifySelfCloseTag(tagName);
-	    }
-
-	    //放入父节点content内
-	    if (pushContent) {
-	      parent[parentContent].push(node);
-	    }
-
-	    //处理子元素
-	    var childNodes = obj.childNodes;
-	    if (childNodes && childNodes.length) {
-	      checkTagContentElem(childNodes, node);
-	    }
-
-	    //If this is params block, set on the "paramsExpr" property of the parent node.
-	    if (isParamsExpr) {
-	      tranElem.addParamsExpr(node, parent);
-	    }
-	  }
-	}
-
-	//检测标签子元素节点
-	function checkTagContentElem(obj, parent) {
-	  if (!parent.content) {
-	    parent.content = [];
-	  }
-	  if (parent.hasElse && !parent.contentElse) {
-	    parent.contentElse = [];
-	  }
-
-	  tools.each(obj, function (item) {
-	    checkTagElem(item, parent);
-	  }, false, true);
-	}
-
-	//Set init data for tag component
-	nj.setInitTagData = function (data) {
-	  nj.initTagData = data;
-	};
-
-	module.exports = checkTagElem;
-
-/***/ },
-/* 11 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1510,7 +1305,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 12 */
+/* 11 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1533,41 +1328,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return component;
 	}
 
-	//注册组件标签命名空间
-	function setNamespace(name) {
-	  nj.namespace = name;
-
-	  //修改标签组件id及类名
-	  nj.tagId = name + '-id';
-	  nj.tagStyle = name + '-style';
-	  nj.tagClassName = name + '-component';
-	}
-
-	//创建标签命名空间
-	function registerTagNamespace(name) {
-	  if (!name) {
-	    name = 'nj';
-	  }
-	  nj.tagNamespaces[name] = name;
-
-	  if (typeof document === 'undefined') {
-	    return;
-	  }
-
-	  var doc = document;
-	  if (doc && doc.namespaces) {
-	    doc.namespaces.add(name, 'urn:schemas-microsoft-com:vml', '#default#VML');
-	  }
-	}
-
 	module.exports = {
-	  registerComponent: registerComponent,
-	  setNamespace: setNamespace,
-	  registerTagNamespace: registerTagNamespace
+	  registerComponent: registerComponent
 	};
 
 /***/ },
-/* 13 */
+/* 12 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1720,7 +1486,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 14 */
+/* 13 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1905,7 +1671,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    parent: false,
 	    index: false,
 	    useString: true,
-	    paramsExpr: false,
 	    result: true,
 	    inverse: true,
 	    newContext: false
@@ -1922,8 +1687,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	  'if': _commonConfig(),
 	  unless: _commonConfig(),
 	  each: _commonConfig({ newContext: true }),
-	  param: _commonConfig({ inverse: false, paramsExpr: true }),
-	  spreadparam: _commonConfig({ useString: false, result: false, inverse: false, paramsExpr: true }),
+	  param: _commonConfig({ inverse: false }),
+	  spreadparam: _commonConfig({ useString: false, result: false, inverse: false }),
 	  equal: _commonConfig({ useString: false }),
 	  'for': _commonConfig({ newContext: true }),
 	  blank: _commonConfig({ useString: false, inverse: false })
@@ -1969,7 +1734,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 15 */
+/* 14 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -2038,53 +1803,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 16 */
+/* 15 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
 	var nj = __webpack_require__(1),
 	  utils = __webpack_require__(2),
-	  buildRuntime = __webpack_require__(17),
-	  compileStringTmpl = __webpack_require__(19);
+	  buildRuntime = __webpack_require__(16),
+	  compileStringTmpl = __webpack_require__(18);
 
 	//编译模板并返回转换函数
-	function compile(obj, tmplName, isComponent, isTag) {
+	function compile(obj, tmplName, isComponent) {
 	  if (!obj) {
 	    return;
-	  }
-
-	  //编译AST
-	  var root;
-	  if (tmplName) {
-	    root = nj.asts[tmplName];
-	  }
-	  if (!root) {
-	    //If obj is Object,we think obj is a precompiled template
-	    if (utils.isObject(obj) && obj.type === 'nj_root') {
-	      root = obj;
-	    }
-	    else {
-	      root = _createAstRoot();
-
-	      //Auto transform string template to array
-	      if (utils.isString(obj)) {
-	        obj = compileStringTmpl(obj);
-	      }
-
-	      //分析传入参数并转换为节点树对象
-	      if (isTag) {
-	        utils.checkTagElem(obj, root);
-	      }
-	      else {
-	        utils.checkElem(obj, root);
-	      }
-	    }
-
-	    //保存模板AST编译结果到全局集合中
-	    if (tmplName) {
-	      nj.asts[tmplName] = root;
-	    }
 	  }
 
 	  //编译模板函数
@@ -2093,7 +1825,42 @@ return /******/ (function(modules) { // webpackBootstrap
 	    tmplFns = nj.templates[tmplName];
 	  }
 	  if (!tmplFns) {
-	    tmplFns = utils.template(buildRuntime(root.content, !isComponent));
+	    var isObj = utils.isObject(obj), fns;
+	    if (isObj && obj.main) {  //直接传入预编译模板
+	      fns = obj;
+	    }
+	    else {  //编译AST
+	      var root;
+	      if (tmplName) {
+	        root = nj.asts[tmplName];
+	      }
+	      if (!root) {
+	        //Can be directly introduced into the AST
+	        if (isObj && obj.type === 'nj_root') {
+	          root = obj;
+	        }
+	        else {
+	          root = _createAstRoot();
+
+	          //Auto transform string template to array
+	          if (utils.isString(obj)) {
+	            obj = compileStringTmpl(obj);
+	          }
+
+	          //分析传入参数并转换为节点树对象
+	          utils.checkElem(obj, root);
+	        }
+
+	        //保存模板AST编译结果到全局集合中
+	        if (tmplName) {
+	          nj.asts[tmplName] = root;
+	        }
+	      }
+
+	      fns = buildRuntime(root.content, !isComponent);
+	    }
+
+	    tmplFns = utils.template(fns);
 
 	    //保存模板函数编译结果到全局集合中
 	    if (tmplName) {
@@ -2118,18 +1885,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return compile(obj, tmplName, true);
 	}
 
-	//编译标签并返回组件转换函数
-	function compileTagComponent(obj, tmplName) {
-	  return compile(obj, tmplName, true, true);
-	}
-
-	//渲染标签组件
-	function renderTagComponent(data, selector) {
-	  var tags = utils.getTagComponents(selector),
+	//渲染内联标签组件
+	function renderInlineComp(data, selector, isAuto) {
+	  var tags = utils.getInlineComponents(selector, isAuto),
 	    ret = [];
 
 	  utils.each(tags, function (tag) {
-	    var tmpl = compileTagComponent(tag, tag.getAttribute(nj.tagId)),
+	    var tmpl = compileComponent(tag.innerHTML, tag.id),
 	      parentNode = tag.parentNode;
 
 	    if (nj.componentLib === 'inferno') {
@@ -2141,24 +1903,30 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return ret;
 	}
 
+	//Set init data for inline component
+	function setInitRenderData(data) {
+	  nj.initRenderData = data;
+	};
+
 	//Precompile template
-	function precompile(obj) {
+	function precompile(obj, isComponent) {
 	  var root = _createAstRoot();
 	  utils.checkElem(obj, root);
 
-	  return root;
+	  return buildRuntime(root.content, !isComponent);
 	}
 
 	module.exports = {
 	  compile: compile,
 	  compileComponent: compileComponent,
-	  compileTagComponent: compileTagComponent,
-	  renderTagComponent: renderTagComponent,
+	  compileComp: compileComponent,
+	  renderInlineComp: renderInlineComp,
+	  setInitRenderData: setInitRenderData,
 	  precompile: precompile
 	};
 
 /***/ },
-/* 17 */
+/* 16 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -2168,7 +1936,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  errorTitle = nj.errorTitle,
 	  exprConfig = utils.exprConfig,
 	  filterConfig = utils.filterConfig,
-	  replaceSpecialSymbol = __webpack_require__(18);
+	  replaceSpecialSymbol = __webpack_require__(17);
 
 	function _buildFn(content, fns, no, newContext) {
 	  var fnStr = '',
@@ -2310,7 +2078,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    utils.each(filters, function (o) {
 	      var _filterC = counter._filter++,
 	        _thisFC = counter._thisF++,
-	        configF = filterConfig[o.name];
+	        configF = filterConfig[o.name],
+	        noConfig = !configF;
 
 	      filterStr += '\nvar _filter' + _filterC + ' = p1.filters[\'' + o.name + '\'];\n';
 	      filterStr += 'if (!_filter' + _filterC + ') {\n';
@@ -2318,16 +2087,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	      filterStr += '}\n';
 	      filterStr += 'else {\n';
 	      filterStr += '  var _thisF' + _thisFC + ' = p1.lightObj();\n';
-	      if (configF.useString) {
+	      if (noConfig || configF.useString) {
 	        filterStr += '  _thisF' + _thisFC + '.useString = p1.useString;\n';
 	      }
-	      if (configF.data) {
+	      if (noConfig || configF.data) {
 	        filterStr += '  _thisF' + _thisFC + '.data = data;\n';
 	      }
-	      if (configF.parent) {
+	      if (noConfig || configF.parent) {
 	        filterStr += '  _thisF' + _thisFC + '.parent = parent.parent;\n';
 	      }
-	      if (configF.index) {
+	      if (noConfig || configF.index) {
 	        filterStr += '  _thisF' + _thisFC + '.index = parent.index;\n';
 	      }
 	      filterStr += '\n  ' + valueStr + ' = _filter' + _filterC + '.apply(_thisF' + _thisFC + ', [' + valueStr
@@ -2484,20 +2253,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	    //执行表达式块
 	    var _thisC = counter._this++,
 	      configE = exprConfig[node.expr],
+	      noConfig = !configE,
 	      newContext = configE.newContext,
 	      newContextP = counter.newContext;
 
 	    fnStr += '\nvar _this' + _thisC + ' = p1.lightObj();\n';
-	    if (configE.useString) {
+	    if (noConfig || configE.useString) {
 	      fnStr += '_this' + _thisC + '.useString = p1.useString;\n';
 	    }
-	    if (configE.data) {
+	    if (noConfig || configE.data) {
 	      fnStr += '_this' + _thisC + '.data = data;\n';
 	    }
-	    if (configE.parent) {
+	    if (noConfig || configE.parent) {
 	      fnStr += '_this' + _thisC + '.parent = parent.parent;\n';
 	    }
-	    if (configE.index) {
+	    if (noConfig || configE.index) {
 	      fnStr += '_this' + _thisC + '.index = parent.index;\n';
 	    }
 
@@ -2505,15 +2275,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var paramsEStr = 'p5';
 	    if (retType && retType._paramsE) {
 	      paramsEStr = retType._paramsE;
-	    }
-	    if (configE.paramsExpr) {
 	      fnStr += '_this' + _thisC + '.paramsExpr = ' + paramsEStr + ';\n';
 	    }
 
-	    if (configE.result) {
+	    if (noConfig || configE.result) {
 	      fnStr += '_this' + _thisC + '.result = ' + (node.content ? 'p1.exprRet(p1, ' + (newContextP ? '_' : '') + 'p2, p3, p1.fn' + _buildFn(node.content, fns, ++fns._no, newContext) + ', ' + paramsEStr + ')' : 'p1.noop') + ';\n';
 	    }
-	    if (configE.inverse) {
+	    if (noConfig || configE.inverse) {
 	      fnStr += '_this' + _thisC + '.inverse = ' + (node.contentElse ? 'p1.exprRet(p1, ' + (newContextP ? '_' : '') + 'p2, p3, p1.fn' + _buildFn(node.contentElse, fns, ++fns._no, newContext) + ', ' + paramsEStr + ')' : 'p1.noop') + ';\n';
 	    }
 
@@ -2760,7 +2528,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 18 */
+/* 17 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -2786,7 +2554,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = replace;
 
 /***/ },
-/* 19 */
+/* 18 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -2796,7 +2564,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  tranElem = __webpack_require__(5),
 	  REGEX_SPLIT = /\$\{\d+\}/,
 	  tmplRule = nj.tmplRule,
-	  shim = __webpack_require__(20);
+	  shim = __webpack_require__(19);
 
 	//Cache the string template by unique key
 	nj.strTmpls = {};
@@ -2898,7 +2666,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      textAfter = matchArr[4];
 
 	    //Text before tag
-	    if (textBefore) {
+	    if (textBefore && textBefore !== '\n') {
 	      if (/\s/.test(textBefore[textBefore.length - 1])) {
 	        textBefore = _formatText(textBefore);
 	      }
@@ -2929,7 +2697,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 
 	    //Text after tag
-	    if (textAfter) {
+	    if (textAfter && textAfter !== '\n') {
 	      if (/\s/.test(textAfter[0])) {
 	        textAfter = _formatText(textAfter);
 	      }
@@ -3104,7 +2872,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = compileStringTmpl;
 
 /***/ },
-/* 20 */
+/* 19 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -3117,12 +2885,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 21 */
+/* 20 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var checkStringElem = __webpack_require__(19);
+	var checkStringElem = __webpack_require__(18);
 
 	module.exports = function (key) {
 	  return function() {
@@ -3131,7 +2899,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 22 */
+/* 21 */
 /***/ function(module, exports) {
 
 	'use strict';
