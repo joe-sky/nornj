@@ -1,6 +1,6 @@
 ﻿var FooterTmpl = nj('\
 <p>\
-  ${0}\
+  @${0}\
   <$each {filters}>\
     <$if {filter:isCurrent}>\
       {name}\
@@ -12,8 +12,8 @@
     <$if {name:equal(Active)}>\
       .\
     <$else />\
-      ${1}\
+      @${1}\
     </$if>\
   </$each>\
 </p>\
-', ['Show: '], [', ']);
+', 'Show: ', ', ');

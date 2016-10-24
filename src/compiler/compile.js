@@ -79,7 +79,7 @@ function compileComponent(obj, tmplName) {
 
 //渲染内联标签组件
 function renderTagComponent(data, selector, isAuto) {
-  var tags = utils.getInlineComponents(selector, isAuto),
+  var tags = utils.getTagComponents(selector, isAuto),
     ret = [];
 
   utils.each(tags, function (tag) {

@@ -180,7 +180,7 @@ function addParamsExpr(node, parent) {
 }
 
 //获取全部内联组件
-function getInlineComponents(selector, isAuto) {
+function getTagComponents(selector, isAuto) {
   if (!selector) {
     selector = 'script[type="text/nornj"]' + (isAuto ? '[autorender]' : '');
   }
@@ -215,6 +215,6 @@ module.exports = {
   addTmpl: addTmpl,
   isParamsExpr: isParamsExpr,
   addParamsExpr: addParamsExpr,
-  getInlineComponents: getInlineComponents,
+  getTagComponents: getTagComponents,
   removeChildNode: removeChildNode
 };

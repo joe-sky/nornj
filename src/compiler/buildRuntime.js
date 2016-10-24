@@ -222,7 +222,7 @@ function _buildProps(obj, counter, fns) {
           + (strI !== '' ? ' + \'' + strI + '\'' : '');
       }
       else if (obj.isTmplPlace) {  //执行tmpl块模板函数
-        dataValueStr += '.call({ parent: parent }, data)';
+        dataValueStr += '.call({ _njParent: parent }, data)';
       }
 
       valueStr += dataValueStr;

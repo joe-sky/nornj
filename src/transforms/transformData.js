@@ -98,7 +98,7 @@ function exprRet(p1, p2, p3, fn, p5) {
 
 //构建可运行的模板函数
 function tmplWrap(configs, main) {
-  return function (data) {
+  return function () {
     var args = arguments,
       len = args.length,
       data;
@@ -116,7 +116,7 @@ function tmplWrap(configs, main) {
       }
     }
 
-    return main(configs, { data: data, parent: this ? this.parent : null }, { multiData: nj.isArray(data) });
+    return main(configs, { data: data, parent: this && this._njParent ? this._njParent : null }, { multiData: nj.isArray(data) });
   };
 }
 

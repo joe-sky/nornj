@@ -16,16 +16,18 @@
 </head>
 <body>
   <div>
-    <nj:Provider class="nj-component" store={store}>
-      <nj:Router history={hashHistory}>
-        <nj:Route path="/" component={App}>
-          <nj:Route path="/all" />
-          <nj:Route path="/active" />
-          <nj:Route path="/completed" />
-          <nj:Redirect from="/" to="/all" />
-        </nj:Route>
-      </nj:Router>
-    </nj:Provider>
+    <script type="text/nornj" autoRender>
+      <Provider class="nj-component" store={store}>
+        <Router history={hashHistory}>
+          <Route path="/" component={App}>
+            <Route path="/all" />
+            <Route path="/active" />
+            <Route path="/completed" />
+            <Redirect from="/" to="/all" />
+          </Route>
+        </Router>
+      </Provider>
+    </script>
   </div>
   <script src="../vendor/react.min.js"></script>
   <script src="../vendor/react-dom.min.js"></script>
@@ -33,18 +35,18 @@
   <script src="../vendor/react-redux.js"></script>
   <script src="../vendor/react-router.js"></script>
   <script src="../vendor/react-router-redux.js"></script>
+  <script src="njConfig.js"></script>
   <script src="actions/actions.js"></script>
   <script src="reducers/reducers.js"></script>
-  <script src="templates/templateFilters.js"></script>
-  <script src="templates/AddTodoTmpl.js"></script>
+  <script src="components/AddTodo.tmpl.js"></script>
   <script src="components/AddTodo.js"></script>
-  <script src="templates/FooterTmpl.js"></script>
+  <script src="components/Footer.tmpl.js"></script>
   <script src="components/Footer.js"></script>
-  <script src="templates/TodoTmpl.js"></script>
+  <script src="components/Todo.tmpl.js"></script>
   <script src="components/Todo.js"></script>
-  <script src="templates/TodoListTmpl.js"></script>
+  <script src="components/TodoList.tmpl.js"></script>
   <script src="components/TodoList.js"></script>
-  <script src="templates/AppTmpl.js"></script>
+  <script src="containers/App.tmpl.js"></script>
   <script src="containers/App.js"></script>
   <script src="store/configureStore.js"></script>
   <script src="index.js"></script>

@@ -648,7 +648,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 	//获取全部内联组件
-	function getInlineComponents(selector, isAuto) {
+	function getTagComponents(selector, isAuto) {
 	  if (!selector) {
 	    selector = 'script[type="text/nornj"]' + (isAuto ? '[autorender]' : '');
 	  }
@@ -683,7 +683,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  addTmpl: addTmpl,
 	  isParamsExpr: isParamsExpr,
 	  addParamsExpr: addParamsExpr,
-	  getInlineComponents: getInlineComponents,
+	  getTagComponents: getTagComponents,
 	  removeChildNode: removeChildNode
 	};
 
@@ -969,7 +969,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	//构建可运行的模板函数
 	function tmplWrap(configs, main) {
-	  return function (data) {
+	  return function () {
 	    var args = arguments,
 	      len = args.length,
 	      data;
@@ -987,7 +987,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }
 	    }
 
-	    return main(configs, { data: data, parent: this ? this.parent : null }, { multiData: nj.isArray(data) });
+	    return main(configs, { data: data, parent: this && this._njParent ? this._njParent : null }, { multiData: nj.isArray(data) });
 	  };
 	}
 
@@ -1885,7 +1885,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	//渲染内联标签组件
 	function renderTagComponent(data, selector, isAuto) {
-	  var tags = utils.getInlineComponents(selector, isAuto),
+	  var tags = utils.getTagComponents(selector, isAuto),
 	    ret = [];
 
 	  utils.each(tags, function (tag) {
@@ -2150,7 +2150,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	          + (strI !== '' ? ' + \'' + strI + '\'' : '');
 	      }
 	      else if (obj.isTmplPlace) {  //执行tmpl块模板函数
-	        dataValueStr += '.call({ parent: parent }, data)';
+	        dataValueStr += '.call({ _njParent: parent }, data)';
 	      }
 
 	      valueStr += dataValueStr;
