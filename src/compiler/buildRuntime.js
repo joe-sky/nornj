@@ -359,7 +359,7 @@ function _buildNode(node, fns, counter, retType) {
     //渲染
     fnStr += _buildRender(2, retType, {
       _expr: _exprC,
-      _dataRefer: _dataReferC,
+      _dataRefer: dataReferStr !== '' ? _dataReferC : 'none',
       _this: _thisC
     }, fns);
   }
@@ -541,7 +541,7 @@ function _buildRender(nodeType, retType, params, fns) {
       retStr = params.text;
       break;
     case 2:  //块表达式
-      retStr = '_expr' + params._expr + '.apply(_this' + params._this + ', _dataRefer' + params._dataRefer + ')';
+      retStr = '_expr' + params._expr + '.apply(_this' + params._this + (params._dataRefer !== 'none' ? ', _dataRefer' + params._dataRefer : '') + ')';
       break;
     case 3:  //元素节点
       if (!useString) {
