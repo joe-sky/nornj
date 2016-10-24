@@ -160,7 +160,7 @@ function _buildPropData(obj, counter, fns, noEscape) {
         filterStr += '  _thisF' + _thisFC + '.useString = p1.useString;\n';
       }
       if (noConfig || configF.data) {
-        filterStr += '  _thisF' + _thisFC + '.data = data;\n';
+        filterStr += '  _thisF' + _thisFC + '.data = parent.data;\n';
       }
       if (noConfig || configF.parent) {
         filterStr += '  _thisF' + _thisFC + '.parent = parent.parent;\n';
@@ -323,7 +323,7 @@ function _buildNode(node, fns, counter, retType) {
     var _thisC = counter._this++,
       configE = exprConfig[node.expr],
       noConfig = !configE,
-      newContext = configE.newContext,
+      newContext = configE ? configE.newContext : false,
       newContextP = counter.newContext;
 
     fnStr += '\nvar _this' + _thisC + ' = p1.lightObj();\n';
@@ -331,7 +331,7 @@ function _buildNode(node, fns, counter, retType) {
       fnStr += '_this' + _thisC + '.useString = p1.useString;\n';
     }
     if (noConfig || configE.data) {
-      fnStr += '_this' + _thisC + '.data = data;\n';
+      fnStr += '_this' + _thisC + '.data = parent.data;\n';
     }
     if (noConfig || configE.parent) {
       fnStr += '_this' + _thisC + '.parent = parent.parent;\n';

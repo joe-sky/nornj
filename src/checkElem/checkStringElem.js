@@ -301,7 +301,7 @@ function _setTmplProps(tmpl, key) {
     return nj.compile(this, this.njKey).apply(null, arguments);
   };
 
-  tmpl.renderComp = function () {
+  tmpl.renderComponent = function () {
     return nj.compileComponent(this, this.njKey).apply(null, arguments);
   };
 }

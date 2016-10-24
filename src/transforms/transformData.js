@@ -116,12 +116,7 @@ function tmplWrap(configs, main) {
       }
     }
 
-    var ret = main(configs, { data: data, parent: this ? this.parent : null }, { multiData: nj.isArray(data) });
-    if (!configs.useString && tools.isArray(ret)) {  //组件最外层必须是单一节点对象
-      ret = ret[0];
-    }
-
-    return ret;
+    return main(configs, { data: data, parent: this ? this.parent : null }, { multiData: nj.isArray(data) });
   };
 }
 

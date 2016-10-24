@@ -80,7 +80,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  //Init tag template
 	  docReady(function () {
 	    if (nj.componentLib) {
-	      nj.renderInlineComp(nj.initRenderData, null, true);
+	      nj.renderTagComponent(nj.initTagData, null, true);
 	    }
 	  });
 	}
@@ -987,12 +987,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }
 	    }
 
-	    var ret = main(configs, { data: data, parent: this ? this.parent : null }, { multiData: nj.isArray(data) });
-	    if (!configs.useString && tools.isArray(ret)) {  //组件最外层必须是单一节点对象
-	      ret = ret[0];
-	    }
-
-	    return ret;
+	    return main(configs, { data: data, parent: this ? this.parent : null }, { multiData: nj.isArray(data) });
 	  };
 	}
 
@@ -1026,6 +1021,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  tools.each(fns, function (v, k) {
 	    if (k.indexOf('main') === 0) {  //将每个主函数构建为可运行的模板函数
 	      configs[k] = tmplWrap(configs, v);
+	      configs['_' + k] = v;
 	    }
 	    else if (k.indexOf('fn') === 0) {  //块表达式函数
 	      configs[k] = v;
@@ -1426,9 +1422,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function _commonConfig(params) {
 	  var ret = {
-	    data: false,
-	    parent: false,
-	    index: false,
+	    data: true,
+	    parent: true,
+	    index: true,
 	    useString: true
 	  };
 
@@ -1439,18 +1435,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 	//Filter default config
-	var filterConfig = {
-	  prop: _commonConfig(),
-	  count: _commonConfig(),
-	  item: _commonConfig(),
-	  equal: _commonConfig(),
-	  lt: _commonConfig(),
-	  gt: _commonConfig(),
-	  add: _commonConfig(),
-	  int: _commonConfig(),
-	  float: _commonConfig(),
-	  bool: _commonConfig()
-	};
+	var _defaultConfig = { data: false, parent: false, index: false },
+	  filterConfig = {
+	    prop: _commonConfig(_defaultConfig),
+	    count: _commonConfig(_defaultConfig),
+	    item: _commonConfig(_defaultConfig),
+	    equal: _commonConfig(_defaultConfig),
+	    lt: _commonConfig(_defaultConfig),
+	    gt: _commonConfig(_defaultConfig),
+	    add: _commonConfig(_defaultConfig),
+	    int: _commonConfig(_defaultConfig),
+	    float: _commonConfig(_defaultConfig),
+	    bool: _commonConfig(_defaultConfig)
+	  };
 
 	//Register filter and also can batch add
 	function registerFilter(name, filter, options) {
@@ -1549,7 +1546,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	        else {
 	          ret.push(retI);
-	          //tools.listPush(ret, retI, true);
 	        }
 	      }, false, tools.isArray(refer));
 
@@ -1645,7 +1641,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    for (; start <= end; start++) {
 	      var retI = this.result({
-	        item: this.data[0],
+	        item: this.data,
 	        index: start
 	      });
 
@@ -1653,7 +1649,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        ret += retI;
 	      }
 	      else {
-	        tools.listPush(ret, retI, true);
+	        ret.push(retI);
 	      }
 	    }
 
@@ -1667,9 +1663,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function _commonConfig(params) {
 	  var ret = {
-	    data: false,
-	    parent: false,
-	    index: false,
+	    data: true,
+	    parent: true,
+	    index: true,
 	    useString: true,
 	    paramsExpr: false,
 	    result: true,
@@ -1684,16 +1680,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 	//Expression default config
-	var exprConfig = {
-	  'if': _commonConfig(),
-	  unless: _commonConfig(),
-	  each: _commonConfig({ newContext: true }),
-	  param: _commonConfig({ inverse: false, paramsExpr: true }),
-	  spreadparam: _commonConfig({ useString: false, result: false, inverse: false, paramsExpr: true }),
-	  equal: _commonConfig({ useString: false }),
-	  'for': _commonConfig({ newContext: true }),
-	  blank: _commonConfig({ useString: false, inverse: false })
-	};
+	var _defaultConfig = { data: false, parent: false, index: false },
+	  exprConfig = {
+	    'if': _commonConfig(_defaultConfig),
+	    unless: _commonConfig(_defaultConfig),
+	    each: _commonConfig(tools.assign({ newContext: true }, _defaultConfig)),
+	    param: _commonConfig(tools.assign({ inverse: false, paramsExpr: true }, _defaultConfig)),
+	    spreadparam: _commonConfig(tools.assign({ useString: false, result: false, inverse: false, paramsExpr: true }, _defaultConfig)),
+	    equal: _commonConfig(tools.assign({ useString: false }, _defaultConfig)),
+	    'for': _commonConfig(tools.assign({ newContext: true }, _defaultConfig, { data: true })),
+	    blank: _commonConfig(tools.assign({ useString: false, inverse: false }, _defaultConfig))
+	  };
 
 	//Expression alias
 	exprs.prop = exprs.p = exprs.param;
@@ -1887,7 +1884,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 	//渲染内联标签组件
-	function renderInlineComp(data, selector, isAuto) {
+	function renderTagComponent(data, selector, isAuto) {
 	  var tags = utils.getInlineComponents(selector, isAuto),
 	    ret = [];
 
@@ -1905,8 +1902,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 	//Set init data for inline component
-	function setInitRenderData(data) {
-	  nj.initRenderData = data;
+	function setInitTagData(data) {
+	  nj.initTagData = data;
 	};
 
 	//Precompile template
@@ -1920,9 +1917,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = {
 	  compile: compile,
 	  compileComponent: compileComponent,
-	  compileComp: compileComponent,
-	  renderInlineComp: renderInlineComp,
-	  setInitRenderData: setInitRenderData,
+	  renderTagComponent: renderTagComponent,
+	  setInitTagData: setInitTagData,
 	  precompile: precompile
 	};
 
@@ -2092,7 +2088,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        filterStr += '  _thisF' + _thisFC + '.useString = p1.useString;\n';
 	      }
 	      if (noConfig || configF.data) {
-	        filterStr += '  _thisF' + _thisFC + '.data = data;\n';
+	        filterStr += '  _thisF' + _thisFC + '.data = parent.data;\n';
 	      }
 	      if (noConfig || configF.parent) {
 	        filterStr += '  _thisF' + _thisFC + '.parent = parent.parent;\n';
@@ -2255,7 +2251,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var _thisC = counter._this++,
 	      configE = exprConfig[node.expr],
 	      noConfig = !configE,
-	      newContext = configE.newContext,
+	      newContext = configE ? configE.newContext : false,
 	      newContextP = counter.newContext;
 
 	    fnStr += '\nvar _this' + _thisC + ' = p1.lightObj();\n';
@@ -2263,7 +2259,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      fnStr += '_this' + _thisC + '.useString = p1.useString;\n';
 	    }
 	    if (noConfig || configE.data) {
-	      fnStr += '_this' + _thisC + '.data = data;\n';
+	      fnStr += '_this' + _thisC + '.data = parent.data;\n';
 	    }
 	    if (noConfig || configE.parent) {
 	      fnStr += '_this' + _thisC + '.parent = parent.parent;\n';
@@ -2670,9 +2666,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    //Text before tag
 	    if (textBefore && textBefore !== '\n') {
-	      if (/\s/.test(textBefore[textBefore.length - 1])) {
-	        textBefore = _formatText(textBefore);
-	      }
+	      textBefore = _formatText(textBefore);
 	      _setText(textBefore, current.elem, params);
 	    }
 
@@ -2701,9 +2695,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    //Text after tag
 	    if (textAfter && textAfter !== '\n') {
-	      if (/\s/.test(textAfter[0])) {
-	        textAfter = _formatText(textAfter);
-	      }
+	      textAfter = _formatText(textAfter);
 	      _setText(textAfter, current.elem, params);
 	    }
 	  }
@@ -2867,7 +2859,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return nj.compile(this, this.njKey).apply(null, arguments);
 	  };
 
-	  tmpl.renderComp = function () {
+	  tmpl.renderComponent = function () {
 	    return nj.compileComponent(this, this.njKey).apply(null, arguments);
 	  };
 	}

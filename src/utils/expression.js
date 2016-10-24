@@ -58,7 +58,6 @@ var exprs = {
         }
         else {
           ret.push(retI);
-          //tools.listPush(ret, retI, true);
         }
       }, false, tools.isArray(refer));
 
@@ -154,7 +153,7 @@ var exprs = {
 
     for (; start <= end; start++) {
       var retI = this.result({
-        item: this.data[0],
+        item: this.data,
         index: start
       });
 
@@ -162,7 +161,7 @@ var exprs = {
         ret += retI;
       }
       else {
-        tools.listPush(ret, retI, true);
+        ret.push(retI);
       }
     }
 
@@ -176,9 +175,9 @@ var exprs = {
 
 function _commonConfig(params) {
   var ret = {
-    data: false,
-    parent: false,
-    index: false,
+    data: true,
+    parent: true,
+    index: true,
     useString: true,
     paramsExpr: false,
     result: true,
@@ -193,16 +192,17 @@ function _commonConfig(params) {
 }
 
 //Expression default config
-var exprConfig = {
-  'if': _commonConfig(),
-  unless: _commonConfig(),
-  each: _commonConfig({ newContext: true }),
-  param: _commonConfig({ inverse: false, paramsExpr: true }),
-  spreadparam: _commonConfig({ useString: false, result: false, inverse: false, paramsExpr: true }),
-  equal: _commonConfig({ useString: false }),
-  'for': _commonConfig({ newContext: true }),
-  blank: _commonConfig({ useString: false, inverse: false })
-};
+var _defaultConfig = { data: false, parent: false, index: false },
+  exprConfig = {
+    'if': _commonConfig(_defaultConfig),
+    unless: _commonConfig(_defaultConfig),
+    each: _commonConfig(tools.assign({ newContext: true }, _defaultConfig)),
+    param: _commonConfig(tools.assign({ inverse: false, paramsExpr: true }, _defaultConfig)),
+    spreadparam: _commonConfig(tools.assign({ useString: false, result: false, inverse: false, paramsExpr: true }, _defaultConfig)),
+    equal: _commonConfig(tools.assign({ useString: false }, _defaultConfig)),
+    'for': _commonConfig(tools.assign({ newContext: true }, _defaultConfig, { data: true })),
+    blank: _commonConfig(tools.assign({ useString: false, inverse: false }, _defaultConfig))
+  };
 
 //Expression alias
 exprs.prop = exprs.p = exprs.param;

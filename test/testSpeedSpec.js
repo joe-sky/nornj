@@ -151,7 +151,7 @@ describe('test speed', function () {
 
     nj.registerComponent('TestComp', React.createClass({
       render: function () {
-        return T`<div><#each {arr}>{!#../text}</#each></div>`.renderComp({
+        return T`<div><#each {arr}>{!#../text}</#each></div>`.renderComponent({
           text: this.props.tmpls['t2'],
           arr: _.times(2, function (n) {
             return n;

@@ -78,7 +78,7 @@ function compileComponent(obj, tmplName) {
 }
 
 //渲染内联标签组件
-function renderInlineComp(data, selector, isAuto) {
+function renderTagComponent(data, selector, isAuto) {
   var tags = utils.getInlineComponents(selector, isAuto),
     ret = [];
 
@@ -96,8 +96,8 @@ function renderInlineComp(data, selector, isAuto) {
 }
 
 //Set init data for inline component
-function setInitRenderData(data) {
-  nj.initRenderData = data;
+function setInitTagData(data) {
+  nj.initTagData = data;
 };
 
 //Precompile template
@@ -111,8 +111,7 @@ function precompile(obj, isComponent) {
 module.exports = {
   compile: compile,
   compileComponent: compileComponent,
-  compileComp: compileComponent,
-  renderInlineComp: renderInlineComp,
-  setInitRenderData: setInitRenderData,
+  renderTagComponent: renderTagComponent,
+  setInitTagData: setInitTagData,
   precompile: precompile
 };

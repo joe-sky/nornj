@@ -24,7 +24,7 @@ if (typeof self !== 'undefined') {
   //Init tag template
   docReady(function () {
     if (nj.componentLib) {
-      nj.renderInlineComp(nj.initRenderData, null, true);
+      nj.renderTagComponent(nj.initTagData, null, true);
     }
   });
 }

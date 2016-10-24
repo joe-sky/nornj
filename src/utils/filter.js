@@ -88,9 +88,9 @@ var filters = {
 
 function _commonConfig(params) {
   var ret = {
-    data: false,
-    parent: false,
-    index: false,
+    data: true,
+    parent: true,
+    index: true,
     useString: true
   };
 
@@ -101,18 +101,19 @@ function _commonConfig(params) {
 }
 
 //Filter default config
-var filterConfig = {
-  prop: _commonConfig(),
-  count: _commonConfig(),
-  item: _commonConfig(),
-  equal: _commonConfig(),
-  lt: _commonConfig(),
-  gt: _commonConfig(),
-  add: _commonConfig(),
-  int: _commonConfig(),
-  float: _commonConfig(),
-  bool: _commonConfig()
-};
+var _defaultConfig = { data: false, parent: false, index: false },
+  filterConfig = {
+    prop: _commonConfig(_defaultConfig),
+    count: _commonConfig(_defaultConfig),
+    item: _commonConfig(_defaultConfig),
+    equal: _commonConfig(_defaultConfig),
+    lt: _commonConfig(_defaultConfig),
+    gt: _commonConfig(_defaultConfig),
+    add: _commonConfig(_defaultConfig),
+    int: _commonConfig(_defaultConfig),
+    float: _commonConfig(_defaultConfig),
+    bool: _commonConfig(_defaultConfig)
+  };
 
 //Register filter and also can batch add
 function registerFilter(name, filter, options) {
