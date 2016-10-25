@@ -89,19 +89,19 @@ var exprs = {
 
     //If the value length greater than 1, it need to be connected to a whole string.
     if (ret != null) {
-      if (ret.length > 1) {
-        value = '';
-        tools.each(ret, function (item) {
-          value += item;
-        }, false, true);
-      }
-      else {
-        value = ret[0];
+      if (!tools.isArray(ret)) {
+        value = ret;
 
         //The "_njShim" property is used to distinguish whether the incoming is an normal array.
         if (value && value._njShim) {
           value = value._njShim;
         }
+      }
+      else {
+        value = '';
+        tools.each(ret, function (item) {
+          value += item;
+        }, false, true);
       }
     }
     else {  //Match to Similar to "checked" or "disabled" attribute.
