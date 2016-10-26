@@ -923,13 +923,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 	//获取each块中的item参数
-	function getItemParam(item, data, isArr) {
-	  var ret = item;
+	function getNewData(item, data, isArr, addData) {
+	  var ret = item,
+	    isAdd = addData != null;
+
 	  if (isArr == null) {
 	    isArr = tools.isArray(data);
 	  }
-	  if (isArr) {
-	    ret = tools.listPush([item], data.slice(1));
+	  if (isArr || isAdd) {
+	    ret = tools.listPush([item], !isAdd ? data.slice(1) : (isArr ? data : [data]));
 	  }
 
 	  return ret;
@@ -1002,7 +1004,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    lightObj: nj.lightObj,
 	    throwIf: nj.throwIf,
 	    warn: nj.warn,
-	    getItemParam: nj.getItemParam,
+	    getNewData: nj.getNewData,
 	    styleProps: nj.styleProps,
 	    exprRet: nj.exprRet
 	  };
@@ -1032,7 +1034,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 	module.exports = {
-	  getItemParam: getItemParam,
+	  getNewData: getNewData,
 	  getDatasValue: getDatasValue,
 	  fixPropName: fixPropName,
 	  styleProps: styleProps,
@@ -1538,7 +1540,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	      tools.each(refer, function (item, index) {
 	        var retI = thiz.result({
 	          item: item,
-	          index: index
+	          index: index,
+	          fallback: true
 	        });
 
 	        if (useString) {
@@ -1641,7 +1644,6 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    for (; start <= end; start++) {
 	      var retI = this.result({
-	        item: this.data,
 	        index: start
 	      });
 
@@ -1969,29 +1971,35 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 
 	  if (main) {
-	    fnStr += 'var parent = p2.parent;\n';
-	    fnStr += 'var data = p2.data;\n';
+	    fnStr += _buildVar();
 	    fnStr += 'if(!parent) {\n';
 	    fnStr += '  parent = p1.lightObj();\n';
 	    fnStr += '  if (data) {\n';
-	    fnStr += '    parent.data = p3.multiData ? data[0] : data;\n';
+	    fnStr += '    parent.data = multiData ? data[0] : data;\n';
 	    fnStr += '  }\n';
 	    fnStr += '  p2.parent = parent;\n';
 	    fnStr += '};\n';
 	  }
 	  else if (newContext) {
-	    fnStr += 'var parent = p1.lightObj();\n';
-	    fnStr += 'parent.data = p4.item;\n';
-	    fnStr += 'parent.parent = p2.parent;\n';
-	    fnStr += 'parent.index = p4.index;\n';
-	    fnStr += 'var data = p1.getItemParam(p4.item, p2.data, p3.multiData);\n';
+	    fnStr += 'var parent = p1.lightObj(),\n';
+	    fnStr += '  _parent = p2.parent,\n';
+	    fnStr += '  multiData = p3.multiData,\n';
+	    fnStr += '  hasItem = \'item\' in p4;\n';
+	    fnStr += 'parent.data = hasItem ? p4.item : _parent.data;\n';
+	    fnStr += 'parent.parent = p4.fallback ? _parent : _parent.parent;\n';
+	    fnStr += 'parent.index = \'index\' in p4 ? p4.index : _parent.index;\n';
+	    fnStr += 'var data;\n';
+	    fnStr += 'if(hasItem) data = p1.getNewData(p4.item, p2.data, multiData, p4.addData);\n';
+	    fnStr += 'else data = p2.data;\n';
 	    fnStr += 'var _p2 = p1.lightObj();\n';
 	    fnStr += '_p2.parent = parent;\n';
 	    fnStr += '_p2.data = data;\n';
+	    fnStr += 'var _p3 = p1.lightObj();\n';
+	    fnStr += 'if(p4.addData) multiData = true;\n';
+	    fnStr += '_p3.multiData = multiData;\n';
 	  }
 	  else {
-	    fnStr += 'var parent = p2.parent;\n';
-	    fnStr += 'var data = p2.data;\n';
+	    fnStr += _buildVar();
 	  }
 
 	  if (retType === '2') {
@@ -2010,14 +2018,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 
 	  /* 构建表达式块函数
-	   p1: 全局模板成员,不可改变
-	   p2: 当前模板的局部成员
-	   p3: 当前模板的全局成员
+	   p1: 全局模板配置信息,不可改变
+	   p2: 当前模板数据信息
+	   p3: 当前模板配置信息
 	   p4: 表格式块内调用result及inverse方法传递的参数
 	   p5: #param块变量
 	  */
 	  fns[main ? 'main' + (isTmplExpr ? no : '') : 'fn' + no] = new Function('p1', 'p2', 'p3', 'p4', 'p5', fnStr);
 	  return no;
+	}
+
+	function _buildVar() {
+	  return ('var parent = p2.parent,\n'
+	    + '  data = p2.data,\n'
+	    + '  multiData = p3.multiData;\n');
 	}
 
 	function _buildPropData(obj, counter, fns, noEscape) {
@@ -2056,7 +2070,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 
 	    if (!special) {
-	      dataValueStr = '(!p3.multiData ? data[\'' + name + '\'] : p1.getDatasValue(data, \'' + name + '\'))';
+	      dataValueStr = '(!multiData ? data[\'' + name + '\'] : p1.getDatasValue(data, \'' + name + '\'))';
 	    }
 	    else {
 	      dataValueStr = data;
@@ -2278,10 +2292,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 
 	    if (noConfig || configE.result) {
-	      fnStr += '_this' + _thisC + '.result = ' + (node.content ? 'p1.exprRet(p1, ' + (newContextP ? '_' : '') + 'p2, p3, p1.fn' + _buildFn(node.content, fns, ++fns._no, newContext) + ', ' + paramsEStr + ')' : 'p1.noop') + ';\n';
+	      fnStr += '_this' + _thisC + '.result = ' + (node.content ? 'p1.exprRet(p1, ' + (newContextP ? '_' : '') + 'p2, ' + (newContextP ? '_' : '') + 'p3, p1.fn' + _buildFn(node.content, fns, ++fns._no, newContext) + ', ' + paramsEStr + ')' : 'p1.noop') + ';\n';
 	    }
 	    if (noConfig || configE.inverse) {
-	      fnStr += '_this' + _thisC + '.inverse = ' + (node.contentElse ? 'p1.exprRet(p1, ' + (newContextP ? '_' : '') + 'p2, p3, p1.fn' + _buildFn(node.contentElse, fns, ++fns._no, newContext) + ', ' + paramsEStr + ')' : 'p1.noop') + ';\n';
+	      fnStr += '_this' + _thisC + '.inverse = ' + (node.contentElse ? 'p1.exprRet(p1, ' + (newContextP ? '_' : '') + 'p2, ' + (newContextP ? '_' : '') + 'p3, p1.fn' + _buildFn(node.contentElse, fns, ++fns._no, newContext) + ', ' + paramsEStr + ')' : 'p1.noop') + ';\n';
 	    }
 
 	    //渲染

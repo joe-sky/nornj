@@ -52,13 +52,15 @@ function getDatasValue(datas, prop) {
 }
 
 //获取each块中的item参数
-function getItemParam(item, data, isArr) {
-  var ret = item;
+function getNewData(item, data, isArr, addData) {
+  var ret = item,
+    isAdd = addData != null;
+
   if (isArr == null) {
     isArr = tools.isArray(data);
   }
-  if (isArr) {
-    ret = tools.listPush([item], data.slice(1));
+  if (isArr || isAdd) {
+    ret = tools.listPush([item], !isAdd ? data.slice(1) : (isArr ? data : [data]));
   }
 
   return ret;
@@ -131,7 +133,7 @@ function template(fns) {
     lightObj: nj.lightObj,
     throwIf: nj.throwIf,
     warn: nj.warn,
-    getItemParam: nj.getItemParam,
+    getNewData: nj.getNewData,
     styleProps: nj.styleProps,
     exprRet: nj.exprRet
   };
@@ -161,7 +163,7 @@ function template(fns) {
 }
 
 module.exports = {
-  getItemParam: getItemParam,
+  getNewData: getNewData,
   getDatasValue: getDatasValue,
   fixPropName: fixPropName,
   styleProps: styleProps,

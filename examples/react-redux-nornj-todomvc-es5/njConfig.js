@@ -1,4 +1,4 @@
-﻿nj.setComponentEngine('react', React, ReactDOM);
+﻿nj.setTmplRule(null, null, '$');
 nj.registerComponent({
   Provider: ReactRedux.Provider,
   Router: ReactRouter.Router,

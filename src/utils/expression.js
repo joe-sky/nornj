@@ -50,7 +50,8 @@ var exprs = {
       tools.each(refer, function (item, index) {
         var retI = thiz.result({
           item: item,
-          index: index
+          index: index,
+          fallback: true
         });
 
         if (useString) {
@@ -153,7 +154,6 @@ var exprs = {
 
     for (; start <= end; start++) {
       var retI = this.result({
-        item: this.data,
         index: start
       });
 
