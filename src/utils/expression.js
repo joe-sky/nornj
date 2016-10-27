@@ -60,7 +60,7 @@ var exprs = {
         else {
           ret.push(retI);
         }
-      }, false, tools.isArray(refer));
+      }, false, tools.isArrayLike(refer));
 
       //Return null when not use string and result is empty.
       if (!useString && !ret.length) {
