@@ -6,7 +6,15 @@ import precompiler from '../../precompiler';
 precompiler({
   source: __dirname + '/**/*.nj.js',
   options: { ignore: __dirname + '/node_modules/' },
-  extension: '.nj.js'
+  extension: '.nj.js',
+  filterConfig: {
+    isCurrent: {
+      data: false,
+      parent: true,
+      index: false,
+      useString: false
+    }
+  }
 });
 
 export default {

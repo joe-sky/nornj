@@ -38,6 +38,28 @@ module.exports = function (param) {
   //Set template rules
   nj.setTmplRule(beginRule, endRule, exprRule);
 
+  //Set configs for expressions and filters
+  if(param.exprConfig) {
+    var exprConfig = {};
+    nj.each(param.exprConfig, function(v, k) {
+      exprConfig[k] = {
+        options: v
+      };
+    });
+
+    nj.registerExpr(exprConfig);
+  }
+  if(param.filterConfig) {
+    var filterConfig = {};
+    nj.each(param.filterConfig, function(v, k) {
+      filterConfig[k] = {
+        options: v
+      };
+    });
+
+    nj.registerFilter(filterConfig);
+  }
+
   var needTransformFiles = [];
   sources.forEach(function (source) {
     glob.sync(source, param.options).forEach(function (file) {

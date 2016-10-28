@@ -1463,18 +1463,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 
 	  tools.each(params, function (v, k) {
-	    var name = k.toLowerCase(),
-	      options;
+	    var name = k.toLowerCase();
+	    if (v) {
+	      var filter = v.filter,
+	        options = v.options;
 
-	    if (v && v.filter) {
-	      filters[name] = v.filter;
-	      options = v.options;
+	      if (filter || options) {
+	        if (filter) {
+	          filters[name] = filter;
+	        }
+	        if (options) {
+	          filterConfig[name] = _commonConfig(options);
+	        }
+	      }
+	      else {
+	        filters[name] = v;
+	      }
 	    }
-	    else {
-	      filters[name] = v;
-	    }
-
-	    filterConfig[name] = _commonConfig(options);
 	  }, false, false);
 	}
 
@@ -1712,18 +1717,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 
 	  tools.each(params, function (v, k) {
-	    var name = k.toLowerCase(),
-	      options;
+	    var name = k.toLowerCase();
+	    if (v) {
+	      var expr = v.expr,
+	        options = v.options;
 
-	    if (v && v.expr) {
-	      exprs[name] = v.expr;
-	      options = v.options;
+	      if (expr || options) {
+	        if(expr) {
+	          exprs[name] = expr;
+	        }
+	        if(options) {
+	          exprConfig[name] = _commonConfig(options);
+	        }
+	      }
+	      else {
+	        exprs[name] = v;
+	      }
 	    }
-	    else {
-	      exprs[name] = v;
-	    }
-
-	    exprConfig[name] = _commonConfig(options);
 	  }, false, false);
 	}
 

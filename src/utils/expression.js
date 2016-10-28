@@ -222,18 +222,23 @@ function registerExpr(name, expr, options) {
   }
 
   tools.each(params, function (v, k) {
-    var name = k.toLowerCase(),
-      options;
+    var name = k.toLowerCase();
+    if (v) {
+      var expr = v.expr,
+        options = v.options;
 
-    if (v && v.expr) {
-      exprs[name] = v.expr;
-      options = v.options;
+      if (expr || options) {
+        if(expr) {
+          exprs[name] = expr;
+        }
+        if(options) {
+          exprConfig[name] = _commonConfig(options);
+        }
+      }
+      else {
+        exprs[name] = v;
+      }
     }
-    else {
-      exprs[name] = v;
-    }
-
-    exprConfig[name] = _commonConfig(options);
   }, false, false);
 }
 
