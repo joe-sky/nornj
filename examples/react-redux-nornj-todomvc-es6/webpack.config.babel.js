@@ -10,7 +10,6 @@ precompiler({
   filterConfig: {
     isCurrent: {
       data: false,
-      parent: true,
       index: false,
       useString: false
     }
