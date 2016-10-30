@@ -200,7 +200,7 @@ describe('test speed', function () {
       }
     });
 
-    var list2 = _.times(50, function (n) {
+    var list2 = _.times(100, function (n) {
       return { no: n + 1 };
     });
 
@@ -258,7 +258,7 @@ describe('test speed', function () {
       }
     });
 
-    var list2 = _.times(50, function (n) {
+    var list2 = _.times(100, function (n) {
       return { no: n + 1 };
     });
 
@@ -279,7 +279,7 @@ describe('test speed', function () {
     var data = {
       div: 'div',
       num: 100,
-      arr: _.times(500, function (n) {
+      arr: _.times(200, function (n) {
         return n;
       }),
       list2: _.times(100, function (n) {
@@ -299,7 +299,7 @@ describe('test speed', function () {
     var data = {
       div: 'div',
       num: 100,
-      arr: _.times(500, function (n) {
+      arr: _.times(200, function (n) {
         return n;
       }),
       list2: _.times(100, function (n) {
