@@ -150,7 +150,7 @@ function _clearNotesAndBlank(str) {
 }
 
 function _formatText(str) {
-  return str.replace(/\n/g, '').trim();
+  return str.replace(/\n/g, '\\n').trim();
 }
 
 //Merge parameters to string
