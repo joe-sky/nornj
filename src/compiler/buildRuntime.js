@@ -502,9 +502,9 @@ function _buildNode(node, fns, counter, retType, level) {
         if (filterStr !== '') {
           paramsStr = filterStr + paramsStr;
         }
-
-        fnStr += paramsStr;
       }
+
+      fnStr += paramsStr;
     }
 
     var _compParamC, _childrenC;
