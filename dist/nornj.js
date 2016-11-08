@@ -2433,7 +2433,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	          }
 
 	          var key = k,
-	            onlyKey = key === utils.clearQuot(valueStr);
+	            onlyKey = ('\'' + key + '\'') === valueStr;
 	          if (!useString) {
 	            key = utils.fixPropName(k);
 	          }

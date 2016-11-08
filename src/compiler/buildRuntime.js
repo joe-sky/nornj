@@ -471,7 +471,7 @@ function _buildNode(node, fns, counter, retType, level) {
           }
 
           var key = k,
-            onlyKey = key === utils.clearQuot(valueStr);
+            onlyKey = ('\'' + key + '\'') === valueStr;
           if (!useString) {
             key = utils.fixPropName(k);
           }
