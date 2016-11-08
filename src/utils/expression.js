@@ -106,7 +106,7 @@ var exprs = {
       }
     }
     else {  //Match to Similar to "checked" or "disabled" attribute.
-      value = name;
+      value = !this.useString ? true : name;
     }
 
     this.paramsExpr[name] = value;

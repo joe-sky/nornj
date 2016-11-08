@@ -38,7 +38,7 @@ module.exports = function (beginRule, endRule, exprRule) {
   var allRules = _clearRepeat(beginRule + endRule),
     firstChar = beginRule[0],
     otherChars = allRules.substr(1),
-    exprRules = _clearRepeat(exprRule),
+    exprRules = _clearRepeat(exprRule + '#\$'),
     escapeExprRule = exprRule.replace(/\$/g, '\\$');
 
   //Reset the regexs to global list
@@ -46,8 +46,8 @@ module.exports = function (beginRule, endRule, exprRule) {
     beginRule: beginRule,
     endRule: endRule,
     exprRule: exprRule,
-    xmlOpenTag: _createRegExp('^<([a-z' + firstChar + '][-a-z0-9_:.\/' + otherChars + ']*)[^>]*>$', 'i'),
-    openTag: _createRegExp('^[a-z' + firstChar + '][-a-z0-9_:.\/' + otherChars + ']*', 'i'),
+    xmlOpenTag: _createRegExp('^<([a-z' + firstChar + exprRules + '][-a-z0-9_:.\/' + otherChars + ']*)[^>]*>$', 'i'),
+    openTag: _createRegExp('^[a-z' + firstChar + exprRules + '][-a-z0-9_:.\/' + otherChars + ']*', 'i'),
     insideBraceParam: _createRegExp(beginRule + '([^' + allRules + ']+)' + endRule, 'i'),
     replaceBraceParam: function() {
       return _createRegExp('[\\s]+(' + beginRule + '){1,2}([^' + allRules + ']+)(' + endRule + '){1,2}', 'g')

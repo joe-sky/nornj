@@ -470,27 +470,25 @@ function _buildNode(node, fns, counter, retType, level) {
             valueStr = 'p1.styleProps(' + valueStr + ')';
           }
 
-          var key;
-          if (useString) {
-            key = k;
-          }
-          else {
+          var key = k,
+            onlyKey = key === utils.clearQuot(valueStr);
+          if (!useString) {
             key = utils.fixPropName(k);
           }
           if (!paramsExpr) {
             if (!useString) {
-              paramsStr += '  ' + key + ': ' + valueStr + (i < len - 1 ? ',\n' : '');
+              paramsStr += '  ' + key + ': ' + (!onlyKey ? valueStr : 'true') + (i < len - 1 ? ',\n' : '');
             }
             else {
-              paramsStr += (i > 0 ? '  + ' : '') + '\' ' + key + '="\' + ' + valueStr + ' + \'"\'' + (i == len - 1 ? ';' : '') + '\n';
+              paramsStr += (i > 0 ? '  + ' : '') + '\' ' + key + (!onlyKey ? '="\' + ' + valueStr + ' + \'"\'' : ' \'') + (i == len - 1 ? ';' : '') + '\n';
             }
           }
           else {
             if (!useString) {
-              paramsStr += '_params' + _paramsC + '.' + key + ' = ' + valueStr + ';\n';
+              paramsStr += '_params' + _paramsC + '.' + key + ' = ' + (!onlyKey ? valueStr : 'true') + ';\n';
             }
             else {
-              paramsStr += '_params' + _paramsC + ' += \' ' + key + '="\' + ' + valueStr + ' + \'"\';\n';
+              paramsStr += '_params' + _paramsC + ' += \' ' + key + (!onlyKey ? '="\' + ' + valueStr + ' + \'"\'' : ' \'') + ';\n';
             }
           }
         }, false, false);

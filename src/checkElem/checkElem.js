@@ -35,29 +35,30 @@ function checkElem(obj, parent) {
       refer;
 
     //判断是否为xml标签
-    var xmlOpenTag = tranElem.getXmlOpenTag(first),
+    var xmlOpenTag,
       openTagName,
       hasCloseTag = false,
       isTmpl, isParamsExpr;
-
-    if (xmlOpenTag) {  //tagname为xml标签时,则认为是元素节点
-      openTagName = xmlOpenTag[1];
-
-      if (!tranElem.isXmlSelfCloseTag(first)) {  //非自闭合标签才验证是否存在关闭标签
-        hasCloseTag = tranElem.isXmlCloseTag(last, openTagName);
+    
+    control = tranElem.isControl(first);
+    if (!control) {
+      xmlOpenTag = tranElem.getXmlOpenTag(first);
+      if (xmlOpenTag) {  //tagname为xml标签时,则认为是元素节点
+        openTagName = xmlOpenTag[1];
+        
+        if (!tranElem.isXmlSelfCloseTag(first)) {  //非自闭合标签才验证是否存在关闭标签
+          hasCloseTag = tranElem.isXmlCloseTag(last, openTagName);
+        }
+        else {  //自闭合标签
+          node.selfCloseTag = true;
+        }
+        isElemNode = true;
       }
-      else {  //自闭合标签
-        node.selfCloseTag = true;
-      }
-      isElemNode = true;
-    }
-    else {
-      control = tranElem.isControl(first);
-      if (!control) {  //tagname不为xml标签时,必须有结束标签才认为是元素节点
+      else {  //tagname不为xml标签时,必须有结束标签才认为是元素节点
         var openTag = tranElem.getOpenTag(first);
         if (openTag) {
           openTagName = openTag[0];
-
+          
           if (!tranElem.isSelfCloseTag(first)) {  //非自闭合标签
             hasCloseTag = tranElem.isCloseTag(last, openTagName);
             if (hasCloseTag) {
@@ -70,23 +71,23 @@ function checkElem(obj, parent) {
           }
         }
       }
-      else {  //为特殊节点,也可视为一个元素节点
-        var ctrl = control[0].toLowerCase();
-        refer = control[1];
-        isTmpl = tranElem.isTmpl(ctrl);
-        isParamsExpr = tranElem.isParamsExpr(ctrl);
+    }
+    else {  //为特殊节点,也可视为一个元素节点
+      var ctrl = control[0].toLowerCase();
+      refer = control[1];
+      isTmpl = tranElem.isTmpl(ctrl);
+      isParamsExpr = tranElem.isParamsExpr(ctrl);
 
-        node.type = 'nj_expr';
-        node.expr = ctrl;
-        if (refer != null && !isTmpl) {
-          node.refer = tranParam.compiledParam(refer);
-        }
-
-        if (tranElem.isControlCloseTag(last, ctrl)) {  //判断是否有流程控制块闭合标签
-          hasCloseTag = true;
-        }
-        isElemNode = true;
+      node.type = 'nj_expr';
+      node.expr = ctrl;
+      if (refer != null && !isTmpl) {
+        node.refer = tranParam.compiledParam(refer);
       }
+
+      if (tranElem.isControlCloseTag(last, ctrl)) {  //判断是否有流程控制块闭合标签
+        hasCloseTag = true;
+      }
+      isElemNode = true;
     }
 
     if (isElemNode) {  //判断是否为元素节点

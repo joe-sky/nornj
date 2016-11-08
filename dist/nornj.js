@@ -510,7 +510,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	//Extract parameters inside the xml open tag
 	function getOpenTagParams(obj, noXml) {
-	  var pattern = /[\s]+([^\s={}>]+)(=(('[^']+')|("[^"]+")|([^"'\s]+)))?/g,
+	  var pattern = /[\s]+([^\s=>]+)(=(('[^']+')|("[^"]+")|([^"'\s]+)))?/g,
 	    matchArr, ret;
 
 	  while ((matchArr = pattern.exec(obj))) {
@@ -958,7 +958,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	  var ret = '';
 	  for (var k in paramsE) {
 	    if (!keys || !keys[k]) {
-	      ret += ' ' + k + '="' + paramsE[k] + '"';
+	      var v = paramsE[k];
+	      ret += ' ' + k + (k !== v ? '="' + v + '"' : ' ');
 	    }
 	  }
 	  return ret;
@@ -1116,29 +1117,30 @@ return /******/ (function(modules) { // webpackBootstrap
 	      refer;
 
 	    //判断是否为xml标签
-	    var xmlOpenTag = tranElem.getXmlOpenTag(first),
+	    var xmlOpenTag,
 	      openTagName,
 	      hasCloseTag = false,
 	      isTmpl, isParamsExpr;
-
-	    if (xmlOpenTag) {  //tagname为xml标签时,则认为是元素节点
-	      openTagName = xmlOpenTag[1];
-
-	      if (!tranElem.isXmlSelfCloseTag(first)) {  //非自闭合标签才验证是否存在关闭标签
-	        hasCloseTag = tranElem.isXmlCloseTag(last, openTagName);
+	    
+	    control = tranElem.isControl(first);
+	    if (!control) {
+	      xmlOpenTag = tranElem.getXmlOpenTag(first);
+	      if (xmlOpenTag) {  //tagname为xml标签时,则认为是元素节点
+	        openTagName = xmlOpenTag[1];
+	        
+	        if (!tranElem.isXmlSelfCloseTag(first)) {  //非自闭合标签才验证是否存在关闭标签
+	          hasCloseTag = tranElem.isXmlCloseTag(last, openTagName);
+	        }
+	        else {  //自闭合标签
+	          node.selfCloseTag = true;
+	        }
+	        isElemNode = true;
 	      }
-	      else {  //自闭合标签
-	        node.selfCloseTag = true;
-	      }
-	      isElemNode = true;
-	    }
-	    else {
-	      control = tranElem.isControl(first);
-	      if (!control) {  //tagname不为xml标签时,必须有结束标签才认为是元素节点
+	      else {  //tagname不为xml标签时,必须有结束标签才认为是元素节点
 	        var openTag = tranElem.getOpenTag(first);
 	        if (openTag) {
 	          openTagName = openTag[0];
-
+	          
 	          if (!tranElem.isSelfCloseTag(first)) {  //非自闭合标签
 	            hasCloseTag = tranElem.isCloseTag(last, openTagName);
 	            if (hasCloseTag) {
@@ -1151,23 +1153,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	          }
 	        }
 	      }
-	      else {  //为特殊节点,也可视为一个元素节点
-	        var ctrl = control[0].toLowerCase();
-	        refer = control[1];
-	        isTmpl = tranElem.isTmpl(ctrl);
-	        isParamsExpr = tranElem.isParamsExpr(ctrl);
+	    }
+	    else {  //为特殊节点,也可视为一个元素节点
+	      var ctrl = control[0].toLowerCase();
+	      refer = control[1];
+	      isTmpl = tranElem.isTmpl(ctrl);
+	      isParamsExpr = tranElem.isParamsExpr(ctrl);
 
-	        node.type = 'nj_expr';
-	        node.expr = ctrl;
-	        if (refer != null && !isTmpl) {
-	          node.refer = tranParam.compiledParam(refer);
-	        }
-
-	        if (tranElem.isControlCloseTag(last, ctrl)) {  //判断是否有流程控制块闭合标签
-	          hasCloseTag = true;
-	        }
-	        isElemNode = true;
+	      node.type = 'nj_expr';
+	      node.expr = ctrl;
+	      if (refer != null && !isTmpl) {
+	        node.refer = tranParam.compiledParam(refer);
 	      }
+
+	      if (tranElem.isControlCloseTag(last, ctrl)) {  //判断是否有流程控制块闭合标签
+	        hasCloseTag = true;
+	      }
+	      isElemNode = true;
 	    }
 
 	    if (isElemNode) {  //判断是否为元素节点
@@ -1603,7 +1605,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }
 	    }
 	    else {  //Match to Similar to "checked" or "disabled" attribute.
-	      value = name;
+	      value = !this.useString ? true : name;
 	    }
 
 	    this.paramsExpr[name] = value;
@@ -1789,7 +1791,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  var allRules = _clearRepeat(beginRule + endRule),
 	    firstChar = beginRule[0],
 	    otherChars = allRules.substr(1),
-	    exprRules = _clearRepeat(exprRule),
+	    exprRules = _clearRepeat(exprRule + '#\$'),
 	    escapeExprRule = exprRule.replace(/\$/g, '\\$');
 
 	  //Reset the regexs to global list
@@ -1797,8 +1799,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    beginRule: beginRule,
 	    endRule: endRule,
 	    exprRule: exprRule,
-	    xmlOpenTag: _createRegExp('^<([a-z' + firstChar + '][-a-z0-9_:.\/' + otherChars + ']*)[^>]*>$', 'i'),
-	    openTag: _createRegExp('^[a-z' + firstChar + '][-a-z0-9_:.\/' + otherChars + ']*', 'i'),
+	    xmlOpenTag: _createRegExp('^<([a-z' + firstChar + exprRules + '][-a-z0-9_:.\/' + otherChars + ']*)[^>]*>$', 'i'),
+	    openTag: _createRegExp('^[a-z' + firstChar + exprRules + '][-a-z0-9_:.\/' + otherChars + ']*', 'i'),
 	    insideBraceParam: _createRegExp(beginRule + '([^' + allRules + ']+)' + endRule, 'i'),
 	    replaceBraceParam: function() {
 	      return _createRegExp('[\\s]+(' + beginRule + '){1,2}([^' + allRules + ']+)(' + endRule + '){1,2}', 'g')
@@ -2430,27 +2432,25 @@ return /******/ (function(modules) { // webpackBootstrap
 	            valueStr = 'p1.styleProps(' + valueStr + ')';
 	          }
 
-	          var key;
-	          if (useString) {
-	            key = k;
-	          }
-	          else {
+	          var key = k,
+	            onlyKey = key === utils.clearQuot(valueStr);
+	          if (!useString) {
 	            key = utils.fixPropName(k);
 	          }
 	          if (!paramsExpr) {
 	            if (!useString) {
-	              paramsStr += '  ' + key + ': ' + valueStr + (i < len - 1 ? ',\n' : '');
+	              paramsStr += '  ' + key + ': ' + (!onlyKey ? valueStr : 'true') + (i < len - 1 ? ',\n' : '');
 	            }
 	            else {
-	              paramsStr += (i > 0 ? '  + ' : '') + '\' ' + key + '="\' + ' + valueStr + ' + \'"\'' + (i == len - 1 ? ';' : '') + '\n';
+	              paramsStr += (i > 0 ? '  + ' : '') + '\' ' + key + (!onlyKey ? '="\' + ' + valueStr + ' + \'"\'' : ' \'') + (i == len - 1 ? ';' : '') + '\n';
 	            }
 	          }
 	          else {
 	            if (!useString) {
-	              paramsStr += '_params' + _paramsC + '.' + key + ' = ' + valueStr + ';\n';
+	              paramsStr += '_params' + _paramsC + '.' + key + ' = ' + (!onlyKey ? valueStr : 'true') + ';\n';
 	            }
 	            else {
-	              paramsStr += '_params' + _paramsC + ' += \' ' + key + '="\' + ' + valueStr + ' + \'"\';\n';
+	              paramsStr += '_params' + _paramsC + ' += \' ' + key + (!onlyKey ? '="\' + ' + valueStr + ' + \'"\'' : ' \'') + ';\n';
 	            }
 	          }
 	        }, false, false);
@@ -2765,7 +2765,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 	function _formatText(str) {
-	  return str.replace(/\n/g, '\\n').trim();
+	  return str.replace(/\n/g, '\\n').replace(/\r/g, '').trim();
 	}
 
 	//Merge parameters to string

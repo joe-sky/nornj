@@ -85,7 +85,8 @@ function assignStringProp(paramsE, keys) {
   var ret = '';
   for (var k in paramsE) {
     if (!keys || !keys[k]) {
-      ret += ' ' + k + '="' + paramsE[k] + '"';
+      var v = paramsE[k];
+      ret += ' ' + k + (k !== v ? '="' + v + '"' : ' ');
     }
   }
   return ret;

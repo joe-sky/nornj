@@ -6,6 +6,11 @@
   <link rel="stylesheet" href="node_modules/todomvc-app-css/index.css">
   <link rel="stylesheet" href="node_modules/todomvc-common/base.css">
   <link rel="stylesheet" href="css/app.css">
+  <style>
+    #todo-list li label {
+      white-space: normal;
+    }
+  </style>
 </head>
 <body>
   <section id="todoapp">
@@ -40,33 +45,33 @@
       </li>
     </ul>
     <button id="clear-completed">
-      <#params>
+      <#props>
         <#unless {completedCount}>
-          <#p {'class'}>hidden</#p>
+          <#prop {'class'}>hidden</#prop>
         </#unless>
-      </#params>
+      </#props>
       Clear completed
     </button>
   </script>
-  <script type="text/html" id="template-header">
+  <script type="text/nornj" id="template-header">
     <h1>todos</h1>
     <input id="new-todo" placeholder="What needs to be done?" autofocus />
   </script>
-  <script type="text/html" id="template-todoItemView">
+  <script type="text/nornj" id="template-todoItemView">
     <div class="view">
       <input class="toggle" type="checkbox">
-        <#params>
+        <#props>
           <#if {completed}>
-            <#p {'checked'} />
+            <#prop {'checked'} />
           </#if>
-        </#params>
+        </#props>
       </input>
       <label>{title}</label>
       <button class="destroy"></button>
     </div>
     <input class="edit" value="{title}" />
   </script>
-  <script type="text/html" id="template-todoListCompositeView">
+  <script type="text/nornj" id="template-todoListCompositeView">
     <input id="toggle-all" type="checkbox" />
     <label for="toggle-all">Mark all as complete</label>
     <ul id="todo-list"></ul>
