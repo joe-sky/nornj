@@ -1,6 +1,6 @@
 {
   "name": "nornj",
-  "version": "0.4.0-beta.1",
+  "version": "0.4.0-beta.2",
   "description": "A multipurpose javascript template engine",
   "main": "src/base.js",
   "files": [
@@ -27,7 +27,7 @@
     "babel-core": "^6.7.7",
     "babel-loader": "^6.2.4",
     "gulp": "^3.9.0",
-    "gulp-eslint": "^2.0.0",
+    "gulp-eslint": "^3.0.1",
     "gulp-if": "^2.0.0",
     "gulp-jasmine": "^2.1.0",
     "gulp-notify": "^2.2.0",
