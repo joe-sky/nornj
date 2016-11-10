@@ -1823,12 +1823,26 @@ return /******/ (function(modules) { // webpackBootstrap
 	'use strict';
 
 	var nj = __webpack_require__(1),
+	  tools = __webpack_require__(3),
 	  registerComponent = __webpack_require__(11).registerComponent;
 
 	//注册模板装饰器
-	function registerTmpl(name) {
+	function registerTmpl(name, template) {
+	  if (tools.isObject(name)) {
+	    template = name.template;
+	    name = name.name;
+	  }
+
 	  return function (target) {
-	    registerComponent(name, target);
+	    //注册组件
+	    if(name != null) {
+	      registerComponent(name, target);
+	    }
+
+	    //创建模板函数
+	    if(template) {
+	      target.prototype.template = nj.compileComponent(template, name);
+	    }
 	  };
 	}
 
