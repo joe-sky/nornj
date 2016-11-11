@@ -243,7 +243,7 @@ function _buildProps(obj, counter, fns) {
       }
     }, false, true, true);
   }
-  else if (utils.isObject(str0) && str0.length) {  //tmpl块表达式
+  else if (utils.isObject(str0) && str0.length != null) {  //tmpl块表达式
     valueStr += '{\n';
     utils.each(str0, function (v, k, i, l) {
       if (k !== 'length') {
@@ -566,7 +566,7 @@ function _buildRender(nodeType, retType, params, fns, level) {
           retStr += levelSpace + '\'</\' + _type' + params._type + ' + \'>\\n\'';
         }
         else {
-          retStr += '\'/>\\n\'';
+          retStr += '\' />\\n\'';
         }
       }
       break;

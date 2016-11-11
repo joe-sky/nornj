@@ -38,7 +38,7 @@ module.exports = function (beginRule, endRule, exprRule) {
   var allRules = _clearRepeat(beginRule + endRule),
     firstChar = beginRule[0],
     otherChars = allRules.substr(1),
-    exprRules = _clearRepeat(exprRule + '#\$'),
+    exprRules = _clearRepeat(exprRule + '#$'),
     escapeExprRule = exprRule.replace(/\$/g, '\\$');
 
   //Reset the regexs to global list

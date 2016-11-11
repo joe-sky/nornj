@@ -1791,7 +1791,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  var allRules = _clearRepeat(beginRule + endRule),
 	    firstChar = beginRule[0],
 	    otherChars = allRules.substr(1),
-	    exprRules = _clearRepeat(exprRule + '#\$'),
+	    exprRules = _clearRepeat(exprRule + '#$'),
 	    escapeExprRule = exprRule.replace(/\$/g, '\\$');
 
 	  //Reset the regexs to global list
@@ -2219,7 +2219,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }
 	    }, false, true, true);
 	  }
-	  else if (utils.isObject(str0) && str0.length) {  //tmpl块表达式
+	  else if (utils.isObject(str0) && str0.length != null) {  //tmpl块表达式
 	    valueStr += '{\n';
 	    utils.each(str0, function (v, k, i, l) {
 	      if (k !== 'length') {
@@ -2542,7 +2542,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	          retStr += levelSpace + '\'</\' + _type' + params._type + ' + \'>\\n\'';
 	        }
 	        else {
-	          retStr += '\'/>\\n\'';
+	          retStr += '\' />\\n\'';
 	        }
 	      }
 	      break;
