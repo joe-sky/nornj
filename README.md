@@ -1,5 +1,5 @@
 # NornJ
-一款轻量级且多用途的javascript模板引擎，可输出字符串也可配合React等组件框架使用
+一款轻量级且多用途的javascript模板引擎，可输出html字符串也可输出React虚拟dom
 
 ###模板基本示例
 ```js
@@ -32,21 +32,17 @@ export default nj`
 </div>`;
 
 /* comp.js */
-import {
-  compileComponent,
-  registerComponent
-} from 'nornj';
+import { registerTmpl, compileComponent } from 'nornj';
 import { Component } from 'react';
 import { render } from 'react-dom';
-const template = compileComponent('./tmpl');
+import tmpl from './tmpl';
 
+@registerTmpl({'TestComponent', tmpl)
 class TestComponent extends Component {
   render() {
     return template(this.props);
   }
 }
-
-registerComponent({ TestComponent });
 
 render(compileComponent(
   nj`<TestComponent no=100 />`
@@ -68,7 +64,9 @@ render(compileComponent(
 ```html
 ...
 <body>
-  <TestComponent class="nj-component" no="100" />
+  <script type="text/nornj" autoRender>
+    <TestComponent no="100" />
+  </script>
 </body>
 ```
 
@@ -106,7 +104,7 @@ console.log(html);
 使用npm安装:
 
 ```sh
-npm install --save nornj
+npm install nornj
 ```
 
 ### 浏览器支持
