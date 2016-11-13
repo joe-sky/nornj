@@ -142,11 +142,8 @@ console.log(html);
 ```
 以数组形式传入多个参数后，NornJ模板在编译时会按顺序检测每个数据对象是否有和模板中对应的值。如果检测到前面的参数有对应值，那么就会停止继续检测后面的参数是否有该对应值，如例中(1)处所示；如果靠前面的参数中没有对应值，那么就按顺序寻找后面的参数中是否存在，如例中(2)处所示。
 
-## 链式API
-NornJ模板还支持类似`jQuery`的链式调用方式。
-
-### renderComponent
-执行`renderComponent`方法就和执行使用`compileComponent`方法编译出来的模板函数的效果相同，如下所示：
+## renderComponent
+执行`renderComponent`方法就和执行使用`compileComponent`方法编译出来的模板函数的效果相同，类似`jQuery`的链式调用方式，如下所示：
 
 ```js
 let comp = nj`<span>test{no}</span>`.renderComponent({ no: 1 });
@@ -160,7 +157,7 @@ console.log(html);
 
 这种渲染方式比使用模板函数性能稍差，一般可以在单元测试中多使用这种渲染方式。
 
-### tmplByKey
+## tmplByKey
 执行`tmplByKey`方法会返回一个可代替`nj`的es6模板字符串前置标签，但是它内部会利用缓存，所以性能比通常使用`nj`的模板要高一些：
 
 ```js
