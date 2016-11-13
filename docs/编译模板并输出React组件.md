@@ -187,7 +187,7 @@ import { registerTmpl } from 'nornj';
 
 @registerTmpl({
   name: 'TestComponent',  //传入组件名，相当于调用了nj.registerComponent注册组件，可以省略不传
-  template: `             //传入模板，普通字符串和es6模板字符串都可以，可以省略不传
+  template: `             <!--传入模板，普通字符串和es6模板字符串都可以，可以省略不传-->
     <div id=test1>
       this the test demo{no}.
       <i>test{no}</i>
