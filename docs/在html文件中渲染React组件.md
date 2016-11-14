@@ -1,21 +1,7 @@
-NornJ模板可以使用字符串或html dom构建：
-* [使用字符串构建模板](https://github.com/joe-sky/nornj/blob/master/docs/使用字符串构建模板.md)
-* [使用dom构建模板](#使用dom构建模板)
- * [用途](#用途)
+NornJ模板可以直接构建在html文件中来渲染React组件。
 
-# 使用dom构建模板
+## 为什么要在html文件中构建模板
 
-结构例如:
-```html
-<Slider>
-    'this the test slider {msg}.'
-    <SliderItem id='test' on-slider-end={event} />
-</Slider>
-```
+使用`React`框架来渲染组件到dom的通常形式为使用｀ReactDOM.render｀方法，而nj模板可提供类似像`Vue`或`Angular`那样直接将模板嵌入到html dom中，这样很多情况下能少写一些js代码，也能使这个渲染过程显得更加声明式。
 
-#### 用途
-
-配合React框架使用，用于替代ReactDOM.render方法，使React开发的组件可以以直接嵌入到html中的形式来渲染。与ReactDOM.render对比它的优势如下：
-* NornJ html模板可以嵌入在常规的html标签内使用。
-* NornJ html模板可使用服务器端页面脚本技术(如JSP、ASP.NET)来动态构建。
-* NornJ html模板开发的React UI组件库可以对外提供html api，使用者甚至可以在不了解React技术的情况下正常使用这些控件。
+## 在html中渲染模板的格式
