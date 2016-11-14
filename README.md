@@ -1,7 +1,7 @@
 # NornJ
-一款轻量级且多用途的javascript模板引擎，可输出html字符串也可输出React虚拟dom
+一款轻量级且多用途的javascript模板引擎，可输出html字符串也可输出React组件的虚拟dom。
 
-###模板基本示例
+### 模板基本示例
 ```js
 const tmpl = nj`
 <div>
@@ -11,13 +11,13 @@ const tmpl = nj`
 ```
 
 ### 用途
-传统js模板引擎如`Handlebars`、`Jade`等通常只支持输出html字符串，`NornJ`与它们相比，相同点和不同点都有：
+传统js模板引擎如`Handlebars`、`EJS`等通常只支持输出html字符串，`NornJ`与它们相比，相同点和不同点都有：
 
 * 支持`React`作为JSX的替代模板语言；可支持模板预编译，也可以直接在浏览器中运行。
 * 支持处理数据并输出html字符串，故它也可以像传统js模板一样支持`Backbone`或`Express`等。
-* 它是弱逻辑的模板引擎，语法和`Handlebars`更类似一些，但也有自己独特的地方。
+* 它的语法偏向弱逻辑，和`Handlebars`更类似一些，但也有自己独特的地方。
 
-###与React配合示例
+### 与React配合示例
 NornJ可以替代JSX输出React组件，用它可以将React组件的逻辑与结构更优雅地实现解藕：
 ```js
 /* tmpl.js */
@@ -70,7 +70,7 @@ render(compileComponent(
 </body>
 ```
 
-###在ES5环境下使用
+### 在ES5环境下使用
 除了使用ES6模板字符串外，NornJ也可以支持在es5环境下使用普通的字符串：
 ```html
 <script id="template" type="text/nornj">
@@ -117,6 +117,7 @@ npm install nornj
 * [编译模板并输出html字符串](https://github.com/joe-sky/nornj/blob/master/docs/编译模板并输出html字符串.md)
 * [编译模板并输出React组件](https://github.com/joe-sky/nornj/blob/master/docs/编译模板并输出React组件.md)
 * [在html文件中渲染React组件](https://github.com/joe-sky/nornj/blob/master/docs/在html文件中渲染React组件.md)
+* [模板全局配置](https://github.com/joe-sky/nornj/blob/master/docs/模板全局配置.md)
 
 ### License
 
