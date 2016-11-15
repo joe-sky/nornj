@@ -1,5 +1,5 @@
 # NornJ
-一款轻量级且多用途的javascript模板引擎，可输出html字符串也可输出React组件的虚拟dom。
+一款轻量级且多用途的javascript模板引擎，可输出html字符串也可输出React组件的虚拟dom
 
 ### 模板基本示例
 ```js

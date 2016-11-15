@@ -14,6 +14,8 @@
     "test": "gulp test"
   },
   "keywords": [
+    "nornj",
+    "nj",
     "template",
     "react"
   ],
