@@ -259,6 +259,9 @@ function _buildProps(obj, counter, fns) {
     }, false, false);
     valueStr += '}';
   }
+  else if (utils.isObject(str0) && str0._njEx) {
+    valueStr = str0._njEx;
+  }
   else {  //非字符串值
     valueStr = JSON.stringify(str0);
   }

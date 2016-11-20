@@ -3,7 +3,6 @@
 var nj = require('../core'),
   tools = require('../utils/tools'),
   tranElem = require('../transforms/transformElement'),
-  REGEX_SPLIT = /\$\{(?:[^{}]*(?:\{[\s\S]*\})*[^{}]*)*\}/,
   tmplRule = nj.tmplRule,
   shim = require('../utils/shim');
 
@@ -29,10 +28,18 @@ function compileStringTmpl(tmpl) {
     args = arguments,
     splitNo = 0,
     params = [],
-    fullXml = '';
+    fullXml = '',
+    exArgs;
 
   if (isStr) {
-    xmls = tmpl.split(REGEX_SPLIT);
+    xmls = tmpl.split(tmplRule.externalSplit);
+
+    var pattern = tmplRule.external(),
+      matchArr;
+    exArgs = [];
+    while (matchArr = pattern.exec(tmpl)) {
+      exArgs.push(matchArr[1]);
+    }
   }
 
   //Connection xml string
@@ -40,17 +47,38 @@ function compileStringTmpl(tmpl) {
   tools.each(xmls, function (xml, i) {
     var split = '';
     if (i < l - 1) {
-      var arg = args[i + 1],
-        last = xml.length - 1,
-        useShim = xml[last] === '@';
+      var last = xml.length - 1,
+        useShim = xml[last] === '@',
+        arg, isEx;
+
+      if (isStr) {
+        var exArg = exArgs[i],
+          match = exArg.match(/#(\d+)/);
+
+        if (match && match[1] != null) {  //分隔符格式为"${#x}", 则按其编号顺序从nj函数参数列表中获取
+          arg = args[parseInt(match[1], 10) + 1];
+        }
+        else {
+          arg = exArg;
+          useShim = isEx = true;
+        }
+      }
+      else {
+        arg = args[i + 1];
+      }
 
       if (!tools.isString(arg) || useShim) {
         split = '_nj-split' + splitNo + '_';
 
         //Use the shim function to convert the parameter when the front of it with a "@" mark.
         if (useShim) {
-          xml = xml.substr(0, last);
-          arg = shim(arg);
+          if (isEx) {
+            arg = shim({ _njEx: arg });
+          }
+          else {
+            xml = xml.substr(0, last);
+            arg = shim(arg);
+          }
         }
 
         params.push(arg);
@@ -100,7 +128,7 @@ function _checkStringElem(xml, params) {
     pattern = tmplRule.checkElem(),
     matchArr;
 
-  while ((matchArr = pattern.exec(xml))) {
+  while (matchArr = pattern.exec(xml)) {
     var textBefore = matchArr[1],
       elem = matchArr[2],
       elemName = matchArr[3],

@@ -46,8 +46,8 @@ module.exports = function (beginRule, endRule, exprRule) {
     beginRule: beginRule,
     endRule: endRule,
     exprRule: exprRule,
-    xmlOpenTag: _createRegExp('^<([a-z' + firstChar + exprRules + '][-a-z0-9_:.\/' + otherChars + ']*)[^>]*>$', 'i'),
-    openTag: _createRegExp('^[a-z' + firstChar + exprRules + '][-a-z0-9_:.\/' + otherChars + ']*', 'i'),
+    xmlOpenTag: _createRegExp('^<([a-z' + firstChar + exprRules + '][-a-z0-9_:./' + otherChars + ']*)[^>]*>$', 'i'),
+    openTag: _createRegExp('^[a-z' + firstChar + exprRules + '][-a-z0-9_:./' + otherChars + ']*', 'i'),
     insideBraceParam: _createRegExp(beginRule + '([^' + allRules + ']+)' + endRule, 'i'),
     replaceBraceParam: function() {
       return _createRegExp('[\\s]+(' + beginRule + '){1,2}([^' + allRules + ']+)(' + endRule + '){1,2}', 'g')
@@ -57,7 +57,11 @@ module.exports = function (beginRule, endRule, exprRule) {
       return _createRegExp('((' + beginRule + '){1,2})([^' + allRules + ']+)(' + endRule + '){1,2}', 'g');
     },
     checkElem: function() {
-      return _createRegExp('([^>]*)(<([a-z' + firstChar + '\/' + exprRules + '!][-a-z0-9_:.' + allRules + exprRules + ']*)[^>]*>)([^<]*)', 'ig');
+      return _createRegExp('([^>]*)(<([a-z' + firstChar + '/' + exprRules + '!][-a-z0-9_:.' + allRules + exprRules + ']*)[^>]*>)([^<]*)', 'ig');
+    },
+    externalSplit: _createRegExp('\\$\\{(?:[^{}]*(?:\\{[\\s\\S]*\\})*[^{}]*)\\}'),
+    external: function() {
+      return _createRegExp('\\$\\{([^{}]*(\\{[\\s\\S]*\\})*[^{}]*)\\}', 'g');
     },
     expr: _createRegExp('^' + escapeExprRule + '([^\\s]+)', 'i')
   });

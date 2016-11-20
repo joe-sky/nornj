@@ -63,7 +63,7 @@ var TodoMVC = TodoMVC || {};
   // ------------------
   TodoMVC.FooterLayout = Backbone.Marionette.ItemView.extend({
     // template: '#template-footer',
-    template: nj.compile(nj(document.getElementById('template-footer').innerHTML, ' ', ' ')),
+    template: nj.compile(nj(document.getElementById('template-footer').innerHTML)),
 
     // UI bindings create cached attributes that
     // point to jQuery selected objects

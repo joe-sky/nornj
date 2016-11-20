@@ -1799,8 +1799,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    beginRule: beginRule,
 	    endRule: endRule,
 	    exprRule: exprRule,
-	    xmlOpenTag: _createRegExp('^<([a-z' + firstChar + exprRules + '][-a-z0-9_:.\/' + otherChars + ']*)[^>]*>$', 'i'),
-	    openTag: _createRegExp('^[a-z' + firstChar + exprRules + '][-a-z0-9_:.\/' + otherChars + ']*', 'i'),
+	    xmlOpenTag: _createRegExp('^<([a-z' + firstChar + exprRules + '][-a-z0-9_:./' + otherChars + ']*)[^>]*>$', 'i'),
+	    openTag: _createRegExp('^[a-z' + firstChar + exprRules + '][-a-z0-9_:./' + otherChars + ']*', 'i'),
 	    insideBraceParam: _createRegExp(beginRule + '([^' + allRules + ']+)' + endRule, 'i'),
 	    replaceBraceParam: function() {
 	      return _createRegExp('[\\s]+(' + beginRule + '){1,2}([^' + allRules + ']+)(' + endRule + '){1,2}', 'g')
@@ -1810,7 +1810,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	      return _createRegExp('((' + beginRule + '){1,2})([^' + allRules + ']+)(' + endRule + '){1,2}', 'g');
 	    },
 	    checkElem: function() {
-	      return _createRegExp('([^>]*)(<([a-z' + firstChar + '\/' + exprRules + '!][-a-z0-9_:.' + allRules + exprRules + ']*)[^>]*>)([^<]*)', 'ig');
+	      return _createRegExp('([^>]*)(<([a-z' + firstChar + '/' + exprRules + '!][-a-z0-9_:.' + allRules + exprRules + ']*)[^>]*>)([^<]*)', 'ig');
+	    },
+	    externalSplit: _createRegExp('\\$\\{(?:[^{}]*(?:\\{[\\s\\S]*\\})*[^{}]*)\\}'),
+	    external: function() {
+	      return _createRegExp('\\$\\{([^{}]*(\\{[\\s\\S]*\\})*[^{}]*)\\}', 'g');
 	    },
 	    expr: _createRegExp('^' + escapeExprRule + '([^\\s]+)', 'i')
 	  });
@@ -2235,6 +2239,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, false, false);
 	    valueStr += '}';
 	  }
+	  else if (utils.isObject(str0) && str0._njEx) {
+	    valueStr = str0._njEx;
+	  }
 	  else {  //非字符串值
 	    valueStr = JSON.stringify(str0);
 	  }
@@ -2632,7 +2639,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	var nj = __webpack_require__(1),
 	  tools = __webpack_require__(3),
 	  tranElem = __webpack_require__(5),
-	  REGEX_SPLIT = /\$\{(?:[^{}]*(?:\{[\s\S]*\})*[^{}]*)*\}/,
 	  tmplRule = nj.tmplRule,
 	  shim = __webpack_require__(20);
 
@@ -2658,10 +2664,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	    args = arguments,
 	    splitNo = 0,
 	    params = [],
-	    fullXml = '';
+	    fullXml = '',
+	    exArgs;
 
 	  if (isStr) {
-	    xmls = tmpl.split(REGEX_SPLIT);
+	    xmls = tmpl.split(tmplRule.externalSplit);
+
+	    var pattern = tmplRule.external(),
+	      matchArr;
+	    exArgs = [];
+	    while (matchArr = pattern.exec(tmpl)) {
+	      exArgs.push(matchArr[1]);
+	    }
 	  }
 
 	  //Connection xml string
@@ -2669,17 +2683,38 @@ return /******/ (function(modules) { // webpackBootstrap
 	  tools.each(xmls, function (xml, i) {
 	    var split = '';
 	    if (i < l - 1) {
-	      var arg = args[i + 1],
-	        last = xml.length - 1,
-	        useShim = xml[last] === '@';
+	      var last = xml.length - 1,
+	        useShim = xml[last] === '@',
+	        arg, isEx;
+
+	      if (isStr) {
+	        var exArg = exArgs[i],
+	          match = exArg.match(/#(\d+)/);
+
+	        if (match && match[1] != null) {  //分隔符格式为"${#x}", 则按其编号顺序从nj函数参数列表中获取
+	          arg = args[parseInt(match[1], 10) + 1];
+	        }
+	        else {
+	          arg = exArg;
+	          useShim = isEx = true;
+	        }
+	      }
+	      else {
+	        arg = args[i + 1];
+	      }
 
 	      if (!tools.isString(arg) || useShim) {
 	        split = '_nj-split' + splitNo + '_';
 
 	        //Use the shim function to convert the parameter when the front of it with a "@" mark.
 	        if (useShim) {
-	          xml = xml.substr(0, last);
-	          arg = shim(arg);
+	          if (isEx) {
+	            arg = shim({ _njEx: arg });
+	          }
+	          else {
+	            xml = xml.substr(0, last);
+	            arg = shim(arg);
+	          }
 	        }
 
 	        params.push(arg);
@@ -2729,7 +2764,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    pattern = tmplRule.checkElem(),
 	    matchArr;
 
-	  while ((matchArr = pattern.exec(xml))) {
+	  while (matchArr = pattern.exec(xml)) {
 	    var textBefore = matchArr[1],
 	      elem = matchArr[2],
 	      elemName = matchArr[3],

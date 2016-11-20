@@ -30,8 +30,8 @@
   <script type="text/html" id="template-footer">
     <span id="todo-count">
       <strong>{activeCount}</strong>
-      @${0}<#if {activeCount:equal(1)}>item<#else />items</#if>
-      @${1}left
+      ${' '}<#if {activeCount:equal(1)}>item<#else />items</#if>
+      ${' '}left
     </span>
     <ul id="filters">
       <li class="all">

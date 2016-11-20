@@ -67,7 +67,7 @@ describe('test compile string', function () {
       '<div name1=../111>\
          <span>\
            <img />\
-           sky:{name},{ id: filter2(1, 2) }${0}\
+           sky:{name},{ id: filter2(1, 2) }${{a:1}}end\
          </span>\
        </div>';
 
@@ -106,8 +106,8 @@ describe('test compile string', function () {
         </div>
       `;
 
-      var tmplFn = compile(tmpl3, 'tmplString'),
-        html = tmplFn(data);
+      var tmplFn = compile(tmpl3, 'tmplString');
+      var html = tmplFn(data);
 
       //console.log(JSON.stringify(nj.asts['tmplString']));
       console.log(html);
