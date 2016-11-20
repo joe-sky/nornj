@@ -3,7 +3,7 @@
 var nj = require('../core'),
   tools = require('../utils/tools'),
   tranElem = require('../transforms/transformElement'),
-  REGEX_SPLIT = /\$\{\d+\}/,
+  REGEX_SPLIT = /\$\{(?:[^{}]*(?:\{[\s\S]*\})*[^{}]*)*\}/,
   tmplRule = nj.tmplRule,
   shim = require('../utils/shim');
 

@@ -2632,7 +2632,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var nj = __webpack_require__(1),
 	  tools = __webpack_require__(3),
 	  tranElem = __webpack_require__(5),
-	  REGEX_SPLIT = /\$\{\d+\}/,
+	  REGEX_SPLIT = /\$\{(?:[^{}]*(?:\{[\s\S]*\})*[^{}]*)*\}/,
 	  tmplRule = nj.tmplRule,
 	  shim = __webpack_require__(20);
 

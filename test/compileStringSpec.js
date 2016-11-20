@@ -80,11 +80,7 @@ describe('test compile string', function () {
             </#each>
             <#prop {'data-name10'}>
               <#each {list}>
-                <#if {.}>
-                  { #:filter2 }
-                <#else />
-                  { '100':filter1 }
-                </#if>
+                <#if {.}>{ #:filter2 }<#else />{ '100':filter1 }</#if>
               </#each>
             </#prop>
           </#props>
@@ -107,7 +103,8 @@ describe('test compile string', function () {
               </#each>
             `}
           </span>
-        </div>`;
+        </div>
+      `;
 
       var tmplFn = compile(tmpl3, 'tmplString'),
         html = tmplFn(data);
