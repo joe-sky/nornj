@@ -8,7 +8,7 @@
   ReactDOMServer = require('react-dom/server'),
   Handlebars = require('handlebars');
 
-describe('test speed', function () {
+xdescribe('test speed', function () {
   var tmpl = nj`
   <{div} id="{num '_100'}">
     <#each {arr}>
