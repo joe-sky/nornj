@@ -24,7 +24,7 @@ function _clearRepeat(str) {
   return ret;
 }
 
-module.exports = function (beginRule, endRule, exprRule) {
+module.exports = function (beginRule, endRule, exprRule, externalRule) {
   if (!beginRule) {
     beginRule = '{';
   }
@@ -34,12 +34,17 @@ module.exports = function (beginRule, endRule, exprRule) {
   if (!exprRule) {
     exprRule = '#';
   }
+  if (!externalRule) {
+    externalRule = '$';
+  }
 
   var allRules = _clearRepeat(beginRule + endRule),
     firstChar = beginRule[0],
     otherChars = allRules.substr(1),
-    exprRules = _clearRepeat(exprRule + '#$'),
-    escapeExprRule = exprRule.replace(/\$/g, '\\$');
+    spChars = '#$',
+    exprRules = _clearRepeat(exprRule + spChars),
+    escapeExprRule = exprRule.replace(/\$/g, '\\$'),
+    escapeExternalRule = externalRule.replace(/\$/g, '\\$');
 
   //Reset the regexs to global list
   tools.assign(nj.tmplRule, {
@@ -59,9 +64,9 @@ module.exports = function (beginRule, endRule, exprRule) {
     checkElem: function() {
       return _createRegExp('([^>]*)(<([a-z' + firstChar + '/' + exprRules + '!][-a-z0-9_:.' + allRules + exprRules + ']*)[^>]*>)([^<]*)', 'ig');
     },
-    externalSplit: _createRegExp('\\$\\{(?:[^{}]*(?:\\{[\\s\\S]*\\})*[^{}]*)\\}'),
+    externalSplit: _createRegExp(escapeExternalRule + '\\{(?:[^{}]*(?:\\{[\\s\\S]*\\})*[^{}]*)\\}'),
     external: function() {
-      return _createRegExp('\\$\\{([^{}]*(\\{[\\s\\S]*\\})*[^{}]*)\\}', 'g');
+      return _createRegExp(escapeExternalRule + '\\{([^{}]*(\\{[\\s\\S]*\\})*[^{}]*)\\}', 'g');
     },
     expr: _createRegExp('^' + escapeExprRule + '([^\\s]+)', 'i')
   });

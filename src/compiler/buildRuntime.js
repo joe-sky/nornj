@@ -263,7 +263,8 @@ function _buildProps(obj, counter, fns) {
     valueStr = str0._njEx;
   }
   else {  //非字符串值
-    valueStr = JSON.stringify(str0);
+    //The "_njShim" property is used to distinguish whether the incoming is an normal array.
+    valueStr = JSON.stringify(str0._njShim ? str0._njShim : str0);
   }
 
   if (filterStr === '') {

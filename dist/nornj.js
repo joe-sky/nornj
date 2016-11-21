@@ -1591,11 +1591,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    if (ret != null) {
 	      if (!tools.isArray(ret)) {
 	        value = ret;
-
-	        //The "_njShim" property is used to distinguish whether the incoming is an normal array.
-	        if (value && value._njShim) {
-	          value = value._njShim;
-	        }
 	      }
 	      else {
 	        value = '';
@@ -1777,7 +1772,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return ret;
 	}
 
-	module.exports = function (beginRule, endRule, exprRule) {
+	module.exports = function (beginRule, endRule, exprRule, externalRule) {
 	  if (!beginRule) {
 	    beginRule = '{';
 	  }
@@ -1787,12 +1782,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	  if (!exprRule) {
 	    exprRule = '#';
 	  }
+	  if (!externalRule) {
+	    externalRule = '$';
+	  }
 
 	  var allRules = _clearRepeat(beginRule + endRule),
 	    firstChar = beginRule[0],
 	    otherChars = allRules.substr(1),
-	    exprRules = _clearRepeat(exprRule + '#$'),
-	    escapeExprRule = exprRule.replace(/\$/g, '\\$');
+	    spChars = '#$',
+	    exprRules = _clearRepeat(exprRule + spChars),
+	    escapeExprRule = exprRule.replace(/\$/g, '\\$'),
+	    escapeExternalRule = externalRule.replace(/\$/g, '\\$');
 
 	  //Reset the regexs to global list
 	  tools.assign(nj.tmplRule, {
@@ -1812,9 +1812,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    checkElem: function() {
 	      return _createRegExp('([^>]*)(<([a-z' + firstChar + '/' + exprRules + '!][-a-z0-9_:.' + allRules + exprRules + ']*)[^>]*>)([^<]*)', 'ig');
 	    },
-	    externalSplit: _createRegExp('\\$\\{(?:[^{}]*(?:\\{[\\s\\S]*\\})*[^{}]*)\\}'),
+	    externalSplit: _createRegExp(escapeExternalRule + '\\{(?:[^{}]*(?:\\{[\\s\\S]*\\})*[^{}]*)\\}'),
 	    external: function() {
-	      return _createRegExp('\\$\\{([^{}]*(\\{[\\s\\S]*\\})*[^{}]*)\\}', 'g');
+	      return _createRegExp(escapeExternalRule + '\\{([^{}]*(\\{[\\s\\S]*\\})*[^{}]*)\\}', 'g');
 	    },
 	    expr: _createRegExp('^' + escapeExprRule + '([^\\s]+)', 'i')
 	  });
@@ -2243,7 +2243,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    valueStr = str0._njEx;
 	  }
 	  else {  //非字符串值
-	    valueStr = JSON.stringify(str0);
+	    //The "_njShim" property is used to distinguish whether the incoming is an normal array.
+	    valueStr = JSON.stringify(str0._njShim ? str0._njShim : str0);
 	  }
 
 	  if (filterStr === '') {

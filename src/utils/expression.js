@@ -92,11 +92,6 @@ var exprs = {
     if (ret != null) {
       if (!tools.isArray(ret)) {
         value = ret;
-
-        //The "_njShim" property is used to distinguish whether the incoming is an normal array.
-        if (value && value._njShim) {
-          value = value._njShim;
-        }
       }
       else {
         value = '';
