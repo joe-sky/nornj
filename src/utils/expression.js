@@ -95,8 +95,8 @@ var exprs = {
       }
       else {
         value = '';
-        tools.each(ret, function (item) {
-          value += item;
+        tools.each(tools.flatten(ret), function (item) {
+          value += item != null ? item : '';
         }, false, true);
       }
     }

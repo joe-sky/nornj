@@ -272,6 +272,31 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return str.trim();
 	}
 
+	//Transform multidimensional array to one-dimensional array
+	function flatten(obj) {
+	  var output = [],
+	    idx = 0;
+
+	  if (isArray(obj)) {
+	    for (var i = 0, l = _getLength(obj) ; i < l; i++) {
+	      var value = obj[i];
+	      //flatten current level of array or arguments object
+	      value = flatten(value);
+
+	      var j = 0, len = value.length;
+	      output.length += len;
+	      while (j < len) {
+	        output[idx++] = value[j++];
+	      }
+	    }
+	  }
+	  else {
+	    output[idx++] = obj;
+	  }
+
+	  return output;
+	}
+
 	//Noop function
 	function noop() { }
 
@@ -362,6 +387,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  each: each,
 	  inArray: inArray,
 	  trim: trim,
+	  flatten: flatten,
 	  throwIf: throwIf,
 	  assign: assign,
 	  uniqueKey: uniqueKey,
@@ -1594,8 +1620,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }
 	      else {
 	        value = '';
-	        tools.each(ret, function (item) {
-	          value += item;
+	        tools.each(tools.flatten(ret), function (item) {
+	          value += item != null ? item : '';
 	        }, false, true);
 	      }
 	    }
