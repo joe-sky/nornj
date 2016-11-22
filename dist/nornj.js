@@ -2487,7 +2487,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	          }
 	          if (!paramsExpr) {
 	            if (!useString) {
-	              paramsStr += '  ' + key + ': ' + (!onlyKey ? valueStr : 'true') + (i < len - 1 ? ',\n' : '');
+	              paramsStr += '  \'' + key + '\': ' + (!onlyKey ? valueStr : 'true') + (i < len - 1 ? ',\n' : '');
 	            }
 	            else {
 	              paramsStr += (i > 0 ? '  + ' : '') + '\' ' + key + (!onlyKey ? '="\' + ' + valueStr + ' + \'"\'' : ' \'') + (i == len - 1 ? ';' : '') + '\n';
@@ -2495,7 +2495,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	          }
 	          else {
 	            if (!useString) {
-	              paramsStr += '_params' + _paramsC + '.' + key + ' = ' + (!onlyKey ? valueStr : 'true') + ';\n';
+	              paramsStr += '_params' + _paramsC + '[\'' + key + '\'] = ' + (!onlyKey ? valueStr : 'true') + ';\n';
 	            }
 	            else {
 	              paramsStr += '_params' + _paramsC + ' += \' ' + key + (!onlyKey ? '="\' + ' + valueStr + ' + \'"\'' : ' \'') + ';\n';
