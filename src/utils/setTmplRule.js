@@ -24,7 +24,7 @@ function _clearRepeat(str) {
   return ret;
 }
 
-module.exports = function (beginRule, endRule, exprRule, externalRule) {
+module.exports = function (beginRule, endRule, exprRule, externalRule, propRule) {
   if (!beginRule) {
     beginRule = '{';
   }
@@ -37,11 +37,14 @@ module.exports = function (beginRule, endRule, exprRule, externalRule) {
   if (!externalRule) {
     externalRule = '$';
   }
+  if (!propRule) {
+    propRule = '@';
+  }
 
   var allRules = _clearRepeat(beginRule + endRule),
     firstChar = beginRule[0],
     otherChars = allRules.substr(1),
-    spChars = '#$',
+    spChars = '#$@',
     exprRules = _clearRepeat(exprRule + spChars),
     escapeExprRule = exprRule.replace(/\$/g, '\\$'),
     escapeExternalRule = externalRule.replace(/\$/g, '\\$');
@@ -51,6 +54,8 @@ module.exports = function (beginRule, endRule, exprRule, externalRule) {
     beginRule: beginRule,
     endRule: endRule,
     exprRule: exprRule,
+    externalRule: externalRule,
+    propRule: propRule,
     xmlOpenTag: _createRegExp('^<([a-z' + firstChar + exprRules + '][-a-z0-9_:./' + otherChars + ']*)[^>]*>$', 'i'),
     openTag: _createRegExp('^[a-z' + firstChar + exprRules + '][-a-z0-9_:./' + otherChars + ']*', 'i'),
     insideBraceParam: _createRegExp(beginRule + '([^' + allRules + ']+)' + endRule, 'i'),

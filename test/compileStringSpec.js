@@ -74,15 +74,16 @@ describe('test compile string', function () {
       var tmpl3 = nj`
         <div name=test1 autofocus name1={a.c.d} name2={a.e:prop(f).g}>
           <#props>
-            <#prop {'name'}>{test0:filter1 'test1':filter2 'test2'}</#prop>
+            <@name>{test0:filter1 'test1':filter2 'test2'}</@name>
+            <@checked />
             <#each {list}>
               <#prop {'data-name' .}>{.:filter1 'test1' 'test2'}</#prop>
             </#each>
-            <#prop {'data-name10'}>
+            <@data-name10>
               <#each {list}>
                 <#if {.}>{ #:filter2 }<#else />{ '100':filter1 }</#if>
               </#each>
-            </#prop>
+            </@data-name10>
           </#props>
           <input autofocus />
           <br></br>

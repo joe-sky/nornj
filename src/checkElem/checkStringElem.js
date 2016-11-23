@@ -222,6 +222,9 @@ function _setElem(elem, elemName, elemArr, params, bySelfClose) {
   if (elemName[0] === tmplRule.exprRule) {
     ret = elem.substring(1, elem.length - 1);
   }
+  else if (elemName.indexOf(tmplRule.propRule) === 0) {
+    ret = tmplRule.exprRule + 'prop {\'' + elemName.substr(tmplRule.propRule.length) + '\'}';
+  }
   else {
     var retS = _getSplitParams(elem, params);
     ret = retS.elem;

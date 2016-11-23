@@ -1798,7 +1798,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return ret;
 	}
 
-	module.exports = function (beginRule, endRule, exprRule, externalRule) {
+	module.exports = function (beginRule, endRule, exprRule, externalRule, propRule) {
 	  if (!beginRule) {
 	    beginRule = '{';
 	  }
@@ -1811,11 +1811,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	  if (!externalRule) {
 	    externalRule = '$';
 	  }
+	  if (!propRule) {
+	    propRule = '@';
+	  }
 
 	  var allRules = _clearRepeat(beginRule + endRule),
 	    firstChar = beginRule[0],
 	    otherChars = allRules.substr(1),
-	    spChars = '#$',
+	    spChars = '#$@',
 	    exprRules = _clearRepeat(exprRule + spChars),
 	    escapeExprRule = exprRule.replace(/\$/g, '\\$'),
 	    escapeExternalRule = externalRule.replace(/\$/g, '\\$');
@@ -1825,6 +1828,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    beginRule: beginRule,
 	    endRule: endRule,
 	    exprRule: exprRule,
+	    externalRule: externalRule,
+	    propRule: propRule,
 	    xmlOpenTag: _createRegExp('^<([a-z' + firstChar + exprRules + '][-a-z0-9_:./' + otherChars + ']*)[^>]*>$', 'i'),
 	    openTag: _createRegExp('^[a-z' + firstChar + exprRules + '][-a-z0-9_:./' + otherChars + ']*', 'i'),
 	    insideBraceParam: _createRegExp(beginRule + '([^' + allRules + ']+)' + endRule, 'i'),
@@ -2885,6 +2890,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  var ret, paramsExpr;
 	  if (elemName[0] === tmplRule.exprRule) {
 	    ret = elem.substring(1, elem.length - 1);
+	  }
+	  else if (elemName.indexOf(tmplRule.propRule) === 0) {
+	    ret = tmplRule.exprRule + 'prop {\'' + elemName.substr(tmplRule.propRule.length) + '\'}';
 	  }
 	  else {
 	    var retS = _getSplitParams(elem, params);
