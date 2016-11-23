@@ -2645,7 +2645,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	  zwnj: '\u200C',
 	  zwj: '\u200D',
 	  lt: '<',
-	  gt: '>'
+	  gt: '>',
+	  amp: '&'
 	};
 
 	var REGEX_SYMBOLS = new RegExp('&(' + Object.keys(SPACIAL_SYMBOLS).join('|') + ');', 'g');
