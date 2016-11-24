@@ -5,11 +5,13 @@ var nj = require('./core'),
   compiler = require('./compiler/compile'),
   compileStringTmpl = require('./checkElem/checkStringElem'),
   tmplByKey = require('./utils/tmplByKey'),
-  docReady = require('./utils/docReady');
+  docReady = require('./utils/docReady'),
+  config = require('./utils/config');
 
 nj.compileStringTmpl = compileStringTmpl;
 nj.tmplByKey = tmplByKey;
 nj.docReady = docReady;
+nj.config = config;
 utils.assign(nj, compiler, utils);
 
 //Default use React as component engine

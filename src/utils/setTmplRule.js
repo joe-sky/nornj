@@ -24,9 +24,17 @@ function _clearRepeat(str) {
   return ret;
 }
 
-module.exports = function (beginRule, endRule, exprRule, externalRule, propRule) {
-  if (!beginRule) {
-    beginRule = '{';
+module.exports = function (startRule, endRule, exprRule, externalRule, propRule) {
+  if(tools.isObject(startRule)){
+    var params = startRule;
+    startRule = params.start;
+    endRule = params.end;
+    exprRule = params.expr;
+    externalRule = params.external;
+    propRule = params.prop;
+  }
+  if (!startRule) {
+    startRule = '{';
   }
   if (!endRule) {
     endRule = '}';
@@ -41,8 +49,8 @@ module.exports = function (beginRule, endRule, exprRule, externalRule, propRule)
     propRule = '@';
   }
 
-  var allRules = _clearRepeat(beginRule + endRule),
-    firstChar = beginRule[0],
+  var allRules = _clearRepeat(startRule + endRule),
+    firstChar = startRule[0],
     otherChars = allRules.substr(1),
     spChars = '#$@',
     exprRules = _clearRepeat(exprRule + spChars),
@@ -51,20 +59,20 @@ module.exports = function (beginRule, endRule, exprRule, externalRule, propRule)
 
   //Reset the regexs to global list
   tools.assign(nj.tmplRule, {
-    beginRule: beginRule,
+    startRule: startRule,
     endRule: endRule,
     exprRule: exprRule,
     externalRule: externalRule,
     propRule: propRule,
     xmlOpenTag: _createRegExp('^<([a-z' + firstChar + exprRules + '][-a-z0-9_:./' + otherChars + ']*)[^>]*>$', 'i'),
     openTag: _createRegExp('^[a-z' + firstChar + exprRules + '][-a-z0-9_:./' + otherChars + ']*', 'i'),
-    insideBraceParam: _createRegExp(beginRule + '([^' + allRules + ']+)' + endRule, 'i'),
+    insideBraceParam: _createRegExp(startRule + '([^' + allRules + ']+)' + endRule, 'i'),
     replaceBraceParam: function() {
-      return _createRegExp('[\\s]+(' + beginRule + '){1,2}([^' + allRules + ']+)(' + endRule + '){1,2}', 'g')
+      return _createRegExp('[\\s]+(' + startRule + '){1,2}([^' + allRules + ']+)(' + endRule + '){1,2}', 'g')
     },
-    replaceSplit: _createRegExp('(?:' + beginRule + '){1,2}[^' + allRules + ']+(?:' + endRule + '){1,2}'),
+    replaceSplit: _createRegExp('(?:' + startRule + '){1,2}[^' + allRules + ']+(?:' + endRule + '){1,2}'),
     replaceParam: function() {
-      return _createRegExp('((' + beginRule + '){1,2})([^' + allRules + ']+)(' + endRule + '){1,2}', 'g');
+      return _createRegExp('((' + startRule + '){1,2})([^' + allRules + ']+)(' + endRule + '){1,2}', 'g');
     },
     checkElem: function() {
       return _createRegExp('([^>]*)(<([a-z' + firstChar + '/' + exprRules + '!][-a-z0-9_:.' + allRules + exprRules + ']*)[^>]*>)([^<]*)', 'ig');
@@ -73,6 +81,9 @@ module.exports = function (beginRule, endRule, exprRule, externalRule, propRule)
     external: function() {
       return _createRegExp(escapeExternalRule + '\\{([^{}]*(\\{[\\s\\S]*\\})*[^{}]*)\\}', 'g');
     },
-    expr: _createRegExp('^' + escapeExprRule + '([^\\s]+)', 'i')
+    expr: _createRegExp('^' + escapeExprRule + '([^\\s]+)', 'i'),
+    include: function() {
+      return _createRegExp('<' + escapeExprRule + 'include([^>]*)>', 'ig');
+    }
   });
 };

@@ -1,6 +1,7 @@
 ﻿var nj = require('../src/base'),
   utils = require('../src/utils/utils'),
-  compile = require('../src/compiler/compile').compile;
+  compile = require('../src/compiler/compile').compile,
+  includeParser = require('../tools/includeParser');
 
 describe('test compile string', function () {
   beforeAll(function () {
@@ -21,7 +22,7 @@ describe('test compile string', function () {
   });
 
   describe('compile string template to html', function () {
-    it('test compile 1', function () {
+    xit('test compile 1', function () {
       var data = {
         name: "<i>joe_sky1</i>",
         id: 100,
@@ -111,6 +112,22 @@ describe('test compile string', function () {
       var html = tmplFn(data);
 
       //console.log(JSON.stringify(nj.asts['tmplString']));
+      console.log(html);
+      expect(html).toBeTruthy();
+    });
+
+    it('test include parser', function () {
+      nj.config({ includeParser });
+
+      const tmpl = `
+        <section>
+          <#include src="./resources/testInclude.html" />
+          <img />
+          <#include src="./resources/testInclude2.html" />
+        </section>
+      `;
+
+      var html = nj.compile(tmpl, __filename)();
       console.log(html);
       expect(html).toBeTruthy();
     });

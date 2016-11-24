@@ -61,11 +61,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	  compiler = __webpack_require__(16),
 	  compileStringTmpl = __webpack_require__(19),
 	  tmplByKey = __webpack_require__(21),
-	  docReady = __webpack_require__(22);
+	  docReady = __webpack_require__(22),
+	  config = __webpack_require__(23);
 
 	nj.compileStringTmpl = compileStringTmpl;
 	nj.tmplByKey = tmplByKey;
 	nj.docReady = docReady;
+	nj.config = config;
 	utils.assign(nj, compiler, utils);
 
 	//Default use React as component engine
@@ -866,7 +868,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      retP.prop = compiledProp(param[2], param[3]);
 
 	      //If parameter's open rules are several,then it need escape.
-	      retP.escape = param[1].split(tmplRule.beginRule).length < 3;
+	      retP.escape = param[1].split(tmplRule.startRule).length < 3;
 	      props.push(retP);
 	    }, false, true);
 	  }
@@ -1798,9 +1800,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return ret;
 	}
 
-	module.exports = function (beginRule, endRule, exprRule, externalRule, propRule) {
-	  if (!beginRule) {
-	    beginRule = '{';
+	module.exports = function (startRule, endRule, exprRule, externalRule, propRule) {
+	  if(tools.isObject(startRule)){
+	    var params = startRule;
+	    startRule = params.start;
+	    endRule = params.end;
+	    exprRule = params.expr;
+	    externalRule = params.external;
+	    propRule = params.prop;
+	  }
+	  if (!startRule) {
+	    startRule = '{';
 	  }
 	  if (!endRule) {
 	    endRule = '}';
@@ -1815,8 +1825,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    propRule = '@';
 	  }
 
-	  var allRules = _clearRepeat(beginRule + endRule),
-	    firstChar = beginRule[0],
+	  var allRules = _clearRepeat(startRule + endRule),
+	    firstChar = startRule[0],
 	    otherChars = allRules.substr(1),
 	    spChars = '#$@',
 	    exprRules = _clearRepeat(exprRule + spChars),
@@ -1825,20 +1835,20 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  //Reset the regexs to global list
 	  tools.assign(nj.tmplRule, {
-	    beginRule: beginRule,
+	    startRule: startRule,
 	    endRule: endRule,
 	    exprRule: exprRule,
 	    externalRule: externalRule,
 	    propRule: propRule,
 	    xmlOpenTag: _createRegExp('^<([a-z' + firstChar + exprRules + '][-a-z0-9_:./' + otherChars + ']*)[^>]*>$', 'i'),
 	    openTag: _createRegExp('^[a-z' + firstChar + exprRules + '][-a-z0-9_:./' + otherChars + ']*', 'i'),
-	    insideBraceParam: _createRegExp(beginRule + '([^' + allRules + ']+)' + endRule, 'i'),
+	    insideBraceParam: _createRegExp(startRule + '([^' + allRules + ']+)' + endRule, 'i'),
 	    replaceBraceParam: function() {
-	      return _createRegExp('[\\s]+(' + beginRule + '){1,2}([^' + allRules + ']+)(' + endRule + '){1,2}', 'g')
+	      return _createRegExp('[\\s]+(' + startRule + '){1,2}([^' + allRules + ']+)(' + endRule + '){1,2}', 'g')
 	    },
-	    replaceSplit: _createRegExp('(?:' + beginRule + '){1,2}[^' + allRules + ']+(?:' + endRule + '){1,2}'),
+	    replaceSplit: _createRegExp('(?:' + startRule + '){1,2}[^' + allRules + ']+(?:' + endRule + '){1,2}'),
 	    replaceParam: function() {
-	      return _createRegExp('((' + beginRule + '){1,2})([^' + allRules + ']+)(' + endRule + '){1,2}', 'g');
+	      return _createRegExp('((' + startRule + '){1,2})([^' + allRules + ']+)(' + endRule + '){1,2}', 'g');
 	    },
 	    checkElem: function() {
 	      return _createRegExp('([^>]*)(<([a-z' + firstChar + '/' + exprRules + '!][-a-z0-9_:.' + allRules + exprRules + ']*)[^>]*>)([^<]*)', 'ig');
@@ -1847,7 +1857,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    external: function() {
 	      return _createRegExp(escapeExternalRule + '\\{([^{}]*(\\{[\\s\\S]*\\})*[^{}]*)\\}', 'g');
 	    },
-	    expr: _createRegExp('^' + escapeExprRule + '([^\\s]+)', 'i')
+	    expr: _createRegExp('^' + escapeExprRule + '([^\\s]+)', 'i'),
+	    include: function() {
+	      return _createRegExp('<' + escapeExprRule + 'include([^>]*)>', 'ig');
+	    }
 	  });
 	};
 
@@ -1925,6 +1938,11 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	          //Auto transform string template to array
 	          if (utils.isString(obj)) {
+	            //Merge all include blocks
+	            if(nj.includeParser) {
+	              obj = nj.includeParser(obj, tmplName);
+	            }
+
 	            obj = compileStringTmpl(obj);
 	          }
 
@@ -2919,7 +2937,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//Extract split parameters
 	function _getSplitParams(elem, params) {
 	  var exprRule = tmplRule.exprRule,
-	    beginRule = tmplRule.beginRule,
+	    startRule = tmplRule.startRule,
 	    endRule = tmplRule.endRule,
 	    paramsExpr;
 
@@ -2929,7 +2947,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      paramsExpr = [exprRule + 'params'];
 	    }
 
-	    paramsExpr.push([exprRule + "param " + beginRule + "'" + key + "'" + endRule, params[no]]);
+	    paramsExpr.push([exprRule + "param " + startRule + "'" + key + "'" + endRule, params[no]]);
 	    return '';
 	  });
 
@@ -2943,7 +2961,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        paramsExpr = [exprRule + 'params'];
 	      }
 
-	      paramsExpr.push([exprRule + 'spreadParam ' + beginRule + prop.replace(/\.\.\./g, '') + endRule + '/']);
+	      paramsExpr.push([exprRule + 'spreadParam ' + startRule + prop.replace(/\.\.\./g, '') + endRule + '/']);
 	      return ' ';
 	    }
 	    else {
@@ -3049,6 +3067,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	  else {
 	    self.attachEvent("onload", callback);
 	  }
+	};
+
+/***/ },
+/* 23 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var nj = __webpack_require__(1),
+	  tools = __webpack_require__(3);
+
+	module.exports = function (configs) {
+	  tools.assign(nj, configs);
 	};
 
 /***/ }

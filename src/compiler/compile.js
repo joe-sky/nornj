@@ -36,6 +36,11 @@ function compile(obj, tmplName, isComponent) {
 
           //Auto transform string template to array
           if (utils.isString(obj)) {
+            //Merge all include blocks
+            if(nj.includeParser) {
+              obj = nj.includeParser(obj, tmplName);
+            }
+
             obj = compileStringTmpl(obj);
           }
 

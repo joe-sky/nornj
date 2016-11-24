@@ -250,7 +250,7 @@ function _setElem(elem, elemName, elemArr, params, bySelfClose) {
 //Extract split parameters
 function _getSplitParams(elem, params) {
   var exprRule = tmplRule.exprRule,
-    beginRule = tmplRule.beginRule,
+    startRule = tmplRule.startRule,
     endRule = tmplRule.endRule,
     paramsExpr;
 
@@ -260,7 +260,7 @@ function _getSplitParams(elem, params) {
       paramsExpr = [exprRule + 'params'];
     }
 
-    paramsExpr.push([exprRule + "param " + beginRule + "'" + key + "'" + endRule, params[no]]);
+    paramsExpr.push([exprRule + "param " + startRule + "'" + key + "'" + endRule, params[no]]);
     return '';
   });
 
@@ -274,7 +274,7 @@ function _getSplitParams(elem, params) {
         paramsExpr = [exprRule + 'params'];
       }
 
-      paramsExpr.push([exprRule + 'spreadParam ' + beginRule + prop.replace(/\.\.\./g, '') + endRule + '/']);
+      paramsExpr.push([exprRule + 'spreadParam ' + startRule + prop.replace(/\.\.\./g, '') + endRule + '/']);
       return ' ';
     }
     else {

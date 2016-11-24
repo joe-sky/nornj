@@ -145,7 +145,7 @@ function compiledParam(value) {
       retP.prop = compiledProp(param[2], param[3]);
 
       //If parameter's open rules are several,then it need escape.
-      retP.escape = param[1].split(tmplRule.beginRule).length < 3;
+      retP.escape = param[1].split(tmplRule.startRule).length < 3;
       props.push(retP);
     }, false, true);
   }
