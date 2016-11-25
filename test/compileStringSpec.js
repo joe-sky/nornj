@@ -127,7 +127,7 @@ describe('test compile string', function () {
         </section>
       `;
 
-      var html = nj.compile(tmpl, __filename)();
+      var html = nj.compile(tmpl, { fileName: __filename })();
       console.log(html);
       expect(html).toBeTruthy();
     });

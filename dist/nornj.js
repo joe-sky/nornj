@@ -1908,9 +1908,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	  compileStringTmpl = __webpack_require__(19);
 
 	//编译模板并返回转换函数
-	function compile(obj, tmplName, isComponent) {
-	  if (!obj) {
+	function compile(tmpl, tmplName, isComponent, fileName) {
+	  if (!tmpl) {
 	    return;
+	  }
+	  if(utils.isObject(tmplName)){
+	    var params = tmplName;
+	    tmplName = params.tmplName;
+	    isComponent = params.isComponent;
+	    fileName = params.fileName;
 	  }
 
 	  //编译模板函数
@@ -1919,9 +1925,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    tmplFns = nj.templates[tmplName];
 	  }
 	  if (!tmplFns) {
-	    var isObj = utils.isObject(obj), fns;
-	    if (isObj && obj.main) {  //直接传入预编译模板
-	      fns = obj;
+	    var isObj = utils.isObject(tmpl), fns;
+	    if (isObj && tmpl.main) {  //直接传入预编译模板
+	      fns = tmpl;
 	    }
 	    else {  //编译AST
 	      var root;
@@ -1930,24 +1936,25 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }
 	      if (!root) {
 	        //Can be directly introduced into the AST
-	        if (isObj && obj.type === 'nj_root') {
-	          root = obj;
+	        if (isObj && tmpl.type === 'nj_root') {
+	          root = tmpl;
 	        }
 	        else {
 	          root = _createAstRoot();
 
 	          //Auto transform string template to array
-	          if (utils.isString(obj)) {
+	          if (utils.isString(tmpl)) {
 	            //Merge all include blocks
-	            if(nj.includeParser) {
-	              obj = nj.includeParser(obj, tmplName);
+	            var includeParser = nj.includeParser;
+	            if(includeParser) {
+	              tmpl = includeParser(tmpl, fileName);
 	            }
 
-	            obj = compileStringTmpl(obj);
+	            tmpl = compileStringTmpl(tmpl);
 	          }
 
 	          //分析传入参数并转换为节点树对象
-	          utils.checkElem(obj, root);
+	          utils.checkElem(tmpl, root);
 	        }
 
 	        //保存模板AST编译结果到全局集合中
@@ -1980,8 +1987,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 	//编译字面量并返回组件转换函数
-	function compileComponent(obj, tmplName) {
-	  return compile(obj, tmplName, true);
+	function compileComponent(tmpl, tmplName) {
+	  return compile(tmpl, tmplName, true);
 	}
 
 	//渲染内联标签组件
@@ -2005,12 +2012,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	//Set init data for inline component
 	function setInitTagData(data) {
 	  nj.initTagData = data;
-	};
+	}
 
 	//Precompile template
-	function precompile(obj, isComponent) {
+	function precompile(tmpl, isComponent) {
 	  var root = _createAstRoot();
-	  utils.checkElem(obj, root);
+	  utils.checkElem(tmpl, root);
 
 	  return buildRuntime(root.content, !isComponent);
 	}
