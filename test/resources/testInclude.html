@@ -1,4 +1,7 @@
-<div>
-  <i>test include block</i>
-  <#include src="./testInclude2.html" />
-</div>
+<template name="t1">1</template>
+<template>
+  <div>
+    <i>test include block <#include name="t1" /></i>
+    <#include src="./testInclude2.html" name="t3" />
+  </div>
+</template>

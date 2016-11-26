@@ -1800,7 +1800,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return ret;
 	}
 
-	module.exports = function (startRule, endRule, exprRule, externalRule, propRule) {
+	module.exports = function (startRule, endRule, exprRule, externalRule, propRule, templateRule) {
 	  if(tools.isObject(startRule)){
 	    var params = startRule;
 	    startRule = params.start;
@@ -1808,6 +1808,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    exprRule = params.expr;
 	    externalRule = params.external;
 	    propRule = params.prop;
+	    templateRule = params.template;
 	  }
 	  if (!startRule) {
 	    startRule = '{';
@@ -1823,6 +1824,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	  if (!propRule) {
 	    propRule = '@';
+	  }
+	  if (!templateRule) {
+	    templateRule = 'template';
 	  }
 
 	  var allRules = _clearRepeat(startRule + endRule),
@@ -1860,7 +1864,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    expr: _createRegExp('^' + escapeExprRule + '([^\\s]+)', 'i'),
 	    include: function() {
 	      return _createRegExp('<' + escapeExprRule + 'include([^>]*)>', 'ig');
-	    }
+	    },
+	    template: templateRule
 	  });
 	};
 
