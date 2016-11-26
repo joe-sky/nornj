@@ -120,12 +120,19 @@ describe('test compile string', function () {
       nj.config({ includeParser });
 
       const tmpl = `
-        <section>
-          <#include src="./resources/testInclude.html" />
+        <template name="t1">
           <img />
-          <#include src="./resources/testInclude2.html" />
-        </section>
+        </template>
+        <template>
+          <section>
+            <#include src="./resources/testInclude.html" />
+            <img />
+            <#include src="./resources/testInclude2.html" />
+          </section>
+        </template>
       `;
+
+      console.log(includeParser(tmpl, __filename, true));
 
       var html = nj.compile(tmpl, { fileName: __filename })();
       console.log(html);
