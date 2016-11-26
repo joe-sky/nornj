@@ -123,6 +123,9 @@ describe('test compile string', function () {
         <template name="t1">
           <img />
         </template>
+        <template name="t2" local>
+          <input />
+        </template>
         <template>
           <section>
             <#include src="./resources/testInclude.html" />

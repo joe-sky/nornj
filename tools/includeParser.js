@@ -15,20 +15,29 @@ function getIncludeTmpl(tmplString, fileName, isAll, tmplStrs, tmplName) {
 
     while (matchArr = pattern.exec(tmplString)) {
       var props = nj.getOpenTagParams(matchArr[1]),
-        name = 'main';
+        name = 'main',
+        isLocal = false;
 
       props && props.forEach(function (prop) {
-        if (prop.key === 'name') {
-          name = prop.value;
+        switch (prop.key) {
+          case 'name':
+            name = prop.value;
+            break;
+          case 'local':
+            isLocal = true;
+            break;
         }
       });
 
-      tmplStrs[name] = matchArr[2];
+      tmplStrs[name] = {
+        tmplStr: matchArr[2],
+        isLocal: isLocal
+      };
       hasTemplate = true;
     }
 
     if (!hasTemplate) {
-      tmplStrs.main = tmplString;
+      tmplStrs.main = { tmplStr: tmplString };
     }
   }
 
@@ -36,11 +45,14 @@ function getIncludeTmpl(tmplString, fileName, isAll, tmplStrs, tmplName) {
     ret;
   if (!isAll) {
     var tName = tmplName == null ? 'main' : tmplName;
-    tmplStrList.push({ name: tName, tmpl: tmplStrs[tName] });
+    tmplStrList.push({ name: tName, tmpl: tmplStrs[tName].tmplStr });
   }
   else {  //按各子模板生成对象结构
     Object.keys(tmplStrs).forEach(function (tName) {
-      tmplStrList.push({ name: tName, tmpl: tmplStrs[tName] });
+      var _tmplStr = tmplStrs[tName];
+      if(!_tmplStr.isLocal) {
+        tmplStrList.push({ name: tName, tmpl: _tmplStr.tmplStr });
+      }
     });
 
     ret = {};
