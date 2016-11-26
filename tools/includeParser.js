@@ -9,7 +9,8 @@ function getIncludeTmpl(tmplString, fileName, tmplStrs, tmplName) {
   //解析template块
   if (!tmplStrs) {
     tmplStrs = {};
-    var pattern = new RegExp('<' + tmplRule.template + '([^>]*)>([\\s\\S]*?)</' + tmplRule.template + '>', 'ig'),
+    var templateRule = tmplRule.template.replace(/\$/g, '\\$'),
+      pattern = new RegExp('<' + templateRule + '([^>]*)>([\\s\\S]*?)</' + templateRule + '>', 'ig'),
       matchArr, hasTemplate;
 
     while (matchArr = pattern.exec(tmplString)) {
