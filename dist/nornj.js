@@ -1917,7 +1917,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  if (!tmpl) {
 	    return;
 	  }
-	  if(utils.isObject(tmplName)){
+	  if (utils.isObject(tmplName)) {
 	    var params = tmplName;
 	    tmplName = params.tmplName;
 	    isComponent = params.isComponent;
@@ -1951,7 +1951,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	          if (utils.isString(tmpl)) {
 	            //Merge all include blocks
 	            var includeParser = nj.includeParser;
-	            if(includeParser) {
+	            if (includeParser) {
 	              tmpl = includeParser(tmpl, fileName);
 	            }
 
@@ -2022,6 +2022,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	//Precompile template
 	function precompile(tmpl, isComponent) {
 	  var root = _createAstRoot();
+
+	  if (utils.isString(tmpl)) {
+	    tmpl = compileStringTmpl(tmpl);
+	  }
 	  utils.checkElem(tmpl, root);
 
 	  return buildRuntime(root.content, !isComponent);

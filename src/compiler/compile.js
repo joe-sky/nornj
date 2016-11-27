@@ -10,7 +10,7 @@ function compile(tmpl, tmplName, isComponent, fileName) {
   if (!tmpl) {
     return;
   }
-  if(utils.isObject(tmplName)){
+  if (utils.isObject(tmplName)) {
     var params = tmplName;
     tmplName = params.tmplName;
     isComponent = params.isComponent;
@@ -44,7 +44,7 @@ function compile(tmpl, tmplName, isComponent, fileName) {
           if (utils.isString(tmpl)) {
             //Merge all include blocks
             var includeParser = nj.includeParser;
-            if(includeParser) {
+            if (includeParser) {
               tmpl = includeParser(tmpl, fileName);
             }
 
@@ -115,6 +115,10 @@ function setInitTagData(data) {
 //Precompile template
 function precompile(tmpl, isComponent) {
   var root = _createAstRoot();
+
+  if (utils.isString(tmpl)) {
+    tmpl = compileStringTmpl(tmpl);
+  }
   utils.checkElem(tmpl, root);
 
   return buildRuntime(root.content, !isComponent);
