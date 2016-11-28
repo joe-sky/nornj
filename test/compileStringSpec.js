@@ -66,7 +66,7 @@ describe('test compile string', function () {
 
       var tmpl2 =
       '<div name1=../111>\
-         <form-item wrapperCol=${{ span: 22, offset: 1 }}>\
+         <form-item wrapperCol=${[{ span: 22, offset: { a: 1 }}, 100]}>\
          <span>\
            <img />\
            sky:{name},{ id: filter2(1, 2) }${{a:1}}end\
