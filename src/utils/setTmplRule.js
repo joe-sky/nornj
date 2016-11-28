@@ -81,9 +81,9 @@ module.exports = function (startRule, endRule, exprRule, externalRule, propRule,
     checkElem: function() {
       return _createRegExp('([^>]*)(<([a-z' + firstChar + '/' + exprRules + '!][-a-z0-9_:.' + allRules + exprRules + ']*)[^>]*>)([^<]*)', 'ig');
     },
-    externalSplit: _createRegExp(escapeExternalRule + '\\{(?:[^{}]*(?:\\{[\\s\\S]*\\})*[^{}]*)\\}'),
+    externalSplit: _createRegExp(escapeExternalRule + '\\{(?:[^{}]*(?:\\{[\\s\\S]*?\\})*[^{}]*)\\}'),
     external: function() {
-      return _createRegExp(escapeExternalRule + '\\{([^{}]*(\\{[\\s\\S]*\\})*[^{}]*)\\}', 'g');
+      return _createRegExp(escapeExternalRule + '\\{([^{}]*(\\{[\\s\\S]*?\\})*[^{}]*)\\}', 'g');
     },
     expr: _createRegExp('^' + escapeExprRule + '([^\\s]+)', 'i'),
     include: function() {

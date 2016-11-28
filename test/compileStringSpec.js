@@ -22,7 +22,7 @@ describe('test compile string', function () {
   });
 
   describe('compile string template to html', function () {
-    xit('test compile 1', function () {
+    it('test compile 1', function () {
       var data = {
         name: "<i>joe_sky1</i>",
         id: 100,
@@ -66,6 +66,7 @@ describe('test compile string', function () {
 
       var tmpl2 =
       '<div name1=../111>\
+         <form-item wrapperCol=${{ span: 22, offset: 1 }}>\
          <span>\
            <img />\
            sky:{name},{ id: filter2(1, 2) }${{a:1}}end\
@@ -108,7 +109,7 @@ describe('test compile string', function () {
         </div>
       `;
 
-      var tmplFn = compile(tmpl3, 'tmplString');
+      var tmplFn = compile(tmpl2, 'tmplString');
       var html = tmplFn(data);
 
       //console.log(JSON.stringify(nj.asts['tmplString']));
@@ -116,7 +117,7 @@ describe('test compile string', function () {
       expect(html).toBeTruthy();
     });
 
-    it('test include parser', function () {
+    xit('test include parser', function () {
       nj.config({ includeParser });
 
       const tmpl = `
