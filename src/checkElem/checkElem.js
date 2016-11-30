@@ -35,14 +35,13 @@ function checkElem(obj, parent) {
       refer;
 
     //判断是否为xml标签
-    var xmlOpenTag,
-      openTagName,
+    var openTagName,
       hasCloseTag = false,
       isTmpl, isParamsExpr;
     
     control = tranElem.isControl(first);
     if (!control) {
-      xmlOpenTag = tranElem.getXmlOpenTag(first);
+      var xmlOpenTag = tranElem.getXmlOpenTag(first);
       if (xmlOpenTag) {  //tagname为xml标签时,则认为是元素节点
         openTagName = xmlOpenTag[1];
         
@@ -53,23 +52,6 @@ function checkElem(obj, parent) {
           node.selfCloseTag = true;
         }
         isElemNode = true;
-      }
-      else {  //tagname不为xml标签时,必须有结束标签才认为是元素节点
-        var openTag = tranElem.getOpenTag(first);
-        if (openTag) {
-          openTagName = openTag[0];
-          
-          if (!tranElem.isSelfCloseTag(first)) {  //非自闭合标签
-            hasCloseTag = tranElem.isCloseTag(last, openTagName);
-            if (hasCloseTag) {
-              isElemNode = true;
-            }
-          }
-          else {  //如果是自闭合标签则直接认为是元素节点
-            node.selfCloseTag = true;
-            isElemNode = true;
-          }
-        }
       }
     }
     else {  //为特殊节点,也可视为一个元素节点
@@ -104,7 +86,7 @@ function checkElem(obj, parent) {
         }
 
         //获取openTag内参数
-        var tagParams = tranElem.getOpenTagParams(first, !xmlOpenTag);
+        var tagParams = tranElem.getOpenTagParams(first);
         if (tagParams) {
           if (!node.params) {
             node.params = tools.lightObj();

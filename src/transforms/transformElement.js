@@ -84,22 +84,6 @@ function isXmlCloseTag(obj, tagName) {
   return tools.isString(obj) && obj.toLowerCase() === '</' + tagName + '>';
 }
 
-//提取open tag
-function getOpenTag(obj) {
-  return tmplRule.openTag.exec(obj);
-}
-
-//验证self close tag
-var REGEX_SELF_CLOSE_TAG = /\/$/i;
-function isSelfCloseTag(obj) {
-  return REGEX_SELF_CLOSE_TAG.test(obj);
-}
-
-//判断close tag
-function isCloseTag(obj, tagName) {
-  return tools.isString(obj) && obj.toLowerCase() === '/' + tagName.toLowerCase();
-}
-
 //get inside brace param
 function getInsideBraceParam(obj) {
   return tmplRule.insideBraceParam.exec(obj);
@@ -205,9 +189,6 @@ module.exports = {
   verifySelfCloseTag: verifySelfCloseTag,
   getOpenTagParams: getOpenTagParams,
   isXmlCloseTag: isXmlCloseTag,
-  getOpenTag: getOpenTag,
-  isSelfCloseTag: isSelfCloseTag,
-  isCloseTag: isCloseTag,
   getInsideBraceParam: getInsideBraceParam,
   isControl: isControl,
   isControlCloseTag: isControlCloseTag,

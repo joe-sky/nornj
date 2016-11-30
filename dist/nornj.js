@@ -582,22 +582,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return tools.isString(obj) && obj.toLowerCase() === '</' + tagName + '>';
 	}
 
-	//提取open tag
-	function getOpenTag(obj) {
-	  return tmplRule.openTag.exec(obj);
-	}
-
-	//验证self close tag
-	var REGEX_SELF_CLOSE_TAG = /\/$/i;
-	function isSelfCloseTag(obj) {
-	  return REGEX_SELF_CLOSE_TAG.test(obj);
-	}
-
-	//判断close tag
-	function isCloseTag(obj, tagName) {
-	  return tools.isString(obj) && obj.toLowerCase() === '/' + tagName.toLowerCase();
-	}
-
 	//get inside brace param
 	function getInsideBraceParam(obj) {
 	  return tmplRule.insideBraceParam.exec(obj);
@@ -703,9 +687,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	  verifySelfCloseTag: verifySelfCloseTag,
 	  getOpenTagParams: getOpenTagParams,
 	  isXmlCloseTag: isXmlCloseTag,
-	  getOpenTag: getOpenTag,
-	  isSelfCloseTag: isSelfCloseTag,
-	  isCloseTag: isCloseTag,
 	  getInsideBraceParam: getInsideBraceParam,
 	  isControl: isControl,
 	  isControlCloseTag: isControlCloseTag,
@@ -1145,14 +1126,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	      refer;
 
 	    //判断是否为xml标签
-	    var xmlOpenTag,
-	      openTagName,
+	    var openTagName,
 	      hasCloseTag = false,
 	      isTmpl, isParamsExpr;
 	    
 	    control = tranElem.isControl(first);
 	    if (!control) {
-	      xmlOpenTag = tranElem.getXmlOpenTag(first);
+	      var xmlOpenTag = tranElem.getXmlOpenTag(first);
 	      if (xmlOpenTag) {  //tagname为xml标签时,则认为是元素节点
 	        openTagName = xmlOpenTag[1];
 	        
@@ -1163,23 +1143,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	          node.selfCloseTag = true;
 	        }
 	        isElemNode = true;
-	      }
-	      else {  //tagname不为xml标签时,必须有结束标签才认为是元素节点
-	        var openTag = tranElem.getOpenTag(first);
-	        if (openTag) {
-	          openTagName = openTag[0];
-	          
-	          if (!tranElem.isSelfCloseTag(first)) {  //非自闭合标签
-	            hasCloseTag = tranElem.isCloseTag(last, openTagName);
-	            if (hasCloseTag) {
-	              isElemNode = true;
-	            }
-	          }
-	          else {  //如果是自闭合标签则直接认为是元素节点
-	            node.selfCloseTag = true;
-	            isElemNode = true;
-	          }
-	        }
 	      }
 	    }
 	    else {  //为特殊节点,也可视为一个元素节点
@@ -1214,7 +1177,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 
 	        //获取openTag内参数
-	        var tagParams = tranElem.getOpenTagParams(first, !xmlOpenTag);
+	        var tagParams = tranElem.getOpenTagParams(first);
 	        if (tagParams) {
 	          if (!node.params) {
 	            node.params = tools.lightObj();
@@ -1845,7 +1808,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    externalRule: externalRule,
 	    propRule: propRule,
 	    xmlOpenTag: _createRegExp('^<([a-z' + firstChar + exprRules + '][-a-z0-9_:./' + otherChars + ']*)[^>]*>$', 'i'),
-	    openTag: _createRegExp('^[a-z' + firstChar + exprRules + '][-a-z0-9_:./' + otherChars + ']*', 'i'),
 	    insideBraceParam: _createRegExp(startRule + '([^' + allRules + ']+)' + endRule, 'i'),
 	    replaceBraceParam: function() {
 	      return _createRegExp('[\\s]+(' + startRule + '){1,2}([^' + allRules + ']+)(' + endRule + '){1,2}', 'g')

@@ -20,14 +20,14 @@ function compiledProp(prop, isString) {
 
   //Extract the dot data path to the 'prop' filter.
   if (!isString && prop.indexOf('.') > -1) {
-    prop = prop.replace(/\.([^\s.:\/]+)/g, ':prop($1)');
+    prop = prop.replace(/\.([^\s.|\/]+)/g, '|prop($1)');
   }
 
   //If there are colons in the property,then use filter
-  if (prop.indexOf(':') >= 0) {
+  if (prop.indexOf('|') >= 0) {
     var filters = [],
       filtersTmp;
-    filtersTmp = prop.split(':');
+    filtersTmp = prop.split('|');
     prop = filtersTmp[0].trim();  //Extract property
 
     filtersTmp = filtersTmp.slice(1);
@@ -43,7 +43,7 @@ function compiledProp(prop, isString) {
         if (paramsF) {
           var params = [];
           tools.each(paramsF.split(','), function (p) {
-            params[params.length] = p.trim();
+            params[params.length] = tools.clearQuot(p).trim();
           }, false, true);
 
           filterObj.params = params;
@@ -86,7 +86,7 @@ function _getFilterParam(obj) {
 var _quots = ['\'', '"'];
 function _getReplaceParam(obj, strs) {
   var pattern = tmplRule.replaceParam(),
-    patternP = /[^\s:]+([\s]?:[\s]?[^\s\(\)]+(\([^\(\)]+\))?(\.[^\s.]+)?){0,}/g,
+    patternP = /[^\s|]+([\s]?\|[\s]?[^\s\(\)]+(\([^\(\)]+\))?(\.[^\s.]+)?){0,}/g,
     matchArr, matchArrP, ret, prop, i = 0;
 
   while ((matchArr = pattern.exec(obj))) {

@@ -19,7 +19,7 @@ xdescribe('test speed', function () {
         <#each {../list2}>
           <div key={#}>
             <#props>
-              <#if {../#:five}>
+              <#if {../# | five}>
                 <#prop {'name'}>five</#prop>
               </#if>
             </#props>
@@ -28,7 +28,7 @@ xdescribe('test speed', function () {
           </div>
         </#each>
       </span>
-      <#if {#:five(1):test}>
+      <#if {# | five(1) | test}>
         <br />
       <#else />
         <img />
@@ -56,7 +56,7 @@ xdescribe('test speed', function () {
         <#each {../list2}>
           <div key={#}>
             <#props>
-              <#if {../#:five}>
+              <#if {../# | five}>
                 <#prop {'name'}>five</#prop>
               </#if>
             </#props>
@@ -65,7 +65,7 @@ xdescribe('test speed', function () {
           </div>
         </#each>
       </span>
-      <#if {#:five(1):test}>
+      <#if {# | five(1) | test}>
         <br />
       <#else />
         <img />
@@ -103,7 +103,7 @@ xdescribe('test speed', function () {
         <#each {../list2}>
           <div key="{#}">
             <#props>
-              <#if {../#:five}>
+              <#if {../# | five}>
                 <#prop {'name'}>five</#prop>
               </#if>
             </#props>
@@ -112,7 +112,7 @@ xdescribe('test speed', function () {
           </div>
         </#each>
       </span>
-      <#if {#:five}>
+      <#if {# | five}>
         <br />
       <#else />
         <img />
