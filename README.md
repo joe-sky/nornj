@@ -26,7 +26,7 @@ import nj from 'nornj';
 export default nj`
 <div id=test1>
   this the test demo{no}.
-  <#for {'1' no}>
+  <#for {'1'} {no}>
     <i>test{#}</i>
   </#for>
 </div>`;
