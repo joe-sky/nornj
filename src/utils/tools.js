@@ -2,22 +2,11 @@
 
 var nj = require('../core'),
   assign = require('object-assign'),
-  arrayProto = Array.prototype,
-  arrayEvery = arrayProto.every,
-  arrayForEach = arrayProto.forEach,
-  arrayPush = arrayProto.push,
+  arrayPush = Array.prototype.push,
   errorTitle = nj.errorTitle;
 
 //Push one by one to array
-function listPush(arr1, arr2, checkIsArr, checkNotNull) {
-  if (checkIsArr && !isArray(arr2)) {
-    //Put the value at the end of the first array only when the second parameter is not null.
-    if (!checkNotNull || arr2 != null) {
-      arr1[arr1.length] = arr2;
-    }
-    return arr1;
-  }
-
+function listPush(arr1, arr2) {
   arrayPush.apply(arr1, arr2);
   return arr1;
 }
@@ -53,18 +42,11 @@ function isArrayLike(obj) {
 }
 
 //遍历数组或对象
-function each(obj, func, context, isArr, useEvery) {
+function each(obj, func, context, isArr) {
   if (!obj) {
     return;
   }
 
-  var arrayEach;
-  if (useEvery) {
-    arrayEach = arrayEvery;
-  }
-  else {
-    arrayEach = arrayForEach;
-  }
   if (isArr == null) {
     isArr = isArrayLike(obj);
   }
@@ -73,45 +55,26 @@ function each(obj, func, context, isArr, useEvery) {
   context = context ? context : obj;
 
   if (isArr) {
-    arrayEach.call(obj, function (o, i) {
-      var ret = func.call(context, o, i);
+    for (var i = 0, l = obj.length; i < l; i++) {
+      var ret = func.call(context, obj[i], i);
 
-      if (useEvery) {
-        if (ret === false) {
-          return ret;
-        }
-        return true;
+      if (ret === false) {
+        break;
       }
-    });
+    }
   }
   else {
     var keys = Object.keys(obj),
       l = keys.length;
-    arrayEach.call(keys, function (k, i) {
-      var ret = func.call(context, obj[k], k, i, l);
+    for (var i = 0; i < l; i++) {
+      var k = keys[i],
+        ret = func.call(context, obj[k], k, i, l);
 
-      if (useEvery) {
-        if (ret === false) {
-          return ret;
-        }
-        return true;
+      if (ret === false) {
+        break;
       }
-    });
+    }
   }
-}
-
-//判断是否在数组内
-function inArray(obj, value) {
-  return obj.indexOf(value);
-}
-
-//去除字符串空格
-function trim(str) {
-  if (!!!str) {
-    return '';
-  }
-
-  return str.trim();
 }
 
 //Transform multidimensional array to one-dimensional array
@@ -120,7 +83,7 @@ function flatten(obj) {
     idx = 0;
 
   if (isArray(obj)) {
-    for (var i = 0, l = _getLength(obj) ; i < l; i++) {
+    for (var i = 0, l = _getLength(obj); i < l; i++) {
       var value = obj[i];
       //flatten current level of array or arguments object
       value = flatten(value);
@@ -227,8 +190,6 @@ var tools = {
   isObject: isObject,
   isString: isString,
   each: each,
-  inArray: inArray,
-  trim: trim,
   flatten: flatten,
   throwIf: throwIf,
   assign: assign,

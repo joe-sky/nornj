@@ -162,22 +162,11 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var nj = __webpack_require__(1),
 	  assign = __webpack_require__(4),
-	  arrayProto = Array.prototype,
-	  arrayEvery = arrayProto.every,
-	  arrayForEach = arrayProto.forEach,
-	  arrayPush = arrayProto.push,
+	  arrayPush = Array.prototype.push,
 	  errorTitle = nj.errorTitle;
 
 	//Push one by one to array
-	function listPush(arr1, arr2, checkIsArr, checkNotNull) {
-	  if (checkIsArr && !isArray(arr2)) {
-	    //Put the value at the end of the first array only when the second parameter is not null.
-	    if (!checkNotNull || arr2 != null) {
-	      arr1[arr1.length] = arr2;
-	    }
-	    return arr1;
-	  }
-
+	function listPush(arr1, arr2) {
 	  arrayPush.apply(arr1, arr2);
 	  return arr1;
 	}
@@ -213,18 +202,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 	//遍历数组或对象
-	function each(obj, func, context, isArr, useEvery) {
+	function each(obj, func, context, isArr) {
 	  if (!obj) {
 	    return;
 	  }
 
-	  var arrayEach;
-	  if (useEvery) {
-	    arrayEach = arrayEvery;
-	  }
-	  else {
-	    arrayEach = arrayForEach;
-	  }
 	  if (isArr == null) {
 	    isArr = isArrayLike(obj);
 	  }
@@ -233,45 +215,26 @@ return /******/ (function(modules) { // webpackBootstrap
 	  context = context ? context : obj;
 
 	  if (isArr) {
-	    arrayEach.call(obj, function (o, i) {
-	      var ret = func.call(context, o, i);
+	    for (var i = 0, l = obj.length; i < l; i++) {
+	      var ret = func.call(context, obj[i], i);
 
-	      if (useEvery) {
-	        if (ret === false) {
-	          return ret;
-	        }
-	        return true;
+	      if (ret === false) {
+	        break;
 	      }
-	    });
+	    }
 	  }
 	  else {
 	    var keys = Object.keys(obj),
 	      l = keys.length;
-	    arrayEach.call(keys, function (k, i) {
-	      var ret = func.call(context, obj[k], k, i, l);
+	    for (var i = 0; i < l; i++) {
+	      var k = keys[i],
+	        ret = func.call(context, obj[k], k, i, l);
 
-	      if (useEvery) {
-	        if (ret === false) {
-	          return ret;
-	        }
-	        return true;
+	      if (ret === false) {
+	        break;
 	      }
-	    });
+	    }
 	  }
-	}
-
-	//判断是否在数组内
-	function inArray(obj, value) {
-	  return obj.indexOf(value);
-	}
-
-	//去除字符串空格
-	function trim(str) {
-	  if (!!!str) {
-	    return '';
-	  }
-
-	  return str.trim();
 	}
 
 	//Transform multidimensional array to one-dimensional array
@@ -280,7 +243,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    idx = 0;
 
 	  if (isArray(obj)) {
-	    for (var i = 0, l = _getLength(obj) ; i < l; i++) {
+	    for (var i = 0, l = _getLength(obj); i < l; i++) {
 	      var value = obj[i];
 	      //flatten current level of array or arguments object
 	      value = flatten(value);
@@ -387,8 +350,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	  isObject: isObject,
 	  isString: isString,
 	  each: each,
-	  inArray: inArray,
-	  trim: trim,
 	  flatten: flatten,
 	  throwIf: throwIf,
 	  assign: assign,
@@ -593,7 +554,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  if (ret1) {
 	    ret = [ret1[1]];
 
-	    var ret2 = getInsideBraceParam(obj);  //提取refer值
+	    var ret2 = tmplRule.exprBraceParam.exec(obj);  //提取refer值
 	    if (ret2) {
 	      ret.push(ret2[0]);
 	    }
@@ -724,14 +685,14 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  //Extract the dot data path to the 'prop' filter.
 	  if (!isString && prop.indexOf('.') > -1) {
-	    prop = prop.replace(/\.([^\s.:\/]+)/g, ':prop($1)');
+	    prop = prop.replace(/\.([^\s.|\/]+)/g, '|prop($1)');
 	  }
 
 	  //If there are colons in the property,then use filter
-	  if (prop.indexOf(':') >= 0) {
+	  if (prop.indexOf('|') >= 0) {
 	    var filters = [],
 	      filtersTmp;
-	    filtersTmp = prop.split(':');
+	    filtersTmp = prop.split('|');
 	    prop = filtersTmp[0].trim();  //Extract property
 
 	    filtersTmp = filtersTmp.slice(1);
@@ -747,7 +708,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        if (paramsF) {
 	          var params = [];
 	          tools.each(paramsF.split(','), function (p) {
-	            params[params.length] = p.trim();
+	            params[params.length] = tools.clearQuot(p).trim();
 	          }, false, true);
 
 	          filterObj.params = params;
@@ -790,41 +751,31 @@ return /******/ (function(modules) { // webpackBootstrap
 	var _quots = ['\'', '"'];
 	function _getReplaceParam(obj, strs) {
 	  var pattern = tmplRule.replaceParam(),
-	    patternP = /[^\s:]+([\s]?:[\s]?[^\s\(\)]+(\([^\(\)]+\))?(\.[^\s.]+)?){0,}/g,
-	    matchArr, matchArrP, ret, prop, i = 0;
+	    matchArr, ret, i = 0;
 
 	  while ((matchArr = pattern.exec(obj))) {
 	    if (!ret) {
 	      ret = [];
 	    }
 
-	    var j = 0;
-	    prop = matchArr[3];
+	    var prop = matchArr[3],
+	      item = [matchArr[0], matchArr[1], null, false, true];
 
-	    //To extract parameters by interval space.
-	    while ((matchArrP = patternP.exec(prop))) {
-	      var propP = matchArrP[0],
-	        item = [matchArr[0], matchArr[1], propP, false, true];
-
-	      //Clear parameter at both ends of the space.
-	      propP = propP.trim();
-
-	      //If parameter has quotation marks, this's a pure string parameter.
-	      if (_quots.indexOf(propP[0]) > -1) {
-	        propP = tools.clearQuot(propP);
-	        item[3] = true;
-	      }
-
-	      item[2] = propP;
-	      ret.push(item);
-
-	      //If there are several parameters in a curly braces, fill the space for the "strs" array.
-	      if (j > 0) {
-	        item[4] = false;  //Sign not contain all of placehorder
-	        strs.splice(++i, 0, '');
-	      }
-	      j++;
+	    if (i > 0) {
+	      item[4] = false;  //Sign not contain all of placehorder
 	    }
+
+	    //Clear parameter at both ends of the space.
+	    prop = prop.trim();
+
+	    //If parameter has quotation marks, this's a pure string parameter.
+	    if (_quots.indexOf(prop[0]) > -1) {
+	      prop = tools.clearQuot(prop);  //TODO 此处也会去除过滤器参数的引号
+	      item[3] = true;
+	    }
+
+	    item[2] = prop;
+	    ret.push(item);
 	    i++;
 	  }
 
@@ -845,7 +796,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    tools.each(params, function (param) {
 	      var retP = tools.lightObj();
-	      isAll = param[4] ? param[0] === value : false;  //If there are several parameters in a curly braces, "isAll" must be false.
+	      isAll = param[4] ? param[0] === value : false;  //If there are several curly braces, "isAll" must be false.
 	      retP.prop = compiledProp(param[2], param[3]);
 
 	      //If parameter's open rules are several,then it need escape.
@@ -859,9 +810,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  ret.isAll = isAll;
 
 	  //标记为模板函数替换变量
-	  if(isAll) {
+	  if (isAll) {
 	    var prop = props[0].prop;
-	    if(prop.name.indexOf('!#') === 0) {
+	    if (prop.name.indexOf('!#') === 0) {
 	      prop.name = prop.name.substr(2);
 	      ret.isTmplPlace = true;
 	    }
@@ -933,16 +884,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	}
 
-	//获取each块中的item参数
+	//Rebuild data in the new context
 	function getNewData(item, data, isArr, addData) {
-	  var ret = item,
-	    isAdd = addData != null;
+	  var ret = item;
 
 	  if (isArr == null) {
 	    isArr = tools.isArray(data);
 	  }
-	  if (isArr || isAdd) {
-	    ret = tools.listPush([item], !isAdd ? data.slice(1) : (isArr ? data : [data]));
+	  if (isArr || addData) {
+	    ret = tools.listPush([item], !addData ? data.slice(1) : (isArr ? data : [data]));
 	  }
 
 	  return ret;
@@ -1205,7 +1155,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	          pushContent = false;
 	        }
 	        else {
-	          elseIndex = tools.inArray(obj, tmplRule.exprRule + 'else');
+	          elseIndex = obj.indexOf(tmplRule.exprRule + 'else');
 	        }
 	      }
 
@@ -1807,8 +1757,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    exprRule: exprRule,
 	    externalRule: externalRule,
 	    propRule: propRule,
-	    xmlOpenTag: _createRegExp('^<([a-z' + firstChar + exprRules + '][-a-z0-9_:./' + otherChars + ']*)[^>]*>$', 'i'),
+	    xmlOpenTag: _createRegExp('^<([a-z' + firstChar + exprRules + '][-a-z0-9_|./' + otherChars + ']*)[^>]*>$', 'i'),
 	    insideBraceParam: _createRegExp(startRule + '([^' + allRules + ']+)' + endRule, 'i'),
+	    exprBraceParam: _createRegExp('([\\s]+(' + startRule + '){1,2}[^' + allRules + ']+(' + endRule + '){1,2})+', 'i'),
 	    replaceBraceParam: function() {
 	      return _createRegExp('[\\s]+(' + startRule + '){1,2}([^' + allRules + ']+)(' + endRule + '){1,2}', 'g')
 	    },
@@ -1817,7 +1768,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      return _createRegExp('((' + startRule + '){1,2})([^' + allRules + ']+)(' + endRule + '){1,2}', 'g');
 	    },
 	    checkElem: function() {
-	      return _createRegExp('([^>]*)(<([a-z' + firstChar + '/' + exprRules + '!][-a-z0-9_:.' + allRules + exprRules + ']*)[^>]*>)([^<]*)', 'ig');
+	      return _createRegExp('([^>]*)(<([a-z' + firstChar + '/' + exprRules + '!][-a-z0-9_|.' + allRules + exprRules + ']*)[^>]*>)([^<]*)', 'ig');
 	    },
 	    externalSplit: _createRegExp(escapeExternalRule + '\\{[^{}]*(?:\\{[^' + externalRule + ']*\\})*[^{}]*\\}'),
 	    external: function() {
@@ -2248,7 +2199,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      if (obj.isAll) {
 	        return false;
 	      }
-	    }, false, true, true);
+	    }, false, true);
 	  }
 	  else if (utils.isObject(str0) && str0.length != null) {  //tmpl块表达式
 	    valueStr += '{\n';

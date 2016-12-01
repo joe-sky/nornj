@@ -10,7 +10,7 @@
 
 xdescribe('test speed', function () {
   var tmpl = nj`
-  <{div} id="{num '_100'}">
+  <{div} id="{num}_100">
     <#each {arr}>
       <span class=test_{#}
             style={../styles}
@@ -20,7 +20,7 @@ xdescribe('test speed', function () {
           <div key={#}>
             <#props>
               <#if {../# | five}>
-                <#prop {'name'}>five</#prop>
+                <@name>five</@name>
               </#if>
             </#props>
             <span>span{no}</span>
@@ -38,7 +38,7 @@ xdescribe('test speed', function () {
   `;
 
   var _tmpl = nj`
-  <{div} id="{num '_100'}">{...props}
+  <{div} id="{num}_100">{...props}
     &nbsp;1&gt;2
     <#each {arr}>
       <TestComp id=@${'false'}>
@@ -57,7 +57,7 @@ xdescribe('test speed', function () {
           <div key={#}>
             <#props>
               <#if {../# | five}>
-                <#prop {'name'}>five</#prop>
+                <@name>five</@name>
               </#if>
             </#props>
             <span>span{no}</span>
@@ -104,7 +104,7 @@ xdescribe('test speed', function () {
           <div key="{#}">
             <#props>
               <#if {../# | five}>
-                <#prop {'name'}>five</#prop>
+                <@name>five</@name>
               </#if>
             </#props>
             <span>span{no}</span>
@@ -144,7 +144,7 @@ xdescribe('test speed', function () {
     });
   });
 
-  it('test render to string by hbs', function () {
+  xit('test render to string by hbs', function () {
     var data = {
       div: 'div',
       num: 100,
@@ -164,7 +164,7 @@ xdescribe('test speed', function () {
     expect(ret).toBeTruthy();
   });
 
-  it('test render to string by nj', function () {
+  xit('test render to string by nj', function () {
     var data = {
       div: 'div',
       num: 100,
@@ -184,7 +184,7 @@ xdescribe('test speed', function () {
     expect(ret).toBeTruthy();
   });
 
-  it('test render to component by jsx', function () {
+  xit('test render to component by jsx', function () {
     var start;
     var TestComponent = React.createClass({
       getInitialState: function () {

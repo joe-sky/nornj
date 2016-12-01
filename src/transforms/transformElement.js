@@ -95,7 +95,7 @@ function isControl(obj) {
   if (ret1) {
     ret = [ret1[1]];
 
-    var ret2 = getInsideBraceParam(obj);  //提取refer值
+    var ret2 = tmplRule.exprBraceParam.exec(obj);  //提取refer值
     if (ret2) {
       ret.push(ret2[0]);
     }

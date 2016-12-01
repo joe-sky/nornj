@@ -86,41 +86,31 @@ function _getFilterParam(obj) {
 var _quots = ['\'', '"'];
 function _getReplaceParam(obj, strs) {
   var pattern = tmplRule.replaceParam(),
-    patternP = /[^\s|]+([\s]?\|[\s]?[^\s\(\)]+(\([^\(\)]+\))?(\.[^\s.]+)?){0,}/g,
-    matchArr, matchArrP, ret, prop, i = 0;
+    matchArr, ret, i = 0;
 
   while ((matchArr = pattern.exec(obj))) {
     if (!ret) {
       ret = [];
     }
 
-    var j = 0;
-    prop = matchArr[3];
+    var prop = matchArr[3],
+      item = [matchArr[0], matchArr[1], null, false, true];
 
-    //To extract parameters by interval space.
-    while ((matchArrP = patternP.exec(prop))) {
-      var propP = matchArrP[0],
-        item = [matchArr[0], matchArr[1], propP, false, true];
-
-      //Clear parameter at both ends of the space.
-      propP = propP.trim();
-
-      //If parameter has quotation marks, this's a pure string parameter.
-      if (_quots.indexOf(propP[0]) > -1) {
-        propP = tools.clearQuot(propP);
-        item[3] = true;
-      }
-
-      item[2] = propP;
-      ret.push(item);
-
-      //If there are several parameters in a curly braces, fill the space for the "strs" array.
-      if (j > 0) {
-        item[4] = false;  //Sign not contain all of placehorder
-        strs.splice(++i, 0, '');
-      }
-      j++;
+    if (i > 0) {
+      item[4] = false;  //Sign not contain all of placehorder
     }
+
+    //Clear parameter at both ends of the space.
+    prop = prop.trim();
+
+    //If parameter has quotation marks, this's a pure string parameter.
+    if (_quots.indexOf(prop[0]) > -1) {
+      prop = tools.clearQuot(prop);  //TODO 此处也会去除过滤器参数的引号
+      item[3] = true;
+    }
+
+    item[2] = prop;
+    ret.push(item);
     i++;
   }
 
@@ -141,7 +131,7 @@ function compiledParam(value) {
 
     tools.each(params, function (param) {
       var retP = tools.lightObj();
-      isAll = param[4] ? param[0] === value : false;  //If there are several parameters in a curly braces, "isAll" must be false.
+      isAll = param[4] ? param[0] === value : false;  //If there are several curly braces, "isAll" must be false.
       retP.prop = compiledProp(param[2], param[3]);
 
       //If parameter's open rules are several,then it need escape.
@@ -155,9 +145,9 @@ function compiledParam(value) {
   ret.isAll = isAll;
 
   //标记为模板函数替换变量
-  if(isAll) {
+  if (isAll) {
     var prop = props[0].prop;
-    if(prop.name.indexOf('!#') === 0) {
+    if (prop.name.indexOf('!#') === 0) {
       prop.name = prop.name.substr(2);
       ret.isTmplPlace = true;
     }

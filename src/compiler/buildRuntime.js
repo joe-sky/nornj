@@ -241,7 +241,7 @@ function _buildProps(obj, counter, fns) {
       if (obj.isAll) {
         return false;
       }
-    }, false, true, true);
+    }, false, true);
   }
   else if (utils.isObject(str0) && str0.length != null) {  //tmpl块表达式
     valueStr += '{\n';

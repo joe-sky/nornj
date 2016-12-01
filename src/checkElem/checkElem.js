@@ -114,7 +114,7 @@ function checkElem(obj, parent) {
           pushContent = false;
         }
         else {
-          elseIndex = tools.inArray(obj, tmplRule.exprRule + 'else');
+          elseIndex = obj.indexOf(tmplRule.exprRule + 'else');
         }
       }
 

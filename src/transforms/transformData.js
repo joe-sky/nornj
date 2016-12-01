@@ -51,16 +51,15 @@ function getDatasValue(datas, prop) {
   }
 }
 
-//获取each块中的item参数
+//Rebuild data in the new context
 function getNewData(item, data, isArr, addData) {
-  var ret = item,
-    isAdd = addData != null;
+  var ret = item;
 
   if (isArr == null) {
     isArr = tools.isArray(data);
   }
-  if (isArr || isAdd) {
-    ret = tools.listPush([item], !isAdd ? data.slice(1) : (isArr ? data : [data]));
+  if (isArr || addData) {
+    ret = tools.listPush([item], !addData ? data.slice(1) : (isArr ? data : [data]));
   }
 
   return ret;
