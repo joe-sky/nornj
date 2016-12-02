@@ -48,11 +48,11 @@ describe('test speed', function () {
       var _expr0 = p1.exprs['prop'];
       p1.throwIf(_expr0, 'prop', 'expr');
 
-      return _expr0.apply({
+      return _expr0.call({
         useString: p1.useString,
         paramsExpr: p5,
         result: p1.exprRet(p1, p2, p3, p1.fn4, p5)
-      }, ['name']);
+      }, 'name');
     },
     fn2: function (p1, p2, p3, p4, p5
 	/**/) {
@@ -75,21 +75,21 @@ describe('test speed', function () {
         p1.warn('five', 'filter');
       }
       else {
-        _value0 = _filter0.apply({
+        _value0 = _filter0.call({
           useString: p1.useString,
           data: parent.data,
           parent: parent.parent,
           index: parent.index
-        }, [_value0]);
+        }, _value0);
       }
 
       p1.throwIf(_expr0, 'if', 'expr');
 
-      _expr0.apply({
+      _expr0.call({
         useString: p1.useString,
         result: p1.exprRet(p1, _p2, _p3, p1.fn3, _paramsE0),
         inverse: p1.noop
-      }, [_value0]);
+      }, _value0);
 
       _paramsE0['key'] = parent.index;
 
@@ -126,12 +126,12 @@ describe('test speed', function () {
         p1.warn('five', 'filter');
       }
       else {
-        _value0 = _filter0.apply({
+        _value0 = _filter0.call({
           useString: p1.useString,
           data: parent.data,
           parent: parent.parent,
           index: parent.index
-        }, [_value0, '1']);
+        }, _value0, '1');
       }
 
       var _filter1 = p1.filters['test'];
@@ -139,12 +139,12 @@ describe('test speed', function () {
         p1.warn('test', 'filter');
       }
       else {
-        _value0 = _filter1.apply({
+        _value0 = _filter1.call({
           useString: p1.useString,
           data: parent.data,
           parent: parent.parent,
           index: parent.index
-        }, [_value0]);
+        }, _value0);
       }
 
       p1.throwIf(_expr1, 'if', 'expr');
@@ -155,17 +155,17 @@ describe('test speed', function () {
           'style': p1.styleProps(parent.parent.data['styles']),
           'onClick': parent.parent.data['onClick']
         }, 'test_' + (parent.parent.data['num']),
-          _expr0.apply({
+          _expr0.call({
             useString: p1.useString,
             result: p1.exprRet(p1, _p2, _p3, p1.fn2, p5),
             inverse: p1.noop
-          }, [parent.parent.data['list2']])
+          }, parent.parent.data['list2'])
         ),
-        _expr1.apply({
+        _expr1.call({
           useString: p1.useString,
           result: p1.exprRet(p1, _p2, _p3, p1.fn5, p5),
           inverse: p1.exprRet(p1, _p2, _p3, p1.fn6, p5)
-        }, [_value0])
+        }, _value0)
       ];
     },
     main: function (p1, p2, p3, p4, p5
@@ -189,11 +189,11 @@ describe('test speed', function () {
 
       return h(_type0, {
         'id': ((!multiData ? data['num'] : p1.getDatasValue(data, 'num'))) + '_100'
-      }, _expr0.apply({
+      }, _expr0.call({
         useString: p1.useString,
         result: p1.exprRet(p1, p2, p3, p1.fn1, p5),
         inverse: p1.noop
-      }, [(!multiData ? data['arr'] : p1.getDatasValue(data, 'arr'))])
+      }, (!multiData ? data['arr'] : p1.getDatasValue(data, 'arr')))
       );
     }
   };
@@ -424,7 +424,7 @@ describe('test speed', function () {
           num: 100
         };
       },
-      template: nj.compileComponent(tmpl, 'tmpl1'),
+      template: nj.compileComponent(tmplFns, 'tmpl1'),
       onClick: function () {
         this.setState({ num: Date.now() }, function () {
           console.log('total:' + (Date.now() - start));
