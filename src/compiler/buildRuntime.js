@@ -43,30 +43,18 @@ function _buildFn(content, fns, no, newContext, level) {
   if (main) {
     fnStr += _buildVar();
     fnStr += 'if(!parent) {\n';
-    fnStr += '  parent = p1.lightObj();\n';
-    fnStr += '  if (data) {\n';
-    fnStr += '    parent.data = multiData ? data[0] : data;\n';
-    fnStr += '  }\n';
+    fnStr += '  if (data) parent = { data: multiData ? data[0] : data };\n';
+    fnStr += '  else parent = {};\n';
     fnStr += '  p2.parent = parent;\n';
     fnStr += '};\n';
   }
   else if (newContext) {
-    fnStr += 'var parent = p1.lightObj(),\n';
-    fnStr += '  _parent = p2.parent,\n';
-    fnStr += '  multiData = p3.multiData,\n';
-    fnStr += '  hasItem = \'item\' in p4;\n';
-    fnStr += 'parent.data = hasItem ? p4.item : _parent.data;\n';
-    fnStr += 'parent.parent = p4.fallback ? _parent : _parent.parent;\n';
-    fnStr += 'parent.index = \'index\' in p4 ? p4.index : _parent.index;\n';
-    fnStr += 'var data;\n';
-    fnStr += 'if(hasItem) data = p1.getNewData(p4.item, p2.data, multiData, p4.addData);\n';
-    fnStr += 'else data = p2.data;\n';
-    fnStr += 'var _p2 = p1.lightObj();\n';
-    fnStr += '_p2.parent = parent;\n';
-    fnStr += '_p2.data = data;\n';
-    fnStr += 'var _p3 = p1.lightObj();\n';
-    fnStr += 'if(p4.addData) multiData = true;\n';
-    fnStr += '_p3.multiData = multiData;\n';
+    fnStr += 'var _newVars = p1.newContextVars(p1, p2, p3, p4),\n';
+    fnStr += '  parent = _newVars._1,\n';
+    fnStr += '  data = _newVars._2,\n';
+    fnStr += '  multiData = _newVars._3,\n';
+    fnStr += '  _p2 = _newVars._4,\n';
+    fnStr += '  _p3 = _newVars._5;\n';
   }
   else {
     fnStr += _buildVar();

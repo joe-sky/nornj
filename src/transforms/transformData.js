@@ -65,6 +65,33 @@ function getNewData(item, data, isArr, addData) {
   return ret;
 }
 
+//Rebuild local variables in the new context
+function newContextVars(p1, p2, p3, p4) {
+  var _parent = p2.parent,
+    multiData = p3.multiData,
+    hasItem = 'item' in p4,
+    parent = {
+      data: hasItem ? p4.item : _parent.data,
+      parent: p4.fallback ? _parent : _parent.parent,
+      index: 'index' in p4 ? p4.index : _parent.index
+    },
+    data = hasItem ? getNewData(p4.item, p2.data, p3.multiData, p4.addData) : p2.data,
+    multiData = p4.addData ? true : p3.multiData;
+
+  return {
+    _1: parent,
+    _2: data,
+    _3: multiData,
+    _4: {
+      parent: parent,
+      data: data
+    },
+    _5: {
+      multiData: multiData
+    }
+  }
+}
+
 //修正属性名
 function fixPropName(name) {
   switch (name) {
@@ -134,6 +161,7 @@ function template(fns) {
     throwIf: nj.throwIf,
     warn: nj.warn,
     getNewData: nj.getNewData,
+    newContextVars: nj.newContextVars,
     styleProps: nj.styleProps,
     exprRet: nj.exprRet
   };
@@ -164,6 +192,7 @@ function template(fns) {
 
 module.exports = {
   getNewData: getNewData,
+  newContextVars: newContextVars,
   getDatasValue: getDatasValue,
   fixPropName: fixPropName,
   styleProps: styleProps,

@@ -8,7 +8,7 @@
   ReactDOMServer = require('react-dom/server'),
   Handlebars = require('handlebars');
 
-xdescribe('test speed', function () {
+describe('test speed', function () {
   var tmpl = nj`
   <{div} id="{num}_100">
     <#each {arr}>
@@ -36,6 +36,167 @@ xdescribe('test speed', function () {
     </#each>
   </{div}>
   `;
+
+  var tmplFns = {
+    useString: false,
+    fn4: function (p1, p2, p3, p4, p5
+	/**/) {
+      return 'five';
+    },
+    fn3: function (p1, p2, p3, p4, p5
+	/**/) {
+      var _expr0 = p1.exprs['prop'];
+      p1.throwIf(_expr0, 'prop', 'expr');
+
+      return _expr0.apply({
+        useString: p1.useString,
+        paramsExpr: p5,
+        result: p1.exprRet(p1, p2, p3, p1.fn4, p5)
+      }, ['name']);
+    },
+    fn2: function (p1, p2, p3, p4, p5
+	/**/) {
+      var _newVars = p1.newContextVars(p1, p2, p3, p4),
+        parent = _newVars._1,
+        data = _newVars._2,
+        multiData = _newVars._3,
+        _p2 = _newVars._4,
+        _p3 = _newVars._5;
+
+      var h = p1.compPort;
+
+      var _paramsE0 = {};
+
+      var _expr0 = p1.exprs['if'];
+      var _value0 = parent.parent.index;
+
+      var _filter0 = p1.filters['five'];
+      if (!_filter0) {
+        p1.warn('five', 'filter');
+      }
+      else {
+        _value0 = _filter0.apply({
+          useString: p1.useString,
+          data: parent.data,
+          parent: parent.parent,
+          index: parent.index
+        }, [_value0]);
+      }
+
+      p1.throwIf(_expr0, 'if', 'expr');
+
+      _expr0.apply({
+        useString: p1.useString,
+        result: p1.exprRet(p1, _p2, _p3, p1.fn3, _paramsE0),
+        inverse: p1.noop
+      }, [_value0]);
+
+      _paramsE0['key'] = parent.index;
+
+      return h('div', _paramsE0,
+        h('span', null, 'span' + ((!multiData ? data['no'] : p1.getDatasValue(data, 'no')))),
+        h('i', null, (!multiData ? data['no'] : p1.getDatasValue(data, 'no')))
+      );
+    },
+    fn5: function (p1) {
+      return p1.compPort('br');
+    },
+    fn6: function (p1) {
+      return p1.compPort('img');
+    },
+    fn1: function (p1, p2, p3, p4, p5
+	/**/) {
+      var _newVars = p1.newContextVars(p1, p2, p3, p4),
+        parent = _newVars._1,
+        data = _newVars._2,
+        multiData = _newVars._3,
+        _p2 = _newVars._4,
+        _p3 = _newVars._5;
+
+      var h = p1.compPort;
+
+      var _expr0 = p1.exprs['each'];
+      p1.throwIf(_expr0, 'each', 'expr');
+
+      var _expr1 = p1.exprs['if'];
+      var _value0 = parent.index;
+
+      var _filter0 = p1.filters['five'];
+      if (!_filter0) {
+        p1.warn('five', 'filter');
+      }
+      else {
+        _value0 = _filter0.apply({
+          useString: p1.useString,
+          data: parent.data,
+          parent: parent.parent,
+          index: parent.index
+        }, [_value0, '1']);
+      }
+
+      var _filter1 = p1.filters['test'];
+      if (!_filter1) {
+        p1.warn('test', 'filter');
+      }
+      else {
+        _value0 = _filter1.apply({
+          useString: p1.useString,
+          data: parent.data,
+          parent: parent.parent,
+          index: parent.index
+        }, [_value0]);
+      }
+
+      p1.throwIf(_expr1, 'if', 'expr');
+
+      return [
+        h('span', {
+          'className': 'test_' + (parent.index),
+          'style': p1.styleProps(parent.parent.data['styles']),
+          'onClick': parent.parent.data['onClick']
+        }, 'test_' + (parent.parent.data['num']),
+          _expr0.apply({
+            useString: p1.useString,
+            result: p1.exprRet(p1, _p2, _p3, p1.fn2, p5),
+            inverse: p1.noop
+          }, [parent.parent.data['list2']])
+        ),
+        _expr1.apply({
+          useString: p1.useString,
+          result: p1.exprRet(p1, _p2, _p3, p1.fn5, p5),
+          inverse: p1.exprRet(p1, _p2, _p3, p1.fn6, p5)
+        }, [_value0])
+      ];
+    },
+    main: function (p1, p2, p3, p4, p5
+	/**/) {
+      var parent = p2.parent,
+        data = p2.data,
+        multiData = p3.multiData;
+      if (!parent) {
+        if (data) parent = { data: multiData ? data[0] : data };
+        else parent = {};
+        p2.parent = parent;
+      };
+
+      var h = p1.compPort;
+
+      var _typeRefer0 = (!multiData ? data['div'] : p1.getDatasValue(data, 'div'));
+      var _type0 = _typeRefer0 ? _typeRefer0 : 'div';
+
+      var _expr0 = p1.exprs['each'];
+      p1.throwIf(_expr0, 'each', 'expr');
+
+      return h(_type0, {
+        'id': ((!multiData ? data['num'] : p1.getDatasValue(data, 'num'))) + '_100'
+      }, _expr0.apply({
+        useString: p1.useString,
+        result: p1.exprRet(p1, p2, p3, p1.fn1, p5),
+        inverse: p1.noop
+      }, [(!multiData ? data['arr'] : p1.getDatasValue(data, 'arr'))])
+      );
+    }
+  };
 
   var _tmpl = nj`
   <{div} id="{num}_100">{...props}
@@ -201,16 +362,16 @@ xdescribe('test speed', function () {
         start = Date.now();
         var ret = React.createElement('div', { id: this.state.num + '_100' }, this.props.arr.map(function (o, i) {
           return [
-              React.createElement('span', { className: 'test_' + i, style: { color: 'blue' }, onClick: this.onClick },
-                'test_' + this.state.num,
-                list2.map(function (p, j) {
-                  return React.createElement('div', i % 5 == 0 ? { name: 'five', key: j } : { key: j },
-                    React.createElement('span', null, 'span' + p.no),
-                    React.createElement('i', null, p.no)
-                  );
-                })
-              ),
-              i % 5 == 0 ? React.createElement('br') : React.createElement('img')
+            React.createElement('span', { className: 'test_' + i, style: { color: 'blue' }, onClick: this.onClick },
+              'test_' + this.state.num,
+              list2.map(function (p, j) {
+                return React.createElement('div', i % 5 == 0 ? { name: 'five', key: j } : { key: j },
+                  React.createElement('span', null, 'span' + p.no),
+                  React.createElement('i', null, p.no)
+                );
+              })
+            ),
+            i % 5 == 0 ? React.createElement('br') : React.createElement('img')
           ];
         }.bind(this)));
 
