@@ -89,13 +89,13 @@ function getInsideBraceParam(obj) {
   return tmplRule.insideBraceParam.exec(obj);
 }
 
-//判断流程控制块并返回refer值
-function isControl(obj) {
+//判断块表达式并返回参数
+function isExpr(obj) {
   var ret, ret1 = tmplRule.expr.exec(obj);
   if (ret1) {
     ret = [ret1[1]];
 
-    var ret2 = tmplRule.exprBraceParam.exec(obj);  //提取refer值
+    var ret2 = tmplRule.exprBraceParam.exec(obj);  //提取各参数
     if (ret2) {
       ret.push(ret2[0]);
     }
@@ -104,8 +104,8 @@ function isControl(obj) {
   return ret;
 }
 
-//判断流程控制块close tag
-function isControlCloseTag(obj, tagName) {
+//判断块表达式close tag
+function isExprCloseTag(obj, tagName) {
   return tools.isString(obj) && obj === '/' + tmplRule.exprRule + tagName;
 }
 
@@ -179,8 +179,8 @@ module.exports = {
   getOpenTagParams: getOpenTagParams,
   isXmlCloseTag: isXmlCloseTag,
   getInsideBraceParam: getInsideBraceParam,
-  isControl: isControl,
-  isControlCloseTag: isControlCloseTag,
+  isExpr: isExpr,
+  isExprCloseTag: isExprCloseTag,
   isTmpl: isTmpl,
   addTmpl: addTmpl,
   isParamsExpr: isParamsExpr,

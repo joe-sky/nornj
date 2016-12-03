@@ -16,12 +16,9 @@ function checkElem(obj, parent) {
       obj = obj._njShim;
     }
 
-    //if (tools.isString(obj)) {
     node.type = 'nj_plaintext';
     node.content = [tranParam.compiledParam(obj)];
     parent[parentContent].push(node);
-    //}
-
     return;
   }
 
@@ -31,16 +28,16 @@ function checkElem(obj, parent) {
       len = obj.length,
       last = obj[len - 1],
       isElemNode = false,
-      control,
-      refer;
+      expr,
+      exprParams;
 
     //判断是否为xml标签
     var openTagName,
       hasCloseTag = false,
       isTmpl, isParamsExpr;
     
-    control = tranElem.isControl(first);
-    if (!control) {
+    expr = tranElem.isExpr(first);
+    if (!expr) {
       var xmlOpenTag = tranElem.getXmlOpenTag(first);
       if (xmlOpenTag) {  //tagname为xml标签时,则认为是元素节点
         openTagName = xmlOpenTag[1];
@@ -54,19 +51,19 @@ function checkElem(obj, parent) {
         isElemNode = true;
       }
     }
-    else {  //为特殊节点,也可视为一个元素节点
-      var ctrl = control[0].toLowerCase();
-      refer = control[1];
-      isTmpl = tranElem.isTmpl(ctrl);
-      isParamsExpr = tranElem.isParamsExpr(ctrl);
+    else {  //为块表达式,也可视为一个元素节点
+      var exprName = expr[0].toLowerCase();
+      exprParams = expr[1];
+      isTmpl = tranElem.isTmpl(exprName);
+      isParamsExpr = tranElem.isParamsExpr(exprName);
 
       node.type = 'nj_expr';
-      node.expr = ctrl;
-      if (refer != null && !isTmpl) {
-        node.refer = tranParam.compiledParam(refer);
+      node.expr = exprName;
+      if (exprParams != null && !isTmpl) {
+        node.refer = tranParam.compiledParam(exprParams);
       }
 
-      if (tranElem.isControlCloseTag(last, ctrl)) {  //判断是否有流程控制块闭合标签
+      if (tranElem.isExprCloseTag(last, exprName)) {  //判断是否有块表达式闭合标签
         hasCloseTag = true;
       }
       isElemNode = true;
@@ -76,7 +73,7 @@ function checkElem(obj, parent) {
       var elseIndex = -1,
         pushContent = true;
 
-      if (!control) {
+      if (!expr) {
         node.type = openTagName;
 
         //If open tag has a brace,add the typeRefer param.
@@ -102,10 +99,10 @@ function checkElem(obj, parent) {
           node.selfCloseTag = tranElem.verifySelfCloseTag(openTagName);
         }
       }
-      else {  //为表达式块时判断是否有$else
+      else {  //为块表达式时判断是否有$else
         if (isTmpl) {  //模板元素
           pushContent = false;
-          var retR = tranElem.getInsideBraceParam(refer);
+          var retR = tranElem.getInsideBraceParam(exprParams);
 
           //将模板添加到父节点的params中
           tranElem.addTmpl(node, parent, retR ? tools.clearQuot(retR[1]) : null);
