@@ -49,12 +49,10 @@ function _buildFn(content, fns, no, newContext, level) {
     fnStr += '};\n';
   }
   else if (newContext) {
-    fnStr += 'var _newVars = p1.newContextVars(p1, p2, p3, p4),\n';
-    fnStr += '  parent = _newVars._1,\n';
-    fnStr += '  data = _newVars._2,\n';
-    fnStr += '  multiData = _newVars._3,\n';
-    fnStr += '  _p2 = _newVars._4,\n';
-    fnStr += '  _p3 = _newVars._5;\n';
+    fnStr += 'var _p2 = p1.newContextVars(p1, p2, p3),\n';
+    fnStr += '  parent = _p2.parent,\n';
+    fnStr += '  data = _p2.data,\n';
+    fnStr += '  multiData = _p2.multiData;\n';
   }
   else {
     fnStr += _buildVar();
@@ -75,21 +73,20 @@ function _buildFn(content, fns, no, newContext, level) {
     fnStr += 'return ret;';
   }
 
-  /* 构建表达式块函数
-   p1: 全局模板配置信息,不可改变
-   p2: 当前模板数据信息
-   p3: 当前模板配置信息
-   p4: 表格式块内调用result及inverse方法传递的参数
-   p5: #param块变量
+  /* 构建块表达式函数
+   p1: 全局模板数据
+   p2: 当前模板数据
+   p3: 块表达式内调用result及inverse方法传递的参数
+   p4: #props块变量
   */
-  fns[main ? 'main' + (isTmplExpr ? no : '') : 'fn' + no] = new Function('p1', 'p2', 'p3', 'p4', 'p5', fnStr);
+  fns[main ? 'main' + (isTmplExpr ? no : '') : 'fn' + no] = new Function('p1', 'p2', 'p3', 'p4', fnStr);
   return no;
 }
 
 function _buildVar() {
   return ('var parent = p2.parent,\n'
     + '  data = p2.data,\n'
-    + '  multiData = p3.multiData;\n');
+    + '  multiData = p2.multiData;\n');
 }
 
 function _buildPropData(obj, counter, fns, noEscape) {
@@ -345,7 +342,7 @@ function _buildNode(node, fns, counter, retType, level) {
     }
 
     //params块
-    var paramsEStr = 'p5';
+    var paramsEStr = 'p4';
     if (retType && retType._paramsE) {
       paramsEStr = retType._paramsE;
     }
@@ -354,10 +351,10 @@ function _buildNode(node, fns, counter, retType, level) {
     }
 
     if (noConfig || configE.result) {
-      fnStr += '_this' + _thisC + '.result = ' + (node.content ? 'p1.exprRet(p1, ' + (newContextP ? '_' : '') + 'p2, ' + (newContextP ? '_' : '') + 'p3, p1.fn' + _buildFn(node.content, fns, ++fns._no, newContext, level) + ', ' + paramsEStr + ')' : 'p1.noop') + ';\n';
+      fnStr += '_this' + _thisC + '.result = ' + (node.content ? 'p1.exprRet(p1, ' + (newContextP ? '_' : '') + 'p2, p1.fn' + _buildFn(node.content, fns, ++fns._no, newContext, level) + ', ' + paramsEStr + ')' : 'p1.noop') + ';\n';
     }
     if (noConfig || configE.inverse) {
-      fnStr += '_this' + _thisC + '.inverse = ' + (node.contentElse ? 'p1.exprRet(p1, ' + (newContextP ? '_' : '') + 'p2, ' + (newContextP ? '_' : '') + 'p3, p1.fn' + _buildFn(node.contentElse, fns, ++fns._no, newContext, level) + ', ' + paramsEStr + ')' : 'p1.noop') + ';\n';
+      fnStr += '_this' + _thisC + '.inverse = ' + (node.contentElse ? 'p1.exprRet(p1, ' + (newContextP ? '_' : '') + 'p2, p1.fn' + _buildFn(node.contentElse, fns, ++fns._no, newContext, level) + ', ' + paramsEStr + ')' : 'p1.noop') + ';\n';
     }
 
     //渲染
@@ -547,7 +544,7 @@ function _buildRender(nodeType, retType, params, fns, level) {
       break;
     case 3:  //元素节点
       if (!useString) {
-        retStr = 'p1.compPort.apply(p1.compLib, _compParam' + params._compParam + ')';
+        retStr = 'p1.h.apply(null, _compParam' + params._compParam + ')';
       }
       else {
         var levelSpace = _buildLevelSpace(level, useString);

@@ -66,29 +66,21 @@ function getNewData(item, data, isArr, addData) {
 }
 
 //Rebuild local variables in the new context
-function newContextVars(p1, p2, p3, p4) {
+function newContextVars(p1, p2, p3) {
   var _parent = p2.parent,
-    multiData = p3.multiData,
-    hasItem = 'item' in p4,
+    hasItem = 'item' in p3,
     parent = {
-      data: hasItem ? p4.item : _parent.data,
-      parent: p4.fallback ? _parent : _parent.parent,
-      index: 'index' in p4 ? p4.index : _parent.index
+      data: hasItem ? p3.item : _parent.data,
+      parent: p3.fallback ? _parent : _parent.parent,
+      index: 'index' in p3 ? p3.index : _parent.index
     },
-    data = hasItem ? getNewData(p4.item, p2.data, p3.multiData, p4.addData) : p2.data,
-    multiData = p4.addData ? true : p3.multiData;
+    data = hasItem ? getNewData(p3.item, p2.data, p2.multiData, p3.addData) : p2.data,
+    multiData = p3.addData ? true : p2.multiData;
 
   return {
-    _1: parent,
-    _2: data,
-    _3: multiData,
-    _4: {
-      parent: parent,
-      data: data
-    },
-    _5: {
-      multiData: multiData
-    }
+    parent: parent,
+    data: data,
+    multiData: multiData
   }
 }
 
@@ -119,9 +111,9 @@ function assignStringProp(paramsE, keys) {
 }
 
 //创建块表达式子节点函数
-function exprRet(p1, p2, p3, fn, p5) {
+function exprRet(p1, p2, fn, p4) {
   return function (param) {
-    return fn(p1, p2, p3, param, p5);
+    return fn(p1, p2, param, p4);
   };
 }
 
@@ -145,7 +137,11 @@ function tmplWrap(configs, main) {
       }
     }
 
-    return main(configs, { data: data, parent: this && this._njParent ? this._njParent : null }, { multiData: nj.isArray(data) });
+    return main(configs, {
+      data: data,
+      parent: this && this._njParent ? this._njParent : null,
+      multiData: tools.isArray(data)
+    });
   };
 }
 
@@ -167,8 +163,7 @@ function template(fns) {
   };
 
   if (!configs.useString) {
-    configs.compPort = nj.componentPort;
-    configs.compLib = nj.componentLibObj;
+    configs.h = nj.componentPort;
     configs.compClass = nj.componentClasses;
     //configs.assign = nj.assign;
   }

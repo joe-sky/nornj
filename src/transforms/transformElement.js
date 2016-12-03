@@ -172,17 +172,6 @@ function getTagComponents(selector, isAuto) {
   return document.querySelectorAll(selector);
 }
 
-//Remove all dom child node
-function removeChildNode(node) {
-  var children = node.childNodes,
-    len = children.length,
-    i = 0;
-
-  for (; i < len; i++) {
-    node.removeChild(node.firstChild);
-  }
-}
-
 module.exports = {
   getXmlOpenTag: getXmlOpenTag,
   isXmlSelfCloseTag: isXmlSelfCloseTag,
@@ -196,6 +185,5 @@ module.exports = {
   addTmpl: addTmpl,
   isParamsExpr: isParamsExpr,
   addParamsExpr: addParamsExpr,
-  getTagComponents: getTagComponents,
-  removeChildNode: removeChildNode
+  getTagComponents: getTagComponents
 };

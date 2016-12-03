@@ -39,31 +39,24 @@ describe('test speed', function () {
 
   var tmplFns = {
     useString: false,
-    fn4: function (p1, p2, p3, p4, p5
-	/**/) {
+    fn4: function (p1, p2, p3, p4) {
       return 'five';
     },
-    fn3: function (p1, p2, p3, p4, p5
-	/**/) {
+    fn3: function (p1, p2, p3, p4) {
       var _expr0 = p1.exprs['prop'];
       p1.throwIf(_expr0, 'prop', 'expr');
 
       return _expr0.call({
         useString: p1.useString,
-        paramsExpr: p5,
-        result: p1.exprRet(p1, p2, p3, p1.fn4, p5)
+        paramsExpr: p4,
+        result: p1.exprRet(p1, p2, p1.fn4, p4)
       }, 'name');
     },
-    fn2: function (p1, p2, p3, p4, p5
-	/**/) {
-      var _newVars = p1.newContextVars(p1, p2, p3, p4),
-        parent = _newVars._1,
-        data = _newVars._2,
-        multiData = _newVars._3,
-        _p2 = _newVars._4,
-        _p3 = _newVars._5;
-
-      var h = p1.compPort;
+    fn2: function (p1, p2, p3, p4) {
+      var _p2 = p1.newContextVars(p1, p2, p3),
+        parent = _p2.parent,
+        data = _p2.data,
+        multiData = _p2.multiData;
 
       var _paramsE0 = {};
 
@@ -87,33 +80,28 @@ describe('test speed', function () {
 
       _expr0.call({
         useString: p1.useString,
-        result: p1.exprRet(p1, _p2, _p3, p1.fn3, _paramsE0),
+        result: p1.exprRet(p1, _p2, p1.fn3, _paramsE0),
         inverse: p1.noop
       }, _value0);
 
       _paramsE0['key'] = parent.index;
 
-      return h('div', _paramsE0,
-        h('span', null, 'span' + ((!multiData ? data['no'] : p1.getDatasValue(data, 'no')))),
-        h('i', null, (!multiData ? data['no'] : p1.getDatasValue(data, 'no')))
+      return p1.h('div', _paramsE0,
+        p1.h('span', null, 'span' + ((!multiData ? data['no'] : p1.getDatasValue(data, 'no')))),
+        p1.h('i', null, (!multiData ? data['no'] : p1.getDatasValue(data, 'no')))
       );
     },
-    fn5: function (p1) {
-      return p1.compPort('br');
+    fn5: function (p1, p2, p3, p4) {
+      return p1.h('br');
     },
-    fn6: function (p1) {
-      return p1.compPort('img');
+    fn6: function (p1, p2, p3, p4) {
+      return p1.h('img');
     },
-    fn1: function (p1, p2, p3, p4, p5
-	/**/) {
-      var _newVars = p1.newContextVars(p1, p2, p3, p4),
-        parent = _newVars._1,
-        data = _newVars._2,
-        multiData = _newVars._3,
-        _p2 = _newVars._4,
-        _p3 = _newVars._5;
-
-      var h = p1.compPort;
+    fn1: function (p1, p2, p3, p4) {
+      var _p2 = p1.newContextVars(p1, p2, p3),
+        parent = _p2.parent,
+        data = _p2.data,
+        multiData = _p2.multiData;
 
       var _expr0 = p1.exprs['each'];
       p1.throwIf(_expr0, 'each', 'expr');
@@ -150,36 +138,33 @@ describe('test speed', function () {
       p1.throwIf(_expr1, 'if', 'expr');
 
       return [
-        h('span', {
+        p1.h('span', {
           'className': 'test_' + (parent.index),
           'style': p1.styleProps(parent.parent.data['styles']),
           'onClick': parent.parent.data['onClick']
         }, 'test_' + (parent.parent.data['num']),
           _expr0.call({
             useString: p1.useString,
-            result: p1.exprRet(p1, _p2, _p3, p1.fn2, p5),
+            result: p1.exprRet(p1, _p2, p1.fn2, p4),
             inverse: p1.noop
           }, parent.parent.data['list2'])
         ),
         _expr1.call({
           useString: p1.useString,
-          result: p1.exprRet(p1, _p2, _p3, p1.fn5, p5),
-          inverse: p1.exprRet(p1, _p2, _p3, p1.fn6, p5)
+          result: p1.exprRet(p1, _p2, p1.fn5, p4),
+          inverse: p1.exprRet(p1, _p2, p1.fn6, p4)
         }, _value0)
       ];
     },
-    main: function (p1, p2, p3, p4, p5
-	/**/) {
+    main: function (p1, p2, p3, p4) {
       var parent = p2.parent,
         data = p2.data,
-        multiData = p3.multiData;
+        multiData = p2.multiData;
       if (!parent) {
         if (data) parent = { data: multiData ? data[0] : data };
         else parent = {};
         p2.parent = parent;
       };
-
-      var h = p1.compPort;
 
       var _typeRefer0 = (!multiData ? data['div'] : p1.getDatasValue(data, 'div'));
       var _type0 = _typeRefer0 ? _typeRefer0 : 'div';
@@ -187,11 +172,11 @@ describe('test speed', function () {
       var _expr0 = p1.exprs['each'];
       p1.throwIf(_expr0, 'each', 'expr');
 
-      return h(_type0, {
+      return p1.h(_type0, {
         'id': ((!multiData ? data['num'] : p1.getDatasValue(data, 'num'))) + '_100'
       }, _expr0.call({
         useString: p1.useString,
-        result: p1.exprRet(p1, p2, p3, p1.fn1, p5),
+        result: p1.exprRet(p1, p2, p1.fn1, p4),
         inverse: p1.noop
       }, (!multiData ? data['arr'] : p1.getDatasValue(data, 'arr')))
       );
@@ -424,7 +409,7 @@ describe('test speed', function () {
           num: 100
         };
       },
-      template: nj.compileComponent(tmplFns, 'tmpl1'),
+      template: nj.compileComponent(tmpl, 'tmpl1'),
       onClick: function () {
         this.setState({ num: Date.now() }, function () {
           console.log('total:' + (Date.now() - start));
@@ -441,10 +426,10 @@ describe('test speed', function () {
             'data-a': 1,
             'data-b': 2
           },
-          //styles: {
-          //  color: 'blue'
-          //},
-          styles: 'color:blue',
+          styles: {
+           color: 'blue'
+          },
+          //styles: 'color:blue',
           div: 'div',
           //props: {
           //  'data-a': 1,

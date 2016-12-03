@@ -98,9 +98,6 @@ function renderTagComponent(data, selector, isAuto) {
     var tmpl = compileComponent(tag.innerHTML, tag.id),
       parentNode = tag.parentNode;
 
-    if (nj.componentLib === 'inferno') {
-      utils.removeChildNode(parentNode);
-    }
     ret.push(nj.componentRender(tmpl(data), parentNode));
   }, false, true);
 

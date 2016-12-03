@@ -631,17 +631,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return document.querySelectorAll(selector);
 	}
 
-	//Remove all dom child node
-	function removeChildNode(node) {
-	  var children = node.childNodes,
-	    len = children.length,
-	    i = 0;
-
-	  for (; i < len; i++) {
-	    node.removeChild(node.firstChild);
-	  }
-	}
-
 	module.exports = {
 	  getXmlOpenTag: getXmlOpenTag,
 	  isXmlSelfCloseTag: isXmlSelfCloseTag,
@@ -655,8 +644,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  addTmpl: addTmpl,
 	  isParamsExpr: isParamsExpr,
 	  addParamsExpr: addParamsExpr,
-	  getTagComponents: getTagComponents,
-	  removeChildNode: removeChildNode
+	  getTagComponents: getTagComponents
 	};
 
 /***/ },
@@ -899,29 +887,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 	//Rebuild local variables in the new context
-	function newContextVars(p1, p2, p3, p4) {
+	function newContextVars(p1, p2, p3) {
 	  var _parent = p2.parent,
-	    multiData = p3.multiData,
-	    hasItem = 'item' in p4,
+	    hasItem = 'item' in p3,
 	    parent = {
-	      data: hasItem ? p4.item : _parent.data,
-	      parent: p4.fallback ? _parent : _parent.parent,
-	      index: 'index' in p4 ? p4.index : _parent.index
+	      data: hasItem ? p3.item : _parent.data,
+	      parent: p3.fallback ? _parent : _parent.parent,
+	      index: 'index' in p3 ? p3.index : _parent.index
 	    },
-	    data = hasItem ? getNewData(p4.item, p2.data, p3.multiData, p4.addData) : p2.data,
-	    multiData = p4.addData ? true : p3.multiData;
+	    data = hasItem ? getNewData(p3.item, p2.data, p2.multiData, p3.addData) : p2.data,
+	    multiData = p3.addData ? true : p2.multiData;
 
 	  return {
-	    _1: parent,
-	    _2: data,
-	    _3: multiData,
-	    _4: {
-	      parent: parent,
-	      data: data
-	    },
-	    _5: {
-	      multiData: multiData
-	    }
+	    parent: parent,
+	    data: data,
+	    multiData: multiData
 	  }
 	}
 
@@ -952,9 +932,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 	//创建块表达式子节点函数
-	function exprRet(p1, p2, p3, fn, p5) {
+	function exprRet(p1, p2, fn, p4) {
 	  return function (param) {
-	    return fn(p1, p2, p3, param, p5);
+	    return fn(p1, p2, param, p4);
 	  };
 	}
 
@@ -978,7 +958,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }
 	    }
 
-	    return main(configs, { data: data, parent: this && this._njParent ? this._njParent : null }, { multiData: nj.isArray(data) });
+	    return main(configs, {
+	      data: data,
+	      parent: this && this._njParent ? this._njParent : null,
+	      multiData: tools.isArray(data)
+	    });
 	  };
 	}
 
@@ -1000,8 +984,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 
 	  if (!configs.useString) {
-	    configs.compPort = nj.componentPort;
-	    configs.compLib = nj.componentLibObj;
+	    configs.h = nj.componentPort;
 	    configs.compClass = nj.componentClasses;
 	    //configs.assign = nj.assign;
 	  }
@@ -1947,9 +1930,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var tmpl = compileComponent(tag.innerHTML, tag.id),
 	      parentNode = tag.parentNode;
 
-	    if (nj.componentLib === 'inferno') {
-	      utils.removeChildNode(parentNode);
-	    }
 	    ret.push(nj.componentRender(tmpl(data), parentNode));
 	  }, false, true);
 
@@ -2036,12 +2016,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    fnStr += '};\n';
 	  }
 	  else if (newContext) {
-	    fnStr += 'var _newVars = p1.newContextVars(p1, p2, p3, p4),\n';
-	    fnStr += '  parent = _newVars._1,\n';
-	    fnStr += '  data = _newVars._2,\n';
-	    fnStr += '  multiData = _newVars._3,\n';
-	    fnStr += '  _p2 = _newVars._4,\n';
-	    fnStr += '  _p3 = _newVars._5;\n';
+	    fnStr += 'var _p2 = p1.newContextVars(p1, p2, p3),\n';
+	    fnStr += '  parent = _p2.parent,\n';
+	    fnStr += '  data = _p2.data,\n';
+	    fnStr += '  multiData = _p2.multiData;\n';
 	  }
 	  else {
 	    fnStr += _buildVar();
@@ -2062,21 +2040,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	    fnStr += 'return ret;';
 	  }
 
-	  /* 构建表达式块函数
-	   p1: 全局模板配置信息,不可改变
-	   p2: 当前模板数据信息
-	   p3: 当前模板配置信息
-	   p4: 表格式块内调用result及inverse方法传递的参数
-	   p5: #param块变量
+	  /* 构建块表达式函数
+	   p1: 全局模板数据
+	   p2: 当前模板数据
+	   p3: 块表达式内调用result及inverse方法传递的参数
+	   p4: #props块变量
 	  */
-	  fns[main ? 'main' + (isTmplExpr ? no : '') : 'fn' + no] = new Function('p1', 'p2', 'p3', 'p4', 'p5', fnStr);
+	  fns[main ? 'main' + (isTmplExpr ? no : '') : 'fn' + no] = new Function('p1', 'p2', 'p3', 'p4', fnStr);
 	  return no;
 	}
 
 	function _buildVar() {
 	  return ('var parent = p2.parent,\n'
 	    + '  data = p2.data,\n'
-	    + '  multiData = p3.multiData;\n');
+	    + '  multiData = p2.multiData;\n');
 	}
 
 	function _buildPropData(obj, counter, fns, noEscape) {
@@ -2332,7 +2309,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 
 	    //params块
-	    var paramsEStr = 'p5';
+	    var paramsEStr = 'p4';
 	    if (retType && retType._paramsE) {
 	      paramsEStr = retType._paramsE;
 	    }
@@ -2341,10 +2318,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 
 	    if (noConfig || configE.result) {
-	      fnStr += '_this' + _thisC + '.result = ' + (node.content ? 'p1.exprRet(p1, ' + (newContextP ? '_' : '') + 'p2, ' + (newContextP ? '_' : '') + 'p3, p1.fn' + _buildFn(node.content, fns, ++fns._no, newContext, level) + ', ' + paramsEStr + ')' : 'p1.noop') + ';\n';
+	      fnStr += '_this' + _thisC + '.result = ' + (node.content ? 'p1.exprRet(p1, ' + (newContextP ? '_' : '') + 'p2, p1.fn' + _buildFn(node.content, fns, ++fns._no, newContext, level) + ', ' + paramsEStr + ')' : 'p1.noop') + ';\n';
 	    }
 	    if (noConfig || configE.inverse) {
-	      fnStr += '_this' + _thisC + '.inverse = ' + (node.contentElse ? 'p1.exprRet(p1, ' + (newContextP ? '_' : '') + 'p2, ' + (newContextP ? '_' : '') + 'p3, p1.fn' + _buildFn(node.contentElse, fns, ++fns._no, newContext, level) + ', ' + paramsEStr + ')' : 'p1.noop') + ';\n';
+	      fnStr += '_this' + _thisC + '.inverse = ' + (node.contentElse ? 'p1.exprRet(p1, ' + (newContextP ? '_' : '') + 'p2, p1.fn' + _buildFn(node.contentElse, fns, ++fns._no, newContext, level) + ', ' + paramsEStr + ')' : 'p1.noop') + ';\n';
 	    }
 
 	    //渲染
@@ -2534,7 +2511,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      break;
 	    case 3:  //元素节点
 	      if (!useString) {
-	        retStr = 'p1.compPort.apply(p1.compLib, _compParam' + params._compParam + ')';
+	        retStr = 'p1.h.apply(null, _compParam' + params._compParam + ')';
 	      }
 	      else {
 	        var levelSpace = _buildLevelSpace(level, useString);
