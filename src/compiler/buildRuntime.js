@@ -377,7 +377,7 @@ function _buildNode(node, fns, counter, retType, level) {
 
     var typeStr;
     if (!useString) {
-      typeStr = 'p1.compClass[\'' + _type + '\'] ? p1.compClass[\'' + _type + '\'] : \'' + _type + '\'';
+      typeStr = 'p1.components[\'' + _type + '\'] ? p1.components[\'' + _type + '\'] : \'' + _type + '\'';
     }
     else {
       typeStr = '\'' + _type + '\'';

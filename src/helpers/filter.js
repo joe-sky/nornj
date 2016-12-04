@@ -1,6 +1,6 @@
 ﻿'use strict';
 
-var tools = require('./tools');
+var tools = require('../utils/tools');
 
 //Global filter list
 var filters = {

@@ -268,7 +268,7 @@ describe('test speed', function () {
   `;
 
   beforeAll(function () {
-    nj.setComponentEngine('react', React, ReactDOM);
+    nj.config({ createElement: React.createElement });
 
     nj.registerFilter('five', function (obj) {
       if (obj % 5 == 0) {
@@ -394,7 +394,7 @@ describe('test speed', function () {
 
     nj.registerComponent('TestComp', React.createClass({
       render: function () {
-        return T`<div><#each {arr}>{!#../text}</#each></div>`.renderComponent({
+        return T`<div><#each {arr}>{!#../text}</#each></div>`.renderH({
           text: this.props.tmpls['t2'],
           arr: _.times(2, function (n) {
             return n;
@@ -409,7 +409,7 @@ describe('test speed', function () {
           num: 100
         };
       },
-      template: nj.compileComponent(tmpl, 'tmpl1'),
+      template: nj.compileH(tmpl, 'tmpl1'),
       onClick: function () {
         this.setState({ num: Date.now() }, function () {
           console.log('total:' + (Date.now() - start));

@@ -4,12 +4,8 @@ function nj() {
   return nj.compileStringTmpl.apply(null, arguments);
 }
 
-nj.componentLib = null;
-nj.componentLibObj = null;
-nj.componentLibDom = null;
-nj.componentPort = null;
-nj.componentRender = null;
-nj.componentClasses = {};
+nj.createElement = null;
+nj.components = {};
 nj.asts = {};
 nj.templates = {};
 nj.errorTitle = 'NornJ:';

@@ -21,10 +21,10 @@ const tmpl = nj`
 </div>`;
 
 //编译为组件模板函数
-const tmplFn = nj.compileComponent(tmpl, 'tmpl1');
+const tmplFn = nj.compileH(tmpl, 'tmpl1');
 ```
 
-1. 编译组件模板函数须使用nj.compileComponent方法。该方法第一个参数为NornJ模板对象(或纯字符串也可)；
+1. 编译组件模板函数须使用nj.compileH方法。该方法第一个参数为NornJ模板对象(或纯字符串也可)；
 2. 第二个参数为模板名称，该参数是可选的。如果设置了模板名称(模板名称应为全局唯一)，则下一次编译名称相同的模板时会直接从缓存中获取，这样就会提升很多性能。通常情况下推荐编译时设置该名称参数。
 
 ## 执行组件模板函数并输出React组件
@@ -44,7 +44,7 @@ var tmpl =
 //注册NornJ模板组件
 nj.registerComponent('TestComponent', React.createClass({
   //编译为组件模板函数
-  template: nj.compileComponent(tmpl, 'tmpl1'),
+  template: nj.compileH(tmpl, 'tmpl1'),
   render: function() {
     return this.template({
       no: this.props.no
@@ -53,7 +53,7 @@ nj.registerComponent('TestComponent', React.createClass({
 }));
 
 //输出React组件
-var comp = nj.compileComponent(
+var comp = nj.compileH(
  nj('<TestComponent no=100 />'),
  'tmpl2'
 )();
@@ -65,7 +65,7 @@ var html = ReactDOMServer.renderToStaticMarkup(comp);
 es6+环境下示例：
 ```js
 import nj from 'nornj';
-import { compileComponent, registerComponent } from 'nornj';
+import { compileH, registerComponent } from 'nornj';
 import { Component } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 
@@ -77,7 +77,7 @@ const tmpl = nj`
 </div>`;
 
 //编译为组件模板函数
-const template = compileComponent(tmpl, 'tmpl1');
+const template = compileH(tmpl, 'tmpl1');
 
 //定义组件
 class TestComponent extends Component {
@@ -92,7 +92,7 @@ class TestComponent extends Component {
 registerComponent('TestComponent', TestComponent);
 
 //输出React组件
-let comp = compileComponent(
+let comp = compileH(
  nj`<TestComponent no=100 />`,
  'tmpl2'
 )();
@@ -123,7 +123,7 @@ const tmpl = nj`
 </div>`;
 
 //编译为模板函数
-const tmplFn = nj.compileComponent(tmpl, 'tmpl1');
+const tmplFn = nj.compileH(tmpl, 'tmpl1');
 
 //渲染
 let comp = tmplFn([{
@@ -143,11 +143,11 @@ console.log(html);
 ```
 以数组形式传入多个参数后，NornJ模板在编译时会按顺序检测每个数据对象是否有和模板中对应的值。如果检测到前面的参数有对应值，那么就会停止继续检测后面的参数是否有该对应值，如例中(1)处所示；如果靠前面的参数中没有对应值，那么就按顺序寻找后面的参数中是否存在，如例中(2)处所示。
 
-## renderComponent
-执行`renderComponent`方法就和执行使用`compileComponent`方法编译出来的模板函数的效果相同，类似`jQuery`的链式调用方式，如下所示：
+## renderH
+执行`renderH`方法就和执行使用`compileH`方法编译出来的模板函数的效果相同，类似`jQuery`的链式调用方式，如下所示：
 
 ```js
-let comp = nj`<span>test{no}</span>`.renderComponent({ no: 1 });
+let comp = nj`<span>test{no}</span>`.renderH({ no: 1 });
 let html = renderToStaticMarkup(comp);
 
 console.log(html);
@@ -172,7 +172,7 @@ class TestComponent extends Component {
       <div id=test1>
         this the test demo{no}.
         <i>test{no}</i>
-      </div>`.renderComponent({ no: 1 });
+      </div>`.renderH({ no: 1 });
   }
 }
 ```
@@ -184,7 +184,7 @@ class TestComponent extends Component {
 
 ```js
 import { Component } from 'react';
-import { registerTmpl } from 'nornj';
+import { registerTmpl } from 'nornj-react';
 
 @registerTmpl({
   name: 'TestComponent',  //传入组件名，相当于调用了nj.registerComponent注册组件，可以省略不传
@@ -197,7 +197,7 @@ import { registerTmpl } from 'nornj';
 })
 class TestComponent extends Component {
   render() {
-    return this.template({ no: 1 });  //使用this.template方法渲染，该方法和nj.compileComponent编译的模板函数是一样的
+    return this.template({ no: 1 });  //使用this.template方法渲染，该方法和nj.compileH编译的模板函数是一样的
   }
 }
 ```

@@ -163,15 +163,6 @@ function addParamsExpr(node, parent) {
   }
 }
 
-//获取全部内联组件
-function getTagComponents(selector, isAuto) {
-  if (!selector) {
-    selector = 'script[type="text/nornj"]' + (isAuto ? '[autorender]' : '');
-  }
-
-  return document.querySelectorAll(selector);
-}
-
 module.exports = {
   getXmlOpenTag: getXmlOpenTag,
   isXmlSelfCloseTag: isXmlSelfCloseTag,
@@ -184,6 +175,5 @@ module.exports = {
   isTmpl: isTmpl,
   addTmpl: addTmpl,
   isParamsExpr: isParamsExpr,
-  addParamsExpr: addParamsExpr,
-  getTagComponents: getTagComponents
+  addParamsExpr: addParamsExpr
 };

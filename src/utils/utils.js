@@ -5,13 +5,11 @@ var tools = require('./tools'),
   transformParam = require('../transforms/transformParam'),
   transformData = require('../transforms/transformData'),
   escape = require('./escape'),
-  checkElem = require('../checkElem/checkElem'),
-  setComponentEngine = require('./setComponentEngine'),
+  checkElem = require('../parser/checkElem'),
   registerComponent = require('./registerComponent'),
-  filter = require('./filter'),
-  expression = require('./expression'),
-  setTmplRule = require('./setTmplRule'),
-  registerTmpl = require('./registerTmpl');
+  filter = require('../helpers/filter'),
+  expression = require('../helpers/expression'),
+  setTmplRule = require('./setTmplRule');
 
 //Set default param rule
 setTmplRule();
@@ -19,11 +17,9 @@ setTmplRule();
 module.exports = tools.assign(
   {
     escape: escape,
-    setTmplRule: setTmplRule,
-    registerTmpl: registerTmpl
+    setTmplRule: setTmplRule
   },
   checkElem,
-  setComponentEngine,
   registerComponent,
   filter,
   expression,

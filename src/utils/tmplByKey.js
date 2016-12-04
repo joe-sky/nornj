@@ -1,6 +1,6 @@
 ﻿'use strict';
 
-var checkStringElem = require('../checkElem/checkStringElem');
+var checkStringElem = require('../parser/checkStringElem');
 
 module.exports = function (key) {
   return function() {

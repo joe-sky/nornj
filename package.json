@@ -6,10 +6,7 @@
   "files": [
     "dist/",
     "src/",
-    "tools/",
-    "precompiler.js",
-    "LICENSE",
-    "README.md"
+    "LICENSE"
   ],
   "scripts": {
     "test": "gulp test"

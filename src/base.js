@@ -3,35 +3,15 @@
 var nj = require('./core'),
   utils = require('./utils/utils'),
   compiler = require('./compiler/compile'),
-  compileStringTmpl = require('./checkElem/checkStringElem'),
+  compileStringTmpl = require('./parser/checkStringElem'),
   tmplByKey = require('./utils/tmplByKey'),
-  docReady = require('./utils/docReady'),
-  config = require('./utils/config');
+  config = require('./config');
 
 nj.compileStringTmpl = compileStringTmpl;
 nj.tmplByKey = tmplByKey;
-nj.docReady = docReady;
 nj.config = config;
 utils.assign(nj, compiler, utils);
 
-//Default use React as component engine
-if (typeof React !== 'undefined') {
-  nj.setComponentEngine('react', React, typeof ReactDOM !== 'undefined' ? ReactDOM : null);
-}
-
-var global;
-if (typeof self !== 'undefined') {
-  global = self;
-
-  //Init tag template
-  docReady(function () {
-    if (nj.componentLib) {
-      nj.renderTagComponent(nj.initTagData, null, true);
-    }
-  });
-}
-else {
-  global = this;
-}
+var global = typeof self !== 'undefined' ? self : this;
 
 module.exports = global.NornJ = global.nj = nj;

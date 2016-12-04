@@ -32,21 +32,20 @@ export default nj`
 </div>`;
 
 /* comp.js */
-import { registerTmpl, compileComponent } from 'nornj';
 import { Component } from 'react';
 import { render } from 'react-dom';
+import nj from 'nornj';
+import { registerTmpl } from 'nornj-react';
 import tmpl from './tmpl';
 
 @registerTmpl({'TestComponent', tmpl)
 class TestComponent extends Component {
   render() {
-    return template(this.props);
+    return this.template(this.props);
   }
 }
 
-render(compileComponent(
-  nj`<TestComponent no=100 />`
-)(), document.body);
+render(nj`<TestComponent no=100 />`.renderH(), document.body);
 
 /* output:
 <div id="test1">

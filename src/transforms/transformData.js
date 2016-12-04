@@ -163,8 +163,8 @@ function template(fns) {
   };
 
   if (!configs.useString) {
-    configs.h = nj.componentPort;
-    configs.compClass = nj.componentClasses;
+    configs.h = nj.createElement;
+    configs.components = nj.components;
     //configs.assign = nj.assign;
   }
   else {

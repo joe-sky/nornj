@@ -3,17 +3,17 @@
 var nj = require('../core'),
   utils = require('../utils/utils'),
   buildRuntime = require('./buildRuntime'),
-  compileStringTmpl = require('../checkElem/checkStringElem');
+  compileStringTmpl = require('../parser/checkStringElem');
 
 //编译模板并返回转换函数
-function compile(tmpl, tmplName, isComponent, fileName) {
+function compile(tmpl, tmplName, outputH, fileName) {
   if (!tmpl) {
     return;
   }
   if (utils.isObject(tmplName)) {
     var params = tmplName;
     tmplName = params.tmplName;
-    isComponent = params.isComponent;
+    outputH = params.outputH;
     fileName = params.fileName;
   }
 
@@ -61,7 +61,7 @@ function compile(tmpl, tmplName, isComponent, fileName) {
         }
       }
 
-      fns = buildRuntime(root.content, !isComponent);
+      fns = buildRuntime(root.content, !outputH);
     }
 
     tmplFns = utils.template(fns);
@@ -85,32 +85,12 @@ function _createAstRoot() {
 }
 
 //编译字面量并返回组件转换函数
-function compileComponent(tmpl, tmplName) {
+function compileH(tmpl, tmplName) {
   return compile(tmpl, tmplName, true);
 }
 
-//渲染内联标签组件
-function renderTagComponent(data, selector, isAuto) {
-  var tags = utils.getTagComponents(selector, isAuto),
-    ret = [];
-
-  utils.each(tags, function (tag) {
-    var tmpl = compileComponent(tag.innerHTML, tag.id),
-      parentNode = tag.parentNode;
-
-    ret.push(nj.componentRender(tmpl(data), parentNode));
-  }, false, true);
-
-  return ret;
-}
-
-//Set init data for inline component
-function setInitTagData(data) {
-  nj.initTagData = data;
-}
-
 //Precompile template
-function precompile(tmpl, isComponent) {
+function precompile(tmpl, outputH) {
   var root = _createAstRoot();
 
   if (utils.isString(tmpl)) {
@@ -118,13 +98,11 @@ function precompile(tmpl, isComponent) {
   }
   utils.checkElem(tmpl, root);
 
-  return buildRuntime(root.content, !isComponent);
+  return buildRuntime(root.content, !outputH);
 }
 
 module.exports = {
   compile: compile,
-  compileComponent: compileComponent,
-  renderTagComponent: renderTagComponent,
-  setInitTagData: setInitTagData,
+  compileH: compileH,
   precompile: precompile
 };

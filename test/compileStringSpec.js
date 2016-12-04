@@ -1,9 +1,9 @@
 ﻿var nj = require('../src/base'),
   utils = require('../src/utils/utils'),
   compile = require('../src/compiler/compile').compile,
-  includeParser = require('../tools/includeParser');
+  includeParser = require('../src/parser/includeParser');
 
-xdescribe('test compile string', function () {
+describe('test compile string', function () {
   beforeAll(function () {
     nj.registerFilter('filter1', function (v, p1) {
       //console.log(this.useString);

@@ -12,7 +12,7 @@ function registerComponent(name, component) {
   }
 
   tools.each(params, function (v, k) {
-    nj.componentClasses[k.toLowerCase()] = v;
+    nj.components[k.toLowerCase()] = v;
   }, false, false);
 
   return component;

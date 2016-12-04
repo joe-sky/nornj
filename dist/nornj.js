@@ -58,37 +58,17 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var nj = __webpack_require__(1),
 	  utils = __webpack_require__(2),
-	  compiler = __webpack_require__(16),
-	  compileStringTmpl = __webpack_require__(19),
-	  tmplByKey = __webpack_require__(21),
-	  docReady = __webpack_require__(22),
-	  config = __webpack_require__(23);
+	  compiler = __webpack_require__(14),
+	  compileStringTmpl = __webpack_require__(17),
+	  tmplByKey = __webpack_require__(19),
+	  config = __webpack_require__(20);
 
 	nj.compileStringTmpl = compileStringTmpl;
 	nj.tmplByKey = tmplByKey;
-	nj.docReady = docReady;
 	nj.config = config;
 	utils.assign(nj, compiler, utils);
 
-	//Default use React as component engine
-	if (typeof React !== 'undefined') {
-	  nj.setComponentEngine('react', React, typeof ReactDOM !== 'undefined' ? ReactDOM : null);
-	}
-
-	var global;
-	if (typeof self !== 'undefined') {
-	  global = self;
-
-	  //Init tag template
-	  docReady(function () {
-	    if (nj.componentLib) {
-	      nj.renderTagComponent(nj.initTagData, null, true);
-	    }
-	  });
-	}
-	else {
-	  global = this;
-	}
+	var global = typeof self !== 'undefined' ? self : this;
 
 	module.exports = global.NornJ = global.nj = nj;
 
@@ -102,12 +82,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return nj.compileStringTmpl.apply(null, arguments);
 	}
 
-	nj.componentLib = null;
-	nj.componentLibObj = null;
-	nj.componentLibDom = null;
-	nj.componentPort = null;
-	nj.componentRender = null;
-	nj.componentClasses = {};
+	nj.createElement = null;
+	nj.components = {};
 	nj.asts = {};
 	nj.templates = {};
 	nj.errorTitle = 'NornJ:';
@@ -127,12 +103,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	  transformData = __webpack_require__(7),
 	  escape = __webpack_require__(8),
 	  checkElem = __webpack_require__(9),
-	  setComponentEngine = __webpack_require__(10),
-	  registerComponent = __webpack_require__(11),
-	  filter = __webpack_require__(12),
-	  expression = __webpack_require__(13),
-	  setTmplRule = __webpack_require__(14),
-	  registerTmpl = __webpack_require__(15);
+	  registerComponent = __webpack_require__(10),
+	  filter = __webpack_require__(11),
+	  expression = __webpack_require__(12),
+	  setTmplRule = __webpack_require__(13);
 
 	//Set default param rule
 	setTmplRule();
@@ -140,11 +114,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = tools.assign(
 	  {
 	    escape: escape,
-	    setTmplRule: setTmplRule,
-	    registerTmpl: registerTmpl
+	    setTmplRule: setTmplRule
 	  },
 	  checkElem,
-	  setComponentEngine,
 	  registerComponent,
 	  filter,
 	  expression,
@@ -548,13 +520,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return tmplRule.insideBraceParam.exec(obj);
 	}
 
-	//判断流程控制块并返回refer值
-	function isControl(obj) {
+	//判断块表达式并返回参数
+	function isExpr(obj) {
 	  var ret, ret1 = tmplRule.expr.exec(obj);
 	  if (ret1) {
 	    ret = [ret1[1]];
 
-	    var ret2 = tmplRule.exprBraceParam.exec(obj);  //提取refer值
+	    var ret2 = tmplRule.exprBraceParam.exec(obj);  //提取各参数
 	    if (ret2) {
 	      ret.push(ret2[0]);
 	    }
@@ -563,8 +535,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return ret;
 	}
 
-	//判断流程控制块close tag
-	function isControlCloseTag(obj, tagName) {
+	//判断块表达式close tag
+	function isExprCloseTag(obj, tagName) {
 	  return tools.isString(obj) && obj === '/' + tmplRule.exprRule + tagName;
 	}
 
@@ -622,15 +594,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	}
 
-	//获取全部内联组件
-	function getTagComponents(selector, isAuto) {
-	  if (!selector) {
-	    selector = 'script[type="text/nornj"]' + (isAuto ? '[autorender]' : '');
-	  }
-
-	  return document.querySelectorAll(selector);
-	}
-
 	module.exports = {
 	  getXmlOpenTag: getXmlOpenTag,
 	  isXmlSelfCloseTag: isXmlSelfCloseTag,
@@ -638,13 +601,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	  getOpenTagParams: getOpenTagParams,
 	  isXmlCloseTag: isXmlCloseTag,
 	  getInsideBraceParam: getInsideBraceParam,
-	  isControl: isControl,
-	  isControlCloseTag: isControlCloseTag,
+	  isExpr: isExpr,
+	  isExprCloseTag: isExprCloseTag,
 	  isTmpl: isTmpl,
 	  addTmpl: addTmpl,
 	  isParamsExpr: isParamsExpr,
-	  addParamsExpr: addParamsExpr,
-	  getTagComponents: getTagComponents
+	  addParamsExpr: addParamsExpr
 	};
 
 /***/ },
@@ -984,8 +946,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 
 	  if (!configs.useString) {
-	    configs.h = nj.componentPort;
-	    configs.compClass = nj.componentClasses;
+	    configs.h = nj.createElement;
+	    configs.components = nj.components;
 	    //configs.assign = nj.assign;
 	  }
 	  else {
@@ -1069,12 +1031,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	      obj = obj._njShim;
 	    }
 
-	    //if (tools.isString(obj)) {
 	    node.type = 'nj_plaintext';
 	    node.content = [tranParam.compiledParam(obj)];
 	    parent[parentContent].push(node);
-	    //}
-
 	    return;
 	  }
 
@@ -1084,16 +1043,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	      len = obj.length,
 	      last = obj[len - 1],
 	      isElemNode = false,
-	      control,
-	      refer;
+	      expr,
+	      exprParams;
 
 	    //判断是否为xml标签
 	    var openTagName,
 	      hasCloseTag = false,
 	      isTmpl, isParamsExpr;
 	    
-	    control = tranElem.isControl(first);
-	    if (!control) {
+	    expr = tranElem.isExpr(first);
+	    if (!expr) {
 	      var xmlOpenTag = tranElem.getXmlOpenTag(first);
 	      if (xmlOpenTag) {  //tagname为xml标签时,则认为是元素节点
 	        openTagName = xmlOpenTag[1];
@@ -1107,19 +1066,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	        isElemNode = true;
 	      }
 	    }
-	    else {  //为特殊节点,也可视为一个元素节点
-	      var ctrl = control[0].toLowerCase();
-	      refer = control[1];
-	      isTmpl = tranElem.isTmpl(ctrl);
-	      isParamsExpr = tranElem.isParamsExpr(ctrl);
+	    else {  //为块表达式,也可视为一个元素节点
+	      var exprName = expr[0].toLowerCase();
+	      exprParams = expr[1];
+	      isTmpl = tranElem.isTmpl(exprName);
+	      isParamsExpr = tranElem.isParamsExpr(exprName);
 
 	      node.type = 'nj_expr';
-	      node.expr = ctrl;
-	      if (refer != null && !isTmpl) {
-	        node.refer = tranParam.compiledParam(refer);
+	      node.expr = exprName;
+	      if (exprParams != null && !isTmpl) {
+	        node.refer = tranParam.compiledParam(exprParams);
 	      }
 
-	      if (tranElem.isControlCloseTag(last, ctrl)) {  //判断是否有流程控制块闭合标签
+	      if (tranElem.isExprCloseTag(last, exprName)) {  //判断是否有块表达式闭合标签
 	        hasCloseTag = true;
 	      }
 	      isElemNode = true;
@@ -1129,7 +1088,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var elseIndex = -1,
 	        pushContent = true;
 
-	      if (!control) {
+	      if (!expr) {
 	        node.type = openTagName;
 
 	        //If open tag has a brace,add the typeRefer param.
@@ -1155,10 +1114,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	          node.selfCloseTag = tranElem.verifySelfCloseTag(openTagName);
 	        }
 	      }
-	      else {  //为表达式块时判断是否有$else
+	      else {  //为块表达式时判断是否有$else
 	        if (isTmpl) {  //模板元素
 	          pushContent = false;
-	          var retR = tranElem.getInsideBraceParam(refer);
+	          var retR = tranElem.getInsideBraceParam(exprParams);
 
 	          //将模板添加到父节点的params中
 	          tranElem.addTmpl(node, parent, retR ? tools.clearQuot(retR[1]) : null);
@@ -1234,40 +1193,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	var nj = __webpack_require__(1),
 	  tools = __webpack_require__(3);
 
-	//Set component engine
-	function setComponentEngine(name, obj, dom, port, render) {
-	  //Component engine's name
-	  nj.componentLib = name;
-
-	  //Component engine's object
-	  nj.componentLibObj = obj;
-
-	  //Component engine's dom object
-	  dom = dom || obj;
-	  nj.componentLibDom = dom;
-
-	  //Component engine's create element and render function
-	  if (name === 'react') {
-	    port = 'createElement';
-	    render = 'render';
-	  }
-	  nj.componentPort = tools.isString(port) ? obj[port] : port;
-	  nj.componentRender = tools.isString(render) ? dom[render] : render;
-	}
-
-	module.exports = {
-	  setComponentEngine: setComponentEngine
-	};
-
-/***/ },
-/* 11 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	var nj = __webpack_require__(1),
-	  tools = __webpack_require__(3);
-
 	//注册组件
 	function registerComponent(name, component) {
 	  var params = name;
@@ -1277,7 +1202,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 
 	  tools.each(params, function (v, k) {
-	    nj.componentClasses[k.toLowerCase()] = v;
+	    nj.components[k.toLowerCase()] = v;
 	  }, false, false);
 
 	  return component;
@@ -1288,7 +1213,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 12 */
+/* 11 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1447,7 +1372,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 13 */
+/* 12 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1696,7 +1621,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 14 */
+/* 13 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1795,57 +1720,25 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 15 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	var nj = __webpack_require__(1),
-	  tools = __webpack_require__(3),
-	  registerComponent = __webpack_require__(11).registerComponent;
-
-	//注册模板装饰器
-	function registerTmpl(name, template) {
-	  if (tools.isObject(name)) {
-	    template = name.template;
-	    name = name.name;
-	  }
-
-	  return function (target) {
-	    //注册组件
-	    if(name != null) {
-	      registerComponent(name, target);
-	    }
-
-	    //创建模板函数
-	    if(template) {
-	      target.prototype.template = nj.compileComponent(template, name);
-	    }
-	  };
-	}
-
-	module.exports = registerTmpl;
-
-/***/ },
-/* 16 */
+/* 14 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
 	var nj = __webpack_require__(1),
 	  utils = __webpack_require__(2),
-	  buildRuntime = __webpack_require__(17),
-	  compileStringTmpl = __webpack_require__(19);
+	  buildRuntime = __webpack_require__(15),
+	  compileStringTmpl = __webpack_require__(17);
 
 	//编译模板并返回转换函数
-	function compile(tmpl, tmplName, isComponent, fileName) {
+	function compile(tmpl, tmplName, outputH, fileName) {
 	  if (!tmpl) {
 	    return;
 	  }
 	  if (utils.isObject(tmplName)) {
 	    var params = tmplName;
 	    tmplName = params.tmplName;
-	    isComponent = params.isComponent;
+	    outputH = params.outputH;
 	    fileName = params.fileName;
 	  }
 
@@ -1893,7 +1786,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	      }
 
-	      fns = buildRuntime(root.content, !isComponent);
+	      fns = buildRuntime(root.content, !outputH);
 	    }
 
 	    tmplFns = utils.template(fns);
@@ -1917,32 +1810,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 	//编译字面量并返回组件转换函数
-	function compileComponent(tmpl, tmplName) {
+	function compileH(tmpl, tmplName) {
 	  return compile(tmpl, tmplName, true);
 	}
 
-	//渲染内联标签组件
-	function renderTagComponent(data, selector, isAuto) {
-	  var tags = utils.getTagComponents(selector, isAuto),
-	    ret = [];
-
-	  utils.each(tags, function (tag) {
-	    var tmpl = compileComponent(tag.innerHTML, tag.id),
-	      parentNode = tag.parentNode;
-
-	    ret.push(nj.componentRender(tmpl(data), parentNode));
-	  }, false, true);
-
-	  return ret;
-	}
-
-	//Set init data for inline component
-	function setInitTagData(data) {
-	  nj.initTagData = data;
-	}
-
 	//Precompile template
-	function precompile(tmpl, isComponent) {
+	function precompile(tmpl, outputH) {
 	  var root = _createAstRoot();
 
 	  if (utils.isString(tmpl)) {
@@ -1950,19 +1823,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	  utils.checkElem(tmpl, root);
 
-	  return buildRuntime(root.content, !isComponent);
+	  return buildRuntime(root.content, !outputH);
 	}
 
 	module.exports = {
 	  compile: compile,
-	  compileComponent: compileComponent,
-	  renderTagComponent: renderTagComponent,
-	  setInitTagData: setInitTagData,
+	  compileH: compileH,
 	  precompile: precompile
 	};
 
 /***/ },
-/* 17 */
+/* 15 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1972,7 +1843,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  errorTitle = nj.errorTitle,
 	  exprConfig = utils.exprConfig,
 	  filterConfig = utils.filterConfig,
-	  replaceSpecialSymbol = __webpack_require__(18);
+	  replaceSpecialSymbol = __webpack_require__(16);
 
 	function _buildFn(content, fns, no, newContext, level) {
 	  var fnStr = '',
@@ -2344,7 +2215,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    var typeStr;
 	    if (!useString) {
-	      typeStr = 'p1.compClass[\'' + _type + '\'] ? p1.compClass[\'' + _type + '\'] : \'' + _type + '\'';
+	      typeStr = 'p1.components[\'' + _type + '\'] ? p1.components[\'' + _type + '\'] : \'' + _type + '\'';
 	    }
 	    else {
 	      typeStr = '\'' + _type + '\'';
@@ -2578,7 +2449,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 18 */
+/* 16 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -2605,7 +2476,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = replace;
 
 /***/ },
-/* 19 */
+/* 17 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -2614,7 +2485,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  tools = __webpack_require__(3),
 	  tranElem = __webpack_require__(5),
 	  tmplRule = nj.tmplRule,
-	  shim = __webpack_require__(20);
+	  shim = __webpack_require__(18);
 
 	//Cache the string template by unique key
 	nj.strTmpls = {};
@@ -2942,15 +2813,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return nj.compile(this, this.njKey).apply(null, arguments);
 	  };
 
-	  tmpl.renderComponent = function () {
-	    return nj.compileComponent(this, this.njKey).apply(null, arguments);
+	  tmpl.renderH = function () {
+	    return nj.compileH(this, this.njKey).apply(null, arguments);
 	  };
 	}
 
 	module.exports = compileStringTmpl;
 
 /***/ },
-/* 20 */
+/* 18 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -2963,12 +2834,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 21 */
+/* 19 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var checkStringElem = __webpack_require__(19);
+	var checkStringElem = __webpack_require__(17);
 
 	module.exports = function (key) {
 	  return function() {
@@ -2977,32 +2848,30 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 22 */
-/***/ function(module, exports) {
-
-	'use strict';
-
-	module.exports = function (callback) {
-	  var doc = document;
-	  if (doc.addEventListener) {
-	    doc.addEventListener("DOMContentLoaded", callback, false);
-	  }
-	  else {
-	    self.attachEvent("onload", callback);
-	  }
-	};
-
-/***/ },
-/* 23 */
+/* 20 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
 	var nj = __webpack_require__(1),
-	  tools = __webpack_require__(3);
+	  setTmplRule = __webpack_require__(13);
 
 	module.exports = function (configs) {
-	  tools.assign(nj, configs);
+	  var delimiters = configs.delimiters,
+	    includeParser = configs.includeParser,
+	    createElement = configs.createElement;
+
+	  if(delimiters) {
+	    setTmplRule(delimiters);
+	  }
+
+	  if(includeParser) {
+	    nj.includeParser = includeParser;
+	  }
+
+	  if(createElement) {
+	    nj.createElement = createElement;
+	  }
 	};
 
 /***/ }
