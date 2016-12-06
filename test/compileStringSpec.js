@@ -1,7 +1,7 @@
 ﻿var nj = require('../src/base'),
   utils = require('../src/utils/utils'),
   compile = require('../src/compiler/compile').compile,
-  includeParser = require('../src/parser/includeParser');
+  includeParser = require('../tools/includeParser');
 
 describe('test compile string', function () {
   beforeAll(function () {
