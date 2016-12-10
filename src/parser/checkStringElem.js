@@ -132,7 +132,8 @@ function _checkStringElem(xml, params) {
     var textBefore = matchArr[1],
       elem = matchArr[2],
       elemName = matchArr[3],
-      textAfter = matchArr[4];
+      elemParams = matchArr[4],
+      textAfter = matchArr[5];
 
     //Text before tag
     if (textBefore && textBefore !== '\n') {
@@ -148,7 +149,7 @@ function _checkStringElem(xml, params) {
         }
       }
       else if (elem[elem.length - 2] === '/') {  //Self close tag
-        _setSelfCloseElem(elem, elemName, current.elem, params);
+        _setSelfCloseElem(elem, elemName, elemParams, current.elem, params);
       }
       else {  //Open tag
         parent = current;
@@ -159,7 +160,7 @@ function _checkStringElem(xml, params) {
         };
 
         parent.elem.push(current.elem);
-        _setElem(elem, elemName, current.elem, params);
+        _setElem(elem, elemName, elemParams, current.elem, params);
       }
     }
 
@@ -217,13 +218,13 @@ function _cascadeArr(p, isArr) {
 }
 
 //Set element node
-function _setElem(elem, elemName, elemArr, params, bySelfClose) {
+function _setElem(elem, elemName, elemParams, elemArr, params, bySelfClose) {
   var ret, paramsExpr;
   if (elemName[0] === tmplRule.exprRule) {
     ret = elem.substring(1, elem.length - 1);
   }
   else if (elemName.indexOf(tmplRule.propRule) === 0) {
-    ret = tmplRule.exprRule + 'prop {\'' + elemName.substr(tmplRule.propRule.length) + '\'}';
+    ret = tmplRule.exprRule + 'prop {\'' + elemName.substr(tmplRule.propRule.length) + '\'}' + elemParams;
   }
   else {
     var retS = _getSplitParams(elem, params);
@@ -289,12 +290,12 @@ function _getSplitParams(elem, params) {
 }
 
 //Set self close element node
-function _setSelfCloseElem(elem, elemName, elemArr, params) {
+function _setSelfCloseElem(elem, elemName, elemParams, elemArr, params) {
   if (elemName === tmplRule.exprRule + 'else') {
     elemArr.push(elem.substr(1, 5));
   }
   else {
-    _setElem(elem, elemName, elemArr, params, true);
+    _setElem(elem, elemName, elemParams, elemArr, params, true);
   }
 }
 
