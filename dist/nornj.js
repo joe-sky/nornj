@@ -505,7 +505,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    var value = matchArr[2];
 	    if (value != null) {
-	      value = tools.clearQuot(_clearExtraChar(value));  //Remove quotation marks
+	      value = tools.clearQuot(_clearExtraChar(value), true);  //Remove double quotation marks
 	      if (key == null) {
 	        key = value;
 	      }
