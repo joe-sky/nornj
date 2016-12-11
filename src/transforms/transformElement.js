@@ -38,41 +38,44 @@ function verifySelfCloseTag(tagName) {
   return OMITTED_CLOSE_TAGS[tagName.toLowerCase()];
 }
 
+function _clearExtraChar(str) {
+  if (str.lastIndexOf('/') === str.length - 1) {
+    str = str.replace(/\//, '');
+  }
+  return str;
+}
+
 //Extract parameters inside the xml open tag
-function getOpenTagParams(obj, noXml) {
-  var pattern = /[\s]+([^\s=>]+)(=(('[^']+')|("[^"]+")|([^"'\s]+)))?/g,
+function getOpenTagParams(obj) {
+  var pattern = /[\s]+([^"\s=>]+)?[=]?(("[^"]+")|([^"\s>]+))?/g,
     matchArr, ret;
 
   while ((matchArr = pattern.exec(obj))) {
     var key = matchArr[1];
-    if (key === '/' || key === '/>') {  //If match to the last "/" or "/>", then continue the loop.
+    if (key === '/') {  //If match to the last "/", then continue the loop.
+      continue;
+    }
+    else if (key != null) {
+      key = _clearExtraChar(key);  //Removed at the end of "/".
+    }
+
+    var value = matchArr[2];
+    if (value != null) {
+      value = tools.clearQuot(_clearExtraChar(value));  //Remove quotation marks
+      if (key == null) {
+        key = value;
+      }
+    }
+    else if (key != null) {
+      value = key;  //Match to Similar to "checked" or "disabled" attribute.
+    }
+    else {
       continue;
     }
 
     if (!ret) {
       ret = [];
     }
-
-    var value = matchArr[3],
-      charF, len, regex;
-    if (value != null) {
-      value = tools.clearQuot(value);  //Remove quotation marks
-    }
-    else {
-      value = key;  //Match to Similar to "checked" or "disabled" attribute.
-    }
-    len = value.length;
-
-    //Removed at the end of "/>" or ">".
-    if (!noXml) {
-      if (value.lastIndexOf('/>') === len - 2) {
-        value = value.replace(/\/>/, '');
-      }
-      else if (value.lastIndexOf('>') === len - 1) {
-        value = value.replace(/>/, '');
-      }
-    }
-
     ret.push({ key: key, value: value });
   }
 
@@ -124,7 +127,7 @@ function addTmpl(node, parent, name) {
   var tmpls = paramsP.tmpls;
   if (!tmpls) {
     var objT = { length: 0 };
-    if(name != null) {
+    if (name != null) {
       objT[name] = node;
     }
     else {
@@ -138,7 +141,7 @@ function addTmpl(node, parent, name) {
     var objT = tmpls.strs[0],
       len = objT.length;
 
-    if(name != null) {
+    if (name != null) {
       objT[name] = node;
     }
     else {

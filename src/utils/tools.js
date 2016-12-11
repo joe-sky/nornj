@@ -156,20 +156,33 @@ function lightObj() {
 }
 
 //Clear quotation marks
-function clearQuot(value) {
-  var charF = value[0],
-    regex;
+var REGEX_QUOT_D = /["]+/g,
+  REGEX_QUOT_S = /[']+/g;
+function clearQuot(value, clearDouble) {
+  if (value == null) {
+    return;
+  }
 
-  if (charF === '\'') {
-    regex = /[']+/g;
+  var regex;
+  if (clearDouble == null) {
+    var charF = value[0];
+    if (charF === '\'') {
+      regex = REGEX_QUOT_S;
+    }
+    else if (charF === '"') {
+      regex = REGEX_QUOT_D;
+    }
   }
-  else if (charF === '"') {
-    regex = /["]+/g;
+  else if (clearDouble) {
+    regex = REGEX_QUOT_D;
   }
+  else {
+    regex = REGEX_QUOT_S;
+  }
+
   if (regex) {
     value = value.replace(regex, '');
   }
-
   return value;
 }
 

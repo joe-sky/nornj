@@ -112,9 +112,9 @@ describe('test compile string', function () {
             </section>
             <input type=button />
             ${nj`
-              <#each { list2 }>
+              <#each "{list2}">
                 <slider>
-                  <{../sliderItem.a|tagName} no1={no} checked no='{ ../sliderItem.b }' />
+                  <{../sliderItem.a|tagName} no1={no} checked no="{ ../sliderItem.b }" />
                 </slider>
               </#each>
             `}

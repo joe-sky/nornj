@@ -317,10 +317,10 @@ function _buildNode(node, fns, counter, retType, level) {
       fnStr += dataReferStr;
     }
 
-    //如果表达式不存在则打印警告信息
+    //如果块表达式不存在则打印警告信息
     fnStr += 'p1.throwIf(_expr' + _exprC + ', \'' + node.expr + '\', \'expr\');\n';
 
-    //执行表达式块
+    //执行块表达式
     var _thisC = counter._this++,
       configE = exprConfig[node.expr],
       noConfig = !configE,

@@ -60,7 +60,9 @@ gulp.task('build', function () {
 //Unit testing
 gulp.task("test", function () {
   return gulp.src(["./test/**/**Spec.js"])
-    .pipe(jasmine());
+    .pipe(jasmine({
+      includeStackTrace: true
+    }));
 });
 
 //Run eslint

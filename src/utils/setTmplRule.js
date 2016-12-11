@@ -70,7 +70,7 @@ module.exports = function (startRule, endRule, exprRule, externalRule, propRule,
     propRule: propRule,
     xmlOpenTag: _createRegExp('^<([a-z' + firstChar + exprRules + '][-a-z0-9_|./' + otherChars + ']*)[^>]*>$', 'i'),
     insideBraceParam: _createRegExp(startRule + '([^' + allRules + ']+)' + endRule, 'i'),
-    exprBraceParam: _createRegExp('([\\s]+(' + startRule + '){1,2}[^' + allRules + ']+(' + endRule + '){1,2})+', 'i'),
+    exprBraceParam: _createRegExp('([\\s]+["]?(' + startRule + '){1,2}[^' + allRules + ']+(' + endRule + '){1,2}["]?)+', 'i'),
     replaceBraceParam: function() {
       return _createRegExp('[\\s]+(' + startRule + '){1,2}([^' + allRules + ']+)(' + endRule + '){1,2}', 'g')
     },

@@ -288,20 +288,33 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 	//Clear quotation marks
-	function clearQuot(value) {
-	  var charF = value[0],
-	    regex;
+	var REGEX_QUOT_D = /["]+/g,
+	  REGEX_QUOT_S = /[']+/g;
+	function clearQuot(value, clearDouble) {
+	  if (value == null) {
+	    return;
+	  }
 
-	  if (charF === '\'') {
-	    regex = /[']+/g;
+	  var regex;
+	  if (clearDouble == null) {
+	    var charF = value[0];
+	    if (charF === '\'') {
+	      regex = REGEX_QUOT_S;
+	    }
+	    else if (charF === '"') {
+	      regex = REGEX_QUOT_D;
+	    }
 	  }
-	  else if (charF === '"') {
-	    regex = /["]+/g;
+	  else if (clearDouble) {
+	    regex = REGEX_QUOT_D;
 	  }
+	  else {
+	    regex = REGEX_QUOT_S;
+	  }
+
 	  if (regex) {
 	    value = value.replace(regex, '');
 	  }
-
 	  return value;
 	}
 
@@ -469,41 +482,44 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return OMITTED_CLOSE_TAGS[tagName.toLowerCase()];
 	}
 
+	function _clearExtraChar(str) {
+	  if (str.lastIndexOf('/') === str.length - 1) {
+	    str = str.replace(/\//, '');
+	  }
+	  return str;
+	}
+
 	//Extract parameters inside the xml open tag
-	function getOpenTagParams(obj, noXml) {
-	  var pattern = /[\s]+([^\s=>]+)(=(('[^']+')|("[^"]+")|([^"'\s]+)))?/g,
+	function getOpenTagParams(obj) {
+	  var pattern = /[\s]+([^"\s=>]+)?[=]?(("[^"]+")|([^"\s>]+))?/g,
 	    matchArr, ret;
 
 	  while ((matchArr = pattern.exec(obj))) {
 	    var key = matchArr[1];
-	    if (key === '/' || key === '/>') {  //If match to the last "/" or "/>", then continue the loop.
+	    if (key === '/') {  //If match to the last "/", then continue the loop.
+	      continue;
+	    }
+	    else if (key != null) {
+	      key = _clearExtraChar(key);  //Removed at the end of "/".
+	    }
+
+	    var value = matchArr[2];
+	    if (value != null) {
+	      value = tools.clearQuot(_clearExtraChar(value));  //Remove quotation marks
+	      if (key == null) {
+	        key = value;
+	      }
+	    }
+	    else if (key != null) {
+	      value = key;  //Match to Similar to "checked" or "disabled" attribute.
+	    }
+	    else {
 	      continue;
 	    }
 
 	    if (!ret) {
 	      ret = [];
 	    }
-
-	    var value = matchArr[3],
-	      charF, len, regex;
-	    if (value != null) {
-	      value = tools.clearQuot(value);  //Remove quotation marks
-	    }
-	    else {
-	      value = key;  //Match to Similar to "checked" or "disabled" attribute.
-	    }
-	    len = value.length;
-
-	    //Removed at the end of "/>" or ">".
-	    if (!noXml) {
-	      if (value.lastIndexOf('/>') === len - 2) {
-	        value = value.replace(/\/>/, '');
-	      }
-	      else if (value.lastIndexOf('>') === len - 1) {
-	        value = value.replace(/>/, '');
-	      }
-	    }
-
 	    ret.push({ key: key, value: value });
 	  }
 
@@ -555,7 +571,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  var tmpls = paramsP.tmpls;
 	  if (!tmpls) {
 	    var objT = { length: 0 };
-	    if(name != null) {
+	    if (name != null) {
 	      objT[name] = node;
 	    }
 	    else {
@@ -569,7 +585,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var objT = tmpls.strs[0],
 	      len = objT.length;
 
-	    if(name != null) {
+	    if (name != null) {
 	      objT[name] = node;
 	    }
 	    else {
@@ -1068,7 +1084,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	    else {  //为块表达式,也可视为一个元素节点
 	      var exprName = expr[0].toLowerCase();
-	      exprParams = expr[1];
+	      exprParams = tools.clearQuot(expr[1], true);
 	      isTmpl = tranElem.isTmpl(exprName);
 	      isParamsExpr = tranElem.isParamsExpr(exprName);
 
@@ -1114,7 +1130,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	          node.selfCloseTag = tranElem.verifySelfCloseTag(openTagName);
 	        }
 	      }
-	      else {  //为块表达式时判断是否有$else
+	      else {  //为块表达式时判断是否有#else
 	        if (isTmpl) {  //模板元素
 	          pushContent = false;
 	          var retR = tranElem.getInsideBraceParam(exprParams);
@@ -1696,7 +1712,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    propRule: propRule,
 	    xmlOpenTag: _createRegExp('^<([a-z' + firstChar + exprRules + '][-a-z0-9_|./' + otherChars + ']*)[^>]*>$', 'i'),
 	    insideBraceParam: _createRegExp(startRule + '([^' + allRules + ']+)' + endRule, 'i'),
-	    exprBraceParam: _createRegExp('([\\s]+(' + startRule + '){1,2}[^' + allRules + ']+(' + endRule + '){1,2})+', 'i'),
+	    exprBraceParam: _createRegExp('([\\s]+["]?(' + startRule + '){1,2}[^' + allRules + ']+(' + endRule + '){1,2}["]?)+', 'i'),
 	    replaceBraceParam: function() {
 	      return _createRegExp('[\\s]+(' + startRule + '){1,2}([^' + allRules + ']+)(' + endRule + '){1,2}', 'g')
 	    },
@@ -1705,7 +1721,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      return _createRegExp('((' + startRule + '){1,2})([^' + allRules + ']+)(' + endRule + '){1,2}', 'g');
 	    },
 	    checkElem: function() {
-	      return _createRegExp('([^>]*)(<([a-z' + firstChar + '/' + exprRules + '!][-a-z0-9_|.' + allRules + exprRules + ']*)[^>]*>)([^<]*)', 'ig');
+	      return _createRegExp('([^>]*)(<([a-z' + firstChar + '/' + exprRules + '!][-a-z0-9_|.' + allRules + exprRules + ']*)([^>]*)>)([^<]*)', 'ig');
 	    },
 	    externalSplit: _createRegExp(escapeExternalRule + '\\{[^{}]*(?:\\{[^' + externalRule + ']*\\})*[^{}]*\\}'),
 	    external: function() {
@@ -2155,10 +2171,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	      fnStr += dataReferStr;
 	    }
 
-	    //如果表达式不存在则打印警告信息
+	    //如果块表达式不存在则打印警告信息
 	    fnStr += 'p1.throwIf(_expr' + _exprC + ', \'' + node.expr + '\', \'expr\');\n';
 
-	    //执行表达式块
+	    //执行块表达式
 	    var _thisC = counter._this++,
 	      configE = exprConfig[node.expr],
 	      noConfig = !configE,
@@ -2613,7 +2629,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var textBefore = matchArr[1],
 	      elem = matchArr[2],
 	      elemName = matchArr[3],
-	      textAfter = matchArr[4];
+	      elemParams = matchArr[4],
+	      textAfter = matchArr[5];
 
 	    //Text before tag
 	    if (textBefore && textBefore !== '\n') {
@@ -2629,7 +2646,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	      }
 	      else if (elem[elem.length - 2] === '/') {  //Self close tag
-	        _setSelfCloseElem(elem, elemName, current.elem, params);
+	        _setSelfCloseElem(elem, elemName, elemParams, current.elem, params);
 	      }
 	      else {  //Open tag
 	        parent = current;
@@ -2640,7 +2657,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        };
 
 	        parent.elem.push(current.elem);
-	        _setElem(elem, elemName, current.elem, params);
+	        _setElem(elem, elemName, elemParams, current.elem, params);
 	      }
 	    }
 
@@ -2698,13 +2715,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 	//Set element node
-	function _setElem(elem, elemName, elemArr, params, bySelfClose) {
+	function _setElem(elem, elemName, elemParams, elemArr, params, bySelfClose) {
 	  var ret, paramsExpr;
 	  if (elemName[0] === tmplRule.exprRule) {
 	    ret = elem.substring(1, elem.length - 1);
 	  }
 	  else if (elemName.indexOf(tmplRule.propRule) === 0) {
-	    ret = tmplRule.exprRule + 'prop {\'' + elemName.substr(tmplRule.propRule.length) + '\'}';
+	    ret = tmplRule.exprRule + 'prop {\'' + elemName.substr(tmplRule.propRule.length) + '\'}' + elemParams;
 	  }
 	  else {
 	    var retS = _getSplitParams(elem, params);
@@ -2770,12 +2787,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 	//Set self close element node
-	function _setSelfCloseElem(elem, elemName, elemArr, params) {
+	function _setSelfCloseElem(elem, elemName, elemParams, elemArr, params) {
 	  if (elemName === tmplRule.exprRule + 'else') {
 	    elemArr.push(elem.substr(1, 5));
 	  }
 	  else {
-	    _setElem(elem, elemName, elemArr, params, true);
+	    _setElem(elem, elemName, elemParams, elemArr, params, true);
 	  }
 	}
 

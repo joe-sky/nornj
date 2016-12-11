@@ -53,7 +53,7 @@ function checkElem(obj, parent) {
     }
     else {  //为块表达式,也可视为一个元素节点
       var exprName = expr[0].toLowerCase();
-      exprParams = expr[1];
+      exprParams = tools.clearQuot(expr[1], true);
       isTmpl = tranElem.isTmpl(exprName);
       isParamsExpr = tranElem.isParamsExpr(exprName);
 
@@ -99,7 +99,7 @@ function checkElem(obj, parent) {
           node.selfCloseTag = tranElem.verifySelfCloseTag(openTagName);
         }
       }
-      else {  //为块表达式时判断是否有$else
+      else {  //为块表达式时判断是否有#else
         if (isTmpl) {  //模板元素
           pushContent = false;
           var retR = tranElem.getInsideBraceParam(exprParams);
