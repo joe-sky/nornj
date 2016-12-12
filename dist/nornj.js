@@ -482,45 +482,43 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return OMITTED_CLOSE_TAGS[tagName.toLowerCase()];
 	}
 
-	function _clearExtraChar(str) {
-	  if (str.lastIndexOf('/') === str.length - 1) {
-	    str = str.replace(/\//, '');
-	  }
-	  return str;
-	}
-
 	//Extract parameters inside the xml open tag
-	function getOpenTagParams(obj) {
-	  var pattern = /[\s]+([^"\s=>]+)?[=]?(("[^"]+")|([^"\s>]+))?/g,
+	function getOpenTagParams(tag) {
+	  var pattern = tmplRule.openTagParams,
 	    matchArr, ret;
 
-	  while ((matchArr = pattern.exec(obj))) {
+	  while ((matchArr = pattern.exec(tag))) {
 	    var key = matchArr[1];
-	    if (key === '/') {  //If match to the last "/", then continue the loop.
-	      continue;
-	    }
-	    else if (key != null) {
-	      key = _clearExtraChar(key);  //Removed at the end of "/".
-	    }
-
-	    var value = matchArr[2];
-	    if (value != null) {
-	      value = tools.clearQuot(_clearExtraChar(value), true);  //Remove double quotation marks
-	      if (key == null) {
-	        key = value;
-	      }
-	    }
-	    else if (key != null) {
-	      value = key;  //Match to Similar to "checked" or "disabled" attribute.
-	    }
-	    else {
+	    if (key === '/') {  //If match to the last of "/", then continue the loop.
 	      continue;
 	    }
 
 	    if (!ret) {
 	      ret = [];
 	    }
-	    ret.push({ key: key, value: value });
+
+	    var value = matchArr[6],
+	      onlyBrace = matchArr[3] != null;
+	    if (value != null) {
+	      value = tools.clearQuot(value);  //Remove quotation marks
+	    }
+	    else {
+	      value = key;  //Match to Similar to "checked" or "disabled" attribute.
+	    }
+
+	    //Removed at the end of "/>", ">" or "/".
+	    if (/\/>$/.test(value)) {
+	      value = value.substr(0, value.length - 2);
+	    }
+	    else if (/>$/.test(value) || /\/$/.test(value)) {
+	      value = value.substr(0, value.length - 1);
+	    }
+
+	    ret.push({
+	      key: key,
+	      value: value,
+	      onlyBrace: onlyBrace
+	    });
 	  }
 
 	  return ret;
@@ -542,9 +540,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  if (ret1) {
 	    ret = [ret1[1]];
 
-	    var ret2 = tmplRule.exprBraceParam.exec(obj);  //提取各参数
-	    if (ret2) {
-	      ret.push(ret2[0]);
+	    var params = getOpenTagParams(obj);  //提取各参数
+	    if (params) {
+	      ret.push(params);
 	    }
 	  }
 
@@ -1066,13 +1064,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var openTagName,
 	      hasCloseTag = false,
 	      isTmpl, isParamsExpr;
-	    
+
 	    expr = tranElem.isExpr(first);
 	    if (!expr) {
 	      var xmlOpenTag = tranElem.getXmlOpenTag(first);
 	      if (xmlOpenTag) {  //tagname为xml标签时,则认为是元素节点
 	        openTagName = xmlOpenTag[1];
-	        
+
 	        if (!tranElem.isXmlSelfCloseTag(first)) {  //非自闭合标签才验证是否存在关闭标签
 	          hasCloseTag = tranElem.isXmlCloseTag(last, openTagName);
 	        }
@@ -1084,14 +1082,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	    else {  //为块表达式,也可视为一个元素节点
 	      var exprName = expr[0].toLowerCase();
-	      exprParams = tools.clearQuot(expr[1], true);
+	      exprParams = expr[1];
 	      isTmpl = tranElem.isTmpl(exprName);
 	      isParamsExpr = tranElem.isParamsExpr(exprName);
 
 	      node.type = 'nj_expr';
 	      node.expr = exprName;
 	      if (exprParams != null && !isTmpl) {
-	        node.refer = tranParam.compiledParam(exprParams);
+	        node.refer = tranParam.compiledParam(exprParams.reduce(function (p, c) {
+	          return p + (c.onlyBrace ? ' ' + c.key : '');
+	        }, ''));
 	      }
 
 	      if (tranElem.isExprCloseTag(last, exprName)) {  //判断是否有块表达式闭合标签
@@ -1133,10 +1133,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	      else {  //为块表达式时判断是否有#else
 	        if (isTmpl) {  //模板元素
 	          pushContent = false;
-	          var retR = tranElem.getInsideBraceParam(exprParams);
 
 	          //将模板添加到父节点的params中
-	          tranElem.addTmpl(node, parent, retR ? tools.clearQuot(retR[1]) : null);
+	          tranElem.addTmpl(node, parent, exprParams ? exprParams[0].value : null);
 	        }
 	        else if (isParamsExpr) {
 	          pushContent = false;
@@ -1711,8 +1710,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    externalRule: externalRule,
 	    propRule: propRule,
 	    xmlOpenTag: _createRegExp('^<([a-z' + firstChar + exprRules + '][-a-z0-9_|./' + otherChars + ']*)[^>]*>$', 'i'),
-	    insideBraceParam: _createRegExp(startRule + '([^' + allRules + ']+)' + endRule, 'i'),
-	    exprBraceParam: _createRegExp('([\\s]+["]?(' + startRule + '){1,2}[^' + allRules + ']+(' + endRule + '){1,2}["]?)+', 'i'),
+	    openTagParams: _createRegExp('[\\s]+(((' + startRule + '){1,2}[^' + allRules + ']+(' + endRule + '){1,2})|[^\\s=>]+)(=((\'[^\']+\')|("[^"]+")|([^"\'\\s]+)))?', 'g'),
+	    insideBraceParam: _createRegExp('(' + startRule + '){1,2}([^' + allRules + ']+)(' + endRule + '){1,2}', 'i'),
 	    replaceBraceParam: function() {
 	      return _createRegExp('[\\s]+(' + startRule + '){1,2}([^' + allRules + ']+)(' + endRule + '){1,2}', 'g')
 	    },

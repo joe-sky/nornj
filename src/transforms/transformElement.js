@@ -38,45 +38,43 @@ function verifySelfCloseTag(tagName) {
   return OMITTED_CLOSE_TAGS[tagName.toLowerCase()];
 }
 
-function _clearExtraChar(str) {
-  if (str.lastIndexOf('/') === str.length - 1) {
-    str = str.replace(/\//, '');
-  }
-  return str;
-}
-
 //Extract parameters inside the xml open tag
-function getOpenTagParams(obj) {
-  var pattern = /[\s]+([^"\s=>]+)?[=]?(("[^"]+")|([^"\s>]+))?/g,
+function getOpenTagParams(tag) {
+  var pattern = tmplRule.openTagParams,
     matchArr, ret;
 
-  while ((matchArr = pattern.exec(obj))) {
+  while ((matchArr = pattern.exec(tag))) {
     var key = matchArr[1];
-    if (key === '/') {  //If match to the last "/", then continue the loop.
-      continue;
-    }
-    else if (key != null) {
-      key = _clearExtraChar(key);  //Removed at the end of "/".
-    }
-
-    var value = matchArr[2];
-    if (value != null) {
-      value = tools.clearQuot(_clearExtraChar(value), true);  //Remove double quotation marks
-      if (key == null) {
-        key = value;
-      }
-    }
-    else if (key != null) {
-      value = key;  //Match to Similar to "checked" or "disabled" attribute.
-    }
-    else {
+    if (key === '/') {  //If match to the last of "/", then continue the loop.
       continue;
     }
 
     if (!ret) {
       ret = [];
     }
-    ret.push({ key: key, value: value });
+
+    var value = matchArr[6],
+      onlyBrace = matchArr[3] != null;
+    if (value != null) {
+      value = tools.clearQuot(value);  //Remove quotation marks
+    }
+    else {
+      value = key;  //Match to Similar to "checked" or "disabled" attribute.
+    }
+
+    //Removed at the end of "/>", ">" or "/".
+    if (/\/>$/.test(value)) {
+      value = value.substr(0, value.length - 2);
+    }
+    else if (/>$/.test(value) || /\/$/.test(value)) {
+      value = value.substr(0, value.length - 1);
+    }
+
+    ret.push({
+      key: key,
+      value: value,
+      onlyBrace: onlyBrace
+    });
   }
 
   return ret;
@@ -98,9 +96,9 @@ function isExpr(obj) {
   if (ret1) {
     ret = [ret1[1]];
 
-    var ret2 = tmplRule.exprBraceParam.exec(obj);  //提取各参数
-    if (ret2) {
-      ret.push(ret2[0]);
+    var params = getOpenTagParams(obj);  //提取各参数
+    if (params) {
+      ret.push(params);
     }
   }
 

@@ -35,13 +35,13 @@ function checkElem(obj, parent) {
     var openTagName,
       hasCloseTag = false,
       isTmpl, isParamsExpr;
-    
+
     expr = tranElem.isExpr(first);
     if (!expr) {
       var xmlOpenTag = tranElem.getXmlOpenTag(first);
       if (xmlOpenTag) {  //tagname为xml标签时,则认为是元素节点
         openTagName = xmlOpenTag[1];
-        
+
         if (!tranElem.isXmlSelfCloseTag(first)) {  //非自闭合标签才验证是否存在关闭标签
           hasCloseTag = tranElem.isXmlCloseTag(last, openTagName);
         }
@@ -53,14 +53,16 @@ function checkElem(obj, parent) {
     }
     else {  //为块表达式,也可视为一个元素节点
       var exprName = expr[0].toLowerCase();
-      exprParams = tools.clearQuot(expr[1], true);
+      exprParams = expr[1];
       isTmpl = tranElem.isTmpl(exprName);
       isParamsExpr = tranElem.isParamsExpr(exprName);
 
       node.type = 'nj_expr';
       node.expr = exprName;
       if (exprParams != null && !isTmpl) {
-        node.refer = tranParam.compiledParam(exprParams);
+        node.refer = tranParam.compiledParam(exprParams.reduce(function (p, c) {
+          return p + (c.onlyBrace ? ' ' + c.key : '');
+        }, ''));
       }
 
       if (tranElem.isExprCloseTag(last, exprName)) {  //判断是否有块表达式闭合标签
@@ -102,10 +104,9 @@ function checkElem(obj, parent) {
       else {  //为块表达式时判断是否有#else
         if (isTmpl) {  //模板元素
           pushContent = false;
-          var retR = tranElem.getInsideBraceParam(exprParams);
 
           //将模板添加到父节点的params中
-          tranElem.addTmpl(node, parent, retR ? tools.clearQuot(retR[1]) : null);
+          tranElem.addTmpl(node, parent, exprParams ? exprParams[0].value : null);
         }
         else if (isParamsExpr) {
           pushContent = false;
