@@ -2011,6 +2011,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }
 	      if (noConfig || configF.data) {
 	        filterStr += '  _thisF' + _thisFC + '.data = parent.data;\n';
+	        filterStr += '  _thisF' + _thisFC + '.datas = data;\n';
 	      }
 	      if (noConfig || configF.parent) {
 	        filterStr += '  _thisF' + _thisFC + '.parent = parent.parent;\n';
@@ -2186,6 +2187,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	    if (noConfig || configE.data) {
 	      fnStr += '_this' + _thisC + '.data = parent.data;\n';
+	      fnStr += '_this' + _thisC + '.datas = data;\n';
 	    }
 	    if (noConfig || configE.parent) {
 	      fnStr += '_this' + _thisC + '.parent = parent.parent;\n';
