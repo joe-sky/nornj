@@ -105,7 +105,7 @@ function _buildPropData(obj, counter, fns, noEscape) {
       data = 'parent.index';
       special = true;
     }
-    else if (name === '.') {
+    else if (name === 'this') {
       data = 'parent.data';
       special = true;
     }

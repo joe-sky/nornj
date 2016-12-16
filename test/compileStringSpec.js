@@ -97,11 +97,11 @@ describe('test compile string', function () {
             <@name checked>{test0 | filter1}{'test1' | filter2}test2</@name>
             <@checked />
             <#each {list}>
-              <#prop {'data-name'} {.}>{. | filter1}{'test1'}test2</#prop>
+              <#prop {'data-name'} {this}>{this | filter1}{'test1'}test2</#prop>
             </#each>
             <@data-name10>
               <#each {list}>
-                <#if {.}>{ # | filter2 }<#else />{ '100' | filter1 }</#if>
+                <#if {this}>{ # | filter2 }<#else />{ '100' | filter1 }</#if>
               </#each>
             </@data-name10>
           </#props>

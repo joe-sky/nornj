@@ -192,7 +192,7 @@ xdescribe('test speed', function () {
           <span>{text}</span>
         </#tmpl>
         <#tmpl {'t2'}>
-          <span key={#}>{.}test!</span>
+          <span key={#}>{this}test!</span>
         </#tmpl>
       </TestComp>
       <span class=test_{#}

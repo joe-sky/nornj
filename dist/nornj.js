@@ -1958,7 +1958,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      data = 'parent.index';
 	      special = true;
 	    }
-	    else if (name === '.') {
+	    else if (name === 'this') {
 	      data = 'parent.data';
 	      special = true;
 	    }
