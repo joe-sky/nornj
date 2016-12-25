@@ -3,11 +3,11 @@
   compile = require('../src/compiler/compile').compile,
   includeParser = require('../tools/includeParser');
 
-describe('test compile string', function () {
+xdescribe('test compile string', function () {
   beforeAll(function () {
     nj.registerFilter('filter1', function (v, p1) {
-      //console.log(nj.getDatasValue(this.datas, 'name1'));
-      return v * 2 + (p1 != null ? parseInt(p1, 10) : 0);
+      //console.log(nj.getDataValue(this.datas, 'name1'));
+      return v * 2 + ((p1 != null && !p1._njOpts) ? parseInt(p1, 10) : 0);
     });
     nj.registerFilter('filter2', function (v, p1, p2) {
       //console.log(p1 + '_' + p2);
@@ -65,7 +65,7 @@ describe('test compile string', function () {
           </span>
           <span1>
             <#props>
-              <#prop {'test'} {'1'} {'2'}>test</#prop>
+              <#prop {'test12'}>test</#prop>
             </#props>
             joe
           </span1>
@@ -97,7 +97,7 @@ describe('test compile string', function () {
             <@name checked>{test0 | filter1}{'test1' | filter2}test2</@name>
             <@checked />
             <#each {list}>
-              <#prop {'data-name'} {this}>{this | filter1}{'test1'}test2</#prop>
+              <#prop {'data-name'}>{this | filter1}{'test1'}test2</#prop>
             </#each>
             <@data-name10>
               <#each {list}>

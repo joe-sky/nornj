@@ -4,60 +4,56 @@ var tools = require('../utils/tools');
 
 //Global expression list
 var exprs = {
-  'if': function (refer, useUnless) {
+  'if': function(refer, options) {
     if (refer === 'false') {
       refer = false;
     }
 
     var referR, ret;
-    if (!useUnless) {
+    if (!options.useUnless) {
       referR = !!refer;
-    }
-    else {
+    } else {
       referR = !!!refer;
     }
     if (referR) {
-      ret = this.result();
-    }
-    else {
-      ret = this.inverse();
+      ret = options.result();
+    } else {
+      ret = options.inverse();
     }
 
-    if (this.useString && ret == null) {
+    if (options.useString && ret == null) {
       return '';
     }
 
     return ret;
   },
 
-  unless: function (refer) {
-    return exprs['if'].call(this, refer, true);
+  unless: function(refer, options) {
+    options.useUnless = true;
+    return exprs['if'].call(this, refer, options);
   },
 
-  each: function (refer) {
-    var thiz = this,
-      useString = thiz.useString,
+  each: function(refer, options) {
+    var useString = options.useString,
       ret;
 
     if (refer) {
       if (useString) {
         ret = '';
-      }
-      else {
+      } else {
         ret = [];
       }
 
-      tools.each(refer, function (item, index) {
-        var retI = thiz.result({
-          item: item,
+      tools.each(refer, function(item, index) {
+        var retI = options.result({
+          data: item,
           index: index,
           fallback: true
         });
 
         if (useString) {
           ret += retI;
-        }
-        else {
+        } else {
           ret.push(retI);
         }
       }, false, tools.isArrayLike(refer));
@@ -66,9 +62,8 @@ var exprs = {
       if (!useString && !ret.length) {
         ret = null;
       }
-    }
-    else {
-      ret = thiz.inverse();
+    } else {
+      ret = options.inverse();
       if (useString && ret == null) {
         ret = '';
       }
@@ -78,65 +73,54 @@ var exprs = {
   },
 
   //Parameter
-  param: function () {
-    var ret = this.result(),  //Get parameter value
-      name = '',
+  param: function(name, options) {
+    var ret = options.result(), //Get parameter value
       value;
-
-    //Make property name by multiple parameters
-    tools.each(arguments, function (item, i) {
-      name += item;
-    }, false, true);
 
     //If the value length greater than 1, it need to be connected to a whole string.
     if (ret != null) {
       if (!tools.isArray(ret)) {
         value = ret;
-      }
-      else {
+      } else {
         value = '';
-        tools.each(tools.flatten(ret), function (item) {
+        tools.each(tools.flatten(ret), function(item) {
           value += item != null ? item : '';
         }, false, true);
       }
-    }
-    else {  //Match to Similar to "checked" or "disabled" attribute.
-      value = !this.useString ? true : name;
+    } else { //Match to Similar to "checked" or "disabled" attribute.
+      value = !options.useString ? true : name;
     }
 
-    this.paramsExpr[name] = value;
+    options.exprProps[name] = value;
   },
 
   //Spread parameters
-  spreadparam: function (refer) {
+  spreadparam: function(refer, options) {
     if (!refer) {
       return;
     }
 
-    var thiz = this;
-    tools.each(refer, function (v, k) {
-      thiz.paramsExpr[k] = v;
+    tools.each(refer, function(v, k) {
+      options.exprProps[k] = v;
     }, false, false);
   },
 
-  equal: function (value1, value2) {
+  equal: function(value1, value2, options) {
     var ret;
     if (value1 == value2) {
-      ret = this.result();
-    }
-    else {
-      ret = this.inverse();
+      ret = options.result();
+    } else {
+      ret = options.inverse();
     }
 
     return ret;
   },
 
-  'for': function (start, end) {
-    var ret, useString = this.useString;
+  'for': function(start, end, options) {
+    var ret, useString = options.useString;
     if (useString) {
       ret = '';
-    }
-    else {
+    } else {
       ret = [];
     }
 
@@ -148,14 +132,13 @@ var exprs = {
     end = parseInt(end, 10);
 
     for (; start <= end; start++) {
-      var retI = this.result({
+      var retI = options.result({
         index: start
       });
 
       if (useString) {
         ret += retI;
-      }
-      else {
+      } else {
         ret.push(retI);
       }
     }
@@ -163,21 +146,16 @@ var exprs = {
     return ret;
   },
 
-  blank: function () {
-    return this.result();
+  blank: function(options) {
+    return options.result();
   }
 };
 
 function _commonConfig(params) {
   var ret = {
-    data: true,
-    parent: true,
-    index: true,
     useString: true,
-    paramsExpr: false,
-    result: true,
-    inverse: true,
-    newContext: false
+    exprProps: false,
+    newContext: true
   };
 
   if (params) {
@@ -187,17 +165,16 @@ function _commonConfig(params) {
 }
 
 //Expression default config
-var _defaultConfig = { data: false, parent: false, index: false },
-  exprConfig = {
-    'if': _commonConfig(_defaultConfig),
-    unless: _commonConfig(_defaultConfig),
-    each: _commonConfig(tools.assign({ newContext: true }, _defaultConfig)),
-    param: _commonConfig(tools.assign({ inverse: false, paramsExpr: true }, _defaultConfig)),
-    spreadparam: _commonConfig(tools.assign({ useString: false, result: false, inverse: false, paramsExpr: true }, _defaultConfig)),
-    equal: _commonConfig(tools.assign({ useString: false }, _defaultConfig)),
-    'for': _commonConfig(tools.assign({ newContext: true }, _defaultConfig, { data: true })),
-    blank: _commonConfig(tools.assign({ useString: false, inverse: false }, _defaultConfig))
-  };
+var exprConfig = {
+  'if': _commonConfig({ newContext: false }),
+  unless: _commonConfig({ newContext: false }),
+  each: _commonConfig(),
+  param: _commonConfig({ newContext: false, exprProps: true }),
+  spreadparam: _commonConfig({ newContext: false, useString: false, exprProps: true }),
+  equal: _commonConfig({ newContext: false, useString: false }),
+  'for': _commonConfig(),
+  blank: _commonConfig({ newContext: false, useString: false })
+};
 
 //Expression alias
 exprs.prop = exprs.p = exprs.param;
@@ -216,21 +193,20 @@ function registerExpr(name, expr, options) {
     };
   }
 
-  tools.each(params, function (v, k) {
+  tools.each(params, function(v, k) {
     var name = k.toLowerCase();
     if (v) {
       var expr = v.expr,
         options = v.options;
 
       if (expr || options) {
-        if(expr) {
+        if (expr) {
           exprs[name] = expr;
         }
-        if(options) {
+        if (options) {
           exprConfig[name] = _commonConfig(options);
         }
-      }
-      else {
+      } else {
         exprs[name] = v;
       }
     }

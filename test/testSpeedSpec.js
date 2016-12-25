@@ -8,15 +8,15 @@
   ReactDOMServer = require('react-dom/server'),
   Handlebars = require('handlebars');
 
-xdescribe('test speed', function () {
+describe('test speed', function () {
   var tmpl = nj`
   <{div} id="{num}_100">
     <#each {arr}>
       <span class=test_{#}
-            style={../styles}
-            onClick={../onClick}>
-        test_{../num}
-        <#each {../list2}>
+            style={styles}
+            onClick={onClick}>
+        test_{num}
+        <#each {list2}>
           <div key={#}>
             <#props>
               <#if {../# | five}>
@@ -421,6 +421,7 @@ xdescribe('test speed', function () {
           arr: this.props.arr,
           num: this.state.num,
           list2: list2,
+          no: 5000,
           onClick: this.onClick,
           params: {
             'data-a': 1,
@@ -443,12 +444,12 @@ xdescribe('test speed', function () {
       }
     });
 
-    var list2 = _.times(100, function (n) {
+    var list2 = _.times(5, function (n) {
       return { no: n + 1 };
     });
 
     var html = ReactDOMServer.renderToStaticMarkup(React.createElement(TestComponent, {
-      arr: _.times(100, function (n) {
+      arr: _.times(2, function (n) {
         return n;
       }),
       a: 1,
@@ -456,7 +457,7 @@ xdescribe('test speed', function () {
     }));
 
     //console.log(JSON.stringify(nj.asts['tmpl1']));
-    //console.log(html);
+    console.log(html);
     expect(html).toBeTruthy();
   });
 });

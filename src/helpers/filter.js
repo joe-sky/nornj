@@ -5,9 +5,9 @@ var tools = require('../utils/tools');
 //Global filter list
 var filters = {
   //Get param properties
-  prop: function (obj, props) {
+  prop: function(obj, props) {
     var ret = obj;
-    ret && tools.each(props.split('.'), function (p) {
+    ret && tools.each(props.split('.'), function(p) {
       ret = ret[p];
     }, false, true);
 
@@ -15,30 +15,29 @@ var filters = {
   },
 
   //Get list count
-  count: function (obj) {
+  count: function(obj) {
     return obj ? obj.length : 0;
   },
 
   //Get list item
-  item: function (obj, no) {
+  item: function(obj, no) {
     return obj ? obj[no] : null;
   },
 
   //Judge equal
-  equal: function (obj, val) {
+  equal: function(obj, val) {
     return obj == val;
   },
 
   //Less than
-  lt: function (val1, val2, noEqual) {
+  lt: function(val1, val2, noEqual) {
     var ret;
     val1 = parseFloat(val1);
     val2 = parseFloat(val2);
 
     if (noEqual) {
       ret = val1 < val2;
-    }
-    else {
+    } else {
       ret = val1 <= val2;
     }
 
@@ -46,15 +45,14 @@ var filters = {
   },
 
   //Greater than
-  gt: function (val1, val2, noEqual) {
+  gt: function(val1, val2, noEqual) {
     var ret;
     val1 = parseFloat(val1);
     val2 = parseFloat(val2);
 
     if (noEqual) {
       ret = val1 > val2;
-    }
-    else {
+    } else {
       ret = val1 >= val2;
     }
 
@@ -62,22 +60,22 @@ var filters = {
   },
 
   //Addition
-  add: function (val1, val2, isFloat) {
+  add: function(val1, val2, isFloat) {
     return val1 + (isFloat ? parseFloat(val2) : parseInt(val2, 10));
   },
 
   //Convert to int 
-  int: function (val) {
+  int: function(val) {
     return parseInt(val, 10);
   },
 
   //Convert to float 
-  float: function (val) {
+  float: function(val) {
     return parseFloat(val);
   },
 
   //Convert to boolean 
-  bool: function (val) {
+  bool: function(val) {
     if (val === 'false') {
       return false;
     }
@@ -88,9 +86,6 @@ var filters = {
 
 function _commonConfig(params) {
   var ret = {
-    data: true,
-    parent: true,
-    index: true,
     useString: true
   };
 
@@ -101,19 +96,18 @@ function _commonConfig(params) {
 }
 
 //Filter default config
-var _defaultConfig = { data: false, parent: false, index: false },
-  filterConfig = {
-    prop: _commonConfig(_defaultConfig),
-    count: _commonConfig(_defaultConfig),
-    item: _commonConfig(_defaultConfig),
-    equal: _commonConfig(_defaultConfig),
-    lt: _commonConfig(_defaultConfig),
-    gt: _commonConfig(_defaultConfig),
-    add: _commonConfig(_defaultConfig),
-    int: _commonConfig(_defaultConfig),
-    float: _commonConfig(_defaultConfig),
-    bool: _commonConfig(_defaultConfig)
-  };
+var filterConfig = {
+  prop: _commonConfig(),
+  count: _commonConfig(),
+  item: _commonConfig(),
+  equal: _commonConfig(),
+  lt: _commonConfig(),
+  gt: _commonConfig(),
+  add: _commonConfig(),
+  int: _commonConfig(),
+  float: _commonConfig(),
+  bool: _commonConfig()
+};
 
 //Register filter and also can batch add
 function registerFilter(name, filter, options) {
@@ -126,7 +120,7 @@ function registerFilter(name, filter, options) {
     };
   }
 
-  tools.each(params, function (v, k) {
+  tools.each(params, function(v, k) {
     var name = k.toLowerCase();
     if (v) {
       var filter = v.filter,
@@ -139,8 +133,7 @@ function registerFilter(name, filter, options) {
         if (options) {
           filterConfig[name] = _commonConfig(options);
         }
-      }
-      else {
+      } else {
         filters[name] = v;
       }
     }

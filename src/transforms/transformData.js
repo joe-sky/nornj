@@ -38,10 +38,10 @@ function styleProps(obj) {
 }
 
 //Get value from multiple datas
-function getDatasValue(datas, prop) {
+function getDataValue(data, prop) {
   var ret, obj;
-  for (var i = 0, l = datas.length; i < l; i++) {
-    obj = datas[i];
+  for (var i = 0, l = data.length; i < l; i++) {
+    obj = data[i];
     if (obj) {
       ret = obj[prop];
       if (ret != null) {
@@ -51,36 +51,20 @@ function getDatasValue(datas, prop) {
   }
 }
 
-//Rebuild data in the new context
-function getNewData(item, data, isArr, addData) {
-  var ret = item;
-
-  if (isArr == null) {
-    isArr = tools.isArray(data);
-  }
-  if (isArr || addData) {
-    ret = tools.listPush([item], !addData ? data.slice(1) : (isArr ? data : [data]));
-  }
-
-  return ret;
-}
-
 //Rebuild local variables in the new context
-function newContextVars(p1, p2, p3) {
-  var _parent = p2.parent,
-    hasItem = 'item' in p3,
-    parent = {
-      data: hasItem ? p3.item : _parent.data,
-      parent: p3.fallback ? _parent : _parent.parent,
-      index: 'index' in p3 ? p3.index : _parent.index
-    },
-    data = hasItem ? getNewData(p3.item, p2.data, p2.multiData, p3.addData) : p2.data,
-    multiData = p3.addData ? true : p2.multiData;
+function newContext(p2, p3) {
+  var newData = [];
+  if ('data' in p3) {
+    newData.push(p3.data);
+  }
+  if ('extra' in p3) {
+    newData.push(p3.extra);
+  }
 
   return {
-    parent: parent,
-    data: data,
-    multiData: multiData
+    data: newData.length ? tools.arrayPush(newData, p2.data) : p2.data,
+    parent: p3.fallback ? p2 : p2.parent,
+    index: 'index' in p3 ? p3.index : p2.index
   }
 }
 
@@ -112,35 +96,21 @@ function assignStringProp(paramsE, keys) {
 
 //创建块表达式子节点函数
 function exprRet(p1, p2, fn, p4) {
-  return function (param) {
+  return function(param) {
     return fn(p1, p2, param, p4);
   };
 }
 
 //构建可运行的模板函数
 function tmplWrap(configs, main) {
-  return function () {
+  return function() {
     var args = arguments,
-      len = args.length,
-      data;
-
-    if (len <= 0) {
-      data = {};
-    }
-    else if (len === 1) {
-      data = args[0];
-    }
-    else {
-      data = [];
-      for (var i = 0; i < len; i++) {
-        data[data.length] = args[i];
-      }
-    }
+      initParams = this;
 
     return main(configs, {
-      data: data,
-      parent: this && this._njParent ? this._njParent : null,
-      multiData: tools.isArray(data)
+      data: !tools.isArray(args[0]) ? tools.arraySlice(args) : args[0],
+      parent: initParams && initParams._njParent ? initParams._njParent : null,
+      index: initParams && initParams._njIndex ? initParams._njIndex : null
     });
   };
 }
@@ -151,33 +121,30 @@ function template(fns) {
     useString: fns.useString,
     exprs: nj.exprs,
     filters: nj.filters,
-    getDatasValue: nj.getDatasValue,
-    noop: nj.noop,
-    lightObj: nj.lightObj,
-    throwIf: nj.throwIf,
-    warn: nj.warn,
-    getNewData: nj.getNewData,
-    newContextVars: nj.newContextVars,
-    styleProps: nj.styleProps,
-    exprRet: nj.exprRet
+    getDataValue: getDataValue,
+    noop: tools.noop,
+    lightObj: tools.lightObj,
+    throwIf: tools.throwIf,
+    warn: tools.warn,
+    newContext: newContext,
+    styleProps: styleProps,
+    exprRet: exprRet
   };
 
   if (!configs.useString) {
     configs.h = nj.createElement;
     configs.components = nj.components;
-    //configs.assign = nj.assign;
-  }
-  else {
-    configs.assignStringProp = nj.assignStringProp;
+    //configs.assign = tools.assign;
+  } else {
+    configs.assignStringProp = assignStringProp;
     configs.escape = nj.escape;
   }
 
-  tools.each(fns, function (v, k) {
-    if (k.indexOf('main') === 0) {  //将每个主函数构建为可运行的模板函数
+  tools.each(fns, function(v, k) {
+    if (k.indexOf('main') === 0) { //将每个主函数构建为可运行的模板函数
       configs[k] = tmplWrap(configs, v);
       configs['_' + k] = v;
-    }
-    else if (k.indexOf('fn') === 0) {  //块表达式函数
+    } else if (k.indexOf('fn') === 0) { //块表达式函数
       configs[k] = v;
     }
   }, false, false);
@@ -186,9 +153,8 @@ function template(fns) {
 }
 
 module.exports = {
-  getNewData: getNewData,
-  newContextVars: newContextVars,
-  getDatasValue: getDatasValue,
+  newContext: newContext,
+  getDataValue: getDataValue,
   fixPropName: fixPropName,
   styleProps: styleProps,
   assignStringProp: assignStringProp,

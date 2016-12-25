@@ -160,7 +160,7 @@ function addParamsExpr(node, parent) {
     parent.paramsExpr = node;
   }
   else {
-    tools.listPush(parent.paramsExpr.content, node.content);
+    tools.arrayPush(parent.paramsExpr.content, node.content);
   }
 }
 

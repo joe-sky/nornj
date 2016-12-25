@@ -2,13 +2,18 @@
 
 var nj = require('../core'),
   assign = require('object-assign'),
-  arrayPush = Array.prototype.push,
+  nativeArrayPush = Array.prototype.push,
+  nativeArraySlice = Array.prototype.slice,
   errorTitle = nj.errorTitle;
 
 //Push one by one to array
-function listPush(arr1, arr2) {
-  arrayPush.apply(arr1, arr2);
+function arrayPush(arr1, arr2) {
+  nativeArrayPush.apply(arr1, arr2);
   return arr1;
+}
+
+function arraySlice(arrLike) {
+  return nativeArraySlice.call(arrLike);
 }
 
 //判断是否为数组
@@ -208,7 +213,8 @@ var tools = {
   assign: assign,
   uniqueKey: uniqueKey,
   lightObj: lightObj,
-  listPush: listPush,
+  arrayPush: arrayPush,
+  arraySlice: arraySlice,
   clearQuot: clearQuot,
   toCamelCase: toCamelCase,
   warn: warn,
