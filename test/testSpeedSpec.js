@@ -13,10 +13,10 @@ describe('test speed', function () {
   <{div} id="{num}_100">
     <#each {arr}>
       <span class=test_{#}
-            style={styles}
-            onClick={onClick}>
-        test_{num}
-        <#each {list2}>
+            style={../styles}
+            onClick={../onClick}>
+        test_{../num}
+        <#each {../list2}>
           <div key={#}>
             <#props>
               <#if {../# | five}>
@@ -46,49 +46,33 @@ describe('test speed', function () {
       var _expr0 = p1.exprs['prop'];
       p1.throwIf(_expr0, 'prop', 'expr');
 
-      return _expr0.call({
-        useString: p1.useString,
-        paramsExpr: p4,
-        result: p1.exprRet(p1, p2, p1.fn4, p4)
-      }, 'name');
+      return _expr0.apply(p2, ['name', { useString: p1.useString, exprProps: p4, result: p1.exprRet(p1, p2, p1.fn4, p4), inverse: p1.noop }]);
     },
     fn2: function (p1, p2, p3, p4) {
-      var _p2 = p1.newContextVars(p1, p2, p3),
-        parent = _p2.parent,
-        data = _p2.data,
-        multiData = _p2.multiData;
+      p2 = p1.newContext(p2, p3);
 
       var _paramsE0 = {};
 
       var _expr0 = p1.exprs['if'];
-      var _value0 = parent.parent.index;
+      var _value0 = p2.parent.index;
 
       var _filter0 = p1.filters['five'];
       if (!_filter0) {
         p1.warn('five', 'filter');
       }
       else {
-        _value0 = _filter0.call({
-          useString: p1.useString,
-          data: parent.data,
-          parent: parent.parent,
-          index: parent.index
-        }, _value0);
+        _value0 = _filter0.apply(p2, [_value0, { useString: p1.useString }]);
       }
 
       p1.throwIf(_expr0, 'if', 'expr');
 
-      _expr0.call({
-        useString: p1.useString,
-        result: p1.exprRet(p1, _p2, p1.fn3, _paramsE0),
-        inverse: p1.noop
-      }, _value0);
+      _expr0.apply(p2, [_value0, { useString: p1.useString, result: p1.exprRet(p1, p2, p1.fn3, _paramsE0), inverse: p1.noop }]);
 
-      _paramsE0['key'] = parent.index;
+      _paramsE0['key'] = p2.index;
 
       return p1.h('div', _paramsE0,
-        p1.h('span', null, 'span' + ((!multiData ? data['no'] : p1.getDatasValue(data, 'no')))),
-        p1.h('i', null, (!multiData ? data['no'] : p1.getDatasValue(data, 'no')))
+        p1.h('span', null, 'span' + (p1.getDataValue(p2.data, 'no'))),
+        p1.h('i', null, (p1.getDataValue(p2.data, 'no')))
       );
     },
     fn5: function (p1, p2, p3, p4) {
@@ -98,28 +82,20 @@ describe('test speed', function () {
       return p1.h('img');
     },
     fn1: function (p1, p2, p3, p4) {
-      var _p2 = p1.newContextVars(p1, p2, p3),
-        parent = _p2.parent,
-        data = _p2.data,
-        multiData = _p2.multiData;
+      p2 = p1.newContext(p2, p3);
 
       var _expr0 = p1.exprs['each'];
       p1.throwIf(_expr0, 'each', 'expr');
 
       var _expr1 = p1.exprs['if'];
-      var _value0 = parent.index;
+      var _value0 = p2.index;
 
       var _filter0 = p1.filters['five'];
       if (!_filter0) {
         p1.warn('five', 'filter');
       }
       else {
-        _value0 = _filter0.call({
-          useString: p1.useString,
-          data: parent.data,
-          parent: parent.parent,
-          index: parent.index
-        }, _value0, '1');
+        _value0 = _filter0.apply(p2, [_value0, '1', { useString: p1.useString }]);
       }
 
       var _filter1 = p1.filters['test'];
@@ -127,58 +103,32 @@ describe('test speed', function () {
         p1.warn('test', 'filter');
       }
       else {
-        _value0 = _filter1.call({
-          useString: p1.useString,
-          data: parent.data,
-          parent: parent.parent,
-          index: parent.index
-        }, _value0);
+        _value0 = _filter1.apply(p2, [_value0, { useString: p1.useString }]);
       }
 
       p1.throwIf(_expr1, 'if', 'expr');
 
       return [
         p1.h('span', {
-          'className': 'test_' + (parent.index),
-          'style': p1.styleProps(parent.parent.data['styles']),
-          'onClick': parent.parent.data['onClick']
-        }, 'test_' + (parent.parent.data['num']),
-          _expr0.call({
-            useString: p1.useString,
-            result: p1.exprRet(p1, _p2, p1.fn2, p4),
-            inverse: p1.noop
-          }, parent.parent.data['list2'])
+          'className': 'test_' + (p2.index),
+          'style': p1.styleProps(p1.getDataValue(p2.parent.data, 'styles')),
+          'onClick': p1.getDataValue(p2.parent.data, 'onClick')
+        }, 'test_' + p1.getDataValue(p2.parent.data, 'num'),
+          _expr0.apply(p2, [p1.getDataValue(p2.parent.data, 'list2'), { useString: p1.useString, result: p1.exprRet(p1, p2, p1.fn2, p4), inverse: p1.noop }])
         ),
-        _expr1.call({
-          useString: p1.useString,
-          result: p1.exprRet(p1, _p2, p1.fn5, p4),
-          inverse: p1.exprRet(p1, _p2, p1.fn6, p4)
-        }, _value0)
+        _expr1.apply(p2, [_value0, { useString: p1.useString, result: p1.exprRet(p1, p2, p1.fn5, p4), inverse: p1.exprRet(p1, p2, p1.fn6, p4) }])
       ];
     },
     main: function (p1, p2, p3, p4) {
-      var parent = p2.parent,
-        data = p2.data,
-        multiData = p2.multiData;
-      if (!parent) {
-        if (data) parent = { data: multiData ? data[0] : data };
-        else parent = {};
-        p2.parent = parent;
-      };
-
-      var _typeRefer0 = (!multiData ? data['div'] : p1.getDatasValue(data, 'div'));
+      var _typeRefer0 = p1.getDataValue(p2.data, 'div');
       var _type0 = _typeRefer0 ? _typeRefer0 : 'div';
 
       var _expr0 = p1.exprs['each'];
       p1.throwIf(_expr0, 'each', 'expr');
 
       return p1.h(_type0, {
-        'id': ((!multiData ? data['num'] : p1.getDatasValue(data, 'num'))) + '_100'
-      }, _expr0.call({
-        useString: p1.useString,
-        result: p1.exprRet(p1, p2, p1.fn1, p4),
-        inverse: p1.noop
-      }, (!multiData ? data['arr'] : p1.getDatasValue(data, 'arr')))
+        'id': p1.getDataValue(p2.data, 'num') + '_100'
+      }, _expr0.apply(p2, [p1.getDataValue(p2.data, 'arr'), { useString: p1.useString, result: p1.exprRet(p1, p2, p1.fn1, p4), inverse: p1.noop }])
       );
     }
   };
@@ -444,12 +394,12 @@ describe('test speed', function () {
       }
     });
 
-    var list2 = _.times(5, function (n) {
+    var list2 = _.times(100, function (n) {
       return { no: n + 1 };
     });
 
     var html = ReactDOMServer.renderToStaticMarkup(React.createElement(TestComponent, {
-      arr: _.times(2, function (n) {
+      arr: _.times(100, function (n) {
         return n;
       }),
       a: 1,
@@ -457,7 +407,7 @@ describe('test speed', function () {
     }));
 
     //console.log(JSON.stringify(nj.asts['tmpl1']));
-    console.log(html);
+    //console.log(html);
     expect(html).toBeTruthy();
   });
 });
