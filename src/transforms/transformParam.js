@@ -34,7 +34,7 @@ function compiledProp(prop, isString) {
     tools.each(filtersTmp, function (filter) {
       var retF = _getFilterParam(filter.trim()),
         filterObj = tools.lightObj(),
-        filterName = retF[1].toLowerCase();  //Get filter name
+        filterName = retF[1];  //Get filter name
 
       if (filterName) {
         var paramsF = retF[3];  //Get filter param

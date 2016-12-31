@@ -86,7 +86,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	nj.components = {};
 	nj.asts = {};
 	nj.templates = {};
-	nj.errorTitle = 'NornJ:';
+	nj.errorTitle = '[NornJ error]';
 	nj.tmplRule = {};
 
 	module.exports = nj;
@@ -260,11 +260,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	  switch (type) {
 	    case 'filter':
 	      ret += 'A filter called "' + msg + '" is undefined.';
+	      break;
 	    default:
 	      ret += msg;
 	  }
 
-	  return ret;
+	  console.warn(ret);
 	}
 
 	//create a unique key
@@ -669,7 +670,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    tools.each(filtersTmp, function (filter) {
 	      var retF = _getFilterParam(filter.trim()),
 	        filterObj = tools.lightObj(),
-	        filterName = retF[1].toLowerCase();  //Get filter name
+	        filterName = retF[1];  //Get filter name
 
 	      if (filterName) {
 	        var paramsF = retF[3];  //Get filter param
@@ -1053,7 +1054,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }
 	    }
 	    else {  //为块表达式,也可视为一个元素节点
-	      var exprName = expr[0].toLowerCase();
+	      var exprName = expr[0];
 	      exprParams = expr[1];
 	      isTmpl = tranElem.isTmpl(exprName);
 	      isParamsExpr = tranElem.isParamsExpr(exprName);
@@ -1325,8 +1326,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	  }
 
-	  tools.each(params, function(v, k) {
-	    var name = k.toLowerCase();
+	  tools.each(params, function(v, name) {
 	    if (v) {
 	      var filter = v.filter,
 	        options = v.options;
@@ -1452,7 +1452,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  },
 
 	  //Spread parameters
-	  spreadparam: function(refer, options) {
+	  spread: function(refer, options) {
 	    if (!refer) {
 	      return;
 	    }
@@ -1527,7 +1527,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  unless: _commonConfig({ newContext: false }),
 	  each: _commonConfig(),
 	  param: _commonConfig({ newContext: false, exprProps: true }),
-	  spreadparam: _commonConfig({ newContext: false, useString: false, exprProps: true }),
+	  spread: _commonConfig({ newContext: false, useString: false, exprProps: true }),
 	  equal: _commonConfig({ newContext: false, useString: false }),
 	  'for': _commonConfig(),
 	  blank: _commonConfig({ newContext: false, useString: false })
@@ -1536,8 +1536,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	//Expression alias
 	exprs.prop = exprs.p = exprs.param;
 	exprConfig.prop = exprConfig.p = exprConfig.param;
-	exprs.spread = exprs.spreadparam;
-	exprConfig.spread = exprConfig.spreadparam;
 
 	//Register expression and also can batch add
 	function registerExpr(name, expr, options) {
@@ -1550,8 +1548,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	  }
 
-	  tools.each(params, function(v, k) {
-	    var name = k.toLowerCase();
+	  tools.each(params, function(v, name) {
 	    if (v) {
 	      var expr = v.expr,
 	        options = v.options;
@@ -1931,14 +1928,21 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    utils.each(filters, function(o) {
 	      var _filterC = counter._filter++,
-	        configF = filterConfig[o.name];
+	        configF = filterConfig[o.name],
+	        filterVarStr = '_filter' + _filterC,
+	        globalFilterStr = 'p1.filters[\'' + o.name + '\']';
 
-	      filterStr += '\nvar _filter' + _filterC + ' = p1.filters[\'' + o.name + '\'];\n';
-	      filterStr += 'if (!_filter' + _filterC + ') {\n';
+	      if (configF) {
+	        filterStr += '\nvar ' + filterVarStr + ' = ' + globalFilterStr + ';\n';
+	      } else { //如果全局配置不存在,先从p2.data中获取
+	        filterStr += '\nvar ' + filterVarStr + ' = p1.getDataValue(p2.data, \'' + o.name + '\');\n';
+	        filterStr += 'if(!' + filterVarStr + ') ' + filterVarStr + ' = ' + globalFilterStr + ';\n';
+	      }
+	      filterStr += 'if (!' + filterVarStr + ') {\n';
 	      filterStr += '  p1.warn(\'' + o.name + '\', \'filter\');\n';
 	      filterStr += '}\n';
 	      filterStr += 'else {\n';
-	      filterStr += '  ' + valueStr + ' = _filter' + _filterC + '.apply(p2, [' + valueStr +
+	      filterStr += '  ' + valueStr + ' = ' + filterVarStr + '.apply(p2, [' + valueStr +
 	        (o.params ? o.params.reduce(function(p, c) {
 	          return p + ', \'' + c + '\'';
 	        }, '') : '') +
@@ -2053,12 +2057,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	  } else if (node.type === 'nj_expr') { //块表达式节点
 	    var _exprC = counter._expr++,
 	      _dataReferC = counter._dataRefer++,
-	      dataReferStr = '';
-	    fnStr += '\nvar _expr' + _exprC + ' = p1.exprs[\'' + node.expr + '\'];\n';
+	      dataReferStr = '',
+	      filterStr = '',
+	      configE = exprConfig[node.expr],
+	      exprVarStr = '_expr' + _exprC,
+	      globalExprStr = 'p1.exprs[\'' + node.expr + '\']';
+
+	    if (configE) {
+	      fnStr += '\nvar ' + exprVarStr + ' = ' + globalExprStr + ';\n';
+	    } else { //如果全局配置不存在,先从p2.data中获取
+	      fnStr += '\nvar ' + exprVarStr + ' = p1.getDataValue(p2.data, \'' + node.expr + '\');\n';
+	      fnStr += 'if(!' + exprVarStr + ') ' + exprVarStr + ' = ' + globalExprStr + ';\n';
+	    }
 
 	    dataReferStr += 'var _dataRefer' + _dataReferC + ' = [\n';
-	    var filterStr = '',
-	      configE = exprConfig[node.expr];
 
 	    if (node.refer) {
 	      var props = node.refer.props;
@@ -2626,10 +2638,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    if (propN.indexOf('...') === 0) {
 	      if (!paramsExpr) {
-	        paramsExpr = [exprRule + 'params'];
+	        paramsExpr = [exprRule + 'props'];
 	      }
 
-	      paramsExpr.push([exprRule + 'spreadParam ' + startRule + prop.replace(/\.\.\./g, '') + endRule + '/']);
+	      paramsExpr.push([exprRule + 'spread ' + startRule + prop.replace(/\.\.\./g, '') + endRule + '/']);
 	      return ' ';
 	    }
 	    else {

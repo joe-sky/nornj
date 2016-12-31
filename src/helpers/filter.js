@@ -120,8 +120,7 @@ function registerFilter(name, filter, options) {
     };
   }
 
-  tools.each(params, function(v, k) {
-    var name = k.toLowerCase();
+  tools.each(params, function(v, name) {
     if (v) {
       var filter = v.filter,
         options = v.options;

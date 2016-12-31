@@ -8,7 +8,7 @@ nj.createElement = null;
 nj.components = {};
 nj.asts = {};
 nj.templates = {};
-nj.errorTitle = 'NornJ:';
+nj.errorTitle = '[NornJ error]';
 nj.tmplRule = {};
 
 module.exports = nj;

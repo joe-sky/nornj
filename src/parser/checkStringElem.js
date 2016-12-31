@@ -272,10 +272,10 @@ function _getSplitParams(elem, params) {
 
     if (propN.indexOf('...') === 0) {
       if (!paramsExpr) {
-        paramsExpr = [exprRule + 'params'];
+        paramsExpr = [exprRule + 'props'];
       }
 
-      paramsExpr.push([exprRule + 'spreadParam ' + startRule + prop.replace(/\.\.\./g, '') + endRule + '/']);
+      paramsExpr.push([exprRule + 'spread ' + startRule + prop.replace(/\.\.\./g, '') + endRule + '/']);
       return ' ';
     }
     else {

@@ -52,7 +52,7 @@ function checkElem(obj, parent) {
       }
     }
     else {  //为块表达式,也可视为一个元素节点
-      var exprName = expr[0].toLowerCase();
+      var exprName = expr[0];
       exprParams = expr[1];
       isTmpl = tranElem.isTmpl(exprName);
       isParamsExpr = tranElem.isParamsExpr(exprName);

@@ -137,14 +137,21 @@ function _buildPropData(obj, counter, fns, noEscape) {
 
     utils.each(filters, function(o) {
       var _filterC = counter._filter++,
-        configF = filterConfig[o.name];
+        configF = filterConfig[o.name],
+        filterVarStr = '_filter' + _filterC,
+        globalFilterStr = 'p1.filters[\'' + o.name + '\']';
 
-      filterStr += '\nvar _filter' + _filterC + ' = p1.filters[\'' + o.name + '\'];\n';
-      filterStr += 'if (!_filter' + _filterC + ') {\n';
+      if (configF) {
+        filterStr += '\nvar ' + filterVarStr + ' = ' + globalFilterStr + ';\n';
+      } else { //如果全局配置不存在,先从p2.data中获取
+        filterStr += '\nvar ' + filterVarStr + ' = p1.getDataValue(p2.data, \'' + o.name + '\');\n';
+        filterStr += 'if(!' + filterVarStr + ') ' + filterVarStr + ' = ' + globalFilterStr + ';\n';
+      }
+      filterStr += 'if (!' + filterVarStr + ') {\n';
       filterStr += '  p1.warn(\'' + o.name + '\', \'filter\');\n';
       filterStr += '}\n';
       filterStr += 'else {\n';
-      filterStr += '  ' + valueStr + ' = _filter' + _filterC + '.apply(p2, [' + valueStr +
+      filterStr += '  ' + valueStr + ' = ' + filterVarStr + '.apply(p2, [' + valueStr +
         (o.params ? o.params.reduce(function(p, c) {
           return p + ', \'' + c + '\'';
         }, '') : '') +
@@ -259,12 +266,20 @@ function _buildNode(node, fns, counter, retType, level) {
   } else if (node.type === 'nj_expr') { //块表达式节点
     var _exprC = counter._expr++,
       _dataReferC = counter._dataRefer++,
-      dataReferStr = '';
-    fnStr += '\nvar _expr' + _exprC + ' = p1.exprs[\'' + node.expr + '\'];\n';
+      dataReferStr = '',
+      filterStr = '',
+      configE = exprConfig[node.expr],
+      exprVarStr = '_expr' + _exprC,
+      globalExprStr = 'p1.exprs[\'' + node.expr + '\']';
+
+    if (configE) {
+      fnStr += '\nvar ' + exprVarStr + ' = ' + globalExprStr + ';\n';
+    } else { //如果全局配置不存在,先从p2.data中获取
+      fnStr += '\nvar ' + exprVarStr + ' = p1.getDataValue(p2.data, \'' + node.expr + '\');\n';
+      fnStr += 'if(!' + exprVarStr + ') ' + exprVarStr + ' = ' + globalExprStr + ';\n';
+    }
 
     dataReferStr += 'var _dataRefer' + _dataReferC + ' = [\n';
-    var filterStr = '',
-      configE = exprConfig[node.expr];
 
     if (node.refer) {
       var props = node.refer.props;

@@ -128,11 +128,12 @@ function warn(msg, type) {
   switch (type) {
     case 'filter':
       ret += 'A filter called "' + msg + '" is undefined.';
+      break;
     default:
       ret += msg;
   }
 
-  return ret;
+  console.warn(ret);
 }
 
 //create a unique key

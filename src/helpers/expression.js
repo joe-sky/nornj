@@ -95,7 +95,7 @@ var exprs = {
   },
 
   //Spread parameters
-  spreadparam: function(refer, options) {
+  spread: function(refer, options) {
     if (!refer) {
       return;
     }
@@ -170,7 +170,7 @@ var exprConfig = {
   unless: _commonConfig({ newContext: false }),
   each: _commonConfig(),
   param: _commonConfig({ newContext: false, exprProps: true }),
-  spreadparam: _commonConfig({ newContext: false, useString: false, exprProps: true }),
+  spread: _commonConfig({ newContext: false, useString: false, exprProps: true }),
   equal: _commonConfig({ newContext: false, useString: false }),
   'for': _commonConfig(),
   blank: _commonConfig({ newContext: false, useString: false })
@@ -179,8 +179,6 @@ var exprConfig = {
 //Expression alias
 exprs.prop = exprs.p = exprs.param;
 exprConfig.prop = exprConfig.p = exprConfig.param;
-exprs.spread = exprs.spreadparam;
-exprConfig.spread = exprConfig.spreadparam;
 
 //Register expression and also can batch add
 function registerExpr(name, expr, options) {
@@ -193,8 +191,7 @@ function registerExpr(name, expr, options) {
     };
   }
 
-  tools.each(params, function(v, k) {
-    var name = k.toLowerCase();
+  tools.each(params, function(v, name) {
     if (v) {
       var expr = v.expr,
         options = v.options;

@@ -226,9 +226,9 @@ describe('test speed', function () {
       }
     });
 
-    nj.registerFilter('test', function (obj) {
-      return obj;
-    });
+    // nj.registerFilter('test', function (obj) {
+    //   return obj;
+    // });
 
     Handlebars.registerHelper('five', function (num, options) {
       if (num % 5 == 0) {
@@ -386,6 +386,9 @@ describe('test speed', function () {
           //  'data-a': 1,
           //  'data-b': 2
           //}
+          test: function (obj) {
+            return obj;
+          }
         };
 
         var ret = this.template(params);
