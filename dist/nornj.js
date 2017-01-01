@@ -1623,7 +1623,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    exprRule = '#';
 	  }
 	  if (!externalRule) {
-	    externalRule = '$';
+	    externalRule = '@';
 	  }
 	  if (!propRule) {
 	    propRule = '@';

@@ -44,7 +44,7 @@ module.exports = function (startRule, endRule, exprRule, externalRule, propRule,
     exprRule = '#';
   }
   if (!externalRule) {
-    externalRule = '$';
+    externalRule = '@';
   }
   if (!propRule) {
     propRule = '@';
