@@ -504,8 +504,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	      ret = [];
 	    }
 
-	    var value = matchArr[6],
-	      onlyBrace = matchArr[3] != null;
+	    var value = matchArr[7],
+	      onlyBrace = matchArr[4];
 	    if (value != null) {
 	      value = tools.clearQuot(value);  //Remove quotation marks
 	    }
@@ -1093,8 +1093,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	            node.params = tools.lightObj();
 	          }
 
-	          tools.each(tagParams, function (param) {
-	            node.params[param.key] = tranParam.compiledParam(param.value);
+	          tools.each(tagParams, function (param) {  //The parameter like "{prop}" needs to be replaced.
+	            node.params[param.onlyBrace ? param.onlyBrace.replace(/\.\.\//g, '') : param.key] = tranParam.compiledParam(param.value);
 	          }, false, true);
 	        }
 
@@ -1648,11 +1648,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    externalRule: externalRule,
 	    propRule: propRule,
 	    xmlOpenTag: _createRegExp('^<([a-z' + firstChar + exprRules + '][-a-z0-9_|./' + otherChars + ']*)[^>]*>$', 'i'),
-	    openTagParams: _createRegExp('[\\s]+(((' + startRule + '){1,2}[^' + allRules + ']+(' + endRule + '){1,2})|[^\\s=>]+)(=((\'[^\']+\')|("[^"]+")|([^"\'\\s]+)))?', 'g'),
+	    openTagParams: _createRegExp('[\\s]+(((' + startRule + '){1,2}([^' + allRules + ']+)(' + endRule + '){1,2})|[^\\s=>]+)(=((\'[^\']+\')|("[^"]+")|([^"\'\\s]+)))?', 'g'),
 	    insideBraceParam: _createRegExp('(' + startRule + '){1,2}([^' + allRules + ']+)(' + endRule + '){1,2}', 'i'),
-	    replaceBraceParam: function() {
-	      return _createRegExp('[\\s]+(' + startRule + '){1,2}([^' + allRules + ']+)(' + endRule + '){1,2}', 'g')
-	    },
+	    spreadProp: _createRegExp('[\\s]+(' + startRule + '){1,2}(\\.\\.\\.[^' + allRules + ']+)(' + endRule + '){1,2}', 'g'),
 	    replaceSplit: _createRegExp('(?:' + startRule + '){1,2}[^' + allRules + ']+(?:' + endRule + '){1,2}'),
 	    replaceParam: function() {
 	      return _createRegExp('((' + startRule + '){1,2})([^' + allRules + ']+)(' + endRule + '){1,2}', 'g');
@@ -2378,11 +2376,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	//Compile string template
 	function compileStringTmpl(tmpl) {
 	  var tmplKey, ret;
-	  if (this) {  //The "tmplKey" parameter can be passed by the "this" object.
+	  if (this) { //The "tmplKey" parameter can be passed by the "this" object.
 	    tmplKey = this.tmplKey;
 	  }
 
-	  if (tmplKey) {  //If the cache already has template data, direct return the template.
+	  if (tmplKey) { //If the cache already has template data, direct return the template.
 	    ret = nj.strTmpls[tmplKey];
 	    if (ret) {
 	      return ret;
@@ -2410,7 +2408,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  //Connection xml string
 	  var l = xmls.length;
-	  tools.each(xmls, function (xml, i) {
+	  tools.each(xmls, function(xml, i) {
 	    var split = '';
 	    if (i < l - 1) {
 	      var last = xml.length - 1,
@@ -2421,15 +2419,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var exArg = exArgs[i],
 	          match = exArg.match(/#(\d+)/);
 
-	        if (match && match[1] != null) {  //分隔符格式为"${#x}", 则按其编号顺序从nj函数参数列表中获取
+	        if (match && match[1] != null) { //分隔符格式为"${#x}", 则按其编号顺序从nj函数参数列表中获取
 	          arg = args[parseInt(match[1], 10) + 1];
-	        }
-	        else {
+	        } else {
 	          arg = exArg;
 	          useShim = isEx = true;
 	        }
-	      }
-	      else {
+	      } else {
 	        arg = args[i + 1];
 	      }
 
@@ -2440,8 +2436,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        if (useShim) {
 	          if (isEx) {
 	            arg = shim({ _njEx: arg });
-	          }
-	          else {
+	          } else {
 	            xml = xml.substr(0, last);
 	            arg = shim(arg);
 	          }
@@ -2449,8 +2444,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        params.push(arg);
 	        splitNo++;
-	      }
-	      else {
+	      } else {
 	        split = arg;
 	      }
 	    }
@@ -2509,15 +2503,13 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    //Element tag
 	    if (elem) {
-	      if (elemName[0] === '/') {  //Close tag
+	      if (elemName[0] === '/') { //Close tag
 	        if (elemName === '/' + current.elemName) {
 	          current = current.parent;
 	        }
-	      }
-	      else if (elem[elem.length - 2] === '/') {  //Self close tag
+	      } else if (elem[elem.length - 2] === '/') { //Self close tag
 	        _setSelfCloseElem(elem, elemName, elemParams, current.elem, params);
-	      }
-	      else {  //Open tag
+	      } else { //Open tag
 	        parent = current;
 	        current = {
 	          elem: [],
@@ -2551,11 +2543,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	//Merge parameters to string
 	function _paramsStr(params) {
 	  var str = '';
-	  tools.each(params, function (p) {
+	  tools.each(params, function(p) {
 	    if (tools.isArray(p)) {
 	      str += '|' + _cascadeArr(p, true);
-	    }
-	    else {
+	    } else {
 	      str += '|' + JSON.stringify(p);
 	    }
 	  }, false, true);
@@ -2568,15 +2559,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	  if (isArr || tools.isArray(p)) {
 	    if (p.njKey != null) {
 	      str = '+' + p.njKey;
-	    }
-	    else {
+	    } else {
 	      str = '';
 	      for (var i = 0, l = p.length; i < l; i++) {
 	        str += _cascadeArr(p[i]);
 	      }
 	    }
-	  }
-	  else {
+	  } else {
 	    str = '+' + p;
 	  }
 
@@ -2588,11 +2577,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  var ret, paramsExpr;
 	  if (elemName[0] === tmplRule.exprRule) {
 	    ret = elem.substring(1, elem.length - 1);
-	  }
-	  else if (elemName.indexOf(tmplRule.propRule) === 0) {
+	  } else if (elemName.indexOf(tmplRule.propRule) === 0) {
 	    ret = tmplRule.exprRule + 'prop {\'' + elemName.substr(tmplRule.propRule.length) + '\'}' + elemParams;
-	  }
-	  else {
+	  } else {
 	    var retS = _getSplitParams(elem, params);
 	    ret = retS.elem;
 	    paramsExpr = retS.params;
@@ -2605,8 +2592,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 
 	    elemArr.push(retC);
-	  }
-	  else {
+	  } else {
 	    elemArr.push(ret);
 	    if (paramsExpr) {
 	      elemArr.push(paramsExpr);
@@ -2622,7 +2608,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    paramsExpr;
 
 	  //Replace the parameter like "prop=_nj-split0_".
-	  elem = elem.replace(/([^\s={}>]+)=['"]?_nj-split(\d+)_['"]?/g, function (all, key, no) {
+	  elem = elem.replace(/([^\s={}>]+)=['"]?_nj-split(\d+)_['"]?/g, function(all, key, no) {
 	    if (!paramsExpr) {
 	      paramsExpr = [exprRule + 'params'];
 	    }
@@ -2631,22 +2617,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return '';
 	  });
 
-	  //Replace the parameter like "{...props}" and "{prop}".
-	  elem = elem.replace(tmplRule.replaceBraceParam(), function (all, begin, prop) {
+	  //Replace the parameter like "{...props}".
+	  elem = elem.replace(tmplRule.spreadProp, function(all, begin, prop) {
 	    prop = prop.trim();
-	    var propN = prop.replace(/\.\.\//g, '');
 
-	    if (propN.indexOf('...') === 0) {
-	      if (!paramsExpr) {
-	        paramsExpr = [exprRule + 'props'];
-	      }
+	    if (!paramsExpr) {
+	      paramsExpr = [exprRule + 'props'];
+	    }
 
-	      paramsExpr.push([exprRule + 'spread ' + startRule + prop.replace(/\.\.\./g, '') + endRule + '/']);
-	      return ' ';
-	    }
-	    else {
-	      return ' ' + propN + '=' + all.trim();
-	    }
+	    paramsExpr.push([exprRule + 'spread ' + startRule + prop.replace(/\.\.\./g, '') + endRule + '/']);
+	    return ' ';
 	  });
 
 	  return {
@@ -2659,15 +2639,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	function _setSelfCloseElem(elem, elemName, elemParams, elemArr, params) {
 	  if (elemName === tmplRule.exprRule + 'else') {
 	    elemArr.push(elem.substr(1, 5));
-	  }
-	  else {
+	  } else {
 	    _setElem(elem, elemName, elemParams, elemArr, params, true);
 	  }
 	}
 
 	//Set text node
 	function _setText(text, elemArr, params) {
-	  var pattern = /_nj-split(\d+)_/g, matchArr,
+	  var pattern = /_nj-split(\d+)_/g,
+	    matchArr,
 	    splitNos = [];
 
 	  while ((matchArr = pattern.exec(text))) {
@@ -2675,7 +2655,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 
 	  if (splitNos.length) {
-	    tools.each(text.split(/_nj-split(?:\d+)_/), function (t) {
+	    tools.each(text.split(/_nj-split(?:\d+)_/), function(t) {
 	      if (t !== '') {
 	        elemArr.push(t);
 	      }
@@ -2685,8 +2665,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        elemArr.push(params[no]);
 	      }
 	    }, false, true);
-	  }
-	  else {
+	  } else {
 	    elemArr.push(text);
 	  }
 	}
@@ -2695,11 +2674,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	function _setTmplProps(tmpl, key) {
 	  tmpl.njKey = key;
 
-	  tmpl.render = function () {
+	  tmpl.render = function() {
 	    return nj.compile(this, this.njKey).apply(null, arguments);
 	  };
 
-	  tmpl.renderH = function () {
+	  tmpl.renderH = function() {
 	    return nj.compileH(this, this.njKey).apply(null, arguments);
 	  };
 	}

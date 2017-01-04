@@ -53,8 +53,8 @@ function getOpenTagParams(tag) {
       ret = [];
     }
 
-    var value = matchArr[6],
-      onlyBrace = matchArr[3] != null;
+    var value = matchArr[7],
+      onlyBrace = matchArr[4];
     if (value != null) {
       value = tools.clearQuot(value);  //Remove quotation marks
     }

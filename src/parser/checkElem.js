@@ -91,8 +91,8 @@ function checkElem(obj, parent) {
             node.params = tools.lightObj();
           }
 
-          tools.each(tagParams, function (param) {
-            node.params[param.key] = tranParam.compiledParam(param.value);
+          tools.each(tagParams, function (param) {  //The parameter like "{prop}" needs to be replaced.
+            node.params[param.onlyBrace ? param.onlyBrace.replace(/\.\.\//g, '') : param.key] = tranParam.compiledParam(param.value);
           }, false, true);
         }
 

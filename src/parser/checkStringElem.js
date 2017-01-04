@@ -12,11 +12,11 @@ nj.strTmpls = {};
 //Compile string template
 function compileStringTmpl(tmpl) {
   var tmplKey, ret;
-  if (this) {  //The "tmplKey" parameter can be passed by the "this" object.
+  if (this) { //The "tmplKey" parameter can be passed by the "this" object.
     tmplKey = this.tmplKey;
   }
 
-  if (tmplKey) {  //If the cache already has template data, direct return the template.
+  if (tmplKey) { //If the cache already has template data, direct return the template.
     ret = nj.strTmpls[tmplKey];
     if (ret) {
       return ret;
@@ -44,7 +44,7 @@ function compileStringTmpl(tmpl) {
 
   //Connection xml string
   var l = xmls.length;
-  tools.each(xmls, function (xml, i) {
+  tools.each(xmls, function(xml, i) {
     var split = '';
     if (i < l - 1) {
       var last = xml.length - 1,
@@ -55,15 +55,13 @@ function compileStringTmpl(tmpl) {
         var exArg = exArgs[i],
           match = exArg.match(/#(\d+)/);
 
-        if (match && match[1] != null) {  //分隔符格式为"${#x}", 则按其编号顺序从nj函数参数列表中获取
+        if (match && match[1] != null) { //分隔符格式为"${#x}", 则按其编号顺序从nj函数参数列表中获取
           arg = args[parseInt(match[1], 10) + 1];
-        }
-        else {
+        } else {
           arg = exArg;
           useShim = isEx = true;
         }
-      }
-      else {
+      } else {
         arg = args[i + 1];
       }
 
@@ -74,8 +72,7 @@ function compileStringTmpl(tmpl) {
         if (useShim) {
           if (isEx) {
             arg = shim({ _njEx: arg });
-          }
-          else {
+          } else {
             xml = xml.substr(0, last);
             arg = shim(arg);
           }
@@ -83,8 +80,7 @@ function compileStringTmpl(tmpl) {
 
         params.push(arg);
         splitNo++;
-      }
-      else {
+      } else {
         split = arg;
       }
     }
@@ -143,15 +139,13 @@ function _checkStringElem(xml, params) {
 
     //Element tag
     if (elem) {
-      if (elemName[0] === '/') {  //Close tag
+      if (elemName[0] === '/') { //Close tag
         if (elemName === '/' + current.elemName) {
           current = current.parent;
         }
-      }
-      else if (elem[elem.length - 2] === '/') {  //Self close tag
+      } else if (elem[elem.length - 2] === '/') { //Self close tag
         _setSelfCloseElem(elem, elemName, elemParams, current.elem, params);
-      }
-      else {  //Open tag
+      } else { //Open tag
         parent = current;
         current = {
           elem: [],
@@ -185,11 +179,10 @@ function _formatText(str) {
 //Merge parameters to string
 function _paramsStr(params) {
   var str = '';
-  tools.each(params, function (p) {
+  tools.each(params, function(p) {
     if (tools.isArray(p)) {
       str += '|' + _cascadeArr(p, true);
-    }
-    else {
+    } else {
       str += '|' + JSON.stringify(p);
     }
   }, false, true);
@@ -202,15 +195,13 @@ function _cascadeArr(p, isArr) {
   if (isArr || tools.isArray(p)) {
     if (p.njKey != null) {
       str = '+' + p.njKey;
-    }
-    else {
+    } else {
       str = '';
       for (var i = 0, l = p.length; i < l; i++) {
         str += _cascadeArr(p[i]);
       }
     }
-  }
-  else {
+  } else {
     str = '+' + p;
   }
 
@@ -222,11 +213,9 @@ function _setElem(elem, elemName, elemParams, elemArr, params, bySelfClose) {
   var ret, paramsExpr;
   if (elemName[0] === tmplRule.exprRule) {
     ret = elem.substring(1, elem.length - 1);
-  }
-  else if (elemName.indexOf(tmplRule.propRule) === 0) {
+  } else if (elemName.indexOf(tmplRule.propRule) === 0) {
     ret = tmplRule.exprRule + 'prop {\'' + elemName.substr(tmplRule.propRule.length) + '\'}' + elemParams;
-  }
-  else {
+  } else {
     var retS = _getSplitParams(elem, params);
     ret = retS.elem;
     paramsExpr = retS.params;
@@ -239,8 +228,7 @@ function _setElem(elem, elemName, elemParams, elemArr, params, bySelfClose) {
     }
 
     elemArr.push(retC);
-  }
-  else {
+  } else {
     elemArr.push(ret);
     if (paramsExpr) {
       elemArr.push(paramsExpr);
@@ -256,7 +244,7 @@ function _getSplitParams(elem, params) {
     paramsExpr;
 
   //Replace the parameter like "prop=_nj-split0_".
-  elem = elem.replace(/([^\s={}>]+)=['"]?_nj-split(\d+)_['"]?/g, function (all, key, no) {
+  elem = elem.replace(/([^\s={}>]+)=['"]?_nj-split(\d+)_['"]?/g, function(all, key, no) {
     if (!paramsExpr) {
       paramsExpr = [exprRule + 'params'];
     }
@@ -265,22 +253,16 @@ function _getSplitParams(elem, params) {
     return '';
   });
 
-  //Replace the parameter like "{...props}" and "{prop}".
-  elem = elem.replace(tmplRule.replaceBraceParam(), function (all, begin, prop) {
+  //Replace the parameter like "{...props}".
+  elem = elem.replace(tmplRule.spreadProp, function(all, begin, prop) {
     prop = prop.trim();
-    var propN = prop.replace(/\.\.\//g, '');
 
-    if (propN.indexOf('...') === 0) {
-      if (!paramsExpr) {
-        paramsExpr = [exprRule + 'props'];
-      }
+    if (!paramsExpr) {
+      paramsExpr = [exprRule + 'props'];
+    }
 
-      paramsExpr.push([exprRule + 'spread ' + startRule + prop.replace(/\.\.\./g, '') + endRule + '/']);
-      return ' ';
-    }
-    else {
-      return ' ' + propN + '=' + all.trim();
-    }
+    paramsExpr.push([exprRule + 'spread ' + startRule + prop.replace(/\.\.\./g, '') + endRule + '/']);
+    return ' ';
   });
 
   return {
@@ -293,15 +275,15 @@ function _getSplitParams(elem, params) {
 function _setSelfCloseElem(elem, elemName, elemParams, elemArr, params) {
   if (elemName === tmplRule.exprRule + 'else') {
     elemArr.push(elem.substr(1, 5));
-  }
-  else {
+  } else {
     _setElem(elem, elemName, elemParams, elemArr, params, true);
   }
 }
 
 //Set text node
 function _setText(text, elemArr, params) {
-  var pattern = /_nj-split(\d+)_/g, matchArr,
+  var pattern = /_nj-split(\d+)_/g,
+    matchArr,
     splitNos = [];
 
   while ((matchArr = pattern.exec(text))) {
@@ -309,7 +291,7 @@ function _setText(text, elemArr, params) {
   }
 
   if (splitNos.length) {
-    tools.each(text.split(/_nj-split(?:\d+)_/), function (t) {
+    tools.each(text.split(/_nj-split(?:\d+)_/), function(t) {
       if (t !== '') {
         elemArr.push(t);
       }
@@ -319,8 +301,7 @@ function _setText(text, elemArr, params) {
         elemArr.push(params[no]);
       }
     }, false, true);
-  }
-  else {
+  } else {
     elemArr.push(text);
   }
 }
@@ -329,11 +310,11 @@ function _setText(text, elemArr, params) {
 function _setTmplProps(tmpl, key) {
   tmpl.njKey = key;
 
-  tmpl.render = function () {
+  tmpl.render = function() {
     return nj.compile(this, this.njKey).apply(null, arguments);
   };
 
-  tmpl.renderH = function () {
+  tmpl.renderH = function() {
     return nj.compileH(this, this.njKey).apply(null, arguments);
   };
 }

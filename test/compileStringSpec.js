@@ -26,6 +26,11 @@ describe('test compile string', function () {
       var data = [
         {
           name: "<i>joe_sky1</i>",
+          name3: 'name3',
+          props: {
+            n: 1,
+            n2: 2
+          },
           id: 100,
           test0: false,
           list: [0, 1, 2],
@@ -86,7 +91,7 @@ describe('test compile string', function () {
       `);
 
       var tmpl3 = nj`
-        <div name={name1} autofocus name1={a.c.d} name2="{a.e | prop('f').g}">
+        <div class="{id} {name3}" {name3} {...props} name={name1} autofocus name1={a.c.d} name2="{a.e | prop('f').g}">
           <#props>
             <@name checked>{test0 | filter1}{'test1' | filter2}test2</@name>
             <@checked />
@@ -112,7 +117,7 @@ describe('test compile string', function () {
             <input type=button />
             ${nj`
               <#each { list2 }>
-                <slider>
+                <slider {../name3}>
                   <{../sliderItem.a|tagName} no1={no} checked no='{ ../sliderItem.b }' />
                 </slider>
               </#each>
