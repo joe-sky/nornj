@@ -91,7 +91,7 @@ describe('test compile string', function () {
       `);
 
       var tmpl3 = nj`
-        <div class="{id} {name3}" {name3} {...props} name={name1} autofocus name1={a.c.d} name2="{a.e | prop('f').g}">
+        <div class="{id} {name3}" {name3} { ...props} name={name1} autofocus name1={a.c.d} name2="{a.e | prop('f').g}">
           <#props>
             <@name checked>{test0 | filter1}{'test1' | filter2}test2</@name>
             <@checked />
