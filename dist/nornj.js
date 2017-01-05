@@ -2113,12 +2113,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	    if (node.typeRefer) {
 	      _type = node.typeRefer.props[0].prop.name;
 	    } else {
-	      _type = node.type.toLowerCase();
+	      _type = node.type;
 	    }
 
 	    var typeStr;
 	    if (!useString) {
-	      typeStr = 'p1.components[\'' + _type + '\'] ? p1.components[\'' + _type + '\'] : \'' + _type + '\'';
+	      typeStr = 'p1.components[\'' + _type.toLowerCase() + '\'] ? p1.components[\'' + _type.toLowerCase() + '\'] : \'' + _type + '\'';
 	    } else {
 	      typeStr = '\'' + _type + '\'';
 	    }
