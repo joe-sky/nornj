@@ -105,12 +105,13 @@ function exprRet(p1, p2, fn, p4) {
 function tmplWrap(configs, main) {
   return function() {
     var args = arguments,
-      initParams = this;
+      initCtx = this,
+      data = !tools.isArray(args[0]) ? tools.arraySlice(args) : args[0];
 
     return main(configs, {
-      data: !tools.isArray(args[0]) ? tools.arraySlice(args) : args[0],
-      parent: initParams && initParams._njParent ? initParams._njParent : null,
-      index: initParams && initParams._njIndex ? initParams._njIndex : null
+      data: initCtx && initCtx._njData ? tools.arrayPush([initCtx._njData], data) : data,
+      parent: initCtx && initCtx._njParent ? initCtx._njParent : null,
+      index: initCtx && initCtx._njIndex ? initCtx._njIndex : null
     });
   };
 }

@@ -1,4 +1,5 @@
 ﻿var nj = require('../src/base'),
+  _ = require('lodash'),
   utils = require('../src/utils/utils'),
   compile = require('../src/compiler/compile').compile,
   includeParser = require('../tools/includeParser');
@@ -22,7 +23,28 @@ describe('test compile string', function () {
   });
 
   describe('compile string template to html', function () {
-    it('test compile 1', function () {
+    it('test template string', function () {
+      let s = Date.now();
+
+      // const tmpl1 = nj`
+      //   <input />
+      // `;
+
+      _.times(50000, () => {
+        let html = nj`
+          <div name="t1">
+            <img />
+          </div>
+        `();
+      });
+
+      console.log(Date.now() - s);
+
+      //console.log(html);
+      //expect(html).toBeTruthy();
+    });
+
+    xit('test compile 1', function () {
       var data = [
         {
           name: "<i>joe_sky1</i>",

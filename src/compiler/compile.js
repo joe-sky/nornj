@@ -50,6 +50,9 @@ function compile(tmpl, tmplName, outputH, fileName) {
 
             tmpl = compileStringTmpl(tmpl);
           }
+          else {
+            tmpl = tmpl._njTmpl;
+          }
 
           //分析传入参数并转换为节点树对象
           utils.checkElem(tmpl, root);

@@ -4,112 +4,96 @@ var nj = require('../core'),
   tools = require('../utils/tools'),
   tranElem = require('../transforms/transformElement'),
   tmplRule = nj.tmplRule,
-  shim = require('../utils/shim');
-
-//Cache the string template by unique key
-nj.strTmpls = {};
+  shim = require('../utils/shim'),
+  tmplStrs = nj.tmplStrs;
 
 //Compile string template
 function compileStringTmpl(tmpl) {
-  var tmplKey, ret;
-  if (this) { //The "tmplKey" parameter can be passed by the "this" object.
-    tmplKey = this.tmplKey;
-  }
+  var tmplKey = tmpl.toString(), //Get unique key
+    ret = tmplStrs[tmplKey];
 
-  if (tmplKey) { //If the cache already has template data, direct return the template.
-    ret = nj.strTmpls[tmplKey];
-    if (ret) {
-      return ret;
-    }
-  }
+  if (!ret) { //If the cache already has template data, direct return the template.
+    var isStr = tools.isString(tmpl),
+      xmls = tmpl,
+      args = arguments,
+      splitNo = 0,
+      params = [],
+      fullXml = '',
+      exArgs;
 
-  var isStr = tools.isString(tmpl),
-    xmls = tmpl,
-    args = arguments,
-    splitNo = 0,
-    params = [],
-    fullXml = '',
-    exArgs;
+    if (isStr) {
+      xmls = tmpl.split(tmplRule.externalSplit);
 
-  if (isStr) {
-    xmls = tmpl.split(tmplRule.externalSplit);
-
-    var pattern = tmplRule.external(),
-      matchArr;
-    exArgs = [];
-    while (matchArr = pattern.exec(tmpl)) {
-      exArgs.push(matchArr[1]);
-    }
-  }
-
-  //Connection xml string
-  var l = xmls.length;
-  tools.each(xmls, function(xml, i) {
-    var split = '';
-    if (i < l - 1) {
-      var last = xml.length - 1,
-        useShim = xml[last] === '@',
-        arg, isEx;
-
-      if (isStr) {
-        var exArg = exArgs[i],
-          match = exArg.match(/#(\d+)/);
-
-        if (match && match[1] != null) { //分隔符格式为"${#x}", 则按其编号顺序从nj函数参数列表中获取
-          arg = args[parseInt(match[1], 10) + 1];
-        } else {
-          arg = exArg;
-          useShim = isEx = true;
-        }
-      } else {
-        arg = args[i + 1];
+      var pattern = tmplRule.external(),
+        matchArr;
+      exArgs = [];
+      while (matchArr = pattern.exec(tmpl)) {
+        exArgs.push(matchArr[1]);
       }
+    }
 
-      if (!tools.isString(arg) || useShim) {
-        split = '_nj-split' + splitNo + '_';
+    //Connection xml string
+    var l = xmls.length;
+    tools.each(xmls, function(xml, i) {
+      var split = '';
+      if (i < l - 1) {
+        var last = xml.length - 1,
+          useShim = xml[last] === '@',
+          arg, isEx;
 
-        //Use the shim function to convert the parameter when the front of it with a "@" mark.
-        if (useShim) {
-          if (isEx) {
-            arg = shim({ _njEx: arg });
+        if (isStr) {
+          var exArg = exArgs[i],
+            match = exArg.match(/#(\d+)/);
+
+          if (match && match[1] != null) { //分隔符格式为"${#x}", 则按其编号顺序从nj函数参数列表中获取
+            arg = args[parseInt(match[1], 10) + 1];
           } else {
-            xml = xml.substr(0, last);
-            arg = shim(arg);
+            arg = exArg;
+            useShim = isEx = true;
           }
+        } else {
+          arg = args[i + 1];
         }
 
-        params.push(arg);
-        splitNo++;
-      } else {
-        split = arg;
+        if (!tools.isString(arg) || useShim) {
+          split = '_nj-split' + splitNo + '_';
+
+          //Use the shim function to convert the parameter when the front of it with a "@" mark.
+          if (useShim) {
+            if (isEx) {
+              arg = shim({ _njEx: arg });
+            } else {
+              xml = xml.substr(0, last);
+              arg = shim(arg);
+            }
+          }
+
+          params.push(arg._njTmpl ? arg._njTmpl : arg);
+          splitNo++;
+        } else {
+          split = arg;
+        }
       }
-    }
 
-    fullXml += xml + split;
-  }, false, true);
+      fullXml += xml + split;
+    }, false, true);
 
-  fullXml = _clearNotesAndBlank(fullXml);
+    fullXml = _clearNotesAndBlank(fullXml);
 
-  if (tmplKey == null) {
-    //Get unique key
-    tmplKey = tools.uniqueKey(fullXml + _paramsStr(params));
+    //Resolve string to element
+    ret = _checkStringElem(fullXml, params);
 
-    ret = nj.strTmpls[tmplKey];
-    if (ret) {
-      return ret;
-    }
+    //Save to the cache
+    tmplStrs[tmplKey] = ret;
   }
 
-  //Resolve string to element
-  ret = _checkStringElem(fullXml, params);
+  var outputH = this ? this.outputH : false,
+    tmplFn = function() {
+      return nj['compile' + (outputH ? 'H' : '')]({ _njTmpl: ret }, tmplKey).apply(null, arguments);
+    };
+  tmplFn._njTmpl = ret;
 
-  //Set the properties for the template object
-  _setTmplProps(ret, tmplKey);
-
-  //Save to the cache
-  nj.strTmpls[tmplKey] = ret;
-
-  return ret;
+  return tmplFn;
 }
 
 //Resolve string to element
@@ -174,38 +158,6 @@ function _clearNotesAndBlank(str) {
 
 function _formatText(str) {
   return str.replace(/\n/g, '\\n').replace(/\r/g, '').trim();
-}
-
-//Merge parameters to string
-function _paramsStr(params) {
-  var str = '';
-  tools.each(params, function(p) {
-    if (tools.isArray(p)) {
-      str += '|' + _cascadeArr(p, true);
-    } else {
-      str += '|' + JSON.stringify(p);
-    }
-  }, false, true);
-
-  return str;
-}
-
-function _cascadeArr(p, isArr) {
-  var str;
-  if (isArr || tools.isArray(p)) {
-    if (p.njKey != null) {
-      str = '+' + p.njKey;
-    } else {
-      str = '';
-      for (var i = 0, l = p.length; i < l; i++) {
-        str += _cascadeArr(p[i]);
-      }
-    }
-  } else {
-    str = '+' + p;
-  }
-
-  return str;
 }
 
 //Set element node
@@ -304,19 +256,6 @@ function _setText(text, elemArr, params) {
   } else {
     elemArr.push(text);
   }
-}
-
-//Set template props
-function _setTmplProps(tmpl, key) {
-  tmpl.njKey = key;
-
-  tmpl.render = function() {
-    return nj.compile(this, this.njKey).apply(null, arguments);
-  };
-
-  tmpl.renderH = function() {
-    return nj.compileH(this, this.njKey).apply(null, arguments);
-  };
 }
 
 module.exports = compileStringTmpl;

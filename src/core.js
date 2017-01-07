@@ -1,14 +1,16 @@
 ﻿'use strict';
 
 function nj() {
-  return nj.compileStringTmpl.apply(null, arguments);
+  return nj['tmplTag' + (nj.outputH ? 'H' : '')].apply(null, arguments);
 }
 
 nj.createElement = null;
 nj.components = {};
 nj.asts = {};
 nj.templates = {};
+nj.tmplStrs = {};
 nj.errorTitle = '[NornJ error]';
 nj.tmplRule = {};
+nj.outputH = false;
 
 module.exports = nj;

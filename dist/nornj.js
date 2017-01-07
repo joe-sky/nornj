@@ -60,13 +60,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	  utils = __webpack_require__(2),
 	  compiler = __webpack_require__(14),
 	  compileStringTmpl = __webpack_require__(17),
-	  tmplByKey = __webpack_require__(19),
+	  tmplTag = __webpack_require__(19),
 	  config = __webpack_require__(20);
 
 	nj.compileStringTmpl = compileStringTmpl;
-	nj.tmplByKey = tmplByKey;
 	nj.config = config;
-	utils.assign(nj, compiler, utils);
+	utils.assign(nj, compiler, tmplTag, utils);
 
 	var global = typeof self !== 'undefined' ? self : this;
 
@@ -79,15 +78,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	'use strict';
 
 	function nj() {
-	  return nj.compileStringTmpl.apply(null, arguments);
+	  return nj['tmplTag' + (nj.outputH ? 'H' : '')].apply(null, arguments);
 	}
 
 	nj.createElement = null;
 	nj.components = {};
 	nj.asts = {};
 	nj.templates = {};
+	nj.tmplStrs = {};
 	nj.errorTitle = '[NornJ error]';
 	nj.tmplRule = {};
+	nj.outputH = false;
 
 	module.exports = nj;
 
@@ -909,12 +910,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	function tmplWrap(configs, main) {
 	  return function() {
 	    var args = arguments,
-	      initParams = this;
+	      initCtx = this,
+	      data = !tools.isArray(args[0]) ? tools.arraySlice(args) : args[0];
 
 	    return main(configs, {
-	      data: !tools.isArray(args[0]) ? tools.arraySlice(args) : args[0],
-	      parent: initParams && initParams._njParent ? initParams._njParent : null,
-	      index: initParams && initParams._njIndex ? initParams._njIndex : null
+	      data: initCtx && initCtx._njData ? tools.arrayPush([initCtx._njData], data) : data,
+	      parent: initCtx && initCtx._njParent ? initCtx._njParent : null,
+	      index: initCtx && initCtx._njIndex ? initCtx._njIndex : null
 	    });
 	  };
 	}
@@ -1726,6 +1728,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	            tmpl = compileStringTmpl(tmpl);
 	          }
+	          else {
+	            tmpl = tmpl._njTmpl;
+	          }
 
 	          //分析传入参数并转换为节点树对象
 	          utils.checkElem(tmpl, root);
@@ -2368,112 +2373,96 @@ return /******/ (function(modules) { // webpackBootstrap
 	  tools = __webpack_require__(3),
 	  tranElem = __webpack_require__(5),
 	  tmplRule = nj.tmplRule,
-	  shim = __webpack_require__(18);
-
-	//Cache the string template by unique key
-	nj.strTmpls = {};
+	  shim = __webpack_require__(18),
+	  tmplStrs = nj.tmplStrs;
 
 	//Compile string template
 	function compileStringTmpl(tmpl) {
-	  var tmplKey, ret;
-	  if (this) { //The "tmplKey" parameter can be passed by the "this" object.
-	    tmplKey = this.tmplKey;
-	  }
+	  var tmplKey = tmpl.toString(), //Get unique key
+	    ret = tmplStrs[tmplKey];
 
-	  if (tmplKey) { //If the cache already has template data, direct return the template.
-	    ret = nj.strTmpls[tmplKey];
-	    if (ret) {
-	      return ret;
-	    }
-	  }
+	  if (!ret) { //If the cache already has template data, direct return the template.
+	    var isStr = tools.isString(tmpl),
+	      xmls = tmpl,
+	      args = arguments,
+	      splitNo = 0,
+	      params = [],
+	      fullXml = '',
+	      exArgs;
 
-	  var isStr = tools.isString(tmpl),
-	    xmls = tmpl,
-	    args = arguments,
-	    splitNo = 0,
-	    params = [],
-	    fullXml = '',
-	    exArgs;
+	    if (isStr) {
+	      xmls = tmpl.split(tmplRule.externalSplit);
 
-	  if (isStr) {
-	    xmls = tmpl.split(tmplRule.externalSplit);
-
-	    var pattern = tmplRule.external(),
-	      matchArr;
-	    exArgs = [];
-	    while (matchArr = pattern.exec(tmpl)) {
-	      exArgs.push(matchArr[1]);
-	    }
-	  }
-
-	  //Connection xml string
-	  var l = xmls.length;
-	  tools.each(xmls, function(xml, i) {
-	    var split = '';
-	    if (i < l - 1) {
-	      var last = xml.length - 1,
-	        useShim = xml[last] === '@',
-	        arg, isEx;
-
-	      if (isStr) {
-	        var exArg = exArgs[i],
-	          match = exArg.match(/#(\d+)/);
-
-	        if (match && match[1] != null) { //分隔符格式为"${#x}", 则按其编号顺序从nj函数参数列表中获取
-	          arg = args[parseInt(match[1], 10) + 1];
-	        } else {
-	          arg = exArg;
-	          useShim = isEx = true;
-	        }
-	      } else {
-	        arg = args[i + 1];
+	      var pattern = tmplRule.external(),
+	        matchArr;
+	      exArgs = [];
+	      while (matchArr = pattern.exec(tmpl)) {
+	        exArgs.push(matchArr[1]);
 	      }
+	    }
 
-	      if (!tools.isString(arg) || useShim) {
-	        split = '_nj-split' + splitNo + '_';
+	    //Connection xml string
+	    var l = xmls.length;
+	    tools.each(xmls, function(xml, i) {
+	      var split = '';
+	      if (i < l - 1) {
+	        var last = xml.length - 1,
+	          useShim = xml[last] === '@',
+	          arg, isEx;
 
-	        //Use the shim function to convert the parameter when the front of it with a "@" mark.
-	        if (useShim) {
-	          if (isEx) {
-	            arg = shim({ _njEx: arg });
+	        if (isStr) {
+	          var exArg = exArgs[i],
+	            match = exArg.match(/#(\d+)/);
+
+	          if (match && match[1] != null) { //分隔符格式为"${#x}", 则按其编号顺序从nj函数参数列表中获取
+	            arg = args[parseInt(match[1], 10) + 1];
 	          } else {
-	            xml = xml.substr(0, last);
-	            arg = shim(arg);
+	            arg = exArg;
+	            useShim = isEx = true;
 	          }
+	        } else {
+	          arg = args[i + 1];
 	        }
 
-	        params.push(arg);
-	        splitNo++;
-	      } else {
-	        split = arg;
+	        if (!tools.isString(arg) || useShim) {
+	          split = '_nj-split' + splitNo + '_';
+
+	          //Use the shim function to convert the parameter when the front of it with a "@" mark.
+	          if (useShim) {
+	            if (isEx) {
+	              arg = shim({ _njEx: arg });
+	            } else {
+	              xml = xml.substr(0, last);
+	              arg = shim(arg);
+	            }
+	          }
+
+	          params.push(arg._njTmpl ? arg._njTmpl : arg);
+	          splitNo++;
+	        } else {
+	          split = arg;
+	        }
 	      }
-	    }
 
-	    fullXml += xml + split;
-	  }, false, true);
+	      fullXml += xml + split;
+	    }, false, true);
 
-	  fullXml = _clearNotesAndBlank(fullXml);
+	    fullXml = _clearNotesAndBlank(fullXml);
 
-	  if (tmplKey == null) {
-	    //Get unique key
-	    tmplKey = tools.uniqueKey(fullXml + _paramsStr(params));
+	    //Resolve string to element
+	    ret = _checkStringElem(fullXml, params);
 
-	    ret = nj.strTmpls[tmplKey];
-	    if (ret) {
-	      return ret;
-	    }
+	    //Save to the cache
+	    tmplStrs[tmplKey] = ret;
 	  }
 
-	  //Resolve string to element
-	  ret = _checkStringElem(fullXml, params);
+	  var outputH = this ? this.outputH : false,
+	    tmplFn = function() {
+	      return nj['compile' + (outputH ? 'H' : '')]({ _njTmpl: ret }, tmplKey).apply(null, arguments);
+	    };
+	  tmplFn._njTmpl = ret;
 
-	  //Set the properties for the template object
-	  _setTmplProps(ret, tmplKey);
-
-	  //Save to the cache
-	  nj.strTmpls[tmplKey] = ret;
-
-	  return ret;
+	  return tmplFn;
 	}
 
 	//Resolve string to element
@@ -2538,38 +2527,6 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function _formatText(str) {
 	  return str.replace(/\n/g, '\\n').replace(/\r/g, '').trim();
-	}
-
-	//Merge parameters to string
-	function _paramsStr(params) {
-	  var str = '';
-	  tools.each(params, function(p) {
-	    if (tools.isArray(p)) {
-	      str += '|' + _cascadeArr(p, true);
-	    } else {
-	      str += '|' + JSON.stringify(p);
-	    }
-	  }, false, true);
-
-	  return str;
-	}
-
-	function _cascadeArr(p, isArr) {
-	  var str;
-	  if (isArr || tools.isArray(p)) {
-	    if (p.njKey != null) {
-	      str = '+' + p.njKey;
-	    } else {
-	      str = '';
-	      for (var i = 0, l = p.length; i < l; i++) {
-	        str += _cascadeArr(p[i]);
-	      }
-	    }
-	  } else {
-	    str = '+' + p;
-	  }
-
-	  return str;
 	}
 
 	//Set element node
@@ -2670,19 +2627,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	}
 
-	//Set template props
-	function _setTmplProps(tmpl, key) {
-	  tmpl.njKey = key;
-
-	  tmpl.render = function() {
-	    return nj.compile(this, this.njKey).apply(null, arguments);
-	  };
-
-	  tmpl.renderH = function() {
-	    return nj.compileH(this, this.njKey).apply(null, arguments);
-	  };
-	}
-
 	module.exports = compileStringTmpl;
 
 /***/ },
@@ -2704,12 +2648,15 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 
-	var checkStringElem = __webpack_require__(17);
+	var compileStringTmpl = __webpack_require__(17);
 
-	module.exports = function (key) {
-	  return function() {
-	    return checkStringElem.apply({ tmplKey: key }, arguments);
-	  };
+	module.exports = {
+	  tmplTag: function() {
+	    return compileStringTmpl.apply({ outputH: false }, arguments);
+	  },
+	  tmplTagH: function() {
+	    return compileStringTmpl.apply({ outputH: true }, arguments);
+	  }
 	};
 
 /***/ },
@@ -2724,7 +2671,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = function (configs) {
 	  var delimiters = configs.delimiters,
 	    includeParser = configs.includeParser,
-	    createElement = configs.createElement;
+	    createElement = configs.createElement,
+	    outputH = configs.outputH;
 
 	  if(delimiters) {
 	    setTmplRule(delimiters);
@@ -2736,6 +2684,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  if(createElement) {
 	    nj.createElement = createElement;
+	  }
+
+	  if(outputH != null) {
+	    nj.outputH = outputH;
 	  }
 	};
 

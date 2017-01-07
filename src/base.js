@@ -4,13 +4,12 @@ var nj = require('./core'),
   utils = require('./utils/utils'),
   compiler = require('./compiler/compile'),
   compileStringTmpl = require('./parser/checkStringElem'),
-  tmplByKey = require('./utils/tmplByKey'),
+  tmplTag = require('./utils/tmplTag'),
   config = require('./config');
 
 nj.compileStringTmpl = compileStringTmpl;
-nj.tmplByKey = tmplByKey;
 nj.config = config;
-utils.assign(nj, compiler, utils);
+utils.assign(nj, compiler, tmplTag, utils);
 
 var global = typeof self !== 'undefined' ? self : this;
 

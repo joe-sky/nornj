@@ -6,7 +6,8 @@ var nj = require('./core'),
 module.exports = function (configs) {
   var delimiters = configs.delimiters,
     includeParser = configs.includeParser,
-    createElement = configs.createElement;
+    createElement = configs.createElement,
+    outputH = configs.outputH;
 
   if(delimiters) {
     setTmplRule(delimiters);
@@ -18,5 +19,9 @@ module.exports = function (configs) {
 
   if(createElement) {
     nj.createElement = createElement;
+  }
+
+  if(outputH != null) {
+    nj.outputH = outputH;
   }
 };
