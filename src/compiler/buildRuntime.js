@@ -120,10 +120,10 @@ function _buildPropData(obj, counter, fns, noEscape) {
     }
 
     if (!special && !specialP) {
-      dataValueStr = 'p1.getDataValue(p2.data, \'' + name + '\')';
+      dataValueStr = 'p1.getData(p2.data, \'' + name + '\')';
     } else {
       var dataStr = 'p2.' + data;
-      dataValueStr = special ? dataStr : 'p1.getDataValue(' + dataStr + ', \'' + name + '\')';
+      dataValueStr = special ? dataStr : 'p1.getData(' + dataStr + ', \'' + name + '\')';
     }
   } else {
     dataValueStr = '\'' + obj.prop.name + '\'';
@@ -144,7 +144,7 @@ function _buildPropData(obj, counter, fns, noEscape) {
       if (configF) {
         filterStr += '\nvar ' + filterVarStr + ' = ' + globalFilterStr + ';\n';
       } else { //如果全局配置不存在,先从p2.data中获取
-        filterStr += '\nvar ' + filterVarStr + ' = p1.getDataValue(p2.data, \'' + o.name + '\');\n';
+        filterStr += '\nvar ' + filterVarStr + ' = p1.getData(p2.data, \'' + o.name + '\');\n';
         filterStr += 'if(!' + filterVarStr + ') ' + filterVarStr + ' = ' + globalFilterStr + ';\n';
       }
       filterStr += 'if (!' + filterVarStr + ') {\n';
@@ -275,7 +275,7 @@ function _buildNode(node, fns, counter, retType, level) {
     if (configE) {
       fnStr += '\nvar ' + exprVarStr + ' = ' + globalExprStr + ';\n';
     } else { //如果全局配置不存在,先从p2.data中获取
-      fnStr += '\nvar ' + exprVarStr + ' = p1.getDataValue(p2.data, \'' + node.expr + '\');\n';
+      fnStr += '\nvar ' + exprVarStr + ' = p1.getData(p2.data, \'' + node.expr + '\');\n';
       fnStr += 'if(!' + exprVarStr + ') ' + exprVarStr + ' = ' + globalExprStr + ';\n';
     }
 

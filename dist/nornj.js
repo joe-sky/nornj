@@ -843,7 +843,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 	//Get value from multiple datas
-	function getDataValue(data, prop) {
+	function getData(data, prop) {
 	  var ret, obj;
 	  for (var i = 0, l = data.length; i < l; i++) {
 	    obj = data[i];
@@ -927,7 +927,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    useString: fns.useString,
 	    exprs: nj.exprs,
 	    filters: nj.filters,
-	    getDataValue: getDataValue,
+	    getData: getData,
 	    noop: tools.noop,
 	    lightObj: tools.lightObj,
 	    throwIf: tools.throwIf,
@@ -960,7 +960,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	module.exports = {
 	  newContext: newContext,
-	  getDataValue: getDataValue,
+	  getData: getData,
 	  fixPropName: fixPropName,
 	  styleProps: styleProps,
 	  assignStringProp: assignStringProp,
@@ -1728,9 +1728,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	            tmpl = compileStringTmpl(tmpl);
 	          }
-	          else {
-	            tmpl = tmpl._njTmpl;
-	          }
+	          tmpl = tmpl._njTmpl;
 
 	          //分析传入参数并转换为节点树对象
 	          utils.checkElem(tmpl, root);
@@ -1777,6 +1775,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  if (utils.isString(tmpl)) {
 	    tmpl = compileStringTmpl(tmpl);
 	  }
+	  tmpl = tmpl._njTmpl;
 	  utils.checkElem(tmpl, root);
 
 	  return buildRuntime(root.content, !outputH);
@@ -1914,10 +1913,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 
 	    if (!special && !specialP) {
-	      dataValueStr = 'p1.getDataValue(p2.data, \'' + name + '\')';
+	      dataValueStr = 'p1.getData(p2.data, \'' + name + '\')';
 	    } else {
 	      var dataStr = 'p2.' + data;
-	      dataValueStr = special ? dataStr : 'p1.getDataValue(' + dataStr + ', \'' + name + '\')';
+	      dataValueStr = special ? dataStr : 'p1.getData(' + dataStr + ', \'' + name + '\')';
 	    }
 	  } else {
 	    dataValueStr = '\'' + obj.prop.name + '\'';
@@ -1938,7 +1937,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      if (configF) {
 	        filterStr += '\nvar ' + filterVarStr + ' = ' + globalFilterStr + ';\n';
 	      } else { //如果全局配置不存在,先从p2.data中获取
-	        filterStr += '\nvar ' + filterVarStr + ' = p1.getDataValue(p2.data, \'' + o.name + '\');\n';
+	        filterStr += '\nvar ' + filterVarStr + ' = p1.getData(p2.data, \'' + o.name + '\');\n';
 	        filterStr += 'if(!' + filterVarStr + ') ' + filterVarStr + ' = ' + globalFilterStr + ';\n';
 	      }
 	      filterStr += 'if (!' + filterVarStr + ') {\n';
@@ -2069,7 +2068,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    if (configE) {
 	      fnStr += '\nvar ' + exprVarStr + ' = ' + globalExprStr + ';\n';
 	    } else { //如果全局配置不存在,先从p2.data中获取
-	      fnStr += '\nvar ' + exprVarStr + ' = p1.getDataValue(p2.data, \'' + node.expr + '\');\n';
+	      fnStr += '\nvar ' + exprVarStr + ' = p1.getData(p2.data, \'' + node.expr + '\');\n';
 	      fnStr += 'if(!' + exprVarStr + ') ' + exprVarStr + ' = ' + globalExprStr + ';\n';
 	    }
 

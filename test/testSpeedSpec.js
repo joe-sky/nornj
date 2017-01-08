@@ -218,7 +218,10 @@ xdescribe('test speed', function () {
   `;
 
   beforeAll(function () {
-    nj.config({ createElement: React.createElement });
+    nj.config({
+      createElement: React.createElement,
+      outputH: true
+    });
 
     nj.registerFilter('five', function (obj) {
       if (obj % 5 == 0) {
@@ -339,12 +342,11 @@ xdescribe('test speed', function () {
   });
 
   it('test render to component by nj', function () {
-    var start,
-      T = nj.tmplByKey('TestComp');
+    var start;
 
     nj.registerComponent('TestComp', React.createClass({
       render: function () {
-        return T`<div><#each {arr}>{!#../text}</#each></div>`.renderH({
+        return nj`<div><#each {arr}>{!#../text}</#each></div>`({
           text: this.props.tmpls['t2'],
           arr: _.times(2, function (n) {
             return n;

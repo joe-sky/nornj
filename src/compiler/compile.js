@@ -50,9 +50,7 @@ function compile(tmpl, tmplName, outputH, fileName) {
 
             tmpl = compileStringTmpl(tmpl);
           }
-          else {
-            tmpl = tmpl._njTmpl;
-          }
+          tmpl = tmpl._njTmpl;
 
           //分析传入参数并转换为节点树对象
           utils.checkElem(tmpl, root);
@@ -99,6 +97,7 @@ function precompile(tmpl, outputH) {
   if (utils.isString(tmpl)) {
     tmpl = compileStringTmpl(tmpl);
   }
+  tmpl = tmpl._njTmpl;
   utils.checkElem(tmpl, root);
 
   return buildRuntime(root.content, !outputH);

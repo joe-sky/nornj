@@ -38,7 +38,7 @@ function styleProps(obj) {
 }
 
 //Get value from multiple datas
-function getDataValue(data, prop) {
+function getData(data, prop) {
   var ret, obj;
   for (var i = 0, l = data.length; i < l; i++) {
     obj = data[i];
@@ -122,7 +122,7 @@ function template(fns) {
     useString: fns.useString,
     exprs: nj.exprs,
     filters: nj.filters,
-    getDataValue: getDataValue,
+    getData: getData,
     noop: tools.noop,
     lightObj: tools.lightObj,
     throwIf: tools.throwIf,
@@ -155,7 +155,7 @@ function template(fns) {
 
 module.exports = {
   newContext: newContext,
-  getDataValue: getDataValue,
+  getData: getData,
   fixPropName: fixPropName,
   styleProps: styleProps,
   assignStringProp: assignStringProp,

@@ -143,41 +143,23 @@ console.log(html);
 ```
 以数组形式传入多个参数后，NornJ模板在编译时会按顺序检测每个数据对象是否有和模板中对应的值。如果检测到前面的参数有对应值，那么就会停止继续检测后面的参数是否有该对应值，如例中(1)处所示；如果靠前面的参数中没有对应值，那么就按顺序寻找后面的参数中是否存在，如例中(2)处所示。
 
-## renderH
-执行`renderH`方法就和执行使用`compileH`方法编译出来的模板函数的效果相同，类似`jQuery`的链式调用方式，如下所示：
-
-```js
-let comp = nj`<span>test{no}</span>`.renderH({ no: 1 });
-let html = renderToStaticMarkup(comp);
-
-console.log(html);
-/*输出html:
-<span>test1</span>
-*/
-```
-
-这种渲染方式比使用模板函数性能稍差，一般可以在单元测试中多使用这种渲染方式。
-
-## tmplByKey
-执行`tmplByKey`方法会返回一个可代替`nj`的es6模板字符串前置标签，但是它内部会利用缓存，所以性能比通常使用`nj`的模板要高一些：
+## 渲染模板
+以`nj`为前置标签的模板字符串可以直接像函数一样执行，就和执行使用`compileH`方法编译出来的模板函数的效果相同，如下所示：
 
 ```js
 import { Component } from 'react';
-import { tmplByKey } from 'nornj';
-const T = tmplByKey('TestComponent');  //接受唯一的key值为参数，通常为组件名
+import nj from 'nornj';
 
 class TestComponent extends Component {
   render() {
-    return T`
+    return nj`
       <div id=test1>
         this the test demo{no}.
         <i>test{no}</i>
-      </div>`.renderH({ no: 1 });
+      </div>`({ no: 1 });
   }
 }
 ```
-
-在render方法内使用`tmplByKey`返回的前置标签渲染模板效率会更高一些。
 
 ## registerTmpl
 `registerTmpl`采用es7装饰器的形式，可以使NornJ用更简洁的语法配合React使用：

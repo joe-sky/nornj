@@ -7,7 +7,7 @@
 describe('test compile string', function () {
   beforeAll(function () {
     nj.registerFilter('filter1', function (v, p1) {
-      //console.log(nj.getDataValue(this.datas, 'name1'));
+      //console.log(nj.getData(this.data, 'name1'));
       return v * 2 + ((p1 != null && !p1._njOpts) ? parseInt(p1, 10) : 0);
     });
     nj.registerFilter('filter2', function (v, p1, p2) {
@@ -23,7 +23,7 @@ describe('test compile string', function () {
   });
 
   describe('compile string template to html', function () {
-    it('test template string', function () {
+    xit('test template string', function () {
       let s = Date.now();
 
       // const tmpl1 = nj`
@@ -156,7 +156,7 @@ describe('test compile string', function () {
       expect(html).toBeTruthy();
     });
 
-    xit('test include parser', function () {
+    it('test include parser', function () {
       nj.config({ includeParser });
 
       const tmpl = `
