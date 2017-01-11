@@ -98,7 +98,7 @@ function _buildPropData(obj, counter, fns, noEscape) {
       special = false,
       specialP = false;
 
-    if (name === '#') {
+    if (name === '@index') {
       data = 'index';
       special = true;
     } else if (name === 'this') {

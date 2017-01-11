@@ -12,14 +12,14 @@ xdescribe('test speed', function () {
   var tmpl = nj`
   <{div} id="{num}_100">
     <#each {arr}>
-      <span class=test_{#}
+      <span class=test_{@index}
             style={../styles}
             onClick={../onClick}>
         test_{../num}
         <#each {../list2}>
-          <div key={#}>
+          <div key={@index}>
             <#props>
-              <#if {../# | five}>
+              <#if {../@index | five}>
                 <@name>five</@name>
               </#if>
             </#props>
@@ -28,7 +28,7 @@ xdescribe('test speed', function () {
           </div>
         </#each>
       </span>
-      <#if {# | five(1) | test}>
+      <#if {@index | five(1) | test}>
         <br />
       <#else />
         <img />
@@ -142,17 +142,17 @@ xdescribe('test speed', function () {
           <span>{text}</span>
         </#tmpl>
         <#tmpl {'t2'}>
-          <span key={#}>{this}test!</span>
+          <span key={@index}>{this}test!</span>
         </#tmpl>
       </TestComp>
-      <span class=test_{#}
+      <span class=test_{@index}
             style={../styles}
             onClick={../onClick}>
         test_{../num}
         <#each {../list2}>
-          <div key={#}>
+          <div key={@index}>
             <#props>
-              <#if {../# | five}>
+              <#if {../@index | five}>
                 <@name>five</@name>
               </#if>
             </#props>
@@ -161,7 +161,7 @@ xdescribe('test speed', function () {
           </div>
         </#each>
       </span>
-      <#if {# | five(1) | test}>
+      <#if {@index | five(1) | test}>
         <br />
       <#else />
         <img />
@@ -194,12 +194,12 @@ xdescribe('test speed', function () {
   var tmplNj = nj`
   <{div} id="{num}_100" id2="2">
     <#each {arr}>
-      <span class="test_{#}">
+      <span class="test_{@index}">
         test_{../num}
         <#each {../list2}>
-          <div key="{#}">
+          <div key="{@index}">
             <#props>
-              <#if {../# | five}>
+              <#if {../@index | five}>
                 <@name>five</@name>
               </#if>
             </#props>
@@ -208,7 +208,7 @@ xdescribe('test speed', function () {
           </div>
         </#each>
       </span>
-      <#if {# | five}>
+      <#if {@index | five}>
         <br />
       <#else />
         <img />

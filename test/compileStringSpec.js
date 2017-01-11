@@ -23,7 +23,7 @@ describe('test compile string', function () {
   });
 
   describe('compile string template to html', function () {
-    xit('test template string', function () {
+    it('test template string', function () {
       let s = Date.now();
 
       // const tmpl1 = nj`
@@ -44,7 +44,7 @@ describe('test compile string', function () {
       //expect(html).toBeTruthy();
     });
 
-    xit('test compile 1', function () {
+    it('test compile 1', function () {
       var data = [
         {
           name: "<i>joe_sky1</i>",
@@ -122,7 +122,7 @@ describe('test compile string', function () {
             </#each>
             <@data-name10>
               <#each {list}>
-                <#if {this}>{ # | filter2 }<#else />{ '100' | filter1 }</#if>
+                <#if {this}>{ @index | filter2 }<#else />{ '100' | filter1 }</#if>
               </#each>
             </@data-name10>
           </#props>
@@ -156,7 +156,7 @@ describe('test compile string', function () {
       expect(html).toBeTruthy();
     });
 
-    it('test include parser', function () {
+    xit('test include parser', function () {
       nj.config({ includeParser });
 
       const tmpl = `
