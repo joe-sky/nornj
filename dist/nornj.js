@@ -784,8 +784,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	  //标记为模板函数替换变量
 	  if (isAll) {
 	    var prop = props[0].prop;
-	    if (prop.name.indexOf('!#') === 0) {
-	      prop.name = prop.name.substr(2);
+	    if (prop.name.indexOf('#') === 0) {
+	      prop.name = prop.name.substr(1);
 	      ret.isTmplPlace = true;
 	    }
 	  }

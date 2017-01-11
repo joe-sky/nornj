@@ -346,7 +346,7 @@ xdescribe('test speed', function () {
 
     nj.registerComponent('TestComp', React.createClass({
       render: function () {
-        return nj`<div><#each {arr}>{!#../text}</#each></div>`({
+        return nj`<div><#each {arr}>{#../text}</#each></div>`({
           text: this.props.tmpls['t2'],
           arr: _.times(2, function (n) {
             return n;
