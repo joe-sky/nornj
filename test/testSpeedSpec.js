@@ -8,7 +8,7 @@
   ReactDOMServer = require('react-dom/server'),
   Handlebars = require('handlebars');
 
-xdescribe('test speed', function () {
+describe('test speed', function () {
   var tmpl = nj`
   <{div} id="{num}_100">
     <#each {arr}>
@@ -28,7 +28,7 @@ xdescribe('test speed', function () {
           </div>
         </#each>
       </span>
-      <#if {@index | five(1) | test}>
+      <#if {@index | five(1)}>
         <br />
       <#else />
         <img />
@@ -71,8 +71,8 @@ xdescribe('test speed', function () {
       _paramsE0['key'] = p2.index;
 
       return p1.h('div', _paramsE0,
-        p1.h('span', null, 'span' + (p1.getDataValue(p2.data, 'no'))),
-        p1.h('i', null, (p1.getDataValue(p2.data, 'no')))
+        p1.h('span', null, 'span' + (p1.getData(p2.data, 'no'))),
+        p1.h('i', null, (p1.getData(p2.data, 'no')))
       );
     },
     fn5: function (p1, p2, p3, p4) {
@@ -98,37 +98,37 @@ xdescribe('test speed', function () {
         _value0 = _filter0.apply(p2, [_value0, '1', { useString: p1.useString }]);
       }
 
-      var _filter1 = p1.filters['test'];
-      if (!_filter1) {
-        p1.warn('test', 'filter');
-      }
-      else {
-        _value0 = _filter1.apply(p2, [_value0, { useString: p1.useString }]);
-      }
+      // var _filter1 = p1.filters['test'];
+      // if (!_filter1) {
+      //   p1.warn('test', 'filter');
+      // }
+      // else {
+      //   _value0 = _filter1.apply(p2, [_value0, { useString: p1.useString }]);
+      // }
 
       p1.throwIf(_expr1, 'if', 'expr');
 
       return [
         p1.h('span', {
           'className': 'test_' + (p2.index),
-          'style': p1.styleProps(p1.getDataValue(p2.parent.data, 'styles')),
-          'onClick': p1.getDataValue(p2.parent.data, 'onClick')
-        }, 'test_' + p1.getDataValue(p2.parent.data, 'num'),
-          _expr0.apply(p2, [p1.getDataValue(p2.parent.data, 'list2'), { useString: p1.useString, result: p1.exprRet(p1, p2, p1.fn2, p4), inverse: p1.noop }])
+          'style': p1.styleProps(p1.getData(p2.parent.data, 'styles')),
+          'onClick': p1.getData(p2.parent.data, 'onClick')
+        }, 'test_' + p1.getData(p2.parent.data, 'num'),
+          _expr0.apply(p2, [p1.getData(p2.parent.data, 'list2'), { useString: p1.useString, result: p1.exprRet(p1, p2, p1.fn2, p4), inverse: p1.noop }])
         ),
         _expr1.apply(p2, [_value0, { useString: p1.useString, result: p1.exprRet(p1, p2, p1.fn5, p4), inverse: p1.exprRet(p1, p2, p1.fn6, p4) }])
       ];
     },
     main: function (p1, p2, p3, p4) {
-      var _typeRefer0 = p1.getDataValue(p2.data, 'div');
+      var _typeRefer0 = p1.getData(p2.data, 'div');
       var _type0 = _typeRefer0 ? _typeRefer0 : 'div';
 
       var _expr0 = p1.exprs['each'];
       p1.throwIf(_expr0, 'each', 'expr');
 
       return p1.h(_type0, {
-        'id': p1.getDataValue(p2.data, 'num') + '_100'
-      }, _expr0.apply(p2, [p1.getDataValue(p2.data, 'arr'), { useString: p1.useString, result: p1.exprRet(p1, p2, p1.fn1, p4), inverse: p1.noop }])
+        'id': p1.getData(p2.data, 'num') + '_100'
+      }, _expr0.apply(p2, [p1.getData(p2.data, 'arr'), { useString: p1.useString, result: p1.exprRet(p1, p2, p1.fn1, p4), inverse: p1.noop }])
       );
     }
   };
@@ -227,7 +227,7 @@ xdescribe('test speed', function () {
       if (obj % 5 == 0) {
         return true;
       }
-    });
+    }, { useString: false });
 
     // nj.registerFilter('test', function (obj) {
     //   return obj;
@@ -388,9 +388,9 @@ xdescribe('test speed', function () {
           //  'data-a': 1,
           //  'data-b': 2
           //}
-          test: function (obj) {
-            return obj;
-          }
+          // test: function (obj) {
+          //   return obj;
+          // }
         };
 
         var ret = this.template(params);

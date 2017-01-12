@@ -4,7 +4,7 @@
   compile = require('../src/compiler/compile').compile,
   includeParser = require('../tools/includeParser');
 
-describe('test compile string', function () {
+xdescribe('test compile string', function () {
   beforeAll(function () {
     nj.registerFilter('filter1', function (v, p1) {
       //console.log(nj.getData(this.data, 'name1'));
