@@ -58,10 +58,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var nj = __webpack_require__(1),
 	  utils = __webpack_require__(2),
-	  compiler = __webpack_require__(14),
-	  compileStringTmpl = __webpack_require__(17),
-	  tmplTag = __webpack_require__(19),
-	  config = __webpack_require__(20);
+	  compiler = __webpack_require__(13),
+	  compileStringTmpl = __webpack_require__(16),
+	  tmplTag = __webpack_require__(18),
+	  config = __webpack_require__(19);
 
 	nj.compileStringTmpl = compileStringTmpl;
 	nj.config = config;
@@ -99,15 +99,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	'use strict';
 
 	var tools = __webpack_require__(3),
-	  transformElement = __webpack_require__(5),
-	  transformParam = __webpack_require__(6),
-	  transformData = __webpack_require__(7),
-	  escape = __webpack_require__(8),
-	  checkElem = __webpack_require__(9),
-	  registerComponent = __webpack_require__(10),
-	  filter = __webpack_require__(11),
-	  expression = __webpack_require__(12),
-	  setTmplRule = __webpack_require__(13);
+	  transformElement = __webpack_require__(4),
+	  transformParam = __webpack_require__(5),
+	  transformData = __webpack_require__(6),
+	  escape = __webpack_require__(7),
+	  checkElem = __webpack_require__(8),
+	  registerComponent = __webpack_require__(9),
+	  filter = __webpack_require__(10),
+	  expression = __webpack_require__(11),
+	  setTmplRule = __webpack_require__(12);
 
 	//Set default param rule
 	setTmplRule();
@@ -134,9 +134,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	'use strict';
 
 	var nj = __webpack_require__(1),
-	  assign = __webpack_require__(4),
 	  nativeArrayPush = Array.prototype.push,
 	  nativeArraySlice = Array.prototype.slice,
+	  hasOwnProperty = Object.prototype.hasOwnProperty,
 	  errorTitle = nj.errorTitle;
 
 	//Push one by one to array
@@ -167,13 +167,14 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	//获取属性值
 	function _getProperty(key) {
-	  return function (obj) {
+	  return function(obj) {
 	    return obj == null ? void 0 : obj[key];
 	  };
 	}
 
 	//是否为类数组
 	var _getLength = _getProperty('length');
+
 	function isArrayLike(obj) {
 	  var length = _getLength(obj);
 	  return typeof length == 'number' && length >= 0;
@@ -200,8 +201,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        break;
 	      }
 	    }
-	  }
-	  else {
+	  } else {
 	    var keys = Object.keys(obj),
 	      l = keys.length;
 	    for (var i = 0; i < l; i++) {
@@ -226,14 +226,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	      //flatten current level of array or arguments object
 	      value = flatten(value);
 
-	      var j = 0, len = value.length;
+	      var j = 0,
+	        len = value.length;
 	      output.length += len;
 	      while (j < len) {
 	        output[idx++] = value[j++];
 	      }
 	    }
-	  }
-	  else {
+	  } else {
 	    output[idx++] = obj;
 	  }
 
@@ -241,7 +241,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 	//Noop function
-	function noop() { }
+	function noop() {}
 
 	//抛出异常
 	function throwIf(val, msg, type) {
@@ -297,6 +297,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//Clear quotation marks
 	var REGEX_QUOT_D = /["]+/g,
 	  REGEX_QUOT_S = /[']+/g;
+
 	function clearQuot(value, clearDouble) {
 	  if (value == null) {
 	    return;
@@ -307,15 +308,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var charF = value[0];
 	    if (charF === '\'') {
 	      regex = REGEX_QUOT_S;
-	    }
-	    else if (charF === '"') {
+	    } else if (charF === '"') {
 	      regex = REGEX_QUOT_D;
 	    }
-	  }
-	  else if (clearDouble) {
+	  } else if (clearDouble) {
 	    regex = REGEX_QUOT_D;
-	  }
-	  else {
+	  } else {
 	    regex = REGEX_QUOT_S;
 	  }
 
@@ -328,13 +326,28 @@ return /******/ (function(modules) { // webpackBootstrap
 	//Transform to camel-case
 	function toCamelCase(str) {
 	  if (str.indexOf('-') > -1) {
-	    str = str.replace(/-\w/g, function (letter) {
+	    str = str.replace(/-\w/g, function(letter) {
 	      return letter.substr(1).toUpperCase();
 	    });
 	  }
 
 	  return str;
 	}
+
+	//Reference by babel-external-helpers
+	var assign = Object.assign || function(target) {
+	  for (var i = 1, args = arguments; i < args.length; i++) {
+	    var source = args[i];
+
+	    for (var key in source) {
+	      if (hasOwnProperty.call(source, key)) {
+	        target[key] = source[key];
+	      }
+	    }
+	  }
+
+	  return target;
+	};
 
 	var tools = {
 	  isArray: isArray,
@@ -359,102 +372,13 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 4 */
-/***/ function(module, exports) {
-
-	'use strict';
-	/* eslint-disable no-unused-vars */
-	var hasOwnProperty = Object.prototype.hasOwnProperty;
-	var propIsEnumerable = Object.prototype.propertyIsEnumerable;
-
-	function toObject(val) {
-		if (val === null || val === undefined) {
-			throw new TypeError('Object.assign cannot be called with null or undefined');
-		}
-
-		return Object(val);
-	}
-
-	function shouldUseNative() {
-		try {
-			if (!Object.assign) {
-				return false;
-			}
-
-			// Detect buggy property enumeration order in older V8 versions.
-
-			// https://bugs.chromium.org/p/v8/issues/detail?id=4118
-			var test1 = new String('abc');  // eslint-disable-line
-			test1[5] = 'de';
-			if (Object.getOwnPropertyNames(test1)[0] === '5') {
-				return false;
-			}
-
-			// https://bugs.chromium.org/p/v8/issues/detail?id=3056
-			var test2 = {};
-			for (var i = 0; i < 10; i++) {
-				test2['_' + String.fromCharCode(i)] = i;
-			}
-			var order2 = Object.getOwnPropertyNames(test2).map(function (n) {
-				return test2[n];
-			});
-			if (order2.join('') !== '0123456789') {
-				return false;
-			}
-
-			// https://bugs.chromium.org/p/v8/issues/detail?id=3056
-			var test3 = {};
-			'abcdefghijklmnopqrst'.split('').forEach(function (letter) {
-				test3[letter] = letter;
-			});
-			if (Object.keys(Object.assign({}, test3)).join('') !==
-					'abcdefghijklmnopqrst') {
-				return false;
-			}
-
-			return true;
-		} catch (e) {
-			// We don't expect any of the above to throw, but better to be safe.
-			return false;
-		}
-	}
-
-	module.exports = shouldUseNative() ? Object.assign : function (target, source) {
-		var from;
-		var to = toObject(target);
-		var symbols;
-
-		for (var s = 1; s < arguments.length; s++) {
-			from = Object(arguments[s]);
-
-			for (var key in from) {
-				if (hasOwnProperty.call(from, key)) {
-					to[key] = from[key];
-				}
-			}
-
-			if (Object.getOwnPropertySymbols) {
-				symbols = Object.getOwnPropertySymbols(from);
-				for (var i = 0; i < symbols.length; i++) {
-					if (propIsEnumerable.call(from, symbols[i])) {
-						to[symbols[i]] = from[symbols[i]];
-					}
-				}
-			}
-		}
-
-		return to;
-	};
-
-
-/***/ },
-/* 5 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
 	var nj = __webpack_require__(1),
 	  tools = __webpack_require__(3),
-	  tranParam = __webpack_require__(6),
+	  tranParam = __webpack_require__(5),
 	  tmplRule = nj.tmplRule;
 
 	//提取xml open tag
@@ -632,7 +556,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 6 */
+/* 5 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -800,7 +724,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 7 */
+/* 6 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -970,7 +894,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 8 */
+/* 7 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -999,15 +923,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = escape;
 
 /***/ },
-/* 9 */
+/* 8 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
 	var nj = __webpack_require__(1),
 	  tools = __webpack_require__(3),
-	  tranParam = __webpack_require__(6),
-	  tranElem = __webpack_require__(5),
+	  tranParam = __webpack_require__(5),
+	  tranElem = __webpack_require__(4),
 	  tmplRule = nj.tmplRule;
 
 	//检测元素节点
@@ -1175,7 +1099,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 10 */
+/* 9 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1203,7 +1127,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 11 */
+/* 10 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1354,7 +1278,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 12 */
+/* 11 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1576,7 +1500,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 13 */
+/* 12 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1673,15 +1597,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 14 */
+/* 13 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
 	var nj = __webpack_require__(1),
 	  utils = __webpack_require__(2),
-	  buildRuntime = __webpack_require__(15),
-	  compileStringTmpl = __webpack_require__(17);
+	  buildRuntime = __webpack_require__(14),
+	  compileStringTmpl = __webpack_require__(16);
 
 	//编译模板并返回转换函数
 	function compile(tmpl, tmplName, outputH, fileName) {
@@ -1788,7 +1712,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 15 */
+/* 14 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1798,7 +1722,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  errorTitle = nj.errorTitle,
 	  exprConfig = utils.exprConfig,
 	  filterConfig = utils.filterConfig,
-	  replaceSpecialSymbol = __webpack_require__(16);
+	  replaceSpecialSymbol = __webpack_require__(15);
 
 	function _buildFn(content, fns, no, newContext, level) {
 	  var fnStr = '',
@@ -2336,7 +2260,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 16 */
+/* 15 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -2363,16 +2287,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = replace;
 
 /***/ },
-/* 17 */
+/* 16 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
 	var nj = __webpack_require__(1),
 	  tools = __webpack_require__(3),
-	  tranElem = __webpack_require__(5),
+	  tranElem = __webpack_require__(4),
 	  tmplRule = nj.tmplRule,
-	  shim = __webpack_require__(18),
+	  shim = __webpack_require__(17),
 	  tmplStrs = nj.tmplStrs;
 
 	//Compile string template
@@ -2629,7 +2553,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = compileStringTmpl;
 
 /***/ },
-/* 18 */
+/* 17 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -2642,12 +2566,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 19 */
+/* 18 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var compileStringTmpl = __webpack_require__(17);
+	var compileStringTmpl = __webpack_require__(16);
 
 	module.exports = {
 	  tmplTag: function() {
@@ -2659,13 +2583,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 20 */
+/* 19 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
 	var nj = __webpack_require__(1),
-	  setTmplRule = __webpack_require__(13);
+	  setTmplRule = __webpack_require__(12);
 
 	module.exports = function (configs) {
 	  var delimiters = configs.delimiters,
