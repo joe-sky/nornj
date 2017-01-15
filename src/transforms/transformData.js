@@ -65,7 +65,7 @@ function newContext(p2, p3) {
     data: newData.length ? tools.arrayPush(newData, p2.data) : p2.data,
     parent: p3.fallback ? p2 : p2.parent,
     index: 'index' in p3 ? p3.index : p2.index
-  }
+  };
 }
 
 //修正属性名
@@ -154,12 +154,12 @@ function template(fns) {
 }
 
 module.exports = {
-  newContext: newContext,
-  getData: getData,
-  fixPropName: fixPropName,
-  styleProps: styleProps,
-  assignStringProp: assignStringProp,
-  exprRet: exprRet,
-  tmplWrap: tmplWrap,
-  template: template
+  newContext,
+  getData,
+  fixPropName,
+  styleProps,
+  assignStringProp,
+  exprRet,
+  tmplWrap,
+  template
 };

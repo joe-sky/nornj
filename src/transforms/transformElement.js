@@ -165,16 +165,16 @@ function addParamsExpr(node, parent) {
 }
 
 module.exports = {
-  getXmlOpenTag: getXmlOpenTag,
-  isXmlSelfCloseTag: isXmlSelfCloseTag,
-  verifySelfCloseTag: verifySelfCloseTag,
-  getOpenTagParams: getOpenTagParams,
-  isXmlCloseTag: isXmlCloseTag,
-  getInsideBraceParam: getInsideBraceParam,
-  isExpr: isExpr,
-  isExprCloseTag: isExprCloseTag,
-  isTmpl: isTmpl,
-  addTmpl: addTmpl,
-  isParamsExpr: isParamsExpr,
-  addParamsExpr: addParamsExpr
+  getXmlOpenTag,
+  isXmlSelfCloseTag,
+  verifySelfCloseTag,
+  getOpenTagParams,
+  isXmlCloseTag,
+  getInsideBraceParam,
+  isExpr,
+  isExprCloseTag,
+  isTmpl,
+  addTmpl,
+  isParamsExpr,
+  addParamsExpr
 };

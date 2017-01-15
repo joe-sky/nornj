@@ -54,22 +54,23 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
-	'use strict';
+	/* WEBPACK VAR INJECTION */(function(global) {'use strict';
 
 	var nj = __webpack_require__(1),
-	  utils = __webpack_require__(2),
-	  compiler = __webpack_require__(13),
-	  compileStringTmpl = __webpack_require__(16),
-	  tmplTag = __webpack_require__(18),
-	  config = __webpack_require__(19);
+	    utils = __webpack_require__(2),
+	    compiler = __webpack_require__(13),
+	    compileStringTmpl = __webpack_require__(16),
+	    tmplTag = __webpack_require__(18),
+	    config = __webpack_require__(19);
 
 	nj.compileStringTmpl = compileStringTmpl;
 	nj.config = config;
 	utils.assign(nj, compiler, tmplTag, utils);
 
-	var global = typeof self !== 'undefined' ? self : this;
+	var _global = typeof self !== 'undefined' ? self : global;
 
-	module.exports = global.NornJ = global.nj = nj;
+	module.exports = _global.NornJ = _global.nj = nj;
+	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
 /* 1 */
@@ -99,33 +100,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	'use strict';
 
 	var tools = __webpack_require__(3),
-	  transformElement = __webpack_require__(4),
-	  transformParam = __webpack_require__(5),
-	  transformData = __webpack_require__(6),
-	  escape = __webpack_require__(7),
-	  checkElem = __webpack_require__(8),
-	  registerComponent = __webpack_require__(9),
-	  filter = __webpack_require__(10),
-	  expression = __webpack_require__(11),
-	  setTmplRule = __webpack_require__(12);
+	    transformElement = __webpack_require__(4),
+	    transformParam = __webpack_require__(5),
+	    transformData = __webpack_require__(6),
+	    escape = __webpack_require__(7),
+	    checkElem = __webpack_require__(8),
+	    registerComponent = __webpack_require__(9),
+	    filter = __webpack_require__(10),
+	    expression = __webpack_require__(11),
+	    setTmplRule = __webpack_require__(12);
 
 	//Set default param rule
 	setTmplRule();
 
-	module.exports = tools.assign(
-	  {
-	    escape: escape,
-	    setTmplRule: setTmplRule
-	  },
-	  checkElem,
-	  registerComponent,
-	  filter,
-	  expression,
-	  tools,
-	  transformElement,
-	  transformParam,
-	  transformData
-	);
+	module.exports = tools.assign({
+	  escape: escape,
+	  setTmplRule: setTmplRule
+	}, checkElem, registerComponent, filter, expression, tools, transformElement, transformParam, transformData);
 
 /***/ },
 /* 3 */
@@ -133,11 +124,13 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 
+	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
 	var nj = __webpack_require__(1),
-	  nativeArrayPush = Array.prototype.push,
-	  nativeArraySlice = Array.prototype.slice,
-	  hasOwnProperty = Object.prototype.hasOwnProperty,
-	  errorTitle = nj.errorTitle;
+	    nativeArrayPush = Array.prototype.push,
+	    nativeArraySlice = Array.prototype.slice,
+	    hasOwnProperty = Object.prototype.hasOwnProperty,
+	    errorTitle = nj.errorTitle;
 
 	//Push one by one to array
 	function arrayPush(arr1, arr2) {
@@ -156,7 +149,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	//判断是否为对象
 	function isObject(obj) {
-	  var type = typeof obj;
+	  var type = typeof obj === 'undefined' ? 'undefined' : _typeof(obj);
 	  return !isArray(obj) && (type === 'function' || type === 'object' && !!obj);
 	}
 
@@ -167,7 +160,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	//获取属性值
 	function _getProperty(key) {
-	  return function(obj) {
+	  return function (obj) {
 	    return obj == null ? void 0 : obj[key];
 	  };
 	}
@@ -203,10 +196,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	  } else {
 	    var keys = Object.keys(obj),
-	      l = keys.length;
+	        l = keys.length;
 	    for (var i = 0; i < l; i++) {
 	      var k = keys[i],
-	        ret = func.call(context, obj[k], k, i, l);
+	          ret = func.call(context, obj[k], k, i, l);
 
 	      if (ret === false) {
 	        break;
@@ -218,7 +211,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//Transform multidimensional array to one-dimensional array
 	function flatten(obj) {
 	  var output = [],
-	    idx = 0;
+	      idx = 0;
 
 	  if (isArray(obj)) {
 	    for (var i = 0, l = _getLength(obj); i < l; i++) {
@@ -227,7 +220,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      value = flatten(value);
 
 	      var j = 0,
-	        len = value.length;
+	          len = value.length;
 	      output.length += len;
 	      while (j < len) {
 	        output[idx++] = value[j++];
@@ -282,7 +275,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  var i, chr;
 	  for (i = 0, len = str.length; i < len; i++) {
 	    chr = str.charCodeAt(i);
-	    hash = ((hash << 5) - hash) + chr;
+	    hash = (hash << 5) - hash + chr;
 	    hash |= 0;
 	  }
 
@@ -296,7 +289,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	//Clear quotation marks
 	var REGEX_QUOT_D = /["]+/g,
-	  REGEX_QUOT_S = /[']+/g;
+	    REGEX_QUOT_S = /[']+/g;
 
 	function clearQuot(value, clearDouble) {
 	  if (value == null) {
@@ -326,7 +319,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//Transform to camel-case
 	function toCamelCase(str) {
 	  if (str.indexOf('-') > -1) {
-	    str = str.replace(/-\w/g, function(letter) {
+	    str = str.replace(/-\w/g, function (letter) {
 	      return letter.substr(1).toUpperCase();
 	    });
 	  }
@@ -335,7 +328,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 	//Reference by babel-external-helpers
-	var assign = Object.assign || function(target) {
+	var assign = Object.assign || function (target) {
 	  for (var i = 1, args = arguments; i < args.length; i++) {
 	    var source = args[i];
 
@@ -377,9 +370,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	'use strict';
 
 	var nj = __webpack_require__(1),
-	  tools = __webpack_require__(3),
-	  tranParam = __webpack_require__(5),
-	  tmplRule = nj.tmplRule;
+	    tools = __webpack_require__(3),
+	    tranParam = __webpack_require__(5),
+	    tmplRule = nj.tmplRule;
 
 	//提取xml open tag
 	function getXmlOpenTag(obj) {
@@ -417,11 +410,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	//Extract parameters inside the xml open tag
 	function getOpenTagParams(tag) {
 	  var pattern = tmplRule.openTagParams,
-	    matchArr, ret;
+	      matchArr,
+	      ret;
 
-	  while ((matchArr = pattern.exec(tag))) {
+	  while (matchArr = pattern.exec(tag)) {
 	    var key = matchArr[1];
-	    if (key === '/') {  //If match to the last of "/", then continue the loop.
+	    if (key === '/') {
+	      //If match to the last of "/", then continue the loop.
 	      continue;
 	    }
 
@@ -430,19 +425,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 
 	    var value = matchArr[7],
-	      onlyBrace = matchArr[4];
+	        onlyBrace = matchArr[4];
 	    if (value != null) {
-	      value = tools.clearQuot(value);  //Remove quotation marks
-	    }
-	    else {
-	      value = key;  //Match to Similar to "checked" or "disabled" attribute.
+	      value = tools.clearQuot(value); //Remove quotation marks
+	    } else {
+	      value = key; //Match to Similar to "checked" or "disabled" attribute.
 	    }
 
 	    //Removed at the end of "/>", ">" or "/".
 	    if (/\/>$/.test(value)) {
 	      value = value.substr(0, value.length - 2);
-	    }
-	    else if (/>$/.test(value) || /\/$/.test(value)) {
+	    } else if (/>$/.test(value) || /\/$/.test(value)) {
 	      value = value.substr(0, value.length - 1);
 	    }
 
@@ -468,11 +461,12 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	//判断块表达式并返回参数
 	function isExpr(obj) {
-	  var ret, ret1 = tmplRule.expr.exec(obj);
+	  var ret,
+	      ret1 = tmplRule.expr.exec(obj);
 	  if (ret1) {
 	    ret = [ret1[1]];
 
-	    var params = getOpenTagParams(obj);  //提取各参数
+	    var params = getOpenTagParams(obj); //提取各参数
 	    if (params) {
 	      ret.push(params);
 	    }
@@ -503,22 +497,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var objT = { length: 0 };
 	    if (name != null) {
 	      objT[name] = node;
-	    }
-	    else {
+	    } else {
 	      objT['0'] = node;
 	      objT.length = 1;
 	    }
 
 	    paramsP.tmpls = tranParam.compiledParam(objT);
-	  }
-	  else {  //Insert the compiled template to the parameter name for "tmpls"'s "strs" array.
+	  } else {
+	    //Insert the compiled template to the parameter name for "tmpls"'s "strs" array.
 	    var objT = tmpls.strs[0],
-	      len = objT.length;
+	        len = objT.length;
 
 	    if (name != null) {
 	      objT[name] = node;
-	    }
-	    else {
+	    } else {
 	      objT[len] = node;
 	      objT.length = ++len;
 	    }
@@ -534,8 +526,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	function addParamsExpr(node, parent) {
 	  if (!parent.paramsExpr) {
 	    parent.paramsExpr = node;
-	  }
-	  else {
+	  } else {
 	    tools.arrayPush(parent.paramsExpr.content, node.content);
 	  }
 	}
@@ -562,8 +553,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	'use strict';
 
 	var nj = __webpack_require__(1),
-	  tools = __webpack_require__(3),
-	  tmplRule = nj.tmplRule;
+	    tools = __webpack_require__(3),
+	    tmplRule = nj.tmplRule;
 
 	//Get compiled parameters from a object
 	function compiledParams(obj) {
@@ -587,18 +578,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	  //If there are colons in the property,then use filter
 	  if (prop.indexOf('|') >= 0) {
 	    var filters = [],
-	      filtersTmp;
+	        filtersTmp;
 	    filtersTmp = prop.split('|');
-	    prop = filtersTmp[0].trim();  //Extract property
+	    prop = filtersTmp[0].trim(); //Extract property
 
 	    filtersTmp = filtersTmp.slice(1);
 	    tools.each(filtersTmp, function (filter) {
 	      var retF = _getFilterParam(filter.trim()),
-	        filterObj = tools.lightObj(),
-	        filterName = retF[1];  //Get filter name
+	          filterObj = tools.lightObj(),
+	          filterName = retF[1]; //Get filter name
 
 	      if (filterName) {
-	        var paramsF = retF[3];  //Get filter param
+	        var paramsF = retF[3]; //Get filter param
 
 	        //Multiple params are separated by commas.
 	        if (paramsF) {
@@ -630,7 +621,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 
 	  ret.name = prop;
-	  if (isString) {  //Sign the parameter is a pure string.
+	  if (isString) {
+	    //Sign the parameter is a pure string.
 	    ret.isStr = true;
 	  }
 
@@ -647,18 +639,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	var _quots = ['\'', '"'];
 	function _getReplaceParam(obj, strs) {
 	  var pattern = tmplRule.replaceParam(),
-	    matchArr, ret, i = 0;
+	      matchArr,
+	      ret,
+	      i = 0;
 
-	  while ((matchArr = pattern.exec(obj))) {
+	  while (matchArr = pattern.exec(obj)) {
 	    if (!ret) {
 	      ret = [];
 	    }
 
 	    var prop = matchArr[3],
-	      item = [matchArr[0], matchArr[1], null, false, true];
+	        item = [matchArr[0], matchArr[1], null, false, true];
 
 	    if (i > 0) {
-	      item[4] = false;  //Sign not contain all of placehorder
+	      item[4] = false; //Sign not contain all of placehorder
 	    }
 
 	    //Clear parameter at both ends of the space.
@@ -666,7 +660,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    //If parameter has quotation marks, this's a pure string parameter.
 	    if (_quots.indexOf(prop[0]) > -1) {
-	      prop = tools.clearQuot(prop);  //TODO 此处也会去除过滤器参数的引号
+	      prop = tools.clearQuot(prop); //TODO 此处也会去除过滤器参数的引号
 	      item[3] = true;
 	    }
 
@@ -681,9 +675,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	//Get compiled parameter
 	function compiledParam(value) {
 	  var ret = tools.lightObj(),
-	    strs = tools.isString(value) ? value.split(tmplRule.replaceSplit) : [value],
-	    props = null,
-	    isAll = false;  //此处指替换符是否占满整个属性值;若无替换符时为false
+	      strs = tools.isString(value) ? value.split(tmplRule.replaceSplit) : [value],
+	      props = null,
+	      isAll = false; //此处指替换符是否占满整个属性值;若无替换符时为false
 
 	  //If have placehorder
 	  if (strs.length > 1) {
@@ -692,7 +686,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    tools.each(params, function (param) {
 	      var retP = tools.lightObj();
-	      isAll = param[4] ? param[0] === value : false;  //If there are several curly braces, "isAll" must be false.
+	      isAll = param[4] ? param[0] === value : false; //If there are several curly braces, "isAll" must be false.
 	      retP.prop = compiledProp(param[2], param[3]);
 
 	      //If parameter's open rules are several,then it need escape.
@@ -730,8 +724,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	'use strict';
 
 	var nj = __webpack_require__(1),
-	  tools = __webpack_require__(3),
-	  errorTitle = nj.errorTitle;
+	    tools = __webpack_require__(3),
+	    errorTitle = nj.errorTitle;
 
 	//提取style内参数
 	function styleProps(obj) {
@@ -742,11 +736,12 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  //参数为字符串
 	  var pattern = /([^\s:]+)[\s]?:[\s]?([^\s;]+)[;]?/g,
-	    matchArr, ret;
+	      matchArr,
+	      ret;
 
-	  while ((matchArr = pattern.exec(obj))) {
+	  while (matchArr = pattern.exec(obj)) {
 	    var key = matchArr[1],
-	      value = matchArr[2];
+	        value = matchArr[2];
 
 	    if (!ret) {
 	      ret = {};
@@ -794,7 +789,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    data: newData.length ? tools.arrayPush(newData, p2.data) : p2.data,
 	    parent: p3.fallback ? p2 : p2.parent,
 	    index: 'index' in p3 ? p3.index : p2.index
-	  }
+	  };
 	}
 
 	//修正属性名
@@ -825,17 +820,17 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	//创建块表达式子节点函数
 	function exprRet(p1, p2, fn, p4) {
-	  return function(param) {
+	  return function (param) {
 	    return fn(p1, p2, param, p4);
 	  };
 	}
 
 	//构建可运行的模板函数
 	function tmplWrap(configs, main) {
-	  return function() {
+	  return function () {
 	    var args = arguments,
-	      initCtx = this,
-	      data = !tools.isArray(args[0]) ? tools.arraySlice(args) : args[0];
+	        initCtx = this,
+	        data = !tools.isArray(args[0]) ? tools.arraySlice(args) : args[0];
 
 	    return main(configs, {
 	      data: initCtx && initCtx._njData ? tools.arrayPush([initCtx._njData], data) : data,
@@ -870,11 +865,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	    configs.escape = nj.escape;
 	  }
 
-	  tools.each(fns, function(v, k) {
-	    if (k.indexOf('main') === 0) { //将每个主函数构建为可运行的模板函数
+	  tools.each(fns, function (v, k) {
+	    if (k.indexOf('main') === 0) {
+	      //将每个主函数构建为可运行的模板函数
 	      configs[k] = tmplWrap(configs, v);
 	      configs['_' + k] = v;
-	    } else if (k.indexOf('fn') === 0) { //块表达式函数
+	    } else if (k.indexOf('fn') === 0) {
+	      //块表达式函数
 	      configs[k] = v;
 	    }
 	  }, false, false);
@@ -910,8 +907,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	function escape(text) {
 	  if (text == null) {
 	    return '';
-	  }
-	  else if(!text.replace) {
+	  } else if (!text.replace) {
 	    return text;
 	  }
 
@@ -929,18 +925,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	'use strict';
 
 	var nj = __webpack_require__(1),
-	  tools = __webpack_require__(3),
-	  tranParam = __webpack_require__(5),
-	  tranElem = __webpack_require__(4),
-	  tmplRule = nj.tmplRule;
+	    tools = __webpack_require__(3),
+	    tranParam = __webpack_require__(5),
+	    tranElem = __webpack_require__(4),
+	    tmplRule = nj.tmplRule;
 
 	//检测元素节点
 	function checkElem(obj, parent) {
 	  var node = {},
-	    parentContent = !parent.hasElse ? 'content' : 'contentElse';
+	      parentContent = !parent.hasElse ? 'content' : 'contentElse';
 
-	  if (!tools.isArray(obj)) {  //判断是否为文本节点
-	    if (tools.isObject(obj) && '_njShim' in obj && !tools.isArray(obj._njShim)) {  //Get the shim value
+	  if (!tools.isArray(obj)) {
+	    //判断是否为文本节点
+	    if (tools.isObject(obj) && '_njShim' in obj && !tools.isArray(obj._njShim)) {
+	      //Get the shim value
 	      obj = obj._njShim;
 	    }
 
@@ -951,35 +949,39 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 
 	  var first = obj[0];
-	  if (tools.isString(first)) {  //第一个子节点为字符串
+	  if (tools.isString(first)) {
+	    //第一个子节点为字符串
 	    var first = first,
-	      len = obj.length,
-	      last = obj[len - 1],
-	      isElemNode = false,
-	      expr,
-	      exprParams;
+	        len = obj.length,
+	        last = obj[len - 1],
+	        isElemNode = false,
+	        expr,
+	        exprParams;
 
 	    //判断是否为xml标签
 	    var openTagName,
-	      hasCloseTag = false,
-	      isTmpl, isParamsExpr;
+	        hasCloseTag = false,
+	        isTmpl,
+	        isParamsExpr;
 
 	    expr = tranElem.isExpr(first);
 	    if (!expr) {
 	      var xmlOpenTag = tranElem.getXmlOpenTag(first);
-	      if (xmlOpenTag) {  //tagname为xml标签时,则认为是元素节点
+	      if (xmlOpenTag) {
+	        //tagname为xml标签时,则认为是元素节点
 	        openTagName = xmlOpenTag[1];
 
-	        if (!tranElem.isXmlSelfCloseTag(first)) {  //非自闭合标签才验证是否存在关闭标签
+	        if (!tranElem.isXmlSelfCloseTag(first)) {
+	          //非自闭合标签才验证是否存在关闭标签
 	          hasCloseTag = tranElem.isXmlCloseTag(last, openTagName);
-	        }
-	        else {  //自闭合标签
+	        } else {
+	          //自闭合标签
 	          node.selfCloseTag = true;
 	        }
 	        isElemNode = true;
 	      }
-	    }
-	    else {  //为块表达式,也可视为一个元素节点
+	    } else {
+	      //为块表达式,也可视为一个元素节点
 	      var exprName = expr[0];
 	      exprParams = expr[1];
 	      isTmpl = tranElem.isTmpl(exprName);
@@ -993,15 +995,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }, ''));
 	      }
 
-	      if (tranElem.isExprCloseTag(last, exprName)) {  //判断是否有块表达式闭合标签
+	      if (tranElem.isExprCloseTag(last, exprName)) {
+	        //判断是否有块表达式闭合标签
 	        hasCloseTag = true;
 	      }
 	      isElemNode = true;
 	    }
 
-	    if (isElemNode) {  //判断是否为元素节点
+	    if (isElemNode) {
+	      //判断是否为元素节点
 	      var elseIndex = -1,
-	        pushContent = true;
+	          pushContent = true;
 
 	      if (!expr) {
 	        node.type = openTagName;
@@ -1019,7 +1023,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	            node.params = tools.lightObj();
 	          }
 
-	          tools.each(tagParams, function (param) {  //The parameter like "{prop}" needs to be replaced.
+	          tools.each(tagParams, function (param) {
+	            //The parameter like "{prop}" needs to be replaced.
 	            node.params[param.onlyBrace ? param.onlyBrace.replace(/\.\.\//g, '') : param.key] = tranParam.compiledParam(param.value);
 	          }, false, true);
 	        }
@@ -1028,18 +1033,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	        if (!node.selfCloseTag) {
 	          node.selfCloseTag = tranElem.verifySelfCloseTag(openTagName);
 	        }
-	      }
-	      else {  //为块表达式时判断是否有#else
-	        if (isTmpl) {  //模板元素
+	      } else {
+	        //为块表达式时判断是否有#else
+	        if (isTmpl) {
+	          //模板元素
 	          pushContent = false;
 
 	          //将模板添加到父节点的params中
 	          tranElem.addTmpl(node, parent, exprParams ? exprParams[0].value : null);
-	        }
-	        else if (isParamsExpr) {
+	        } else if (isParamsExpr) {
 	          pushContent = false;
-	        }
-	        else {
+	        } else {
 	          elseIndex = obj.indexOf(tmplRule.exprRule + 'else');
 	        }
 	      }
@@ -1051,7 +1055,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	      //取出子节点集合
 	      var end = len - (hasCloseTag ? 1 : 0),
-	        content = obj.slice(1, (elseIndex < 0 ? end : elseIndex));
+	          content = obj.slice(1, elseIndex < 0 ? end : elseIndex);
 	      if (content && content.length) {
 	        checkContentElem(content, node);
 	      }
@@ -1070,12 +1074,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	      if (isParamsExpr) {
 	        tranElem.addParamsExpr(node, parent);
 	      }
-	    }
-	    else {  //如果不是元素节点,则为节点集合
+	    } else {
+	      //如果不是元素节点,则为节点集合
 	      checkContentElem(obj, parent);
 	    }
-	  }
-	  else if (tools.isArray(first)) {  //如果第一个子节点为数组,则该节点一定为节点集合(可以是多层数组嵌套的集合)
+	  } else if (tools.isArray(first)) {
+	    //如果第一个子节点为数组,则该节点一定为节点集合(可以是多层数组嵌套的集合)
 	    checkContentElem(obj, parent);
 	  }
 	}
@@ -1105,7 +1109,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	'use strict';
 
 	var nj = __webpack_require__(1),
-	  tools = __webpack_require__(3);
+	    tools = __webpack_require__(3);
 
 	//注册组件
 	function registerComponent(name, component) {
@@ -1137,9 +1141,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	//Global filter list
 	var filters = {
 	  //Get param properties
-	  prop: function(obj, props) {
+	  prop: function prop(obj, props) {
 	    var ret = obj;
-	    ret && tools.each(props.split('.'), function(p) {
+	    ret && tools.each(props.split('.'), function (p) {
 	      ret = ret[p];
 	    }, false, true);
 
@@ -1147,22 +1151,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	  },
 
 	  //Get list count
-	  count: function(obj) {
+	  count: function count(obj) {
 	    return obj ? obj.length : 0;
 	  },
 
 	  //Get list item
-	  item: function(obj, no) {
+	  item: function item(obj, no) {
 	    return obj ? obj[no] : null;
 	  },
 
 	  //Judge equal
-	  equal: function(obj, val) {
+	  equal: function equal(obj, val) {
 	    return obj == val;
 	  },
 
 	  //Less than
-	  lt: function(val1, val2, noEqual) {
+	  lt: function lt(val1, val2, noEqual) {
 	    var ret;
 	    val1 = parseFloat(val1);
 	    val2 = parseFloat(val2);
@@ -1177,7 +1181,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  },
 
 	  //Greater than
-	  gt: function(val1, val2, noEqual) {
+	  gt: function gt(val1, val2, noEqual) {
 	    var ret;
 	    val1 = parseFloat(val1);
 	    val2 = parseFloat(val2);
@@ -1192,22 +1196,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	  },
 
 	  //Addition
-	  add: function(val1, val2, isFloat) {
+	  add: function add(val1, val2, isFloat) {
 	    return val1 + (isFloat ? parseFloat(val2) : parseInt(val2, 10));
 	  },
 
 	  //Convert to int 
-	  int: function(val) {
+	  int: function int(val) {
 	    return parseInt(val, 10);
 	  },
 
 	  //Convert to float 
-	  float: function(val) {
+	  float: function float(val) {
 	    return parseFloat(val);
 	  },
 
 	  //Convert to boolean 
-	  bool: function(val) {
+	  bool: function bool(val) {
 	    if (val === 'false') {
 	      return false;
 	    }
@@ -1252,10 +1256,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	  }
 
-	  tools.each(params, function(v, name) {
+	  tools.each(params, function (v, name) {
 	    if (v) {
 	      var filter = v.filter,
-	        options = v.options;
+	          options = v.options;
 
 	      if (filter || options) {
 	        if (filter) {
@@ -1287,7 +1291,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	//Global expression list
 	var exprs = {
-	  'if': function(refer, options) {
+	  'if': function _if(refer, options) {
 	    if (refer === 'false') {
 	      refer = false;
 	    }
@@ -1311,14 +1315,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return ret;
 	  },
 
-	  unless: function(refer, options) {
+	  unless: function unless(refer, options) {
 	    options.useUnless = true;
 	    return exprs['if'].call(this, refer, options);
 	  },
 
-	  each: function(refer, options) {
+	  each: function each(refer, options) {
 	    var useString = options.useString,
-	      ret;
+	        ret;
 
 	    if (refer) {
 	      if (useString) {
@@ -1327,7 +1331,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        ret = [];
 	      }
 
-	      tools.each(refer, function(item, index) {
+	      tools.each(refer, function (item, index) {
 	        var retI = options.result({
 	          data: item,
 	          index: index,
@@ -1356,9 +1360,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	  },
 
 	  //Parameter
-	  param: function(name, options) {
-	    var ret = options.result(), //Get parameter value
-	      value;
+	  param: function param(name, options) {
+	    var ret = options.result(),
+	        //Get parameter value
+	    value;
 
 	    //If the value length greater than 1, it need to be connected to a whole string.
 	    if (ret != null) {
@@ -1366,11 +1371,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	        value = ret;
 	      } else {
 	        value = '';
-	        tools.each(tools.flatten(ret), function(item) {
+	        tools.each(tools.flatten(ret), function (item) {
 	          value += item != null ? item : '';
 	        }, false, true);
 	      }
-	    } else { //Match to Similar to "checked" or "disabled" attribute.
+	    } else {
+	      //Match to Similar to "checked" or "disabled" attribute.
 	      value = !options.useString ? true : name;
 	    }
 
@@ -1378,17 +1384,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	  },
 
 	  //Spread parameters
-	  spread: function(refer, options) {
+	  spread: function spread(refer, options) {
 	    if (!refer) {
 	      return;
 	    }
 
-	    tools.each(refer, function(v, k) {
+	    tools.each(refer, function (v, k) {
 	      options.exprProps[k] = v;
 	    }, false, false);
 	  },
 
-	  equal: function(value1, value2, options) {
+	  equal: function equal(value1, value2, options) {
 	    var ret;
 	    if (value1 == value2) {
 	      ret = options.result();
@@ -1399,8 +1405,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return ret;
 	  },
 
-	  'for': function(start, end, options) {
-	    var ret, useString = options.useString;
+	  'for': function _for(start, end, options) {
+	    var ret,
+	        useString = options.useString;
 	    if (useString) {
 	      ret = '';
 	    } else {
@@ -1429,7 +1436,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return ret;
 	  },
 
-	  blank: function(options) {
+	  blank: function blank(options) {
 	    return options.result();
 	  }
 	};
@@ -1474,10 +1481,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	  }
 
-	  tools.each(params, function(v, name) {
+	  tools.each(params, function (v, name) {
 	    if (v) {
 	      var expr = v.expr,
-	        options = v.options;
+	          options = v.options;
 
 	      if (expr || options) {
 	        if (expr) {
@@ -1506,7 +1513,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	'use strict';
 
 	var nj = __webpack_require__(1),
-	  tools = __webpack_require__(3);
+	    tools = __webpack_require__(3);
 
 	function _createRegExp(reg, mode) {
 	  return new RegExp(reg, mode);
@@ -1515,9 +1522,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	//Clear the repeated characters
 	function _clearRepeat(str) {
 	  var ret = '',
-	    i = 0,
-	    l = str.length,
-	    char;
+	      i = 0,
+	      l = str.length,
+	      char;
 
 	  for (; i < l; i++) {
 	    char = str[i];
@@ -1530,7 +1537,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 	module.exports = function (startRule, endRule, exprRule, externalRule, propRule, templateRule) {
-	  if(tools.isObject(startRule)){
+	  if (tools.isObject(startRule)) {
 	    var params = startRule;
 	    startRule = params.start;
 	    endRule = params.end;
@@ -1559,12 +1566,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 
 	  var allRules = _clearRepeat(startRule + endRule),
-	    firstChar = startRule[0],
-	    otherChars = allRules.substr(1),
-	    spChars = '#$@',
-	    exprRules = _clearRepeat(exprRule + spChars),
-	    escapeExprRule = exprRule.replace(/\$/g, '\\$'),
-	    escapeExternalRule = externalRule.replace(/\$/g, '\\$');
+	      firstChar = startRule[0],
+	      otherChars = allRules.substr(1),
+	      spChars = '#$@',
+	      exprRules = _clearRepeat(exprRule + spChars),
+	      escapeExprRule = exprRule.replace(/\$/g, '\\$'),
+	      escapeExternalRule = externalRule.replace(/\$/g, '\\$');
 
 	  //Reset the regexs to global list
 	  tools.assign(nj.tmplRule, {
@@ -1578,18 +1585,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	    insideBraceParam: _createRegExp('(' + startRule + '){1,2}([^' + allRules + ']+)(' + endRule + '){1,2}', 'i'),
 	    spreadProp: _createRegExp('[\\s]+(' + startRule + '){1,2}[\\s]*(\\.\\.\\.[^' + allRules + ']+)(' + endRule + '){1,2}', 'g'),
 	    replaceSplit: _createRegExp('(?:' + startRule + '){1,2}[^' + allRules + ']+(?:' + endRule + '){1,2}'),
-	    replaceParam: function() {
+	    replaceParam: function replaceParam() {
 	      return _createRegExp('((' + startRule + '){1,2})([^' + allRules + ']+)(' + endRule + '){1,2}', 'g');
 	    },
-	    checkElem: function() {
+	    checkElem: function checkElem() {
 	      return _createRegExp('([^>]*)(<([a-z' + firstChar + '/' + exprRules + '!][-a-z0-9_|.' + allRules + exprRules + ']*)([^>]*)>)([^<]*)', 'ig');
 	    },
 	    externalSplit: _createRegExp(escapeExternalRule + '\\{[^{}]*(?:\\{[^' + externalRule + ']*\\})*[^{}]*\\}'),
-	    external: function() {
+	    external: function external() {
 	      return _createRegExp(escapeExternalRule + '\\{([^{}]*(\\{[^' + externalRule + ']*\\})*[^{}]*)\\}', 'g');
 	    },
 	    expr: _createRegExp('^' + escapeExprRule + '([^\\s]+)', 'i'),
-	    include: function() {
+	    include: function include() {
 	      return _createRegExp('<' + escapeExprRule + 'include([^>]*)>', 'ig');
 	    },
 	    template: templateRule
@@ -1603,9 +1610,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	'use strict';
 
 	var nj = __webpack_require__(1),
-	  utils = __webpack_require__(2),
-	  buildRuntime = __webpack_require__(14),
-	  compileStringTmpl = __webpack_require__(16);
+	    utils = __webpack_require__(2),
+	    buildRuntime = __webpack_require__(14),
+	    compileStringTmpl = __webpack_require__(16);
 
 	//编译模板并返回转换函数
 	function compile(tmpl, tmplName, outputH, fileName) {
@@ -1625,11 +1632,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	    tmplFns = nj.templates[tmplName];
 	  }
 	  if (!tmplFns) {
-	    var isObj = utils.isObject(tmpl), fns;
-	    if (isObj && tmpl.main) {  //直接传入预编译模板
+	    var isObj = utils.isObject(tmpl),
+	        fns;
+	    if (isObj && tmpl.main) {
+	      //直接传入预编译模板
 	      fns = tmpl;
-	    }
-	    else {  //编译AST
+	    } else {
+	      //编译AST
 	      var root;
 	      if (tmplName) {
 	        root = nj.asts[tmplName];
@@ -1638,8 +1647,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        //Can be directly introduced into the AST
 	        if (isObj && tmpl.type === 'nj_root') {
 	          root = tmpl;
-	        }
-	        else {
+	        } else {
 	          root = _createAstRoot();
 
 	          //Auto transform string template to array
@@ -1718,35 +1726,37 @@ return /******/ (function(modules) { // webpackBootstrap
 	'use strict';
 
 	var nj = __webpack_require__(1),
-	  utils = __webpack_require__(2),
-	  errorTitle = nj.errorTitle,
-	  exprConfig = utils.exprConfig,
-	  filterConfig = utils.filterConfig,
-	  replaceSpecialSymbol = __webpack_require__(15);
+	    utils = __webpack_require__(2),
+	    errorTitle = nj.errorTitle,
+	    exprConfig = utils.exprConfig,
+	    filterConfig = utils.filterConfig,
+	    replaceSpecialSymbol = __webpack_require__(15);
 
 	function _buildFn(content, fns, no, newContext, level) {
 	  var fnStr = '',
-	    useString = fns.useString,
-	    isTmplExpr = utils.isString(no), //如果no为字符串, 则本次将构建tmpl块模板函数
-	    main = isTmplExpr || no === 0,
-	    /* retType
-	     1: 只有单个子节点
-	     2: 有多个子节点
-	     object: 非构建函数时
-	    */
-	    retType = content.length === 1 ? '1' : '2',
-	    counter = {
-	      _type: 0,
-	      _typeRefer: 0,
-	      _params: 0,
-	      _paramsE: 0,
-	      _compParam: 0,
-	      _dataRefer: 0,
-	      _expr: 0,
-	      _value: 0,
-	      _filter: 0,
-	      newContext: newContext
-	    };
+	      useString = fns.useString,
+	      isTmplExpr = utils.isString(no),
+	      //如果no为字符串, 则本次将构建tmpl块模板函数
+	  main = isTmplExpr || no === 0,
+
+	  /* retType
+	   1: 只有单个子节点
+	   2: 有多个子节点
+	   object: 非构建函数时
+	  */
+	  retType = content.length === 1 ? '1' : '2',
+	      counter = {
+	    _type: 0,
+	    _typeRefer: 0,
+	    _params: 0,
+	    _paramsE: 0,
+	    _compParam: 0,
+	    _dataRefer: 0,
+	    _expr: 0,
+	    _value: 0,
+	    _filter: 0,
+	    newContext: newContext
+	  };
 
 	  if (!useString) {
 	    counter._compParam = 0;
@@ -1784,7 +1794,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function _buildOptions(config, node, fns, exprPropsStr, level) {
 	  var hashStr = '',
-	    noConfig = !config;
+	      noConfig = !config;
 
 	  if (noConfig || config.useString) {
 	    hashStr += ', useString: p1.useString';
@@ -1804,16 +1814,16 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function _buildPropData(obj, counter, fns, noEscape) {
 	  var dataValueStr,
-	    useString = fns.useString,
-	    escape = !noEscape ? obj.escape : false;
+	      useString = fns.useString,
+	      escape = !noEscape ? obj.escape : false;
 
 	  //先生成数据值
 	  if (!obj.prop.isStr) {
 	    var name = obj.prop.name,
-	      parentNum = obj.prop.parentNum,
-	      data = '',
-	      special = false,
-	      specialP = false;
+	        parentNum = obj.prop.parentNum,
+	        data = '',
+	        special = false,
+	        specialP = false;
 
 	    if (name === '@index') {
 	      data = 'index';
@@ -1850,17 +1860,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	  var filters = obj.prop.filters;
 	  if (filters) {
 	    var valueStr = '_value' + counter._value++,
-	      filterStr = 'var ' + valueStr + ' = ' + dataValueStr + ';\n';
+	        filterStr = 'var ' + valueStr + ' = ' + dataValueStr + ';\n';
 
-	    utils.each(filters, function(o) {
+	    utils.each(filters, function (o) {
 	      var _filterC = counter._filter++,
-	        configF = filterConfig[o.name],
-	        filterVarStr = '_filter' + _filterC,
-	        globalFilterStr = 'p1.filters[\'' + o.name + '\']';
+	          configF = filterConfig[o.name],
+	          filterVarStr = '_filter' + _filterC,
+	          globalFilterStr = 'p1.filters[\'' + o.name + '\']';
 
 	      if (configF) {
 	        filterStr += '\nvar ' + filterVarStr + ' = ' + globalFilterStr + ';\n';
-	      } else { //如果全局配置不存在,先从p2.data中获取
+	      } else {
+	        //如果全局配置不存在,先从p2.data中获取
 	        filterStr += '\nvar ' + filterVarStr + ' = p1.getData(p2.data, \'' + o.name + '\');\n';
 	        filterStr += 'if(!' + filterVarStr + ') ' + filterVarStr + ' = ' + globalFilterStr + ';\n';
 	      }
@@ -1868,12 +1879,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	      filterStr += '  p1.warn(\'' + o.name + '\', \'filter\');\n';
 	      filterStr += '}\n';
 	      filterStr += 'else {\n';
-	      filterStr += '  ' + valueStr + ' = ' + filterVarStr + '.apply(p2, [' + valueStr +
-	        (o.params ? o.params.reduce(function(p, c) {
-	          return p + ', \'' + c + '\'';
-	        }, '') : '') +
-	        ', ' + _buildOptions(configF) +
-	        ']);\n';
+	      filterStr += '  ' + valueStr + ' = ' + filterVarStr + '.apply(p2, [' + valueStr + (o.params ? o.params.reduce(function (p, c) {
+	        return p + ', \'' + c + '\'';
+	      }, '') : '') + ', ' + _buildOptions(configF) + ']);\n';
 	      filterStr += '}\n';
 	    }, false, true);
 
@@ -1896,16 +1904,17 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function _buildProps(obj, counter, fns) {
 	  var str0 = obj.strs[0],
-	    valueStr = '',
+	      valueStr = '',
+	      filterStr = '';
+
+	  if (utils.isString(str0)) {
+	    //常规属性
+	    valueStr = !obj.isAll && str0 !== '' ? '\'' + str0 + '\'' : '';
 	    filterStr = '';
 
-	  if (utils.isString(str0)) { //常规属性
-	    valueStr = !obj.isAll && str0 !== '' ? ('\'' + str0 + '\'') : '';
-	    filterStr = '';
-
-	    utils.each(obj.props, function(o, i) {
+	    utils.each(obj.props, function (o, i) {
 	      var propData = _buildPropData(o, counter, fns),
-	        dataValueStr;
+	          dataValueStr;
 	      if (utils.isString(propData)) {
 	        dataValueStr = propData;
 	      } else {
@@ -1915,10 +1924,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	      if (!obj.isAll) {
 	        var strI = obj.strs[i + 1];
-	        dataValueStr = (str0 === '' && i == 0 ? '' : ' + ') +
-	          '(' + dataValueStr + ')' +
-	          (strI !== '' ? ' + \'' + strI + '\'' : '');
-	      } else if (obj.isTmplPlace) { //执行tmpl块模板函数
+	        dataValueStr = (str0 === '' && i == 0 ? '' : ' + ') + '(' + dataValueStr + ')' + (strI !== '' ? ' + \'' + strI + '\'' : '');
+	      } else if (obj.isTmplPlace) {
+	        //执行tmpl块模板函数
 	        dataValueStr += '.call({ _njParent: p2, _njIndex: p2.index }, p2.data)';
 	      }
 
@@ -1927,9 +1935,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return false;
 	      }
 	    }, false, true);
-	  } else if (utils.isObject(str0) && str0.length != null) { //tmpl块表达式
+	  } else if (utils.isObject(str0) && str0.length != null) {
+	    //tmpl块表达式
 	    valueStr += '{\n';
-	    utils.each(str0, function(v, k, i, l) {
+	    utils.each(str0, function (v, k, i, l) {
 	      if (k !== 'length') {
 	        valueStr += '  "' + k + '": p1.main' + _buildFn(v.content, fns, 'T' + ++fns._noT);
 	      } else {
@@ -1943,14 +1952,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	    valueStr += '}';
 	  } else if (utils.isObject(str0) && str0._njEx) {
 	    valueStr = str0._njEx;
-	  } else { //非字符串值
+	  } else {
+	    //非字符串值
 	    //The "_njShim" property is used to distinguish whether the incoming is an normal array.
 	    valueStr = JSON.stringify(str0._njShim ? str0._njShim : str0);
 	  }
 
 	  if (filterStr === '') {
 	    return valueStr;
-	  } else { //包含过滤器
+	  } else {
+	    //包含过滤器
 	    return {
 	      valueStr: valueStr,
 	      filterStr: filterStr
@@ -1960,11 +1971,12 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function _buildNode(node, fns, counter, retType, level) {
 	  var fnStr = '',
-	    useString = fns.useString;
+	      useString = fns.useString;
 
-	  if (node.type === 'nj_plaintext') { //文本节点
+	  if (node.type === 'nj_plaintext') {
+	    //文本节点
 	    var valueStr = _buildProps(node.content[0], counter, fns),
-	      filterStr;
+	        filterStr;
 	    if (utils.isObject(valueStr)) {
 	      filterStr = valueStr.filterStr;
 	      valueStr = valueStr.valueStr;
@@ -1977,21 +1989,24 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    if (useString) {
 	      fnStr += textStr;
-	    } else { //文本中的特殊字符需转义
+	    } else {
+	      //文本中的特殊字符需转义
 	      fnStr += replaceSpecialSymbol(textStr);
 	    }
-	  } else if (node.type === 'nj_expr') { //块表达式节点
+	  } else if (node.type === 'nj_expr') {
+	    //块表达式节点
 	    var _exprC = counter._expr++,
-	      _dataReferC = counter._dataRefer++,
-	      dataReferStr = '',
-	      filterStr = '',
-	      configE = exprConfig[node.expr],
-	      exprVarStr = '_expr' + _exprC,
-	      globalExprStr = 'p1.exprs[\'' + node.expr + '\']';
+	        _dataReferC = counter._dataRefer++,
+	        dataReferStr = '',
+	        filterStr = '',
+	        configE = exprConfig[node.expr],
+	        exprVarStr = '_expr' + _exprC,
+	        globalExprStr = 'p1.exprs[\'' + node.expr + '\']';
 
 	    if (configE) {
 	      fnStr += '\nvar ' + exprVarStr + ' = ' + globalExprStr + ';\n';
-	    } else { //如果全局配置不存在,先从p2.data中获取
+	    } else {
+	      //如果全局配置不存在,先从p2.data中获取
 	      fnStr += '\nvar ' + exprVarStr + ' = p1.getData(p2.data, \'' + node.expr + '\');\n';
 	      fnStr += 'if(!' + exprVarStr + ') ' + exprVarStr + ' = ' + globalExprStr + ';\n';
 	    }
@@ -2000,7 +2015,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    if (node.refer) {
 	      var props = node.refer.props;
-	      utils.each(props, function(o, i) {
+	      utils.each(props, function (o, i) {
 	        var valueStr = _buildPropData(o, counter, fns, true);
 	        if (utils.isObject(valueStr)) {
 	          filterStr += valueStr.filterStr;
@@ -2034,10 +2049,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	      _expr: _exprC,
 	      _dataRefer: _dataReferC
 	    }, fns, level);
-	  } else { //元素节点
+	  } else {
+	    //元素节点
 	    //节点类型和typeRefer
 	    var _typeC = counter._type++,
-	      _type;
+	        _type;
 	    if (node.typeRefer) {
 	      _type = node.typeRefer.props[0].prop.name;
 	    } else {
@@ -2053,7 +2069,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    if (node.typeRefer) {
 	      var _typeReferC = counter._typeRefer++,
-	        valueStrT = _buildProps(node.typeRefer, counter, fns);
+	          valueStrT = _buildProps(node.typeRefer, counter, fns);
 	      if (utils.isObject(valueStrT)) {
 	        fnStr += valueStrT.filterStr;
 	        valueStrT = valueStrT.valueStr;
@@ -2067,8 +2083,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    //节点参数
 	    var params = node.params,
-	      paramsExpr = node.paramsExpr,
-	      paramsStr = '';
+	        paramsExpr = node.paramsExpr,
+	        paramsStr = '';
 	    if (params || paramsExpr) {
 	      var _paramsC = counter._params++;
 	      paramsStr = 'var _params' + _paramsC + ' = ';
@@ -2088,14 +2104,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	          //paramsStr += '\np1.assign(_params' + _paramsC + ', _paramsE' + _paramsEC + ');\n';
 	        } else {
 	          var keys = '';
-	          utils.each(params, function(v, k, i, l) {
+	          utils.each(params, function (v, k, i, l) {
 	            if (i == 0) {
 	              keys += '{ ';
 	            }
 	            keys += k + ': 1';
 
 	            if (i < l - 1) {
-	              keys += ', '
+	              keys += ', ';
 	            } else {
 	              keys += ' }';
 	            }
@@ -2106,26 +2122,27 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	      if (params) {
 	        var paramKeys = Object.keys(params),
-	          len = paramKeys.length,
-	          filterStr = '';
+	            len = paramKeys.length,
+	            filterStr = '';
 
 	        if (!useString && !paramsExpr) {
 	          paramsStr += '{\n';
 	        }
 
-	        utils.each(paramKeys, function(k, i) {
+	        utils.each(paramKeys, function (k, i) {
 	          var valueStr = _buildProps(params[k], counter, fns);
 	          if (utils.isObject(valueStr)) {
 	            filterStr += valueStr.filterStr;
 	            valueStr = valueStr.valueStr;
 	          }
 
-	          if (!useString && k === 'style') { //将style字符串转换为对象
+	          if (!useString && k === 'style') {
+	            //将style字符串转换为对象
 	            valueStr = 'p1.styleProps(' + valueStr + ')';
 	          }
 
 	          var key = k,
-	            onlyKey = ('\'' + key + '\'') === valueStr;
+	              onlyKey = '\'' + key + '\'' === valueStr;
 	          if (!useString) {
 	            key = utils.fixPropName(k);
 	          }
@@ -2157,10 +2174,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 
 	    var _compParamC, _childrenC;
-	    if (!useString) { //组件引擎参数
+	    if (!useString) {
+	      //组件引擎参数
 	      _compParamC = counter._compParam++;
 	      fnStr += 'var _compParam' + _compParamC + ' = [_type' + _typeC + ', ' + (paramsStr !== '' ? '_params' + _paramsC : 'null') + '];\n';
-	    } else { //子节点字符串
+	    } else {
+	      //子节点字符串
 	      _childrenC = counter._children++;
 	      fnStr += 'var _children' + _childrenC + ' = \'\';\n';
 	    }
@@ -2181,7 +2200,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return fnStr;
 	  }
 
-	  utils.each(content, function(node) {
+	  utils.each(content, function (node) {
 	    fnStr += _buildNode(node, fns, counter, retType, level);
 	  }, false, true);
 
@@ -2190,16 +2209,19 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function _buildRender(nodeType, retType, params, fns, level) {
 	  var retStr,
-	    useString = fns.useString;
+	      useString = fns.useString;
 
 	  switch (nodeType) {
-	    case 1: //文本节点
+	    case 1:
+	      //文本节点
 	      retStr = _buildLevelSpace(level, useString) + params.text + (!useString || level == null ? '' : ' + \'\\n\'');
 	      break;
-	    case 2: //块表达式
+	    case 2:
+	      //块表达式
 	      retStr = '_expr' + params._expr + '.apply(p2, _dataRefer' + params._dataRefer + ')';
 	      break;
-	    case 3: //元素节点
+	    case 3:
+	      //元素节点
 	      if (!useString) {
 	        retStr = 'p1.h.apply(null, _compParam' + params._compParam + ')';
 	      } else {
@@ -2248,7 +2270,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return ret;
 	}
 
-	module.exports = function(ast, useString) {
+	module.exports = function (ast, useString) {
 	  var fns = {
 	    useString: useString,
 	    _no: 0, //块表达式函数计数
@@ -2266,7 +2288,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	'use strict';
 
 	var SPACIAL_SYMBOLS = {
-	  nbsp: '\u00A0',
+	  nbsp: '\xA0',
 	  ensp: '\u2002',
 	  emsp: '\u2003',
 	  thinsp: '\u2009',
@@ -2293,31 +2315,33 @@ return /******/ (function(modules) { // webpackBootstrap
 	'use strict';
 
 	var nj = __webpack_require__(1),
-	  tools = __webpack_require__(3),
-	  tranElem = __webpack_require__(4),
-	  tmplRule = nj.tmplRule,
-	  shim = __webpack_require__(17),
-	  tmplStrs = nj.tmplStrs;
+	    tools = __webpack_require__(3),
+	    tranElem = __webpack_require__(4),
+	    tmplRule = nj.tmplRule,
+	    shim = __webpack_require__(17),
+	    tmplStrs = nj.tmplStrs;
 
 	//Compile string template
 	function compileStringTmpl(tmpl) {
-	  var tmplKey = tmpl.toString(), //Get unique key
-	    ret = tmplStrs[tmplKey];
+	  var tmplKey = tmpl.toString(),
+	      //Get unique key
+	  ret = tmplStrs[tmplKey];
 
-	  if (!ret) { //If the cache already has template data, direct return the template.
+	  if (!ret) {
+	    //If the cache already has template data, direct return the template.
 	    var isStr = tools.isString(tmpl),
-	      xmls = tmpl,
-	      args = arguments,
-	      splitNo = 0,
-	      params = [],
-	      fullXml = '',
-	      exArgs;
+	        xmls = tmpl,
+	        args = arguments,
+	        splitNo = 0,
+	        params = [],
+	        fullXml = '',
+	        exArgs;
 
 	    if (isStr) {
 	      xmls = tmpl.split(tmplRule.externalSplit);
 
 	      var pattern = tmplRule.external(),
-	        matchArr;
+	          matchArr;
 	      exArgs = [];
 	      while (matchArr = pattern.exec(tmpl)) {
 	        exArgs.push(matchArr[1]);
@@ -2326,18 +2350,20 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    //Connection xml string
 	    var l = xmls.length;
-	    tools.each(xmls, function(xml, i) {
+	    tools.each(xmls, function (xml, i) {
 	      var split = '';
 	      if (i < l - 1) {
 	        var last = xml.length - 1,
-	          useShim = xml[last] === '@',
-	          arg, isEx;
+	            useShim = xml[last] === '@',
+	            arg,
+	            isEx;
 
 	        if (isStr) {
 	          var exArg = exArgs[i],
-	            match = exArg.match(/#(\d+)/);
+	              match = exArg.match(/#(\d+)/);
 
-	          if (match && match[1] != null) { //分隔符格式为"${#x}", 则按其编号顺序从nj函数参数列表中获取
+	          if (match && match[1] != null) {
+	            //分隔符格式为"${#x}", 则按其编号顺序从nj函数参数列表中获取
 	            arg = args[parseInt(match[1], 10) + 1];
 	          } else {
 	            arg = exArg;
@@ -2380,9 +2406,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 
 	  var outputH = this ? this.outputH : false,
-	    tmplFn = function() {
-	      return nj['compile' + (outputH ? 'H' : '')]({ _njTmpl: ret }, tmplKey).apply(null, arguments);
-	    };
+	      tmplFn = function tmplFn() {
+	    return nj['compile' + (outputH ? 'H' : '')]({ _njTmpl: ret }, tmplKey).apply(null, arguments);
+	  };
 	  tmplFn._njTmpl = ret;
 
 	  return tmplFn;
@@ -2391,21 +2417,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	//Resolve string to element
 	function _checkStringElem(xml, params) {
 	  var root = [],
-	    current = {
-	      elem: root,
-	      elemName: 'root',
-	      parent: null
-	    },
-	    parent = null,
-	    pattern = tmplRule.checkElem(),
-	    matchArr;
+	      current = {
+	    elem: root,
+	    elemName: 'root',
+	    parent: null
+	  },
+	      parent = null,
+	      pattern = tmplRule.checkElem(),
+	      matchArr;
 
 	  while (matchArr = pattern.exec(xml)) {
 	    var textBefore = matchArr[1],
-	      elem = matchArr[2],
-	      elemName = matchArr[3],
-	      elemParams = matchArr[4],
-	      textAfter = matchArr[5];
+	        elem = matchArr[2],
+	        elemName = matchArr[3],
+	        elemParams = matchArr[4],
+	        textAfter = matchArr[5];
 
 	    //Text before tag
 	    if (textBefore && textBefore !== '\n') {
@@ -2415,13 +2441,16 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    //Element tag
 	    if (elem) {
-	      if (elemName[0] === '/') { //Close tag
+	      if (elemName[0] === '/') {
+	        //Close tag
 	        if (elemName === '/' + current.elemName) {
 	          current = current.parent;
 	        }
-	      } else if (elem[elem.length - 2] === '/') { //Self close tag
+	      } else if (elem[elem.length - 2] === '/') {
+	        //Self close tag
 	        _setSelfCloseElem(elem, elemName, elemParams, current.elem, params);
-	      } else { //Open tag
+	      } else {
+	        //Open tag
 	        parent = current;
 	        current = {
 	          elem: [],
@@ -2483,12 +2512,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	//Extract split parameters
 	function _getSplitParams(elem, params) {
 	  var exprRule = tmplRule.exprRule,
-	    startRule = tmplRule.startRule,
-	    endRule = tmplRule.endRule,
-	    paramsExpr;
+	      startRule = tmplRule.startRule,
+	      endRule = tmplRule.endRule,
+	      paramsExpr;
 
 	  //Replace the parameter like "prop=_nj-split0_".
-	  elem = elem.replace(/([^\s={}>]+)=['"]?_nj-split(\d+)_['"]?/g, function(all, key, no) {
+	  elem = elem.replace(/([^\s={}>]+)=['"]?_nj-split(\d+)_['"]?/g, function (all, key, no) {
 	    if (!paramsExpr) {
 	      paramsExpr = [exprRule + 'params'];
 	    }
@@ -2498,7 +2527,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  });
 
 	  //Replace the parameter like "{...props}".
-	  elem = elem.replace(tmplRule.spreadProp, function(all, begin, prop) {
+	  elem = elem.replace(tmplRule.spreadProp, function (all, begin, prop) {
 	    prop = prop.trim();
 
 	    if (!paramsExpr) {
@@ -2527,15 +2556,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	//Set text node
 	function _setText(text, elemArr, params) {
 	  var pattern = /_nj-split(\d+)_/g,
-	    matchArr,
-	    splitNos = [];
+	      matchArr,
+	      splitNos = [];
 
-	  while ((matchArr = pattern.exec(text))) {
+	  while (matchArr = pattern.exec(text)) {
 	    splitNos.push(matchArr[1]);
 	  }
 
 	  if (splitNos.length) {
-	    tools.each(text.split(/_nj-split(?:\d+)_/), function(t) {
+	    tools.each(text.split(/_nj-split(?:\d+)_/), function (t) {
 	      if (t !== '') {
 	        elemArr.push(t);
 	      }
@@ -2559,6 +2588,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	'use strict';
 
 	//Converts any value to the parameter of NornJ template can be parsed.
+
 	module.exports = function (obj) {
 	  return {
 	    _njShim: obj
@@ -2574,10 +2604,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	var compileStringTmpl = __webpack_require__(16);
 
 	module.exports = {
-	  tmplTag: function() {
+	  tmplTag: function tmplTag() {
 	    return compileStringTmpl.apply({ outputH: false }, arguments);
 	  },
-	  tmplTagH: function() {
+	  tmplTagH: function tmplTagH() {
 	    return compileStringTmpl.apply({ outputH: true }, arguments);
 	  }
 	};
@@ -2589,27 +2619,27 @@ return /******/ (function(modules) { // webpackBootstrap
 	'use strict';
 
 	var nj = __webpack_require__(1),
-	  setTmplRule = __webpack_require__(12);
+	    setTmplRule = __webpack_require__(12);
 
 	module.exports = function (configs) {
 	  var delimiters = configs.delimiters,
-	    includeParser = configs.includeParser,
-	    createElement = configs.createElement,
-	    outputH = configs.outputH;
+	      includeParser = configs.includeParser,
+	      createElement = configs.createElement,
+	      outputH = configs.outputH;
 
-	  if(delimiters) {
+	  if (delimiters) {
 	    setTmplRule(delimiters);
 	  }
 
-	  if(includeParser) {
+	  if (includeParser) {
 	    nj.includeParser = includeParser;
 	  }
 
-	  if(createElement) {
+	  if (createElement) {
 	    nj.createElement = createElement;
 	  }
 
-	  if(outputH != null) {
+	  if (outputH != null) {
 	    nj.outputH = outputH;
 	  }
 	};

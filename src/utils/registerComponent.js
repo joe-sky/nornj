@@ -19,5 +19,5 @@ function registerComponent(name, component) {
 }
 
 module.exports = {
-  registerComponent: registerComponent
+  registerComponent
 };

@@ -1,4 +1,7 @@
-﻿var gulp = require('gulp'),
+﻿'use strict';
+
+const gulp = require('gulp'),
+  babel = require('gulp-babel'),
   webpack = require('webpack'),
   webpackStream = require('webpack-stream'),
   jasmine = require('gulp-jasmine'),
@@ -10,7 +13,7 @@
 
 //Handle error
 function handlebuildError() {
-  var args = Array.prototype.slice.call(arguments);
+  const args = Array.prototype.slice.call(arguments);
 
   // Send error to notification center with gulp-notify
   notify.onError({
@@ -23,13 +26,13 @@ function handlebuildError() {
 }
 
 //Build js
-gulp.task('build', function () {
-  var libName = 'nornj.js';
+gulp.task('build', () => {
+  let libName = 'nornj.js';
   if (argv.p) {
     libName = 'nornj.min.js';
   }
 
-  var plugins = [];
+  let plugins = [];
   if (argv.p) {
     plugins.push(new webpack.optimize.UglifyJsPlugin({
       compressor: {
@@ -51,35 +54,38 @@ gulp.task('build', function () {
         library: 'NornJ',
         libraryTarget: 'umd'
       },
+      module: {
+        loaders: [{
+          test: /\.js$/,
+          loader: 'babel',
+          exclude: /node_modules/
+        }],
+      },
       plugins: plugins
     }))
     .on('error', handlebuildError)
     .pipe(gulp.dest('./dist'));
 });
 
+//Convert es6 code to es5 from src to lib
+gulp.task("lib", () => gulp.src('./src/**/*.js')
+  .pipe(babel())
+  .pipe(gulp.dest('./lib'))
+);
+
 //Unit testing
-gulp.task("test", function () {
-  return gulp.src(["./test/**/**Spec.js"])
-    .pipe(jasmine({
-      includeStackTrace: true
-    }));
-});
+gulp.task("test", () => gulp.src(["./test/**/**Spec.js"])
+  .pipe(jasmine({
+    includeStackTrace: true
+  }))
+);
 
 //Run eslint
-gulp.task('eslint', function () {
-  return gulp.src(['./src/**/*.js'])
-    .pipe(eslint({
-      "rules": {
-        "camelcase": [2, { "properties": "always" }],
-        "comma-dangle": [2, "never"],
-        "semi": [2, "always"],
-        "quotes": [2, "single"],
-        "strict": [2, "global"]
-      }
-    }))
-    .pipe(eslint.format())
-    .pipe(eslint.failAfterError());
-});
+gulp.task('eslint', () => gulp.src(['./src/**/*.js'])
+  .pipe(eslint())
+  .pipe(eslint.format())
+  .pipe(eslint.failAfterError())
+);
 
 //Default task
 gulp.task('default', ['build']);

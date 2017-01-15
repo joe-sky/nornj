@@ -217,22 +217,22 @@ var assign = Object.assign || function(target) {
 };
 
 var tools = {
-  isArray: isArray,
-  isArrayLike: isArrayLike,
-  isObject: isObject,
-  isString: isString,
-  each: each,
-  flatten: flatten,
-  throwIf: throwIf,
-  assign: assign,
-  uniqueKey: uniqueKey,
-  lightObj: lightObj,
-  arrayPush: arrayPush,
-  arraySlice: arraySlice,
-  clearQuot: clearQuot,
-  toCamelCase: toCamelCase,
-  warn: warn,
-  noop: noop
+  isArray,
+  isArrayLike,
+  isObject,
+  isString,
+  each,
+  flatten,
+  throwIf,
+  assign,
+  uniqueKey,
+  lightObj,
+  arrayPush,
+  arraySlice,
+  clearQuot,
+  toCamelCase,
+  warn,
+  noop
 };
 
 module.exports = tools;

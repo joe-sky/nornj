@@ -104,7 +104,7 @@ function precompile(tmpl, outputH) {
 }
 
 module.exports = {
-  compile: compile,
-  compileH: compileH,
-  precompile: precompile
+  compile,
+  compileH,
+  precompile
 };
