@@ -171,10 +171,14 @@ function _buildPropData(obj, counter, fns, noEscape) {
 }
 
 function _buildEscape(valueStr, useString, escape) {
-  if (useString && escape) {
-    return 'p1.escape(' + valueStr + ')';
-  } else {
-    return valueStr;
+  if (useString) {
+    if (escape) {
+      return 'p1.escape(' + valueStr + ')';
+    } else {
+      return valueStr;
+    }
+  } else {  //文本中的特殊字符需转义
+    return replaceSpecialSymbol(valueStr);
   }
 }
 

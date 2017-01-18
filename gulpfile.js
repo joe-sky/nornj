@@ -88,4 +88,4 @@ gulp.task('eslint', () => gulp.src(['./src/**/*.js'])
 );
 
 //Default task
-gulp.task('default', ['build']);
+gulp.task('default', ['build', 'lib']);

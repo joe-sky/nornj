@@ -1,10 +1,11 @@
 {
   "name": "nornj",
-  "version": "0.4.1-alpha.14",
+  "version": "0.4.1-alpha.16",
   "description": "A multipurpose javascript template engine",
   "main": "lib/base.js",
   "files": [
     "dist/",
+    "lib/",
     "src/",
     "tools/",
     "LICENSE"

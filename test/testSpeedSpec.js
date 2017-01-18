@@ -8,9 +8,6 @@
   ReactDOMServer = require('react-dom/server'),
   Handlebars = require('handlebars');
 
-var pattern = /([^.[\]()]+)([^\s()]*)/g;
-console.log(pattern.exec("'a'"));
-
 xdescribe('test speed', function() {
   var tmpl = nj `
   <{div} id="{num}_100">

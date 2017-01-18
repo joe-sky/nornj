@@ -1,6 +1,6 @@
 ﻿'use strict';
 
-var nj = require('../src/base'),
+var nj = require('../lib/base'),
   fs = require('fs'),
   path = require('path'),
   tmplRule = nj.tmplRule;

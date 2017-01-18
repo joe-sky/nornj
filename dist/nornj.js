@@ -567,13 +567,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 	//Get compiled property
+	var REGEX_JS_PROP = /([^.[\]()]+)([^\s()]*)/;
 	function compiledProp(prop, isString) {
 	  var ret = tools.lightObj();
-
-	  //Extract the dot data path to the 'prop' filter.
-	  if (!isString && prop.indexOf('.') > -1) {
-	    prop = prop.replace(/\.([^\s.|\/]+)/g, '|prop($1)');
-	  }
 
 	  //If there are colons in the property,then use filter
 	  if (prop.indexOf('|') >= 0) {
@@ -620,7 +616,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    ret.parentNum = n;
 	  }
 
-	  ret.name = prop;
+	  //Extract the js property
+	  prop = REGEX_JS_PROP.exec(prop);
+	  ret.name = prop[1];
+	  ret.jsProp = prop[2];
+
 	  if (isString) {
 	    //Sign the parameter is a pure string.
 	    ret.isStr = true;
@@ -1815,7 +1815,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	function _buildPropData(obj, counter, fns, noEscape) {
 	  var dataValueStr,
 	      useString = fns.useString,
-	      escape = !noEscape ? obj.escape : false;
+	      escape = !noEscape ? obj.escape : false,
+	      jsProp = obj.prop.jsProp;
 
 	  //先生成数据值
 	  if (!obj.prop.isStr) {
@@ -1847,13 +1848,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 
 	    if (!special && !specialP) {
-	      dataValueStr = 'p1.getData(p2.data, \'' + name + '\')';
+	      dataValueStr = 'p1.getData(p2.data, \'' + name + '\')' + jsProp;
 	    } else {
 	      var dataStr = 'p2.' + data;
-	      dataValueStr = special ? dataStr : 'p1.getData(' + dataStr + ', \'' + name + '\')';
+	      dataValueStr = (special ? dataStr : 'p1.getData(' + dataStr + ', \'' + name + '\')') + jsProp;
 	    }
 	  } else {
-	    dataValueStr = '\'' + obj.prop.name + '\'';
+	    dataValueStr = '\'' + obj.prop.name + '\'' + jsProp;
 	  }
 
 	  //有过滤器时需要生成"_value"值
@@ -1895,10 +1896,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 	function _buildEscape(valueStr, useString, escape) {
-	  if (useString && escape) {
-	    return 'p1.escape(' + valueStr + ')';
+	  if (useString) {
+	    if (escape) {
+	      return 'p1.escape(' + valueStr + ')';
+	    } else {
+	      return valueStr;
+	    }
 	  } else {
-	    return valueStr;
+	    //文本中的特殊字符需转义
+	    return replaceSpecialSymbol(valueStr);
 	  }
 	}
 
