@@ -4,7 +4,7 @@
   compile = require('../src/compiler/compile').compile,
   includeParser = require('../tools/includeParser');
 
-xdescribe('test compile string', function () {
+describe('test compile string', function () {
   beforeAll(function () {
     nj.registerFilter('filter1', function (v, p1) {
       //console.log(nj.getData(this.data, 'name1'));
@@ -113,7 +113,7 @@ xdescribe('test compile string', function () {
       `);
 
       var tmpl3 = nj`
-        <div class="{id} {name3}" {name3} { ...props} name={name1} autofocus name1={a.c.d} name2="{a.e | prop('f').g}">
+        <div class="{id} {name3}" {name3} { ...props} name={name1} autofocus name1={a.c.d} name2="{a.e | prop('f') | prop('g')}">
           <#props>
             <@name checked>{test0 | filter1}{'test1' | filter2}test2</@name>
             <@checked />

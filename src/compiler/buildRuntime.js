@@ -88,7 +88,8 @@ function _buildOptions(config, node, fns, exprPropsStr, level) {
 function _buildPropData(obj, counter, fns, noEscape) {
   var dataValueStr,
     useString = fns.useString,
-    escape = !noEscape ? obj.escape : false;
+    escape = !noEscape ? obj.escape : false,
+    jsProp = obj.prop.jsProp;
 
   //先生成数据值
   if (!obj.prop.isStr) {
@@ -120,13 +121,13 @@ function _buildPropData(obj, counter, fns, noEscape) {
     }
 
     if (!special && !specialP) {
-      dataValueStr = 'p1.getData(p2.data, \'' + name + '\')';
+      dataValueStr = 'p1.getData(p2.data, \'' + name + '\')' + jsProp;
     } else {
       var dataStr = 'p2.' + data;
-      dataValueStr = special ? dataStr : 'p1.getData(' + dataStr + ', \'' + name + '\')';
+      dataValueStr = (special ? dataStr : 'p1.getData(' + dataStr + ', \'' + name + '\')') + jsProp;
     }
   } else {
-    dataValueStr = '\'' + obj.prop.name + '\'';
+    dataValueStr = '\'' + obj.prop.name + '\'' + jsProp;
   }
 
   //有过滤器时需要生成"_value"值

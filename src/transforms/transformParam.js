@@ -15,13 +15,9 @@ function compiledParams(obj) {
 }
 
 //Get compiled property
+var REGEX_JS_PROP = /([^.[\]()]+)([^\s()]*)/;
 function compiledProp(prop, isString) {
   var ret = tools.lightObj();
-
-  //Extract the dot data path to the 'prop' filter.
-  if (!isString && prop.indexOf('.') > -1) {
-    prop = prop.replace(/\.([^\s.|\/]+)/g, '|prop($1)');
-  }
 
   //If there are colons in the property,then use filter
   if (prop.indexOf('|') >= 0) {
@@ -68,7 +64,11 @@ function compiledProp(prop, isString) {
     ret.parentNum = n;
   }
 
-  ret.name = prop;
+  //Extract the js property
+  prop = REGEX_JS_PROP.exec(prop);
+  ret.name = prop[1];
+  ret.jsProp = prop[2];
+
   if (isString) {  //Sign the parameter is a pure string.
     ret.isStr = true;
   }
