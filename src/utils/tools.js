@@ -1,9 +1,9 @@
 ﻿'use strict';
 
 var nj = require('../core'),
-  assign = require('object-assign'),
   nativeArrayPush = Array.prototype.push,
   nativeArraySlice = Array.prototype.slice,
+  hasOwnProperty = Object.prototype.hasOwnProperty,
   errorTitle = nj.errorTitle;
 
 //Push one by one to array
@@ -34,13 +34,14 @@ function isString(obj) {
 
 //获取属性值
 function _getProperty(key) {
-  return function (obj) {
+  return function(obj) {
     return obj == null ? void 0 : obj[key];
   };
 }
 
 //是否为类数组
 var _getLength = _getProperty('length');
+
 function isArrayLike(obj) {
   var length = _getLength(obj);
   return typeof length == 'number' && length >= 0;
@@ -67,8 +68,7 @@ function each(obj, func, context, isArr) {
         break;
       }
     }
-  }
-  else {
+  } else {
     var keys = Object.keys(obj),
       l = keys.length;
     for (var i = 0; i < l; i++) {
@@ -93,14 +93,14 @@ function flatten(obj) {
       //flatten current level of array or arguments object
       value = flatten(value);
 
-      var j = 0, len = value.length;
+      var j = 0,
+        len = value.length;
       output.length += len;
       while (j < len) {
         output[idx++] = value[j++];
       }
     }
-  }
-  else {
+  } else {
     output[idx++] = obj;
   }
 
@@ -108,7 +108,7 @@ function flatten(obj) {
 }
 
 //Noop function
-function noop() { }
+function noop() {}
 
 //抛出异常
 function throwIf(val, msg, type) {
@@ -164,6 +164,7 @@ function lightObj() {
 //Clear quotation marks
 var REGEX_QUOT_D = /["]+/g,
   REGEX_QUOT_S = /[']+/g;
+
 function clearQuot(value, clearDouble) {
   if (value == null) {
     return;
@@ -174,15 +175,12 @@ function clearQuot(value, clearDouble) {
     var charF = value[0];
     if (charF === '\'') {
       regex = REGEX_QUOT_S;
-    }
-    else if (charF === '"') {
+    } else if (charF === '"') {
       regex = REGEX_QUOT_D;
     }
-  }
-  else if (clearDouble) {
+  } else if (clearDouble) {
     regex = REGEX_QUOT_D;
-  }
-  else {
+  } else {
     regex = REGEX_QUOT_S;
   }
 
@@ -195,7 +193,7 @@ function clearQuot(value, clearDouble) {
 //Transform to camel-case
 function toCamelCase(str) {
   if (str.indexOf('-') > -1) {
-    str = str.replace(/-\w/g, function (letter) {
+    str = str.replace(/-\w/g, function(letter) {
       return letter.substr(1).toUpperCase();
     });
   }
@@ -203,23 +201,38 @@ function toCamelCase(str) {
   return str;
 }
 
+//Reference by babel-external-helpers
+var assign = Object.assign || function(target) {
+  for (var i = 1, args = arguments; i < args.length; i++) {
+    var source = args[i];
+
+    for (var key in source) {
+      if (hasOwnProperty.call(source, key)) {
+        target[key] = source[key];
+      }
+    }
+  }
+
+  return target;
+};
+
 var tools = {
-  isArray: isArray,
-  isArrayLike: isArrayLike,
-  isObject: isObject,
-  isString: isString,
-  each: each,
-  flatten: flatten,
-  throwIf: throwIf,
-  assign: assign,
-  uniqueKey: uniqueKey,
-  lightObj: lightObj,
-  arrayPush: arrayPush,
-  arraySlice: arraySlice,
-  clearQuot: clearQuot,
-  toCamelCase: toCamelCase,
-  warn: warn,
-  noop: noop
+  isArray,
+  isArrayLike,
+  isObject,
+  isString,
+  each,
+  flatten,
+  throwIf,
+  assign,
+  uniqueKey,
+  lightObj,
+  arrayPush,
+  arraySlice,
+  clearQuot,
+  toCamelCase,
+  warn,
+  noop
 };
 
 module.exports = tools;

@@ -16,8 +16,8 @@ setTmplRule();
 
 module.exports = tools.assign(
   {
-    escape: escape,
-    setTmplRule: setTmplRule
+    escape,
+    setTmplRule
   },
   checkElem,
   registerComponent,

@@ -211,7 +211,7 @@ function registerExpr(name, expr, options) {
 }
 
 module.exports = {
-  exprs: exprs,
-  exprConfig: exprConfig,
-  registerExpr: registerExpr
+  exprs,
+  exprConfig,
+  registerExpr
 };

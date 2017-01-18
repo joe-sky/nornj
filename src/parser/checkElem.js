@@ -167,5 +167,5 @@ function checkContentElem(obj, parent) {
 }
 
 module.exports = {
-  checkElem: checkElem
+  checkElem
 };

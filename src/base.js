@@ -11,6 +11,6 @@ nj.compileStringTmpl = compileStringTmpl;
 nj.config = config;
 utils.assign(nj, compiler, tmplTag, utils);
 
-var global = typeof self !== 'undefined' ? self : this;
+var _global = typeof self !== 'undefined' ? self : global;
 
-module.exports = global.NornJ = global.nj = nj;
+module.exports = _global.NornJ = _global.nj = nj;

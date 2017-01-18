@@ -1,8 +1,8 @@
 {
   "name": "nornj",
-  "version": "0.4.1-alpha.13",
+  "version": "0.4.1-alpha.14",
   "description": "A multipurpose javascript template engine",
-  "main": "src/base.js",
+  "main": "lib/base.js",
   "files": [
     "dist/",
     "src/",
@@ -26,8 +26,13 @@
   "license": "MIT",
   "devDependencies": {
     "babel-core": "^6.7.7",
+    "babel-eslint": "^7.1.1",
     "babel-loader": "^6.2.4",
+    "babel-preset-es2015": "^6.18.0",
+    "babel-preset-stage-1": "^6.16.0",
+    "babel-register": "^6.18.0",
     "gulp": "^3.9.0",
+    "gulp-babel": "^6.1.2",
     "gulp-eslint": "^3.0.1",
     "gulp-if": "^2.0.0",
     "gulp-jasmine": "^2.1.0",
@@ -41,8 +46,5 @@
     "webpack": "^1.13.1",
     "webpack-stream": "^3.2.0",
     "yargs": "^4.2.0"
-  },
-  "dependencies": {
-    "object-assign": "^4.0.1"
   }
 }

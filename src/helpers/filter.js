@@ -140,7 +140,7 @@ function registerFilter(name, filter, options) {
 }
 
 module.exports = {
-  filters: filters,
-  filterConfig: filterConfig,
-  registerFilter: registerFilter
+  filters,
+  filterConfig,
+  registerFilter
 };

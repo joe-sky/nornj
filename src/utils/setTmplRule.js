@@ -63,11 +63,11 @@ module.exports = function (startRule, endRule, exprRule, externalRule, propRule,
 
   //Reset the regexs to global list
   tools.assign(nj.tmplRule, {
-    startRule: startRule,
-    endRule: endRule,
-    exprRule: exprRule,
-    externalRule: externalRule,
-    propRule: propRule,
+    startRule,
+    endRule,
+    exprRule,
+    externalRule,
+    propRule,
     xmlOpenTag: _createRegExp('^<([a-z' + firstChar + exprRules + '][-a-z0-9_|./' + otherChars + ']*)[^>]*>$', 'i'),
     openTagParams: _createRegExp('[\\s]+(((' + startRule + '){1,2}([^' + allRules + ']+)(' + endRule + '){1,2})|[^\\s=>]+)(=((\'[^\']+\')|("[^"]+")|([^"\'\\s]+)))?', 'g'),
     insideBraceParam: _createRegExp('(' + startRule + '){1,2}([^' + allRules + ']+)(' + endRule + '){1,2}', 'i'),

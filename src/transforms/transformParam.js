@@ -157,7 +157,7 @@ function compiledParam(value) {
 }
 
 module.exports = {
-  compiledParam: compiledParam,
-  compiledParams: compiledParams,
-  compiledProp: compiledProp
+  compiledParam,
+  compiledParams,
+  compiledProp
 };

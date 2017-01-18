@@ -378,7 +378,7 @@ function _buildNode(node, fns, counter, retType, level) {
             keys += k + ': 1';
 
             if (i < l - 1) {
-              keys += ', '
+              keys += ', ';
             } else {
               keys += ' }';
             }
