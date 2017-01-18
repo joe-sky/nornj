@@ -8,8 +8,8 @@
   ReactDOMServer = require('react-dom/server'),
   Handlebars = require('handlebars');
 
-describe('test speed', function () {
-  var tmpl = nj`
+describe('test speed', function() {
+  var tmpl = nj `
   <{div} id="{num}_100">
     <#each {arr}>
       <span class=test_{@index}
@@ -39,16 +39,16 @@ describe('test speed', function () {
 
   var tmplFns = {
     useString: false,
-    fn4: function (p1, p2, p3, p4) {
+    fn4: function(p1, p2, p3, p4) {
       return 'five';
     },
-    fn3: function (p1, p2, p3, p4) {
+    fn3: function(p1, p2, p3, p4) {
       var _expr0 = p1.exprs['prop'];
       p1.throwIf(_expr0, 'prop', 'expr');
 
       return _expr0.apply(p2, ['name', { useString: p1.useString, exprProps: p4, result: p1.exprRet(p1, p2, p1.fn4, p4), inverse: p1.noop }]);
     },
-    fn2: function (p1, p2, p3, p4) {
+    fn2: function(p1, p2, p3, p4) {
       p2 = p1.newContext(p2, p3);
 
       var _paramsE0 = {};
@@ -59,8 +59,7 @@ describe('test speed', function () {
       var _filter0 = p1.filters['five'];
       if (!_filter0) {
         p1.warn('five', 'filter');
-      }
-      else {
+      } else {
         _value0 = _filter0.apply(p2, [_value0, { useString: p1.useString }]);
       }
 
@@ -75,13 +74,13 @@ describe('test speed', function () {
         p1.h('i', null, (p1.getData(p2.data, 'no')))
       );
     },
-    fn5: function (p1, p2, p3, p4) {
+    fn5: function(p1, p2, p3, p4) {
       return p1.h('br');
     },
-    fn6: function (p1, p2, p3, p4) {
+    fn6: function(p1, p2, p3, p4) {
       return p1.h('img');
     },
-    fn1: function (p1, p2, p3, p4) {
+    fn1: function(p1, p2, p3, p4) {
       p2 = p1.newContext(p2, p3);
 
       var _expr0 = p1.exprs['each'];
@@ -93,8 +92,7 @@ describe('test speed', function () {
       var _filter0 = p1.filters['five'];
       if (!_filter0) {
         p1.warn('five', 'filter');
-      }
-      else {
+      } else {
         _value0 = _filter0.apply(p2, [_value0, '1', { useString: p1.useString }]);
       }
 
@@ -110,16 +108,16 @@ describe('test speed', function () {
 
       return [
         p1.h('span', {
-          'className': 'test_' + (p2.index),
-          'style': p1.styleProps(p1.getData(p2.parent.data, 'styles')),
-          'onClick': p1.getData(p2.parent.data, 'onClick')
-        }, 'test_' + p1.getData(p2.parent.data, 'num'),
+            'className': 'test_' + (p2.index),
+            'style': p1.styleProps(p1.getData(p2.parent.data, 'styles')),
+            'onClick': p1.getData(p2.parent.data, 'onClick')
+          }, 'test_' + p1.getData(p2.parent.data, 'num'),
           _expr0.apply(p2, [p1.getData(p2.parent.data, 'list2'), { useString: p1.useString, result: p1.exprRet(p1, p2, p1.fn2, p4), inverse: p1.noop }])
         ),
         _expr1.apply(p2, [_value0, { useString: p1.useString, result: p1.exprRet(p1, p2, p1.fn5, p4), inverse: p1.exprRet(p1, p2, p1.fn6, p4) }])
       ];
     },
-    main: function (p1, p2, p3, p4) {
+    main: function(p1, p2, p3, p4) {
       var _typeRefer0 = p1.getData(p2.data, 'div');
       var _type0 = _typeRefer0 ? _typeRefer0 : 'div';
 
@@ -128,12 +126,11 @@ describe('test speed', function () {
 
       return p1.h(_type0, {
         'id': p1.getData(p2.data, 'num') + '_100'
-      }, _expr0.apply(p2, [p1.getData(p2.data, 'arr'), { useString: p1.useString, result: p1.exprRet(p1, p2, p1.fn1, p4), inverse: p1.noop }])
-      );
+      }, _expr0.apply(p2, [p1.getData(p2.data, 'arr'), { useString: p1.useString, result: p1.exprRet(p1, p2, p1.fn1, p4), inverse: p1.noop }]));
     }
   };
 
-  var _tmpl = nj`
+  var _tmpl = nj `
   <{div} id="{num}_100">{...props}
     &nbsp;1&gt;2
     <#each {arr}>
@@ -191,7 +188,7 @@ describe('test speed', function () {
   </{{div}}>
   `;
 
-  var tmplNj = nj`
+  var tmplNj = nj `
   <{div} id="{num}_100" id2="2">
     <#each {arr}>
       <span class="test_{@index}">
@@ -217,13 +214,13 @@ describe('test speed', function () {
   </{div}>
   `;
 
-  beforeAll(function () {
+  beforeAll(function() {
     nj.config({
       createElement: React.createElement,
       outputH: true
     });
 
-    nj.registerFilter('five', function (obj) {
+    nj.registerFilter('five', function(obj) {
       if (obj % 5 == 0) {
         return true;
       }
@@ -233,24 +230,23 @@ describe('test speed', function () {
     //   return obj;
     // });
 
-    Handlebars.registerHelper('five', function (num, options) {
+    Handlebars.registerHelper('five', function(num, options) {
       if (num % 5 == 0) {
         return options.fn(this);
-      }
-      else {
+      } else {
         return options.inverse(this);
       }
     });
   });
 
-  xit('test render to string by hbs', function () {
+  xit('test render to string by hbs', function() {
     var data = {
       div: 'div',
       num: 100,
-      arr: _.times(200, function (n) {
+      arr: _.times(200, function(n) {
         return n;
       }),
-      list2: _.times(100, function (n) {
+      list2: _.times(100, function(n) {
         return { no: n + 1 };
       })
     };
@@ -263,14 +259,14 @@ describe('test speed', function () {
     expect(ret).toBeTruthy();
   });
 
-  xit('test render to string by nj', function () {
+  xit('test render to string by nj', function() {
     var data = {
       div: 'div',
       num: 100,
-      arr: _.times(200, function (n) {
+      arr: _.times(200, function(n) {
         return n;
       }),
-      list2: _.times(100, function (n) {
+      list2: _.times(100, function(n) {
         return { no: n + 1 };
       })
     };
@@ -283,26 +279,26 @@ describe('test speed', function () {
     expect(ret).toBeTruthy();
   });
 
-  xit('test render to component by jsx', function () {
+  xit('test render to component by jsx', function() {
     var start;
     var TestComponent = React.createClass({
-      getInitialState: function () {
+      getInitialState: function() {
         return {
           num: 100
         };
       },
-      onClick: function () {
-        this.setState({ num: Date.now() }, function () {
+      onClick: function() {
+        this.setState({ num: Date.now() }, function() {
           console.log('total:' + (Date.now() - start));
         });
       },
-      render: function () {
+      render: function() {
         start = Date.now();
-        var ret = React.createElement('div', { id: this.state.num + '_100' }, this.props.arr.map(function (o, i) {
+        var ret = React.createElement('div', { id: this.state.num + '_100' }, this.props.arr.map(function(o, i) {
           return [
             React.createElement('span', { className: 'test_' + i, style: { color: 'blue' }, onClick: this.onClick },
               'test_' + this.state.num,
-              list2.map(function (p, j) {
+              list2.map(function(p, j) {
                 return React.createElement('div', i % 5 == 0 ? { name: 'five', key: j } : { key: j },
                   React.createElement('span', null, 'span' + p.no),
                   React.createElement('i', null, p.no)
@@ -324,12 +320,12 @@ describe('test speed', function () {
       }
     });
 
-    var list2 = _.times(100, function (n) {
+    var list2 = _.times(100, function(n) {
       return { no: n + 1 };
     });
 
     var html = ReactDOMServer.renderToStaticMarkup(React.createElement(TestComponent, {
-      arr: _.times(100, function (n) {
+      arr: _.times(100, function(n) {
         return n;
       }),
       a: 1,
@@ -341,14 +337,14 @@ describe('test speed', function () {
     expect(html).toBeTruthy();
   });
 
-  it('test render to component by nj', function () {
+  it('test render to component by nj', function() {
     var start;
 
     nj.registerComponent('TestComp', React.createClass({
-      render: function () {
-        return nj`<div><#each {arr}>{#../text}</#each></div>`({
+      render: function() {
+        return nj `<div><#each {arr}>{#../text}</#each></div>` ({
           text: this.props.tmpls['t2'],
-          arr: _.times(2, function (n) {
+          arr: _.times(2, function(n) {
             return n;
           })
         });
@@ -356,18 +352,18 @@ describe('test speed', function () {
     }));
 
     var TestComponent = React.createClass({
-      getInitialState: function () {
+      getInitialState: function() {
         return {
           num: 100
         };
       },
       template: nj.compileH(tmpl, 'tmpl1'),
-      onClick: function () {
-        this.setState({ num: Date.now() }, function () {
+      onClick: function() {
+        this.setState({ num: Date.now() }, function() {
           console.log('total:' + (Date.now() - start));
         });
       },
-      render: function () {
+      render: function() {
         start = Date.now();
         var params = {
           arr: this.props.arr,
@@ -380,7 +376,7 @@ describe('test speed', function () {
             'data-b': 2
           },
           styles: {
-           color: 'blue'
+            color: 'blue'
           },
           //styles: 'color:blue',
           div: 'div',
@@ -393,23 +389,62 @@ describe('test speed', function () {
           // }
         };
 
-        var ret = this.template(params);
+        var ret = nj `
+        <{div} id="{num}_100">
+          <#each {arr}>
+            <span class=test_{@index}
+                  style={../styles}
+                  onClick={../onClick}>
+              test_{../num}
+              <#each {../list2}>
+                <div key={@index}>
+                  <#props>
+                    <#if {../@index | five}>
+                      <@name>five</@name>
+                    </#if>
+                  </#props>
+                  <span>span{no}</span>
+                  <i>{no}</i>
+                </div>
+              </#each>
+            </span>
+            <#if {@index | five(1)}>
+              <br />
+            <#else />
+              <img />
+            </#if>
+          </#each>
+        </{div}>
+        ` (params);
+
+        //var ret = this.template(params);
         console.log('nj:' + (Date.now() - start));
         return ret;
       }
     });
 
-    var list2 = _.times(100, function (n) {
+    var list2 = _.times(100, function(n) {
       return { no: n + 1 };
     });
 
-    var html = ReactDOMServer.renderToStaticMarkup(React.createElement(TestComponent, {
-      arr: _.times(100, function (n) {
-        return n;
-      }),
-      a: 1,
-      list: [{ no: 1, b: 1 }, { no: 2, b: 0 }, { no: 3, b: 1 }]
-    }));
+    // var html = ReactDOMServer.renderToStaticMarkup(React.createElement(TestComponent, {
+    //   arr: _.times(100, function(n) {
+    //     return n;
+    //   }),
+    //   a: 1,
+    //   list: [{ no: 1, b: 1 }, { no: 2, b: 0 }, { no: 3, b: 1 }]
+    // }));
+
+    var html = ReactDOMServer.renderToStaticMarkup(React.createElement('div', null, _.times(10, (n) => {
+      return React.createElement(TestComponent, {
+        key: n,
+        arr: _.times(100, function(n) {
+          return n;
+        }),
+        a: 1,
+        list: [{ no: 1, b: 1 }, { no: 2, b: 0 }, { no: 3, b: 1 }]
+      })
+    })));
 
     //console.log(JSON.stringify(nj.asts['tmpl1']));
     //console.log(html);
