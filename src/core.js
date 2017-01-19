@@ -9,7 +9,7 @@ nj.components = {};
 nj.asts = {};
 nj.templates = {};
 nj.tmplStrs = {};
-nj.errorTitle = '[NornJ error]';
+nj.errorTitle = '[NornJ]';
 nj.tmplRule = {};
 nj.outputH = false;
 

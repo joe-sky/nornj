@@ -8,7 +8,7 @@
   ReactDOMServer = require('react-dom/server'),
   Handlebars = require('handlebars');
 
-xdescribe('test speed', function() {
+describe('test speed', function() {
   var tmpl = nj `
   <{div} id="{num}_100">
     <#each {arr}>
@@ -70,8 +70,8 @@ xdescribe('test speed', function() {
       _paramsE0['key'] = p2.index;
 
       return p1.h('div', _paramsE0,
-        p1.h('span', null, 'span' + (p1.getData(p2.data, 'no'))),
-        p1.h('i', null, (p1.getData(p2.data, 'no')))
+        p1.h('span', null, 'span' + (p2.getData('no'))),
+        p1.h('i', null, (p2.getData('no')))
       );
     },
     fn5: function(p1, p2, p3, p4) {
@@ -109,24 +109,24 @@ xdescribe('test speed', function() {
       return [
         p1.h('span', {
             'className': 'test_' + (p2.index),
-            'style': p1.styleProps(p1.getData(p2.parent.data, 'styles')),
-            'onClick': p1.getData(p2.parent.data, 'onClick')
-          }, 'test_' + p1.getData(p2.parent.data, 'num'),
-          _expr0.apply(p2, [p1.getData(p2.parent.data, 'list2'), { useString: p1.useString, result: p1.exprRet(p1, p2, p1.fn2, p4), inverse: p1.noop }])
+            'style': p1.styleProps(p2.getData('styles', p2.parent.data)),
+            'onClick': p2.getData('onClick', p2.parent.data)
+          }, 'test_' + p2.getData('num', p2.parent.data),
+          _expr0.apply(p2, [p2.getData('list2', p2.parent.data), { useString: p1.useString, result: p1.exprRet(p1, p2, p1.fn2, p4), inverse: p1.noop }])
         ),
         _expr1.apply(p2, [_value0, { useString: p1.useString, result: p1.exprRet(p1, p2, p1.fn5, p4), inverse: p1.exprRet(p1, p2, p1.fn6, p4) }])
       ];
     },
     main: function(p1, p2, p3, p4) {
-      var _typeRefer0 = p1.getData(p2.data, 'div');
+      var _typeRefer0 = p2.getData('div');
       var _type0 = _typeRefer0 ? _typeRefer0 : 'div';
 
       var _expr0 = p1.exprs['each'];
       p1.throwIf(_expr0, 'each', 'expr');
 
       return p1.h(_type0, {
-        'id': p1.getData(p2.data, 'num') + '_100'
-      }, _expr0.apply(p2, [p1.getData(p2.data, 'arr'), { useString: p1.useString, result: p1.exprRet(p1, p2, p1.fn1, p4), inverse: p1.noop }]));
+        'id': p2.getData('num') + '_100'
+      }, _expr0.apply(p2, [p2.getData('arr'), { useString: p1.useString, result: p1.exprRet(p1, p2, p1.fn1, p4), inverse: p1.noop }]));
     }
   };
 
@@ -389,35 +389,35 @@ xdescribe('test speed', function() {
           // }
         };
 
-        var ret = nj `
-        <{div} id="{num}_100">
-          <#each {arr}>
-            <span class=test_{@index}
-                  style={../styles}
-                  onClick={../onClick}>
-              test_{../num}
-              <#each {../list2}>
-                <div key={@index}>
-                  <#props>
-                    <#if {../@index | five}>
-                      <@name>five</@name>
-                    </#if>
-                  </#props>
-                  <span>span{no}</span>
-                  <i>{no}</i>
-                </div>
-              </#each>
-            </span>
-            <#if {@index | five(1)}>
-              <br />
-            <#else />
-              <img />
-            </#if>
-          </#each>
-        </{div}>
-        ` (params);
+        // var ret = nj `
+        // <{div} id="{num}_100">
+        //   <#each {arr}>
+        //     <span class=test_{@index}
+        //           style={../styles}
+        //           onClick={../onClick}>
+        //       test_{../num}
+        //       <#each {../list2}>
+        //         <div key={@index}>
+        //           <#props>
+        //             <#if {../@index | five}>
+        //               <@name>five</@name>
+        //             </#if>
+        //           </#props>
+        //           <span>span{no}</span>
+        //           <i>{no}</i>
+        //         </div>
+        //       </#each>
+        //     </span>
+        //     <#if {@index | five(1)}>
+        //       <br />
+        //     <#else />
+        //       <img />
+        //     </#if>
+        //   </#each>
+        // </{div}>
+        // ` (params);
 
-        //var ret = this.template(params);
+        var ret = this.template(params);
         console.log('nj:' + (Date.now() - start));
         return ret;
       }
@@ -427,24 +427,24 @@ xdescribe('test speed', function() {
       return { no: n + 1 };
     });
 
-    // var html = ReactDOMServer.renderToStaticMarkup(React.createElement(TestComponent, {
-    //   arr: _.times(100, function(n) {
-    //     return n;
-    //   }),
-    //   a: 1,
-    //   list: [{ no: 1, b: 1 }, { no: 2, b: 0 }, { no: 3, b: 1 }]
-    // }));
+    var html = ReactDOMServer.renderToStaticMarkup(React.createElement(TestComponent, {
+      arr: _.times(100, function(n) {
+        return n;
+      }),
+      a: 1,
+      list: [{ no: 1, b: 1 }, { no: 2, b: 0 }, { no: 3, b: 1 }]
+    }));
 
-    var html = ReactDOMServer.renderToStaticMarkup(React.createElement('div', null, _.times(10, (n) => {
-      return React.createElement(TestComponent, {
-        key: n,
-        arr: _.times(100, function(n) {
-          return n;
-        }),
-        a: 1,
-        list: [{ no: 1, b: 1 }, { no: 2, b: 0 }, { no: 3, b: 1 }]
-      })
-    })));
+    // var html = ReactDOMServer.renderToStaticMarkup(React.createElement('div', null, _.times(10, (n) => {
+    //   return React.createElement(TestComponent, {
+    //     key: n,
+    //     arr: _.times(100, function(n) {
+    //       return n;
+    //     }),
+    //     a: 1,
+    //     list: [{ no: 1, b: 1 }, { no: 2, b: 0 }, { no: 3, b: 1 }]
+    //   })
+    // })));
 
     //console.log(JSON.stringify(nj.asts['tmpl1']));
     //console.log(html);

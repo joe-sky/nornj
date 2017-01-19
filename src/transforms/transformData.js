@@ -1,6 +1,6 @@
 ﻿'use strict';
 
-var nj = require('../core'),
+const nj = require('../core'),
   tools = require('../utils/tools'),
   errorTitle = nj.errorTitle;
 
@@ -12,7 +12,7 @@ function styleProps(obj) {
   }
 
   //参数为字符串
-  var pattern = /([^\s:]+)[\s]?:[\s]?([^\s;]+)[;]?/g,
+  let pattern = /([^\s:]+)[\s]?:[\s]?([^\s;]+)[;]?/g,
     matchArr, ret;
 
   while ((matchArr = pattern.exec(obj))) {
@@ -38,8 +38,12 @@ function styleProps(obj) {
 }
 
 //Get value from multiple datas
-function getData(data, prop) {
+function getData(prop, data) {
   var ret, obj;
+  if (data === undefined) {
+    data = this.data;
+  }
+
   for (var i = 0, l = data.length; i < l; i++) {
     obj = data[i];
     if (obj) {
@@ -64,7 +68,8 @@ function newContext(p2, p3) {
   return {
     data: newData.length ? tools.arrayPush(newData, p2.data) : p2.data,
     parent: p3.fallback ? p2 : p2.parent,
-    index: 'index' in p3 ? p3.index : p2.index
+    index: 'index' in p3 ? p3.index : p2.index,
+    getData
   };
 }
 
@@ -111,7 +116,8 @@ function tmplWrap(configs, main) {
     return main(configs, {
       data: initCtx && initCtx._njData ? tools.arrayPush([initCtx._njData], data) : data,
       parent: initCtx && initCtx._njParent ? initCtx._njParent : null,
-      index: initCtx && initCtx._njIndex ? initCtx._njIndex : null
+      index: initCtx && initCtx._njIndex ? initCtx._njIndex : null,
+      getData
     });
   };
 }
@@ -122,14 +128,13 @@ function template(fns) {
     useString: fns.useString,
     exprs: nj.exprs,
     filters: nj.filters,
-    getData: getData,
     noop: tools.noop,
     lightObj: tools.lightObj,
     throwIf: tools.throwIf,
     warn: tools.warn,
-    newContext: newContext,
-    styleProps: styleProps,
-    exprRet: exprRet
+    newContext,
+    styleProps,
+    exprRet
   };
 
   if (!configs.useString) {

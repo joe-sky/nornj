@@ -87,7 +87,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	nj.asts = {};
 	nj.templates = {};
 	nj.tmplStrs = {};
-	nj.errorTitle = '[NornJ error]';
+	nj.errorTitle = '[NornJ]';
 	nj.tmplRule = {};
 	nj.outputH = false;
 
@@ -736,8 +736,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  //参数为字符串
 	  var pattern = /([^\s:]+)[\s]?:[\s]?([^\s;]+)[;]?/g,
-	      matchArr,
-	      ret;
+	      matchArr = void 0,
+	      ret = void 0;
 
 	  while (matchArr = pattern.exec(obj)) {
 	    var key = matchArr[1],
@@ -762,8 +762,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 	//Get value from multiple datas
-	function getData(data, prop) {
+	function getData(prop, data) {
 	  var ret, obj;
+	  if (data === undefined) {
+	    data = this.data;
+	  }
+
 	  for (var i = 0, l = data.length; i < l; i++) {
 	    obj = data[i];
 	    if (obj) {
@@ -788,7 +792,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return {
 	    data: newData.length ? tools.arrayPush(newData, p2.data) : p2.data,
 	    parent: p3.fallback ? p2 : p2.parent,
-	    index: 'index' in p3 ? p3.index : p2.index
+	    index: 'index' in p3 ? p3.index : p2.index,
+	    getData: getData
 	  };
 	}
 
@@ -835,7 +840,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return main(configs, {
 	      data: initCtx && initCtx._njData ? tools.arrayPush([initCtx._njData], data) : data,
 	      parent: initCtx && initCtx._njParent ? initCtx._njParent : null,
-	      index: initCtx && initCtx._njIndex ? initCtx._njIndex : null
+	      index: initCtx && initCtx._njIndex ? initCtx._njIndex : null,
+	      getData: getData
 	    });
 	  };
 	}
@@ -846,7 +852,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    useString: fns.useString,
 	    exprs: nj.exprs,
 	    filters: nj.filters,
-	    getData: getData,
 	    noop: tools.noop,
 	    lightObj: tools.lightObj,
 	    throwIf: tools.throwIf,
@@ -1848,10 +1853,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 
 	    if (!special && !specialP) {
-	      dataValueStr = 'p1.getData(p2.data, \'' + name + '\')' + jsProp;
+	      dataValueStr = 'p2.getData(\'' + name + '\')' + jsProp;
 	    } else {
 	      var dataStr = 'p2.' + data;
-	      dataValueStr = (special ? dataStr : 'p1.getData(' + dataStr + ', \'' + name + '\')') + jsProp;
+	      dataValueStr = (special ? dataStr : 'p2.getData(\'' + name + '\', ' + dataStr + ')') + jsProp;
 	    }
 	  } else {
 	    dataValueStr = '\'' + obj.prop.name + '\'' + jsProp;
@@ -1873,7 +1878,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        filterStr += '\nvar ' + filterVarStr + ' = ' + globalFilterStr + ';\n';
 	      } else {
 	        //如果全局配置不存在,先从p2.data中获取
-	        filterStr += '\nvar ' + filterVarStr + ' = p1.getData(p2.data, \'' + o.name + '\');\n';
+	        filterStr += '\nvar ' + filterVarStr + ' = p2.getData(\'' + o.name + '\');\n';
 	        filterStr += 'if(!' + filterVarStr + ') ' + filterVarStr + ' = ' + globalFilterStr + ';\n';
 	      }
 	      filterStr += 'if (!' + filterVarStr + ') {\n';
@@ -2013,7 +2018,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      fnStr += '\nvar ' + exprVarStr + ' = ' + globalExprStr + ';\n';
 	    } else {
 	      //如果全局配置不存在,先从p2.data中获取
-	      fnStr += '\nvar ' + exprVarStr + ' = p1.getData(p2.data, \'' + node.expr + '\');\n';
+	      fnStr += '\nvar ' + exprVarStr + ' = p2.getData(\'' + node.expr + '\');\n';
 	      fnStr += 'if(!' + exprVarStr + ') ' + exprVarStr + ' = ' + globalExprStr + ';\n';
 	    }
 
