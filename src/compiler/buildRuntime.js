@@ -177,8 +177,17 @@ function _buildEscape(valueStr, useString, escape) {
     } else {
       return valueStr;
     }
-  } else {  //文本中的特殊字符需转义
+  } else { //文本中的特殊字符需转义
     return replaceSpecialSymbol(valueStr);
+  }
+}
+
+function _replaceQuot(str, fns) {
+  if(fns.useString) {
+    return str.replace(/'/g, "\\'");
+  }
+  else {
+    return str;
   }
 }
 
@@ -188,7 +197,7 @@ function _buildProps(obj, counter, fns) {
     filterStr = '';
 
   if (utils.isString(str0)) { //常规属性
-    valueStr = !obj.isAll && str0 !== '' ? ('\'' + str0 + '\'') : '';
+    valueStr = !obj.isAll && str0 !== '' ? ('\'' + _replaceQuot(str0, fns) + '\'') : '';
     filterStr = '';
 
     utils.each(obj.props, function(o, i) {
@@ -205,7 +214,7 @@ function _buildProps(obj, counter, fns) {
         var strI = obj.strs[i + 1];
         dataValueStr = (str0 === '' && i == 0 ? '' : ' + ') +
           '(' + dataValueStr + ')' +
-          (strI !== '' ? ' + \'' + strI + '\'' : '');
+          (strI !== '' ? ' + \'' + _replaceQuot(strI, fns) + '\'' : '');
       } else if (obj.isTmplPlace) { //执行tmpl块模板函数
         dataValueStr += '.call({ _njParent: p2, _njIndex: p2.index }, p2.data)';
       }
