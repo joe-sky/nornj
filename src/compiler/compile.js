@@ -6,21 +6,21 @@ var nj = require('../core'),
   compileStringTmpl = require('../parser/checkStringElem');
 
 //编译模板并返回转换函数
-function compile(tmpl, tmplName, outputH, fileName) {
+function compile(tmpl, tmplKey, outputH, fileName) {
   if (!tmpl) {
     return;
   }
-  if (utils.isObject(tmplName)) {
-    var params = tmplName;
-    tmplName = params.tmplName;
+  if (utils.isObject(tmplKey)) {
+    var params = tmplKey;
+    tmplKey = params.tmplKey;
     outputH = params.outputH;
     fileName = params.fileName;
   }
 
   //编译模板函数
   var tmplFns;
-  if (tmplName) {
-    tmplFns = nj.templates[tmplName];
+  if (tmplKey) {
+    tmplFns = nj.templates[tmplKey];
   }
   if (!tmplFns) {
     var isObj = utils.isObject(tmpl), fns;
@@ -29,8 +29,8 @@ function compile(tmpl, tmplName, outputH, fileName) {
     }
     else {  //编译AST
       var root;
-      if (tmplName) {
-        root = nj.asts[tmplName];
+      if (tmplKey) {
+        root = nj.asts[tmplKey];
       }
       if (!root) {
         //Can be directly introduced into the AST
@@ -57,8 +57,8 @@ function compile(tmpl, tmplName, outputH, fileName) {
         }
 
         //保存模板AST编译结果到全局集合中
-        if (tmplName) {
-          nj.asts[tmplName] = root;
+        if (tmplKey) {
+          nj.asts[tmplKey] = root;
         }
       }
 
@@ -68,8 +68,8 @@ function compile(tmpl, tmplName, outputH, fileName) {
     tmplFns = utils.template(fns);
 
     //保存模板函数编译结果到全局集合中
-    if (tmplName) {
-      nj.templates[tmplName] = tmplFns;
+    if (tmplKey) {
+      nj.templates[tmplKey] = tmplFns;
     }
   }
 
@@ -86,8 +86,8 @@ function _createAstRoot() {
 }
 
 //编译字面量并返回组件转换函数
-function compileH(tmpl, tmplName) {
-  return compile(tmpl, tmplName, true);
+function compileH(tmpl, tmplKey) {
+  return compile(tmpl, tmplKey, true);
 }
 
 //Precompile template
@@ -103,8 +103,16 @@ function precompile(tmpl, outputH) {
   return buildRuntime(root.content, !outputH);
 }
 
+function _createRender(outputH) {
+  return function(tmpl) {
+    return (outputH ? compileH : compile)(tmpl, tmpl._njKey ? tmpl._njKey : tmpl).apply(null, utils.arraySlice(arguments, 1));
+  };
+}
+
 module.exports = {
   compile,
   compileH,
-  precompile
+  precompile,
+  render: _createRender(),
+  renderH: _createRender(true)
 };

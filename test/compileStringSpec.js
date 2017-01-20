@@ -4,7 +4,7 @@
   compile = require('../src/compiler/compile').compile,
   includeParser = require('../tools/includeParser');
 
-xdescribe('test compile string', function () {
+describe('test compile string', function () {
   beforeAll(function () {
     nj.registerFilter('filter1', function (v, p1) {
       //console.log(this.getData('name1'));
@@ -148,8 +148,9 @@ xdescribe('test compile string', function () {
         </div>
       `;
 
-      var tmplFn = compile(tmpl3, 'tmplString');
-      var html = tmplFn(data);
+      // var tmplFn = compile(tmpl3, 'tmplString');
+      // var html = tmplFn(data);
+      var html = nj.render(tmpl3, data);
 
       //console.log(JSON.stringify(nj.asts['tmplString']));
       console.log(html);

@@ -92,6 +92,7 @@ function compileStringTmpl(tmpl) {
       return nj['compile' + (outputH ? 'H' : '')]({ _njTmpl: ret }, tmplKey).apply(null, arguments);
     };
   tmplFn._njTmpl = ret;
+  tmplFn._njKey = tmplKey;
 
   return tmplFn;
 }
