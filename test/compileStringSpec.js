@@ -93,7 +93,7 @@ describe('test compile string', function () {
           <div id=555>
             <a />
             <input type=button />
-            <#unless {test0}>
+            <#unless {false}>
               <input id="test5" />
             </#unless>
           </div>
@@ -139,8 +139,11 @@ describe('test compile string', function () {
             <input type=button />
             ${nj`
               <#each { list2 }>
+                <#each {list}>
+                  {../../list2.length}{../@index}
+                </#each>
                 <slider {../name3}>
-                  <{../sliderItem.a|tagName} no1={no} checked no='{ ../sliderItem.b }' />
+                  <{../sliderItem.a|tagName} no1={no} no2="{-0.05 | filter2}" checked no='{ ../sliderItem.b }' />
                 </slider>
               </#each>
             `}

@@ -15,8 +15,8 @@ function compiledParams(obj) {
 }
 
 //Get compiled property
-var REGEX_JS_PROP = /([^.[\]()]+)([^\s()]*)/;
-function compiledProp(prop, isString) {
+var REGEX_JS_PROP = /(('[^']+')|("[^"]+")|(-?([0-9][0-9]*)(\.\d+)?)|true|false|null|undefined|([^.[\]()]+))([^\s()]*)/;
+function compiledProp(prop) {
   var ret = tools.lightObj();
 
   //If there are colons in the property,then use filter
@@ -54,7 +54,7 @@ function compiledProp(prop, isString) {
   }
 
   //Extract the parent data path
-  if (!isString && prop.indexOf('../') > -1) {
+  if (prop.indexOf('../') === 0) {
     var n = 0;
     prop = prop.replace(/\.\.\//g, function () {
       n++;
@@ -67,10 +67,10 @@ function compiledProp(prop, isString) {
   //Extract the js property
   prop = REGEX_JS_PROP.exec(prop);
   ret.name = prop[1];
-  ret.jsProp = prop[2];
+  ret.jsProp = prop[8];
 
-  if (isString) {  //Sign the parameter is a pure string.
-    ret.isStr = true;
+  if (!prop[7]) {  //Sign the parameter is a basic type value.
+    ret.isBasicType = true;
   }
 
   return ret;
@@ -94,20 +94,14 @@ function _getReplaceParam(obj, strs) {
     }
 
     var prop = matchArr[3],
-      item = [matchArr[0], matchArr[1], null, false, true];
+      item = [matchArr[0], matchArr[1], null, true];
 
     if (i > 0) {
-      item[4] = false;  //Sign not contain all of placehorder
+      item[3] = false;  //Sign not contain all of placehorder
     }
 
     //Clear parameter at both ends of the space.
     prop = prop.trim();
-
-    //If parameter has quotation marks, this's a pure string parameter.
-    if (_quots.indexOf(prop[0]) > -1) {
-      prop = tools.clearQuot(prop);  //TODO 此处也会去除过滤器参数的引号
-      item[3] = true;
-    }
 
     item[2] = prop;
     ret.push(item);
@@ -131,8 +125,8 @@ function compiledParam(value) {
 
     tools.each(params, function (param) {
       var retP = tools.lightObj();
-      isAll = param[4] ? param[0] === value : false;  //If there are several curly braces, "isAll" must be false.
-      retP.prop = compiledProp(param[2], param[3]);
+      isAll = param[3] ? param[0] === value : false;  //If there are several curly braces, "isAll" must be false.
+      retP.prop = compiledProp(param[2]);
 
       //If parameter's open rules are several,then it need escape.
       retP.escape = param[1].split(tmplRule.startRule).length < 3;

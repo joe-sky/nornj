@@ -138,8 +138,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return arr1;
 	}
 
-	function arraySlice(arrLike) {
-	  return nativeArraySlice.call(arrLike);
+	function arraySlice(arrLike, start) {
+	  return nativeArraySlice.call(arrLike, start);
 	}
 
 	//判断是否为数组
@@ -262,26 +262,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	  console.warn(ret);
 	}
 
-	//create a unique key
-	function uniqueKey(str, hash) {
-	  var len = str.length;
-	  if (len == 0) {
-	    return str;
-	  }
-	  if (hash == null) {
-	    hash = 0;
-	  }
-
-	  var i, chr;
-	  for (i = 0, len = str.length; i < len; i++) {
-	    chr = str.charCodeAt(i);
-	    hash = (hash << 5) - hash + chr;
-	    hash |= 0;
-	  }
-
-	  return hash;
-	}
-
 	//create light weight object
 	function lightObj() {
 	  return Object.create(null);
@@ -351,7 +331,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	  flatten: flatten,
 	  throwIf: throwIf,
 	  assign: assign,
-	  uniqueKey: uniqueKey,
 	  lightObj: lightObj,
 	  arrayPush: arrayPush,
 	  arraySlice: arraySlice,
@@ -567,8 +546,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 	//Get compiled property
-	var REGEX_JS_PROP = /([^.[\]()]+)([^\s()]*)/;
-	function compiledProp(prop, isString) {
+	var REGEX_JS_PROP = /(('[^']+')|("[^"]+")|(-?([0-9][0-9]*)(\.\d+)?)|true|false|null|undefined|([^.[\]()]+))([^\s()]*)/;
+	function compiledProp(prop) {
 	  var ret = tools.lightObj();
 
 	  //If there are colons in the property,then use filter
@@ -606,7 +585,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 
 	  //Extract the parent data path
-	  if (!isString && prop.indexOf('../') > -1) {
+	  if (prop.indexOf('../') === 0) {
 	    var n = 0;
 	    prop = prop.replace(/\.\.\//g, function () {
 	      n++;
@@ -619,11 +598,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	  //Extract the js property
 	  prop = REGEX_JS_PROP.exec(prop);
 	  ret.name = prop[1];
-	  ret.jsProp = prop[2];
+	  ret.jsProp = prop[8];
 
-	  if (isString) {
-	    //Sign the parameter is a pure string.
-	    ret.isStr = true;
+	  if (!prop[7]) {
+	    //Sign the parameter is a basic type value.
+	    ret.isBasicType = true;
 	  }
 
 	  return ret;
@@ -649,20 +628,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 
 	    var prop = matchArr[3],
-	        item = [matchArr[0], matchArr[1], null, false, true];
+	        item = [matchArr[0], matchArr[1], null, true];
 
 	    if (i > 0) {
-	      item[4] = false; //Sign not contain all of placehorder
+	      item[3] = false; //Sign not contain all of placehorder
 	    }
 
 	    //Clear parameter at both ends of the space.
 	    prop = prop.trim();
-
-	    //If parameter has quotation marks, this's a pure string parameter.
-	    if (_quots.indexOf(prop[0]) > -1) {
-	      prop = tools.clearQuot(prop); //TODO 此处也会去除过滤器参数的引号
-	      item[3] = true;
-	    }
 
 	    item[2] = prop;
 	    ret.push(item);
@@ -686,8 +659,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    tools.each(params, function (param) {
 	      var retP = tools.lightObj();
-	      isAll = param[4] ? param[0] === value : false; //If there are several curly braces, "isAll" must be false.
-	      retP.prop = compiledProp(param[2], param[3]);
+	      isAll = param[3] ? param[0] === value : false; //If there are several curly braces, "isAll" must be false.
+	      retP.prop = compiledProp(param[2]);
 
 	      //If parameter's open rules are several,then it need escape.
 	      retP.escape = param[1].split(tmplRule.startRule).length < 3;
@@ -1620,76 +1593,80 @@ return /******/ (function(modules) { // webpackBootstrap
 	    compileStringTmpl = __webpack_require__(16);
 
 	//编译模板并返回转换函数
-	function compile(tmpl, tmplName, outputH, fileName) {
-	  if (!tmpl) {
-	    return;
-	  }
-	  if (utils.isObject(tmplName)) {
-	    var params = tmplName;
-	    tmplName = params.tmplName;
-	    outputH = params.outputH;
-	    fileName = params.fileName;
-	  }
+	function _createCompile(outputH) {
+	  return function (tmpl, tmplKey, fileName) {
+	    if (!tmpl) {
+	      return;
+	    }
+	    if (utils.isObject(tmplKey)) {
+	      var params = tmplKey;
+	      tmplKey = params.tmplKey;
+	      fileName = params.fileName;
+	    }
 
-	  //编译模板函数
-	  var tmplFns;
-	  if (tmplName) {
-	    tmplFns = nj.templates[tmplName];
-	  }
-	  if (!tmplFns) {
-	    var isObj = utils.isObject(tmpl),
-	        fns;
-	    if (isObj && tmpl.main) {
-	      //直接传入预编译模板
-	      fns = tmpl;
-	    } else {
-	      //编译AST
-	      var root;
-	      if (tmplName) {
-	        root = nj.asts[tmplName];
-	      }
-	      if (!root) {
-	        //Can be directly introduced into the AST
-	        if (isObj && tmpl.type === 'nj_root') {
-	          root = tmpl;
-	        } else {
-	          root = _createAstRoot();
+	    //编译模板函数
+	    var tmplFns;
+	    if (tmplKey) {
+	      tmplFns = nj.templates[tmplKey];
+	    }
+	    if (!tmplFns) {
+	      var isObj = utils.isObject(tmpl),
+	          fns;
+	      if (isObj && tmpl.main) {
+	        //直接传入预编译模板
+	        fns = tmpl;
+	      } else {
+	        //编译AST
+	        var root;
+	        if (tmplKey) {
+	          root = nj.asts[tmplKey];
+	        }
+	        if (!root) {
+	          //Can be directly introduced into the AST
+	          if (isObj && tmpl.type === 'nj_root') {
+	            root = tmpl;
+	          } else {
+	            root = _createAstRoot();
 
-	          //Auto transform string template to array
-	          if (utils.isString(tmpl)) {
-	            //Merge all include blocks
-	            var includeParser = nj.includeParser;
-	            if (includeParser) {
-	              tmpl = includeParser(tmpl, fileName);
+	            //Auto transform string template to array
+	            if (utils.isString(tmpl)) {
+	              //Merge all include blocks
+	              var includeParser = nj.includeParser;
+	              if (includeParser) {
+	                tmpl = includeParser(tmpl, fileName);
+	              }
+
+	              tmpl = compileStringTmpl(tmpl);
 	            }
+	            tmpl = tmpl._njTmpl;
 
-	            tmpl = compileStringTmpl(tmpl);
+	            //分析传入参数并转换为节点树对象
+	            utils.checkElem(tmpl, root);
 	          }
-	          tmpl = tmpl._njTmpl;
 
-	          //分析传入参数并转换为节点树对象
-	          utils.checkElem(tmpl, root);
+	          //保存模板AST编译结果到全局集合中
+	          if (tmplKey) {
+	            nj.asts[tmplKey] = root;
+	          }
 	        }
 
-	        //保存模板AST编译结果到全局集合中
-	        if (tmplName) {
-	          nj.asts[tmplName] = root;
-	        }
+	        fns = buildRuntime(root.content, !outputH);
 	      }
 
-	      fns = buildRuntime(root.content, !outputH);
+	      tmplFns = utils.template(fns);
+
+	      //保存模板函数编译结果到全局集合中
+	      if (tmplKey) {
+	        nj.templates[tmplKey] = tmplFns;
+	      }
 	    }
 
-	    tmplFns = utils.template(fns);
-
-	    //保存模板函数编译结果到全局集合中
-	    if (tmplName) {
-	      nj.templates[tmplName] = tmplFns;
-	    }
-	  }
-
-	  return tmplFns.main;
+	    return tmplFns.main;
+	  };
 	}
+
+	var compile = _createCompile(),
+	    compileH = _createCompile(true);
 
 	//Create template root object
 	function _createAstRoot() {
@@ -1698,11 +1675,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	  root.content = [];
 
 	  return root;
-	}
-
-	//编译字面量并返回组件转换函数
-	function compileH(tmpl, tmplName) {
-	  return compile(tmpl, tmplName, true);
 	}
 
 	//Precompile template
@@ -1718,10 +1690,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return buildRuntime(root.content, !outputH);
 	}
 
+	function _createRender(outputH) {
+	  return function (tmpl) {
+	    return (outputH ? compileH : compile)(tmpl, tmpl._njKey ? tmpl._njKey : tmpl).apply(null, utils.arraySlice(arguments, 1));
+	  };
+	}
+
 	module.exports = {
 	  compile: compile,
 	  compileH: compileH,
-	  precompile: precompile
+	  precompile: precompile,
+	  render: _createRender(),
+	  renderH: _createRender(true)
 	};
 
 /***/ },
@@ -1824,7 +1804,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      jsProp = obj.prop.jsProp;
 
 	  //先生成数据值
-	  if (!obj.prop.isStr) {
+	  if (!obj.prop.isBasicType) {
 	    var name = obj.prop.name,
 	        parentNum = obj.prop.parentNum,
 	        data = '',
@@ -1859,7 +1839,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      dataValueStr = (special ? dataStr : 'p2.getData(\'' + name + '\', ' + dataStr + ')') + jsProp;
 	    }
 	  } else {
-	    dataValueStr = '\'' + obj.prop.name + '\'' + jsProp;
+	    dataValueStr = obj.prop.name + jsProp;
 	  }
 
 	  //有过滤器时需要生成"_value"值
@@ -1913,6 +1893,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	}
 
+	function _replaceQuot(str, fns) {
+	  if (fns.useString) {
+	    return str.replace(/'/g, "\\'");
+	  } else {
+	    return str;
+	  }
+	}
+
 	function _buildProps(obj, counter, fns) {
 	  var str0 = obj.strs[0],
 	      valueStr = '',
@@ -1920,7 +1908,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  if (utils.isString(str0)) {
 	    //常规属性
-	    valueStr = !obj.isAll && str0 !== '' ? '\'' + str0 + '\'' : '';
+	    valueStr = !obj.isAll && str0 !== '' ? '\'' + _replaceQuot(str0, fns) + '\'' : '';
 	    filterStr = '';
 
 	    utils.each(obj.props, function (o, i) {
@@ -1935,7 +1923,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	      if (!obj.isAll) {
 	        var strI = obj.strs[i + 1];
-	        dataValueStr = (str0 === '' && i == 0 ? '' : ' + ') + '(' + dataValueStr + ')' + (strI !== '' ? ' + \'' + strI + '\'' : '');
+	        dataValueStr = (str0 === '' && i == 0 ? '' : ' + ') + '(' + dataValueStr + ')' + (strI !== '' ? ' + \'' + _replaceQuot(strI, fns) + '\'' : '');
 	      } else if (obj.isTmplPlace) {
 	        //执行tmpl块模板函数
 	        dataValueStr += '.call({ _njParent: p2, _njIndex: p2.index }, p2.data)';
@@ -2421,6 +2409,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return nj['compile' + (outputH ? 'H' : '')]({ _njTmpl: ret }, tmplKey).apply(null, arguments);
 	  };
 	  tmplFn._njTmpl = ret;
+	  tmplFn._njKey = tmplKey;
 
 	  return tmplFn;
 	}

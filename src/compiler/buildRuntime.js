@@ -92,7 +92,7 @@ function _buildPropData(obj, counter, fns, noEscape) {
     jsProp = obj.prop.jsProp;
 
   //先生成数据值
-  if (!obj.prop.isStr) {
+  if (!obj.prop.isBasicType) {
     var name = obj.prop.name,
       parentNum = obj.prop.parentNum,
       data = '',
@@ -127,7 +127,7 @@ function _buildPropData(obj, counter, fns, noEscape) {
       dataValueStr = (special ? dataStr : 'p2.getData(\'' + name + '\', ' + dataStr + ')') + jsProp;
     }
   } else {
-    dataValueStr = '\'' + obj.prop.name + '\'' + jsProp;
+    dataValueStr = obj.prop.name + jsProp;
   }
 
   //有过滤器时需要生成"_value"值
