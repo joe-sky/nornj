@@ -24,13 +24,12 @@ function _clearRepeat(str) {
   return ret;
 }
 
-module.exports = function (startRule, endRule, exprRule, externalRule, propRule, templateRule) {
+module.exports = function (startRule, endRule, exprRule, propRule, templateRule) {
   if(tools.isObject(startRule)){
     var params = startRule;
     startRule = params.start;
     endRule = params.end;
     exprRule = params.expr;
-    externalRule = params.external;
     propRule = params.prop;
     templateRule = params.template;
   }
@@ -42,9 +41,6 @@ module.exports = function (startRule, endRule, exprRule, externalRule, propRule,
   }
   if (!exprRule) {
     exprRule = '#';
-  }
-  if (!externalRule) {
-    externalRule = '@';
   }
   if (!propRule) {
     propRule = '@';
@@ -58,15 +54,13 @@ module.exports = function (startRule, endRule, exprRule, externalRule, propRule,
     otherChars = allRules.substr(1),
     spChars = '#$@',
     exprRules = _clearRepeat(exprRule + spChars),
-    escapeExprRule = exprRule.replace(/\$/g, '\\$'),
-    escapeExternalRule = externalRule.replace(/\$/g, '\\$');
+    escapeExprRule = exprRule.replace(/\$/g, '\\$');
 
   //Reset the regexs to global list
   tools.assign(nj.tmplRule, {
     startRule,
     endRule,
     exprRule,
-    externalRule,
     propRule,
     xmlOpenTag: _createRegExp('^<([a-z' + firstChar + exprRules + '][-a-z0-9_|./' + otherChars + ']*)[^>]*>$', 'i'),
     openTagParams: _createRegExp('[\\s]+(((' + startRule + '){1,2}([^' + allRules + ']+)(' + endRule + '){1,2})|[^\\s=>]+)(=((\'[^\']+\')|("[^"]+")|([^"\'\\s]+)))?', 'g'),
@@ -78,10 +72,6 @@ module.exports = function (startRule, endRule, exprRule, externalRule, propRule,
     },
     checkElem: function() {
       return _createRegExp('([^>]*)(<([a-z' + firstChar + '/' + exprRules + '!][-a-z0-9_|.' + allRules + exprRules + ']*)([^>]*)>)([^<]*)', 'ig');
-    },
-    externalSplit: _createRegExp(escapeExternalRule + '\\{[^{}]*(?:\\{[^' + externalRule + ']*\\})*[^{}]*\\}'),
-    external: function() {
-      return _createRegExp(escapeExternalRule + '\\{([^{}]*(\\{[^' + externalRule + ']*\\})*[^{}]*)\\}', 'g');
     },
     expr: _createRegExp('^' + escapeExprRule + '([^\\s]+)', 'i'),
     include: function() {

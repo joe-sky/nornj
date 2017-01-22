@@ -4,8 +4,8 @@ var nj = require('../core'),
   tools = require('../utils/tools'),
   tranElem = require('../transforms/transformElement'),
   tmplRule = nj.tmplRule,
-  shim = require('../utils/shim'),
-  tmplStrs = nj.tmplStrs;
+  tmplStrs = nj.tmplStrs,
+  SPLIT_FLAG = '_nj_split';
 
 //Compile string template
 function compileStringTmpl(tmpl) {
@@ -14,65 +14,24 @@ function compileStringTmpl(tmpl) {
 
   if (!ret) { //If the cache already has template data, direct return the template.
     var isStr = tools.isString(tmpl),
-      xmls = tmpl,
-      args = arguments,
-      splitNo = 0,
-      params = [],
-      fullXml = '',
-      exArgs;
-
-    if (isStr) {
-      xmls = tmpl.split(tmplRule.externalSplit);
-
-      var pattern = tmplRule.external(),
-        matchArr;
-      exArgs = [];
-      while (matchArr = pattern.exec(tmpl)) {
-        exArgs.push(matchArr[1]);
-      }
-    }
+      xmls = isStr ? [tmpl] : tmpl,
+      l = xmls.length,
+      computedNos = [],
+      fullXml = '';
 
     //Connection xml string
-    var l = xmls.length;
     tools.each(xmls, function(xml, i) {
       var split = '';
       if (i < l - 1) {
         var last = xml.length - 1,
-          useShim = xml[last] === '@',
-          arg, isEx;
+          isComputed = xml[last] === '#';
 
-        if (isStr) {
-          var exArg = exArgs[i],
-            match = exArg.match(/#(\d+)/);
-
-          if (match && match[1] != null) { //分隔符格式为"${#x}", 则按其编号顺序从nj函数参数列表中获取
-            arg = args[parseInt(match[1], 10) + 1];
-          } else {
-            arg = exArg;
-            useShim = isEx = true;
-          }
-        } else {
-          arg = args[i + 1];
+        if (isComputed) {
+          computedNos.push(i);
+          xml = xml.substr(0, last);
         }
 
-        if (!tools.isString(arg) || useShim) {
-          split = '_nj-split' + splitNo + '_';
-
-          //Use the shim function to convert the parameter when the front of it with a "@" mark.
-          if (useShim) {
-            if (isEx) {
-              arg = shim({ _njEx: arg });
-            } else {
-              xml = xml.substr(0, last);
-              arg = shim(arg);
-            }
-          }
-
-          params.push(arg._njTmpl ? arg._njTmpl : arg);
-          splitNo++;
-        } else {
-          split = arg;
-        }
+        split = tmplRule.startRule + (isComputed ? '#' : '') + SPLIT_FLAG + i + tmplRule.endRule;
       }
 
       fullXml += xml + split;
@@ -81,15 +40,28 @@ function compileStringTmpl(tmpl) {
     fullXml = _clearNotesAndBlank(fullXml);
 
     //Resolve string to element
-    ret = _checkStringElem(fullXml, params);
+    ret = _checkStringElem(fullXml);
+    ret._njParamCount = l - 1;
+    ret._njComputedNos = computedNos;
 
     //Save to the cache
     tmplStrs[tmplKey] = ret;
   }
 
+  var params,
+    args = arguments,
+    paramCount = ret._njParamCount;
+  if (paramCount > 0) {
+    params = {};
+
+    for (var i = 0; i < paramCount; i++) {
+      params[SPLIT_FLAG + i] = args[i + 1];
+    }
+  }
+
   var outputH = this ? this.outputH : false,
     tmplFn = function() {
-      return nj['compile' + (outputH ? 'H' : '')]({ _njTmpl: ret }, tmplKey).apply(null, arguments);
+      return nj['compile' + (outputH ? 'H' : '')]({ _njTmpl: ret }, tmplKey).apply(this, params ? tools.arrayPush([params], arguments) : arguments);
     };
   tmplFn._njTmpl = ret;
   tmplFn._njKey = tmplKey;
@@ -98,7 +70,7 @@ function compileStringTmpl(tmpl) {
 }
 
 //Resolve string to element
-function _checkStringElem(xml, params) {
+function _checkStringElem(xml) {
   var root = [],
     current = {
       elem: root,
@@ -119,7 +91,7 @@ function _checkStringElem(xml, params) {
     //Text before tag
     if (textBefore && textBefore !== '\n') {
       textBefore = _formatText(textBefore);
-      _setText(textBefore, current.elem, params);
+      _setText(textBefore, current.elem);
     }
 
     //Element tag
@@ -129,7 +101,7 @@ function _checkStringElem(xml, params) {
           current = current.parent;
         }
       } else if (elem[elem.length - 2] === '/') { //Self close tag
-        _setSelfCloseElem(elem, elemName, elemParams, current.elem, params);
+        _setSelfCloseElem(elem, elemName, elemParams, current.elem);
       } else { //Open tag
         parent = current;
         current = {
@@ -139,14 +111,14 @@ function _checkStringElem(xml, params) {
         };
 
         parent.elem.push(current.elem);
-        _setElem(elem, elemName, elemParams, current.elem, params);
+        _setElem(elem, elemName, elemParams, current.elem);
       }
     }
 
     //Text after tag
     if (textAfter && textAfter !== '\n') {
       textAfter = _formatText(textAfter);
-      _setText(textAfter, current.elem, params);
+      _setText(textAfter, current.elem);
     }
   }
 
@@ -162,14 +134,14 @@ function _formatText(str) {
 }
 
 //Set element node
-function _setElem(elem, elemName, elemParams, elemArr, params, bySelfClose) {
+function _setElem(elem, elemName, elemParams, elemArr, bySelfClose) {
   var ret, paramsExpr;
   if (elemName[0] === tmplRule.exprRule) {
     ret = elem.substring(1, elem.length - 1);
   } else if (elemName.indexOf(tmplRule.propRule) === 0) {
     ret = tmplRule.exprRule + 'prop {\'' + elemName.substr(tmplRule.propRule.length) + '\'}' + elemParams;
   } else {
-    var retS = _getSplitParams(elem, params);
+    var retS = _getSplitParams(elem);
     ret = retS.elem;
     paramsExpr = retS.params;
   }
@@ -190,21 +162,11 @@ function _setElem(elem, elemName, elemParams, elemArr, params, bySelfClose) {
 }
 
 //Extract split parameters
-function _getSplitParams(elem, params) {
+function _getSplitParams(elem) {
   var exprRule = tmplRule.exprRule,
     startRule = tmplRule.startRule,
     endRule = tmplRule.endRule,
     paramsExpr;
-
-  //Replace the parameter like "prop=_nj-split0_".
-  elem = elem.replace(/([^\s={}>]+)=['"]?_nj-split(\d+)_['"]?/g, function(all, key, no) {
-    if (!paramsExpr) {
-      paramsExpr = [exprRule + 'params'];
-    }
-
-    paramsExpr.push([exprRule + "param " + startRule + "'" + key + "'" + endRule, params[no]]);
-    return '';
-  });
 
   //Replace the parameter like "{...props}".
   elem = elem.replace(tmplRule.spreadProp, function(all, begin, prop) {
@@ -225,38 +187,17 @@ function _getSplitParams(elem, params) {
 }
 
 //Set self close element node
-function _setSelfCloseElem(elem, elemName, elemParams, elemArr, params) {
+function _setSelfCloseElem(elem, elemName, elemParams, elemArr) {
   if (elemName === tmplRule.exprRule + 'else') {
     elemArr.push(elem.substr(1, 5));
   } else {
-    _setElem(elem, elemName, elemParams, elemArr, params, true);
+    _setElem(elem, elemName, elemParams, elemArr, true);
   }
 }
 
 //Set text node
-function _setText(text, elemArr, params) {
-  var pattern = /_nj-split(\d+)_/g,
-    matchArr,
-    splitNos = [];
-
-  while ((matchArr = pattern.exec(text))) {
-    splitNos.push(matchArr[1]);
-  }
-
-  if (splitNos.length) {
-    tools.each(text.split(/_nj-split(?:\d+)_/), function(t) {
-      if (t !== '') {
-        elemArr.push(t);
-      }
-
-      var no = splitNos.shift();
-      if (no != null) {
-        elemArr.push(params[no]);
-      }
-    }, false, true);
-  } else {
-    elemArr.push(text);
-  }
+function _setText(text, elemArr) {
+  elemArr.push(text);
 }
 
 module.exports = compileStringTmpl;

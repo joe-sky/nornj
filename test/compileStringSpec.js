@@ -23,7 +23,7 @@ describe('test compile string', function () {
   });
 
   describe('compile string template to html', function () {
-    it('test template string', function () {
+    xit('test template string', function () {
       let s = Date.now();
 
       // const tmpl1 = nj`
@@ -100,17 +100,15 @@ describe('test compile string', function () {
         </div>
       `;
 
-      var tmpl2 = nj(`
+      var tmpl2 = `
         <div name1=../111>
-          <form-item wrapperCol="@{[
-            { span: 22, offset: { a: 1 }}, 100
-          ]}">
+          <form-item wrapperCol="{'[1, 2]'}">
           <span>
             <img />
-            sky:{name},{ id | filter2(1, 2) }@{{a:1}}end
+            sky:{name},{ id | filter2(1, 2) }{'[1]'}end
           </span>
         </div>
-      `);
+      `;
 
       var tmpl3 = nj`
         <div class="{id} {name3}" {name3} { ...props} name={name1} autofocus name1={a.c.d} name2="{a.e | prop('f') | prop('g')}" a="/%'aaa'%/">
@@ -151,9 +149,22 @@ describe('test compile string', function () {
         </div>
       `;
 
+      var tmplTest = nj`
+      <#each { list2 }>
+        <#each {list}>
+          {../../list2.length}split{../@index}
+        </#each>
+        <slider {../name3}>
+          #${nj`<div>{../name3}111</div>`}
+          <{../sliderItem.a|tagName} no1={no} no2="{-0.05 | filter2}" checked no='{ ../sliderItem.b }' />
+        </slider>
+      </#each>
+      `;
+
       // var tmplFn = compile(tmpl3, 'tmplString');
       // var html = tmplFn(data);
-      var html = nj.render(tmpl3, data);
+      //var html = nj.render(tmplTest, data);
+      var html = tmplTest.apply(null, data);
 
       //console.log(JSON.stringify(nj.asts['tmplString']));
       console.log(html);

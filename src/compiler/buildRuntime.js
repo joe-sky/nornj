@@ -216,7 +216,7 @@ function _buildProps(obj, counter, fns) {
           '(' + dataValueStr + ')' +
           (strI !== '' ? ' + \'' + _replaceQuot(strI, fns) + '\'' : '');
       } else if (obj.isTmplPlace) { //执行tmpl块模板函数
-        dataValueStr += '.call({ _njParent: p2, _njIndex: p2.index }, p2.data)';
+        dataValueStr += '.call({ _njData: p2.data, _njParent: p2, _njIndex: p2.index })';
       }
 
       valueStr += dataValueStr;
@@ -232,17 +232,15 @@ function _buildProps(obj, counter, fns) {
       } else {
         valueStr += '  length: ' + v;
       }
-      if (i < l - 1) {
-        valueStr += ',';
+
+      valueStr += ',\n';
+      if (i === l - 1) {  //传递上下文参数
+        valueStr += '  _njData: p2.data,\n  _njParent: p2,\n  _njIndex: p2.index\n';
       }
-      valueStr += '\n';
     }, false, false);
     valueStr += '}';
   } else if (utils.isObject(str0) && str0._njEx) {
     valueStr = str0._njEx;
-  } else { //非字符串值
-    //The "_njShim" property is used to distinguish whether the incoming is an normal array.
-    valueStr = JSON.stringify(str0._njShim ? str0._njShim : str0);
   }
 
   if (filterStr === '') {

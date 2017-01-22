@@ -11,6 +11,11 @@
 xdescribe('test speed', function() {
   var tmpl = nj `
   <{div} id="{num}_100">
+    <TestComp2>
+      <#tmpl>
+        <span>{no}</span>
+      </#tmpl>
+    </TestComp2>
     <#each {arr}>
       <span class=test_{@index}
             style={../styles}
@@ -134,7 +139,7 @@ xdescribe('test speed', function() {
   <{div} id="{num}_100">{...props}
     &nbsp;1&gt;2
     <#each {arr}>
-      <TestComp id=@${'false'}>
+      <TestComp id={'false'}>
         <#tmpl>
           <span>{text}</span>
         </#tmpl>
@@ -351,6 +356,22 @@ xdescribe('test speed', function() {
       }
     }));
 
+    nj.registerComponent('TestComp2', React.createClass({
+      render: function() {
+        return nj`
+        <div>
+          {tmpl}
+          <br />
+          {#tmplFn}
+        </div>
+        `({
+          tmpl: this.props.tmpls[0]({ no: 5001 }),
+          tmplFn: this.props.tmpls[0],
+          no: 5002
+        });
+      }
+    }));
+
     var TestComponent = React.createClass({
       getInitialState: function() {
         return {
@@ -423,12 +444,12 @@ xdescribe('test speed', function() {
       }
     });
 
-    var list2 = _.times(100, function(n) {
+    var list2 = _.times(5, function(n) {
       return { no: n + 1 };
     });
 
     var html = ReactDOMServer.renderToStaticMarkup(React.createElement(TestComponent, {
-      arr: _.times(100, function(n) {
+      arr: _.times(2, function(n) {
         return n;
       }),
       a: 1,
@@ -447,7 +468,7 @@ xdescribe('test speed', function() {
     // })));
 
     //console.log(JSON.stringify(nj.asts['tmpl1']));
-    //console.log(html);
+    console.log(html);
     expect(html).toBeTruthy();
   });
 });

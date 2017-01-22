@@ -109,12 +109,11 @@ function exprRet(p1, p2, fn, p4) {
 //构建可运行的模板函数
 function tmplWrap(configs, main) {
   return function() {
-    var args = arguments,
-      initCtx = this,
-      data = !tools.isArray(args[0]) ? tools.arraySlice(args) : args[0];
+    var initCtx = this,
+      data = tools.arraySlice(arguments);
 
     return main(configs, {
-      data: initCtx && initCtx._njData ? tools.arrayPush([initCtx._njData], data) : data,
+      data: initCtx && initCtx._njData ? tools.arrayPush(data, initCtx._njData) : data,
       parent: initCtx && initCtx._njParent ? initCtx._njParent : null,
       index: initCtx && initCtx._njIndex ? initCtx._njIndex : null,
       getData

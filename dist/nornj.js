@@ -60,8 +60,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    utils = __webpack_require__(2),
 	    compiler = __webpack_require__(13),
 	    compileStringTmpl = __webpack_require__(16),
-	    tmplTag = __webpack_require__(18),
-	    config = __webpack_require__(19);
+	    tmplTag = __webpack_require__(17),
+	    config = __webpack_require__(18);
 
 	nj.compileStringTmpl = compileStringTmpl;
 	nj.config = config;
@@ -806,12 +806,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	//构建可运行的模板函数
 	function tmplWrap(configs, main) {
 	  return function () {
-	    var args = arguments,
-	        initCtx = this,
-	        data = !tools.isArray(args[0]) ? tools.arraySlice(args) : args[0];
+	    var initCtx = this,
+	        data = tools.arraySlice(arguments);
 
 	    return main(configs, {
-	      data: initCtx && initCtx._njData ? tools.arrayPush([initCtx._njData], data) : data,
+	      data: initCtx && initCtx._njData ? tools.arrayPush(data, initCtx._njData) : data,
 	      parent: initCtx && initCtx._njParent ? initCtx._njParent : null,
 	      index: initCtx && initCtx._njIndex ? initCtx._njIndex : null,
 	      getData: getData
@@ -915,11 +914,6 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  if (!tools.isArray(obj)) {
 	    //判断是否为文本节点
-	    if (tools.isObject(obj) && '_njShim' in obj && !tools.isArray(obj._njShim)) {
-	      //Get the shim value
-	      obj = obj._njShim;
-	    }
-
 	    node.type = 'nj_plaintext';
 	    node.content = [tranParam.compiledParam(obj)];
 	    parent[parentContent].push(node);
@@ -1514,13 +1508,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return ret;
 	}
 
-	module.exports = function (startRule, endRule, exprRule, externalRule, propRule, templateRule) {
+	module.exports = function (startRule, endRule, exprRule, propRule, templateRule) {
 	  if (tools.isObject(startRule)) {
 	    var params = startRule;
 	    startRule = params.start;
 	    endRule = params.end;
 	    exprRule = params.expr;
-	    externalRule = params.external;
 	    propRule = params.prop;
 	    templateRule = params.template;
 	  }
@@ -1532,9 +1525,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	  if (!exprRule) {
 	    exprRule = '#';
-	  }
-	  if (!externalRule) {
-	    externalRule = '@';
 	  }
 	  if (!propRule) {
 	    propRule = '@';
@@ -1548,15 +1538,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	      otherChars = allRules.substr(1),
 	      spChars = '#$@',
 	      exprRules = _clearRepeat(exprRule + spChars),
-	      escapeExprRule = exprRule.replace(/\$/g, '\\$'),
-	      escapeExternalRule = externalRule.replace(/\$/g, '\\$');
+	      escapeExprRule = exprRule.replace(/\$/g, '\\$');
 
 	  //Reset the regexs to global list
 	  tools.assign(nj.tmplRule, {
 	    startRule: startRule,
 	    endRule: endRule,
 	    exprRule: exprRule,
-	    externalRule: externalRule,
 	    propRule: propRule,
 	    xmlOpenTag: _createRegExp('^<([a-z' + firstChar + exprRules + '][-a-z0-9_|./' + otherChars + ']*)[^>]*>$', 'i'),
 	    openTagParams: _createRegExp('[\\s]+(((' + startRule + '){1,2}([^' + allRules + ']+)(' + endRule + '){1,2})|[^\\s=>]+)(=((\'[^\']+\')|("[^"]+")|([^"\'\\s]+)))?', 'g'),
@@ -1568,10 +1556,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    },
 	    checkElem: function checkElem() {
 	      return _createRegExp('([^>]*)(<([a-z' + firstChar + '/' + exprRules + '!][-a-z0-9_|.' + allRules + exprRules + ']*)([^>]*)>)([^<]*)', 'ig');
-	    },
-	    externalSplit: _createRegExp(escapeExternalRule + '\\{[^{}]*(?:\\{[^' + externalRule + ']*\\})*[^{}]*\\}'),
-	    external: function external() {
-	      return _createRegExp(escapeExternalRule + '\\{([^{}]*(\\{[^' + externalRule + ']*\\})*[^{}]*)\\}', 'g');
 	    },
 	    expr: _createRegExp('^' + escapeExprRule + '([^\\s]+)', 'i'),
 	    include: function include() {
@@ -1926,7 +1910,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        dataValueStr = (str0 === '' && i == 0 ? '' : ' + ') + '(' + dataValueStr + ')' + (strI !== '' ? ' + \'' + _replaceQuot(strI, fns) + '\'' : '');
 	      } else if (obj.isTmplPlace) {
 	        //执行tmpl块模板函数
-	        dataValueStr += '.call({ _njParent: p2, _njIndex: p2.index }, p2.data)';
+	        dataValueStr += '.call({ _njData: p2.data, _njParent: p2, _njIndex: p2.index })';
 	      }
 
 	      valueStr += dataValueStr;
@@ -1943,18 +1927,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	      } else {
 	        valueStr += '  length: ' + v;
 	      }
-	      if (i < l - 1) {
-	        valueStr += ',';
+
+	      valueStr += ',\n';
+	      if (i === l - 1) {
+	        //传递上下文参数
+	        valueStr += '  _njData: p2.data,\n  _njParent: p2,\n  _njIndex: p2.index\n';
 	      }
-	      valueStr += '\n';
 	    }, false, false);
 	    valueStr += '}';
 	  } else if (utils.isObject(str0) && str0._njEx) {
 	    valueStr = str0._njEx;
-	  } else {
-	    //非字符串值
-	    //The "_njShim" property is used to distinguish whether the incoming is an normal array.
-	    valueStr = JSON.stringify(str0._njShim ? str0._njShim : str0);
 	  }
 
 	  if (filterStr === '') {
@@ -2317,8 +2299,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    tools = __webpack_require__(3),
 	    tranElem = __webpack_require__(4),
 	    tmplRule = nj.tmplRule,
-	    shim = __webpack_require__(17),
-	    tmplStrs = nj.tmplStrs;
+	    tmplStrs = nj.tmplStrs,
+	    SPLIT_FLAG = '_nj_split';
 
 	//Compile string template
 	function compileStringTmpl(tmpl) {
@@ -2329,67 +2311,24 @@ return /******/ (function(modules) { // webpackBootstrap
 	  if (!ret) {
 	    //If the cache already has template data, direct return the template.
 	    var isStr = tools.isString(tmpl),
-	        xmls = tmpl,
-	        args = arguments,
-	        splitNo = 0,
-	        params = [],
-	        fullXml = '',
-	        exArgs;
-
-	    if (isStr) {
-	      xmls = tmpl.split(tmplRule.externalSplit);
-
-	      var pattern = tmplRule.external(),
-	          matchArr;
-	      exArgs = [];
-	      while (matchArr = pattern.exec(tmpl)) {
-	        exArgs.push(matchArr[1]);
-	      }
-	    }
+	        xmls = isStr ? [tmpl] : tmpl,
+	        l = xmls.length,
+	        computedNos = [],
+	        fullXml = '';
 
 	    //Connection xml string
-	    var l = xmls.length;
 	    tools.each(xmls, function (xml, i) {
 	      var split = '';
 	      if (i < l - 1) {
 	        var last = xml.length - 1,
-	            useShim = xml[last] === '@',
-	            arg,
-	            isEx;
+	            isComputed = xml[last] === '#';
 
-	        if (isStr) {
-	          var exArg = exArgs[i],
-	              match = exArg.match(/#(\d+)/);
-
-	          if (match && match[1] != null) {
-	            //分隔符格式为"${#x}", 则按其编号顺序从nj函数参数列表中获取
-	            arg = args[parseInt(match[1], 10) + 1];
-	          } else {
-	            arg = exArg;
-	            useShim = isEx = true;
-	          }
-	        } else {
-	          arg = args[i + 1];
+	        if (isComputed) {
+	          computedNos.push(i);
+	          xml = xml.substr(0, last);
 	        }
 
-	        if (!tools.isString(arg) || useShim) {
-	          split = '_nj-split' + splitNo + '_';
-
-	          //Use the shim function to convert the parameter when the front of it with a "@" mark.
-	          if (useShim) {
-	            if (isEx) {
-	              arg = shim({ _njEx: arg });
-	            } else {
-	              xml = xml.substr(0, last);
-	              arg = shim(arg);
-	            }
-	          }
-
-	          params.push(arg._njTmpl ? arg._njTmpl : arg);
-	          splitNo++;
-	        } else {
-	          split = arg;
-	        }
+	        split = tmplRule.startRule + (isComputed ? '#' : '') + SPLIT_FLAG + i + tmplRule.endRule;
 	      }
 
 	      fullXml += xml + split;
@@ -2398,15 +2337,28 @@ return /******/ (function(modules) { // webpackBootstrap
 	    fullXml = _clearNotesAndBlank(fullXml);
 
 	    //Resolve string to element
-	    ret = _checkStringElem(fullXml, params);
+	    ret = _checkStringElem(fullXml);
+	    ret._njParamCount = l - 1;
+	    ret._njComputedNos = computedNos;
 
 	    //Save to the cache
 	    tmplStrs[tmplKey] = ret;
 	  }
 
+	  var params,
+	      args = arguments,
+	      paramCount = ret._njParamCount;
+	  if (paramCount > 0) {
+	    params = {};
+
+	    for (var i = 0; i < paramCount; i++) {
+	      params[SPLIT_FLAG + i] = args[i + 1];
+	    }
+	  }
+
 	  var outputH = this ? this.outputH : false,
 	      tmplFn = function tmplFn() {
-	    return nj['compile' + (outputH ? 'H' : '')]({ _njTmpl: ret }, tmplKey).apply(null, arguments);
+	    return nj['compile' + (outputH ? 'H' : '')]({ _njTmpl: ret }, tmplKey).apply(this, params ? tools.arrayPush([params], arguments) : arguments);
 	  };
 	  tmplFn._njTmpl = ret;
 	  tmplFn._njKey = tmplKey;
@@ -2415,7 +2367,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 	//Resolve string to element
-	function _checkStringElem(xml, params) {
+	function _checkStringElem(xml) {
 	  var root = [],
 	      current = {
 	    elem: root,
@@ -2436,7 +2388,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    //Text before tag
 	    if (textBefore && textBefore !== '\n') {
 	      textBefore = _formatText(textBefore);
-	      _setText(textBefore, current.elem, params);
+	      _setText(textBefore, current.elem);
 	    }
 
 	    //Element tag
@@ -2448,7 +2400,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	      } else if (elem[elem.length - 2] === '/') {
 	        //Self close tag
-	        _setSelfCloseElem(elem, elemName, elemParams, current.elem, params);
+	        _setSelfCloseElem(elem, elemName, elemParams, current.elem);
 	      } else {
 	        //Open tag
 	        parent = current;
@@ -2459,14 +2411,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	        };
 
 	        parent.elem.push(current.elem);
-	        _setElem(elem, elemName, elemParams, current.elem, params);
+	        _setElem(elem, elemName, elemParams, current.elem);
 	      }
 	    }
 
 	    //Text after tag
 	    if (textAfter && textAfter !== '\n') {
 	      textAfter = _formatText(textAfter);
-	      _setText(textAfter, current.elem, params);
+	      _setText(textAfter, current.elem);
 	    }
 	  }
 
@@ -2482,14 +2434,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 	//Set element node
-	function _setElem(elem, elemName, elemParams, elemArr, params, bySelfClose) {
+	function _setElem(elem, elemName, elemParams, elemArr, bySelfClose) {
 	  var ret, paramsExpr;
 	  if (elemName[0] === tmplRule.exprRule) {
 	    ret = elem.substring(1, elem.length - 1);
 	  } else if (elemName.indexOf(tmplRule.propRule) === 0) {
 	    ret = tmplRule.exprRule + 'prop {\'' + elemName.substr(tmplRule.propRule.length) + '\'}' + elemParams;
 	  } else {
-	    var retS = _getSplitParams(elem, params);
+	    var retS = _getSplitParams(elem);
 	    ret = retS.elem;
 	    paramsExpr = retS.params;
 	  }
@@ -2510,21 +2462,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 	//Extract split parameters
-	function _getSplitParams(elem, params) {
+	function _getSplitParams(elem) {
 	  var exprRule = tmplRule.exprRule,
 	      startRule = tmplRule.startRule,
 	      endRule = tmplRule.endRule,
 	      paramsExpr;
-
-	  //Replace the parameter like "prop=_nj-split0_".
-	  elem = elem.replace(/([^\s={}>]+)=['"]?_nj-split(\d+)_['"]?/g, function (all, key, no) {
-	    if (!paramsExpr) {
-	      paramsExpr = [exprRule + 'params'];
-	    }
-
-	    paramsExpr.push([exprRule + "param " + startRule + "'" + key + "'" + endRule, params[no]]);
-	    return '';
-	  });
 
 	  //Replace the parameter like "{...props}".
 	  elem = elem.replace(tmplRule.spreadProp, function (all, begin, prop) {
@@ -2545,58 +2487,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 	//Set self close element node
-	function _setSelfCloseElem(elem, elemName, elemParams, elemArr, params) {
+	function _setSelfCloseElem(elem, elemName, elemParams, elemArr) {
 	  if (elemName === tmplRule.exprRule + 'else') {
 	    elemArr.push(elem.substr(1, 5));
 	  } else {
-	    _setElem(elem, elemName, elemParams, elemArr, params, true);
+	    _setElem(elem, elemName, elemParams, elemArr, true);
 	  }
 	}
 
 	//Set text node
-	function _setText(text, elemArr, params) {
-	  var pattern = /_nj-split(\d+)_/g,
-	      matchArr,
-	      splitNos = [];
-
-	  while (matchArr = pattern.exec(text)) {
-	    splitNos.push(matchArr[1]);
-	  }
-
-	  if (splitNos.length) {
-	    tools.each(text.split(/_nj-split(?:\d+)_/), function (t) {
-	      if (t !== '') {
-	        elemArr.push(t);
-	      }
-
-	      var no = splitNos.shift();
-	      if (no != null) {
-	        elemArr.push(params[no]);
-	      }
-	    }, false, true);
-	  } else {
-	    elemArr.push(text);
-	  }
+	function _setText(text, elemArr) {
+	  elemArr.push(text);
 	}
 
 	module.exports = compileStringTmpl;
 
 /***/ },
 /* 17 */
-/***/ function(module, exports) {
-
-	'use strict';
-
-	//Converts any value to the parameter of NornJ template can be parsed.
-
-	module.exports = function (obj) {
-	  return {
-	    _njShim: obj
-	  };
-	};
-
-/***/ },
-/* 18 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -2613,7 +2520,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ },
-/* 19 */
+/* 18 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
