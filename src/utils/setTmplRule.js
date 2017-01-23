@@ -51,6 +51,7 @@ module.exports = function (startRule, endRule, exprRule, propRule, templateRule)
 
   var allRules = _clearRepeat(startRule + endRule),
     firstChar = startRule[0],
+    lastChar = endRule[endRule.length - 1],
     otherChars = allRules.substr(1),
     spChars = '#$@',
     exprRules = _clearRepeat(exprRule + spChars),
@@ -77,6 +78,7 @@ module.exports = function (startRule, endRule, exprRule, propRule, templateRule)
     include: function() {
       return _createRegExp('<' + escapeExprRule + 'include([^>]*)>', 'ig');
     },
-    template: templateRule
+    template: templateRule,
+    newlineSplit: _createRegExp('\\\\n(?![^' + firstChar + lastChar + ']*' + lastChar + ')', 'g'),
   });
 };

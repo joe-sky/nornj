@@ -8,9 +8,28 @@
   ReactDOMServer = require('react-dom/server'),
   Handlebars = require('handlebars');
 
-xdescribe('test speed', function() {
+nj.config({
+  createElement: React.createElement,
+  outputH: true
+});
+
+describe('test speed', function() {
+  var t1 = nj `
+  <img src="t1" />
+  `;
+
+  var t2 = nj `
+  <img src="t2" />
+  `;
+
   var tmpl = nj `
   <{div} id="{num}_100">
+    #${t1}
+    ${[
+      t2(),
+      t2()
+    ]}
+    #${t1}
     <TestComp2>
       <#tmpl>
         <span>{no}</span>
@@ -220,11 +239,6 @@ xdescribe('test speed', function() {
   `;
 
   beforeAll(function() {
-    nj.config({
-      createElement: React.createElement,
-      outputH: true
-    });
-
     nj.registerFilter('five', function(obj) {
       if (obj % 5 == 0) {
         return true;
@@ -347,7 +361,7 @@ xdescribe('test speed', function() {
 
     nj.registerComponent('TestComp', React.createClass({
       render: function() {
-        return nj `<div><#each {arr}>{#../text}</#each></div>` ({
+        return nj `<div><#each {arr}>{../#text}</#each></div>` ({
           text: this.props.tmpls['t2'],
           arr: _.times(2, function(n) {
             return n;
@@ -358,13 +372,13 @@ xdescribe('test speed', function() {
 
     nj.registerComponent('TestComp2', React.createClass({
       render: function() {
-        return nj`
+        return nj `
         <div>
           {tmpl}
           <br />
           {#tmplFn}
         </div>
-        `({
+        ` ({
           tmpl: this.props.tmpls[0]({ no: 5001 }),
           tmplFn: this.props.tmpls[0],
           no: 5002

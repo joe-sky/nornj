@@ -10,7 +10,8 @@ var nj = require('../core'),
 //Compile string template
 function compileStringTmpl(tmpl) {
   var tmplKey = tmpl.toString(), //Get unique key
-    ret = tmplStrs[tmplKey];
+    ret = tmplStrs[tmplKey],
+    outputH = this ? this.outputH : false;
 
   if (!ret) { //If the cache already has template data, direct return the template.
     var isStr = tools.isString(tmpl),
@@ -33,9 +34,9 @@ function compileStringTmpl(tmpl) {
           xml = xml.substr(0, last);
         }
 
-        split = tmplRule.startRule + (isNoEscape ? '' : tmplRule.startRule) 
-          + (isComputed ? '#' : '') + SPLIT_FLAG + i 
-          + tmplRule.endRule + (isNoEscape ? '' : tmplRule.endRule);
+        split = tmplRule.startRule + ((isNoEscape || outputH) ? '' : tmplRule.startRule) +
+          (isComputed ? '#' : '') + SPLIT_FLAG + i +
+          tmplRule.endRule + ((isNoEscape || outputH) ? '' : tmplRule.endRule);
       }
 
       fullXml += xml + split;
@@ -63,10 +64,9 @@ function compileStringTmpl(tmpl) {
     }
   }
 
-  var outputH = this ? this.outputH : false,
-    tmplFn = function() {
-      return nj['compile' + (outputH ? 'H' : '')](tmplFn, tmplKey).apply(this, params ? tools.arrayPush([params], arguments) : arguments);
-    };
+  var tmplFn = function() {
+    return nj['compile' + (outputH ? 'H' : '')](tmplFn, tmplKey).apply(this, params ? tools.arrayPush([params], arguments) : arguments);
+  };
   tmplFn._njTmpl = ret;
   tmplFn._njTmplKey = tmplKey;
   tmplFn._njParams = params;

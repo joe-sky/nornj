@@ -546,7 +546,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 	//Get compiled property
-	var REGEX_JS_PROP = /(('[^']+')|("[^"]+")|(-?([0-9][0-9]*)(\.\d+)?)|true|false|null|undefined|([^.[\]()]+))([^\s()]*)/;
+	var REGEX_JS_PROP = /(('[^']+')|("[^"]+")|(-?([0-9][0-9]*)(\.\d+)?)|true|false|null|undefined|([#]*)([^.[\]()]+))([^\s()]*)/;
+
 	function compiledProp(prop) {
 	  var ret = tools.lightObj();
 
@@ -597,12 +598,16 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  //Extract the js property
 	  prop = REGEX_JS_PROP.exec(prop);
-	  ret.name = prop[1];
-	  ret.jsProp = prop[8];
+	  var hasComputed = prop[7];
+	  ret.name = hasComputed ? prop[8] : prop[1];
+	  ret.jsProp = prop[9];
 
-	  if (!prop[7]) {
+	  if (!prop[8]) {
 	    //Sign the parameter is a basic type value.
 	    ret.isBasicType = true;
+	  }
+	  if (hasComputed) {
+	    ret.isComputed = true;
 	  }
 
 	  return ret;
@@ -610,12 +615,14 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	//Get filter param
 	var REGEX_FILTER_PARAM = /([\w$]+)(\(([^()]+)\))*/;
+
 	function _getFilterParam(obj) {
 	  return REGEX_FILTER_PARAM.exec(obj);
 	}
 
 	//Extract replace parameters
 	var _quots = ['\'', '"'];
+
 	function _getReplaceParam(obj, strs) {
 	  var pattern = tmplRule.replaceParam(),
 	      matchArr,
@@ -671,15 +678,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	  ret.props = props;
 	  ret.strs = strs;
 	  ret.isAll = isAll;
-
-	  //标记为模板函数替换变量
-	  if (isAll) {
-	    var prop = props[0].prop;
-	    if (prop.name.indexOf('#') === 0) {
-	      prop.name = prop.name.substr(1);
-	      ret.isTmplPlace = true;
-	    }
-	  }
 
 	  return ret;
 	}
@@ -907,20 +905,36 @@ return /******/ (function(modules) { // webpackBootstrap
 	    tranElem = __webpack_require__(4),
 	    tmplRule = nj.tmplRule;
 
+	function _plainTextNode(obj, parent, parentContent) {
+	  var node = {};
+	  node.type = 'nj_plaintext';
+	  node.content = [tranParam.compiledParam(obj)];
+	  parent[parentContent].push(node);
+	}
+
 	//检测元素节点
 	function checkElem(obj, parent) {
-	  var node = {},
-	      parentContent = !parent.hasElse ? 'content' : 'contentElse';
+	  var parentContent = !parent.hasElse ? 'content' : 'contentElse';
 
 	  if (!tools.isArray(obj)) {
 	    //判断是否为文本节点
-	    node.type = 'nj_plaintext';
-	    node.content = [tranParam.compiledParam(obj)];
-	    parent[parentContent].push(node);
+	    if (tools.isString(obj)) {
+	      var strs = obj.split(tmplRule.newlineSplit),
+	          lastIndex = strs.length - 1;
+
+	      strs.forEach(function (str, i) {
+	        str = str.trim();
+	        str !== '' && _plainTextNode(str + (i < lastIndex ? '\\n' : ''), parent, parentContent);
+	      });
+	    } else {
+	      _plainTextNode(obj, parent, parentContent);
+	    }
+
 	    return;
 	  }
 
-	  var first = obj[0];
+	  var node = {},
+	      first = obj[0];
 	  if (tools.isString(first)) {
 	    //第一个子节点为字符串
 	    var first = first,
@@ -1535,6 +1549,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  var allRules = _clearRepeat(startRule + endRule),
 	      firstChar = startRule[0],
+	      lastChar = endRule[endRule.length - 1],
 	      otherChars = allRules.substr(1),
 	      spChars = '#$@',
 	      exprRules = _clearRepeat(exprRule + spChars),
@@ -1561,7 +1576,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    include: function include() {
 	      return _createRegExp('<' + escapeExprRule + 'include([^>]*)>', 'ig');
 	    },
-	    template: templateRule
+	    template: templateRule,
+	    newlineSplit: _createRegExp('\\\\n(?![^' + firstChar + lastChar + ']*' + lastChar + ')', 'g')
 	  });
 	};
 
@@ -1784,6 +1800,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return hashStr.length ? '{ _njOpts: true' + hashStr + ' }' : '';
 	}
 
+	var EXEC_COMPUTED = '.call({ _njData: p2.data, _njParent: p2.parent, _njIndex: p2.index })';
 	function _buildPropData(obj, counter, fns, noEscape) {
 	  var dataValueStr,
 	      useString = fns.useString,
@@ -1792,9 +1809,12 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  //先生成数据值
 	  if (!obj.prop.isBasicType) {
-	    var name = obj.prop.name,
-	        parentNum = obj.prop.parentNum,
-	        data = '',
+	    var _obj$prop = obj.prop,
+	        name = _obj$prop.name,
+	        parentNum = _obj$prop.parentNum,
+	        isComputed = _obj$prop.isComputed;
+
+	    var data = '',
 	        special = false,
 	        specialP = false;
 
@@ -1820,10 +1840,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 
 	    if (!special && !specialP) {
-	      dataValueStr = 'p2.getData(\'' + name + '\')' + jsProp;
+	      dataValueStr = 'p2.getData(\'' + name + '\')' + (isComputed ? EXEC_COMPUTED : '') + jsProp;
 	    } else {
 	      var dataStr = 'p2.' + data;
-	      dataValueStr = (special ? dataStr : 'p2.getData(\'' + name + '\', ' + dataStr + ')') + jsProp;
+	      dataValueStr = (special ? dataStr : 'p2.getData(\'' + name + '\', ' + dataStr + ')' + (isComputed ? EXEC_COMPUTED : '')) + jsProp;
 	    }
 	  } else {
 	    dataValueStr = obj.prop.name + jsProp;
@@ -1910,10 +1930,13 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	      if (!obj.isAll) {
 	        var strI = obj.strs[i + 1];
+	        if (!fns.useString && strI.trim() === '\\n') {
+	          //在outputH时如果只包含换行符号则忽略
+	          valueStr += dataValueStr;
+	          return;
+	        }
+
 	        dataValueStr = (str0 === '' && i == 0 ? '' : ' + ') + '(' + dataValueStr + ')' + (strI !== '' ? ' + \'' + _replaceQuot(strI, fns) + '\'' : '');
-	      } else if (obj.isTmplPlace) {
-	        //执行tmpl块模板函数
-	        dataValueStr += '.call({ _njData: p2.data, _njParent: p2, _njIndex: p2.index })';
 	      }
 
 	      valueStr += dataValueStr;
@@ -1934,7 +1957,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      valueStr += ',\n';
 	      if (i === l - 1) {
 	        //传递上下文参数
-	        valueStr += '  _njData: p2.data,\n  _njParent: p2,\n  _njIndex: p2.index\n';
+	        valueStr += '  _njData: p2.data,\n  _njParent: p2.parent,\n  _njIndex: p2.index\n';
 	      }
 	    }, false, false);
 	    valueStr += '}';
@@ -2309,7 +2332,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	function compileStringTmpl(tmpl) {
 	  var tmplKey = tmpl.toString(),
 	      //Get unique key
-	  ret = tmplStrs[tmplKey];
+	  ret = tmplStrs[tmplKey],
+	      outputH = this ? this.outputH : false;
 
 	  if (!ret) {
 	    //If the cache already has template data, direct return the template.
@@ -2333,7 +2357,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	          xml = xml.substr(0, last);
 	        }
 
-	        split = tmplRule.startRule + (isNoEscape ? tmplRule.startRule : '') + (isComputed ? '#' : '') + SPLIT_FLAG + i + tmplRule.endRule + (isNoEscape ? tmplRule.endRule : '');
+	        split = tmplRule.startRule + (isNoEscape || outputH ? '' : tmplRule.startRule) + (isComputed ? '#' : '') + SPLIT_FLAG + i + tmplRule.endRule + (isNoEscape || outputH ? '' : tmplRule.endRule);
 	      }
 
 	      fullXml += xml + split;
@@ -2361,8 +2385,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	  }
 
-	  var outputH = this ? this.outputH : false,
-	      tmplFn = function tmplFn() {
+	  var tmplFn = function tmplFn() {
 	    return nj['compile' + (outputH ? 'H' : '')](tmplFn, tmplKey).apply(this, params ? tools.arrayPush([params], arguments) : arguments);
 	  };
 	  tmplFn._njTmpl = ret;

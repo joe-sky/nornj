@@ -4,7 +4,7 @@
   compile = require('../src/compiler/compile').compile,
   includeParser = require('../tools/includeParser');
 
-describe('test compile string', function () {
+xdescribe('test compile string', function () {
   beforeAll(function () {
     nj.registerFilter('filter1', function (v, p1) {
       //console.log(this.getData('name1'));
@@ -156,17 +156,16 @@ describe('test compile string', function () {
         </#each>
         <slider {../name3}>
           ${nj`<div>111</div>`()}
-          <br />
           #${nj`<div>{../name3}</div>`}
           <{../sliderItem.a|tagName} no1={no} no2="{-0.05 | filter2}" checked no='{ ../sliderItem.b }' />
         </slider>
       </#each>
       `;
 
-      var tmplFn = compile(tmpl3, 'tmplString');
-      var html = tmplFn.apply(null, data);
+      // var tmplFn = compile(tmpl3, 'tmplString');
+      // var html = tmplFn.apply(null, data);
       // var html = nj.render.call(null, tmplTest, data[0], data[1]);
-      //var html = tmplTest.apply(null, data);
+      var html = tmplTest.apply(null, data);
 
       //console.log(JSON.stringify(nj.asts['tmplString']));
       console.log(html);

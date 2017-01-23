@@ -7,7 +7,7 @@ var nj = require('../core'),
 //Get compiled parameters from a object
 function compiledParams(obj) {
   var ret = tools.lightObj();
-  tools.each(obj, function (v, k) {
+  tools.each(obj, function(v, k) {
     ret[k] = compiledParam(v);
   }, false, false);
 
@@ -15,7 +15,8 @@ function compiledParams(obj) {
 }
 
 //Get compiled property
-var REGEX_JS_PROP = /(('[^']+')|("[^"]+")|(-?([0-9][0-9]*)(\.\d+)?)|true|false|null|undefined|([^.[\]()]+))([^\s()]*)/;
+var REGEX_JS_PROP = /(('[^']+')|("[^"]+")|(-?([0-9][0-9]*)(\.\d+)?)|true|false|null|undefined|([#]*)([^.[\]()]+))([^\s()]*)/;
+
 function compiledProp(prop) {
   var ret = tools.lightObj();
 
@@ -24,21 +25,21 @@ function compiledProp(prop) {
     var filters = [],
       filtersTmp;
     filtersTmp = prop.split('|');
-    prop = filtersTmp[0].trim();  //Extract property
+    prop = filtersTmp[0].trim(); //Extract property
 
     filtersTmp = filtersTmp.slice(1);
-    tools.each(filtersTmp, function (filter) {
+    tools.each(filtersTmp, function(filter) {
       var retF = _getFilterParam(filter.trim()),
         filterObj = tools.lightObj(),
-        filterName = retF[1];  //Get filter name
+        filterName = retF[1]; //Get filter name
 
       if (filterName) {
-        var paramsF = retF[3];  //Get filter param
+        var paramsF = retF[3]; //Get filter param
 
         //Multiple params are separated by commas.
         if (paramsF) {
           var params = [];
-          tools.each(paramsF.split(','), function (p) {
+          tools.each(paramsF.split(','), function(p) {
             params[params.length] = tools.clearQuot(p).trim();
           }, false, true);
 
@@ -56,7 +57,7 @@ function compiledProp(prop) {
   //Extract the parent data path
   if (prop.indexOf('../') === 0) {
     var n = 0;
-    prop = prop.replace(/\.\.\//g, function () {
+    prop = prop.replace(/\.\.\//g, function() {
       n++;
       return '';
     });
@@ -66,11 +67,15 @@ function compiledProp(prop) {
 
   //Extract the js property
   prop = REGEX_JS_PROP.exec(prop);
-  ret.name = prop[1];
-  ret.jsProp = prop[8];
+  var hasComputed = prop[7];
+  ret.name = hasComputed ? prop[8] : prop[1];
+  ret.jsProp = prop[9];
 
-  if (!prop[7]) {  //Sign the parameter is a basic type value.
+  if (!prop[8]) { //Sign the parameter is a basic type value.
     ret.isBasicType = true;
+  }
+  if (hasComputed) {
+    ret.isComputed = true;
   }
 
   return ret;
@@ -78,12 +83,14 @@ function compiledProp(prop) {
 
 //Get filter param
 var REGEX_FILTER_PARAM = /([\w$]+)(\(([^()]+)\))*/;
+
 function _getFilterParam(obj) {
   return REGEX_FILTER_PARAM.exec(obj);
 }
 
 //Extract replace parameters
 var _quots = ['\'', '"'];
+
 function _getReplaceParam(obj, strs) {
   var pattern = tmplRule.replaceParam(),
     matchArr, ret, i = 0;
@@ -97,7 +104,7 @@ function _getReplaceParam(obj, strs) {
       item = [matchArr[0], matchArr[1], null, true];
 
     if (i > 0) {
-      item[3] = false;  //Sign not contain all of placehorder
+      item[3] = false; //Sign not contain all of placehorder
     }
 
     //Clear parameter at both ends of the space.
@@ -116,16 +123,16 @@ function compiledParam(value) {
   var ret = tools.lightObj(),
     strs = tools.isString(value) ? value.split(tmplRule.replaceSplit) : [value],
     props = null,
-    isAll = false;  //此处指替换符是否占满整个属性值;若无替换符时为false
+    isAll = false; //此处指替换符是否占满整个属性值;若无替换符时为false
 
   //If have placehorder
   if (strs.length > 1) {
     var params = _getReplaceParam(value, strs);
     props = [];
 
-    tools.each(params, function (param) {
+    tools.each(params, function(param) {
       var retP = tools.lightObj();
-      isAll = param[3] ? param[0] === value : false;  //If there are several curly braces, "isAll" must be false.
+      isAll = param[3] ? param[0] === value : false; //If there are several curly braces, "isAll" must be false.
       retP.prop = compiledProp(param[2]);
 
       //If parameter's open rules are several,then it need escape.
@@ -137,15 +144,6 @@ function compiledParam(value) {
   ret.props = props;
   ret.strs = strs;
   ret.isAll = isAll;
-
-  //标记为模板函数替换变量
-  if (isAll) {
-    var prop = props[0].prop;
-    if (prop.name.indexOf('#') === 0) {
-      prop.name = prop.name.substr(1);
-      ret.isTmplPlace = true;
-    }
-  }
 
   return ret;
 }

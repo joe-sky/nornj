@@ -85,6 +85,7 @@ function _buildOptions(config, node, fns, exprPropsStr, level) {
   return hashStr.length ? '{ _njOpts: true' + hashStr + ' }' : '';
 }
 
+const EXEC_COMPUTED = '.call({ _njData: p2.data, _njParent: p2.parent, _njIndex: p2.index })';
 function _buildPropData(obj, counter, fns, noEscape) {
   var dataValueStr,
     useString = fns.useString,
@@ -93,9 +94,8 @@ function _buildPropData(obj, counter, fns, noEscape) {
 
   //先生成数据值
   if (!obj.prop.isBasicType) {
-    var name = obj.prop.name,
-      parentNum = obj.prop.parentNum,
-      data = '',
+    const { name, parentNum, isComputed } = obj.prop;
+    let data = '',
       special = false,
       specialP = false;
 
@@ -121,10 +121,10 @@ function _buildPropData(obj, counter, fns, noEscape) {
     }
 
     if (!special && !specialP) {
-      dataValueStr = 'p2.getData(\'' + name + '\')' + jsProp;
+      dataValueStr = 'p2.getData(\'' + name + '\')' + (isComputed ? EXEC_COMPUTED : '') + jsProp;
     } else {
       var dataStr = 'p2.' + data;
-      dataValueStr = (special ? dataStr : 'p2.getData(\'' + name + '\', ' + dataStr + ')') + jsProp;
+      dataValueStr = (special ? dataStr : 'p2.getData(\'' + name + '\', ' + dataStr + ')' + (isComputed ? EXEC_COMPUTED : '')) + jsProp;
     }
   } else {
     dataValueStr = obj.prop.name + jsProp;
@@ -212,11 +212,14 @@ function _buildProps(obj, counter, fns) {
 
       if (!obj.isAll) {
         var strI = obj.strs[i + 1];
+        if(!fns.useString && strI.trim() === '\\n') {  //在outputH时如果只包含换行符号则忽略
+          valueStr += dataValueStr;
+          return;
+        }
+
         dataValueStr = (str0 === '' && i == 0 ? '' : ' + ') +
           '(' + dataValueStr + ')' +
           (strI !== '' ? ' + \'' + _replaceQuot(strI, fns) + '\'' : '');
-      } else if (obj.isTmplPlace) { //执行tmpl块模板函数
-        dataValueStr += '.call({ _njData: p2.data, _njParent: p2.parent, _njIndex: p2.index })';
       }
 
       valueStr += dataValueStr;
