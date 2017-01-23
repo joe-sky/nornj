@@ -48,7 +48,7 @@ function getData(prop, data) {
     obj = data[i];
     if (obj) {
       ret = obj[prop];
-      if (ret != null) {
+      if (ret !== undefined) {
         return ret;
       }
     }

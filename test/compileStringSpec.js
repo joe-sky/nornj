@@ -79,7 +79,7 @@ describe('test compile string', function () {
         }
       ];
 
-      var tmpl1 = `
+      var tmpl1 = nj`
         <div name1="../111" class="{ c1 } c0{ '5' | filter1 }{'!'}{ '10' | filter1('1') } c2" id1=666 id2=777 name="my name:{'name'}{name},id:{id},name:{name}" id=test1>
           <span>
             sky:{name},{id}
@@ -100,7 +100,7 @@ describe('test compile string', function () {
         </div>
       `;
 
-      var tmpl2 = `
+      var tmpl2 = nj`
         <div name1=../111>
           <form-item wrapperCol="{'[1, 2]'}">
           <span>
@@ -128,17 +128,17 @@ describe('test compile string', function () {
           <br></br>
           test2
           <span>
-            ${tmpl2}
+            #${tmpl2}
             <img />
             sky:{{ 'name555' }},{ id | filter2 }
             <section>
-            ${tmpl1}
+            ${tmpl1()}
             </section>
             <input type=button />
-            ${nj`
+            #${nj`
               <#each { list2 }>
                 <#each {list}>
-                  {../../list2.length}{../@index}
+                  {../../list2.length}split{../@index}
                 </#each>
                 <slider {../name3}>
                   <{../sliderItem.a|tagName} no1={no} no2="{-0.05 | filter2}" checked no='{ ../sliderItem.b }' />
@@ -155,16 +155,18 @@ describe('test compile string', function () {
           {../../list2.length}split{../@index}
         </#each>
         <slider {../name3}>
-          #${nj`<div>{../name3}111</div>`}
+          ${nj`<div>111</div>`()}
+          <br />
+          #${nj`<div>{../name3}</div>`}
           <{../sliderItem.a|tagName} no1={no} no2="{-0.05 | filter2}" checked no='{ ../sliderItem.b }' />
         </slider>
       </#each>
       `;
 
-      // var tmplFn = compile(tmpl3, 'tmplString');
-      // var html = tmplFn(data);
-      //var html = nj.render(tmplTest, data);
-      var html = tmplTest.apply(null, data);
+      var tmplFn = compile(tmpl3, 'tmplString');
+      var html = tmplFn.apply(null, data);
+      // var html = nj.render.call(null, tmplTest, data[0], data[1]);
+      //var html = tmplTest.apply(null, data);
 
       //console.log(JSON.stringify(nj.asts['tmplString']));
       console.log(html);

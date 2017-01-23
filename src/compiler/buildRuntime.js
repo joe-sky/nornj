@@ -216,7 +216,7 @@ function _buildProps(obj, counter, fns) {
           '(' + dataValueStr + ')' +
           (strI !== '' ? ' + \'' + _replaceQuot(strI, fns) + '\'' : '');
       } else if (obj.isTmplPlace) { //执行tmpl块模板函数
-        dataValueStr += '.call({ _njData: p2.data, _njParent: p2, _njIndex: p2.index })';
+        dataValueStr += '.call({ _njData: p2.data, _njParent: p2.parent, _njIndex: p2.index })';
       }
 
       valueStr += dataValueStr;
@@ -235,7 +235,7 @@ function _buildProps(obj, counter, fns) {
 
       valueStr += ',\n';
       if (i === l - 1) {  //传递上下文参数
-        valueStr += '  _njData: p2.data,\n  _njParent: p2,\n  _njIndex: p2.index\n';
+        valueStr += '  _njData: p2.data,\n  _njParent: p2.parent,\n  _njIndex: p2.index\n';
       }
     }, false, false);
     valueStr += '}';

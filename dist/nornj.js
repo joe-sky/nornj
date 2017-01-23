@@ -745,7 +745,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    obj = data[i];
 	    if (obj) {
 	      ret = obj[prop];
-	      if (ret != null) {
+	      if (ret !== undefined) {
 	        return ret;
 	      }
 	    }
@@ -1583,9 +1583,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	      return;
 	    }
 	    if (utils.isObject(tmplKey)) {
-	      var params = tmplKey;
-	      tmplKey = params.tmplKey;
-	      fileName = params.fileName;
+	      var options = tmplKey;
+	      tmplKey = options.tmplKey;
+	      fileName = options.fileName;
 	    }
 
 	    //编译模板函数
@@ -1622,10 +1622,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	              tmpl = compileStringTmpl(tmpl);
 	            }
-	            tmpl = tmpl._njTmpl;
 
 	            //分析传入参数并转换为节点树对象
-	            utils.checkElem(tmpl, root);
+	            utils.checkElem(tmpl._njTmpl, root);
 	          }
 
 	          //保存模板AST编译结果到全局集合中
@@ -1645,7 +1644,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }
 	    }
 
-	    return tmplFns.main;
+	    return tmpl._njParams ? function () {
+	      return tmplFns.main.apply(this, utils.arrayPush([tmpl._njParams], arguments));
+	    } : tmplFns.main;
 	  };
 	}
 
@@ -1668,15 +1669,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	  if (utils.isString(tmpl)) {
 	    tmpl = compileStringTmpl(tmpl);
 	  }
-	  tmpl = tmpl._njTmpl;
-	  utils.checkElem(tmpl, root);
+	  utils.checkElem(tmpl._njTmpl, root);
 
 	  return buildRuntime(root.content, !outputH);
 	}
 
 	function _createRender(outputH) {
-	  return function (tmpl) {
-	    return (outputH ? compileH : compile)(tmpl, tmpl._njKey ? tmpl._njKey : tmpl).apply(null, utils.arraySlice(arguments, 1));
+	  return function (tmpl, options) {
+	    return (outputH ? compileH : compile)(tmpl, options ? {
+	      tmplKey: options.tmplKey ? options.tmplKey : tmpl._njTmplKey,
+	      fileName: options.fileName
+	    } : tmpl._njTmplKey).apply(null, utils.arraySlice(arguments, 1));
 	  };
 	}
 
@@ -2321,14 +2324,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var split = '';
 	      if (i < l - 1) {
 	        var last = xml.length - 1,
-	            isComputed = xml[last] === '#';
+	            lastChar = xml[last],
+	            isComputed = lastChar === '#',
+	            isNoEscape = lastChar === '@';
 
-	        if (isComputed) {
-	          computedNos.push(i);
+	        if (isComputed || isNoEscape) {
+	          isComputed && computedNos.push(i);
 	          xml = xml.substr(0, last);
 	        }
 
-	        split = tmplRule.startRule + (isComputed ? '#' : '') + SPLIT_FLAG + i + tmplRule.endRule;
+	        split = tmplRule.startRule + (isNoEscape ? tmplRule.startRule : '') + (isComputed ? '#' : '') + SPLIT_FLAG + i + tmplRule.endRule + (isNoEscape ? tmplRule.endRule : '');
 	      }
 
 	      fullXml += xml + split;
@@ -2358,10 +2363,11 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  var outputH = this ? this.outputH : false,
 	      tmplFn = function tmplFn() {
-	    return nj['compile' + (outputH ? 'H' : '')]({ _njTmpl: ret }, tmplKey).apply(this, params ? tools.arrayPush([params], arguments) : arguments);
+	    return nj['compile' + (outputH ? 'H' : '')](tmplFn, tmplKey).apply(this, params ? tools.arrayPush([params], arguments) : arguments);
 	  };
 	  tmplFn._njTmpl = ret;
-	  tmplFn._njKey = tmplKey;
+	  tmplFn._njTmplKey = tmplKey;
+	  tmplFn._njParams = params;
 
 	  return tmplFn;
 	}
