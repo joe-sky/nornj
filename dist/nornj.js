@@ -454,11 +454,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return ret;
 	}
 
-	//判断块表达式close tag
-	function isExprCloseTag(obj, tagName) {
-	  return tools.isString(obj) && obj === '/' + tmplRule.exprRule + tagName;
-	}
-
 	//判断是否模板元素
 	function isTmpl(obj) {
 	  return obj === 'tmpl';
@@ -518,7 +513,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	  isXmlCloseTag: isXmlCloseTag,
 	  getInsideBraceParam: getInsideBraceParam,
 	  isExpr: isExpr,
-	  isExprCloseTag: isExprCloseTag,
 	  isTmpl: isTmpl,
 	  addTmpl: addTmpl,
 	  isParamsExpr: isParamsExpr,
@@ -706,7 +700,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 
 	  //参数为字符串
-	  var pattern = /([^\s:]+)[\s]?:[\s]?([^\s;]+)[;]?/g,
+	  var pattern = /([^\s:]+)[\s]?:[\s]?([^;]+)[;]?/g,
 	      matchArr = void 0,
 	      ret = void 0;
 
@@ -1002,10 +996,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }, ''));
 	      }
 
-	      if (tranElem.isExprCloseTag(last, exprName)) {
-	        //判断是否有块表达式闭合标签
-	        hasCloseTag = true;
-	      }
 	      isElemNode = true;
 	    }
 
@@ -2004,6 +1994,102 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	}
 
+	function _buildParams(node, fns, counter, useString) {
+	  //节点参数
+	  var params = node.params,
+	      paramsExpr = node.paramsExpr,
+	      paramsStr = '',
+	      _paramsC;
+
+	  if (params || paramsExpr) {
+	    _paramsC = counter._params++;
+	    paramsStr = 'var _params' + _paramsC + ' = ';
+
+	    //params块
+	    if (paramsExpr) {
+	      var _paramsEC = counter._paramsE++;
+	      paramsStr += (useString ? '\'\'' : 'null') + ';\n';
+	      paramsStr += 'var _paramsE' + _paramsEC + ' = {};\n';
+
+	      //params块的子节点
+	      paramsStr += _buildContent(paramsExpr.content, fns, counter, { _paramsE: '_paramsE' + _paramsEC });
+
+	      //合并params块的值
+	      if (!useString) {
+	        paramsStr += '\n_params' + _paramsC + ' = _paramsE' + _paramsEC + ';\n';
+	        //paramsStr += '\np1.assign(_params' + _paramsC + ', _paramsE' + _paramsEC + ');\n';
+	      } else {
+	        var keys = '';
+	        utils.each(params, function (v, k, i, l) {
+	          if (i == 0) {
+	            keys += '{ ';
+	          }
+	          keys += k + ': 1';
+
+	          if (i < l - 1) {
+	            keys += ', ';
+	          } else {
+	            keys += ' }';
+	          }
+	        }, false, false);
+	        paramsStr += '_params' + _paramsC + ' += p1.assignStringProp(_paramsE' + _paramsEC + ', ' + (keys === '' ? 'null' : keys) + ');\n';
+	      }
+	    }
+
+	    if (params) {
+	      var paramKeys = Object.keys(params),
+	          len = paramKeys.length,
+	          filterStr = '';
+
+	      if (!useString && !paramsExpr) {
+	        paramsStr += '{\n';
+	      }
+
+	      utils.each(paramKeys, function (k, i) {
+	        var valueStr = _buildProps(params[k], counter, fns);
+	        if (utils.isObject(valueStr)) {
+	          filterStr += valueStr.filterStr;
+	          valueStr = valueStr.valueStr;
+	        }
+
+	        if (!useString && k === 'style') {
+	          //将style字符串转换为对象
+	          valueStr = 'p1.styleProps(' + valueStr + ')';
+	        }
+
+	        var key = k,
+	            onlyKey = '\'' + key + '\'' === valueStr;
+	        if (!useString) {
+	          key = utils.fixPropName(k);
+	        }
+	        if (!paramsExpr) {
+	          if (!useString) {
+	            paramsStr += '  \'' + key + '\': ' + (!onlyKey ? valueStr : 'true') + (i < len - 1 ? ',\n' : '');
+	          } else {
+	            paramsStr += (i > 0 ? '  + ' : '') + '\' ' + key + (!onlyKey ? '="\' + ' + valueStr + ' + \'"\'' : ' \'') + (i == len - 1 ? ';' : '') + '\n';
+	          }
+	        } else {
+	          if (!useString) {
+	            paramsStr += '_params' + _paramsC + '[\'' + key + '\'] = ' + (!onlyKey ? valueStr : 'true') + ';\n';
+	          } else {
+	            paramsStr += '_params' + _paramsC + ' += \' ' + key + (!onlyKey ? '="\' + ' + valueStr + ' + \'"\'' : ' \'') + ';\n';
+	          }
+	        }
+	      }, false, false);
+
+	      if (!useString && !paramsExpr) {
+	        paramsStr += '\n};\n';
+	      }
+
+	      if (filterStr !== '') {
+	        paramsStr = filterStr + paramsStr;
+	      }
+	    }
+	  }
+
+	  return [paramsStr, _paramsC];
+	}
+
 	function _buildNode(node, fns, counter, retType, level) {
 	  var fnStr = '',
 	      useString = fns.useString;
@@ -2117,96 +2203,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 
 	    //节点参数
-	    var params = node.params,
-	        paramsExpr = node.paramsExpr,
-	        paramsStr = '';
-	    if (params || paramsExpr) {
-	      var _paramsC = counter._params++;
-	      paramsStr = 'var _params' + _paramsC + ' = ';
-
-	      //params块
-	      if (paramsExpr) {
-	        var _paramsEC = counter._paramsE++;
-	        paramsStr += (useString ? '\'\'' : 'null') + ';\n';
-	        paramsStr += 'var _paramsE' + _paramsEC + ' = {};\n';
-
-	        //params块的子节点
-	        paramsStr += _buildContent(paramsExpr.content, fns, counter, { _paramsE: '_paramsE' + _paramsEC });
-
-	        //合并params块的值
-	        if (!useString) {
-	          paramsStr += '\n_params' + _paramsC + ' = _paramsE' + _paramsEC + ';\n';
-	          //paramsStr += '\np1.assign(_params' + _paramsC + ', _paramsE' + _paramsEC + ');\n';
-	        } else {
-	          var keys = '';
-	          utils.each(params, function (v, k, i, l) {
-	            if (i == 0) {
-	              keys += '{ ';
-	            }
-	            keys += k + ': 1';
-
-	            if (i < l - 1) {
-	              keys += ', ';
-	            } else {
-	              keys += ' }';
-	            }
-	          }, false, false);
-	          paramsStr += '_params' + _paramsC + ' += p1.assignStringProp(_paramsE' + _paramsEC + ', ' + (keys === '' ? 'null' : keys) + ');\n';
-	        }
-	      }
-
-	      if (params) {
-	        var paramKeys = Object.keys(params),
-	            len = paramKeys.length,
-	            filterStr = '';
-
-	        if (!useString && !paramsExpr) {
-	          paramsStr += '{\n';
-	        }
-
-	        utils.each(paramKeys, function (k, i) {
-	          var valueStr = _buildProps(params[k], counter, fns);
-	          if (utils.isObject(valueStr)) {
-	            filterStr += valueStr.filterStr;
-	            valueStr = valueStr.valueStr;
-	          }
-
-	          if (!useString && k === 'style') {
-	            //将style字符串转换为对象
-	            valueStr = 'p1.styleProps(' + valueStr + ')';
-	          }
-
-	          var key = k,
-	              onlyKey = '\'' + key + '\'' === valueStr;
-	          if (!useString) {
-	            key = utils.fixPropName(k);
-	          }
-	          if (!paramsExpr) {
-	            if (!useString) {
-	              paramsStr += '  \'' + key + '\': ' + (!onlyKey ? valueStr : 'true') + (i < len - 1 ? ',\n' : '');
-	            } else {
-	              paramsStr += (i > 0 ? '  + ' : '') + '\' ' + key + (!onlyKey ? '="\' + ' + valueStr + ' + \'"\'' : ' \'') + (i == len - 1 ? ';' : '') + '\n';
-	            }
-	          } else {
-	            if (!useString) {
-	              paramsStr += '_params' + _paramsC + '[\'' + key + '\'] = ' + (!onlyKey ? valueStr : 'true') + ';\n';
-	            } else {
-	              paramsStr += '_params' + _paramsC + ' += \' ' + key + (!onlyKey ? '="\' + ' + valueStr + ' + \'"\'' : ' \'') + ';\n';
-	            }
-	          }
-	        }, false, false);
-
-	        if (!useString && !paramsExpr) {
-	          paramsStr += '\n};\n';
-	        }
-
-	        if (filterStr !== '') {
-	          paramsStr = filterStr + paramsStr;
-	        }
-	      }
-
-	      fnStr += paramsStr;
-	    }
+	    var retP = _buildParams(node, fns, counter, useString),
+	        paramsStr = retP[0],
+	        _paramsC = retP[1];
+	    fnStr += paramsStr;
 
 	    var _compParamC, _childrenC;
 	    if (!useString) {

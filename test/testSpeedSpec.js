@@ -8,18 +8,18 @@
   ReactDOMServer = require('react-dom/server'),
   Handlebars = require('handlebars');
 
-nj.config({
-  createElement: React.createElement,
-  outputH: true
-});
+// nj.config({
+//   createElement: React.createElement,
+//   outputH: true
+// });
 
-describe('test speed', function() {
+xdescribe('test speed', function() {
   var t1 = nj `
   <img src="t1" />
   `;
 
   var t2 = nj `
-  <img src="t2" />
+  <img src="t2" style="margin:0 auto" />
   `;
 
   var tmpl = nj `

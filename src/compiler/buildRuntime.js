@@ -182,10 +182,9 @@ function _buildEscape(valueStr, useString, escape) {
 }
 
 function _replaceQuot(str, fns) {
-  if(fns.useString) {
+  if (fns.useString) {
     return str.replace(/'/g, "\\'");
-  }
-  else {
+  } else {
     return str;
   }
 }
@@ -211,7 +210,7 @@ function _buildProps(obj, counter, fns) {
 
       if (!obj.isAll) {
         var strI = obj.strs[i + 1];
-        if(!fns.useString && strI.trim() === '\\n') {  //在outputH时如果只包含换行符号则忽略
+        if (!fns.useString && strI.trim() === '\\n') { //在outputH时如果只包含换行符号则忽略
           valueStr += dataValueStr;
           return;
         }
@@ -236,7 +235,7 @@ function _buildProps(obj, counter, fns) {
       }
 
       valueStr += ',\n';
-      if (i === l - 1) {  //传递上下文参数
+      if (i === l - 1) { //传递上下文参数
         valueStr += '  _njData: p2.data,\n  _njParent: p2.parent,\n  _njIndex: p2.index\n';
       }
     }, false, false);
@@ -253,6 +252,101 @@ function _buildProps(obj, counter, fns) {
       filterStr: filterStr
     };
   }
+}
+
+function _buildParams(node, fns, counter, useString) {
+  //节点参数
+  var params = node.params,
+    paramsExpr = node.paramsExpr,
+    paramsStr = '',
+    _paramsC;
+
+  if (params || paramsExpr) {
+    _paramsC = counter._params++;
+    paramsStr = 'var _params' + _paramsC + ' = ';
+
+    //params块
+    if (paramsExpr) {
+      var _paramsEC = counter._paramsE++;
+      paramsStr += (useString ? '\'\'' : 'null') + ';\n';
+      paramsStr += 'var _paramsE' + _paramsEC + ' = {};\n';
+
+      //params块的子节点
+      paramsStr += _buildContent(paramsExpr.content, fns, counter, { _paramsE: '_paramsE' + _paramsEC });
+
+      //合并params块的值
+      if (!useString) {
+        paramsStr += '\n_params' + _paramsC + ' = _paramsE' + _paramsEC + ';\n';
+        //paramsStr += '\np1.assign(_params' + _paramsC + ', _paramsE' + _paramsEC + ');\n';
+      } else {
+        var keys = '';
+        utils.each(params, function(v, k, i, l) {
+          if (i == 0) {
+            keys += '{ ';
+          }
+          keys += k + ': 1';
+
+          if (i < l - 1) {
+            keys += ', ';
+          } else {
+            keys += ' }';
+          }
+        }, false, false);
+        paramsStr += '_params' + _paramsC + ' += p1.assignStringProp(_paramsE' + _paramsEC + ', ' + (keys === '' ? 'null' : keys) + ');\n';
+      }
+    }
+
+    if (params) {
+      var paramKeys = Object.keys(params),
+        len = paramKeys.length,
+        filterStr = '';
+
+      if (!useString && !paramsExpr) {
+        paramsStr += '{\n';
+      }
+
+      utils.each(paramKeys, function(k, i) {
+        var valueStr = _buildProps(params[k], counter, fns);
+        if (utils.isObject(valueStr)) {
+          filterStr += valueStr.filterStr;
+          valueStr = valueStr.valueStr;
+        }
+
+        if (!useString && k === 'style') { //将style字符串转换为对象
+          valueStr = 'p1.styleProps(' + valueStr + ')';
+        }
+
+        var key = k,
+          onlyKey = ('\'' + key + '\'') === valueStr;
+        if (!useString) {
+          key = utils.fixPropName(k);
+        }
+        if (!paramsExpr) {
+          if (!useString) {
+            paramsStr += '  \'' + key + '\': ' + (!onlyKey ? valueStr : 'true') + (i < len - 1 ? ',\n' : '');
+          } else {
+            paramsStr += (i > 0 ? '  + ' : '') + '\' ' + key + (!onlyKey ? '="\' + ' + valueStr + ' + \'"\'' : ' \'') + (i == len - 1 ? ';' : '') + '\n';
+          }
+        } else {
+          if (!useString) {
+            paramsStr += '_params' + _paramsC + '[\'' + key + '\'] = ' + (!onlyKey ? valueStr : 'true') + ';\n';
+          } else {
+            paramsStr += '_params' + _paramsC + ' += \' ' + key + (!onlyKey ? '="\' + ' + valueStr + ' + \'"\'' : ' \'') + ';\n';
+          }
+        }
+      }, false, false);
+
+      if (!useString && !paramsExpr) {
+        paramsStr += '\n};\n';
+      }
+
+      if (filterStr !== '') {
+        paramsStr = filterStr + paramsStr;
+      }
+    }
+  }
+
+  return [paramsStr, _paramsC];
 }
 
 function _buildNode(node, fns, counter, retType, level) {
@@ -363,95 +457,10 @@ function _buildNode(node, fns, counter, retType, level) {
     }
 
     //节点参数
-    var params = node.params,
-      paramsExpr = node.paramsExpr,
-      paramsStr = '';
-    if (params || paramsExpr) {
-      var _paramsC = counter._params++;
-      paramsStr = 'var _params' + _paramsC + ' = ';
-
-      //params块
-      if (paramsExpr) {
-        var _paramsEC = counter._paramsE++;
-        paramsStr += (useString ? '\'\'' : 'null') + ';\n';
-        paramsStr += 'var _paramsE' + _paramsEC + ' = {};\n';
-
-        //params块的子节点
-        paramsStr += _buildContent(paramsExpr.content, fns, counter, { _paramsE: '_paramsE' + _paramsEC });
-
-        //合并params块的值
-        if (!useString) {
-          paramsStr += '\n_params' + _paramsC + ' = _paramsE' + _paramsEC + ';\n';
-          //paramsStr += '\np1.assign(_params' + _paramsC + ', _paramsE' + _paramsEC + ');\n';
-        } else {
-          var keys = '';
-          utils.each(params, function(v, k, i, l) {
-            if (i == 0) {
-              keys += '{ ';
-            }
-            keys += k + ': 1';
-
-            if (i < l - 1) {
-              keys += ', ';
-            } else {
-              keys += ' }';
-            }
-          }, false, false);
-          paramsStr += '_params' + _paramsC + ' += p1.assignStringProp(_paramsE' + _paramsEC + ', ' + (keys === '' ? 'null' : keys) + ');\n';
-        }
-      }
-
-      if (params) {
-        var paramKeys = Object.keys(params),
-          len = paramKeys.length,
-          filterStr = '';
-
-        if (!useString && !paramsExpr) {
-          paramsStr += '{\n';
-        }
-
-        utils.each(paramKeys, function(k, i) {
-          var valueStr = _buildProps(params[k], counter, fns);
-          if (utils.isObject(valueStr)) {
-            filterStr += valueStr.filterStr;
-            valueStr = valueStr.valueStr;
-          }
-
-          if (!useString && k === 'style') { //将style字符串转换为对象
-            valueStr = 'p1.styleProps(' + valueStr + ')';
-          }
-
-          var key = k,
-            onlyKey = ('\'' + key + '\'') === valueStr;
-          if (!useString) {
-            key = utils.fixPropName(k);
-          }
-          if (!paramsExpr) {
-            if (!useString) {
-              paramsStr += '  \'' + key + '\': ' + (!onlyKey ? valueStr : 'true') + (i < len - 1 ? ',\n' : '');
-            } else {
-              paramsStr += (i > 0 ? '  + ' : '') + '\' ' + key + (!onlyKey ? '="\' + ' + valueStr + ' + \'"\'' : ' \'') + (i == len - 1 ? ';' : '') + '\n';
-            }
-          } else {
-            if (!useString) {
-              paramsStr += '_params' + _paramsC + '[\'' + key + '\'] = ' + (!onlyKey ? valueStr : 'true') + ';\n';
-            } else {
-              paramsStr += '_params' + _paramsC + ' += \' ' + key + (!onlyKey ? '="\' + ' + valueStr + ' + \'"\'' : ' \'') + ';\n';
-            }
-          }
-        }, false, false);
-
-        if (!useString && !paramsExpr) {
-          paramsStr += '\n};\n';
-        }
-
-        if (filterStr !== '') {
-          paramsStr = filterStr + paramsStr;
-        }
-      }
-
-      fnStr += paramsStr;
-    }
+    var retP = _buildParams(node, fns, counter, useString),
+      paramsStr = retP[0],
+      _paramsC = retP[1];
+    fnStr += paramsStr;
 
     var _compParamC, _childrenC;
     if (!useString) { //组件引擎参数

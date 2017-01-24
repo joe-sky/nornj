@@ -105,11 +105,6 @@ function isExpr(obj) {
   return ret;
 }
 
-//判断块表达式close tag
-function isExprCloseTag(obj, tagName) {
-  return tools.isString(obj) && obj === '/' + tmplRule.exprRule + tagName;
-}
-
 //判断是否模板元素
 function isTmpl(obj) {
   return obj === 'tmpl';
@@ -172,7 +167,6 @@ module.exports = {
   isXmlCloseTag,
   getInsideBraceParam,
   isExpr,
-  isExprCloseTag,
   isTmpl,
   addTmpl,
   isParamsExpr,

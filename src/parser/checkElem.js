@@ -75,9 +75,6 @@ function checkElem(obj, parent) {
         }, ''));
       }
 
-      if (tranElem.isExprCloseTag(last, exprName)) { //判断是否有块表达式闭合标签
-        hasCloseTag = true;
-      }
       isElemNode = true;
     }
 

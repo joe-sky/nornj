@@ -12,7 +12,7 @@ function styleProps(obj) {
   }
 
   //参数为字符串
-  let pattern = /([^\s:]+)[\s]?:[\s]?([^\s;]+)[;]?/g,
+  let pattern = /([^\s:]+)[\s]?:[\s]?([^;]+)[;]?/g,
     matchArr, ret;
 
   while ((matchArr = pattern.exec(obj))) {
