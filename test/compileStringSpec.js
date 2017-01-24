@@ -20,6 +20,9 @@ xdescribe('test compile string', function () {
     nj.registerFilter('tagName', function (v) {
       return v + 'Tmp';
     });
+    nj.registerExpr('textExpr', function () {
+      return '<TextExpr />';
+    });
   });
 
   describe('compile string template to html', function () {
@@ -152,10 +155,11 @@ xdescribe('test compile string', function () {
       var tmplTest = nj`
       <#each { list2 }>
         <#each {list}>
-          {../../list2.length}split{../@index}
+          {../../list2.length}${'split1'}{../@index}
         </#each>
+        <#textExpr />
         <slider {../name3}>
-          ${nj`<div>111</div>`()}
+          @${nj`<div>111</div>`()}
           #${nj`<div>{../name3}</div>`}
           <{../sliderItem.a|tagName} no1={no} no2="{-0.05 | filter2}" checked no='{ ../sliderItem.b }' />
         </slider>

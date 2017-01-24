@@ -85,16 +85,15 @@ function _buildOptions(config, node, fns, exprPropsStr, level) {
   return hashStr.length ? '{ _njOpts: true' + hashStr + ' }' : '';
 }
 
-const EXEC_COMPUTED = '.call({ _njData: p2.data, _njParent: p2.parent, _njIndex: p2.index })';
 function _buildPropData(obj, counter, fns, noEscape) {
-  var dataValueStr,
+  let dataValueStr,
     useString = fns.useString,
-    escape = !noEscape ? obj.escape : false,
-    jsProp = obj.prop.jsProp;
+    escape = !noEscape ? obj.escape : false;
+  const { jsProp, isComputed } = obj.prop;
 
   //先生成数据值
   if (!obj.prop.isBasicType) {
-    const { name, parentNum, isComputed } = obj.prop;
+    const { name, parentNum } = obj.prop;
     let data = '',
       special = false,
       specialP = false;
@@ -121,10 +120,10 @@ function _buildPropData(obj, counter, fns, noEscape) {
     }
 
     if (!special && !specialP) {
-      dataValueStr = 'p2.getData(\'' + name + '\')' + (isComputed ? EXEC_COMPUTED : '') + jsProp;
+      dataValueStr = (isComputed ? 'p1.getComputedData(' : '') + 'p2.getData(\'' + name + '\')' + (isComputed ? ', p2)' : '') + jsProp;
     } else {
       var dataStr = 'p2.' + data;
-      dataValueStr = (special ? dataStr : 'p2.getData(\'' + name + '\', ' + dataStr + ')' + (isComputed ? EXEC_COMPUTED : '')) + jsProp;
+      dataValueStr = (special ? dataStr : (isComputed ? 'p1.getComputedData(' : '') + 'p2.getData(\'' + name + '\', ' + dataStr + ')' + (isComputed ? ', p2)' : '')) + jsProp;
     }
   } else {
     dataValueStr = obj.prop.name + jsProp;
@@ -162,11 +161,11 @@ function _buildPropData(obj, counter, fns, noEscape) {
     }, false, true);
 
     return {
-      valueStr: _buildEscape(valueStr, useString, escape),
+      valueStr: _buildEscape(valueStr, useString, isComputed ? false : escape),
       filterStr: filterStr
     };
   } else {
-    return _buildEscape(dataValueStr, useString, escape);
+    return _buildEscape(dataValueStr, useString, isComputed ? false : escape);
   }
 }
 

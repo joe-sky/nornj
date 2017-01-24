@@ -750,6 +750,24 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	}
 
+	function getComputedData(fn, p2) {
+	  if (fn == null) {
+	    return fn;
+	  }
+
+	  if (fn._njTmpl) {
+	    //模板函数
+	    return fn.call({
+	      _njData: p2.data,
+	      _njParent: p2.parent,
+	      _njIndex: p2.index
+	    });
+	  } else {
+	    //普通函数
+	    return fn(p2);
+	  }
+	}
+
 	//Rebuild local variables in the new context
 	function newContext(p2, p3) {
 	  var newData = [];
@@ -827,6 +845,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    throwIf: tools.throwIf,
 	    warn: tools.warn,
 	    newContext: newContext,
+	    getComputedData: getComputedData,
 	    styleProps: styleProps,
 	    exprRet: exprRet
 	  };
@@ -844,6 +863,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    if (k.indexOf('main') === 0) {
 	      //将每个主函数构建为可运行的模板函数
 	      configs[k] = tmplWrap(configs, v);
+	      configs[k]._njTmpl = true;
 	      configs['_' + k] = v;
 	    } else if (k.indexOf('fn') === 0) {
 	      //块表达式函数
@@ -857,6 +877,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = {
 	  newContext: newContext,
 	  getData: getData,
+	  getComputedData: getComputedData,
 	  fixPropName: fixPropName,
 	  styleProps: styleProps,
 	  assignStringProp: assignStringProp,
@@ -1660,9 +1681,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }
 	    }
 
-	    return tmpl._njParams ? function () {
-	      return tmplFns.main.apply(this, utils.arrayPush([tmpl._njParams], arguments));
-	    } : tmplFns.main;
+	    if (tmpl._njParams) {
+	      var tmplFn = function tmplFn() {
+	        return tmplFns.main.apply(this, utils.arrayPush([tmpl._njParams], arguments));
+	      };
+	      tmplFn._njTmpl = true;
+	      return tmplFn;
+	    } else {
+	      return tmplFns.main;
+	    }
 	  };
 	}
 
@@ -1800,19 +1827,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return hashStr.length ? '{ _njOpts: true' + hashStr + ' }' : '';
 	}
 
-	var EXEC_COMPUTED = '.call({ _njData: p2.data, _njParent: p2.parent, _njIndex: p2.index })';
 	function _buildPropData(obj, counter, fns, noEscape) {
-	  var dataValueStr,
+	  var dataValueStr = void 0,
 	      useString = fns.useString,
-	      escape = !noEscape ? obj.escape : false,
-	      jsProp = obj.prop.jsProp;
+	      escape = !noEscape ? obj.escape : false;
+	  var _obj$prop = obj.prop,
+	      jsProp = _obj$prop.jsProp,
+	      isComputed = _obj$prop.isComputed;
 
 	  //先生成数据值
+
 	  if (!obj.prop.isBasicType) {
-	    var _obj$prop = obj.prop,
-	        name = _obj$prop.name,
-	        parentNum = _obj$prop.parentNum,
-	        isComputed = _obj$prop.isComputed;
+	    var _obj$prop2 = obj.prop,
+	        name = _obj$prop2.name,
+	        parentNum = _obj$prop2.parentNum;
 
 	    var data = '',
 	        special = false,
@@ -1840,10 +1868,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 
 	    if (!special && !specialP) {
-	      dataValueStr = 'p2.getData(\'' + name + '\')' + (isComputed ? EXEC_COMPUTED : '') + jsProp;
+	      dataValueStr = (isComputed ? 'p1.getComputedData(' : '') + 'p2.getData(\'' + name + '\')' + (isComputed ? ', p2)' : '') + jsProp;
 	    } else {
 	      var dataStr = 'p2.' + data;
-	      dataValueStr = (special ? dataStr : 'p2.getData(\'' + name + '\', ' + dataStr + ')' + (isComputed ? EXEC_COMPUTED : '')) + jsProp;
+	      dataValueStr = (special ? dataStr : (isComputed ? 'p1.getComputedData(' : '') + 'p2.getData(\'' + name + '\', ' + dataStr + ')' + (isComputed ? ', p2)' : '')) + jsProp;
 	    }
 	  } else {
 	    dataValueStr = obj.prop.name + jsProp;
@@ -1879,11 +1907,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, false, true);
 
 	    return {
-	      valueStr: _buildEscape(valueStr, useString, escape),
+	      valueStr: _buildEscape(valueStr, useString, isComputed ? false : escape),
 	      filterStr: filterStr
 	    };
 	  } else {
-	    return _buildEscape(dataValueStr, useString, escape);
+	    return _buildEscape(dataValueStr, useString, isComputed ? false : escape);
 	  }
 	}
 
@@ -2357,7 +2385,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	          xml = xml.substr(0, last);
 	        }
 
-	        split = tmplRule.startRule + (isNoEscape || outputH ? '' : tmplRule.startRule) + (isComputed ? '#' : '') + SPLIT_FLAG + i + tmplRule.endRule + (isNoEscape || outputH ? '' : tmplRule.endRule);
+	        split = tmplRule.startRule + (isNoEscape ? tmplRule.startRule : '') + (isComputed ? '#' : '') + SPLIT_FLAG + i + tmplRule.endRule + (isNoEscape ? tmplRule.endRule : '');
 	      }
 
 	      fullXml += xml + split;

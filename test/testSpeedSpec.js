@@ -25,11 +25,12 @@ describe('test speed', function() {
   var tmpl = nj `
   <{div} id="{num}_100">
     #${t1}
-    ${[
-      t2(),
-      t2()
-    ]}
-    #${t1}
+    ${t2()}
+    <#each ${[1, 2, 3]}>
+      #${(ctx) => {
+        return ctx.getData('no') + 1;
+      }}
+    </#each>
     <TestComp2>
       <#tmpl>
         <span>{no}</span>

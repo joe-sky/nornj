@@ -55,6 +55,23 @@ function getData(prop, data) {
   }
 }
 
+function getComputedData(fn, p2) {
+  if (fn == null) {
+    return fn;
+  }
+
+  if (fn._njTmpl) {  //模板函数
+    return fn.call({
+      _njData: p2.data,
+      _njParent: p2.parent,
+      _njIndex: p2.index
+    });
+  }
+  else {  //普通函数
+    return fn(p2);
+  }
+}
+
 //Rebuild local variables in the new context
 function newContext(p2, p3) {
   var newData = [];
@@ -132,6 +149,7 @@ function template(fns) {
     throwIf: tools.throwIf,
     warn: tools.warn,
     newContext,
+    getComputedData,
     styleProps,
     exprRet
   };
@@ -148,6 +166,7 @@ function template(fns) {
   tools.each(fns, function(v, k) {
     if (k.indexOf('main') === 0) { //将每个主函数构建为可运行的模板函数
       configs[k] = tmplWrap(configs, v);
+      configs[k]._njTmpl = true;
       configs['_' + k] = v;
     } else if (k.indexOf('fn') === 0) { //块表达式函数
       configs[k] = v;
@@ -160,6 +179,7 @@ function template(fns) {
 module.exports = {
   newContext,
   getData,
+  getComputedData,
   fixPropName,
   styleProps,
   assignStringProp,

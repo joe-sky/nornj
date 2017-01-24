@@ -34,9 +34,9 @@ function compileStringTmpl(tmpl) {
           xml = xml.substr(0, last);
         }
 
-        split = tmplRule.startRule + ((isNoEscape || outputH) ? '' : tmplRule.startRule) +
+        split = tmplRule.startRule + (isNoEscape ? tmplRule.startRule : '') +
           (isComputed ? '#' : '') + SPLIT_FLAG + i +
-          tmplRule.endRule + ((isNoEscape || outputH) ? '' : tmplRule.endRule);
+          tmplRule.endRule + (isNoEscape ? tmplRule.endRule : '');
       }
 
       fullXml += xml + split;

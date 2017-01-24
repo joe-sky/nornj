@@ -71,9 +71,15 @@ function _createCompile(outputH) {
       }
     }
 
-    return tmpl._njParams ? function() {
-      return tmplFns.main.apply(this, utils.arrayPush([tmpl._njParams], arguments));
-    } : tmplFns.main;
+    if (tmpl._njParams) {
+      const tmplFn = function() {
+        return tmplFns.main.apply(this, utils.arrayPush([tmpl._njParams], arguments));
+      };
+      tmplFn._njTmpl = true;
+      return tmplFn;
+    } else {
+      return tmplFns.main;
+    }
   };
 }
 
