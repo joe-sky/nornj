@@ -8,12 +8,12 @@
   ReactDOMServer = require('react-dom/server'),
   Handlebars = require('handlebars');
 
-// nj.config({
-//   createElement: React.createElement,
-//   outputH: true
-// });
+nj.config({
+  createElement: React.createElement,
+  outputH: true
+});
 
-xdescribe('test speed', function() {
+describe('test speed', function() {
   var t1 = nj `
   <img src="t1" />
   `;
@@ -55,8 +55,9 @@ xdescribe('test speed', function() {
       </span>
       <#if {@index | five(1)}>
         <br />
-      <#else />
-        <img />
+        <#else>
+          <img />
+        </#else>
       </#if>
     </#each>
   </{div}>
@@ -185,8 +186,9 @@ xdescribe('test speed', function() {
       </span>
       <#if {@index | five(1) | test}>
         <br />
-      <#else />
-        <img />
+        <#else>
+          <img />
+        </#else>
       </#if>
     </#each>
   </{div}>
@@ -232,8 +234,9 @@ xdescribe('test speed', function() {
       </span>
       <#if {@index | five}>
         <br />
-      <#else />
-        <img />
+        <#else>
+          <img />
+        </#else>
       </#if>
     </#each>
   </{div}>
@@ -446,8 +449,9 @@ xdescribe('test speed', function() {
         //     </span>
         //     <#if {@index | five(1)}>
         //       <br />
-        //     <#else />
-        //       <img />
+        //       <#else>
+        //         <img />
+        //       </#else>
         //     </#if>
         //   </#each>
         // </{div}>

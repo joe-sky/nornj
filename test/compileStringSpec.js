@@ -4,7 +4,7 @@
   compile = require('../src/compiler/compile').compile,
   includeParser = require('../tools/includeParser');
 
-describe('test compile string', function () {
+xdescribe('test compile string', function () {
   beforeAll(function () {
     nj.registerFilter('filter1', function (v, p1) {
       //console.log(this.getData('name1'));
@@ -119,7 +119,7 @@ describe('test compile string', function () {
           <@checked />
           <@data-name10>
             <#each {{list}}>
-              <#if {this}>{ @index | filter2 }<#else />{ '100' | filter1 }</#if>
+              <#if {this}>{ @index | filter2 }<#else>{ '100' | filter1 }</#else></#if>
             </#each>
           </@data-name10>
           <#props>

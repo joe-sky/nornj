@@ -519,9 +519,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	}
 
+	var PROP_EXPRS = ['param', 'prop', 'spread'];
 	function isExprProp(name) {
 	  var config = exprConfig[name];
-	  return config ? config.exprProps : false;
+	  return {
+	    isExprProp: config ? config.exprProps : false,
+	    isProp: PROP_EXPRS.indexOf(name) > -1
+	  };
 	}
 
 	module.exports = {
@@ -712,21 +716,24 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	//Global expression list
 	var exprs = {
-	  'if': function _if(refer, options) {
-	    if (refer === 'false') {
-	      refer = false;
+	  'if': function _if(value, options) {
+	    if (value === 'false') {
+	      value = false;
 	    }
 
-	    var referR, ret;
+	    var valueR, ret;
 	    if (!options.useUnless) {
-	      referR = !!refer;
+	      valueR = !!value;
 	    } else {
-	      referR = !!!refer;
+	      valueR = !!!value;
 	    }
-	    if (referR) {
+	    if (valueR) {
 	      ret = options.result();
 	    } else {
-	      ret = options.inverse();
+	      var props = options.props;
+	      if (props && props['else']) {
+	        ret = props['else']();
+	      }
 	    }
 
 	    if (options.useString && ret == null) {
@@ -736,42 +743,62 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return ret;
 	  },
 
-	  unless: function unless(refer, options) {
-	    options.useUnless = true;
-	    return exprs['if'].call(this, refer, options);
+	  'else': function _else(options) {
+	    options.exprProps['else'] = function () {
+	      return options.result();
+	    };
 	  },
 
-	  each: function each(refer, options) {
+	  unless: function unless(value, options) {
+	    options.useUnless = true;
+	    return exprs['if'].call(this, value, options);
+	  },
+
+	  each: function each(list, options) {
 	    var useString = options.useString,
 	        ret;
 
-	    if (refer) {
-	      if (useString) {
-	        ret = '';
-	      } else {
-	        ret = [];
-	      }
-
-	      tools.each(refer, function (item, index) {
-	        var retI = options.result({
-	          data: item,
-	          index: index,
-	          fallback: true
-	        });
-
+	    if (list) {
+	      (function () {
 	        if (useString) {
-	          ret += retI;
+	          ret = '';
 	        } else {
-	          ret.push(retI);
+	          ret = [];
 	        }
-	      }, false, tools.isArrayLike(refer));
 
-	      //Return null when not use string and result is empty.
-	      if (!useString && !ret.length) {
-	        ret = null;
-	      }
+	        var props = options.props;
+	        tools.each(list, function (item, index) {
+	          var param = {
+	            data: item,
+	            index: index,
+	            fallback: true
+	          };
+
+	          if (props && props.extra) {
+	            param.extra = {
+	              isFirst: index === 0,
+	              isLast: index === list.length - 1
+	            };
+	          }
+
+	          var retI = options.result(param);
+	          if (useString) {
+	            ret += retI;
+	          } else {
+	            ret.push(retI);
+	          }
+	        }, false, tools.isArrayLike(list));
+
+	        //Return null when not use string and result is empty.
+	        if (!useString && !ret.length) {
+	          ret = null;
+	        }
+	      })();
 	    } else {
-	      ret = options.inverse();
+	      var props = options.props;
+	      if (props && props['else']) {
+	        ret = props['else']();
+	      }
 	      if (useString && ret == null) {
 	        ret = '';
 	      }
@@ -813,17 +840,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    tools.each(refer, function (v, k) {
 	      options.exprProps[k] = v;
 	    }, false, false);
-	  },
-
-	  equal: function equal(value1, value2, options) {
-	    var ret;
-	    if (value1 == value2) {
-	      ret = options.result();
-	    } else {
-	      ret = options.inverse();
-	    }
-
-	    return ret;
 	  },
 
 	  'for': function _for(start, end, options) {
@@ -878,6 +894,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	//Expression default config
 	var exprConfig = {
 	  'if': _commonConfig({ newContext: false }),
+	  'else': _commonConfig({ newContext: false, useString: false, exprProps: true }),
 	  unless: _commonConfig({ newContext: false }),
 	  each: _commonConfig(),
 	  param: _commonConfig({ newContext: false, exprProps: true }),
@@ -1174,7 +1191,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	//检测元素节点
 	function checkElem(obj, parent, hasExprProps) {
-	  var parentContent = !parent.hasElse ? 'content' : 'contentElse';
+	  var parentContent = 'content';
 
 	  if (!tools.isArray(obj)) {
 	    //判断是否为文本节点
@@ -1209,7 +1226,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	        hasCloseTag = false,
 	        isTmpl,
 	        isParamsExpr,
-	        isExprProp;
+	        isProp,
+	        isExprProp,
+	        needAddToProps;
 
 	    expr = tranElem.isExpr(first);
 	    if (!expr) {
@@ -1234,15 +1253,31 @@ return /******/ (function(modules) { // webpackBootstrap
 	      isTmpl = tranElem.isTmpl(exprName);
 	      isParamsExpr = tranElem.isParamsExpr(exprName);
 	      if (!isParamsExpr) {
-	        isExprProp = tranElem.isExprProp(exprName);
+	        var exprProp = tranElem.isExprProp(exprName);
+	        isProp = exprProp.isProp;
+	        isExprProp = exprProp.isExprProp;
+	        needAddToProps = isProp ? !hasExprProps : isExprProp;
 	      }
 
 	      node.type = 'nj_expr';
 	      node.expr = exprName;
-	      if (exprParams != null && !isTmpl) {
-	        node.refer = tranParam.compiledParam(exprParams.reduce(function (p, c) {
-	          return p + (c.onlyBrace ? ' ' + c.key : '');
-	        }, ''));
+	      if (exprParams != null && !isTmpl && !isParamsExpr) {
+	        if (!node.args) {
+	          node.args = [];
+	        }
+
+	        tools.each(exprParams, function (param) {
+	          var paramV = tranParam.compiledParam(param.value);
+	          if (param.onlyBrace) {
+	            //提取匿名参数
+	            node.args.push(paramV);
+	          } else {
+	            if (!node.params) {
+	              node.params = tools.lightObj();
+	            }
+	            node.params[param.key] = paramV;
+	          }
+	        }, false, true);
 	      }
 
 	      isElemNode = true;
@@ -1250,8 +1285,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    if (isElemNode) {
 	      //判断是否为元素节点
-	      var elseIndex = -1,
-	          pushContent = true;
+	      var pushContent = true;
 
 	      if (!expr) {
 	        node.type = openTagName;
@@ -1280,7 +1314,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	          node.selfCloseTag = tranElem.verifySelfCloseTag(openTagName);
 	        }
 	      } else {
-	        //为块表达式时判断是否有#else
 	        if (isTmpl) {
 	          //模板元素
 	          pushContent = false;
@@ -1289,10 +1322,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	          tranElem.addTmpl(node, parent, exprParams ? exprParams[0].value : null);
 	        } else if (isParamsExpr) {
 	          pushContent = false;
-	        } else if (isExprProp && !hasExprProps) {
+	        } else if (needAddToProps) {
 	          pushContent = false;
-	        } else {
-	          elseIndex = obj.indexOf(tmplRule.exprRule + 'else');
 	        }
 	      }
 
@@ -1303,23 +1334,13 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	      //取出子节点集合
 	      var end = len - (hasCloseTag ? 1 : 0),
-	          content = obj.slice(1, elseIndex < 0 ? end : elseIndex);
+	          content = obj.slice(1, end);
 	      if (content && content.length) {
-	        checkContentElem(content, node, isParamsExpr || hasExprProps && !isExprProp);
-	      }
-
-	      //如果有#else,则将#else后面的部分存入content_else集合中
-	      if (elseIndex >= 0) {
-	        var contentElse = obj.slice(elseIndex + 1, end);
-	        node.hasElse = true;
-
-	        if (contentElse && contentElse.length) {
-	          checkContentElem(contentElse, node, isParamsExpr || hasExprProps && !isExprProp);
-	        }
+	        checkContentElem(content, node, isParamsExpr || hasExprProps && !isProp);
 	      }
 
 	      //If this is params block, set on the "paramsExpr" property of the parent node.
-	      if (isParamsExpr || isExprProp && !hasExprProps) {
+	      if (isParamsExpr || needAddToProps) {
 	        tranElem.addParamsExpr(node, parent, isExprProp);
 	      }
 	    } else {
@@ -1336,9 +1357,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	function checkContentElem(obj, parent, hasExprProps) {
 	  if (!parent.content) {
 	    parent.content = [];
-	  }
-	  if (parent.hasElse && !parent.contentElse) {
-	    parent.contentElse = [];
 	  }
 
 	  tools.each(obj, function (item) {
@@ -1823,7 +1841,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return no;
 	}
 
-	function _buildOptions(config, node, fns, exprPropsStr, level) {
+	function _buildOptions(config, node, fns, exprPropsStr, level, hashProps) {
 	  var hashStr = '',
 	      noConfig = !config;
 
@@ -1831,13 +1849,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	    hashStr += ', useString: p1.useString';
 	  }
 	  if (node) {
+	    //标签表达式
 	    var newContext = config ? config.newContext : true;
 	    if (noConfig || config.exprProps) {
 	      hashStr += ', exprProps: ' + exprPropsStr;
 	    }
 
 	    hashStr += ', result: ' + (node.content ? 'p1.exprRet(p1, p2, p1.fn' + _buildFn(node.content, fns, ++fns._no, newContext, level) + ', ' + exprPropsStr + ')' : 'p1.noop');
-	    hashStr += ', inverse: ' + (node.contentElse ? 'p1.exprRet(p1, p2, p1.fn' + _buildFn(node.contentElse, fns, ++fns._no, newContext, level) + ', ' + exprPropsStr + ')' : 'p1.noop');
+
+	    if (hashProps != null) {
+	      hashStr += ', props: ' + hashProps;
+	    }
 	  }
 
 	  return hashStr.length ? '{ _njOpts: true' + hashStr + ' }' : '';
@@ -2160,10 +2182,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    dataReferStr += 'var _dataRefer' + _dataReferC + ' = [\n';
 
-	    if (node.refer) {
-	      var props = node.refer.props;
-	      utils.each(props, function (o, i) {
-	        var valueStr = _buildPropData(o, counter, fns, true);
+	    if (node.args) {
+	      //构建匿名参数
+	      utils.each(node.args, function (arg, i) {
+	        var valueStr = _buildProps(arg, counter, fns);
 	        if (utils.isObject(valueStr)) {
 	          filterStr += valueStr.filterStr;
 	          valueStr = valueStr.valueStr;
@@ -2179,14 +2201,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	      exprPropsStr = retType._paramsE;
 	    }
 
-	    dataReferStr += _buildOptions(configE, node, fns, exprPropsStr, level);
+	    //hash参数
+	    var retP = _buildParams(node, fns, counter, false),
+	        paramsStr = retP[0],
+	        _paramsC = retP[1];
+
+	    dataReferStr += _buildOptions(configE, node, fns, exprPropsStr, level, paramsStr !== '' ? '_params' + _paramsC : null);
 	    dataReferStr += '\n];\n';
 
 	    if (filterStr !== '') {
 	      dataReferStr = filterStr + dataReferStr;
 	    }
 
-	    fnStr += dataReferStr;
+	    fnStr += paramsStr + dataReferStr;
 
 	    //如果块表达式不存在则打印警告信息
 	    fnStr += 'p1.throwIf(_expr' + _exprC + ', \'' + node.expr + '\', \'expr\');\n';
@@ -2571,11 +2598,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	//Set self close element node
 	function _setSelfCloseElem(elem, elemName, elemParams, elemArr) {
-	  if (elemName === tmplRule.exprRule + 'else') {
-	    elemArr.push(elem.substr(1, 5));
-	  } else {
-	    _setElem(elem, elemName, elemParams, elemArr, true);
-	  }
+	  _setElem(elem, elemName, elemParams, elemArr, true);
 	}
 
 	//Set text node

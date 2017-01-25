@@ -15,7 +15,7 @@ function _plainTextNode(obj, parent, parentContent) {
 
 //检测元素节点
 function checkElem(obj, parent, hasExprProps) {
-  var parentContent = !parent.hasElse ? 'content' : 'contentElse';
+  var parentContent = 'content';
 
   if (!tools.isArray(obj)) { //判断是否为文本节点
     if (tools.isString(obj)) {
@@ -101,8 +101,7 @@ function checkElem(obj, parent, hasExprProps) {
     }
 
     if (isElemNode) { //判断是否为元素节点
-      var elseIndex = -1,
-        pushContent = true;
+      var pushContent = true;
 
       if (!expr) {
         node.type = openTagName;
@@ -129,7 +128,7 @@ function checkElem(obj, parent, hasExprProps) {
         if (!node.selfCloseTag) {
           node.selfCloseTag = tranElem.verifySelfCloseTag(openTagName);
         }
-      } else { //为块表达式时判断是否有#else
+      } else {
         if (isTmpl) { //模板元素
           pushContent = false;
 
@@ -139,8 +138,6 @@ function checkElem(obj, parent, hasExprProps) {
           pushContent = false;
         } else if (needAddToProps) {
           pushContent = false;
-        } else {
-          elseIndex = obj.indexOf(tmplRule.exprRule + 'else');
         }
       }
 
@@ -151,19 +148,9 @@ function checkElem(obj, parent, hasExprProps) {
 
       //取出子节点集合
       var end = len - (hasCloseTag ? 1 : 0),
-        content = obj.slice(1, (elseIndex < 0 ? end : elseIndex));
+        content = obj.slice(1, end);
       if (content && content.length) {
         checkContentElem(content, node, isParamsExpr || (hasExprProps && !isProp));
-      }
-
-      //如果有#else,则将#else后面的部分存入content_else集合中
-      if (elseIndex >= 0) {
-        var contentElse = obj.slice(elseIndex + 1, end);
-        node.hasElse = true;
-
-        if (contentElse && contentElse.length) {
-          checkContentElem(contentElse, node, isParamsExpr || (hasExprProps && !isProp));
-        }
       }
 
       //If this is params block, set on the "paramsExpr" property of the parent node.
@@ -182,9 +169,6 @@ function checkElem(obj, parent, hasExprProps) {
 function checkContentElem(obj, parent, hasExprProps) {
   if (!parent.content) {
     parent.content = [];
-  }
-  if (parent.hasElse && !parent.contentElse) {
-    parent.contentElse = [];
   }
 
   tools.each(obj, function(item) {

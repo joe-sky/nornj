@@ -18,7 +18,10 @@ var exprs = {
     if (valueR) {
       ret = options.result();
     } else {
-      ret = options.inverse();
+      let props = options.props;
+      if(props && props['else']) {
+        ret = props['else']();
+      }
     }
 
     if (options.useString && ret == null) {
@@ -28,7 +31,9 @@ var exprs = {
     return ret;
   },
 
-  'else': (options) => () => options.result(),
+  'else': function(options) {
+    options.exprProps['else'] = () => options.result();
+  },
 
   unless: function(value, options) {
     options.useUnless = true;
@@ -74,7 +79,10 @@ var exprs = {
         ret = null;
       }
     } else {
-      ret = options.inverse();
+      let props = options.props;
+      if(props && props['else']) {
+        ret = props['else']();
+      }
       if (useString && ret == null) {
         ret = '';
       }
@@ -114,17 +122,6 @@ var exprs = {
     tools.each(refer, function(v, k) {
       options.exprProps[k] = v;
     }, false, false);
-  },
-
-  equal: function(value1, value2, options) {
-    var ret;
-    if (value1 == value2) {
-      ret = options.result();
-    } else {
-      ret = options.inverse();
-    }
-
-    return ret;
   },
 
   'for': function(start, end, options) {
@@ -178,6 +175,7 @@ function _commonConfig(params) {
 //Expression default config
 var exprConfig = {
   'if': _commonConfig({ newContext: false }),
+  'else': _commonConfig({ newContext: false, useString: false, exprProps: true }),
   unless: _commonConfig({ newContext: false }),
   each: _commonConfig(),
   param: _commonConfig({ newContext: false, exprProps: true }),

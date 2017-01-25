@@ -193,11 +193,7 @@ function _getSplitParams(elem) {
 
 //Set self close element node
 function _setSelfCloseElem(elem, elemName, elemParams, elemArr) {
-  if (elemName === tmplRule.exprRule + 'else') {
-    elemArr.push(elem.substr(1, 5));
-  } else {
-    _setElem(elem, elemName, elemParams, elemArr, true);
-  }
+  _setElem(elem, elemName, elemParams, elemArr, true);
 }
 
 //Set text node

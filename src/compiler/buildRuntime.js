@@ -79,7 +79,6 @@ function _buildOptions(config, node, fns, exprPropsStr, level, hashProps) {
     }
 
     hashStr += ', result: ' + (node.content ? 'p1.exprRet(p1, p2, p1.fn' + _buildFn(node.content, fns, ++fns._no, newContext, level) + ', ' + exprPropsStr + ')' : 'p1.noop');
-    hashStr += ', inverse: ' + (node.contentElse ? 'p1.exprRet(p1, p2, p1.fn' + _buildFn(node.contentElse, fns, ++fns._no, newContext, level) + ', ' + exprPropsStr + ')' : 'p1.noop');
 
     if (hashProps != null) {
       hashStr += ', props: ' + hashProps;
