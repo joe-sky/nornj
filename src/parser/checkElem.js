@@ -46,7 +46,11 @@ function checkElem(obj, parent, hasExprProps) {
     //判断是否为xml标签
     var openTagName,
       hasCloseTag = false,
-      isTmpl, isParamsExpr, isExprProp;
+      isTmpl,
+      isParamsExpr,
+      isProp,
+      isExprProp,
+      needAddToProps;
 
     expr = tranElem.isExpr(first);
     if (!expr) {
@@ -67,15 +71,30 @@ function checkElem(obj, parent, hasExprProps) {
       isTmpl = tranElem.isTmpl(exprName);
       isParamsExpr = tranElem.isParamsExpr(exprName);
       if (!isParamsExpr) {
-        isExprProp = tranElem.isExprProp(exprName);
+        let exprProp = tranElem.isExprProp(exprName);
+        isProp = exprProp.isProp;
+        isExprProp = exprProp.isExprProp;
+        needAddToProps = isProp ? !hasExprProps : isExprProp;
       }
 
       node.type = 'nj_expr';
       node.expr = exprName;
-      if (exprParams != null && !isTmpl) {
-        node.refer = tranParam.compiledParam(exprParams.reduce(function(p, c) {
-          return p + (c.onlyBrace ? ' ' + c.key : '');
-        }, ''));
+      if (exprParams != null && !isTmpl && !isParamsExpr) {
+        if (!node.args) {
+          node.args = [];
+        }
+
+        tools.each(exprParams, function(param) {
+          let paramV = tranParam.compiledParam(param.value);
+          if (param.onlyBrace) { //提取匿名参数
+            node.args.push(paramV);
+          } else {
+            if (!node.params) {
+              node.params = tools.lightObj();
+            }
+            node.params[param.key] = paramV;
+          }
+        }, false, true);
       }
 
       isElemNode = true;
@@ -118,7 +137,7 @@ function checkElem(obj, parent, hasExprProps) {
           tranElem.addTmpl(node, parent, exprParams ? exprParams[0].value : null);
         } else if (isParamsExpr) {
           pushContent = false;
-        } else if (isExprProp && !hasExprProps) {
+        } else if (needAddToProps) {
           pushContent = false;
         } else {
           elseIndex = obj.indexOf(tmplRule.exprRule + 'else');
@@ -134,7 +153,7 @@ function checkElem(obj, parent, hasExprProps) {
       var end = len - (hasCloseTag ? 1 : 0),
         content = obj.slice(1, (elseIndex < 0 ? end : elseIndex));
       if (content && content.length) {
-        checkContentElem(content, node, isParamsExpr || (hasExprProps && !isExprProp));
+        checkContentElem(content, node, isParamsExpr || (hasExprProps && !isProp));
       }
 
       //如果有#else,则将#else后面的部分存入content_else集合中
@@ -143,12 +162,12 @@ function checkElem(obj, parent, hasExprProps) {
         node.hasElse = true;
 
         if (contentElse && contentElse.length) {
-          checkContentElem(contentElse, node, isParamsExpr || (hasExprProps && !isExprProp));
+          checkContentElem(contentElse, node, isParamsExpr || (hasExprProps && !isProp));
         }
       }
 
       //If this is params block, set on the "paramsExpr" property of the parent node.
-      if (isParamsExpr || (isExprProp && !hasExprProps)) {
+      if (isParamsExpr || needAddToProps) {
         tranElem.addParamsExpr(node, parent, isExprProp);
       }
     } else { //如果不是元素节点,则为节点集合

@@ -118,7 +118,7 @@ describe('test compile string', function () {
           <@name checked>{test0 | filter1}{'test1' | filter2}test2</@name>
           <@checked />
           <@data-name10>
-            <#each {list}>
+            <#each {{list}}>
               <#if {this}>{ @index | filter2 }<#else />{ '100' | filter1 }</#if>
             </#each>
           </@data-name10>
@@ -141,7 +141,10 @@ describe('test compile string', function () {
             #${nj`
               <#each { list2 }>
                 <#each {list}>
-                  {../../list2.length}split{../@index}
+                  <@extra />
+                  <#if {isLast | filter3}>
+                    {../../list2.length}split{@index}
+                  </#if>
                 </#each>
                 <slider {../name3}>
                   <{../sliderItem.a|tagName} no1={no} no2="{-0.05 | filter2}" checked no='{ ../sliderItem.b }' />

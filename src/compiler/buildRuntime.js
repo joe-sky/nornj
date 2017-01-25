@@ -65,14 +65,14 @@ function _buildFn(content, fns, no, newContext, level) {
   return no;
 }
 
-function _buildOptions(config, node, fns, exprPropsStr, level) {
+function _buildOptions(config, node, fns, exprPropsStr, level, hashProps) {
   var hashStr = '',
     noConfig = !config;
 
   if (noConfig || config.useString) {
     hashStr += ', useString: p1.useString';
   }
-  if (node) {
+  if (node) { //标签表达式
     var newContext = config ? config.newContext : true;
     if (noConfig || config.exprProps) {
       hashStr += ', exprProps: ' + exprPropsStr;
@@ -80,6 +80,10 @@ function _buildOptions(config, node, fns, exprPropsStr, level) {
 
     hashStr += ', result: ' + (node.content ? 'p1.exprRet(p1, p2, p1.fn' + _buildFn(node.content, fns, ++fns._no, newContext, level) + ', ' + exprPropsStr + ')' : 'p1.noop');
     hashStr += ', inverse: ' + (node.contentElse ? 'p1.exprRet(p1, p2, p1.fn' + _buildFn(node.contentElse, fns, ++fns._no, newContext, level) + ', ' + exprPropsStr + ')' : 'p1.noop');
+
+    if (hashProps != null) {
+      hashStr += ', props: ' + hashProps;
+    }
   }
 
   return hashStr.length ? '{ _njOpts: true' + hashStr + ' }' : '';
@@ -389,10 +393,9 @@ function _buildNode(node, fns, counter, retType, level) {
 
     dataReferStr += 'var _dataRefer' + _dataReferC + ' = [\n';
 
-    if (node.refer) {
-      var props = node.refer.props;
-      utils.each(props, function(o, i) {
-        var valueStr = _buildPropData(o, counter, fns, true);
+    if (node.args) { //构建匿名参数
+      utils.each(node.args, function(arg, i) {
+        let valueStr = _buildProps(arg, counter, fns);
         if (utils.isObject(valueStr)) {
           filterStr += valueStr.filterStr;
           valueStr = valueStr.valueStr;
@@ -408,14 +411,19 @@ function _buildNode(node, fns, counter, retType, level) {
       exprPropsStr = retType._paramsE;
     }
 
-    dataReferStr += _buildOptions(configE, node, fns, exprPropsStr, level);
+    //hash参数
+    var retP = _buildParams(node, fns, counter, false),
+      paramsStr = retP[0],
+      _paramsC = retP[1];
+
+    dataReferStr += _buildOptions(configE, node, fns, exprPropsStr, level, paramsStr !== '' ? '_params' + _paramsC : null);
     dataReferStr += '\n];\n';
 
     if (filterStr !== '') {
       dataReferStr = filterStr + dataReferStr;
     }
 
-    fnStr += dataReferStr;
+    fnStr += paramsStr + dataReferStr;
 
     //如果块表达式不存在则打印警告信息
     fnStr += 'p1.throwIf(_expr' + _exprC + ', \'' + node.expr + '\', \'expr\');\n';

@@ -4,18 +4,18 @@ var tools = require('../utils/tools');
 
 //Global expression list
 var exprs = {
-  'if': function(refer, options) {
-    if (refer === 'false') {
-      refer = false;
+  'if': function(value, options) {
+    if (value === 'false') {
+      value = false;
     }
 
-    var referR, ret;
+    var valueR, ret;
     if (!options.useUnless) {
-      referR = !!refer;
+      valueR = !!value;
     } else {
-      referR = !!!refer;
+      valueR = !!!value;
     }
-    if (referR) {
+    if (valueR) {
       ret = options.result();
     } else {
       ret = options.inverse();
@@ -28,35 +28,46 @@ var exprs = {
     return ret;
   },
 
-  unless: function(refer, options) {
+  'else': (options) => () => options.result(),
+
+  unless: function(value, options) {
     options.useUnless = true;
-    return exprs['if'].call(this, refer, options);
+    return exprs['if'].call(this, value, options);
   },
 
-  each: function(refer, options) {
+  each: function(list, options) {
     var useString = options.useString,
       ret;
 
-    if (refer) {
+    if (list) {
       if (useString) {
         ret = '';
       } else {
         ret = [];
       }
 
-      tools.each(refer, function(item, index) {
-        var retI = options.result({
+      const props = options.props;
+      tools.each(list, function(item, index) {
+        let param = {
           data: item,
           index: index,
           fallback: true
-        });
+        };
 
+        if (props && props.extra) {
+          param.extra = {
+            isFirst: index === 0,
+            isLast: index === list.length - 1
+          };
+        }
+
+        let retI = options.result(param);
         if (useString) {
           ret += retI;
         } else {
           ret.push(retI);
         }
-      }, false, tools.isArrayLike(refer));
+      }, false, tools.isArrayLike(list));
 
       //Return null when not use string and result is empty.
       if (!useString && !ret.length) {
