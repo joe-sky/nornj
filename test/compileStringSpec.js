@@ -115,17 +115,17 @@ describe('test compile string', function () {
 
       var tmpl3 = nj`
         <div class="{id} {name3}" {name3} { ...props} name={name1} autofocus name1={a.c.d} name2="{a.e | prop('f') | prop('g')}" a="/%'aaa'%/">
+          <@name checked>{test0 | filter1}{'test1' | filter2}test2</@name>
+          <@checked />
+          <@data-name10>
+            <#each {list}>
+              <#if {this}>{ @index | filter2 }<#else />{ '100' | filter1 }</#if>
+            </#each>
+          </@data-name10>
           <#props>
-            <@name checked>{test0 | filter1}{'test1' | filter2}test2</@name>
-            <@checked />
             <#each {list}>
               <#prop {'data-name'}>{this | filter1}{'test1'}test2</#prop>
             </#each>
-            <@data-name10>
-              <#each {list}>
-                <#if {this}>{ @index | filter2 }<#else />{ '100' | filter1 }</#if>
-              </#each>
-            </@data-name10>
           </#props>
           <input autofocus />
           <br></br>
@@ -135,7 +135,7 @@ describe('test compile string', function () {
             <img />
             sky:{{ 'name555' }},{ id | filter2 }
             <section>
-            ${tmpl1()}
+            @${tmpl1()}
             </section>
             <input type=button />
             #${nj`
@@ -154,6 +154,14 @@ describe('test compile string', function () {
 
       var tmplTest = nj`
       <#each { list2 }>
+        <div {...props}>
+          <@id>d1</@id>
+          <#props>
+            <#unless {test0}>
+              <@id1>d2</@id1>
+            </#unless>
+          </#props>
+        </div>
         <#each {list}>
           {../../list2.length}${'split1'}{../@index}
         </#each>
@@ -166,10 +174,10 @@ describe('test compile string', function () {
       </#each>
       `;
 
-      // var tmplFn = compile(tmpl3, 'tmplString');
-      // var html = tmplFn.apply(null, data);
+      var tmplFn = compile(tmpl3, 'tmplString');
+      var html = tmplFn.apply(null, data);
       // var html = nj.render.call(null, tmplTest, data[0], data[1]);
-      var html = tmplTest.apply(null, data);
+      //var html = tmplTest.apply(null, data);
 
       //console.log(JSON.stringify(nj.asts['tmplString']));
       console.log(html);

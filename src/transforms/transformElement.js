@@ -1,8 +1,9 @@
 ﻿'use strict';
 
-var nj = require('../core'),
+const nj = require('../core'),
   tools = require('../utils/tools'),
   tranParam = require('./transformParam'),
+  exprConfig = require('../helpers/expression').exprConfig,
   tmplRule = nj.tmplRule;
 
 //提取xml open tag
@@ -12,6 +13,7 @@ function getXmlOpenTag(obj) {
 
 //验证xml self close tag
 var REGEX_XML_SELF_CLOSE_TAG = /^<[^>]+\/>$/i;
+
 function isXmlSelfCloseTag(obj) {
   return REGEX_XML_SELF_CLOSE_TAG.test(obj);
 }
@@ -34,6 +36,7 @@ var OMITTED_CLOSE_TAGS = {
   'track': true,
   'wbr': true
 };
+
 function verifySelfCloseTag(tagName) {
   return OMITTED_CLOSE_TAGS[tagName.toLowerCase()];
 }
@@ -45,7 +48,7 @@ function getOpenTagParams(tag) {
 
   while ((matchArr = pattern.exec(tag))) {
     var key = matchArr[1];
-    if (key === '/') {  //If match to the last of "/", then continue the loop.
+    if (key === '/') { //If match to the last of "/", then continue the loop.
       continue;
     }
 
@@ -56,17 +59,15 @@ function getOpenTagParams(tag) {
     var value = matchArr[7],
       onlyBrace = matchArr[4];
     if (value != null) {
-      value = tools.clearQuot(value);  //Remove quotation marks
-    }
-    else {
-      value = key;  //Match to Similar to "checked" or "disabled" attribute.
+      value = tools.clearQuot(value); //Remove quotation marks
+    } else {
+      value = key; //Match to Similar to "checked" or "disabled" attribute.
     }
 
     //Removed at the end of "/>", ">" or "/".
     if (/\/>$/.test(value)) {
       value = value.substr(0, value.length - 2);
-    }
-    else if (/>$/.test(value) || /\/$/.test(value)) {
+    } else if (/>$/.test(value) || /\/$/.test(value)) {
       value = value.substr(0, value.length - 1);
     }
 
@@ -96,7 +97,7 @@ function isExpr(obj) {
   if (ret1) {
     ret = [ret1[1]];
 
-    var params = getOpenTagParams(obj);  //提取各参数
+    var params = getOpenTagParams(obj); //提取各参数
     if (params) {
       ret.push(params);
     }
@@ -122,22 +123,19 @@ function addTmpl(node, parent, name) {
     var objT = { length: 0 };
     if (name != null) {
       objT[name] = node;
-    }
-    else {
+    } else {
       objT['0'] = node;
       objT.length = 1;
     }
 
     paramsP.tmpls = tranParam.compiledParam(objT);
-  }
-  else {  //Insert the compiled template to the parameter name for "tmpls"'s "strs" array.
+  } else { //Insert the compiled template to the parameter name for "tmpls"'s "strs" array.
     var objT = tmpls.strs[0],
       len = objT.length;
 
     if (name != null) {
       objT[name] = node;
-    }
-    else {
+    } else {
       objT[len] = node;
       objT.length = ++len;
     }
@@ -145,18 +143,33 @@ function addTmpl(node, parent, name) {
 }
 
 //Test whether as parameters expression
-function isParamsExpr(obj) {
-  return obj === 'params' || obj === 'props';
+function isParamsExpr(name) {
+  return name === 'params' || name === 'props';
 }
 
 //Add to the "paramsExpr" property of the parent node
-function addParamsExpr(node, parent) {
+function addParamsExpr(node, parent, isExprProp) {
   if (!parent.paramsExpr) {
-    parent.paramsExpr = node;
+    let exprPropsNode;
+    if (isExprProp) {
+      exprPropsNode = {
+        type: 'nj_expr',
+        expr: 'props',
+        content: [node]
+      };
+    } else {
+      exprPropsNode = node;
+    }
+
+    parent.paramsExpr = exprPropsNode;
+  } else {
+    tools.arrayPush(parent.paramsExpr.content, isExprProp ? [node] : node.content);
   }
-  else {
-    tools.arrayPush(parent.paramsExpr.content, node.content);
-  }
+}
+
+function isExprProp(name) {
+  const config = exprConfig[name];
+  return config ? config.exprProps : false;
 }
 
 module.exports = {
@@ -170,5 +183,6 @@ module.exports = {
   isTmpl,
   addTmpl,
   isParamsExpr,
-  addParamsExpr
+  addParamsExpr,
+  isExprProp
 };

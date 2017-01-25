@@ -14,14 +14,14 @@ function _plainTextNode(obj, parent, parentContent) {
 }
 
 //检测元素节点
-function checkElem(obj, parent) {
+function checkElem(obj, parent, hasExprProps) {
   var parentContent = !parent.hasElse ? 'content' : 'contentElse';
 
   if (!tools.isArray(obj)) { //判断是否为文本节点
     if (tools.isString(obj)) {
       var strs = obj.split(tmplRule.newlineSplit),
         lastIndex = strs.length - 1;
-        
+
       strs.forEach((str, i) => {
         str = str.trim();
         str !== '' && _plainTextNode(str + (i < lastIndex ? '\\n' : ''), parent, parentContent);
@@ -46,7 +46,7 @@ function checkElem(obj, parent) {
     //判断是否为xml标签
     var openTagName,
       hasCloseTag = false,
-      isTmpl, isParamsExpr;
+      isTmpl, isParamsExpr, isExprProp;
 
     expr = tranElem.isExpr(first);
     if (!expr) {
@@ -66,6 +66,9 @@ function checkElem(obj, parent) {
       exprParams = expr[1];
       isTmpl = tranElem.isTmpl(exprName);
       isParamsExpr = tranElem.isParamsExpr(exprName);
+      if (!isParamsExpr) {
+        isExprProp = tranElem.isExprProp(exprName);
+      }
 
       node.type = 'nj_expr';
       node.expr = exprName;
@@ -115,6 +118,8 @@ function checkElem(obj, parent) {
           tranElem.addTmpl(node, parent, exprParams ? exprParams[0].value : null);
         } else if (isParamsExpr) {
           pushContent = false;
+        } else if (isExprProp && !hasExprProps) {
+          pushContent = false;
         } else {
           elseIndex = obj.indexOf(tmplRule.exprRule + 'else');
         }
@@ -129,22 +134,22 @@ function checkElem(obj, parent) {
       var end = len - (hasCloseTag ? 1 : 0),
         content = obj.slice(1, (elseIndex < 0 ? end : elseIndex));
       if (content && content.length) {
-        checkContentElem(content, node);
+        checkContentElem(content, node, isParamsExpr || (hasExprProps && !isExprProp));
       }
 
-      //如果有$else,则将$else后面的部分存入content_else集合中
+      //如果有#else,则将#else后面的部分存入content_else集合中
       if (elseIndex >= 0) {
         var contentElse = obj.slice(elseIndex + 1, end);
         node.hasElse = true;
 
         if (contentElse && contentElse.length) {
-          checkContentElem(contentElse, node);
+          checkContentElem(contentElse, node, isParamsExpr || (hasExprProps && !isExprProp));
         }
       }
 
       //If this is params block, set on the "paramsExpr" property of the parent node.
-      if (isParamsExpr) {
-        tranElem.addParamsExpr(node, parent);
+      if (isParamsExpr || (isExprProp && !hasExprProps)) {
+        tranElem.addParamsExpr(node, parent, isExprProp);
       }
     } else { //如果不是元素节点,则为节点集合
       checkContentElem(obj, parent);
@@ -155,7 +160,7 @@ function checkElem(obj, parent) {
 }
 
 //检测子元素节点
-function checkContentElem(obj, parent) {
+function checkContentElem(obj, parent, hasExprProps) {
   if (!parent.content) {
     parent.content = [];
   }
@@ -164,7 +169,7 @@ function checkContentElem(obj, parent) {
   }
 
   tools.each(obj, function(item) {
-    checkElem(item, parent);
+    checkElem(item, parent, hasExprProps);
   }, false, true);
 }
 

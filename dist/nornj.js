@@ -102,12 +102,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	var tools = __webpack_require__(3),
 	    transformElement = __webpack_require__(4),
 	    transformParam = __webpack_require__(5),
-	    transformData = __webpack_require__(6),
-	    escape = __webpack_require__(7),
-	    checkElem = __webpack_require__(8),
-	    registerComponent = __webpack_require__(9),
-	    filter = __webpack_require__(10),
-	    expression = __webpack_require__(11),
+	    transformData = __webpack_require__(7),
+	    escape = __webpack_require__(8),
+	    checkElem = __webpack_require__(9),
+	    registerComponent = __webpack_require__(10),
+	    filter = __webpack_require__(11),
+	    expression = __webpack_require__(6),
 	    setTmplRule = __webpack_require__(12);
 
 	//Set default param rule
@@ -351,6 +351,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var nj = __webpack_require__(1),
 	    tools = __webpack_require__(3),
 	    tranParam = __webpack_require__(5),
+	    exprConfig = __webpack_require__(6).exprConfig,
 	    tmplRule = nj.tmplRule;
 
 	//提取xml open tag
@@ -360,6 +361,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	//验证xml self close tag
 	var REGEX_XML_SELF_CLOSE_TAG = /^<[^>]+\/>$/i;
+
 	function isXmlSelfCloseTag(obj) {
 	  return REGEX_XML_SELF_CLOSE_TAG.test(obj);
 	}
@@ -382,6 +384,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  'track': true,
 	  'wbr': true
 	};
+
 	function verifySelfCloseTag(tagName) {
 	  return OMITTED_CLOSE_TAGS[tagName.toLowerCase()];
 	}
@@ -492,17 +495,33 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 	//Test whether as parameters expression
-	function isParamsExpr(obj) {
-	  return obj === 'params' || obj === 'props';
+	function isParamsExpr(name) {
+	  return name === 'params' || name === 'props';
 	}
 
 	//Add to the "paramsExpr" property of the parent node
-	function addParamsExpr(node, parent) {
+	function addParamsExpr(node, parent, isExprProp) {
 	  if (!parent.paramsExpr) {
-	    parent.paramsExpr = node;
+	    var exprPropsNode = void 0;
+	    if (isExprProp) {
+	      exprPropsNode = {
+	        type: 'nj_expr',
+	        expr: 'props',
+	        content: [node]
+	      };
+	    } else {
+	      exprPropsNode = node;
+	    }
+
+	    parent.paramsExpr = exprPropsNode;
 	  } else {
-	    tools.arrayPush(parent.paramsExpr.content, node.content);
+	    tools.arrayPush(parent.paramsExpr.content, isExprProp ? [node] : node.content);
 	  }
+	}
+
+	function isExprProp(name) {
+	  var config = exprConfig[name];
+	  return config ? config.exprProps : false;
 	}
 
 	module.exports = {
@@ -516,7 +535,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	  isTmpl: isTmpl,
 	  addTmpl: addTmpl,
 	  isParamsExpr: isParamsExpr,
-	  addParamsExpr: addParamsExpr
+	  addParamsExpr: addParamsExpr,
+	  isExprProp: isExprProp
 	};
 
 /***/ },
@@ -684,602 +704,6 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 6 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	var nj = __webpack_require__(1),
-	    tools = __webpack_require__(3),
-	    errorTitle = nj.errorTitle;
-
-	//提取style内参数
-	function styleProps(obj) {
-	  //If the parameter is a style object,then direct return.
-	  if (tools.isObject(obj)) {
-	    return obj;
-	  }
-
-	  //参数为字符串
-	  var pattern = /([^\s:]+)[\s]?:[\s]?([^;]+)[;]?/g,
-	      matchArr = void 0,
-	      ret = void 0;
-
-	  while (matchArr = pattern.exec(obj)) {
-	    var key = matchArr[1],
-	        value = matchArr[2];
-
-	    if (!ret) {
-	      ret = {};
-	    }
-
-	    //Convert to lowercase when style name is all capital.
-	    if (/^[A-Z-]+$/.test(key)) {
-	      key = key.toLowerCase();
-	    }
-
-	    //将连字符转为驼峰命名
-	    key = tools.toCamelCase(key);
-
-	    ret[key] = value;
-	  }
-
-	  return ret;
-	}
-
-	//Get value from multiple datas
-	function getData(prop, data) {
-	  var ret, obj;
-	  if (data === undefined) {
-	    data = this.data;
-	  }
-
-	  for (var i = 0, l = data.length; i < l; i++) {
-	    obj = data[i];
-	    if (obj) {
-	      ret = obj[prop];
-	      if (ret !== undefined) {
-	        return ret;
-	      }
-	    }
-	  }
-	}
-
-	function getComputedData(fn, p2) {
-	  if (fn == null) {
-	    return fn;
-	  }
-
-	  if (fn._njTmpl) {
-	    //模板函数
-	    return fn.call({
-	      _njData: p2.data,
-	      _njParent: p2.parent,
-	      _njIndex: p2.index
-	    });
-	  } else {
-	    //普通函数
-	    return fn(p2);
-	  }
-	}
-
-	//Rebuild local variables in the new context
-	function newContext(p2, p3) {
-	  var newData = [];
-	  if ('data' in p3) {
-	    newData.push(p3.data);
-	  }
-	  if ('extra' in p3) {
-	    newData.push(p3.extra);
-	  }
-
-	  return {
-	    data: newData.length ? tools.arrayPush(newData, p2.data) : p2.data,
-	    parent: p3.fallback ? p2 : p2.parent,
-	    index: 'index' in p3 ? p3.index : p2.index,
-	    getData: getData
-	  };
-	}
-
-	//修正属性名
-	function fixPropName(name) {
-	  switch (name) {
-	    case 'class':
-	      name = 'className';
-	      break;
-	    case 'for':
-	      name = 'htmlFor';
-	      break;
-	  }
-
-	  return name;
-	}
-
-	//合并字符串属性
-	function assignStringProp(paramsE, keys) {
-	  var ret = '';
-	  for (var k in paramsE) {
-	    if (!keys || !keys[k]) {
-	      var v = paramsE[k];
-	      ret += ' ' + k + (k !== v ? '="' + v + '"' : ' ');
-	    }
-	  }
-	  return ret;
-	}
-
-	//创建块表达式子节点函数
-	function exprRet(p1, p2, fn, p4) {
-	  return function (param) {
-	    return fn(p1, p2, param, p4);
-	  };
-	}
-
-	//构建可运行的模板函数
-	function tmplWrap(configs, main) {
-	  return function () {
-	    var initCtx = this,
-	        data = tools.arraySlice(arguments);
-
-	    return main(configs, {
-	      data: initCtx && initCtx._njData ? tools.arrayPush(data, initCtx._njData) : data,
-	      parent: initCtx && initCtx._njParent ? initCtx._njParent : null,
-	      index: initCtx && initCtx._njIndex ? initCtx._njIndex : null,
-	      getData: getData
-	    });
-	  };
-	}
-
-	//创建模板函数
-	function template(fns) {
-	  var configs = {
-	    useString: fns.useString,
-	    exprs: nj.exprs,
-	    filters: nj.filters,
-	    noop: tools.noop,
-	    lightObj: tools.lightObj,
-	    throwIf: tools.throwIf,
-	    warn: tools.warn,
-	    newContext: newContext,
-	    getComputedData: getComputedData,
-	    styleProps: styleProps,
-	    exprRet: exprRet
-	  };
-
-	  if (!configs.useString) {
-	    configs.h = nj.createElement;
-	    configs.components = nj.components;
-	    //configs.assign = tools.assign;
-	  } else {
-	    configs.assignStringProp = assignStringProp;
-	    configs.escape = nj.escape;
-	  }
-
-	  tools.each(fns, function (v, k) {
-	    if (k.indexOf('main') === 0) {
-	      //将每个主函数构建为可运行的模板函数
-	      configs[k] = tmplWrap(configs, v);
-	      configs[k]._njTmpl = true;
-	      configs['_' + k] = v;
-	    } else if (k.indexOf('fn') === 0) {
-	      //块表达式函数
-	      configs[k] = v;
-	    }
-	  }, false, false);
-
-	  return configs;
-	}
-
-	module.exports = {
-	  newContext: newContext,
-	  getData: getData,
-	  getComputedData: getComputedData,
-	  fixPropName: fixPropName,
-	  styleProps: styleProps,
-	  assignStringProp: assignStringProp,
-	  exprRet: exprRet,
-	  tmplWrap: tmplWrap,
-	  template: template
-	};
-
-/***/ },
-/* 7 */
-/***/ function(module, exports) {
-
-	'use strict';
-
-	var ESCAPE_LOOKUP = {
-	  '&': '&amp;',
-	  '>': '&gt;',
-	  '<': '&lt;',
-	  '"': '&quot;',
-	  '\'': '&#x27;'
-	};
-
-	function escape(text) {
-	  if (text == null) {
-	    return '';
-	  } else if (!text.replace) {
-	    return text;
-	  }
-
-	  return text.replace(/[&><"']/g, function (match) {
-	    return ESCAPE_LOOKUP[match];
-	  });
-	}
-
-	module.exports = escape;
-
-/***/ },
-/* 8 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	var nj = __webpack_require__(1),
-	    tools = __webpack_require__(3),
-	    tranParam = __webpack_require__(5),
-	    tranElem = __webpack_require__(4),
-	    tmplRule = nj.tmplRule;
-
-	function _plainTextNode(obj, parent, parentContent) {
-	  var node = {};
-	  node.type = 'nj_plaintext';
-	  node.content = [tranParam.compiledParam(obj)];
-	  parent[parentContent].push(node);
-	}
-
-	//检测元素节点
-	function checkElem(obj, parent) {
-	  var parentContent = !parent.hasElse ? 'content' : 'contentElse';
-
-	  if (!tools.isArray(obj)) {
-	    //判断是否为文本节点
-	    if (tools.isString(obj)) {
-	      var strs = obj.split(tmplRule.newlineSplit),
-	          lastIndex = strs.length - 1;
-
-	      strs.forEach(function (str, i) {
-	        str = str.trim();
-	        str !== '' && _plainTextNode(str + (i < lastIndex ? '\\n' : ''), parent, parentContent);
-	      });
-	    } else {
-	      _plainTextNode(obj, parent, parentContent);
-	    }
-
-	    return;
-	  }
-
-	  var node = {},
-	      first = obj[0];
-	  if (tools.isString(first)) {
-	    //第一个子节点为字符串
-	    var first = first,
-	        len = obj.length,
-	        last = obj[len - 1],
-	        isElemNode = false,
-	        expr,
-	        exprParams;
-
-	    //判断是否为xml标签
-	    var openTagName,
-	        hasCloseTag = false,
-	        isTmpl,
-	        isParamsExpr;
-
-	    expr = tranElem.isExpr(first);
-	    if (!expr) {
-	      var xmlOpenTag = tranElem.getXmlOpenTag(first);
-	      if (xmlOpenTag) {
-	        //tagname为xml标签时,则认为是元素节点
-	        openTagName = xmlOpenTag[1];
-
-	        if (!tranElem.isXmlSelfCloseTag(first)) {
-	          //非自闭合标签才验证是否存在关闭标签
-	          hasCloseTag = tranElem.isXmlCloseTag(last, openTagName);
-	        } else {
-	          //自闭合标签
-	          node.selfCloseTag = true;
-	        }
-	        isElemNode = true;
-	      }
-	    } else {
-	      //为块表达式,也可视为一个元素节点
-	      var exprName = expr[0];
-	      exprParams = expr[1];
-	      isTmpl = tranElem.isTmpl(exprName);
-	      isParamsExpr = tranElem.isParamsExpr(exprName);
-
-	      node.type = 'nj_expr';
-	      node.expr = exprName;
-	      if (exprParams != null && !isTmpl) {
-	        node.refer = tranParam.compiledParam(exprParams.reduce(function (p, c) {
-	          return p + (c.onlyBrace ? ' ' + c.key : '');
-	        }, ''));
-	      }
-
-	      isElemNode = true;
-	    }
-
-	    if (isElemNode) {
-	      //判断是否为元素节点
-	      var elseIndex = -1,
-	          pushContent = true;
-
-	      if (!expr) {
-	        node.type = openTagName;
-
-	        //If open tag has a brace,add the typeRefer param.
-	        var typeRefer = tranElem.getInsideBraceParam(openTagName);
-	        if (typeRefer) {
-	          node.typeRefer = tranParam.compiledParam(typeRefer[0]);
-	        }
-
-	        //获取openTag内参数
-	        var tagParams = tranElem.getOpenTagParams(first);
-	        if (tagParams) {
-	          if (!node.params) {
-	            node.params = tools.lightObj();
-	          }
-
-	          tools.each(tagParams, function (param) {
-	            //The parameter like "{prop}" needs to be replaced.
-	            node.params[param.onlyBrace ? param.onlyBrace.replace(/\.\.\//g, '') : param.key] = tranParam.compiledParam(param.value);
-	          }, false, true);
-	        }
-
-	        //Verify if self closing tag again, because the tag may be similar to "<br></br>".
-	        if (!node.selfCloseTag) {
-	          node.selfCloseTag = tranElem.verifySelfCloseTag(openTagName);
-	        }
-	      } else {
-	        //为块表达式时判断是否有#else
-	        if (isTmpl) {
-	          //模板元素
-	          pushContent = false;
-
-	          //将模板添加到父节点的params中
-	          tranElem.addTmpl(node, parent, exprParams ? exprParams[0].value : null);
-	        } else if (isParamsExpr) {
-	          pushContent = false;
-	        } else {
-	          elseIndex = obj.indexOf(tmplRule.exprRule + 'else');
-	        }
-	      }
-
-	      //放入父节点content内
-	      if (pushContent) {
-	        parent[parentContent].push(node);
-	      }
-
-	      //取出子节点集合
-	      var end = len - (hasCloseTag ? 1 : 0),
-	          content = obj.slice(1, elseIndex < 0 ? end : elseIndex);
-	      if (content && content.length) {
-	        checkContentElem(content, node);
-	      }
-
-	      //如果有$else,则将$else后面的部分存入content_else集合中
-	      if (elseIndex >= 0) {
-	        var contentElse = obj.slice(elseIndex + 1, end);
-	        node.hasElse = true;
-
-	        if (contentElse && contentElse.length) {
-	          checkContentElem(contentElse, node);
-	        }
-	      }
-
-	      //If this is params block, set on the "paramsExpr" property of the parent node.
-	      if (isParamsExpr) {
-	        tranElem.addParamsExpr(node, parent);
-	      }
-	    } else {
-	      //如果不是元素节点,则为节点集合
-	      checkContentElem(obj, parent);
-	    }
-	  } else if (tools.isArray(first)) {
-	    //如果第一个子节点为数组,则该节点一定为节点集合(可以是多层数组嵌套的集合)
-	    checkContentElem(obj, parent);
-	  }
-	}
-
-	//检测子元素节点
-	function checkContentElem(obj, parent) {
-	  if (!parent.content) {
-	    parent.content = [];
-	  }
-	  if (parent.hasElse && !parent.contentElse) {
-	    parent.contentElse = [];
-	  }
-
-	  tools.each(obj, function (item) {
-	    checkElem(item, parent);
-	  }, false, true);
-	}
-
-	module.exports = {
-	  checkElem: checkElem
-	};
-
-/***/ },
-/* 9 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	var nj = __webpack_require__(1),
-	    tools = __webpack_require__(3);
-
-	//注册组件
-	function registerComponent(name, component) {
-	  var params = name;
-	  if (!tools.isObject(name)) {
-	    params = {};
-	    params[name] = component;
-	  }
-
-	  tools.each(params, function (v, k) {
-	    nj.components[k.toLowerCase()] = v;
-	  }, false, false);
-
-	  return component;
-	}
-
-	module.exports = {
-	  registerComponent: registerComponent
-	};
-
-/***/ },
-/* 10 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	var tools = __webpack_require__(3);
-
-	//Global filter list
-	var filters = {
-	  //Get param properties
-	  prop: function prop(obj, props) {
-	    var ret = obj;
-	    ret && tools.each(props.split('.'), function (p) {
-	      ret = ret[p];
-	    }, false, true);
-
-	    return ret;
-	  },
-
-	  //Get list count
-	  count: function count(obj) {
-	    return obj ? obj.length : 0;
-	  },
-
-	  //Get list item
-	  item: function item(obj, no) {
-	    return obj ? obj[no] : null;
-	  },
-
-	  //Judge equal
-	  equal: function equal(obj, val) {
-	    return obj == val;
-	  },
-
-	  //Less than
-	  lt: function lt(val1, val2, noEqual) {
-	    var ret;
-	    val1 = parseFloat(val1);
-	    val2 = parseFloat(val2);
-
-	    if (noEqual) {
-	      ret = val1 < val2;
-	    } else {
-	      ret = val1 <= val2;
-	    }
-
-	    return ret;
-	  },
-
-	  //Greater than
-	  gt: function gt(val1, val2, noEqual) {
-	    var ret;
-	    val1 = parseFloat(val1);
-	    val2 = parseFloat(val2);
-
-	    if (noEqual) {
-	      ret = val1 > val2;
-	    } else {
-	      ret = val1 >= val2;
-	    }
-
-	    return ret;
-	  },
-
-	  //Addition
-	  add: function add(val1, val2, isFloat) {
-	    return val1 + (isFloat ? parseFloat(val2) : parseInt(val2, 10));
-	  },
-
-	  //Convert to int 
-	  int: function int(val) {
-	    return parseInt(val, 10);
-	  },
-
-	  //Convert to float 
-	  float: function float(val) {
-	    return parseFloat(val);
-	  },
-
-	  //Convert to boolean 
-	  bool: function bool(val) {
-	    if (val === 'false') {
-	      return false;
-	    }
-
-	    return Boolean(val);
-	  }
-	};
-
-	function _commonConfig(params) {
-	  var ret = {
-	    useString: true
-	  };
-
-	  if (params) {
-	    ret = tools.assign(ret, params);
-	  }
-	  return ret;
-	}
-
-	//Filter default config
-	var filterConfig = {
-	  prop: _commonConfig(),
-	  count: _commonConfig(),
-	  item: _commonConfig(),
-	  equal: _commonConfig(),
-	  lt: _commonConfig(),
-	  gt: _commonConfig(),
-	  add: _commonConfig(),
-	  int: _commonConfig(),
-	  float: _commonConfig(),
-	  bool: _commonConfig()
-	};
-
-	//Register filter and also can batch add
-	function registerFilter(name, filter, options) {
-	  var params = name;
-	  if (!tools.isObject(name)) {
-	    params = {};
-	    params[name] = {
-	      filter: filter,
-	      options: options
-	    };
-	  }
-
-	  tools.each(params, function (v, name) {
-	    if (v) {
-	      var filter = v.filter,
-	          options = v.options;
-
-	      if (filter || options) {
-	        if (filter) {
-	          filters[name] = filter;
-	        }
-	        if (options) {
-	          filterConfig[name] = _commonConfig(options);
-	        }
-	      } else {
-	        filters[name] = v;
-	      }
-	    }
-	  }, false, false);
-	}
-
-	module.exports = {
-	  filters: filters,
-	  filterConfig: filterConfig,
-	  registerFilter: registerFilter
-	};
-
-/***/ },
-/* 11 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1501,6 +925,608 @@ return /******/ (function(modules) { // webpackBootstrap
 	  exprs: exprs,
 	  exprConfig: exprConfig,
 	  registerExpr: registerExpr
+	};
+
+/***/ },
+/* 7 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var nj = __webpack_require__(1),
+	    tools = __webpack_require__(3),
+	    errorTitle = nj.errorTitle;
+
+	//提取style内参数
+	function styleProps(obj) {
+	  //If the parameter is a style object,then direct return.
+	  if (tools.isObject(obj)) {
+	    return obj;
+	  }
+
+	  //参数为字符串
+	  var pattern = /([^\s:]+)[\s]?:[\s]?([^;]+)[;]?/g,
+	      matchArr = void 0,
+	      ret = void 0;
+
+	  while (matchArr = pattern.exec(obj)) {
+	    var key = matchArr[1],
+	        value = matchArr[2];
+
+	    if (!ret) {
+	      ret = {};
+	    }
+
+	    //Convert to lowercase when style name is all capital.
+	    if (/^[A-Z-]+$/.test(key)) {
+	      key = key.toLowerCase();
+	    }
+
+	    //将连字符转为驼峰命名
+	    key = tools.toCamelCase(key);
+
+	    ret[key] = value;
+	  }
+
+	  return ret;
+	}
+
+	//Get value from multiple datas
+	function getData(prop, data) {
+	  var ret, obj;
+	  if (data === undefined) {
+	    data = this.data;
+	  }
+
+	  for (var i = 0, l = data.length; i < l; i++) {
+	    obj = data[i];
+	    if (obj) {
+	      ret = obj[prop];
+	      if (ret !== undefined) {
+	        return ret;
+	      }
+	    }
+	  }
+	}
+
+	function getComputedData(fn, p2) {
+	  if (fn == null) {
+	    return fn;
+	  }
+
+	  if (fn._njTmpl) {
+	    //模板函数
+	    return fn.call({
+	      _njData: p2.data,
+	      _njParent: p2.parent,
+	      _njIndex: p2.index
+	    });
+	  } else {
+	    //普通函数
+	    return fn(p2);
+	  }
+	}
+
+	//Rebuild local variables in the new context
+	function newContext(p2, p3) {
+	  var newData = [];
+	  if ('data' in p3) {
+	    newData.push(p3.data);
+	  }
+	  if ('extra' in p3) {
+	    newData.push(p3.extra);
+	  }
+
+	  return {
+	    data: newData.length ? tools.arrayPush(newData, p2.data) : p2.data,
+	    parent: p3.fallback ? p2 : p2.parent,
+	    index: 'index' in p3 ? p3.index : p2.index,
+	    getData: getData
+	  };
+	}
+
+	//修正属性名
+	function fixPropName(name) {
+	  switch (name) {
+	    case 'class':
+	      name = 'className';
+	      break;
+	    case 'for':
+	      name = 'htmlFor';
+	      break;
+	  }
+
+	  return name;
+	}
+
+	//合并字符串属性
+	function assignStringProp(paramsE, keys) {
+	  var ret = '';
+	  for (var k in paramsE) {
+	    if (!keys || !keys[k]) {
+	      var v = paramsE[k];
+	      ret += ' ' + k + (k !== v ? '="' + v + '"' : ' ');
+	    }
+	  }
+	  return ret;
+	}
+
+	//创建块表达式子节点函数
+	function exprRet(p1, p2, fn, p4) {
+	  return function (param) {
+	    return fn(p1, p2, param, p4);
+	  };
+	}
+
+	//构建可运行的模板函数
+	function tmplWrap(configs, main) {
+	  return function () {
+	    var initCtx = this,
+	        data = tools.arraySlice(arguments);
+
+	    return main(configs, {
+	      data: initCtx && initCtx._njData ? tools.arrayPush(data, initCtx._njData) : data,
+	      parent: initCtx && initCtx._njParent ? initCtx._njParent : null,
+	      index: initCtx && initCtx._njIndex ? initCtx._njIndex : null,
+	      getData: getData
+	    });
+	  };
+	}
+
+	//创建模板函数
+	function template(fns) {
+	  var configs = {
+	    useString: fns.useString,
+	    exprs: nj.exprs,
+	    filters: nj.filters,
+	    noop: tools.noop,
+	    lightObj: tools.lightObj,
+	    throwIf: tools.throwIf,
+	    warn: tools.warn,
+	    newContext: newContext,
+	    getComputedData: getComputedData,
+	    styleProps: styleProps,
+	    exprRet: exprRet
+	  };
+
+	  if (!configs.useString) {
+	    configs.h = nj.createElement;
+	    configs.components = nj.components;
+	    //configs.assign = tools.assign;
+	  } else {
+	    configs.assignStringProp = assignStringProp;
+	    configs.escape = nj.escape;
+	  }
+
+	  tools.each(fns, function (v, k) {
+	    if (k.indexOf('main') === 0) {
+	      //将每个主函数构建为可运行的模板函数
+	      configs[k] = tmplWrap(configs, v);
+	      configs[k]._njTmpl = true;
+	      configs['_' + k] = v;
+	    } else if (k.indexOf('fn') === 0) {
+	      //块表达式函数
+	      configs[k] = v;
+	    }
+	  }, false, false);
+
+	  return configs;
+	}
+
+	module.exports = {
+	  newContext: newContext,
+	  getData: getData,
+	  getComputedData: getComputedData,
+	  fixPropName: fixPropName,
+	  styleProps: styleProps,
+	  assignStringProp: assignStringProp,
+	  exprRet: exprRet,
+	  tmplWrap: tmplWrap,
+	  template: template
+	};
+
+/***/ },
+/* 8 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	var ESCAPE_LOOKUP = {
+	  '&': '&amp;',
+	  '>': '&gt;',
+	  '<': '&lt;',
+	  '"': '&quot;',
+	  '\'': '&#x27;'
+	};
+
+	function escape(text) {
+	  if (text == null) {
+	    return '';
+	  } else if (!text.replace) {
+	    return text;
+	  }
+
+	  return text.replace(/[&><"']/g, function (match) {
+	    return ESCAPE_LOOKUP[match];
+	  });
+	}
+
+	module.exports = escape;
+
+/***/ },
+/* 9 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var nj = __webpack_require__(1),
+	    tools = __webpack_require__(3),
+	    tranParam = __webpack_require__(5),
+	    tranElem = __webpack_require__(4),
+	    tmplRule = nj.tmplRule;
+
+	function _plainTextNode(obj, parent, parentContent) {
+	  var node = {};
+	  node.type = 'nj_plaintext';
+	  node.content = [tranParam.compiledParam(obj)];
+	  parent[parentContent].push(node);
+	}
+
+	//检测元素节点
+	function checkElem(obj, parent, hasExprProps) {
+	  var parentContent = !parent.hasElse ? 'content' : 'contentElse';
+
+	  if (!tools.isArray(obj)) {
+	    //判断是否为文本节点
+	    if (tools.isString(obj)) {
+	      var strs = obj.split(tmplRule.newlineSplit),
+	          lastIndex = strs.length - 1;
+
+	      strs.forEach(function (str, i) {
+	        str = str.trim();
+	        str !== '' && _plainTextNode(str + (i < lastIndex ? '\\n' : ''), parent, parentContent);
+	      });
+	    } else {
+	      _plainTextNode(obj, parent, parentContent);
+	    }
+
+	    return;
+	  }
+
+	  var node = {},
+	      first = obj[0];
+	  if (tools.isString(first)) {
+	    //第一个子节点为字符串
+	    var first = first,
+	        len = obj.length,
+	        last = obj[len - 1],
+	        isElemNode = false,
+	        expr,
+	        exprParams;
+
+	    //判断是否为xml标签
+	    var openTagName,
+	        hasCloseTag = false,
+	        isTmpl,
+	        isParamsExpr,
+	        isExprProp;
+
+	    expr = tranElem.isExpr(first);
+	    if (!expr) {
+	      var xmlOpenTag = tranElem.getXmlOpenTag(first);
+	      if (xmlOpenTag) {
+	        //tagname为xml标签时,则认为是元素节点
+	        openTagName = xmlOpenTag[1];
+
+	        if (!tranElem.isXmlSelfCloseTag(first)) {
+	          //非自闭合标签才验证是否存在关闭标签
+	          hasCloseTag = tranElem.isXmlCloseTag(last, openTagName);
+	        } else {
+	          //自闭合标签
+	          node.selfCloseTag = true;
+	        }
+	        isElemNode = true;
+	      }
+	    } else {
+	      //为块表达式,也可视为一个元素节点
+	      var exprName = expr[0];
+	      exprParams = expr[1];
+	      isTmpl = tranElem.isTmpl(exprName);
+	      isParamsExpr = tranElem.isParamsExpr(exprName);
+	      if (!isParamsExpr) {
+	        isExprProp = tranElem.isExprProp(exprName);
+	      }
+
+	      node.type = 'nj_expr';
+	      node.expr = exprName;
+	      if (exprParams != null && !isTmpl) {
+	        node.refer = tranParam.compiledParam(exprParams.reduce(function (p, c) {
+	          return p + (c.onlyBrace ? ' ' + c.key : '');
+	        }, ''));
+	      }
+
+	      isElemNode = true;
+	    }
+
+	    if (isElemNode) {
+	      //判断是否为元素节点
+	      var elseIndex = -1,
+	          pushContent = true;
+
+	      if (!expr) {
+	        node.type = openTagName;
+
+	        //If open tag has a brace,add the typeRefer param.
+	        var typeRefer = tranElem.getInsideBraceParam(openTagName);
+	        if (typeRefer) {
+	          node.typeRefer = tranParam.compiledParam(typeRefer[0]);
+	        }
+
+	        //获取openTag内参数
+	        var tagParams = tranElem.getOpenTagParams(first);
+	        if (tagParams) {
+	          if (!node.params) {
+	            node.params = tools.lightObj();
+	          }
+
+	          tools.each(tagParams, function (param) {
+	            //The parameter like "{prop}" needs to be replaced.
+	            node.params[param.onlyBrace ? param.onlyBrace.replace(/\.\.\//g, '') : param.key] = tranParam.compiledParam(param.value);
+	          }, false, true);
+	        }
+
+	        //Verify if self closing tag again, because the tag may be similar to "<br></br>".
+	        if (!node.selfCloseTag) {
+	          node.selfCloseTag = tranElem.verifySelfCloseTag(openTagName);
+	        }
+	      } else {
+	        //为块表达式时判断是否有#else
+	        if (isTmpl) {
+	          //模板元素
+	          pushContent = false;
+
+	          //将模板添加到父节点的params中
+	          tranElem.addTmpl(node, parent, exprParams ? exprParams[0].value : null);
+	        } else if (isParamsExpr) {
+	          pushContent = false;
+	        } else if (isExprProp && !hasExprProps) {
+	          pushContent = false;
+	        } else {
+	          elseIndex = obj.indexOf(tmplRule.exprRule + 'else');
+	        }
+	      }
+
+	      //放入父节点content内
+	      if (pushContent) {
+	        parent[parentContent].push(node);
+	      }
+
+	      //取出子节点集合
+	      var end = len - (hasCloseTag ? 1 : 0),
+	          content = obj.slice(1, elseIndex < 0 ? end : elseIndex);
+	      if (content && content.length) {
+	        checkContentElem(content, node, isParamsExpr || hasExprProps && !isExprProp);
+	      }
+
+	      //如果有#else,则将#else后面的部分存入content_else集合中
+	      if (elseIndex >= 0) {
+	        var contentElse = obj.slice(elseIndex + 1, end);
+	        node.hasElse = true;
+
+	        if (contentElse && contentElse.length) {
+	          checkContentElem(contentElse, node, isParamsExpr || hasExprProps && !isExprProp);
+	        }
+	      }
+
+	      //If this is params block, set on the "paramsExpr" property of the parent node.
+	      if (isParamsExpr || isExprProp && !hasExprProps) {
+	        tranElem.addParamsExpr(node, parent, isExprProp);
+	      }
+	    } else {
+	      //如果不是元素节点,则为节点集合
+	      checkContentElem(obj, parent);
+	    }
+	  } else if (tools.isArray(first)) {
+	    //如果第一个子节点为数组,则该节点一定为节点集合(可以是多层数组嵌套的集合)
+	    checkContentElem(obj, parent);
+	  }
+	}
+
+	//检测子元素节点
+	function checkContentElem(obj, parent, hasExprProps) {
+	  if (!parent.content) {
+	    parent.content = [];
+	  }
+	  if (parent.hasElse && !parent.contentElse) {
+	    parent.contentElse = [];
+	  }
+
+	  tools.each(obj, function (item) {
+	    checkElem(item, parent, hasExprProps);
+	  }, false, true);
+	}
+
+	module.exports = {
+	  checkElem: checkElem
+	};
+
+/***/ },
+/* 10 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var nj = __webpack_require__(1),
+	    tools = __webpack_require__(3);
+
+	//注册组件
+	function registerComponent(name, component) {
+	  var params = name;
+	  if (!tools.isObject(name)) {
+	    params = {};
+	    params[name] = component;
+	  }
+
+	  tools.each(params, function (v, k) {
+	    nj.components[k.toLowerCase()] = v;
+	  }, false, false);
+
+	  return component;
+	}
+
+	module.exports = {
+	  registerComponent: registerComponent
+	};
+
+/***/ },
+/* 11 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var tools = __webpack_require__(3);
+
+	//Global filter list
+	var filters = {
+	  //Get param properties
+	  prop: function prop(obj, props) {
+	    var ret = obj;
+	    ret && tools.each(props.split('.'), function (p) {
+	      ret = ret[p];
+	    }, false, true);
+
+	    return ret;
+	  },
+
+	  //Get list count
+	  count: function count(obj) {
+	    return obj ? obj.length : 0;
+	  },
+
+	  //Get list item
+	  item: function item(obj, no) {
+	    return obj ? obj[no] : null;
+	  },
+
+	  //Judge equal
+	  equal: function equal(obj, val) {
+	    return obj == val;
+	  },
+
+	  //Less than
+	  lt: function lt(val1, val2, noEqual) {
+	    var ret;
+	    val1 = parseFloat(val1);
+	    val2 = parseFloat(val2);
+
+	    if (noEqual) {
+	      ret = val1 < val2;
+	    } else {
+	      ret = val1 <= val2;
+	    }
+
+	    return ret;
+	  },
+
+	  //Greater than
+	  gt: function gt(val1, val2, noEqual) {
+	    var ret;
+	    val1 = parseFloat(val1);
+	    val2 = parseFloat(val2);
+
+	    if (noEqual) {
+	      ret = val1 > val2;
+	    } else {
+	      ret = val1 >= val2;
+	    }
+
+	    return ret;
+	  },
+
+	  //Addition
+	  add: function add(val1, val2, isFloat) {
+	    return val1 + (isFloat ? parseFloat(val2) : parseInt(val2, 10));
+	  },
+
+	  //Convert to int 
+	  int: function int(val) {
+	    return parseInt(val, 10);
+	  },
+
+	  //Convert to float 
+	  float: function float(val) {
+	    return parseFloat(val);
+	  },
+
+	  //Convert to boolean 
+	  bool: function bool(val) {
+	    if (val === 'false') {
+	      return false;
+	    }
+
+	    return Boolean(val);
+	  }
+	};
+
+	function _commonConfig(params) {
+	  var ret = {
+	    useString: true
+	  };
+
+	  if (params) {
+	    ret = tools.assign(ret, params);
+	  }
+	  return ret;
+	}
+
+	//Filter default config
+	var filterConfig = {
+	  prop: _commonConfig(),
+	  count: _commonConfig(),
+	  item: _commonConfig(),
+	  equal: _commonConfig(),
+	  lt: _commonConfig(),
+	  gt: _commonConfig(),
+	  add: _commonConfig(),
+	  int: _commonConfig(),
+	  float: _commonConfig(),
+	  bool: _commonConfig()
+	};
+
+	//Register filter and also can batch add
+	function registerFilter(name, filter, options) {
+	  var params = name;
+	  if (!tools.isObject(name)) {
+	    params = {};
+	    params[name] = {
+	      filter: filter,
+	      options: options
+	    };
+	  }
+
+	  tools.each(params, function (v, name) {
+	    if (v) {
+	      var filter = v.filter,
+	          options = v.options;
+
+	      if (filter || options) {
+	        if (filter) {
+	          filters[name] = filter;
+	        }
+	        if (options) {
+	          filterConfig[name] = _commonConfig(options);
+	        }
+	      } else {
+	        filters[name] = v;
+	      }
+	    }
+	  }, false, false);
+	}
+
+	module.exports = {
+	  filters: filters,
+	  filterConfig: filterConfig,
+	  registerFilter: registerFilter
 	};
 
 /***/ },
