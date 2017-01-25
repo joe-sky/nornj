@@ -55,10 +55,24 @@ describe('test speed', function() {
       </span>
       <#if {@index | five(1)}>
         <br />
+        <#elseif {true}>
+          <img name="elseif" />
+        </#elseif>
         <#else>
           <img />
         </#else>
       </#if>
+      <#switch {@index}>
+        <#case {1}>
+          <img name="case_1" />
+        </#case>
+        <#case {2}>
+          <img name="case_2" />
+        </#case>
+        <#default>
+          <img name="case_default" />
+        </#default>
+      </#switch>
     </#each>
   </{div}>
   `;

@@ -731,8 +731,30 @@ return /******/ (function(modules) { // webpackBootstrap
 	      ret = options.result();
 	    } else {
 	      var props = options.props;
-	      if (props && props['else']) {
-	        ret = props['else']();
+	      if (props) {
+	        (function () {
+	          var elseFn = props['else'];
+
+	          if (props.elseifs) {
+	            (function () {
+	              var l = props.elseifs.length;
+	              tools.each(props.elseifs, function (elseif, i) {
+	                if (!!elseif.value) {
+	                  ret = elseif.fn();
+	                  return false;
+	                } else if (i === l - 1) {
+	                  if (elseFn) {
+	                    ret = elseFn();
+	                  }
+	                }
+	              }, false, true);
+	            })();
+	          } else {
+	            if (elseFn) {
+	              ret = elseFn();
+	            }
+	          }
+	        })();
 	      }
 	    }
 
@@ -744,9 +766,37 @@ return /******/ (function(modules) { // webpackBootstrap
 	  },
 
 	  'else': function _else(options) {
-	    options.exprProps['else'] = function () {
-	      return options.result();
-	    };
+	    return options.exprProps['else'] = options.result;
+	  },
+
+	  'elseif': function elseif(value, options) {
+	    var exprProps = options.exprProps;
+	    if (!exprProps.elseifs) {
+	      exprProps.elseifs = [];
+	    }
+	    exprProps.elseifs.push({
+	      value: value,
+	      fn: options.result
+	    });
+	  },
+
+	  'switch': function _switch(value, options) {
+	    var ret,
+	        props = options.props,
+	        l = props.elseifs.length;
+
+	    tools.each(props.elseifs, function (elseif, i) {
+	      if (value === elseif.value) {
+	        ret = elseif.fn();
+	        return false;
+	      } else if (i === l - 1) {
+	        if (props['else']) {
+	          ret = props['else']();
+	        }
+	      }
+	    }, false, true);
+
+	    return ret;
 	  },
 
 	  unless: function unless(value, options) {
@@ -895,6 +945,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var exprConfig = {
 	  'if': _commonConfig({ newContext: false }),
 	  'else': _commonConfig({ newContext: false, useString: false, exprProps: true }),
+	  elseif: _commonConfig({ newContext: false, useString: false, exprProps: true }),
 	  unless: _commonConfig({ newContext: false }),
 	  each: _commonConfig(),
 	  param: _commonConfig({ newContext: false, exprProps: true }),
@@ -905,8 +956,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 	//Expression alias
-	exprs.prop = exprs.p = exprs.param;
-	exprConfig.prop = exprConfig.p = exprConfig.param;
+	exprs.prop = exprs.param;
+	exprConfig.prop = exprConfig.param;
+	exprs['case'] = exprs.elseif;
+	exprConfig['case'] = exprConfig.elseif;
+	exprs['default'] = exprs['else'];
+	exprConfig['default'] = exprConfig['else'];
 
 	//Register expression and also can batch add
 	function registerExpr(name, expr, options) {

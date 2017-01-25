@@ -1,9 +1,9 @@
 ﻿'use strict';
 
-var tools = require('../utils/tools');
+const tools = require('../utils/tools');
 
 //Global expression list
-var exprs = {
+const exprs = {
   'if': function(value, options) {
     if (value === 'false') {
       value = false;
@@ -19,8 +19,26 @@ var exprs = {
       ret = options.result();
     } else {
       let props = options.props;
-      if(props && props['else']) {
-        ret = props['else']();
+      if (props) {
+        let elseFn = props['else'];
+
+        if (props.elseifs) {
+          let l = props.elseifs.length;
+          tools.each(props.elseifs, function(elseif, i) {
+            if (!!elseif.value) {
+              ret = elseif.fn();
+              return false;
+            } else if (i === l - 1) {
+              if (elseFn) {
+                ret = elseFn();
+              }
+            }
+          }, false, true);
+        } else {
+          if (elseFn) {
+            ret = elseFn();
+          }
+        }
       }
     }
 
@@ -31,8 +49,36 @@ var exprs = {
     return ret;
   },
 
-  'else': function(options) {
-    options.exprProps['else'] = () => options.result();
+  'else': (options) => options.exprProps['else'] = options.result,
+
+  'elseif': (value, options) => {
+    const exprProps = options.exprProps;
+    if (!exprProps.elseifs) {
+      exprProps.elseifs = [];
+    }
+    exprProps.elseifs.push({
+      value,
+      fn: options.result
+    });
+  },
+
+  'switch': function(value, options) {
+    var ret,
+      props = options.props,
+      l = props.elseifs.length;
+
+    tools.each(props.elseifs, function(elseif, i) {
+      if (value === elseif.value) {
+        ret = elseif.fn();
+        return false;
+      } else if (i === l - 1) {
+        if (props['else']) {
+          ret = props['else']();
+        }
+      }
+    }, false, true);
+
+    return ret;
   },
 
   unless: function(value, options) {
@@ -80,7 +126,7 @@ var exprs = {
       }
     } else {
       let props = options.props;
-      if(props && props['else']) {
+      if (props && props['else']) {
         ret = props['else']();
       }
       if (useString && ret == null) {
@@ -176,6 +222,7 @@ function _commonConfig(params) {
 var exprConfig = {
   'if': _commonConfig({ newContext: false }),
   'else': _commonConfig({ newContext: false, useString: false, exprProps: true }),
+  elseif: _commonConfig({ newContext: false, useString: false, exprProps: true }),
   unless: _commonConfig({ newContext: false }),
   each: _commonConfig(),
   param: _commonConfig({ newContext: false, exprProps: true }),
@@ -186,8 +233,12 @@ var exprConfig = {
 };
 
 //Expression alias
-exprs.prop = exprs.p = exprs.param;
-exprConfig.prop = exprConfig.p = exprConfig.param;
+exprs.prop = exprs.param;
+exprConfig.prop = exprConfig.param;
+exprs['case'] = exprs.elseif;
+exprConfig['case'] = exprConfig.elseif;
+exprs['default'] = exprs['else'];
+exprConfig['default'] = exprConfig['else'];
 
 //Register expression and also can batch add
 function registerExpr(name, expr, options) {
