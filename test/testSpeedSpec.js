@@ -8,12 +8,12 @@
   ReactDOMServer = require('react-dom/server'),
   Handlebars = require('handlebars');
 
-nj.config({
-  createElement: React.createElement,
-  outputH: true
-});
+// nj.config({
+//   createElement: React.createElement,
+//   outputH: true
+// });
 
-describe('test speed', function() {
+xdescribe('test speed', function() {
   var t1 = nj `
   <img src="t1" />
   `;
@@ -64,7 +64,7 @@ describe('test speed', function() {
       </#if>
       <#switch {@index}>
         <#case {1}>
-          <img name="case_1" />
+          <img name="case_1{100 | test(500, styles.color)}" />
         </#case>
         <#case {2}>
           <img name="case_2" />
@@ -263,9 +263,9 @@ describe('test speed', function() {
       }
     }, { useString: false });
 
-    // nj.registerFilter('test', function (obj) {
-    //   return obj;
-    // });
+    nj.registerFilter('test', function (obj, p, p2) {
+      return (obj + p) + p2;
+    });
 
     Handlebars.registerHelper('five', function(num, options) {
       if (num % 5 == 0) {

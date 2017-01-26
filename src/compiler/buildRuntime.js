@@ -85,13 +85,13 @@ function _buildOptions(config, node, fns, exprPropsStr, level, hashProps) {
     }
   }
 
-  return hashStr.length ? '{ _njOpts: true' + hashStr + ' }' : '';
+  return '{ _njOpts: true, ctx: p2' + hashStr + ' }';
 }
 
-function _buildPropData(obj, counter, fns, noEscape) {
+function _buildPropData(obj, counter, fns) {
   let dataValueStr,
     useString = fns.useString,
-    escape = !noEscape ? obj.escape : false;
+    escape = obj.escape;
   const { jsProp, isComputed } = obj.prop;
 
   //先生成数据值
@@ -156,7 +156,10 @@ function _buildPropData(obj, counter, fns, noEscape) {
       filterStr += 'else {\n';
       filterStr += '  ' + valueStr + ' = ' + filterVarStr + '.apply(p2, [' + valueStr +
         (o.params ? o.params.reduce(function(p, c) {
-          return p + ', \'' + c + '\'';
+          return p + ', ' + _buildPropData({
+            prop: c,
+            escape
+          }, counter, fns);
         }, '') : '') +
         ', ' + _buildOptions(configF) +
         ']);\n';

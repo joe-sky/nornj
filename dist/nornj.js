@@ -589,7 +589,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        if (paramsF) {
 	          var params = [];
 	          tools.each(paramsF.split(','), function (p) {
-	            params[params.length] = tools.clearQuot(p).trim();
+	            params[params.length] = compiledProp(p.trim());
 	          }, false, true);
 
 	          filterObj.params = params;
@@ -632,7 +632,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 	//Get filter param
-	var REGEX_FILTER_PARAM = /([\w$]+)(\(([^()]+)\))*/;
+	var REGEX_FILTER_PARAM = /([\w$@=+-\\*/&]+)(\(([^()]+)\))*/;
 
 	function _getFilterParam(obj) {
 	  return REGEX_FILTER_PARAM.exec(obj);
@@ -1917,13 +1917,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	  }
 
-	  return hashStr.length ? '{ _njOpts: true' + hashStr + ' }' : '';
+	  return '{ _njOpts: true, ctx: p2' + hashStr + ' }';
 	}
 
-	function _buildPropData(obj, counter, fns, noEscape) {
+	function _buildPropData(obj, counter, fns) {
 	  var dataValueStr = void 0,
 	      useString = fns.useString,
-	      escape = !noEscape ? obj.escape : false;
+	      escape = obj.escape;
 	  var _obj$prop = obj.prop,
 	      jsProp = _obj$prop.jsProp,
 	      isComputed = _obj$prop.isComputed;
@@ -1994,7 +1994,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	      filterStr += '}\n';
 	      filterStr += 'else {\n';
 	      filterStr += '  ' + valueStr + ' = ' + filterVarStr + '.apply(p2, [' + valueStr + (o.params ? o.params.reduce(function (p, c) {
-	        return p + ', \'' + c + '\'';
+	        return p + ', ' + _buildPropData({
+	          prop: c,
+	          escape: escape
+	        }, counter, fns);
 	      }, '') : '') + ', ' + _buildOptions(configF) + ']);\n';
 	      filterStr += '}\n';
 	    }, false, true);
