@@ -130,8 +130,16 @@ function _checkStringElem(xml) {
   return root;
 }
 
+const SPECIAL_LOOKUP = {
+  '>(': 'gt(',
+  '<(': 'lt(',
+  '>=(': 'gte(',
+  '<=(': 'lte('
+};
+
 function _clearNotesAndBlank(str) {
-  return str.replace(/<!--[\s\S]*?-->/g, '').replace(/>\s+([^\s<]*)\s+</g, '>$1<').trim();
+  return str.replace(/<!--[\s\S]*?-->/g, '').replace(/>\s+([^\s<]*)\s+</g, '>$1<').trim()
+    .replace(/(>|<|>=|<=)\(/g, (match) => SPECIAL_LOOKUP[match]);
 }
 
 function _formatText(str) {

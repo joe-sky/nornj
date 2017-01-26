@@ -62,7 +62,7 @@ function each(obj, func, context, isArr) {
 
   if (isArr) {
     for (var i = 0, l = obj.length; i < l; i++) {
-      var ret = func.call(context, obj[i], i);
+      var ret = func.call(context, obj[i], i, l);
 
       if (ret === false) {
         break;

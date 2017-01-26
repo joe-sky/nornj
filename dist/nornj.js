@@ -188,7 +188,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  if (isArr) {
 	    for (var i = 0, l = obj.length; i < l; i++) {
-	      var ret = func.call(context, obj[i], i);
+	      var ret = func.call(context, obj[i], i, l);
 
 	      if (ret === false) {
 	        break;
@@ -632,7 +632,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 	//Get filter param
-	var REGEX_FILTER_PARAM = /([\w$@=+-\\*/&]+)(\(([^()]+)\))*/;
+	var REGEX_FILTER_PARAM = /([\w$@=+-\\*/&%]+)(\(([^()]+)\))*/;
 
 	function _getFilterParam(obj) {
 	  return REGEX_FILTER_PARAM.exec(obj);
@@ -711,6 +711,8 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
+
+	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 	var tools = __webpack_require__(3);
 
@@ -817,18 +819,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 
 	        var props = options.props;
-	        tools.each(list, function (item, index) {
+	        tools.each(list, function (item, index, len) {
 	          var param = {
 	            data: item,
 	            index: index,
 	            fallback: true
 	          };
 
-	          if (props && props.extra) {
-	            param.extra = {
-	              isFirst: index === 0,
-	              isLast: index === list.length - 1
-	            };
+	          if (props && props.moreValues) {
+	            var _param$extra;
+
+	            param.extra = (_param$extra = {}, _defineProperty(_param$extra, '@first', index === 0), _defineProperty(_param$extra, '@last', index === len - 1), _defineProperty(_param$extra, '@length', len), _param$extra);
 	          }
 
 	          var retI = options.result(param);
@@ -893,6 +894,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	  },
 
 	  'for': function _for(start, end, options) {
+	    if (end._njOpts) {
+	      options = end;
+	      end = start;
+	      start = 0;
+	    }
+
 	    var ret,
 	        useString = options.useString;
 	    if (useString) {
@@ -900,13 +907,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    } else {
 	      ret = [];
 	    }
-
-	    if (end == null) {
-	      end = start;
-	      start = 0;
-	    }
-	    start = parseInt(start, 10);
-	    end = parseInt(end, 10);
 
 	    for (; start <= end; start++) {
 	      var retI = options.result({
@@ -921,6 +921,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 
 	    return ret;
+	  },
+
+	  obj: function obj(options) {
+	    return options.props;
 	  },
 
 	  blank: function blank(options) {
@@ -946,12 +950,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	  'if': _commonConfig({ newContext: false }),
 	  'else': _commonConfig({ newContext: false, useString: false, exprProps: true }),
 	  elseif: _commonConfig({ newContext: false, useString: false, exprProps: true }),
+	  'switch': _commonConfig({ newContext: false }),
 	  unless: _commonConfig({ newContext: false }),
 	  each: _commonConfig(),
 	  param: _commonConfig({ newContext: false, exprProps: true }),
 	  spread: _commonConfig({ newContext: false, useString: false, exprProps: true }),
-	  equal: _commonConfig({ newContext: false, useString: false }),
 	  'for': _commonConfig(),
+	  obj: _commonConfig({ newContext: false, useString: false }),
 	  blank: _commonConfig({ newContext: false, useString: false })
 	};
 
@@ -1462,8 +1467,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	//Global filter list
 	var filters = {
 	  //Get param properties
-	  prop: function prop(obj, props) {
-	    var ret = obj;
+	  prop: function prop(value, props) {
+	    var ret = value;
 	    ret && tools.each(props.split('.'), function (p) {
 	      ret = ret[p];
 	    }, false, true);
@@ -1471,54 +1476,38 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return ret;
 	  },
 
-	  //Get list count
-	  count: function count(obj) {
-	    return obj ? obj.length : 0;
+	  '==': function _(val1, val2) {
+	    return val1 == val2;
 	  },
 
-	  //Get list item
-	  item: function item(obj, no) {
-	    return obj ? obj[no] : null;
-	  },
-
-	  //Judge equal
-	  equal: function equal(obj, val) {
-	    return obj == val;
+	  '===': function _(val1, val2) {
+	    return val1 === val2;
 	  },
 
 	  //Less than
-	  lt: function lt(val1, val2, noEqual) {
-	    var ret;
-	    val1 = parseFloat(val1);
-	    val2 = parseFloat(val2);
+	  lt: function lt(val1, val2) {
+	    return val1 < val2;
+	  },
 
-	    if (noEqual) {
-	      ret = val1 < val2;
-	    } else {
-	      ret = val1 <= val2;
-	    }
-
-	    return ret;
+	  lte: function lte(val1, val2) {
+	    return val1 <= val2;
 	  },
 
 	  //Greater than
-	  gt: function gt(val1, val2, noEqual) {
-	    var ret;
-	    val1 = parseFloat(val1);
-	    val2 = parseFloat(val2);
-
-	    if (noEqual) {
-	      ret = val1 > val2;
-	    } else {
-	      ret = val1 >= val2;
-	    }
-
-	    return ret;
+	  gt: function gt(val1, val2) {
+	    return val1 > val2;
 	  },
 
-	  //Addition
-	  add: function add(val1, val2, isFloat) {
-	    return val1 + (isFloat ? parseFloat(val2) : parseInt(val2, 10));
+	  gte: function gte(val1, val2) {
+	    return val1 >= val2;
+	  },
+
+	  '+': function _(val1, val2) {
+	    return val1 + val2;
+	  },
+
+	  '-': function _(val1, val2) {
+	    return val1 - val2;
 	  },
 
 	  //Convert to int 
@@ -1543,7 +1532,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function _commonConfig(params) {
 	  var ret = {
-	    useString: true
+	    useString: false
 	  };
 
 	  if (params) {
@@ -1555,12 +1544,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	//Filter default config
 	var filterConfig = {
 	  prop: _commonConfig(),
-	  count: _commonConfig(),
-	  item: _commonConfig(),
-	  equal: _commonConfig(),
+	  '==': _commonConfig(),
+	  '===': _commonConfig(),
 	  lt: _commonConfig(),
+	  lte: _commonConfig(),
 	  gt: _commonConfig(),
-	  add: _commonConfig(),
+	  gte: _commonConfig(),
+	  '+': _commonConfig(),
+	  '-': _commonConfig(),
 	  int: _commonConfig(),
 	  float: _commonConfig(),
 	  bool: _commonConfig()
@@ -2593,8 +2584,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return root;
 	}
 
+	var SPECIAL_LOOKUP = {
+	  '>(': 'gt(',
+	  '<(': 'lt(',
+	  '>=(': 'gte(',
+	  '<=(': 'lte('
+	};
+
 	function _clearNotesAndBlank(str) {
-	  return str.replace(/<!--[\s\S]*?-->/g, '').replace(/>\s+([^\s<]*)\s+</g, '>$1<').trim();
+	  return str.replace(/<!--[\s\S]*?-->/g, '').replace(/>\s+([^\s<]*)\s+</g, '>$1<').trim().replace(/(>|<|>=|<=)\(/g, function (match) {
+	    return SPECIAL_LOOKUP[match];
+	  });
 	}
 
 	function _formatText(str) {

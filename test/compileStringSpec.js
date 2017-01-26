@@ -4,7 +4,7 @@
   compile = require('../src/compiler/compile').compile,
   includeParser = require('../tools/includeParser');
 
-describe('test compile string', function () {
+xdescribe('test compile string', function () {
   beforeAll(function () {
     nj.registerFilter('filter1', function (v, p1) {
       //console.log(this.getData('name1'));
@@ -141,8 +141,8 @@ describe('test compile string', function () {
             #${nj`
               <#each { list2 }>
                 <#each {list}>
-                  <@extra />
-                  <#if {isLast | filter3}>
+                  <@moreValues />
+                  <#if {@last | filter3}>
                     {../../list2.length}split{@index}
                   </#if>
                 </#each>

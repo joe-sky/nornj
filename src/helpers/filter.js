@@ -5,8 +5,8 @@ var tools = require('../utils/tools');
 //Global filter list
 var filters = {
   //Get param properties
-  prop: function(obj, props) {
-    var ret = obj;
+  prop: function(value, props) {
+    var ret = value;
     ret && tools.each(props.split('.'), function(p) {
       ret = ret[p];
     }, false, true);
@@ -14,55 +14,23 @@ var filters = {
     return ret;
   },
 
-  //Get list count
-  count: function(obj) {
-    return obj ? obj.length : 0;
-  },
+  '==': (val1, val2) => val1 == val2,
 
-  //Get list item
-  item: function(obj, no) {
-    return obj ? obj[no] : null;
-  },
-
-  //Judge equal
-  equal: function(obj, val) {
-    return obj == val;
-  },
+  '===': (val1, val2) => val1 === val2,
 
   //Less than
-  lt: function(val1, val2, noEqual) {
-    var ret;
-    val1 = parseFloat(val1);
-    val2 = parseFloat(val2);
+  lt: (val1, val2) => val1 < val2,
 
-    if (noEqual) {
-      ret = val1 < val2;
-    } else {
-      ret = val1 <= val2;
-    }
-
-    return ret;
-  },
+  lte: (val1, val2) => val1 <= val2,
 
   //Greater than
-  gt: function(val1, val2, noEqual) {
-    var ret;
-    val1 = parseFloat(val1);
-    val2 = parseFloat(val2);
+  gt: (val1, val2) => val1 > val2,
 
-    if (noEqual) {
-      ret = val1 > val2;
-    } else {
-      ret = val1 >= val2;
-    }
+  gte: (val1, val2) => val1 >= val2,
 
-    return ret;
-  },
+  '+': (val1, val2) => val1 + val2,
 
-  //Addition
-  add: function(val1, val2, isFloat) {
-    return val1 + (isFloat ? parseFloat(val2) : parseInt(val2, 10));
-  },
+  '-': (val1, val2) => val1 - val2,
 
   //Convert to int 
   int: function(val) {
@@ -86,7 +54,7 @@ var filters = {
 
 function _commonConfig(params) {
   var ret = {
-    useString: true
+    useString: false
   };
 
   if (params) {
@@ -98,12 +66,14 @@ function _commonConfig(params) {
 //Filter default config
 var filterConfig = {
   prop: _commonConfig(),
-  count: _commonConfig(),
-  item: _commonConfig(),
-  equal: _commonConfig(),
+  '==': _commonConfig(),
+  '===': _commonConfig(),
   lt: _commonConfig(),
+  lte: _commonConfig(),
   gt: _commonConfig(),
-  add: _commonConfig(),
+  gte: _commonConfig(),
+  '+': _commonConfig(),
+  '-': _commonConfig(),
   int: _commonConfig(),
   float: _commonConfig(),
   bool: _commonConfig()

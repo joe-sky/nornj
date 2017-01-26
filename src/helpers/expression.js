@@ -98,17 +98,18 @@ const exprs = {
       }
 
       const props = options.props;
-      tools.each(list, function(item, index) {
+      tools.each(list, function(item, index, len) {
         let param = {
           data: item,
           index: index,
           fallback: true
         };
 
-        if (props && props.extra) {
+        if (props && props.moreValues) {
           param.extra = {
-            isFirst: index === 0,
-            isLast: index === list.length - 1
+            ['@first']: index === 0,
+            ['@last']: index === len - 1,
+            ['@length']: len
           };
         }
 
@@ -171,19 +172,18 @@ const exprs = {
   },
 
   'for': function(start, end, options) {
+    if (end._njOpts) {
+      options = end;
+      end = start;
+      start = 0;
+    }
+
     var ret, useString = options.useString;
     if (useString) {
       ret = '';
     } else {
       ret = [];
     }
-
-    if (end == null) {
-      end = start;
-      start = 0;
-    }
-    start = parseInt(start, 10);
-    end = parseInt(end, 10);
 
     for (; start <= end; start++) {
       var retI = options.result({
@@ -198,6 +198,10 @@ const exprs = {
     }
 
     return ret;
+  },
+
+  obj: function(options) {
+    return options.props;
   },
 
   blank: function(options) {
@@ -223,12 +227,13 @@ var exprConfig = {
   'if': _commonConfig({ newContext: false }),
   'else': _commonConfig({ newContext: false, useString: false, exprProps: true }),
   elseif: _commonConfig({ newContext: false, useString: false, exprProps: true }),
+  'switch': _commonConfig({ newContext: false }),
   unless: _commonConfig({ newContext: false }),
   each: _commonConfig(),
   param: _commonConfig({ newContext: false, exprProps: true }),
   spread: _commonConfig({ newContext: false, useString: false, exprProps: true }),
-  equal: _commonConfig({ newContext: false, useString: false }),
   'for': _commonConfig(),
+  obj: _commonConfig({ newContext: false, useString: false }),
   blank: _commonConfig({ newContext: false, useString: false })
 };
 

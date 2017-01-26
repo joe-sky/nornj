@@ -82,7 +82,7 @@ function compiledProp(prop) {
 }
 
 //Get filter param
-var REGEX_FILTER_PARAM = /([\w$@=+-\\*/&]+)(\(([^()]+)\))*/;
+var REGEX_FILTER_PARAM = /([\w$@=+-\\*/&%]+)(\(([^()]+)\))*/;
 
 function _getFilterParam(obj) {
   return REGEX_FILTER_PARAM.exec(obj);

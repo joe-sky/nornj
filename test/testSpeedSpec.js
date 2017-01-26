@@ -8,12 +8,12 @@
   ReactDOMServer = require('react-dom/server'),
   Handlebars = require('handlebars');
 
-// nj.config({
-//   createElement: React.createElement,
-//   outputH: true
-// });
+nj.config({
+  createElement: React.createElement,
+  outputH: true
+});
 
-xdescribe('test speed', function() {
+describe('test speed', function() {
   var t1 = nj `
   <img src="t1" />
   `;
@@ -32,6 +32,7 @@ xdescribe('test speed', function() {
       }}
     </#each>
     <TestComp2>
+      <@store><#obj id=1 name="2" /></@store>
       <#tmpl>
         <span>{no}</span>
       </#tmpl>
@@ -55,7 +56,7 @@ xdescribe('test speed', function() {
       </span>
       <#if {@index | five(1)}>
         <br />
-        <#elseif {true}>
+        <#elseif {@index | >=(1)}>
           <img name="elseif" />
         </#elseif>
         <#else>
@@ -397,7 +398,7 @@ xdescribe('test speed', function() {
           {#tmplFn}
         </div>
         ` ({
-          tmpl: this.props.tmpls[0]({ no: 5001 }),
+          tmpl: this.props.tmpls[0]({ no: this.props.store.id }),
           tmplFn: this.props.tmpls[0],
           no: 5002
         });
