@@ -1,5 +1,5 @@
 # NornJ
-一款轻量级且多用途的javascript模板引擎，可输出html字符串也可输出React组件的虚拟dom
+一款轻量级且使用场景丰富的javascript模板引擎。它不仅支持输出普通html字符串，还可以接入`React`或API与`React`类似的view层框架为它们输出虚拟dom，同时还能保证很高的渲染效率。
 
 ### 模板基本示例
 ```js
@@ -20,32 +20,29 @@ const tmpl = nj`
 ### 与React配合示例
 NornJ可以替代JSX输出React组件，用它可以将React组件的逻辑与结构更优雅地实现解藕：
 ```js
-/* tmpl.js */
-import nj from 'nornj';
-
-export default nj`
-<div id=test1>
-  this the test demo{no}.
-  <#for {'1'} {no}>
-    <i>test{#}</i>
-  </#for>
-</div>`;
-
-/* comp.js */
 import { Component } from 'react';
 import { render } from 'react-dom';
 import nj from 'nornj';
 import { registerTmpl } from 'nornj-react';
-import tmpl from './tmpl';
 
-@registerTmpl({'TestComponent', tmpl)
+@registerTmpl({
+  name: 'TestComponent',
+  template: `
+    <div id=test1>
+      this the test demo{no}.
+      <#for {1} {no}>
+        <i>test{#}</i>
+      </#for>
+    </div>
+  `
+})
 class TestComponent extends Component {
   render() {
     return this.template(this.props);
   }
 }
 
-render(nj`<TestComponent no=100 />`.renderH(), document.body);
+render(nj`<TestComponent no=100 />`(), document.body);
 
 /* output:
 <div id="test1">
@@ -82,9 +79,9 @@ render(nj`<TestComponent no=100 />`.renderH(), document.body);
   var tmpl = document.querySelector('#template').innerHTML;
 </script>
 ```
-然后可以这样编译后输出html字符串：
+然后可以这样渲染html字符串：
 ```js
-let html = nj.compile(tmpl)({
+let html = nj.render(tmpl, {
   msg: 'Hello world!',
   click: "alert('test')"
 });
