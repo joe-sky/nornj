@@ -2,12 +2,17 @@
 一款轻量级且使用场景丰富的javascript模板引擎。它不仅支持输出普通html字符串，还可以接入`React`或API与`React`类似的view层框架为它们输出虚拟dom，同时还能保证很高的渲染效率。
 
 ### 模板基本示例
-```js
-const tmpl = nj`
-<div>
-  this the test demo Hello {msg}
-  <input id=test onclick={click} />
-</div>`;
+```html
+<template name="partial">
+  <input id=test onclick={{click}} />
+</template>
+
+<template>
+  <div>
+    this the test demo Hello {{msg}}
+    <#include name="partial" />
+  </div>
+</template>
 ```
 
 ### 用途
@@ -31,7 +36,7 @@ import { registerTmpl } from 'nornj-react';
     <div id=test1>
       this the test demo{no}.
       <#for {1} {no}>
-        <i>test{#}</i>
+        <i>test{@index}</i>
       </#for>
     </div>
   `
