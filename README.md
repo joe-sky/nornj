@@ -76,8 +76,8 @@ render(nj`<TestComponent no=100 />`(), document.body);
 ```html
 <script id="template" type="text/nornj">
   <div>
-    this the test demo Hello {msg}
-    <input id=test onclick={click} />
+    this the test demo Hello {{msg}}
+    <input id="test" onclick="{{click}}" />
   </div>
 </script>
 <script type="text/javascript">

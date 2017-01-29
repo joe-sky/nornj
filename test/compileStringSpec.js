@@ -4,7 +4,7 @@
   compile = require('../src/compiler/compile').compile,
   includeParser = require('../tools/includeParser');
 
-xdescribe('test compile string', function () {
+describe('test compile string', function () {
   beforeAll(function () {
     nj.registerFilter('filter1', function (v, p1) {
       //console.log(this.getData('name1'));
@@ -83,20 +83,20 @@ xdescribe('test compile string', function () {
       ];
 
       var tmpl1 = nj`
-        <div name1="../111" class="{ c1 } c0{ 5 | filter1 }{'!'}{ 10 | filter1(1) } c2" id1=666 id2=777 name="my name:{'name'}{name},id:{id},name:{name}" id=test1>
+        <div name1="../111" class="{{ c1 }} c0{{ 5 | filter1 }}{{'!'}}{{ 10 | filter1(1) }} c2" id1=666 id2=777 name="my name:{{'name'}}{{name}},id:{{id}},name:{{name}}" id=test1>
           <span>
-            sky:{name},{id}
+            sky:{{name}},{{id}}
           </span>
           <span1>
             <#props>
-              <#prop {'test12'}>test</#prop>
+              <#prop {{'test12'}}>test</#prop>
             </#props>
             joe
           </span1>
           <div id=555>
             <a />
             <input type=button />
-            <#unless {false}>
+            <#unless {{false}}>
               <input id="test5" />
             </#unless>
           </div>
@@ -105,26 +105,26 @@ xdescribe('test compile string', function () {
 
       var tmpl2 = nj`
         <div name1=../111>
-          <form-item wrapperCol="{'[1, 2]'}">
+          <form-item wrapperCol="{{'[1, 2]'}}">
           <span>
             <img />
-            sky:{name},{ id | filter2(1, 2) }{'[1]'}end
+            sky:{{name}},{{ id | filter2(1, 2) }}{{'[1]'}}end
           </span>
         </div>
       `;
 
       var tmpl3 = nj`
-        <div class="{id} {name3}" {name3} { ...props} name={name1} autofocus name1={a.c.d} name2="{a.e | prop('f') | prop('g')}" a="/%'aaa'%/">
-          <@name checked>{test0 | filter1}{'test1' | filter2}test2</@name>
+        <div class="{{id}} {{name3}}" {{name3}} {{ ...props}} name={{name1}} autofocus name1={{a.c.d}} name2="{{a.e | prop('f') | prop('g')}}" a="/%'aaa'%/">
+          <@name checked>{{test0 | filter1}}{{'test1' | filter2}}test2</@name>
           <@checked />
           <@data-name10>
-            <#each {{list}}>
-              <#if {this}>{ @index | filter2 }<#else>{ 100 | filter1 }</#else></#if>
+            <#each {{{list}}}>
+              <#if {{this}}>{{ @index | filter2 }}<#else>{{ 100 | filter1 }}</#else></#if>
             </#each>
           </@data-name10>
           <#props>
-            <#each {list}>
-              <#prop {'data-name'}>{this | filter1}{'test1'}test2</#prop>
+            <#each {{list}}>
+              <#prop {{'data-name'}}>{{this | filter1}}{{'test1'}}test2</#prop>
             </#each>
           </#props>
           <input autofocus />
@@ -133,21 +133,21 @@ xdescribe('test compile string', function () {
           <span>
             #${tmpl2}
             <img />
-            sky:{{ 'name555' }},{ id | filter2 }
+            sky:{{{ 'name555' }}},{{ id | filter2 }}
             <section>
             @${tmpl1()}
             </section>
             <input type=button />
             #${nj`
-              <#each { list2 }>
-                <#each {list}>
+              <#each {{ list2 }}>
+                <#each {{list}}>
                   <@moreValues />
-                  <#if {@last | filter3}>
-                    {../../list2.length}split{@index}
+                  <#if {{@last | filter3}}>
+                    {{../../list2.length}}split{{@index}}
                   </#if>
                 </#each>
-                <slider {../name3}>
-                  <{../sliderItem.a|tagName} no1={no} no2="{-0.05 | filter2}" checked no='{ ../sliderItem.b }' />
+                <slider {{../name3}}>
+                  <{{../sliderItem.a|tagName}} no1={{no}} no2="{{-0.05 | filter2}}" checked no='{{ ../sliderItem.b }}' />
                 </slider>
               </#each>
             `}
@@ -156,23 +156,23 @@ xdescribe('test compile string', function () {
       `;
 
       var tmplTest = nj`
-      <#each { list2 }>
-        <div {...props}>
+      <#each {{ list2 }}>
+        <div {{...props}}>
           <@id>d1</@id>
           <#props>
-            <#unless {test0}>
+            <#unless {{test0}}>
               <@id1>d2</@id1>
             </#unless>
           </#props>
         </div>
-        <#each {list}>
-          {../../list2.length}${'split1'}{../@index}
+        <#each {{list}}>
+          {{../../list2.length}}${'split1'}{{../@index}}
         </#each>
         <#textExpr />
-        <slider {../name3}>
+        <slider {{../name3}}>
           @${nj`<div>111</div>`()}
-          #${nj`<div>{../name3}</div>`}
-          <{../sliderItem.a|tagName} no1={no} no2="{-0.05 | filter2}" checked no='{ ../sliderItem.b }' />
+          #${nj`<div>{{../name3}}</div>`}
+          <{{../sliderItem.a|tagName}} no1={{no}} no2="{{-0.05 | filter2}}" checked no='{{ ../sliderItem.b }}' />
         </slider>
       </#each>
       `;

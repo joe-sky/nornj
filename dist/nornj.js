@@ -642,7 +642,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var _quots = ['\'', '"'];
 
 	function _getReplaceParam(obj, strs) {
-	  var pattern = tmplRule.replaceParam(),
+	  var pattern = tmplRule.replaceParam,
 	      matchArr,
 	      ret,
 	      i = 0;
@@ -684,11 +684,11 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    tools.each(params, function (param) {
 	      var retP = tools.lightObj();
-	      isAll = param[3] ? param[0] === value : false; //If there are several curly braces, "isAll" must be false.
+	      isAll = param[3] ? param[0] === value : false; //If there are several curly braces in one property value, "isAll" must be false.
 	      retP.prop = compiledProp(param[2]);
 
-	      //If parameter's open rules are several,then it need escape.
-	      retP.escape = param[1].split(tmplRule.startRule).length < 3;
+	      //To determine whether it is necessary to escape
+	      retP.escape = param[1] !== tmplRule.firstChar + tmplRule.startRule;
 	      props.push(retP);
 	    }, false, true);
 	  }
@@ -1633,10 +1633,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    templateRule = params.template;
 	  }
 	  if (!startRule) {
-	    startRule = '{';
+	    startRule = '{{';
 	  }
 	  if (!endRule) {
-	    endRule = '}';
+	    endRule = '}}';
 	  }
 	  if (!exprRule) {
 	    exprRule = '#';
@@ -1660,23 +1660,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	  tools.assign(nj.tmplRule, {
 	    startRule: startRule,
 	    endRule: endRule,
+	    firstChar: firstChar,
+	    lastChar: lastChar,
 	    exprRule: exprRule,
 	    propRule: propRule,
-	    xmlOpenTag: _createRegExp('^<([a-z' + firstChar + exprRules + '][-a-z0-9_|./' + otherChars + ']*)[^>]*>$', 'i'),
-	    openTagParams: _createRegExp('[\\s]+(((' + startRule + '){1,2}([^' + allRules + ']+)(' + endRule + '){1,2})|[^\\s=>]+)(=((\'[^\']+\')|("[^"]+")|([^"\'\\s]+)))?', 'g'),
-	    insideBraceParam: _createRegExp('(' + startRule + '){1,2}([^' + allRules + ']+)(' + endRule + '){1,2}', 'i'),
-	    spreadProp: _createRegExp('[\\s]+(' + startRule + '){1,2}[\\s]*(\\.\\.\\.[^' + allRules + ']+)(' + endRule + '){1,2}', 'g'),
-	    replaceSplit: _createRegExp('(?:' + startRule + '){1,2}[^' + allRules + ']+(?:' + endRule + '){1,2}'),
-	    replaceParam: function replaceParam() {
-	      return _createRegExp('((' + startRule + '){1,2})([^' + allRules + ']+)(' + endRule + '){1,2}', 'g');
-	    },
-	    checkElem: function checkElem() {
-	      return _createRegExp('([^>]*)(<([a-z' + firstChar + '/' + exprRules + '!][-a-z0-9_|.' + allRules + exprRules + ']*)([^>]*)>)([^<]*)', 'ig');
-	    },
+	    xmlOpenTag: _createRegExp('^<([a-z' + firstChar + exprRules + '][-a-z0-9_|./' + firstChar + otherChars + ']*)[^>]*>$', 'i'),
+	    openTagParams: _createRegExp('[\\s]+((([' + firstChar + ']?' + startRule + ')([^' + allRules + ']+)(' + endRule + '[' + lastChar + ']?))|[^\\s=>]+)(=((\'[^\']+\')|("[^"]+")|([^"\'\\s]+)))?', 'g'),
+	    insideBraceParam: _createRegExp('([' + firstChar + ']?' + startRule + ')([^' + allRules + ']+)(' + endRule + '[' + lastChar + ']?)', 'i'),
+	    spreadProp: _createRegExp('[\\s]+([' + firstChar + ']?' + startRule + ')[\\s]*(\\.\\.\\.[^' + allRules + ']+)(' + endRule + '[' + lastChar + ']?)', 'g'),
+	    replaceSplit: _createRegExp('(?:[' + firstChar + ']?' + startRule + ')[^' + allRules + ']+(?:' + endRule + '[' + lastChar + ']?)'),
+	    replaceParam: _createRegExp('(([' + firstChar + ']?' + startRule + '))([^' + allRules + ']+)(' + endRule + '[' + lastChar + ']?)', 'g'),
+	    checkElem: _createRegExp('([^>]*)(<([a-z' + firstChar + '/' + exprRules + '!][-a-z0-9_|.' + allRules + exprRules + ']*)([^>]*)>)([^<]*)', 'ig'),
 	    expr: _createRegExp('^' + escapeExprRule + '([^\\s]+)', 'i'),
-	    include: function include() {
-	      return _createRegExp('<' + escapeExprRule + 'include([^>]*)>', 'ig');
-	    },
+	    include: _createRegExp('<' + escapeExprRule + 'include([^>]*)>', 'ig'),
 	    template: templateRule,
 	    newlineSplit: _createRegExp('\\\\n(?![^' + firstChar + lastChar + ']*' + lastChar + ')', 'g')
 	  });
@@ -2487,7 +2483,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	          xml = xml.substr(0, last);
 	        }
 
-	        split = tmplRule.startRule + (isNoEscape ? tmplRule.startRule : '') + (isComputed ? '#' : '') + SPLIT_FLAG + i + tmplRule.endRule + (isNoEscape ? tmplRule.endRule : '');
+	        split = (isNoEscape ? tmplRule.firstChar : '') + tmplRule.startRule + (isComputed ? '#' : '') + SPLIT_FLAG + i + tmplRule.endRule + (isNoEscape ? tmplRule.lastChar : '');
 	      }
 
 	      fullXml += xml + split;
@@ -2534,7 +2530,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    parent: null
 	  },
 	      parent = null,
-	      pattern = tmplRule.checkElem(),
+	      pattern = tmplRule.checkElem,
 	      matchArr;
 
 	  while (matchArr = pattern.exec(xml)) {
@@ -2607,7 +2603,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  if (elemName[0] === tmplRule.exprRule) {
 	    ret = elem.substring(1, elem.length - 1);
 	  } else if (elemName.indexOf(tmplRule.propRule) === 0) {
-	    ret = tmplRule.exprRule + 'prop {\'' + elemName.substr(tmplRule.propRule.length) + '\'}' + elemParams;
+	    ret = tmplRule.exprRule + 'prop ' + tmplRule.startRule + '\'' + elemName.substr(tmplRule.propRule.length) + '\'' + tmplRule.endRule + elemParams;
 	  } else {
 	    var retS = _getSplitParams(elem);
 	    ret = retS.elem;

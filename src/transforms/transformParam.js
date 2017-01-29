@@ -92,7 +92,7 @@ function _getFilterParam(obj) {
 var _quots = ['\'', '"'];
 
 function _getReplaceParam(obj, strs) {
-  var pattern = tmplRule.replaceParam(),
+  var pattern = tmplRule.replaceParam,
     matchArr, ret, i = 0;
 
   while ((matchArr = pattern.exec(obj))) {
@@ -132,11 +132,11 @@ function compiledParam(value) {
 
     tools.each(params, function(param) {
       var retP = tools.lightObj();
-      isAll = param[3] ? param[0] === value : false; //If there are several curly braces, "isAll" must be false.
+      isAll = param[3] ? param[0] === value : false; //If there are several curly braces in one property value, "isAll" must be false.
       retP.prop = compiledProp(param[2]);
 
-      //If parameter's open rules are several,then it need escape.
-      retP.escape = param[1].split(tmplRule.startRule).length < 3;
+      //To determine whether it is necessary to escape
+      retP.escape = param[1] !== tmplRule.firstChar + tmplRule.startRule;
       props.push(retP);
     }, false, true);
   }

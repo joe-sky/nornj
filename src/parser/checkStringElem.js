@@ -34,9 +34,9 @@ function compileStringTmpl(tmpl) {
           xml = xml.substr(0, last);
         }
 
-        split = tmplRule.startRule + (isNoEscape ? tmplRule.startRule : '') +
+        split = (isNoEscape ? tmplRule.firstChar : '') + tmplRule.startRule +
           (isComputed ? '#' : '') + SPLIT_FLAG + i +
-          tmplRule.endRule + (isNoEscape ? tmplRule.endRule : '');
+          tmplRule.endRule + (isNoEscape ? tmplRule.lastChar : '');
       }
 
       fullXml += xml + split;
@@ -83,7 +83,7 @@ function _checkStringElem(xml) {
       parent: null
     },
     parent = null,
-    pattern = tmplRule.checkElem(),
+    pattern = tmplRule.checkElem,
     matchArr;
 
   while (matchArr = pattern.exec(xml)) {
@@ -152,7 +152,7 @@ function _setElem(elem, elemName, elemParams, elemArr, bySelfClose) {
   if (elemName[0] === tmplRule.exprRule) {
     ret = elem.substring(1, elem.length - 1);
   } else if (elemName.indexOf(tmplRule.propRule) === 0) {
-    ret = tmplRule.exprRule + 'prop {\'' + elemName.substr(tmplRule.propRule.length) + '\'}' + elemParams;
+    ret = tmplRule.exprRule + 'prop ' + tmplRule.startRule + '\'' + elemName.substr(tmplRule.propRule.length) + '\'' + tmplRule.endRule + elemParams;
   } else {
     var retS = _getSplitParams(elem);
     ret = retS.elem;

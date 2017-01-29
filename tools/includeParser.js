@@ -60,7 +60,7 @@ function getIncludeTmpl(tmplString, fileName, isAll, tmplStrs, tmplName) {
 
   tmplStrList.forEach(function (obj) {
     //解析include块
-    var _ret = obj.tmpl.replace(tmplRule.include(), function (all, params) {
+    var _ret = obj.tmpl.replace(tmplRule.include, function (all, params) {
       var props = nj.getOpenTagParams(params),
         src, name;
 
