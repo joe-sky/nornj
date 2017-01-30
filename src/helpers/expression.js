@@ -144,7 +144,7 @@ const exprs = {
       value;
 
     //If the value length greater than 1, it need to be connected to a whole string.
-    if (ret != null) {
+    if (ret !== undefined) {
       if (!tools.isArray(ret)) {
         value = ret;
       } else {
@@ -161,12 +161,8 @@ const exprs = {
   },
 
   //Spread parameters
-  spread: function(refer, options) {
-    if (!refer) {
-      return;
-    }
-
-    tools.each(refer, function(v, k) {
+  spread: function(props, options) {
+    tools.each(props, function(v, k) {
       options.exprProps[k] = v;
     }, false, false);
   },

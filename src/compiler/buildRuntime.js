@@ -246,8 +246,6 @@ function _buildProps(obj, counter, fns) {
       }
     }, false, false);
     valueStr += '}';
-  } else if (utils.isObject(str0) && str0._njEx) {
-    valueStr = str0._njEx;
   }
 
   if (filterStr === '') {
