@@ -865,7 +865,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value;
 
 	    //If the value length greater than 1, it need to be connected to a whole string.
-	    if (ret != null) {
+	    if (ret !== undefined) {
 	      if (!tools.isArray(ret)) {
 	        value = ret;
 	      } else {
@@ -883,12 +883,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	  },
 
 	  //Spread parameters
-	  spread: function spread(refer, options) {
-	    if (!refer) {
-	      return;
-	    }
-
-	    tools.each(refer, function (v, k) {
+	  spread: function spread(props, options) {
+	    tools.each(props, function (v, k) {
 	      options.exprProps[k] = v;
 	    }, false, false);
 	  },
@@ -2011,12 +2007,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	}
 
-	function _replaceQuot(str, fns) {
-	  if (fns.useString) {
-	    return str.replace(/'/g, "\\'");
-	  } else {
-	    return str;
-	  }
+	function _replaceQuot(str) {
+	  return str.replace(/'/g, "\\'");
 	}
 
 	function _buildProps(obj, counter, fns) {
@@ -2026,7 +2018,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  if (utils.isString(str0)) {
 	    //常规属性
-	    valueStr = !obj.isAll && str0 !== '' ? '\'' + _replaceQuot(str0, fns) + '\'' : '';
+	    valueStr = !obj.isAll && str0 !== '' ? '\'' + _replaceQuot(str0) + '\'' : '';
 	    filterStr = '';
 
 	    utils.each(obj.props, function (o, i) {
@@ -2040,14 +2032,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }
 
 	      if (!obj.isAll) {
-	        var strI = obj.strs[i + 1];
-	        if (!fns.useString && strI.trim() === '\\n') {
-	          //在outputH时如果只包含换行符号则忽略
-	          valueStr += dataValueStr;
+	        var strI = obj.strs[i + 1],
+	            prefixStr = str0 === '' && i == 0 ? '' : ' + ';
+
+	        if (strI.trim() === '\\n') {
+	          //如果只包含换行符号则忽略
+	          valueStr += prefixStr + dataValueStr;
 	          return;
 	        }
 
-	        dataValueStr = (str0 === '' && i == 0 ? '' : ' + ') + '(' + dataValueStr + ')' + (strI !== '' ? ' + \'' + _replaceQuot(strI, fns) + '\'' : '');
+	        dataValueStr = prefixStr + '(' + dataValueStr + ')' + (strI !== '' ? ' + \'' + _replaceQuot(strI) + '\'' : '');
 	      }
 
 	      valueStr += dataValueStr;
@@ -2072,8 +2066,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }
 	    }, false, false);
 	    valueStr += '}';
-	  } else if (utils.isObject(str0) && str0._njEx) {
-	    valueStr = str0._njEx;
 	  }
 
 	  if (filterStr === '') {

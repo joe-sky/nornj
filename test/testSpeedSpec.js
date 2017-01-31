@@ -8,16 +8,16 @@
   ReactDOMServer = require('react-dom/server'),
   Handlebars = require('handlebars');
 
-// nj.config({
-//   createElement: React.createElement,
-//   outputH: true,
-//   delimiters: {
-//     start: '{',
-//     end: '}'
-//   }
-// });
+nj.config({
+  createElement: React.createElement,
+  outputH: true,
+  delimiters: {
+    start: '{',
+    end: '}'
+  }
+});
 
-xdescribe('test speed', function() {
+describe('test speed', function() {
   var t1 = nj `
   <img src="t1" />
   `;
@@ -27,7 +27,7 @@ xdescribe('test speed', function() {
   `;
 
   var tmpl = nj `
-  <{div} id="{num}_100">
+  <{div} id="{num}_100'200'">
     #${t1}
     ${t2()}
     <#each ${[1, 2, 3]}>

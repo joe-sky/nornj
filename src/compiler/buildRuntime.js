@@ -187,12 +187,8 @@ function _buildEscape(valueStr, useString, escape) {
   }
 }
 
-function _replaceQuot(str, fns) {
-  if (fns.useString) {
-    return str.replace(/'/g, "\\'");
-  } else {
-    return str;
-  }
+function _replaceQuot(str) {
+  return str.replace(/'/g, "\\'");
 }
 
 function _buildProps(obj, counter, fns) {
@@ -201,7 +197,7 @@ function _buildProps(obj, counter, fns) {
     filterStr = '';
 
   if (utils.isString(str0)) { //常规属性
-    valueStr = !obj.isAll && str0 !== '' ? ('\'' + _replaceQuot(str0, fns) + '\'') : '';
+    valueStr = !obj.isAll && str0 !== '' ? ('\'' + _replaceQuot(str0) + '\'') : '';
     filterStr = '';
 
     utils.each(obj.props, function(o, i) {
@@ -215,15 +211,17 @@ function _buildProps(obj, counter, fns) {
       }
 
       if (!obj.isAll) {
-        var strI = obj.strs[i + 1];
-        if (!fns.useString && strI.trim() === '\\n') { //在outputH时如果只包含换行符号则忽略
-          valueStr += dataValueStr;
+        var strI = obj.strs[i + 1],
+          prefixStr = (str0 === '' && i == 0 ? '' : ' + ');
+
+        if (strI.trim() === '\\n') { //如果只包含换行符号则忽略
+          valueStr += prefixStr + dataValueStr;
           return;
         }
 
-        dataValueStr = (str0 === '' && i == 0 ? '' : ' + ') +
+        dataValueStr = prefixStr +
           '(' + dataValueStr + ')' +
-          (strI !== '' ? ' + \'' + _replaceQuot(strI, fns) + '\'' : '');
+          (strI !== '' ? ' + \'' + _replaceQuot(strI) + '\'' : '');
       }
 
       valueStr += dataValueStr;
