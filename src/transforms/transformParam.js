@@ -6,7 +6,7 @@ var nj = require('../core'),
 
 //Get compiled parameters from a object
 function compiledParams(obj) {
-  var ret = tools.lightObj();
+  var ret = tools.obj();
   tools.each(obj, function(v, k) {
     ret[k] = compiledParam(v);
   }, false, false);
@@ -18,7 +18,7 @@ function compiledParams(obj) {
 var REGEX_JS_PROP = /(('[^']+')|("[^"]+")|(-?([0-9][0-9]*)(\.\d+)?)|true|false|null|undefined|([#]*)([^.[\]()]+))([^\s()]*)/;
 
 function compiledProp(prop) {
-  var ret = tools.lightObj();
+  var ret = tools.obj();
 
   //If there are colons in the property,then use filter
   if (prop.indexOf('|') >= 0) {
@@ -30,7 +30,7 @@ function compiledProp(prop) {
     filtersTmp = filtersTmp.slice(1);
     tools.each(filtersTmp, function(filter) {
       var retF = _getFilterParam(filter.trim()),
-        filterObj = tools.lightObj(),
+        filterObj = tools.obj(),
         filterName = retF[1]; //Get filter name
 
       if (filterName) {
@@ -82,7 +82,7 @@ function compiledProp(prop) {
 }
 
 //Get filter param
-var REGEX_FILTER_PARAM = /([\w$@=+-\\*/&%]+)(\(([^()]+)\))*/;
+var REGEX_FILTER_PARAM = /([\w$@=+-\\*/&%?]+)(\(([^()]+)\))*/;
 
 function _getFilterParam(obj) {
   return REGEX_FILTER_PARAM.exec(obj);
@@ -120,7 +120,7 @@ function _getReplaceParam(obj, strs) {
 
 //Get compiled parameter
 function compiledParam(value) {
-  var ret = tools.lightObj(),
+  var ret = tools.obj(),
     strs = tools.isString(value) ? value.split(tmplRule.replaceSplit) : [value],
     props = null,
     isAll = false; //此处指替换符是否占满整个属性值;若无替换符时为false
@@ -131,7 +131,7 @@ function compiledParam(value) {
     props = [];
 
     tools.each(params, function(param) {
-      var retP = tools.lightObj();
+      var retP = tools.obj();
       isAll = param[3] ? param[0] === value : false; //If there are several curly braces in one property value, "isAll" must be false.
       retP.prop = compiledProp(param[2]);
 

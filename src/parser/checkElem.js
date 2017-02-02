@@ -90,7 +90,7 @@ function checkElem(obj, parent, hasExprProps) {
             node.args.push(paramV);
           } else {
             if (!node.params) {
-              node.params = tools.lightObj();
+              node.params = tools.obj();
             }
             node.params[param.key] = paramV;
           }
@@ -116,7 +116,7 @@ function checkElem(obj, parent, hasExprProps) {
         var tagParams = tranElem.getOpenTagParams(first);
         if (tagParams) {
           if (!node.params) {
-            node.params = tools.lightObj();
+            node.params = tools.obj();
           }
 
           tools.each(tagParams, function(param) { //The parameter like "{prop}" needs to be replaced.

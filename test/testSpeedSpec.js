@@ -8,16 +8,16 @@
   ReactDOMServer = require('react-dom/server'),
   Handlebars = require('handlebars');
 
-nj.config({
-  createElement: React.createElement,
-  outputH: true,
-  delimiters: {
-    start: '{',
-    end: '}'
-  }
-});
+// nj.config({
+//   createElement: React.createElement,
+//   outputH: true,
+//   delimiters: {
+//     start: '{',
+//     end: '}'
+//   }
+// });
 
-describe('test speed', function() {
+xdescribe('test speed', function() {
   var t1 = nj `
   <img src="t1" />
   `;
@@ -54,7 +54,7 @@ describe('test speed', function() {
               </#if>
             </#props>
             <span>span{no}</span>
-            <i>{no}</i>
+            <i>{no | -(1) | ?(10, 20)}</i>
           </div>
         </#each>
       </span>

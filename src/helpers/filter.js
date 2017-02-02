@@ -5,11 +5,11 @@ var tools = require('../utils/tools');
 //Global filter list
 var filters = {
   //Get param properties
-  prop: function(value, props) {
+  prop: (value, props) => {
     var ret = value;
-    ret && tools.each(props.split('.'), function(p) {
+    ret && props.split('.').forEach(p => {
       ret = ret[p];
-    }, false, true);
+    });
 
     return ret;
   },
@@ -32,18 +32,17 @@ var filters = {
 
   '-': (val1, val2) => val1 - val2,
 
+  //Ternary operator
+  '?': (val, val1, val2) => val ? val1 : val2,
+
   //Convert to int 
-  int: function(val) {
-    return parseInt(val, 10);
-  },
+  int: val => parseInt(val, 10),
 
   //Convert to float 
-  float: function(val) {
-    return parseFloat(val);
-  },
+  float: val => parseFloat(val),
 
   //Convert to boolean 
-  bool: function(val) {
+  bool: val => {
     if (val === 'false') {
       return false;
     }

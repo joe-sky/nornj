@@ -137,7 +137,7 @@ function warn(msg, type) {
 }
 
 //create light weight object
-function lightObj() {
+function obj() {
   return Object.create(null);
 }
 
@@ -205,7 +205,7 @@ var tools = {
   flatten,
   throwIf,
   assign,
-  lightObj,
+  obj,
   arrayPush,
   arraySlice,
   clearQuot,

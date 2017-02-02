@@ -145,7 +145,7 @@ function template(fns) {
     exprs: nj.exprs,
     filters: nj.filters,
     noop: tools.noop,
-    lightObj: tools.lightObj,
+    obj: tools.obj,
     throwIf: tools.throwIf,
     warn: tools.warn,
     newContext,

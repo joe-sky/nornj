@@ -4,7 +4,7 @@
   compile = require('../src/compiler/compile').compile,
   includeParser = require('../tools/includeParser');
 
-xdescribe('test compile string', function () {
+describe('test compile string', function () {
   beforeAll(function () {
     nj.registerFilter('filter1', function (v, p1) {
       //console.log(this.getData('name1'));
@@ -20,8 +20,8 @@ xdescribe('test compile string', function () {
     nj.registerFilter('tagName', function (v) {
       return v + 'Tmp';
     });
-    nj.registerExpr('textExpr', function () {
-      return '<TextExpr />';
+    nj.registerExpr('textExpr', function (opts) {
+      return opts.props.tmpls[0]();
     });
   });
 
@@ -168,7 +168,11 @@ xdescribe('test compile string', function () {
         <#each {{list}}>
           {{../../list2.length}}${'split1'}{{../@index}}
         </#each>
-        <#textExpr />
+        <#textExpr>
+          <#tmpl>
+            <TextExpr name="{{no}}" />
+          </#tmpl>
+        </#textExpr>
         <slider {{../name3}}>
           @${nj`<div>111</div>`()}
           #${nj`<div>{{../name3}}</div>`}
@@ -177,10 +181,10 @@ xdescribe('test compile string', function () {
       </#each>
       `;
 
-      var tmplFn = compile(tmpl3, 'tmplString');
-      var html = tmplFn.apply(null, data);
+      // var tmplFn = compile(tmpl3, 'tmplString');
+      // var html = tmplFn.apply(null, data);
       // var html = nj.render.call(null, tmplTest, data[0], data[1]);
-      //var html = tmplTest.apply(null, data);
+      var html = tmplTest.apply(null, data);
 
       //console.log(JSON.stringify(nj.asts['tmplString']));
       console.log(html);

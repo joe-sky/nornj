@@ -115,7 +115,7 @@ function isTmpl(obj) {
 function addTmpl(node, parent, name) {
   var paramsP = parent.params;
   if (!paramsP) {
-    paramsP = parent.params = tools.lightObj();
+    paramsP = parent.params = tools.obj();
   }
 
   var tmpls = paramsP.tmpls;

@@ -88,7 +88,7 @@ const compile = _createCompile(),
 
 //Create template root object
 function _createAstRoot() {
-  var root = utils.lightObj();
+  var root = utils.obj();
   root.type = 'nj_root';
   root.content = [];
 
