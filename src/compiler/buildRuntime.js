@@ -7,9 +7,9 @@ var nj = require('../core'),
   filterConfig = utils.filterConfig,
   replaceSpecialSymbol = require('../utils/replaceSpecialSymbol');
 
-function _buildFn(content, fns, no, newContext, level) {
+function _buildFn(content, fns, no, newContext, level, useStringLocal) {
   var fnStr = '',
-    useString = fns.useString,
+    useString = useStringLocal != null ? useStringLocal : fns.useString,
     isTmplExpr = utils.isString(no), //如果no为字符串, 则本次将构建tmpl块模板函数
     main = isTmplExpr || no === 0,
     /* retType
@@ -49,7 +49,7 @@ function _buildFn(content, fns, no, newContext, level) {
     }
   }
 
-  fnStr += _buildContent(content, fns, counter, retType, level);
+  fnStr += _buildContent(content, fns, counter, retType, level, useStringLocal);
 
   if (retType === '2') {
     fnStr += 'return ret;';
@@ -65,12 +65,12 @@ function _buildFn(content, fns, no, newContext, level) {
   return no;
 }
 
-function _buildOptions(config, node, fns, exprPropsStr, level, hashProps) {
+function _buildOptions(config, useStringLocal, node, fns, exprPropsStr, level, hashProps) {
   var hashStr = '',
     noConfig = !config;
 
   if (noConfig || config.useString) {
-    hashStr += ', useString: p1.useString';
+    hashStr += ', useString: ' + (useStringLocal == null ? 'p1.useString' : (useStringLocal ? 'true' : 'false'));
   }
   if (node) { //标签表达式
     var newContext = config ? config.newContext : true;
@@ -78,7 +78,7 @@ function _buildOptions(config, node, fns, exprPropsStr, level, hashProps) {
       hashStr += ', exprProps: ' + exprPropsStr;
     }
 
-    hashStr += ', result: ' + (node.content ? 'p1.exprRet(p1, p2, p1.fn' + _buildFn(node.content, fns, ++fns._no, newContext, level) + ', ' + exprPropsStr + ')' : 'p1.noop');
+    hashStr += ', result: ' + (node.content ? 'p1.exprRet(p1, p2, p1.fn' + _buildFn(node.content, fns, ++fns._no, newContext, level, useStringLocal) + ', ' + exprPropsStr + ')' : 'p1.noop');
 
     if (hashProps != null) {
       hashStr += ', props: ' + hashProps;
@@ -88,9 +88,8 @@ function _buildOptions(config, node, fns, exprPropsStr, level, hashProps) {
   return '{ _njOpts: true, ctx: p2' + hashStr + ' }';
 }
 
-function _buildPropData(obj, counter, fns) {
+function _buildPropData(obj, counter, fns, useStringLocal) {
   let dataValueStr,
-    useString = fns.useString,
     escape = obj.escape;
   const { jsProp, isComputed } = obj.prop;
 
@@ -159,24 +158,24 @@ function _buildPropData(obj, counter, fns) {
           return p + ', ' + _buildPropData({
             prop: c,
             escape
-          }, counter, fns);
+          }, counter, fns, useStringLocal);
         }, '') : '') +
-        ', ' + _buildOptions(configF) +
+        ', ' + _buildOptions(configF, useStringLocal) +
         ']);\n';
       filterStr += '}\n';
     }, false, true);
 
     return {
-      valueStr: _buildEscape(valueStr, useString, isComputed ? false : escape),
+      valueStr: _buildEscape(valueStr, fns, isComputed ? false : escape),
       filterStr: filterStr
     };
   } else {
-    return _buildEscape(dataValueStr, useString, isComputed ? false : escape);
+    return _buildEscape(dataValueStr, fns, isComputed ? false : escape);
   }
 }
 
-function _buildEscape(valueStr, useString, escape) {
-  if (useString) {
+function _buildEscape(valueStr, fns, escape) {
+  if (fns.useString) {
     if (escape) {
       return 'p1.escape(' + valueStr + ')';
     } else {
@@ -191,7 +190,7 @@ function _replaceQuot(str) {
   return str.replace(/'/g, "\\'");
 }
 
-function _buildProps(obj, counter, fns) {
+function _buildProps(obj, counter, fns, useStringLocal) {
   var str0 = obj.strs[0],
     valueStr = '',
     filterStr = '';
@@ -201,7 +200,7 @@ function _buildProps(obj, counter, fns) {
     filterStr = '';
 
     utils.each(obj.props, function(o, i) {
-      var propData = _buildPropData(o, counter, fns),
+      var propData = _buildPropData(o, counter, fns, useStringLocal),
         dataValueStr;
       if (utils.isString(propData)) {
         dataValueStr = propData;
@@ -261,7 +260,8 @@ function _buildParams(node, fns, counter, useString) {
   var params = node.params,
     paramsExpr = node.paramsExpr,
     paramsStr = '',
-    _paramsC;
+    _paramsC,
+    useStringF = fns.useString;
 
   if (params || paramsExpr) {
     _paramsC = counter._params++;
@@ -274,7 +274,7 @@ function _buildParams(node, fns, counter, useString) {
       paramsStr += 'var _paramsE' + _paramsEC + ' = {};\n';
 
       //params块的子节点
-      paramsStr += _buildContent(paramsExpr.content, fns, counter, { _paramsE: '_paramsE' + _paramsEC });
+      paramsStr += _buildContent(paramsExpr.content, fns, counter, { _paramsE: '_paramsE' + _paramsEC }, null, useString);
 
       //合并params块的值
       if (!useString) {
@@ -308,19 +308,19 @@ function _buildParams(node, fns, counter, useString) {
       }
 
       utils.each(paramKeys, function(k, i) {
-        var valueStr = _buildProps(params[k], counter, fns);
+        var valueStr = _buildProps(params[k], counter, fns, useString);
         if (utils.isObject(valueStr)) {
           filterStr += valueStr.filterStr;
           valueStr = valueStr.valueStr;
         }
 
-        if (!useString && k === 'style') { //将style字符串转换为对象
+        if (!useStringF && k === 'style') { //将style字符串转换为对象
           valueStr = 'p1.styleProps(' + valueStr + ')';
         }
 
         var key = k,
           onlyKey = ('\'' + key + '\'') === valueStr;
-        if (!useString) {
+        if (!useStringF) {
           key = utils.fixPropName(k);
         }
         if (!paramsExpr) {
@@ -351,24 +351,24 @@ function _buildParams(node, fns, counter, useString) {
   return [paramsStr, _paramsC];
 }
 
-function _buildNode(node, fns, counter, retType, level) {
+function _buildNode(node, fns, counter, retType, level, useStringLocal) {
   var fnStr = '',
-    useString = fns.useString;
+    useStringF = fns.useString;
 
   if (node.type === 'nj_plaintext') { //文本节点
-    var valueStr = _buildProps(node.content[0], counter, fns),
+    var valueStr = _buildProps(node.content[0], counter, fns, useStringLocal),
       filterStr;
     if (utils.isObject(valueStr)) {
       filterStr = valueStr.filterStr;
       valueStr = valueStr.valueStr;
     }
 
-    var textStr = _buildRender(1, retType, { text: valueStr }, fns, level);
+    var textStr = _buildRender(1, retType, { text: valueStr }, fns, level, useStringLocal);
     if (filterStr) {
       textStr = filterStr + textStr;
     }
 
-    if (useString) {
+    if (useStringF) {
       fnStr += textStr;
     } else { //文本中的特殊字符需转义
       fnStr += replaceSpecialSymbol(textStr);
@@ -393,7 +393,7 @@ function _buildNode(node, fns, counter, retType, level) {
 
     if (node.args) { //构建匿名参数
       utils.each(node.args, function(arg, i) {
-        let valueStr = _buildProps(arg, counter, fns);
+        let valueStr = _buildProps(arg, counter, fns, useStringLocal);
         if (utils.isObject(valueStr)) {
           filterStr += valueStr.filterStr;
           valueStr = valueStr.valueStr;
@@ -414,7 +414,7 @@ function _buildNode(node, fns, counter, retType, level) {
       paramsStr = retP[0],
       _paramsC = retP[1];
 
-    dataReferStr += _buildOptions(configE, node, fns, exprPropsStr, level, paramsStr !== '' ? '_params' + _paramsC : null);
+    dataReferStr += _buildOptions(configE, useStringLocal, node, fns, exprPropsStr, level, paramsStr !== '' ? '_params' + _paramsC : null);
     dataReferStr += '\n];\n';
 
     if (filterStr !== '') {
@@ -430,7 +430,7 @@ function _buildNode(node, fns, counter, retType, level) {
     fnStr += _buildRender(2, retType, {
       _expr: _exprC,
       _dataRefer: _dataReferC
-    }, fns, level);
+    }, fns, level, useStringLocal);
   } else { //元素节点
     //节点类型和typeRefer
     var _typeC = counter._type++,
@@ -442,7 +442,7 @@ function _buildNode(node, fns, counter, retType, level) {
     }
 
     var typeStr;
-    if (!useString) {
+    if (!useStringF) {
       typeStr = 'p1.components[\'' + _type.toLowerCase() + '\'] ? p1.components[\'' + _type.toLowerCase() + '\'] : \'' + _type + '\'';
     } else {
       typeStr = '\'' + _type + '\'';
@@ -463,13 +463,13 @@ function _buildNode(node, fns, counter, retType, level) {
     }
 
     //节点参数
-    var retP = _buildParams(node, fns, counter, useString),
+    var retP = _buildParams(node, fns, counter, useStringF),
       paramsStr = retP[0],
       _paramsC = retP[1];
     fnStr += paramsStr;
 
     var _compParamC, _childrenC;
-    if (!useString) { //组件引擎参数
+    if (!useStringF) { //组件参数
       _compParamC = counter._compParam++;
       fnStr += 'var _compParam' + _compParamC + ' = [_type' + _typeC + ', ' + (paramsStr !== '' ? '_params' + _paramsC : 'null') + '];\n';
     } else { //子节点字符串
@@ -478,44 +478,45 @@ function _buildNode(node, fns, counter, retType, level) {
     }
 
     //子节点
-    fnStr += _buildContent(node.content, fns, counter, !useString ? { _compParam: '_compParam' + _compParamC } : { _children: '_children' + _childrenC }, level != null ? level + 1 : level);
+    fnStr += _buildContent(node.content, fns, counter, !useStringF ? { _compParam: '_compParam' + _compParamC } : { _children: '_children' + _childrenC }, level != null ? level + 1 : level, useStringLocal);
 
     //渲染
-    fnStr += _buildRender(3, retType, !useString ? { _compParam: _compParamC } : { _type: _typeC, _params: paramsStr !== '' ? _paramsC : null, _children: _childrenC, _selfClose: node.selfCloseTag }, fns, level);
+    fnStr += _buildRender(3, retType, !useStringF ? { _compParam: _compParamC } : { _type: _typeC, _params: paramsStr !== '' ? _paramsC : null, _children: _childrenC, _selfClose: node.selfCloseTag }, fns, level, useStringLocal);
   }
 
   return fnStr;
 }
 
-function _buildContent(content, fns, counter, retType, level) {
+function _buildContent(content, fns, counter, retType, level, useStringLocal) {
   var fnStr = '';
   if (!content) {
     return fnStr;
   }
 
   utils.each(content, function(node) {
-    fnStr += _buildNode(node, fns, counter, retType, level);
+    fnStr += _buildNode(node, fns, counter, retType, level, node.useString ? true : useStringLocal);
   }, false, true);
 
   return fnStr;
 }
 
-function _buildRender(nodeType, retType, params, fns, level) {
+function _buildRender(nodeType, retType, params, fns, level, useStringLocal) {
   var retStr,
-    useString = fns.useString;
+    useStringF = fns.useString,
+    useString = useStringLocal != null ? useStringLocal : useStringF;
 
   switch (nodeType) {
     case 1: //文本节点
-      retStr = _buildLevelSpace(level, useString) + params.text + (!useString || level == null ? '' : ' + \'\\n\'');
+      retStr = _buildLevelSpace(level, fns) + params.text + (!useStringF || level == null ? '' : ' + \'\\n\'');
       break;
     case 2: //块表达式
       retStr = '_expr' + params._expr + '.apply(p2, _dataRefer' + params._dataRefer + ')';
       break;
     case 3: //元素节点
-      if (!useString) {
+      if (!useStringF) {
         retStr = 'p1.h.apply(null, _compParam' + params._compParam + ')';
       } else {
-        var levelSpace = _buildLevelSpace(level, useString);
+        var levelSpace = _buildLevelSpace(level, fns);
         retStr = levelSpace + '\'<\' + _type' + params._type + ' + ' + (params._params != null ? '_params' + params._params + ' + ' : '');
         if (!params._selfClose) {
           retStr += '\'>\\n\'';
@@ -540,7 +541,7 @@ function _buildRender(nodeType, retType, params, fns, level) {
   } else if (retType._paramsE) {
     return '\n' + retStr + ';\n';
   } else {
-    if (!useString) {
+    if (!useStringF) {
       return '\n' + retType._compParam + '.push(' + retStr + ');\n';
     } else {
       return '\n' + retType._children + ' += ' + retStr + ';\n';
@@ -548,9 +549,9 @@ function _buildRender(nodeType, retType, params, fns, level) {
   }
 }
 
-function _buildLevelSpace(level, useString) {
+function _buildLevelSpace(level, fns) {
   var ret = '';
-  if (useString && level != null && level > 0) {
+  if (fns.useString && level != null && level > 0) {
     ret += '\'';
     for (var i = 0; i < level; i++) {
       ret += '  ';
@@ -562,7 +563,7 @@ function _buildLevelSpace(level, useString) {
 
 module.exports = function(ast, useString) {
   var fns = {
-    useString: useString,
+    useString,
     _no: 0, //块表达式函数计数
     _noT: 0 //tmpl块模板函数计数
   };

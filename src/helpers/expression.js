@@ -139,20 +139,12 @@ const exprs = {
   },
 
   //Parameter
-  param: function(name, options) {
+  prop: function(name, options) {
     var ret = options.result(), //Get parameter value
       value;
 
-    //If the value length greater than 1, it need to be connected to a whole string.
     if (ret !== undefined) {
-      if (!tools.isArray(ret)) {
-        value = ret;
-      } else {
-        value = '';
-        tools.each(tools.flatten(ret), function(item) {
-          value += item != null ? item : '';
-        }, false, true);
-      }
+      value = ret;
     } else { //Match to Similar to "checked" or "disabled" attribute.
       value = !options.useString ? true : name;
     }
@@ -226,7 +218,7 @@ var exprConfig = {
   'switch': _commonConfig({ newContext: false }),
   unless: _commonConfig({ newContext: false }),
   each: _commonConfig(),
-  param: _commonConfig({ newContext: false, exprProps: true }),
+  prop: _commonConfig({ newContext: false, exprProps: true }),
   spread: _commonConfig({ newContext: false, useString: false, exprProps: true }),
   'for': _commonConfig(),
   obj: _commonConfig({ newContext: false, useString: false }),
@@ -234,8 +226,6 @@ var exprConfig = {
 };
 
 //Expression alias
-exprs.prop = exprs.param;
-exprConfig.prop = exprConfig.param;
 exprs['case'] = exprs.elseif;
 exprConfig['case'] = exprConfig.elseif;
 exprs['default'] = exprs['else'];

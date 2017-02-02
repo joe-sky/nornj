@@ -82,31 +82,6 @@ function each(obj, func, context, isArr) {
   }
 }
 
-//Transform multidimensional array to one-dimensional array
-function flatten(obj) {
-  var output = [],
-    idx = 0;
-
-  if (isArray(obj)) {
-    for (var i = 0, l = _getLength(obj); i < l; i++) {
-      var value = obj[i];
-      //flatten current level of array or arguments object
-      value = flatten(value);
-
-      var j = 0,
-        len = value.length;
-      output.length += len;
-      while (j < len) {
-        output[idx++] = value[j++];
-      }
-    }
-  } else {
-    output[idx++] = obj;
-  }
-
-  return output;
-}
-
 //Noop function
 function noop() {}
 
@@ -202,7 +177,6 @@ var tools = {
   isObject,
   isString,
   each,
-  flatten,
   throwIf,
   assign,
   obj,

@@ -208,31 +208,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	}
 
-	//Transform multidimensional array to one-dimensional array
-	function flatten(obj) {
-	  var output = [],
-	      idx = 0;
-
-	  if (isArray(obj)) {
-	    for (var i = 0, l = _getLength(obj); i < l; i++) {
-	      var value = obj[i];
-	      //flatten current level of array or arguments object
-	      value = flatten(value);
-
-	      var j = 0,
-	          len = value.length;
-	      output.length += len;
-	      while (j < len) {
-	        output[idx++] = value[j++];
-	      }
-	    }
-	  } else {
-	    output[idx++] = obj;
-	  }
-
-	  return output;
-	}
-
 	//Noop function
 	function noop() {}
 
@@ -263,7 +238,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 	//create light weight object
-	function lightObj() {
+	function obj() {
 	  return Object.create(null);
 	}
 
@@ -328,10 +303,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  isObject: isObject,
 	  isString: isString,
 	  each: each,
-	  flatten: flatten,
 	  throwIf: throwIf,
 	  assign: assign,
-	  lightObj: lightObj,
+	  obj: obj,
 	  arrayPush: arrayPush,
 	  arraySlice: arraySlice,
 	  clearQuot: clearQuot,
@@ -466,7 +440,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	function addTmpl(node, parent, name) {
 	  var paramsP = parent.params;
 	  if (!paramsP) {
-	    paramsP = parent.params = tools.lightObj();
+	    paramsP = parent.params = tools.obj();
 	  }
 
 	  var tmpls = paramsP.tmpls;
@@ -519,7 +493,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	}
 
-	var PROP_EXPRS = ['param', 'prop', 'spread'];
+	var PROP_EXPRS = ['prop', 'spread'];
 	function isExprProp(name) {
 	  var config = exprConfig[name];
 	  return {
@@ -555,7 +529,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	//Get compiled parameters from a object
 	function compiledParams(obj) {
-	  var ret = tools.lightObj();
+	  var ret = tools.obj();
 	  tools.each(obj, function (v, k) {
 	    ret[k] = compiledParam(v);
 	  }, false, false);
@@ -567,7 +541,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var REGEX_JS_PROP = /(('[^']+')|("[^"]+")|(-?([0-9][0-9]*)(\.\d+)?)|true|false|null|undefined|([#]*)([^.[\]()]+))([^\s()]*)/;
 
 	function compiledProp(prop) {
-	  var ret = tools.lightObj();
+	  var ret = tools.obj();
 
 	  //If there are colons in the property,then use filter
 	  if (prop.indexOf('|') >= 0) {
@@ -579,7 +553,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    filtersTmp = filtersTmp.slice(1);
 	    tools.each(filtersTmp, function (filter) {
 	      var retF = _getFilterParam(filter.trim()),
-	          filterObj = tools.lightObj(),
+	          filterObj = tools.obj(),
 	          filterName = retF[1]; //Get filter name
 
 	      if (filterName) {
@@ -632,7 +606,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 	//Get filter param
-	var REGEX_FILTER_PARAM = /([\w$@=+-\\*/&%]+)(\(([^()]+)\))*/;
+	var REGEX_FILTER_PARAM = /([\w$@=+-\\*/&%?]+)(\(([^()]+)\))*/;
 
 	function _getFilterParam(obj) {
 	  return REGEX_FILTER_PARAM.exec(obj);
@@ -672,7 +646,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	//Get compiled parameter
 	function compiledParam(value) {
-	  var ret = tools.lightObj(),
+	  var ret = tools.obj(),
 	      strs = tools.isString(value) ? value.split(tmplRule.replaceSplit) : [value],
 	      props = null,
 	      isAll = false; //此处指替换符是否占满整个属性值;若无替换符时为false
@@ -683,7 +657,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    props = [];
 
 	    tools.each(params, function (param) {
-	      var retP = tools.lightObj();
+	      var retP = tools.obj();
 	      isAll = param[3] ? param[0] === value : false; //If there are several curly braces in one property value, "isAll" must be false.
 	      retP.prop = compiledProp(param[2]);
 
@@ -859,21 +833,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	  },
 
 	  //Parameter
-	  param: function param(name, options) {
+	  prop: function prop(name, options) {
 	    var ret = options.result(),
 	        //Get parameter value
 	    value;
 
-	    //If the value length greater than 1, it need to be connected to a whole string.
 	    if (ret !== undefined) {
-	      if (!tools.isArray(ret)) {
-	        value = ret;
-	      } else {
-	        value = '';
-	        tools.each(tools.flatten(ret), function (item) {
-	          value += item != null ? item : '';
-	        }, false, true);
-	      }
+	      value = ret;
 	    } else {
 	      //Match to Similar to "checked" or "disabled" attribute.
 	      value = !options.useString ? true : name;
@@ -949,7 +915,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  'switch': _commonConfig({ newContext: false }),
 	  unless: _commonConfig({ newContext: false }),
 	  each: _commonConfig(),
-	  param: _commonConfig({ newContext: false, exprProps: true }),
+	  prop: _commonConfig({ newContext: false, exprProps: true }),
 	  spread: _commonConfig({ newContext: false, useString: false, exprProps: true }),
 	  'for': _commonConfig(),
 	  obj: _commonConfig({ newContext: false, useString: false }),
@@ -957,8 +923,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 	//Expression alias
-	exprs.prop = exprs.param;
-	exprConfig.prop = exprConfig.param;
 	exprs['case'] = exprs.elseif;
 	exprConfig['case'] = exprConfig.elseif;
 	exprs['default'] = exprs['else'];
@@ -1083,17 +1047,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	//Rebuild local variables in the new context
 	function newContext(p2, p3) {
 	  var newData = [];
-	  if ('data' in p3) {
+	  if (p3 && 'data' in p3) {
 	    newData.push(p3.data);
 	  }
-	  if ('extra' in p3) {
+	  if (p3 && 'extra' in p3) {
 	    newData.push(p3.extra);
 	  }
 
 	  return {
 	    data: newData.length ? tools.arrayPush(newData, p2.data) : p2.data,
-	    parent: p3.fallback ? p2 : p2.parent,
-	    index: 'index' in p3 ? p3.index : p2.index,
+	    parent: p3 && p3.fallback ? p2 : p2.parent,
+	    index: p3 && 'index' in p3 ? p3.index : p2.index,
 	    getData: getData
 	  };
 	}
@@ -1153,7 +1117,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    exprs: nj.exprs,
 	    filters: nj.filters,
 	    noop: tools.noop,
-	    lightObj: tools.lightObj,
+	    obj: tools.obj,
 	    throwIf: tools.throwIf,
 	    warn: tools.warn,
 	    newContext: newContext,
@@ -1252,12 +1216,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	  if (!tools.isArray(obj)) {
 	    //判断是否为文本节点
 	    if (tools.isString(obj)) {
-	      var strs = obj.split(tmplRule.newlineSplit),
-	          lastIndex = strs.length - 1;
-
+	      var strs = obj.split(tmplRule.newlineSplit);
 	      strs.forEach(function (str, i) {
 	        str = str.trim();
-	        str !== '' && _plainTextNode(str + (i < lastIndex ? '\\n' : ''), parent, parentContent);
+	        str !== '' && _plainTextNode(str, parent, parentContent);
 	      });
 	    } else {
 	      _plainTextNode(obj, parent, parentContent);
@@ -1323,13 +1285,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 
 	        tools.each(exprParams, function (param) {
+	          if (param.value === 'useString') {
+	            node.useString = true;
+	            return;
+	          }
+
 	          var paramV = tranParam.compiledParam(param.value);
 	          if (param.onlyBrace) {
 	            //提取匿名参数
 	            node.args.push(paramV);
 	          } else {
 	            if (!node.params) {
-	              node.params = tools.lightObj();
+	              node.params = tools.obj();
 	            }
 	            node.params[param.key] = paramV;
 	          }
@@ -1356,7 +1323,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var tagParams = tranElem.getOpenTagParams(first);
 	        if (tagParams) {
 	          if (!node.params) {
-	            node.params = tools.lightObj();
+	            node.params = tools.obj();
 	          }
 
 	          tools.each(tagParams, function (param) {
@@ -1401,11 +1368,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }
 	    } else {
 	      //如果不是元素节点,则为节点集合
-	      checkContentElem(obj, parent);
+	      checkContentElem(obj, parent, hasExprProps);
 	    }
 	  } else if (tools.isArray(first)) {
 	    //如果第一个子节点为数组,则该节点一定为节点集合(可以是多层数组嵌套的集合)
-	    checkContentElem(obj, parent);
+	    checkContentElem(obj, parent, hasExprProps);
 	  }
 	}
 
@@ -1465,9 +1432,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  //Get param properties
 	  prop: function prop(value, props) {
 	    var ret = value;
-	    ret && tools.each(props.split('.'), function (p) {
+	    ret && props.split('.').forEach(function (p) {
 	      ret = ret[p];
-	    }, false, true);
+	    });
 
 	    return ret;
 	  },
@@ -1504,6 +1471,11 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  '-': function _(val1, val2) {
 	    return val1 - val2;
+	  },
+
+	  //Ternary operator
+	  '?': function _(val, val1, val2) {
+	    return val ? val1 : val2;
 	  },
 
 	  //Convert to int 
@@ -1770,7 +1742,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	//Create template root object
 	function _createAstRoot() {
-	  var root = utils.lightObj();
+	  var root = utils.obj();
 	  root.type = 'nj_root';
 	  root.content = [];
 
@@ -1819,9 +1791,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    filterConfig = utils.filterConfig,
 	    replaceSpecialSymbol = __webpack_require__(15);
 
-	function _buildFn(content, fns, no, newContext, level) {
+	function _buildFn(content, fns, no, newContext, level, useStringLocal) {
 	  var fnStr = '',
-	      useString = fns.useString,
+	      useString = useStringLocal != null ? useStringLocal : fns.useString,
 	      isTmplExpr = utils.isString(no),
 	      //如果no为字符串, 则本次将构建tmpl块模板函数
 	  main = isTmplExpr || no === 0,
@@ -1863,7 +1835,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	  }
 
-	  fnStr += _buildContent(content, fns, counter, retType, level);
+	  fnStr += _buildContent(content, fns, counter, retType, level, useStringLocal);
 
 	  if (retType === '2') {
 	    fnStr += 'return ret;';
@@ -1879,12 +1851,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return no;
 	}
 
-	function _buildOptions(config, node, fns, exprPropsStr, level, hashProps) {
+	function _buildOptions(config, useStringLocal, node, fns, exprPropsStr, level, hashProps) {
 	  var hashStr = '',
 	      noConfig = !config;
 
 	  if (noConfig || config.useString) {
-	    hashStr += ', useString: p1.useString';
+	    hashStr += ', useString: ' + (useStringLocal == null ? 'p1.useString' : useStringLocal ? 'true' : 'false');
 	  }
 	  if (node) {
 	    //标签表达式
@@ -1893,7 +1865,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      hashStr += ', exprProps: ' + exprPropsStr;
 	    }
 
-	    hashStr += ', result: ' + (node.content ? 'p1.exprRet(p1, p2, p1.fn' + _buildFn(node.content, fns, ++fns._no, newContext, level) + ', ' + exprPropsStr + ')' : 'p1.noop');
+	    hashStr += ', result: ' + (node.content ? 'p1.exprRet(p1, p2, p1.fn' + _buildFn(node.content, fns, ++fns._no, newContext, level, useStringLocal) + ', ' + exprPropsStr + ')' : 'p1.noop');
 
 	    if (hashProps != null) {
 	      hashStr += ', props: ' + hashProps;
@@ -1903,9 +1875,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return '{ _njOpts: true, ctx: p2' + hashStr + ' }';
 	}
 
-	function _buildPropData(obj, counter, fns) {
+	function _buildPropData(obj, counter, fns, useStringLocal) {
 	  var dataValueStr = void 0,
-	      useString = fns.useString,
 	      escape = obj.escape;
 	  var _obj$prop = obj.prop,
 	      jsProp = _obj$prop.jsProp,
@@ -1980,22 +1951,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return p + ', ' + _buildPropData({
 	          prop: c,
 	          escape: escape
-	        }, counter, fns);
-	      }, '') : '') + ', ' + _buildOptions(configF) + ']);\n';
+	        }, counter, fns, useStringLocal);
+	      }, '') : '') + ', ' + _buildOptions(configF, useStringLocal) + ']);\n';
 	      filterStr += '}\n';
 	    }, false, true);
 
 	    return {
-	      valueStr: _buildEscape(valueStr, useString, isComputed ? false : escape),
+	      valueStr: _buildEscape(valueStr, fns, isComputed ? false : escape),
 	      filterStr: filterStr
 	    };
 	  } else {
-	    return _buildEscape(dataValueStr, useString, isComputed ? false : escape);
+	    return _buildEscape(dataValueStr, fns, isComputed ? false : escape);
 	  }
 	}
 
-	function _buildEscape(valueStr, useString, escape) {
-	  if (useString) {
+	function _buildEscape(valueStr, fns, escape) {
+	  if (fns.useString) {
 	    if (escape) {
 	      return 'p1.escape(' + valueStr + ')';
 	    } else {
@@ -2011,7 +1982,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return str.replace(/'/g, "\\'");
 	}
 
-	function _buildProps(obj, counter, fns) {
+	function _buildProps(obj, counter, fns, useStringLocal) {
 	  var str0 = obj.strs[0],
 	      valueStr = '',
 	      filterStr = '';
@@ -2022,7 +1993,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    filterStr = '';
 
 	    utils.each(obj.props, function (o, i) {
-	      var propData = _buildPropData(o, counter, fns),
+	      var propData = _buildPropData(o, counter, fns, useStringLocal),
 	          dataValueStr;
 	      if (utils.isString(propData)) {
 	        dataValueStr = propData;
@@ -2084,7 +2055,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	  var params = node.params,
 	      paramsExpr = node.paramsExpr,
 	      paramsStr = '',
-	      _paramsC;
+	      _paramsC,
+	      useStringF = fns.useString;
 
 	  if (params || paramsExpr) {
 	    _paramsC = counter._params++;
@@ -2097,7 +2069,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      paramsStr += 'var _paramsE' + _paramsEC + ' = {};\n';
 
 	      //params块的子节点
-	      paramsStr += _buildContent(paramsExpr.content, fns, counter, { _paramsE: '_paramsE' + _paramsEC });
+	      paramsStr += _buildContent(paramsExpr.content, fns, counter, { _paramsE: '_paramsE' + _paramsEC }, null, useString);
 
 	      //合并params块的值
 	      if (!useString) {
@@ -2131,20 +2103,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }
 
 	      utils.each(paramKeys, function (k, i) {
-	        var valueStr = _buildProps(params[k], counter, fns);
+	        var valueStr = _buildProps(params[k], counter, fns, useString);
 	        if (utils.isObject(valueStr)) {
 	          filterStr += valueStr.filterStr;
 	          valueStr = valueStr.valueStr;
 	        }
 
-	        if (!useString && k === 'style') {
+	        if (!useStringF && k === 'style') {
 	          //将style字符串转换为对象
 	          valueStr = 'p1.styleProps(' + valueStr + ')';
 	        }
 
 	        var key = k,
 	            onlyKey = '\'' + key + '\'' === valueStr;
-	        if (!useString) {
+	        if (!useStringF) {
 	          key = utils.fixPropName(k);
 	        }
 	        if (!paramsExpr) {
@@ -2175,25 +2147,25 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return [paramsStr, _paramsC];
 	}
 
-	function _buildNode(node, fns, counter, retType, level) {
+	function _buildNode(node, fns, counter, retType, level, useStringLocal) {
 	  var fnStr = '',
-	      useString = fns.useString;
+	      useStringF = fns.useString;
 
 	  if (node.type === 'nj_plaintext') {
 	    //文本节点
-	    var valueStr = _buildProps(node.content[0], counter, fns),
+	    var valueStr = _buildProps(node.content[0], counter, fns, useStringLocal),
 	        filterStr;
 	    if (utils.isObject(valueStr)) {
 	      filterStr = valueStr.filterStr;
 	      valueStr = valueStr.valueStr;
 	    }
 
-	    var textStr = _buildRender(1, retType, { text: valueStr }, fns, level);
+	    var textStr = _buildRender(1, retType, { text: valueStr }, fns, level, useStringLocal);
 	    if (filterStr) {
 	      textStr = filterStr + textStr;
 	    }
 
-	    if (useString) {
+	    if (useStringF) {
 	      fnStr += textStr;
 	    } else {
 	      //文本中的特殊字符需转义
@@ -2222,7 +2194,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    if (node.args) {
 	      //构建匿名参数
 	      utils.each(node.args, function (arg, i) {
-	        var valueStr = _buildProps(arg, counter, fns);
+	        var valueStr = _buildProps(arg, counter, fns, useStringLocal);
 	        if (utils.isObject(valueStr)) {
 	          filterStr += valueStr.filterStr;
 	          valueStr = valueStr.valueStr;
@@ -2243,7 +2215,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        paramsStr = retP[0],
 	        _paramsC = retP[1];
 
-	    dataReferStr += _buildOptions(configE, node, fns, exprPropsStr, level, paramsStr !== '' ? '_params' + _paramsC : null);
+	    dataReferStr += _buildOptions(configE, useStringLocal, node, fns, exprPropsStr, level, paramsStr !== '' ? '_params' + _paramsC : null);
 	    dataReferStr += '\n];\n';
 
 	    if (filterStr !== '') {
@@ -2259,7 +2231,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    fnStr += _buildRender(2, retType, {
 	      _expr: _exprC,
 	      _dataRefer: _dataReferC
-	    }, fns, level);
+	    }, fns, level, useStringLocal);
 	  } else {
 	    //元素节点
 	    //节点类型和typeRefer
@@ -2272,7 +2244,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 
 	    var typeStr;
-	    if (!useString) {
+	    if (!useStringF) {
 	      typeStr = 'p1.components[\'' + _type.toLowerCase() + '\'] ? p1.components[\'' + _type.toLowerCase() + '\'] : \'' + _type + '\'';
 	    } else {
 	      typeStr = '\'' + _type + '\'';
@@ -2293,14 +2265,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 
 	    //节点参数
-	    var retP = _buildParams(node, fns, counter, useString),
+	    var retP = _buildParams(node, fns, counter, useStringF),
 	        paramsStr = retP[0],
 	        _paramsC = retP[1];
 	    fnStr += paramsStr;
 
 	    var _compParamC, _childrenC;
-	    if (!useString) {
-	      //组件引擎参数
+	    if (!useStringF) {
+	      //组件参数
 	      _compParamC = counter._compParam++;
 	      fnStr += 'var _compParam' + _compParamC + ' = [_type' + _typeC + ', ' + (paramsStr !== '' ? '_params' + _paramsC : 'null') + '];\n';
 	    } else {
@@ -2310,36 +2282,37 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 
 	    //子节点
-	    fnStr += _buildContent(node.content, fns, counter, !useString ? { _compParam: '_compParam' + _compParamC } : { _children: '_children' + _childrenC }, level != null ? level + 1 : level);
+	    fnStr += _buildContent(node.content, fns, counter, !useStringF ? { _compParam: '_compParam' + _compParamC } : { _children: '_children' + _childrenC }, level != null ? level + 1 : level, useStringLocal);
 
 	    //渲染
-	    fnStr += _buildRender(3, retType, !useString ? { _compParam: _compParamC } : { _type: _typeC, _params: paramsStr !== '' ? _paramsC : null, _children: _childrenC, _selfClose: node.selfCloseTag }, fns, level);
+	    fnStr += _buildRender(3, retType, !useStringF ? { _compParam: _compParamC } : { _type: _typeC, _params: paramsStr !== '' ? _paramsC : null, _children: _childrenC, _selfClose: node.selfCloseTag }, fns, level, useStringLocal);
 	  }
 
 	  return fnStr;
 	}
 
-	function _buildContent(content, fns, counter, retType, level) {
+	function _buildContent(content, fns, counter, retType, level, useStringLocal) {
 	  var fnStr = '';
 	  if (!content) {
 	    return fnStr;
 	  }
 
 	  utils.each(content, function (node) {
-	    fnStr += _buildNode(node, fns, counter, retType, level);
+	    fnStr += _buildNode(node, fns, counter, retType, level, node.useString ? true : useStringLocal);
 	  }, false, true);
 
 	  return fnStr;
 	}
 
-	function _buildRender(nodeType, retType, params, fns, level) {
+	function _buildRender(nodeType, retType, params, fns, level, useStringLocal) {
 	  var retStr,
-	      useString = fns.useString;
+	      useStringF = fns.useString,
+	      useString = useStringLocal != null ? useStringLocal : useStringF;
 
 	  switch (nodeType) {
 	    case 1:
 	      //文本节点
-	      retStr = _buildLevelSpace(level, useString) + params.text + (!useString || level == null ? '' : ' + \'\\n\'');
+	      retStr = _buildLevelSpace(level, fns) + params.text + (!useStringF || level == null ? '' : ' + \'\\n\'');
 	      break;
 	    case 2:
 	      //块表达式
@@ -2347,10 +2320,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	      break;
 	    case 3:
 	      //元素节点
-	      if (!useString) {
+	      if (!useStringF) {
 	        retStr = 'p1.h.apply(null, _compParam' + params._compParam + ')';
 	      } else {
-	        var levelSpace = _buildLevelSpace(level, useString);
+	        var levelSpace = _buildLevelSpace(level, fns);
 	        retStr = levelSpace + '\'<\' + _type' + params._type + ' + ' + (params._params != null ? '_params' + params._params + ' + ' : '');
 	        if (!params._selfClose) {
 	          retStr += '\'>\\n\'';
@@ -2375,7 +2348,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  } else if (retType._paramsE) {
 	    return '\n' + retStr + ';\n';
 	  } else {
-	    if (!useString) {
+	    if (!useStringF) {
 	      return '\n' + retType._compParam + '.push(' + retStr + ');\n';
 	    } else {
 	      return '\n' + retType._children + ' += ' + retStr + ';\n';
@@ -2383,9 +2356,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	}
 
-	function _buildLevelSpace(level, useString) {
+	function _buildLevelSpace(level, fns) {
 	  var ret = '';
-	  if (useString && level != null && level > 0) {
+	  if (fns.useString && level != null && level > 0) {
 	    ret += '\'';
 	    for (var i = 0; i < level; i++) {
 	      ret += '  ';
@@ -2534,7 +2507,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    //Text before tag
 	    if (textBefore && textBefore !== '\n') {
-	      textBefore = _formatText(textBefore);
+	      textBefore = _formatNewline(textBefore);
 	      _setText(textBefore, current.elem);
 	    }
 
@@ -2564,7 +2537,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    //Text after tag
 	    if (textAfter && textAfter !== '\n') {
-	      textAfter = _formatText(textAfter);
+	      textAfter = _formatNewline(textAfter);
 	      _setText(textAfter, current.elem);
 	    }
 	  }
@@ -2580,18 +2553,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 	function _clearNotesAndBlank(str) {
-	  return str.replace(/<!--[\s\S]*?-->/g, '').replace(/>\s+([^\s<]*)\s+</g, '>$1<').trim().replace(/(>|<|>=|<=)\(/g, function (match) {
+	  return str.replace(/<#!--[\s\S]*?--#>/g, '').replace(/>\s+([^\s<]*)\s+</g, '>$1<').trim().replace(/(>|<|>=|<=)\(/g, function (match) {
 	    return SPECIAL_LOOKUP[match];
 	  });
 	}
 
-	function _formatText(str) {
+	function _formatNewline(str) {
 	  return str.replace(/\n/g, '\\n').replace(/\r/g, '').trim();
 	}
 
 	//Set element node
 	function _setElem(elem, elemName, elemParams, elemArr, bySelfClose) {
 	  var ret, paramsExpr;
+	  elem = _formatNewline(elem);
+
 	  if (elemName[0] === tmplRule.exprRule) {
 	    ret = elem.substring(1, elem.length - 1);
 	  } else if (elemName.indexOf(tmplRule.propRule) === 0) {

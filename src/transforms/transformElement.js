@@ -167,7 +167,7 @@ function addParamsExpr(node, parent, isExprProp) {
   }
 }
 
-const PROP_EXPRS = ['param', 'prop', 'spread'];
+const PROP_EXPRS = ['prop', 'spread'];
 function isExprProp(name) {
   const config = exprConfig[name];
   return {

@@ -4,7 +4,7 @@
   compile = require('../src/compiler/compile').compile,
   includeParser = require('../tools/includeParser');
 
-describe('test compile string', function () {
+xdescribe('test compile string', function () {
   beforeAll(function () {
     nj.registerFilter('filter1', function (v, p1) {
       //console.log(this.getData('name1'));
@@ -21,7 +21,8 @@ describe('test compile string', function () {
       return v + 'Tmp';
     });
     nj.registerExpr('textExpr', function (opts) {
-      return opts.props.tmpls[0]();
+      //return opts.props.tmpls[0]();
+      return opts.props.name;
     });
   });
 
@@ -156,6 +157,16 @@ describe('test compile string', function () {
       `;
 
       var tmplTest = nj`
+      <style>
+        .class1 {
+          margin-left: 10px;
+        }
+      </style>
+      <script>
+        function test() {
+          console.log(1);
+        }
+      </script>
       <#each {{ list2 }}>
         <!--
           aaa
@@ -165,6 +176,10 @@ describe('test compile string', function () {
         ]]>
         <div {{...props}}>
           <@id>d1</@id>
+          <@name>
+            img
+            img
+          </@name>
           <#props>
             <#unless {{test0}}>
               <@id1>d2</@id1>
@@ -178,6 +193,16 @@ describe('test compile string', function () {
           <#tmpl>
             <TextExpr name="{{no}}" />
           </#tmpl>
+          <img /><img />
+          <@name>
+            img
+            <img>
+              <@name>
+                1
+                2
+              </@name>
+            </img>
+          </@name>
         </#textExpr>
         <slider {{../name3}}>
           @${nj`<div>111</div>`()}
@@ -187,10 +212,10 @@ describe('test compile string', function () {
       </#each>
       `;
 
-      var tmplFn = compile(tmpl3, 'tmplString');
-      var html = tmplFn.apply(null, data);
+      // var tmplFn = compile(tmpl3, 'tmplString');
+      // var html = tmplFn.apply(null, data);
       // var html = nj.render.call(null, tmplTest, data[0], data[1]);
-      //var html = tmplTest.apply(null, data);
+      var html = tmplTest.apply(null, data);
 
       //console.log(JSON.stringify(nj.asts['tmplString']));
       console.log(html);

@@ -19,12 +19,10 @@ function checkElem(obj, parent, hasExprProps) {
 
   if (!tools.isArray(obj)) { //判断是否为文本节点
     if (tools.isString(obj)) {
-      var strs = obj.split(tmplRule.newlineSplit),
-        lastIndex = strs.length - 1;
-
+      var strs = obj.split(tmplRule.newlineSplit);
       strs.forEach((str, i) => {
         str = str.trim();
-        str !== '' && _plainTextNode(str + (i < lastIndex ? '\\n' : ''), parent, parentContent);
+        str !== '' && _plainTextNode(str, parent, parentContent);
       });
     } else {
       _plainTextNode(obj, parent, parentContent);
@@ -85,6 +83,11 @@ function checkElem(obj, parent, hasExprProps) {
         }
 
         tools.each(exprParams, function(param) {
+          if (param.value === 'useString') {
+            node.useString = true;
+            return;
+          }
+
           let paramV = tranParam.compiledParam(param.value);
           if (param.onlyBrace) { //提取匿名参数
             node.args.push(paramV);
