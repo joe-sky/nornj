@@ -95,7 +95,7 @@ function _checkStringElem(xml) {
 
     //Text before tag
     if (textBefore && textBefore !== '\n') {
-      textBefore = _formatText(textBefore);
+      textBefore = _formatNewline(textBefore);
       _setText(textBefore, current.elem);
     }
 
@@ -122,7 +122,7 @@ function _checkStringElem(xml) {
 
     //Text after tag
     if (textAfter && textAfter !== '\n') {
-      textAfter = _formatText(textAfter);
+      textAfter = _formatNewline(textAfter);
       _setText(textAfter, current.elem);
     }
   }
@@ -138,17 +138,19 @@ const SPECIAL_LOOKUP = {
 };
 
 function _clearNotesAndBlank(str) {
-  return str.replace(/<!--[\s\S]*?-->/g, '').replace(/>\s+([^\s<]*)\s+</g, '>$1<').trim()
+  return str.replace(/<#!--[\s\S]*?--#>/g, '').replace(/>\s+([^\s<]*)\s+</g, '>$1<').trim()
     .replace(/(>|<|>=|<=)\(/g, (match) => SPECIAL_LOOKUP[match]);
 }
 
-function _formatText(str) {
+function _formatNewline(str) {
   return str.replace(/\n/g, '\\n').replace(/\r/g, '').trim();
 }
 
 //Set element node
 function _setElem(elem, elemName, elemParams, elemArr, bySelfClose) {
   var ret, paramsExpr;
+  elem = _formatNewline(elem);
+
   if (elemName[0] === tmplRule.exprRule) {
     ret = elem.substring(1, elem.length - 1);
   } else if (elemName.indexOf(tmplRule.propRule) === 0) {

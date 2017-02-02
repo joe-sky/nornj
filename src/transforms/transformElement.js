@@ -72,9 +72,9 @@ function getOpenTagParams(tag) {
     }
 
     ret.push({
-      key: key,
-      value: value,
-      onlyBrace: onlyBrace
+      key,
+      value,
+      onlyBrace
     });
   }
 

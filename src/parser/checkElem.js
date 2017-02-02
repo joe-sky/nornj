@@ -158,10 +158,10 @@ function checkElem(obj, parent, hasExprProps) {
         tranElem.addParamsExpr(node, parent, isExprProp);
       }
     } else { //如果不是元素节点,则为节点集合
-      checkContentElem(obj, parent);
+      checkContentElem(obj, parent, hasExprProps);
     }
   } else if (tools.isArray(first)) { //如果第一个子节点为数组,则该节点一定为节点集合(可以是多层数组嵌套的集合)
-    checkContentElem(obj, parent);
+    checkContentElem(obj, parent, hasExprProps);
   }
 }
 

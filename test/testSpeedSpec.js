@@ -28,6 +28,9 @@ xdescribe('test speed', function() {
 
   var tmpl = nj `
   <{div} id="{num}_100'200'">
+    <!--
+      aaa
+    -->
     #${t1}
     ${t2()}
     <#each ${[1, 2, 3]}>

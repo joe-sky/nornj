@@ -114,7 +114,7 @@ describe('test compile string', function () {
       `;
 
       var tmpl3 = nj`
-        <div class="{{id}} {{name3}}" {{name3}} {{ ...props}} name={{name1}} autofocus name1={{a.c.d}} name2="{{a.e | prop('f') | prop('g')}}" a="/%'aaa'%/">
+        <div class="{{id}} {{name3}}" {{name3}} {{ ...props}} name={{name1}} autofocus name1={{a.c.d}} name2="{{a.e | prop('f') | prop('g')}}" a="/%'aaa'%//">
           <@name checked>{{test0 | filter1}}{{'test1' | filter2}}test2</@name>
           <@checked />
           <@data-name10>
@@ -157,6 +157,12 @@ describe('test compile string', function () {
 
       var tmplTest = nj`
       <#each {{ list2 }}>
+        <!--
+          aaa
+        -->
+        <![CDATA[
+          <message> Welcome to YiiBai </message>
+        ]]>
         <div {{...props}}>
           <@id>d1</@id>
           <#props>
@@ -181,10 +187,10 @@ describe('test compile string', function () {
       </#each>
       `;
 
-      // var tmplFn = compile(tmpl3, 'tmplString');
-      // var html = tmplFn.apply(null, data);
+      var tmplFn = compile(tmpl3, 'tmplString');
+      var html = tmplFn.apply(null, data);
       // var html = nj.render.call(null, tmplTest, data[0], data[1]);
-      var html = tmplTest.apply(null, data);
+      //var html = tmplTest.apply(null, data);
 
       //console.log(JSON.stringify(nj.asts['tmplString']));
       console.log(html);
