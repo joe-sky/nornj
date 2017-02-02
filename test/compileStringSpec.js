@@ -4,7 +4,7 @@
   compile = require('../src/compiler/compile').compile,
   includeParser = require('../tools/includeParser');
 
-xdescribe('test compile string', function () {
+describe('test compile string', function () {
   beforeAll(function () {
     nj.registerFilter('filter1', function (v, p1) {
       //console.log(this.getData('name1'));
@@ -165,6 +165,10 @@ xdescribe('test compile string', function () {
       <script>
         function test() {
           console.log(1);
+
+          function test2() {
+            console.log(2);
+          }
         }
       </script>
       <#each {{ list2 }}>

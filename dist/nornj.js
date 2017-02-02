@@ -1200,7 +1200,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    tools = __webpack_require__(3),
 	    tranParam = __webpack_require__(5),
 	    tranElem = __webpack_require__(4),
-	    tmplRule = nj.tmplRule;
+	    tmplRule = nj.tmplRule,
+	    NO_SPLIT_TEXT = ['style', 'script'];
 
 	function _plainTextNode(obj, parent, parentContent) {
 	  var node = {};
@@ -1215,7 +1216,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  if (!tools.isArray(obj)) {
 	    //判断是否为文本节点
-	    if (tools.isString(obj)) {
+	    if (NO_SPLIT_TEXT.indexOf(parent.type.toLowerCase()) < 0) {
 	      var strs = obj.split(tmplRule.newlineSplit);
 	      strs.forEach(function (str, i) {
 	        str = str.trim();

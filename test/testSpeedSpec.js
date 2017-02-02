@@ -8,16 +8,16 @@
   ReactDOMServer = require('react-dom/server'),
   Handlebars = require('handlebars');
 
-nj.config({
-  createElement: React.createElement,
-  outputH: true,
-  delimiters: {
-    start: '{',
-    end: '}'
-  }
-});
+// nj.config({
+//   createElement: React.createElement,
+//   outputH: true,
+//   delimiters: {
+//     start: '{',
+//     end: '}'
+//   }
+// });
 
-describe('test speed', function() {
+xdescribe('test speed', function() {
   var t1 = nj `
   <img src="t1" />
   `;

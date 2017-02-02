@@ -1,10 +1,11 @@
 ﻿'use strict';
 
-var nj = require('../core'),
+const nj = require('../core'),
   tools = require('../utils/tools'),
   tranParam = require('../transforms/transformParam'),
   tranElem = require('../transforms/transformElement'),
-  tmplRule = nj.tmplRule;
+  tmplRule = nj.tmplRule,
+  NO_SPLIT_TEXT = ['style', 'script'];
 
 function _plainTextNode(obj, parent, parentContent) {
   var node = {};
@@ -18,13 +19,14 @@ function checkElem(obj, parent, hasExprProps) {
   var parentContent = 'content';
 
   if (!tools.isArray(obj)) { //判断是否为文本节点
-    if (tools.isString(obj)) {
+    if (NO_SPLIT_TEXT.indexOf(parent.type.toLowerCase()) < 0) {
       var strs = obj.split(tmplRule.newlineSplit);
       strs.forEach((str, i) => {
         str = str.trim();
         str !== '' && _plainTextNode(str, parent, parentContent);
       });
-    } else {
+    }
+    else {
       _plainTextNode(obj, parent, parentContent);
     }
 
