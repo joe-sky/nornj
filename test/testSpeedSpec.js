@@ -36,7 +36,15 @@ xdescribe('test speed', function() {
     </@name>
     <!--
       aaa
+      <div>
+        <span />
+      </div>
     -->
+    <![CDATA[
+      <div>
+        <span />
+      </div>
+    ]]>
     #${t1}
     ${t2()}
     <#each ${[1, 2, 3]}>

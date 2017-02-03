@@ -4,7 +4,6 @@ const nj = require('../core'),
   tools = require('../utils/tools'),
   tranElem = require('../transforms/transformElement'),
   tmplRule = nj.tmplRule,
-  commentRule = tmplRule.commentRule,
   tmplStrs = nj.tmplStrs,
   SPLIT_FLAG = '_nj_split';
 
@@ -102,22 +101,26 @@ function _checkStringElem(xml) {
 
     //Element tag
     if (elem) {
-      if (elemName[0] === '/') { //Close tag
-        if (elemName === '/' + current.elemName) {
-          current = current.parent;
-        }
-      } else if (elem[elem.length - 2] === '/') { //Self close tag
-        _setSelfCloseElem(elem, elemName, elemParams, current.elem);
-      } else { //Open tag
-        parent = current;
-        current = {
-          elem: [],
-          elemName: elemName,
-          parent: parent
-        };
+      if (elem.indexOf('<!') === 0) {  //doctype等标签当做文本处理
+        _setText(_formatNewline(elem), current.elem);
+      } else {
+        if (elemName[0] === '/') { //Close tag
+          if (elemName === '/' + current.elemName) {
+            current = current.parent;
+          }
+        } else if (elem[elem.length - 2] === '/') { //Self close tag
+          _setSelfCloseElem(elem, elemName, elemParams, current.elem);
+        } else { //Open tag
+          parent = current;
+          current = {
+            elem: [],
+            elemName: elemName,
+            parent: parent
+          };
 
-        parent.elem.push(current.elem);
-        _setElem(elem, elemName, elemParams, current.elem);
+          parent.elem.push(current.elem);
+          _setElem(elem, elemName, elemParams, current.elem);
+        }
       }
     }
 
@@ -139,6 +142,7 @@ const SPECIAL_LOOKUP = {
 };
 
 function _clearNotesAndBlank(str) {
+  const commentRule = tmplRule.commentRule;
   return str.replace(new RegExp('<!--' + commentRule + '[\\s\\S]*?' + commentRule + '-->', 'g'), '').replace(/>\s+([^\s<]*)\s+</g, '>$1<').trim()
     .replace(/(>|<|>=|<=)\(/g, (match) => SPECIAL_LOOKUP[match]);
 }
@@ -150,8 +154,6 @@ function _formatNewline(str) {
 //Set element node
 function _setElem(elem, elemName, elemParams, elemArr, bySelfClose) {
   var ret, paramsExpr;
-  elem = _formatNewline(elem);
-
   if (elemName[0] === tmplRule.exprRule) {
     ret = elem.substring(1, elem.length - 1);
   } else if (elemName.indexOf(tmplRule.propRule) === 0) {

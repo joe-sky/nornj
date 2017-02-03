@@ -63,7 +63,7 @@ module.exports = function(rules = {}) {
   if (tagSp) {
     tagSpRule = tagSp;
   }
-  if (comment) {
+  if (comment != null) {
     commentRule = comment;
   }
 

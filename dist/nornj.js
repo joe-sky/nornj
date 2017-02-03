@@ -538,7 +538,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 	//Get compiled property
-	var REGEX_JS_PROP = /(('[^']+')|("[^"]+")|(-?([0-9][0-9]*)(\.\d+)?)|true|false|null|undefined|([#]*)([^.[\]()]+))([^\s()]*)/;
+	var REGEX_JS_PROP = /(('[^']*')|("[^"]*")|(-?([0-9][0-9]*)(\.\d+)?)|true|false|null|undefined|([#]*)([^.[\]()]+))([^\s()]*)/;
 
 	function compiledProp(prop) {
 	  var ret = tools.obj();
@@ -1216,7 +1216,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  if (!tools.isArray(obj)) {
 	    //判断是否为文本节点
-	    if (parent.expr || NO_SPLIT_TEXT.indexOf(parent.type.toLowerCase()) < 0) {
+	    if (tools.isString(obj) && (parent.expr || NO_SPLIT_TEXT.indexOf(parent.type.toLowerCase()) < 0)) {
 	      var strs = obj.split(tmplRule.newlineSplit);
 	      strs.forEach(function (str, i) {
 	        str = str.trim();
@@ -1636,7 +1636,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  if (tagSp) {
 	    tagSpRule = tagSp;
 	  }
-	  if (comment) {
+	  if (comment != null) {
 	    commentRule = comment;
 	  }
 
@@ -2441,7 +2441,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    tools = __webpack_require__(3),
 	    tranElem = __webpack_require__(4),
 	    tmplRule = nj.tmplRule,
-	    commentRule = tmplRule.commentRule,
 	    tmplStrs = nj.tmplStrs,
 	    SPLIT_FLAG = '_nj_split';
 
@@ -2539,25 +2538,30 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    //Element tag
 	    if (elem) {
-	      if (elemName[0] === '/') {
-	        //Close tag
-	        if (elemName === '/' + current.elemName) {
-	          current = current.parent;
-	        }
-	      } else if (elem[elem.length - 2] === '/') {
-	        //Self close tag
-	        _setSelfCloseElem(elem, elemName, elemParams, current.elem);
+	      if (elem.indexOf('<!') === 0) {
+	        //doctype等标签当做文本处理
+	        _setText(_formatNewline(elem), current.elem);
 	      } else {
-	        //Open tag
-	        parent = current;
-	        current = {
-	          elem: [],
-	          elemName: elemName,
-	          parent: parent
-	        };
+	        if (elemName[0] === '/') {
+	          //Close tag
+	          if (elemName === '/' + current.elemName) {
+	            current = current.parent;
+	          }
+	        } else if (elem[elem.length - 2] === '/') {
+	          //Self close tag
+	          _setSelfCloseElem(elem, elemName, elemParams, current.elem);
+	        } else {
+	          //Open tag
+	          parent = current;
+	          current = {
+	            elem: [],
+	            elemName: elemName,
+	            parent: parent
+	          };
 
-	        parent.elem.push(current.elem);
-	        _setElem(elem, elemName, elemParams, current.elem);
+	          parent.elem.push(current.elem);
+	          _setElem(elem, elemName, elemParams, current.elem);
+	        }
 	      }
 	    }
 
@@ -2579,6 +2583,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 	function _clearNotesAndBlank(str) {
+	  var commentRule = tmplRule.commentRule;
 	  return str.replace(new RegExp('<!--' + commentRule + '[\\s\\S]*?' + commentRule + '-->', 'g'), '').replace(/>\s+([^\s<]*)\s+</g, '>$1<').trim().replace(/(>|<|>=|<=)\(/g, function (match) {
 	    return SPECIAL_LOOKUP[match];
 	  });
@@ -2591,8 +2596,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	//Set element node
 	function _setElem(elem, elemName, elemParams, elemArr, bySelfClose) {
 	  var ret, paramsExpr;
-	  elem = _formatNewline(elem);
-
 	  if (elemName[0] === tmplRule.exprRule) {
 	    ret = elem.substring(1, elem.length - 1);
 	  } else if (elemName.indexOf(tmplRule.propRule) === 0) {

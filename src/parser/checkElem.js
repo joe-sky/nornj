@@ -25,7 +25,7 @@ function checkElem(obj, parent, hasExprProps) {
   var parentContent = 'content';
 
   if (!tools.isArray(obj)) { //判断是否为文本节点
-    if (parent.expr || NO_SPLIT_TEXT.indexOf(parent.type.toLowerCase()) < 0) {
+    if (tools.isString(obj) && (parent.expr || NO_SPLIT_TEXT.indexOf(parent.type.toLowerCase()) < 0)) {
       var strs = obj.split(tmplRule.newlineSplit);
       strs.forEach((str, i) => {
         str = str.trim();
