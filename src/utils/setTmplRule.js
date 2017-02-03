@@ -1,6 +1,6 @@
 ﻿'use strict';
 
-var nj = require('../core'),
+const nj = require('../core'),
   tools = require('./tools');
 
 function _createRegExp(reg, mode) {
@@ -24,40 +24,47 @@ function _clearRepeat(str) {
   return ret;
 }
 
-module.exports = function(
-  startRule,
-  endRule,
-  exprRule,
-  propRule,
-  templateRule,
-  tagSpRule
-) {
-  if (tools.isObject(startRule)) {
-    var params = startRule;
-    startRule = params.start;
-    endRule = params.end;
-    exprRule = params.expr;
-    propRule = params.prop;
-    templateRule = params.template;
-    tagSpRule = params.tagSpRule;
+module.exports = function(rules = {}) {
+  let {
+    startRule = '{{',
+    endRule = '}}',
+    exprRule = '#',
+    propRule = '@',
+    templateRule = 'template',
+    tagSpRule = '#$@',
+    commentRule = '#'
+  } = nj.tmplRule;
+
+  let {
+    start,
+    end,
+    expr,
+    prop,
+    template,
+    tagSp,
+    comment
+  } = rules;
+
+  if (start) {
+    startRule = start;
   }
-  if (!startRule) {
-    startRule = '{{';
+  if (end) {
+    endRule = end;
   }
-  if (!endRule) {
-    endRule = '}}';
+  if (expr) {
+    exprRule = expr;
   }
-  if (!exprRule) {
-    exprRule = '#';
+  if (prop) {
+    propRule = prop;
   }
-  if (!propRule) {
-    propRule = '@';
+  if (template) {
+    templateRule = template;
   }
-  if (!templateRule) {
-    templateRule = 'template';
+  if (tagSp) {
+    tagSpRule = tagSp;
   }
-  if (!tagSpRule) {
-    tagSpRule = '#$@';
+  if (comment) {
+    commentRule = comment;
   }
 
   var allRules = _clearRepeat(startRule + endRule),
@@ -71,10 +78,13 @@ module.exports = function(
   tools.assign(nj.tmplRule, {
     startRule,
     endRule,
-    firstChar,
-    lastChar,
     exprRule,
     propRule,
+    templateRule,
+    tagSpRule,
+    commentRule,
+    firstChar,
+    lastChar,
     xmlOpenTag: _createRegExp('^<([a-z' + firstChar + exprRules + '][-a-z0-9_|./' + firstChar + otherChars + ']*)[^>]*>$', 'i'),
     openTagParams: _createRegExp('[\\s]+((([' + firstChar + ']?' + startRule + ')([^' + allRules + ']+)(' + endRule + '[' + lastChar + ']?))|[^\\s=>]+)(=((\'[^\']+\')|("[^"]+")|([^"\'\\s]+)))?', 'g'),
     insideBraceParam: _createRegExp('([' + firstChar + ']?' + startRule + ')([^' + allRules + ']+)(' + endRule + '[' + lastChar + ']?)', 'i'),
@@ -84,7 +94,6 @@ module.exports = function(
     checkElem: _createRegExp('([^>]*)(<([a-z' + firstChar + '/' + exprRules + '!][-a-z0-9_|.' + allRules + exprRules + ']*)([^>]*)>)([^<]*)', 'ig'),
     expr: _createRegExp('^' + escapeExprRule + '([^\\s]+)', 'i'),
     include: _createRegExp('<' + escapeExprRule + 'include([^>]*)>', 'ig'),
-    template: templateRule,
     newlineSplit: _createRegExp('\\\\n(?![^' + firstChar + lastChar + ']*' + lastChar + ')', 'g'),
   });
 };

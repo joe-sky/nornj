@@ -172,9 +172,9 @@ describe('test compile string', function () {
         }
       </script>
       <#each {{ list2 }}>
-        <!--
+        <!--#
           aaa
-        -->
+        #-->
         <![CDATA[
           <message> Welcome to YiiBai </message>
         ]]>

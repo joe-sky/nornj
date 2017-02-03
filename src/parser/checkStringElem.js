@@ -1,9 +1,10 @@
 ﻿'use strict';
 
-var nj = require('../core'),
+const nj = require('../core'),
   tools = require('../utils/tools'),
   tranElem = require('../transforms/transformElement'),
   tmplRule = nj.tmplRule,
+  commentRule = tmplRule.commentRule,
   tmplStrs = nj.tmplStrs,
   SPLIT_FLAG = '_nj_split';
 
@@ -138,7 +139,7 @@ const SPECIAL_LOOKUP = {
 };
 
 function _clearNotesAndBlank(str) {
-  return str.replace(/<#!--[\s\S]*?--#>/g, '').replace(/>\s+([^\s<]*)\s+</g, '>$1<').trim()
+  return str.replace(new RegExp('<!--' + commentRule + '[\\s\\S]*?' + commentRule + '-->', 'g'), '').replace(/>\s+([^\s<]*)\s+</g, '>$1<').trim()
     .replace(/(>|<|>=|<=)\(/g, (match) => SPECIAL_LOOKUP[match]);
 }
 

@@ -1592,33 +1592,52 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return ret;
 	}
 
-	module.exports = function (startRule, endRule, exprRule, propRule, templateRule, tagSpRule) {
-	  if (tools.isObject(startRule)) {
-	    var params = startRule;
-	    startRule = params.start;
-	    endRule = params.end;
-	    exprRule = params.expr;
-	    propRule = params.prop;
-	    templateRule = params.template;
-	    tagSpRule = params.tagSpRule;
+	module.exports = function () {
+	  var rules = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+	  var _nj$tmplRule = nj.tmplRule,
+	      _nj$tmplRule$startRul = _nj$tmplRule.startRule,
+	      startRule = _nj$tmplRule$startRul === undefined ? '{{' : _nj$tmplRule$startRul,
+	      _nj$tmplRule$endRule = _nj$tmplRule.endRule,
+	      endRule = _nj$tmplRule$endRule === undefined ? '}}' : _nj$tmplRule$endRule,
+	      _nj$tmplRule$exprRule = _nj$tmplRule.exprRule,
+	      exprRule = _nj$tmplRule$exprRule === undefined ? '#' : _nj$tmplRule$exprRule,
+	      _nj$tmplRule$propRule = _nj$tmplRule.propRule,
+	      propRule = _nj$tmplRule$propRule === undefined ? '@' : _nj$tmplRule$propRule,
+	      _nj$tmplRule$template = _nj$tmplRule.templateRule,
+	      templateRule = _nj$tmplRule$template === undefined ? 'template' : _nj$tmplRule$template,
+	      _nj$tmplRule$tagSpRul = _nj$tmplRule.tagSpRule,
+	      tagSpRule = _nj$tmplRule$tagSpRul === undefined ? '#$@' : _nj$tmplRule$tagSpRul,
+	      _nj$tmplRule$commentR = _nj$tmplRule.commentRule,
+	      commentRule = _nj$tmplRule$commentR === undefined ? '#' : _nj$tmplRule$commentR;
+	  var start = rules.start,
+	      end = rules.end,
+	      expr = rules.expr,
+	      prop = rules.prop,
+	      template = rules.template,
+	      tagSp = rules.tagSp,
+	      comment = rules.comment;
+
+
+	  if (start) {
+	    startRule = start;
 	  }
-	  if (!startRule) {
-	    startRule = '{{';
+	  if (end) {
+	    endRule = end;
 	  }
-	  if (!endRule) {
-	    endRule = '}}';
+	  if (expr) {
+	    exprRule = expr;
 	  }
-	  if (!exprRule) {
-	    exprRule = '#';
+	  if (prop) {
+	    propRule = prop;
 	  }
-	  if (!propRule) {
-	    propRule = '@';
+	  if (template) {
+	    templateRule = template;
 	  }
-	  if (!templateRule) {
-	    templateRule = 'template';
+	  if (tagSp) {
+	    tagSpRule = tagSp;
 	  }
-	  if (!tagSpRule) {
-	    tagSpRule = '#$@';
+	  if (comment) {
+	    commentRule = comment;
 	  }
 
 	  var allRules = _clearRepeat(startRule + endRule),
@@ -1632,10 +1651,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	  tools.assign(nj.tmplRule, {
 	    startRule: startRule,
 	    endRule: endRule,
-	    firstChar: firstChar,
-	    lastChar: lastChar,
 	    exprRule: exprRule,
 	    propRule: propRule,
+	    templateRule: templateRule,
+	    tagSpRule: tagSpRule,
+	    commentRule: commentRule,
+	    firstChar: firstChar,
+	    lastChar: lastChar,
 	    xmlOpenTag: _createRegExp('^<([a-z' + firstChar + exprRules + '][-a-z0-9_|./' + firstChar + otherChars + ']*)[^>]*>$', 'i'),
 	    openTagParams: _createRegExp('[\\s]+((([' + firstChar + ']?' + startRule + ')([^' + allRules + ']+)(' + endRule + '[' + lastChar + ']?))|[^\\s=>]+)(=((\'[^\']+\')|("[^"]+")|([^"\'\\s]+)))?', 'g'),
 	    insideBraceParam: _createRegExp('([' + firstChar + ']?' + startRule + ')([^' + allRules + ']+)(' + endRule + '[' + lastChar + ']?)', 'i'),
@@ -1645,7 +1667,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    checkElem: _createRegExp('([^>]*)(<([a-z' + firstChar + '/' + exprRules + '!][-a-z0-9_|.' + allRules + exprRules + ']*)([^>]*)>)([^<]*)', 'ig'),
 	    expr: _createRegExp('^' + escapeExprRule + '([^\\s]+)', 'i'),
 	    include: _createRegExp('<' + escapeExprRule + 'include([^>]*)>', 'ig'),
-	    template: templateRule,
 	    newlineSplit: _createRegExp('\\\\n(?![^' + firstChar + lastChar + ']*' + lastChar + ')', 'g')
 	  });
 	};
@@ -2420,6 +2441,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    tools = __webpack_require__(3),
 	    tranElem = __webpack_require__(4),
 	    tmplRule = nj.tmplRule,
+	    commentRule = tmplRule.commentRule,
 	    tmplStrs = nj.tmplStrs,
 	    SPLIT_FLAG = '_nj_split';
 
@@ -2557,7 +2579,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 	function _clearNotesAndBlank(str) {
-	  return str.replace(/<#!--[\s\S]*?--#>/g, '').replace(/>\s+([^\s<]*)\s+</g, '>$1<').trim().replace(/(>|<|>=|<=)\(/g, function (match) {
+	  return str.replace(new RegExp('<!--' + commentRule + '[\\s\\S]*?' + commentRule + '-->', 'g'), '').replace(/>\s+([^\s<]*)\s+</g, '>$1<').trim().replace(/(>|<|>=|<=)\(/g, function (match) {
 	    return SPECIAL_LOOKUP[match];
 	  });
 	}
