@@ -24,14 +24,22 @@ function _clearRepeat(str) {
   return ret;
 }
 
-module.exports = function (startRule, endRule, exprRule, propRule, templateRule) {
-  if(tools.isObject(startRule)){
+module.exports = function(
+  startRule,
+  endRule,
+  exprRule,
+  propRule,
+  templateRule,
+  tagSpRule
+) {
+  if (tools.isObject(startRule)) {
     var params = startRule;
     startRule = params.start;
     endRule = params.end;
     exprRule = params.expr;
     propRule = params.prop;
     templateRule = params.template;
+    tagSpRule = params.tagSpRule;
   }
   if (!startRule) {
     startRule = '{{';
@@ -48,13 +56,15 @@ module.exports = function (startRule, endRule, exprRule, propRule, templateRule)
   if (!templateRule) {
     templateRule = 'template';
   }
+  if (!tagSpRule) {
+    tagSpRule = '#$@';
+  }
 
   var allRules = _clearRepeat(startRule + endRule),
     firstChar = startRule[0],
     lastChar = endRule[endRule.length - 1],
     otherChars = allRules.substr(1),
-    spChars = '#$@',
-    exprRules = _clearRepeat(exprRule + spChars),
+    exprRules = _clearRepeat(exprRule + propRule + tagSpRule),
     escapeExprRule = exprRule.replace(/\$/g, '\\$');
 
   //Reset the regexs to global list

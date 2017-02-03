@@ -5,7 +5,13 @@ const nj = require('../core'),
   tranParam = require('../transforms/transformParam'),
   tranElem = require('../transforms/transformElement'),
   tmplRule = nj.tmplRule,
-  NO_SPLIT_TEXT = ['style', 'script'];
+  NO_SPLIT_TEXT = [
+    'style',
+    'script',
+    'textarea',
+    'pre',
+    'code'
+  ];
 
 function _plainTextNode(obj, parent, parentContent) {
   var node = {};
@@ -19,7 +25,7 @@ function checkElem(obj, parent, hasExprProps) {
   var parentContent = 'content';
 
   if (!tools.isArray(obj)) { //判断是否为文本节点
-    if (NO_SPLIT_TEXT.indexOf(parent.type.toLowerCase()) < 0) {
+    if (parent.expr || NO_SPLIT_TEXT.indexOf(parent.type.toLowerCase()) < 0) {
       var strs = obj.split(tmplRule.newlineSplit);
       strs.forEach((str, i) => {
         str = str.trim();

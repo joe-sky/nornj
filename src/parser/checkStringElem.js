@@ -143,7 +143,7 @@ function _clearNotesAndBlank(str) {
 }
 
 function _formatNewline(str) {
-  return str.replace(/\n/g, '\\n').replace(/\r/g, '').trim();
+  return str.trim().replace(/\n/g, '\\n').replace(/\r/g, '');
 }
 
 //Set element node

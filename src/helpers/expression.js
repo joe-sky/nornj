@@ -214,16 +214,16 @@ function _commonConfig(params) {
 var exprConfig = {
   'if': _commonConfig({ newContext: false }),
   'else': _commonConfig({ newContext: false, useString: false, exprProps: true }),
-  elseif: _commonConfig({ newContext: false, useString: false, exprProps: true }),
   'switch': _commonConfig({ newContext: false }),
   unless: _commonConfig({ newContext: false }),
   each: _commonConfig(),
   prop: _commonConfig({ newContext: false, exprProps: true }),
   spread: _commonConfig({ newContext: false, useString: false, exprProps: true }),
   'for': _commonConfig(),
-  obj: _commonConfig({ newContext: false, useString: false }),
-  blank: _commonConfig({ newContext: false, useString: false })
+  obj: _commonConfig({ newContext: false, useString: false })
 };
+exprConfig.elseif = _commonConfig(exprConfig['else']);
+exprConfig.blank = _commonConfig(exprConfig.obj);
 
 //Expression alias
 exprs['case'] = exprs.elseif;

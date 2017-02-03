@@ -911,16 +911,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	var exprConfig = {
 	  'if': _commonConfig({ newContext: false }),
 	  'else': _commonConfig({ newContext: false, useString: false, exprProps: true }),
-	  elseif: _commonConfig({ newContext: false, useString: false, exprProps: true }),
 	  'switch': _commonConfig({ newContext: false }),
 	  unless: _commonConfig({ newContext: false }),
 	  each: _commonConfig(),
 	  prop: _commonConfig({ newContext: false, exprProps: true }),
 	  spread: _commonConfig({ newContext: false, useString: false, exprProps: true }),
 	  'for': _commonConfig(),
-	  obj: _commonConfig({ newContext: false, useString: false }),
-	  blank: _commonConfig({ newContext: false, useString: false })
+	  obj: _commonConfig({ newContext: false, useString: false })
 	};
+	exprConfig.elseif = _commonConfig(exprConfig['else']);
+	exprConfig.blank = _commonConfig(exprConfig.obj);
 
 	//Expression alias
 	exprs['case'] = exprs.elseif;
@@ -1201,7 +1201,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    tranParam = __webpack_require__(5),
 	    tranElem = __webpack_require__(4),
 	    tmplRule = nj.tmplRule,
-	    NO_SPLIT_TEXT = ['style', 'script'];
+	    NO_SPLIT_TEXT = ['style', 'script', 'textarea', 'pre', 'code'];
 
 	function _plainTextNode(obj, parent, parentContent) {
 	  var node = {};
@@ -1216,7 +1216,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  if (!tools.isArray(obj)) {
 	    //判断是否为文本节点
-	    if (NO_SPLIT_TEXT.indexOf(parent.type.toLowerCase()) < 0) {
+	    if (parent.expr || NO_SPLIT_TEXT.indexOf(parent.type.toLowerCase()) < 0) {
 	      var strs = obj.split(tmplRule.newlineSplit);
 	      strs.forEach(function (str, i) {
 	        str = str.trim();
@@ -1592,7 +1592,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return ret;
 	}
 
-	module.exports = function (startRule, endRule, exprRule, propRule, templateRule) {
+	module.exports = function (startRule, endRule, exprRule, propRule, templateRule, tagSpRule) {
 	  if (tools.isObject(startRule)) {
 	    var params = startRule;
 	    startRule = params.start;
@@ -1600,6 +1600,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    exprRule = params.expr;
 	    propRule = params.prop;
 	    templateRule = params.template;
+	    tagSpRule = params.tagSpRule;
 	  }
 	  if (!startRule) {
 	    startRule = '{{';
@@ -1616,13 +1617,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	  if (!templateRule) {
 	    templateRule = 'template';
 	  }
+	  if (!tagSpRule) {
+	    tagSpRule = '#$@';
+	  }
 
 	  var allRules = _clearRepeat(startRule + endRule),
 	      firstChar = startRule[0],
 	      lastChar = endRule[endRule.length - 1],
 	      otherChars = allRules.substr(1),
-	      spChars = '#$@',
-	      exprRules = _clearRepeat(exprRule + spChars),
+	      exprRules = _clearRepeat(exprRule + propRule + tagSpRule),
 	      escapeExprRule = exprRule.replace(/\$/g, '\\$');
 
 	  //Reset the regexs to global list
@@ -2560,7 +2563,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 	function _formatNewline(str) {
-	  return str.replace(/\n/g, '\\n').replace(/\r/g, '').trim();
+	  return str.trim().replace(/\n/g, '\\n').replace(/\r/g, '');
 	}
 
 	//Set element node
