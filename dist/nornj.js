@@ -1201,7 +1201,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    tranParam = __webpack_require__(5),
 	    tranElem = __webpack_require__(4),
 	    tmplRule = nj.tmplRule,
-	    NO_SPLIT_TEXT = ['style', 'script', 'textarea', 'pre', 'code'];
+	    NO_SPLIT_NEWLINE = ['style', 'script', 'textarea', 'pre', 'xmp', 'template'];
 
 	function _plainTextNode(obj, parent, parentContent) {
 	  var node = {};
@@ -1216,7 +1216,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  if (!tools.isArray(obj)) {
 	    //判断是否为文本节点
-	    if (tools.isString(obj) && (parent.expr || NO_SPLIT_TEXT.indexOf(parent.type.toLowerCase()) < 0)) {
+	    if (tools.isString(obj) && (parent.expr || NO_SPLIT_NEWLINE.indexOf(parent.type.toLowerCase()) < 0)) {
 	      var strs = obj.split(tmplRule.newlineSplit);
 	      strs.forEach(function (str, i) {
 	        str = str.trim();
