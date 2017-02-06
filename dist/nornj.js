@@ -1643,7 +1643,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	  var allRules = _clearRepeat(startRule + endRule),
 	      firstChar = startRule[0],
 	      lastChar = endRule[endRule.length - 1],
-	      otherChars = allRules.substr(1),
 	      exprRules = _clearRepeat(exprRule + propRule + tagSpRule),
 	      escapeExprRule = exprRule.replace(/\$/g, '\\$');
 
@@ -1658,13 +1657,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	    commentRule: commentRule,
 	    firstChar: firstChar,
 	    lastChar: lastChar,
-	    xmlOpenTag: _createRegExp('^<([a-z' + firstChar + exprRules + '][-a-z0-9_|./' + firstChar + otherChars + ']*)[^>]*>$', 'i'),
+	    xmlOpenTag: _createRegExp('^<([a-z' + firstChar + exprRules + '][^\\s>]*)[^>]*>$', 'i'),
 	    openTagParams: _createRegExp('[\\s]+((([' + firstChar + ']?' + startRule + ')([^' + allRules + ']+)(' + endRule + '[' + lastChar + ']?))|[^\\s=>]+)(=((\'[^\']+\')|("[^"]+")|([^"\'\\s]+)))?', 'g'),
 	    insideBraceParam: _createRegExp('([' + firstChar + ']?' + startRule + ')([^' + allRules + ']+)(' + endRule + '[' + lastChar + ']?)', 'i'),
 	    spreadProp: _createRegExp('[\\s]+([' + firstChar + ']?' + startRule + ')[\\s]*(\\.\\.\\.[^' + allRules + ']+)(' + endRule + '[' + lastChar + ']?)', 'g'),
 	    replaceSplit: _createRegExp('(?:[' + firstChar + ']?' + startRule + ')[^' + allRules + ']+(?:' + endRule + '[' + lastChar + ']?)'),
 	    replaceParam: _createRegExp('(([' + firstChar + ']?' + startRule + '))([^' + allRules + ']+)(' + endRule + '[' + lastChar + ']?)', 'g'),
-	    checkElem: _createRegExp('([^>]*)(<([a-z' + firstChar + '/' + exprRules + '!][-a-z0-9_|.' + allRules + exprRules + ']*)([^>]*)>)([^<]*)', 'ig'),
+	    checkElem: _createRegExp('([^>]*)(<([a-z/!' + firstChar + exprRules + '][^\\s>]*)([^>]*)>)([^<]*)', 'ig'),
 	    expr: _createRegExp('^' + escapeExprRule + '([^\\s]+)', 'i'),
 	    include: _createRegExp('<' + escapeExprRule + 'include([^>]*)>', 'ig'),
 	    newlineSplit: _createRegExp('\\\\n(?![^' + firstChar + lastChar + ']*' + lastChar + ')', 'g')

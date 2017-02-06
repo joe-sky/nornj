@@ -172,9 +172,9 @@ describe('test compile string', function () {
         }
       </script>
       <#each {{ list2 }}>
-        <!--#
+        <!--
           aaa
-        #-->
+        -->
         <![CDATA[
           <message> Welcome to YiiBai </message>
         ]]>
@@ -211,7 +211,7 @@ describe('test compile string', function () {
         <slider {{../name3}}>
           @${nj`<div>111</div>`()}
           #${nj`<div>{{../name3}}</div>`}
-          <{{../sliderItem.a|tagName}} no1={{no}} no2="{{-0.05 | filter2}}" checked no='{{ ../sliderItem.b }}' />
+          <{{../sliderItem['a']|tagName(1,2)}} no1={{no}} no2="{{-0.05 | filter2}}" checked no='{{ ../sliderItem.b }}' />
         </slider>
       </#each>
       `;
