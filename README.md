@@ -114,7 +114,7 @@ npm install nornj
 
 ### 更多详细文档
 
-* [使用字符串构建模板](https://github.com/joe-sky/nornj/blob/master/docs/使用字符串构建模板.md)
+* [模板语法](https://github.com/joe-sky/nornj/blob/master/docs/模板语法.md)
 * [编译模板并输出html字符串](https://github.com/joe-sky/nornj/blob/master/docs/编译模板并输出html字符串.md)
 * [编译模板并输出React组件](https://github.com/joe-sky/nornj/blob/master/docs/编译模板并输出React组件.md)
 * [在独立模板文件中分模块构建](https://github.com/joe-sky/nornj/blob/master/docs/在独立模板文件中分模块构建.md)
