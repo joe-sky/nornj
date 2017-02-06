@@ -889,7 +889,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return options.props;
 	  },
 
-	  blank: function blank(options) {
+	  block: function block(options) {
 	    return options.result();
 	  }
 	};
@@ -1884,7 +1884,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    hashStr += ', useString: ' + (useStringLocal == null ? 'p1.useString' : useStringLocal ? 'true' : 'false');
 	  }
 	  if (node) {
-	    //标签表达式
+	    //块表达式
 	    var newContext = config ? config.newContext : true;
 	    if (noConfig || config.exprProps) {
 	      hashStr += ', exprProps: ' + exprPropsStr;

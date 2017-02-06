@@ -72,7 +72,7 @@ function _buildOptions(config, useStringLocal, node, fns, exprPropsStr, level, h
   if (noConfig || config.useString) {
     hashStr += ', useString: ' + (useStringLocal == null ? 'p1.useString' : (useStringLocal ? 'true' : 'false'));
   }
-  if (node) { //标签表达式
+  if (node) { //块表达式
     var newContext = config ? config.newContext : true;
     if (noConfig || config.exprProps) {
       hashStr += ', exprProps: ' + exprPropsStr;

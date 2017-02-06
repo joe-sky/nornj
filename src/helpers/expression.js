@@ -192,7 +192,7 @@ const exprs = {
     return options.props;
   },
 
-  blank: function(options) {
+  block: function(options) {
     return options.result();
   }
 };
