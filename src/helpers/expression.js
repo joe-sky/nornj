@@ -223,7 +223,7 @@ var exprConfig = {
   obj: _commonConfig({ newContext: false, useString: false })
 };
 exprConfig.elseif = _commonConfig(exprConfig['else']);
-exprConfig.blank = _commonConfig(exprConfig.obj);
+exprConfig.block = _commonConfig(exprConfig.obj);
 
 //Expression alias
 exprs['case'] = exprs.elseif;
