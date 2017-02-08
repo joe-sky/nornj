@@ -85,7 +85,7 @@ function _buildOptions(config, useStringLocal, node, fns, exprPropsStr, level, h
     }
   }
 
-  return '{ _njOpts: true, ctx: p2' + hashStr + ' }';
+  return '{ _njOpts: true, ctx: p2, outputH: ' + !fns.useString + hashStr + ' }';
 }
 
 function _buildPropData(obj, counter, fns, useStringLocal) {
@@ -160,7 +160,7 @@ function _buildPropData(obj, counter, fns, useStringLocal) {
             escape
           }, counter, fns, useStringLocal);
         }, '') : '') +
-        ', ' + _buildOptions(configF, useStringLocal) +
+        ', ' + _buildOptions(configF, useStringLocal, null, fns) +
         ']);\n';
       filterStr += '}\n';
     }, false, true);

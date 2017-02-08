@@ -1,6 +1,7 @@
 ﻿'use strict';
 
-const tools = require('../utils/tools');
+const tools = require('../utils/tools'),
+  tranData = require('../transforms/transformData');
 
 //Global expression list
 const exprs = {
@@ -149,7 +150,7 @@ const exprs = {
       value = !options.useString ? true : name;
     }
 
-    options.exprProps[name] = value;
+    options.exprProps[options.outputH ? tranData.fixPropName(name) : name] = value;
   },
 
   //Spread parameters

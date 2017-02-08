@@ -688,7 +688,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
-	var tools = __webpack_require__(3);
+	var tools = __webpack_require__(3),
+	    tranData = __webpack_require__(7);
 
 	//Global expression list
 	var exprs = {
@@ -845,7 +846,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      value = !options.useString ? true : name;
 	    }
 
-	    options.exprProps[name] = value;
+	    options.exprProps[options.outputH ? tranData.fixPropName(name) : name] = value;
 	  },
 
 	  //Spread parameters
@@ -1896,7 +1897,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	  }
 
-	  return '{ _njOpts: true, ctx: p2' + hashStr + ' }';
+	  return '{ _njOpts: true, ctx: p2, outputH: ' + !fns.useString + hashStr + ' }';
 	}
 
 	function _buildPropData(obj, counter, fns, useStringLocal) {
@@ -1976,7 +1977,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	          prop: c,
 	          escape: escape
 	        }, counter, fns, useStringLocal);
-	      }, '') : '') + ', ' + _buildOptions(configF, useStringLocal) + ']);\n';
+	      }, '') : '') + ', ' + _buildOptions(configF, useStringLocal, null, fns) + ']);\n';
 	      filterStr += '}\n';
 	    }, false, true);
 
