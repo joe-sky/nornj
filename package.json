@@ -44,7 +44,7 @@
     "lodash": "^4.13.1",
     "react": "^0.14.7",
     "react-dom": "^0.14.7",
-    "webpack": "^1.13.1",
+    "webpack": "^2.2.1",
     "webpack-stream": "^3.2.0",
     "yargs": "^4.2.0"
   }

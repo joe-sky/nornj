@@ -39,15 +39,16 @@ gulp.task('build', () => {
         pure_getters: true,
         unsafe: true,
         unsafe_comps: true,
-        screw_ie8: true,
+        screw_ie8: false,
         warnings: false
-      }
+      },
+      sourceMap: true
     }));
   }
 
   return gulp.src('./src/base.js')
     .pipe(webpackStream({
-      devtool: argv.p ? 'source-map' : null,
+      devtool: argv.p ? 'source-map' : false,
       watch: argv.w ? true : false,
       output: {
         filename: libName,
@@ -55,14 +56,14 @@ gulp.task('build', () => {
         libraryTarget: 'umd'
       },
       module: {
-        loaders: [{
+        rules: [{
           test: /\.js$/,
-          loader: 'babel',
+          use: ['babel-loader'],
           exclude: /node_modules/
-        }],
+        }]
       },
       plugins: plugins
-    }))
+    }, webpack))
     .on('error', handlebuildError)
     .pipe(gulp.dest('./dist'));
 });
