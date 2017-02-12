@@ -1,12 +1,9 @@
-﻿'use strict';
+﻿import compileStringTmpl from '../parser/checkStringElem';
 
-var compileStringTmpl = require('../parser/checkStringElem');
+export function tmplTag() {
+  return compileStringTmpl.apply({ outputH: false }, arguments);
+}
 
-module.exports = {
-  tmplTag: function() {
-    return compileStringTmpl.apply({ outputH: false }, arguments);
-  },
-  tmplTagH: function() {
-    return compileStringTmpl.apply({ outputH: true }, arguments);
-  }
-};
+export function tmplTagH() {
+  return compileStringTmpl.apply({ outputH: true }, arguments);
+}

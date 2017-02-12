@@ -1,6 +1,5 @@
 ﻿var nj = require('../src/base'),
   _ = require('lodash'),
-  utils = require('../src/utils/utils'),
   compile = require('../src/compiler/compile').compile,
   includeParser = require('../tools/includeParser');
 

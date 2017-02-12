@@ -1,5 +1,4 @@
 ﻿var nj = require('../src/base'),
-    utils = require('../src/utils/utils'),
     compiler = require('../src/compiler/compile'),
     compile = compiler.compile;
 

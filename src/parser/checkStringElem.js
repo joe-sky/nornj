@@ -1,14 +1,11 @@
-﻿'use strict';
-
-const nj = require('../core'),
-  tools = require('../utils/tools'),
-  tranElem = require('../transforms/transformElement'),
-  tmplRule = nj.tmplRule,
-  tmplStrs = nj.tmplStrs,
-  SPLIT_FLAG = '_nj_split';
+﻿import nj from '../core';
+import * as tools from '../utils/tools';
+import * as tranElem from '../transforms/transformElement';
+const { tmplRule, tmplStrs } = nj;
+const SPLIT_FLAG = '_nj_split';
 
 //Compile string template
-function compileStringTmpl(tmpl) {
+export default function compileStringTmpl(tmpl) {
   let tmplKey = tmpl.toString(), //Get unique key
     ret = tmplStrs[tmplKey],
     outputH = this ? this.outputH : false;
@@ -210,5 +207,3 @@ function _setSelfCloseElem(elem, elemName, elemParams, elemArr) {
 function _setText(text, elemArr) {
   elemArr.push(text);
 }
-
-module.exports = compileStringTmpl;

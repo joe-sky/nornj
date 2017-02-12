@@ -1,5 +1,5 @@
 var nj = require('../src/base'),
-  utils = require('../src/utils/utils'),
+  checkElem = require('../src/parser/checkElem').default,
   compiler = require('../src/compiler/compile'),
   compile = compiler.compile;
 
@@ -23,7 +23,7 @@ describe('test convert template', function () {
       content: []
     };
 
-    utils.checkElem(tmpl, root);
+    checkElem(tmpl, root);
 
     console.log(root.content);
     expect(root).toBeTruthy();

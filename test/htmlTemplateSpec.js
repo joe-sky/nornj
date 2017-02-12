@@ -1,5 +1,4 @@
 ﻿var nj = require('../src/base'),
-  utils = require('../src/utils/utils'),
   compile = require('../src/compiler/compile').compile,
   jsdom = require('jsdom'),
   React = require('react'),

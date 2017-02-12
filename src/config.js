@@ -1,10 +1,8 @@
-﻿'use strict';
+﻿import nj from './core';
+import setTmplRule from './utils/setTmplRule';
 
-var nj = require('./core'),
-  setTmplRule = require('./utils/setTmplRule');
-
-module.exports = function (configs) {
-  var delimiters = configs.delimiters,
+export default function (configs) {
+  const delimiters = configs.delimiters,
     includeParser = configs.includeParser,
     createElement = configs.createElement,
     outputH = configs.outputH;

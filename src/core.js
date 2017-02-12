@@ -1,6 +1,4 @@
-﻿'use strict';
-
-function nj() {
+﻿function nj() {
   return nj['tmplTag' + (nj.outputH ? 'H' : '')].apply(null, arguments);
 }
 

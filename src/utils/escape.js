@@ -1,6 +1,4 @@
-﻿'use strict';
-
-var ESCAPE_LOOKUP = {
+﻿const ESCAPE_LOOKUP = {
   '&': '&amp;',
   '>': '&gt;',
   '<': '&lt;',
@@ -8,7 +6,7 @@ var ESCAPE_LOOKUP = {
   '\'': '&#x27;'
 };
 
-function escape(text) {
+export default function escape(text) {
   if (text == null) {
     return '';
   }
@@ -20,5 +18,3 @@ function escape(text) {
     return ESCAPE_LOOKUP[match];
   });
 }
-
-module.exports = escape;

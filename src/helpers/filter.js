@@ -1,9 +1,7 @@
-﻿'use strict';
-
-const tools = require('../utils/tools');
+﻿import * as tools from '../utils/tools';
 
 //Global filter list
-const filters = {
+export const filters = {
   //Get param properties
   prop: (value, prop) => value[prop],
 
@@ -56,7 +54,7 @@ function _commonConfig(params) {
 }
 
 //Filter default config
-const filterConfig = {
+export const filterConfig = {
   prop: _commonConfig(),
   '==': _commonConfig(),
   '===': _commonConfig(),
@@ -72,7 +70,7 @@ const filterConfig = {
 };
 
 //Register filter and also can batch add
-function registerFilter(name, filter, options) {
+export function registerFilter(name, filter, options) {
   let params = name;
   if (!tools.isObject(name)) {
     params = {};
@@ -99,9 +97,3 @@ function registerFilter(name, filter, options) {
     }
   }, false, false);
 }
-
-module.exports = {
-  filters,
-  filterConfig,
-  registerFilter
-};

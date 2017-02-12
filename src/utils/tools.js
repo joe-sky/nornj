@@ -1,54 +1,52 @@
-﻿'use strict';
-
-var nj = require('../core'),
-  nativeArrayPush = Array.prototype.push,
+﻿import nj from '../core';
+const nativeArrayPush = Array.prototype.push,
   nativeArraySlice = Array.prototype.slice,
-  hasOwnProperty = Object.prototype.hasOwnProperty,
-  errorTitle = nj.errorTitle;
+  hasOwnProperty = Object.prototype.hasOwnProperty;
+const { errorTitle } = nj;
 
 //Push one by one to array
-function arrayPush(arr1, arr2) {
+export function arrayPush(arr1, arr2) {
   nativeArrayPush.apply(arr1, arr2);
   return arr1;
 }
 
-function arraySlice(arrLike, start) {
+export function arraySlice(arrLike, start) {
   return nativeArraySlice.call(arrLike, start);
 }
 
 //判断是否为数组
-function isArray(obj) {
+export function isArray(obj) {
   return Array.isArray(obj);
 }
 
 //判断是否为对象
-function isObject(obj) {
+export function isObject(obj) {
   var type = typeof obj;
   return !isArray(obj) && (type === 'function' || type === 'object' && !!obj);
 }
 
 //判断是否为字符串
-function isString(obj) {
+export function isString(obj) {
   return Object.prototype.toString.call(obj) === '[object String]';
 }
 
 //获取属性值
-function _getProperty(key) {
+export function _getProperty(key) {
   return function(obj) {
     return obj == null ? void 0 : obj[key];
   };
 }
 
 //是否为类数组
-var _getLength = _getProperty('length');
+const _getLength = _getProperty('length');
 
-function isArrayLike(obj) {
+export function isArrayLike(obj) {
   var length = _getLength(obj);
   return typeof length == 'number' && length >= 0;
 }
 
 //遍历数组或对象
-function each(obj, func, context, isArr) {
+export function each(obj, func, context, isArr) {
   if (!obj) {
     return;
   }
@@ -83,10 +81,10 @@ function each(obj, func, context, isArr) {
 }
 
 //Noop function
-function noop() {}
+export function noop() {}
 
 //抛出异常
-function throwIf(val, msg, type) {
+export function throwIf(val, msg, type) {
   if (!val) {
     switch (type) {
       case 'expr':
@@ -98,7 +96,7 @@ function throwIf(val, msg, type) {
 }
 
 //Print warn
-function warn(msg, type) {
+export function warn(msg, type) {
   var ret = errorTitle;
   switch (type) {
     case 'filter':
@@ -112,15 +110,15 @@ function warn(msg, type) {
 }
 
 //create light weight object
-function obj() {
+export function obj() {
   return Object.create(null);
 }
 
 //Clear quotation marks
-var REGEX_QUOT_D = /["]+/g,
+const REGEX_QUOT_D = /["]+/g,
   REGEX_QUOT_S = /[']+/g;
 
-function clearQuot(value, clearDouble) {
+export function clearQuot(value, clearDouble) {
   if (value == null) {
     return;
   }
@@ -146,7 +144,7 @@ function clearQuot(value, clearDouble) {
 }
 
 //Transform to camel-case
-function toCamelCase(str) {
+export function toCamelCase(str) {
   if (str.indexOf('-') > -1) {
     str = str.replace(/-\w/g, function(letter) {
       return letter.substr(1).toUpperCase();
@@ -157,7 +155,7 @@ function toCamelCase(str) {
 }
 
 //Reference by babel-external-helpers
-var assign = Object.assign || function(target) {
+export const assign = Object.assign || function(target) {
   for (var i = 1, args = arguments; i < args.length; i++) {
     var source = args[i];
 
@@ -170,22 +168,3 @@ var assign = Object.assign || function(target) {
 
   return target;
 };
-
-var tools = {
-  isArray,
-  isArrayLike,
-  isObject,
-  isString,
-  each,
-  throwIf,
-  assign,
-  obj,
-  arrayPush,
-  arraySlice,
-  clearQuot,
-  toCamelCase,
-  warn,
-  noop
-};
-
-module.exports = tools;

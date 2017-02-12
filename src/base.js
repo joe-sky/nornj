@@ -1,16 +1,25 @@
-﻿'use strict';
-
-var nj = require('./core'),
-  utils = require('./utils/utils'),
+﻿const nj = require('./core'),
+  tools = require('./utils/tools'),
+  expression = require('./helpers/expression'),
+  filter = require('./helpers/filter'),
   compiler = require('./compiler/compile'),
-  compileStringTmpl = require('./parser/checkStringElem'),
   tmplTag = require('./utils/tmplTag'),
-  config = require('./config');
+  escape = require('./utils/escape').default,
+  registerComponent = require('./utils/registerComponent').default,
+  replaceSpecialSymbol = require('./utils/replaceSpecialSymbol').default,
+  setTmplRule = require('./utils/setTmplRule').default,
+  config = require('./config').default;
 
-nj.compileStringTmpl = compileStringTmpl;
-nj.config = config;
-utils.assign(nj, compiler, tmplTag, utils);
+tools.assign(nj, {
+  escape,
+  registerComponent,
+  replaceSpecialSymbol,
+  setTmplRule,
+  config
+}, tools, expression, filter, compiler, tmplTag);
 
-var _global = typeof self !== 'undefined' ? self : global;
+//Set default template rules
+setTmplRule();
 
+const _global = typeof self !== 'undefined' ? self : global;
 module.exports = _global.NornJ = _global.nj = nj;

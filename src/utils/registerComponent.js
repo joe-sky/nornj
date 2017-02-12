@@ -1,10 +1,8 @@
-﻿'use strict';
-
-var nj = require('../core'),
-  tools = require('./tools');
+﻿import nj from '../core';
+import * as tools from './tools';
 
 //注册组件
-function registerComponent(name, component) {
+export default function registerComponent(name, component) {
   var params = name;
   if (!tools.isObject(name)) {
     params = {};
@@ -17,7 +15,3 @@ function registerComponent(name, component) {
 
   return component;
 }
-
-module.exports = {
-  registerComponent
-};

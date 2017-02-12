@@ -1,11 +1,9 @@
-﻿'use strict';
-
-var nj = require('../core'),
-  tools = require('../utils/tools'),
-  tmplRule = nj.tmplRule;
+﻿import nj from '../core';
+import * as tools from '../utils/tools';
+const { tmplRule } = nj;
 
 //Get compiled parameters from a object
-function compiledParams(obj) {
+export function compiledParams(obj) {
   var ret = tools.obj();
   tools.each(obj, function(v, k) {
     ret[k] = compiledParam(v);
@@ -15,9 +13,9 @@ function compiledParams(obj) {
 }
 
 //Get compiled property
-var REGEX_JS_PROP = /(('[^']*')|("[^"]*")|(-?([0-9][0-9]*)(\.\d+)?)|true|false|null|undefined|([#]*)([^.[\]()]+))([^\s()]*)/;
+const REGEX_JS_PROP = /(('[^']*')|("[^"]*")|(-?([0-9][0-9]*)(\.\d+)?)|true|false|null|undefined|([#]*)([^.[\]()]+))([^\s()]*)/;
 
-function compiledProp(prop) {
+export function compiledProp(prop) {
   var ret = tools.obj();
 
   //If there are colons in the property,then use filter
@@ -82,14 +80,14 @@ function compiledProp(prop) {
 }
 
 //Get filter param
-var REGEX_FILTER_PARAM = /([^\s()]+)(\(([^()]+)\))*/;
+const REGEX_FILTER_PARAM = /([^\s()]+)(\(([^()]+)\))*/;
 
 function _getFilterParam(obj) {
   return REGEX_FILTER_PARAM.exec(obj);
 }
 
 //Extract replace parameters
-var _quots = ['\'', '"'];
+const _quots = ['\'', '"'];
 
 function _getReplaceParam(obj, strs) {
   var pattern = tmplRule.replaceParam,
@@ -119,7 +117,7 @@ function _getReplaceParam(obj, strs) {
 }
 
 //Get compiled parameter
-function compiledParam(value) {
+export function compiledParam(value) {
   var ret = tools.obj(),
     strs = tools.isString(value) ? value.split(tmplRule.replaceSplit) : [value],
     props = null,
@@ -147,9 +145,3 @@ function compiledParam(value) {
 
   return ret;
 }
-
-module.exports = {
-  compiledParam,
-  compiledParams,
-  compiledProp
-};

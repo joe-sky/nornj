@@ -1,7 +1,7 @@
 ﻿'use strict';
 
 function uniqueKey(str, hash) {
-  var len = str.length;
+  let len = str.length;
   if (len == 0) {
     return str;
   }
@@ -9,7 +9,7 @@ function uniqueKey(str, hash) {
     hash = 0;
   }
 
-  var i, chr;
+  let i, chr;
   for (i = 0, len = str.length; i < len; i++) {
     chr = str.charCodeAt(i);
     hash = ((hash << 5) - hash) + chr;

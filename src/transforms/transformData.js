@@ -1,11 +1,9 @@
-﻿'use strict';
-
-const nj = require('../core'),
-  tools = require('../utils/tools'),
-  errorTitle = nj.errorTitle;
+﻿import nj from '../core';
+import * as tools from '../utils/tools';
+const { errorTitle } = nj;
 
 //提取style内参数
-function styleProps(obj) {
+export function styleProps(obj) {
   //If the parameter is a style object,then direct return.
   if (tools.isObject(obj)) {
     return obj;
@@ -38,7 +36,7 @@ function styleProps(obj) {
 }
 
 //Get value from multiple datas
-function getData(prop, data) {
+export function getData(prop, data) {
   var ret, obj;
   if (data === undefined) {
     data = this.data;
@@ -55,7 +53,7 @@ function getData(prop, data) {
   }
 }
 
-function getComputedData(fn, p2) {
+export function getComputedData(fn, p2) {
   if (fn == null) {
     return fn;
   }
@@ -73,7 +71,7 @@ function getComputedData(fn, p2) {
 }
 
 //Rebuild local variables in the new context
-function newContext(p2, p3) {
+export function newContext(p2, p3) {
   var newData = [];
   if (p3 && 'data' in p3) {
     newData.push(p3.data);
@@ -91,7 +89,7 @@ function newContext(p2, p3) {
 }
 
 //修正属性名
-function fixPropName(name) {
+export function fixPropName(name) {
   switch (name) {
     case 'class':
       name = 'className';
@@ -105,7 +103,7 @@ function fixPropName(name) {
 }
 
 //合并字符串属性
-function assignStringProp(paramsE, keys) {
+export function assignStringProp(paramsE, keys) {
   var ret = '';
   for (var k in paramsE) {
     if (!keys || !keys[k]) {
@@ -117,14 +115,14 @@ function assignStringProp(paramsE, keys) {
 }
 
 //创建块表达式子节点函数
-function exprRet(p1, p2, fn, p4) {
+export function exprRet(p1, p2, fn, p4) {
   return function(param) {
     return fn(p1, p2, param, p4);
   };
 }
 
 //构建可运行的模板函数
-function tmplWrap(configs, main) {
+export function tmplWrap(configs, main) {
   return function() {
     var initCtx = this,
       data = tools.arraySlice(arguments);
@@ -139,7 +137,7 @@ function tmplWrap(configs, main) {
 }
 
 //创建模板函数
-function template(fns) {
+export function template(fns) {
   var configs = {
     useString: fns.useString,
     exprs: nj.exprs,
@@ -175,15 +173,3 @@ function template(fns) {
 
   return configs;
 }
-
-module.exports = {
-  newContext,
-  getData,
-  getComputedData,
-  fixPropName,
-  styleProps,
-  assignStringProp,
-  exprRet,
-  tmplWrap,
-  template
-};

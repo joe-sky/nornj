@@ -1,10 +1,8 @@
-﻿'use strict';
-
-const tools = require('../utils/tools'),
-  tranData = require('../transforms/transformData');
+﻿import * as tools from '../utils/tools';
+import * as tranData from '../transforms/transformData';
 
 //Global expression list
-const exprs = {
+export const exprs = {
   'if': (value, options) => {
     if (value === 'false') {
       value = false;
@@ -208,7 +206,7 @@ function _commonConfig(params) {
 }
 
 //Expression default config
-const exprConfig = {
+export const exprConfig = {
   'if': _commonConfig({ newContext: false }),
   'else': _commonConfig({ newContext: false, useString: false, exprProps: true }),
   'switch': _commonConfig({ newContext: false }),
@@ -229,7 +227,7 @@ exprs['default'] = exprs['else'];
 exprConfig['default'] = exprConfig['else'];
 
 //Register expression and also can batch add
-function registerExpr(name, expr, options) {
+export function registerExpr(name, expr, options) {
   let params = name;
   if (!tools.isObject(name)) {
     params = {};
@@ -256,9 +254,3 @@ function registerExpr(name, expr, options) {
     }
   }, false, false);
 }
-
-module.exports = {
-  exprs,
-  exprConfig,
-  registerExpr
-};

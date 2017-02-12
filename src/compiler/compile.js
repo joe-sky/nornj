@@ -1,9 +1,9 @@
-﻿'use strict';
-
-const nj = require('../core'),
-  utils = require('../utils/utils'),
-  buildRuntime = require('./buildRuntime'),
-  compileStringTmpl = require('../parser/checkStringElem');
+﻿import nj from '../core';
+import * as tools from '../utils/tools';
+import checkElem from '../parser/checkElem';
+import * as tranData from '../transforms/transformData';
+import buildRuntime from './buildRuntime';
+import compileStringTmpl from '../parser/checkStringElem';
 
 //编译模板并返回转换函数
 function _createCompile(outputH) {
@@ -11,7 +11,7 @@ function _createCompile(outputH) {
     if (!tmpl) {
       return;
     }
-    if (utils.isObject(tmplKey)) {
+    if (tools.isObject(tmplKey)) {
       const options = tmplKey;
       tmplKey = options.tmplKey;
       fileName = options.fileName;
@@ -23,7 +23,7 @@ function _createCompile(outputH) {
       tmplFns = nj.templates[tmplKey];
     }
     if (!tmplFns) {
-      let isObj = utils.isObject(tmpl),
+      let isObj = tools.isObject(tmpl),
         fns;
       if (isObj && tmpl.main) { //直接传入预编译模板
         fns = tmpl;
@@ -40,7 +40,7 @@ function _createCompile(outputH) {
             root = _createAstRoot();
 
             //Auto transform string template to array
-            if (utils.isString(tmpl)) {
+            if (tools.isString(tmpl)) {
               //Merge all include blocks
               const includeParser = nj.includeParser;
               if (includeParser) {
@@ -51,7 +51,7 @@ function _createCompile(outputH) {
             }
 
             //分析传入参数并转换为节点树对象
-            utils.checkElem(tmpl._njTmpl, root);
+            checkElem(tmpl._njTmpl, root);
           }
 
           //保存模板AST编译结果到全局集合中
@@ -63,7 +63,7 @@ function _createCompile(outputH) {
         fns = buildRuntime(root.content, !outputH);
       }
 
-      tmplFns = utils.template(fns);
+      tmplFns = tranData.template(fns);
 
       //保存模板函数编译结果到全局集合中
       if (tmplKey) {
@@ -73,7 +73,7 @@ function _createCompile(outputH) {
 
     if (tmpl._njParams) {
       const tmplFn = function() {
-        return tmplFns.main.apply(this, utils.arrayPush([tmpl._njParams], arguments));
+        return tmplFns.main.apply(this, tools.arrayPush([tmpl._njParams], arguments));
       };
       tmplFn._njTmpl = true;
       return tmplFn;
@@ -83,12 +83,12 @@ function _createCompile(outputH) {
   };
 }
 
-const compile = _createCompile(),
-  compileH = _createCompile(true);
+export const compile = _createCompile();
+export const compileH = _createCompile(true);
 
 //Create template root object
 function _createAstRoot() {
-  const root = utils.obj();
+  const root = tools.obj();
   root.type = 'nj_root';
   root.content = [];
 
@@ -96,13 +96,13 @@ function _createAstRoot() {
 }
 
 //Precompile template
-function precompile(tmpl, outputH) {
+export function precompile(tmpl, outputH) {
   const root = _createAstRoot();
 
-  if (utils.isString(tmpl)) {
+  if (tools.isString(tmpl)) {
     tmpl = compileStringTmpl(tmpl);
   }
-  utils.checkElem(tmpl._njTmpl, root);
+  checkElem(tmpl._njTmpl, root);
 
   return buildRuntime(root.content, !outputH);
 }
@@ -112,14 +112,9 @@ function _createRender(outputH) {
     return (outputH ? compileH : compile)(tmpl, options ? {
       tmplKey: options.tmplKey ? options.tmplKey : tmpl._njTmplKey,
       fileName: options.fileName
-    } : tmpl._njTmplKey).apply(null, utils.arraySlice(arguments, 1));
+    } : tmpl._njTmplKey).apply(null, tools.arraySlice(arguments, 1));
   };
 }
 
-module.exports = {
-  compile,
-  compileH,
-  precompile,
-  render: _createRender(),
-  renderH: _createRender(true)
-};
+export const render = _createRender();
+export const renderH = _createRender(true);

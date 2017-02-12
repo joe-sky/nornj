@@ -1,6 +1,4 @@
-﻿'use strict';
-
-var SPACIAL_SYMBOLS = {
+﻿const SPACIAL_SYMBOLS = {
   nbsp: '\u00A0',
   ensp: '\u2002',
   emsp: '\u2003',
@@ -12,11 +10,9 @@ var SPACIAL_SYMBOLS = {
   amp: '&'
 };
 
-var REGEX_SYMBOLS = new RegExp('&(' + Object.keys(SPACIAL_SYMBOLS).join('|') + ');', 'g');
-function replace(str) {
+const REGEX_SYMBOLS = new RegExp('&(' + Object.keys(SPACIAL_SYMBOLS).join('|') + ');', 'g');
+export default function replace(str) {
   return str.replace(REGEX_SYMBOLS, function (all, match) {
     return SPACIAL_SYMBOLS[match];
   });
 }
-
-module.exports = replace;

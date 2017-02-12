@@ -1,7 +1,5 @@
-﻿'use strict';
-
-const nj = require('../core'),
-  tools = require('./tools');
+﻿import nj from '../core';
+import * as tools from './tools';
 
 function _createRegExp(reg, mode) {
   return new RegExp(reg, mode);
@@ -24,7 +22,7 @@ function _clearRepeat(str) {
   return ret;
 }
 
-module.exports = function(rules = {}) {
+export default function(rules = {}) {
   let {
     startRule = '{{',
     endRule = '}}',

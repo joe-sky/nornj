@@ -1,6 +1,7 @@
 ﻿'use strict';
 
-var nj = require('../lib/base'),
+const nj = require('../lib/base'),
+  { getOpenTagParams } = require('../lib/transforms/transformElement'),
   fs = require('fs'),
   path = require('path'),
   tmplRule = nj.tmplRule;
@@ -9,12 +10,12 @@ function getIncludeTmpl(tmplString, fileName, isAll, tmplStrs, tmplName) {
   //解析template块
   if (!tmplStrs) {
     tmplStrs = {};
-    var templateRule = tmplRule.templateRule.replace(/\$/g, '\\$'),
+    let templateRule = tmplRule.templateRule.replace(/\$/g, '\\$'),
       pattern = new RegExp('<' + templateRule + '([^>]*)>([\\s\\S]*?)</' + templateRule + '>', 'ig'),
       matchArr, hasTemplate;
 
     while (matchArr = pattern.exec(tmplString)) {
-      var props = nj.getOpenTagParams(matchArr[1]),
+      let props = getOpenTagParams(matchArr[1]),
         name = 'main',
         isLocal = false;
 
@@ -41,15 +42,15 @@ function getIncludeTmpl(tmplString, fileName, isAll, tmplStrs, tmplName) {
     }
   }
 
-  var tmplStrList = [],
+  let tmplStrList = [],
     ret;
   if (!isAll) {
-    var tName = tmplName == null ? 'main' : tmplName;
+    const tName = tmplName == null ? 'main' : tmplName;
     tmplStrList.push({ name: tName, tmpl: tmplStrs[tName].tmplStr });
   }
   else {  //按各子模板生成对象结构
     Object.keys(tmplStrs).forEach(function (tName) {
-      var _tmplStr = tmplStrs[tName];
+      const _tmplStr = tmplStrs[tName];
       if(!_tmplStr.isLocal) {
         tmplStrList.push({ name: tName, tmpl: _tmplStr.tmplStr });
       }
@@ -60,8 +61,8 @@ function getIncludeTmpl(tmplString, fileName, isAll, tmplStrs, tmplName) {
 
   tmplStrList.forEach(function (obj) {
     //解析include块
-    var _ret = obj.tmpl.replace(tmplRule.include, function (all, params) {
-      var props = nj.getOpenTagParams(params),
+    const _ret = obj.tmpl.replace(tmplRule.include, function (all, params) {
+      let props = getOpenTagParams(params),
         src, name;
 
       props.forEach(function (prop) {
@@ -76,7 +77,7 @@ function getIncludeTmpl(tmplString, fileName, isAll, tmplStrs, tmplName) {
       });
 
       if (src != null) {  //读取其他文件中的模板
-        var basePath = path.dirname(fileName),
+        const basePath = path.dirname(fileName),
           targetFileName = path.resolve(basePath, src),
           targetTmplString = fs.readFileSync(targetFileName, 'utf-8');
 

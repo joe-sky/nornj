@@ -1,25 +1,23 @@
-﻿'use strict';
-
-const nj = require('../core'),
-  tools = require('../utils/tools'),
-  tranParam = require('./transformParam'),
-  exprConfig = require('../helpers/expression').exprConfig,
-  tmplRule = nj.tmplRule;
+﻿import nj from '../core';
+import * as tools from '../utils/tools';
+import * as tranParam from './transformParam';
+import { exprConfig } from '../helpers/expression';
+const { tmplRule } = nj;
 
 //提取xml open tag
-function getXmlOpenTag(obj) {
+export function getXmlOpenTag(obj) {
   return tmplRule.xmlOpenTag.exec(obj);
 }
 
 //验证xml self close tag
-var REGEX_XML_SELF_CLOSE_TAG = /^<[^>]+\/>$/i;
+const REGEX_XML_SELF_CLOSE_TAG = /^<[^>]+\/>$/i;
 
-function isXmlSelfCloseTag(obj) {
+export function isXmlSelfCloseTag(obj) {
   return REGEX_XML_SELF_CLOSE_TAG.test(obj);
 }
 
 //Verify self close tag name
-var OMITTED_CLOSE_TAGS = {
+const OMITTED_CLOSE_TAGS = {
   'area': true,
   'base': true,
   'br': true,
@@ -37,12 +35,12 @@ var OMITTED_CLOSE_TAGS = {
   'wbr': true
 };
 
-function verifySelfCloseTag(tagName) {
+export function verifySelfCloseTag(tagName) {
   return OMITTED_CLOSE_TAGS[tagName.toLowerCase()];
 }
 
 //Extract parameters inside the xml open tag
-function getOpenTagParams(tag) {
+export function getOpenTagParams(tag) {
   var pattern = tmplRule.openTagParams,
     matchArr, ret;
 
@@ -82,17 +80,17 @@ function getOpenTagParams(tag) {
 }
 
 //判断xml close tag
-function isXmlCloseTag(obj, tagName) {
+export function isXmlCloseTag(obj, tagName) {
   return tools.isString(obj) && obj.toLowerCase() === '</' + tagName + '>';
 }
 
 //get inside brace param
-function getInsideBraceParam(obj) {
+export function getInsideBraceParam(obj) {
   return tmplRule.insideBraceParam.exec(obj);
 }
 
 //判断块表达式并返回参数
-function isExpr(obj) {
+export function isExpr(obj) {
   var ret, ret1 = tmplRule.expr.exec(obj);
   if (ret1) {
     ret = [ret1[1]];
@@ -107,12 +105,12 @@ function isExpr(obj) {
 }
 
 //判断是否模板元素
-function isTmpl(obj) {
+export function isTmpl(obj) {
   return obj === 'tmpl';
 }
 
 //加入到模板集合中
-function addTmpl(node, parent, name) {
+export function addTmpl(node, parent, name) {
   var paramsP = parent.params;
   if (!paramsP) {
     paramsP = parent.params = tools.obj();
@@ -143,12 +141,12 @@ function addTmpl(node, parent, name) {
 }
 
 //Test whether as parameters expression
-function isParamsExpr(name) {
+export function isParamsExpr(name) {
   return name === 'params' || name === 'props';
 }
 
 //Add to the "paramsExpr" property of the parent node
-function addParamsExpr(node, parent, isExprProp) {
+export function addParamsExpr(node, parent, isExprProp) {
   if (!parent.paramsExpr) {
     let exprPropsNode;
     if (isExprProp) {
@@ -168,25 +166,10 @@ function addParamsExpr(node, parent, isExprProp) {
 }
 
 const PROP_EXPRS = ['prop', 'spread'];
-function isExprProp(name) {
+export function isExprProp(name) {
   const config = exprConfig[name];
   return {
     isExprProp: config ? config.exprProps : false,
     isProp: PROP_EXPRS.indexOf(name) > -1
   };
 }
-
-module.exports = {
-  getXmlOpenTag,
-  isXmlSelfCloseTag,
-  verifySelfCloseTag,
-  getOpenTagParams,
-  isXmlCloseTag,
-  getInsideBraceParam,
-  isExpr,
-  isTmpl,
-  addTmpl,
-  isParamsExpr,
-  addParamsExpr,
-  isExprProp
-};

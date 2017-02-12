@@ -1,18 +1,16 @@
-﻿'use strict';
-
-const nj = require('../core'),
-  tools = require('../utils/tools'),
-  tranParam = require('../transforms/transformParam'),
-  tranElem = require('../transforms/transformElement'),
-  tmplRule = nj.tmplRule,
-  NO_SPLIT_NEWLINE = [
-    'style',
-    'script',
-    'textarea',
-    'pre',
-    'xmp',
-    'template'
-  ];
+﻿import nj from '../core';
+import * as tools from '../utils/tools';
+import * as tranParam from '../transforms/transformParam';
+import * as tranElem from '../transforms/transformElement';
+const { tmplRule } = nj;
+const NO_SPLIT_NEWLINE = [
+  'style',
+  'script',
+  'textarea',
+  'pre',
+  'xmp',
+  'template'
+];
 
 function _plainTextNode(obj, parent, parentContent) {
   const node = {};
@@ -22,7 +20,7 @@ function _plainTextNode(obj, parent, parentContent) {
 }
 
 //检测元素节点
-function checkElem(obj, parent, hasExprProps) {
+export default function checkElem(obj, parent, hasExprProps) {
   const parentContent = 'content';
 
   if (!tools.isArray(obj)) { //判断是否为文本节点
@@ -32,8 +30,7 @@ function checkElem(obj, parent, hasExprProps) {
         str = str.trim();
         str !== '' && _plainTextNode(str, parent, parentContent);
       });
-    }
-    else {
+    } else {
       _plainTextNode(obj, parent, parentContent);
     }
 
@@ -186,7 +183,3 @@ function checkContentElem(obj, parent, hasExprProps) {
     checkElem(item, parent, hasExprProps);
   }, false, true);
 }
-
-module.exports = {
-  checkElem
-};
