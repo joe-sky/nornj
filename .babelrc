@@ -1,5 +1,13 @@
 {
-  "presets": [
-    ["es2015", { "modules": false }], "stage-1"
-  ]
+  "presets": ["stage-1"],
+  "env": {
+    "development": {
+      "presets": ["es2015"]
+    },
+    "webpack": {
+      "presets": [
+        ["es2015", { "modules": false }]
+      ]
+    }
+  }
 }

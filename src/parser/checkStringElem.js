@@ -9,34 +9,33 @@ const nj = require('../core'),
 
 //Compile string template
 function compileStringTmpl(tmpl) {
-  var tmplKey = tmpl.toString(), //Get unique key
+  let tmplKey = tmpl.toString(), //Get unique key
     ret = tmplStrs[tmplKey],
     outputH = this ? this.outputH : false;
 
   if (!ret) { //If the cache already has template data, direct return the template.
-    var isStr = tools.isString(tmpl),
+    let isStr = tools.isString(tmpl),
       xmls = isStr ? [tmpl] : tmpl,
       l = xmls.length,
       computedNos = [],
       fullXml = '';
 
     //Connection xml string
-    tools.each(xmls, function(xml, i) {
-      var split = '';
+    tools.each(xmls, (xml, i) => {
+      let split = '';
       if (i < l - 1) {
-        var last = xml.length - 1,
+        const last = xml.length - 1,
           lastChar = xml[last],
-          isComputed = lastChar === '#',
-          isNoEscape = lastChar === '@';
+          isComputed = lastChar === '#';
 
-        if (isComputed || isNoEscape) {
+        if (isComputed) {
           isComputed && computedNos.push(i);
           xml = xml.substr(0, last);
         }
 
-        split = (isNoEscape ? tmplRule.firstChar : '') + tmplRule.startRule +
+        split = tmplRule.startRule +
           (isComputed ? '#' : '') + SPLIT_FLAG + i +
-          tmplRule.endRule + (isNoEscape ? tmplRule.lastChar : '');
+          tmplRule.endRule;
       }
 
       fullXml += xml + split;
@@ -53,18 +52,18 @@ function compileStringTmpl(tmpl) {
     tmplStrs[tmplKey] = ret;
   }
 
-  var params,
+  let params,
     args = arguments,
     paramCount = ret._njParamCount;
   if (paramCount > 0) {
     params = {};
 
-    for (var i = 0; i < paramCount; i++) {
+    for (let i = 0; i < paramCount; i++) {
       params[SPLIT_FLAG + i] = args[i + 1];
     }
   }
 
-  var tmplFn = function() {
+  const tmplFn = function() {
     return nj['compile' + (outputH ? 'H' : '')](tmplFn, tmplKey).apply(this, params ? tools.arrayPush([params], arguments) : arguments);
   };
   tmplFn._njTmpl = ret;
@@ -76,7 +75,7 @@ function compileStringTmpl(tmpl) {
 
 //Resolve string to element
 function _checkStringElem(xml) {
-  var root = [],
+  let root = [],
     current = {
       elem: root,
       elemName: 'root',
@@ -87,7 +86,7 @@ function _checkStringElem(xml) {
     matchArr;
 
   while (matchArr = pattern.exec(xml)) {
-    var textBefore = matchArr[1],
+    let textBefore = matchArr[1],
       elem = matchArr[2],
       elemName = matchArr[3],
       elemParams = matchArr[4],
@@ -153,19 +152,19 @@ function _formatNewline(str) {
 
 //Set element node
 function _setElem(elem, elemName, elemParams, elemArr, bySelfClose) {
-  var ret, paramsExpr;
+  let ret, paramsExpr;
   if (elemName[0] === tmplRule.exprRule) {
     ret = elem.substring(1, elem.length - 1);
   } else if (elemName.indexOf(tmplRule.propRule) === 0) {
     ret = tmplRule.exprRule + 'prop ' + tmplRule.startRule + '\'' + elemName.substr(tmplRule.propRule.length) + '\'' + tmplRule.endRule + elemParams;
   } else {
-    var retS = _getSplitParams(elem);
+    const retS = _getSplitParams(elem);
     ret = retS.elem;
     paramsExpr = retS.params;
   }
 
   if (bySelfClose) {
-    var retC = [ret];
+    const retC = [ret];
     if (paramsExpr) {
       retC.push(paramsExpr);
     }
@@ -181,13 +180,11 @@ function _setElem(elem, elemName, elemParams, elemArr, bySelfClose) {
 
 //Extract split parameters
 function _getSplitParams(elem) {
-  var exprRule = tmplRule.exprRule,
-    startRule = tmplRule.startRule,
-    endRule = tmplRule.endRule,
-    paramsExpr;
+  const { exprRule, startRule, endRule } = tmplRule;
+  let paramsExpr;
 
   //Replace the parameter like "{...props}".
-  elem = elem.replace(tmplRule.spreadProp, function(all, begin, prop) {
+  elem = elem.replace(tmplRule.spreadProp, (all, begin, prop) => {
     prop = prop.trim();
 
     if (!paramsExpr) {

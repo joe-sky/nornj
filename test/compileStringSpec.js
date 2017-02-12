@@ -4,7 +4,7 @@
   compile = require('../src/compiler/compile').compile,
   includeParser = require('../tools/includeParser');
 
-xdescribe('test compile string', function () {
+describe('test compile string', function () {
   beforeAll(function () {
     nj.registerFilter('filter1', function (v, p1) {
       //console.log(this.getData('name1'));
@@ -136,7 +136,7 @@ xdescribe('test compile string', function () {
             <img />
             sky:{{{ 'name555' }}},{{ id | filter2 }}
             <section>
-            @${tmpl1()}
+            {${tmpl1()}}
             </section>
             <input type=button />
             #${nj`
@@ -209,7 +209,7 @@ xdescribe('test compile string', function () {
           </@name>
         </#textExpr>
         <slider {{../name3}}>
-          @${nj`<div>111</div>`()}
+          {${nj`<div>111</div>`()}}
           #${nj`<div>{{../name3}}</div>`}
           <{{../sliderItem['a']|tagName(1,2)}} no1={{no}} no2="{{-0.05 | filter2}}" checked no='{{ ../sliderItem.b }}' />
         </slider>

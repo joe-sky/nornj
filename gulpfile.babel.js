@@ -1,15 +1,14 @@
-﻿'use strict';
-
-const gulp = require('gulp'),
-  babel = require('gulp-babel'),
-  webpack = require('webpack'),
-  webpackStream = require('webpack-stream'),
-  jasmine = require('gulp-jasmine'),
-  rename = require('gulp-rename'),
-  gulpif = require('gulp-if'),
-  eslint = require('gulp-eslint'),
-  notify = require('gulp-notify'),
-  argv = require('yargs').argv;
+﻿import gulp from 'gulp';
+import babel from 'gulp-babel';
+import webpack from 'webpack';
+import webpackStream from 'webpack-stream';
+import jasmine from 'gulp-jasmine';
+import rename from 'gulp-rename';
+import gulpIf from 'gulp-if';
+import eslint from 'gulp-eslint';
+import notify from 'gulp-notify';
+import { argv } from 'yargs';
+import env from 'gulp-env';
 
 //Handle error
 function handlebuildError() {
@@ -37,7 +36,7 @@ gulp.task('build', () => {
         pure_getters: true,
         unsafe: true,
         unsafe_comps: true,
-        screw_ie8: false,
+        screw_ie8: true,
         warnings: false
       },
       sourceMap: true
@@ -45,6 +44,9 @@ gulp.task('build', () => {
   }
 
   return gulp.src('./src/base.js')
+    .pipe(env.set({
+      BABEL_ENV: 'webpack'
+    }))
     .pipe(webpackStream({
       devtool: argv.p ? 'source-map' : false,
       watch: argv.w ? true : false,
@@ -68,6 +70,9 @@ gulp.task('build', () => {
 
 //Convert es6 code to es5 from src to lib
 gulp.task("lib", () => gulp.src('./src/**/*.js')
+  .pipe(env.set({
+    BABEL_ENV: 'development'
+  }))
   .pipe(babel())
   .pipe(gulp.dest('./lib'))
 );
@@ -87,4 +92,4 @@ gulp.task('eslint', () => gulp.src(['./src/**/*.js'])
 );
 
 //Default task
-gulp.task('default', ['build', 'lib']);
+gulp.task('default', ['build'], () => gulp.start('lib'));

@@ -5,12 +5,12 @@ const tools = require('../utils/tools'),
 
 //Global expression list
 const exprs = {
-  'if': function(value, options) {
+  'if': (value, options) => {
     if (value === 'false') {
       value = false;
     }
 
-    var valueR, ret;
+    let valueR, ret;
     if (!options.useUnless) {
       valueR = !!value;
     } else {
@@ -25,7 +25,7 @@ const exprs = {
 
         if (props.elseifs) {
           let l = props.elseifs.length;
-          tools.each(props.elseifs, function(elseif, i) {
+          tools.each(props.elseifs, (elseif, i) => {
             if (!!elseif.value) {
               ret = elseif.fn();
               return false;
@@ -63,12 +63,12 @@ const exprs = {
     });
   },
 
-  'switch': function(value, options) {
-    var ret,
+  'switch': (value, options) => {
+    let ret,
       props = options.props,
       l = props.elseifs.length;
 
-    tools.each(props.elseifs, function(elseif, i) {
+    tools.each(props.elseifs, (elseif, i) => {
       if (value === elseif.value) {
         ret = elseif.fn();
         return false;
@@ -82,13 +82,13 @@ const exprs = {
     return ret;
   },
 
-  unless: function(value, options) {
+  unless: (value, options) => {
     options.useUnless = true;
-    return exprs['if'].call(this, value, options);
+    return exprs['if'](value, options);
   },
 
-  each: function(list, options) {
-    var useString = options.useString,
+  each: (list, options) => {
+    let useString = options.useString,
       ret;
 
     if (list) {
@@ -99,7 +99,7 @@ const exprs = {
       }
 
       const props = options.props;
-      tools.each(list, function(item, index, len) {
+      tools.each(list, (item, index, len) => {
         let param = {
           data: item,
           index: index,
@@ -108,9 +108,9 @@ const exprs = {
 
         if (props && props.moreValues) {
           param.extra = {
-            ['@first']: index === 0,
-            ['@last']: index === len - 1,
-            ['@length']: len
+            '@first': index === 0,
+            '@last': index === len - 1,
+            '@length': len
           };
         }
 
@@ -140,8 +140,8 @@ const exprs = {
   },
 
   //Parameter
-  prop: function(name, options) {
-    var ret = options.result(), //Get parameter value
+  prop: (name, options) => {
+    let ret = options.result(), //Get parameter value
       value;
 
     if (ret !== undefined) {
@@ -154,20 +154,20 @@ const exprs = {
   },
 
   //Spread parameters
-  spread: function(props, options) {
-    tools.each(props, function(v, k) {
+  spread: (props, options) => {
+    tools.each(props, (v, k) => {
       options.exprProps[k] = v;
     }, false, false);
   },
 
-  'for': function(start, end, options) {
+  'for': (start, end, options) => {
     if (end._njOpts) {
       options = end;
       end = start;
       start = 0;
     }
 
-    var ret, useString = options.useString;
+    let ret, useString = options.useString;
     if (useString) {
       ret = '';
     } else {
@@ -175,7 +175,7 @@ const exprs = {
     }
 
     for (; start <= end; start++) {
-      var retI = options.result({
+      let retI = options.result({
         index: start
       });
 
@@ -189,17 +189,13 @@ const exprs = {
     return ret;
   },
 
-  obj: function(options) {
-    return options.props;
-  },
+  obj: (options) => options.props,
 
-  block: function(options) {
-    return options.result();
-  }
+  block: (options) => options.result()
 };
 
 function _commonConfig(params) {
-  var ret = {
+  let ret = {
     useString: true,
     exprProps: false,
     newContext: true
@@ -212,7 +208,7 @@ function _commonConfig(params) {
 }
 
 //Expression default config
-var exprConfig = {
+const exprConfig = {
   'if': _commonConfig({ newContext: false }),
   'else': _commonConfig({ newContext: false, useString: false, exprProps: true }),
   'switch': _commonConfig({ newContext: false }),
@@ -234,7 +230,7 @@ exprConfig['default'] = exprConfig['else'];
 
 //Register expression and also can batch add
 function registerExpr(name, expr, options) {
-  var params = name;
+  let params = name;
   if (!tools.isObject(name)) {
     params = {};
     params[name] = {
@@ -245,8 +241,7 @@ function registerExpr(name, expr, options) {
 
   tools.each(params, function(v, name) {
     if (v) {
-      var expr = v.expr,
-        options = v.options;
+      const { expr, options } = v;
 
       if (expr || options) {
         if (expr) {

@@ -7,28 +7,28 @@ const nj = require('../core'),
 
 //编译模板并返回转换函数
 function _createCompile(outputH) {
-  return function(tmpl, tmplKey, fileName) {
+  return (tmpl, tmplKey, fileName) => {
     if (!tmpl) {
       return;
     }
     if (utils.isObject(tmplKey)) {
-      var options = tmplKey;
+      const options = tmplKey;
       tmplKey = options.tmplKey;
       fileName = options.fileName;
     }
 
     //编译模板函数
-    var tmplFns;
+    let tmplFns;
     if (tmplKey) {
       tmplFns = nj.templates[tmplKey];
     }
     if (!tmplFns) {
-      var isObj = utils.isObject(tmpl),
+      let isObj = utils.isObject(tmpl),
         fns;
       if (isObj && tmpl.main) { //直接传入预编译模板
         fns = tmpl;
       } else { //编译AST
-        var root;
+        let root;
         if (tmplKey) {
           root = nj.asts[tmplKey];
         }
@@ -42,7 +42,7 @@ function _createCompile(outputH) {
             //Auto transform string template to array
             if (utils.isString(tmpl)) {
               //Merge all include blocks
-              var includeParser = nj.includeParser;
+              const includeParser = nj.includeParser;
               if (includeParser) {
                 tmpl = includeParser(tmpl, fileName);
               }
@@ -88,7 +88,7 @@ const compile = _createCompile(),
 
 //Create template root object
 function _createAstRoot() {
-  var root = utils.obj();
+  const root = utils.obj();
   root.type = 'nj_root';
   root.content = [];
 
@@ -97,7 +97,7 @@ function _createAstRoot() {
 
 //Precompile template
 function precompile(tmpl, outputH) {
-  var root = _createAstRoot();
+  const root = _createAstRoot();
 
   if (utils.isString(tmpl)) {
     tmpl = compileStringTmpl(tmpl);

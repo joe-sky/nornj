@@ -1,14 +1,11 @@
-﻿'use strict';
-
-var nj = require('../core'),
-  utils = require('../utils/utils'),
-  errorTitle = nj.errorTitle,
-  exprConfig = utils.exprConfig,
-  filterConfig = utils.filterConfig,
-  replaceSpecialSymbol = require('../utils/replaceSpecialSymbol');
+﻿import nj from '../core';
+import utils from '../utils/utils';
+import replaceSpecialSymbol from '../utils/replaceSpecialSymbol';
+const errorTitle = nj.errorTitle;
+const { exprConfig, filterConfig } = utils;
 
 function _buildFn(content, fns, no, newContext, level, useStringLocal) {
-  var fnStr = '',
+  let fnStr = '',
     useString = useStringLocal != null ? useStringLocal : fns.useString,
     isTmplExpr = utils.isString(no), //如果no为字符串, 则本次将构建tmpl块模板函数
     main = isTmplExpr || no === 0,
@@ -66,14 +63,14 @@ function _buildFn(content, fns, no, newContext, level, useStringLocal) {
 }
 
 function _buildOptions(config, useStringLocal, node, fns, exprPropsStr, level, hashProps) {
-  var hashStr = '',
+  let hashStr = '',
     noConfig = !config;
 
   if (noConfig || config.useString) {
     hashStr += ', useString: ' + (useStringLocal == null ? 'p1.useString' : (useStringLocal ? 'true' : 'false'));
   }
   if (node) { //块表达式
-    var newContext = config ? config.newContext : true;
+    let newContext = config ? config.newContext : true;
     if (noConfig || config.exprProps) {
       hashStr += ', exprProps: ' + exprPropsStr;
     }
@@ -112,7 +109,7 @@ function _buildPropData(obj, counter, fns, useStringLocal) {
       if (!data) {
         data = 'data';
       }
-      for (var i = 0; i < parentNum; i++) {
+      for (let i = 0; i < parentNum; i++) {
         data = 'parent.' + data;
       }
 
@@ -124,7 +121,7 @@ function _buildPropData(obj, counter, fns, useStringLocal) {
     if (!special && !specialP) {
       dataValueStr = (isComputed ? 'p1.getComputedData(' : '') + 'p2.getData(\'' + name + '\')' + (isComputed ? ', p2)' : '') + jsProp;
     } else {
-      var dataStr = 'p2.' + data;
+      let dataStr = 'p2.' + data;
       dataValueStr = (special ? dataStr : (isComputed ? 'p1.getComputedData(' : '') + 'p2.getData(\'' + name + '\', ' + dataStr + ')' + (isComputed ? ', p2)' : '')) + jsProp;
     }
   } else {
@@ -132,13 +129,13 @@ function _buildPropData(obj, counter, fns, useStringLocal) {
   }
 
   //有过滤器时需要生成"_value"值
-  var filters = obj.prop.filters;
+  let filters = obj.prop.filters;
   if (filters) {
-    var valueStr = '_value' + counter._value++,
+    let valueStr = '_value' + counter._value++,
       filterStr = 'var ' + valueStr + ' = ' + dataValueStr + ';\n';
 
     utils.each(filters, function(o) {
-      var _filterC = counter._filter++,
+      let _filterC = counter._filter++,
         configF = filterConfig[o.name],
         filterVarStr = '_filter' + _filterC,
         globalFilterStr = 'p1.filters[\'' + o.name + '\']';
@@ -191,7 +188,7 @@ function _replaceQuot(str) {
 }
 
 function _buildProps(obj, counter, fns, useStringLocal) {
-  var str0 = obj.strs[0],
+  let str0 = obj.strs[0],
     valueStr = '',
     filterStr = '';
 
@@ -200,7 +197,7 @@ function _buildProps(obj, counter, fns, useStringLocal) {
     filterStr = '';
 
     utils.each(obj.props, function(o, i) {
-      var propData = _buildPropData(o, counter, fns, useStringLocal),
+      let propData = _buildPropData(o, counter, fns, useStringLocal),
         dataValueStr;
       if (utils.isString(propData)) {
         dataValueStr = propData;
@@ -210,7 +207,7 @@ function _buildProps(obj, counter, fns, useStringLocal) {
       }
 
       if (!obj.isAll) {
-        var strI = obj.strs[i + 1],
+        let strI = obj.strs[i + 1],
           prefixStr = (str0 === '' && i == 0 ? '' : ' + ');
 
         if (strI.trim() === '\\n') { //如果只包含换行符号则忽略
@@ -257,9 +254,8 @@ function _buildProps(obj, counter, fns, useStringLocal) {
 
 function _buildParams(node, fns, counter, useString) {
   //节点参数
-  var params = node.params,
-    paramsExpr = node.paramsExpr,
-    paramsStr = '',
+  const { params, paramsExpr } = node;
+  let paramsStr = '',
     _paramsC,
     useStringF = fns.useString;
 
@@ -269,7 +265,7 @@ function _buildParams(node, fns, counter, useString) {
 
     //params块
     if (paramsExpr) {
-      var _paramsEC = counter._paramsE++;
+      let _paramsEC = counter._paramsE++;
       paramsStr += (useString ? '\'\'' : 'null') + ';\n';
       paramsStr += 'var _paramsE' + _paramsEC + ' = {};\n';
 
@@ -281,7 +277,7 @@ function _buildParams(node, fns, counter, useString) {
         paramsStr += '\n_params' + _paramsC + ' = _paramsE' + _paramsEC + ';\n';
         //paramsStr += '\np1.assign(_params' + _paramsC + ', _paramsE' + _paramsEC + ');\n';
       } else {
-        var keys = '';
+        let keys = '';
         utils.each(params, function(v, k, i, l) {
           if (i == 0) {
             keys += '{ ';
@@ -299,7 +295,7 @@ function _buildParams(node, fns, counter, useString) {
     }
 
     if (params) {
-      var paramKeys = Object.keys(params),
+      let paramKeys = Object.keys(params),
         len = paramKeys.length,
         filterStr = '';
 
@@ -308,7 +304,7 @@ function _buildParams(node, fns, counter, useString) {
       }
 
       utils.each(paramKeys, function(k, i) {
-        var valueStr = _buildProps(params[k], counter, fns, useString);
+        let valueStr = _buildProps(params[k], counter, fns, useString);
         if (utils.isObject(valueStr)) {
           filterStr += valueStr.filterStr;
           valueStr = valueStr.valueStr;
@@ -318,7 +314,7 @@ function _buildParams(node, fns, counter, useString) {
           valueStr = 'p1.styleProps(' + valueStr + ')';
         }
 
-        var key = k,
+        let key = k,
           onlyKey = ('\'' + key + '\'') === valueStr;
         if (!useStringF) {
           key = utils.fixPropName(k);
@@ -352,18 +348,18 @@ function _buildParams(node, fns, counter, useString) {
 }
 
 function _buildNode(node, fns, counter, retType, level, useStringLocal) {
-  var fnStr = '',
+  let fnStr = '',
     useStringF = fns.useString;
 
   if (node.type === 'nj_plaintext') { //文本节点
-    var valueStr = _buildProps(node.content[0], counter, fns, useStringLocal),
+    let valueStr = _buildProps(node.content[0], counter, fns, useStringLocal),
       filterStr;
     if (utils.isObject(valueStr)) {
       filterStr = valueStr.filterStr;
       valueStr = valueStr.valueStr;
     }
 
-    var textStr = _buildRender(1, retType, { text: valueStr }, fns, level, useStringLocal);
+    let textStr = _buildRender(1, retType, { text: valueStr }, fns, level, useStringLocal);
     if (filterStr) {
       textStr = filterStr + textStr;
     }
@@ -374,7 +370,7 @@ function _buildNode(node, fns, counter, retType, level, useStringLocal) {
       fnStr += replaceSpecialSymbol(textStr);
     }
   } else if (node.type === 'nj_expr') { //块表达式节点
-    var _exprC = counter._expr++,
+    let _exprC = counter._expr++,
       _dataReferC = counter._dataRefer++,
       dataReferStr = '',
       filterStr = '',
@@ -404,13 +400,13 @@ function _buildNode(node, fns, counter, retType, level, useStringLocal) {
     }
 
     //props块
-    var exprPropsStr = 'p4';
+    let exprPropsStr = 'p4';
     if (retType && retType._paramsE) {
       exprPropsStr = retType._paramsE;
     }
 
     //hash参数
-    var retP = _buildParams(node, fns, counter, false),
+    let retP = _buildParams(node, fns, counter, false),
       paramsStr = retP[0],
       _paramsC = retP[1];
 
@@ -433,7 +429,7 @@ function _buildNode(node, fns, counter, retType, level, useStringLocal) {
     }, fns, level, useStringLocal);
   } else { //元素节点
     //节点类型和typeRefer
-    var _typeC = counter._type++,
+    let _typeC = counter._type++,
       _type;
     if (node.typeRefer) {
       _type = node.typeRefer.props[0].prop.name;
@@ -441,7 +437,7 @@ function _buildNode(node, fns, counter, retType, level, useStringLocal) {
       _type = node.type;
     }
 
-    var typeStr;
+    let typeStr;
     if (!useStringF) {
       typeStr = 'p1.components[\'' + _type.toLowerCase() + '\'] ? p1.components[\'' + _type.toLowerCase() + '\'] : \'' + _type + '\'';
     } else {
@@ -449,7 +445,7 @@ function _buildNode(node, fns, counter, retType, level, useStringLocal) {
     }
 
     if (node.typeRefer) {
-      var _typeReferC = counter._typeRefer++,
+      let _typeReferC = counter._typeRefer++,
         valueStrT = _buildProps(node.typeRefer, counter, fns);
       if (utils.isObject(valueStrT)) {
         fnStr += valueStrT.filterStr;
@@ -463,12 +459,12 @@ function _buildNode(node, fns, counter, retType, level, useStringLocal) {
     }
 
     //节点参数
-    var retP = _buildParams(node, fns, counter, useStringF),
+    let retP = _buildParams(node, fns, counter, useStringF),
       paramsStr = retP[0],
       _paramsC = retP[1];
     fnStr += paramsStr;
 
-    var _compParamC, _childrenC;
+    let _compParamC, _childrenC;
     if (!useStringF) { //组件参数
       _compParamC = counter._compParam++;
       fnStr += 'var _compParam' + _compParamC + ' = [_type' + _typeC + ', ' + (paramsStr !== '' ? '_params' + _paramsC : 'null') + '];\n';
@@ -488,7 +484,7 @@ function _buildNode(node, fns, counter, retType, level, useStringLocal) {
 }
 
 function _buildContent(content, fns, counter, retType, level, useStringLocal) {
-  var fnStr = '';
+  let fnStr = '';
   if (!content) {
     return fnStr;
   }
@@ -501,7 +497,7 @@ function _buildContent(content, fns, counter, retType, level, useStringLocal) {
 }
 
 function _buildRender(nodeType, retType, params, fns, level, useStringLocal) {
-  var retStr,
+  let retStr,
     useStringF = fns.useString,
     useString = useStringLocal != null ? useStringLocal : useStringF;
 
@@ -516,7 +512,7 @@ function _buildRender(nodeType, retType, params, fns, level, useStringLocal) {
       if (!useStringF) {
         retStr = 'p1.h.apply(null, _compParam' + params._compParam + ')';
       } else {
-        var levelSpace = _buildLevelSpace(level, fns);
+        let levelSpace = _buildLevelSpace(level, fns);
         retStr = levelSpace + '\'<\' + _type' + params._type + ' + ' + (params._params != null ? '_params' + params._params + ' + ' : '');
         if (!params._selfClose) {
           retStr += '\'>\\n\'';
@@ -550,10 +546,10 @@ function _buildRender(nodeType, retType, params, fns, level, useStringLocal) {
 }
 
 function _buildLevelSpace(level, fns) {
-  var ret = '';
+  let ret = '';
   if (fns.useString && level != null && level > 0) {
     ret += '\'';
-    for (var i = 0; i < level; i++) {
+    for (let i = 0; i < level; i++) {
       ret += '  ';
     }
     ret += '\' + ';
@@ -561,8 +557,8 @@ function _buildLevelSpace(level, fns) {
   return ret;
 }
 
-module.exports = function(ast, useString) {
-  var fns = {
+module.exports = (ast, useString) => {
+  const fns = {
     useString,
     _no: 0, //块表达式函数计数
     _noT: 0 //tmpl块模板函数计数

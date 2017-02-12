@@ -1,18 +1,11 @@
 ﻿'use strict';
 
-var tools = require('../utils/tools');
+const tools = require('../utils/tools');
 
 //Global filter list
-var filters = {
+const filters = {
   //Get param properties
-  prop: (value, props) => {
-    var ret = value;
-    ret && props.split('.').forEach(p => {
-      ret = ret[p];
-    });
-
-    return ret;
-  },
+  prop: (value, prop) => value[prop],
 
   '==': (val1, val2) => val1 == val2,
 
@@ -52,7 +45,7 @@ var filters = {
 };
 
 function _commonConfig(params) {
-  var ret = {
+  let ret = {
     useString: false
   };
 
@@ -63,7 +56,7 @@ function _commonConfig(params) {
 }
 
 //Filter default config
-var filterConfig = {
+const filterConfig = {
   prop: _commonConfig(),
   '==': _commonConfig(),
   '===': _commonConfig(),
@@ -80,7 +73,7 @@ var filterConfig = {
 
 //Register filter and also can batch add
 function registerFilter(name, filter, options) {
-  var params = name;
+  let params = name;
   if (!tools.isObject(name)) {
     params = {};
     params[name] = {
@@ -89,10 +82,9 @@ function registerFilter(name, filter, options) {
     };
   }
 
-  tools.each(params, function(v, name) {
+  tools.each(params, (v, name) => {
     if (v) {
-      var filter = v.filter,
-        options = v.options;
+      const { filter, options } = v;
 
       if (filter || options) {
         if (filter) {

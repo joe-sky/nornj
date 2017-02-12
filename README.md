@@ -110,7 +110,7 @@ npm install nornj
 
 ### 浏览器支持
 
-* 可支持所有现代浏览器以及Internet Explorer 9+。
+* 可支持所有现代浏览器以及Internet Explorer 8+。
 
 ### 更多详细文档
 

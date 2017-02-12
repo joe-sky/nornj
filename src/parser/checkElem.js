@@ -15,7 +15,7 @@ const nj = require('../core'),
   ];
 
 function _plainTextNode(obj, parent, parentContent) {
-  var node = {};
+  const node = {};
   node.type = 'nj_plaintext';
   node.content = [tranParam.compiledParam(obj)];
   parent[parentContent].push(node);
@@ -23,11 +23,11 @@ function _plainTextNode(obj, parent, parentContent) {
 
 //检测元素节点
 function checkElem(obj, parent, hasExprProps) {
-  var parentContent = 'content';
+  const parentContent = 'content';
 
   if (!tools.isArray(obj)) { //判断是否为文本节点
     if (tools.isString(obj) && (parent.expr || NO_SPLIT_NEWLINE.indexOf(parent.type.toLowerCase()) < 0)) {
-      var strs = obj.split(tmplRule.newlineSplit);
+      let strs = obj.split(tmplRule.newlineSplit);
       strs.forEach((str, i) => {
         str = str.trim();
         str !== '' && _plainTextNode(str, parent, parentContent);
@@ -40,18 +40,17 @@ function checkElem(obj, parent, hasExprProps) {
     return;
   }
 
-  var node = {},
+  const node = {},
     first = obj[0];
   if (tools.isString(first)) { //第一个子节点为字符串
-    var first = first,
-      len = obj.length,
+    let len = obj.length,
       last = obj[len - 1],
       isElemNode = false,
       expr,
       exprParams;
 
     //判断是否为xml标签
-    var openTagName,
+    let openTagName,
       hasCloseTag = false,
       isTmpl,
       isParamsExpr,
@@ -61,7 +60,7 @@ function checkElem(obj, parent, hasExprProps) {
 
     expr = tranElem.isExpr(first);
     if (!expr) {
-      var xmlOpenTag = tranElem.getXmlOpenTag(first);
+      const xmlOpenTag = tranElem.getXmlOpenTag(first);
       if (xmlOpenTag) { //tagname为xml标签时,则认为是元素节点
         openTagName = xmlOpenTag[1];
 
@@ -73,7 +72,7 @@ function checkElem(obj, parent, hasExprProps) {
         isElemNode = true;
       }
     } else { //为块表达式,也可视为一个元素节点
-      var exprName = expr[0];
+      const exprName = expr[0];
       exprParams = expr[1];
       isTmpl = tranElem.isTmpl(exprName);
       isParamsExpr = tranElem.isParamsExpr(exprName);
@@ -91,7 +90,7 @@ function checkElem(obj, parent, hasExprProps) {
           node.args = [];
         }
 
-        tools.each(exprParams, function(param) {
+        tools.each(exprParams, (param) => {
           if (param.value === 'useString') {
             node.useString = true;
             return;
@@ -113,25 +112,25 @@ function checkElem(obj, parent, hasExprProps) {
     }
 
     if (isElemNode) { //判断是否为元素节点
-      var pushContent = true;
+      let pushContent = true;
 
       if (!expr) {
         node.type = openTagName;
 
         //If open tag has a brace,add the typeRefer param.
-        var typeRefer = tranElem.getInsideBraceParam(openTagName);
+        const typeRefer = tranElem.getInsideBraceParam(openTagName);
         if (typeRefer) {
           node.typeRefer = tranParam.compiledParam(typeRefer[0]);
         }
 
         //获取openTag内参数
-        var tagParams = tranElem.getOpenTagParams(first);
+        const tagParams = tranElem.getOpenTagParams(first);
         if (tagParams) {
           if (!node.params) {
             node.params = tools.obj();
           }
 
-          tools.each(tagParams, function(param) { //The parameter like "{prop}" needs to be replaced.
+          tools.each(tagParams, (param) => { //The parameter like "{prop}" needs to be replaced.
             node.params[param.onlyBrace ? param.onlyBrace.replace(/\.\.\//g, '') : param.key] = tranParam.compiledParam(param.value);
           }, false, true);
         }
@@ -159,7 +158,7 @@ function checkElem(obj, parent, hasExprProps) {
       }
 
       //取出子节点集合
-      var end = len - (hasCloseTag ? 1 : 0),
+      const end = len - (hasCloseTag ? 1 : 0),
         content = obj.slice(1, end);
       if (content && content.length) {
         checkContentElem(content, node, isParamsExpr || (hasExprProps && !isProp));
@@ -183,7 +182,7 @@ function checkContentElem(obj, parent, hasExprProps) {
     parent.content = [];
   }
 
-  tools.each(obj, function(item) {
+  tools.each(obj, (item) => {
     checkElem(item, parent, hasExprProps);
   }, false, true);
 }
