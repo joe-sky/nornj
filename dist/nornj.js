@@ -2791,6 +2791,14 @@ function checkContentElem(obj, parent, hasExprProps) {
 
 
 
+// tools.assign(nj, {
+//   escape,
+//   registerComponent,
+//   replaceSpecialSymbol,
+//   setTmplRule,
+//   config
+// }, tools, expression, filter, compiler, tmplTag);
+
 //Set default template rules
 __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_9__utils_setTmplRule__["a" /* default */])();
 
