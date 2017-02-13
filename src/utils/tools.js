@@ -21,7 +21,7 @@ export function isArray(obj) {
 
 //判断是否为对象
 export function isObject(obj) {
-  var type = typeof obj;
+  const type = typeof obj;
   return !isArray(obj) && (type === 'function' || type === 'object' && !!obj);
 }
 
@@ -41,7 +41,7 @@ function _getProperty(key) {
 const _getLength = _getProperty('length');
 
 export function isArrayLike(obj) {
-  var length = _getLength(obj);
+  const length = _getLength(obj);
   return typeof length == 'number' && length >= 0;
 }
 
@@ -59,18 +59,18 @@ export function each(obj, func, context, isArr) {
   context = context ? context : obj;
 
   if (isArr) {
-    for (var i = 0, l = obj.length; i < l; i++) {
-      var ret = func.call(context, obj[i], i, l);
+    for (let i = 0, l = obj.length; i < l; i++) {
+      let ret = func.call(context, obj[i], i, l);
 
       if (ret === false) {
         break;
       }
     }
   } else {
-    var keys = Object.keys(obj),
+    let keys = Object.keys(obj),
       l = keys.length;
-    for (var i = 0; i < l; i++) {
-      var k = keys[i],
+    for (let i = 0; i < l; i++) {
+      let k = keys[i],
         ret = func.call(context, obj[k], k, i, l);
 
       if (ret === false) {
@@ -97,7 +97,7 @@ export function throwIf(val, msg, type) {
 
 //Print warn
 export function warn(msg, type) {
-  var ret = errorTitle;
+  let ret = errorTitle;
   switch (type) {
     case 'filter':
       ret += 'A filter called "' + msg + '" is undefined.';
@@ -123,9 +123,9 @@ export function clearQuot(value, clearDouble) {
     return;
   }
 
-  var regex;
+  let regex;
   if (clearDouble == null) {
-    var charF = value[0];
+    const charF = value[0];
     if (charF === '\'') {
       regex = REGEX_QUOT_S;
     } else if (charF === '"') {
@@ -156,10 +156,10 @@ export function toCamelCase(str) {
 
 //Reference by babel-external-helpers
 export const assign = Object.assign || function(target) {
-  for (var i = 1, args = arguments; i < args.length; i++) {
-    var source = args[i];
+  for (let i = 1, args = arguments; i < args.length; i++) {
+    let source = args[i];
 
-    for (var key in source) {
+    for (let key in source) {
       if (hasOwnProperty.call(source, key)) {
         target[key] = source[key];
       }

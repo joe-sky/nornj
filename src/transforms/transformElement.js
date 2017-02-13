@@ -41,11 +41,11 @@ export function verifySelfCloseTag(tagName) {
 
 //Extract parameters inside the xml open tag
 export function getOpenTagParams(tag) {
-  var pattern = tmplRule.openTagParams,
+  let pattern = tmplRule.openTagParams,
     matchArr, ret;
 
   while ((matchArr = pattern.exec(tag))) {
-    var key = matchArr[1];
+    const key = matchArr[1];
     if (key === '/') { //If match to the last of "/", then continue the loop.
       continue;
     }
@@ -54,7 +54,7 @@ export function getOpenTagParams(tag) {
       ret = [];
     }
 
-    var value = matchArr[7],
+    let value = matchArr[7],
       onlyBrace = matchArr[4];
     if (value != null) {
       value = tools.clearQuot(value); //Remove quotation marks
@@ -91,11 +91,11 @@ export function getInsideBraceParam(obj) {
 
 //判断块表达式并返回参数
 export function isExpr(obj) {
-  var ret, ret1 = tmplRule.expr.exec(obj);
+  let ret, ret1 = tmplRule.expr.exec(obj);
   if (ret1) {
     ret = [ret1[1]];
 
-    var params = getOpenTagParams(obj); //提取各参数
+    const params = getOpenTagParams(obj); //提取各参数
     if (params) {
       ret.push(params);
     }
@@ -111,14 +111,14 @@ export function isTmpl(obj) {
 
 //加入到模板集合中
 export function addTmpl(node, parent, name) {
-  var paramsP = parent.params;
+  let paramsP = parent.params;
   if (!paramsP) {
     paramsP = parent.params = tools.obj();
   }
 
-  var tmpls = paramsP.tmpls;
+  const tmpls = paramsP.tmpls;
   if (!tmpls) {
-    var objT = { length: 0 };
+    let objT = { length: 0 };
     if (name != null) {
       objT[name] = node;
     } else {
@@ -128,7 +128,7 @@ export function addTmpl(node, parent, name) {
 
     paramsP.tmpls = tranParam.compiledParam(objT);
   } else { //Insert the compiled template to the parameter name for "tmpls"'s "strs" array.
-    var objT = tmpls.strs[0],
+    let objT = tmpls.strs[0],
       len = objT.length;
 
     if (name != null) {

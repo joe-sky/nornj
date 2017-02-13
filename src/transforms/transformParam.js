@@ -4,7 +4,7 @@ const { tmplRule } = nj;
 
 //Get compiled parameters from a object
 export function compiledParams(obj) {
-  var ret = tools.obj();
+  let ret = tools.obj();
   tools.each(obj, function(v, k) {
     ret[k] = compiledParam(v);
   }, false, false);
@@ -16,28 +16,28 @@ export function compiledParams(obj) {
 const REGEX_JS_PROP = /(('[^']*')|("[^"]*")|(-?([0-9][0-9]*)(\.\d+)?)|true|false|null|undefined|([#]*)([^.[\]()]+))([^\s()]*)/;
 
 export function compiledProp(prop) {
-  var ret = tools.obj();
+  let ret = tools.obj();
 
   //If there are colons in the property,then use filter
   if (prop.indexOf('|') >= 0) {
-    var filters = [],
+    let filters = [],
       filtersTmp;
     filtersTmp = prop.split('|');
     prop = filtersTmp[0].trim(); //Extract property
 
     filtersTmp = filtersTmp.slice(1);
-    tools.each(filtersTmp, function(filter) {
-      var retF = _getFilterParam(filter.trim()),
+    tools.each(filtersTmp, (filter) => {
+      let retF = _getFilterParam(filter.trim()),
         filterObj = tools.obj(),
         filterName = retF[1]; //Get filter name
 
       if (filterName) {
-        var paramsF = retF[3]; //Get filter param
+        const paramsF = retF[3]; //Get filter param
 
         //Multiple params are separated by commas.
         if (paramsF) {
-          var params = [];
-          tools.each(paramsF.split(','), function(p) {
+          let params = [];
+          tools.each(paramsF.split(','), (p) => {
             params[params.length] = compiledProp(p.trim());
           }, false, true);
 
@@ -54,7 +54,7 @@ export function compiledProp(prop) {
 
   //Extract the parent data path
   if (prop.indexOf('../') === 0) {
-    var n = 0;
+    let n = 0;
     prop = prop.replace(/\.\.\//g, function() {
       n++;
       return '';
@@ -65,7 +65,7 @@ export function compiledProp(prop) {
 
   //Extract the js property
   prop = REGEX_JS_PROP.exec(prop);
-  var hasComputed = prop[7];
+  const hasComputed = prop[7];
   ret.name = hasComputed ? prop[8] : prop[1];
   ret.jsProp = prop[9];
 
@@ -90,7 +90,7 @@ function _getFilterParam(obj) {
 const _quots = ['\'', '"'];
 
 function _getReplaceParam(obj, strs) {
-  var pattern = tmplRule.replaceParam,
+  let pattern = tmplRule.replaceParam,
     matchArr, ret, i = 0;
 
   while ((matchArr = pattern.exec(obj))) {
@@ -98,7 +98,7 @@ function _getReplaceParam(obj, strs) {
       ret = [];
     }
 
-    var prop = matchArr[3],
+    let prop = matchArr[3],
       item = [matchArr[0], matchArr[1], null, true];
 
     if (i > 0) {
@@ -118,18 +118,18 @@ function _getReplaceParam(obj, strs) {
 
 //Get compiled parameter
 export function compiledParam(value) {
-  var ret = tools.obj(),
+  let ret = tools.obj(),
     strs = tools.isString(value) ? value.split(tmplRule.replaceSplit) : [value],
     props = null,
     isAll = false; //此处指替换符是否占满整个属性值;若无替换符时为false
 
   //If have placehorder
   if (strs.length > 1) {
-    var params = _getReplaceParam(value, strs);
+    const params = _getReplaceParam(value, strs);
     props = [];
 
-    tools.each(params, function(param) {
-      var retP = tools.obj();
+    tools.each(params, (param) => {
+      let retP = tools.obj();
       isAll = param[3] ? param[0] === value : false; //If there are several curly braces in one property value, "isAll" must be false.
       retP.prop = compiledProp(param[2]);
 

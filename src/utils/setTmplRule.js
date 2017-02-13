@@ -7,7 +7,7 @@ function _createRegExp(reg, mode) {
 
 //Clear the repeated characters
 function _clearRepeat(str) {
-  var ret = '',
+  let ret = '',
     i = 0,
     l = str.length,
     char;
@@ -22,7 +22,7 @@ function _clearRepeat(str) {
   return ret;
 }
 
-export default function(rules = {}) {
+export default (rules = {}) => {
   let {
     startRule = '{{',
     endRule = '}}',
@@ -65,7 +65,7 @@ export default function(rules = {}) {
     commentRule = comment;
   }
 
-  var allRules = _clearRepeat(startRule + endRule),
+  const allRules = _clearRepeat(startRule + endRule),
     firstChar = startRule[0],
     lastChar = endRule[endRule.length - 1],
     exprRules = _clearRepeat(exprRule + propRule + tagSpRule),

@@ -12,7 +12,5 @@
 
 const REGEX_SYMBOLS = new RegExp('&(' + Object.keys(SPACIAL_SYMBOLS).join('|') + ');', 'g');
 export default function replace(str) {
-  return str.replace(REGEX_SYMBOLS, function (all, match) {
-    return SPACIAL_SYMBOLS[match];
-  });
+  return str.replace(REGEX_SYMBOLS, (all, match) => SPACIAL_SYMBOLS[match]);
 }

@@ -14,7 +14,5 @@ export default function escape(text) {
     return text;
   }
 
-  return text.replace(/[&><"']/g, function (match) {
-    return ESCAPE_LOOKUP[match];
-  });
+  return text.replace(/[&><"']/g, match => ESCAPE_LOOKUP[match]);
 }

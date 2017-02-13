@@ -14,7 +14,7 @@ export function styleProps(obj) {
     matchArr, ret;
 
   while ((matchArr = pattern.exec(obj))) {
-    var key = matchArr[1],
+    let key = matchArr[1],
       value = matchArr[2];
 
     if (!ret) {
@@ -37,12 +37,12 @@ export function styleProps(obj) {
 
 //Get value from multiple datas
 export function getData(prop, data) {
-  var ret, obj;
+  let ret, obj;
   if (data === undefined) {
     data = this.data;
   }
 
-  for (var i = 0, l = data.length; i < l; i++) {
+  for (let i = 0, l = data.length; i < l; i++) {
     obj = data[i];
     if (obj) {
       ret = obj[prop];
@@ -72,7 +72,7 @@ export function getComputedData(fn, p2) {
 
 //Rebuild local variables in the new context
 export function newContext(p2, p3) {
-  var newData = [];
+  const newData = [];
   if (p3 && 'data' in p3) {
     newData.push(p3.data);
   }
@@ -104,10 +104,10 @@ export function fixPropName(name) {
 
 //合并字符串属性
 export function assignStringProp(paramsE, keys) {
-  var ret = '';
-  for (var k in paramsE) {
+  let ret = '';
+  for (let k in paramsE) {
     if (!keys || !keys[k]) {
-      var v = paramsE[k];
+      const v = paramsE[k];
       ret += ' ' + k + (k !== v ? '="' + v + '"' : ' ');
     }
   }
@@ -124,7 +124,7 @@ export function exprRet(p1, p2, fn, p4) {
 //构建可运行的模板函数
 export function tmplWrap(configs, main) {
   return function() {
-    var initCtx = this,
+    const initCtx = this,
       data = tools.arraySlice(arguments);
 
     return main(configs, {
@@ -138,7 +138,7 @@ export function tmplWrap(configs, main) {
 
 //创建模板函数
 export function template(fns) {
-  var configs = {
+  const configs = {
     useString: fns.useString,
     exprs: nj.exprs,
     filters: nj.filters,
@@ -161,7 +161,7 @@ export function template(fns) {
     configs.escape = nj.escape;
   }
 
-  tools.each(fns, function(v, k) {
+  tools.each(fns, (v, k) => {
     if (k.indexOf('main') === 0) { //将每个主函数构建为可运行的模板函数
       configs[k] = tmplWrap(configs, v);
       configs[k]._njTmpl = true;

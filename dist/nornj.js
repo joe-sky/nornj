@@ -188,12 +188,12 @@ function each(obj, func, context, isArr) {
     }
   } else {
     var keys = Object.keys(obj),
-        l = keys.length;
-    for (var i = 0; i < l; i++) {
-      var k = keys[i],
-          ret = func.call(context, obj[k], k, i, l);
+        _l = keys.length;
+    for (var _i = 0; _i < _l; _i++) {
+      var k = keys[_i],
+          _ret = func.call(context, obj[k], k, _i, _l);
 
-      if (ret === false) {
+      if (_ret === false) {
         break;
       }
     }
@@ -243,7 +243,7 @@ function clearQuot(value, clearDouble) {
     return;
   }
 
-  var regex;
+  var regex = void 0;
   if (clearDouble == null) {
     var charF = value[0];
     if (charF === '\'') {
@@ -655,7 +655,8 @@ function styleProps(obj) {
 
 //Get value from multiple datas
 function getData(prop, data) {
-  var ret, obj;
+  var ret = void 0,
+      obj = void 0;
   if (data === undefined) {
     data = this.data;
   }
@@ -983,7 +984,7 @@ function _clearRepeat(str) {
   var ret = '',
       i = 0,
       l = str.length,
-      char;
+      char = void 0;
 
   for (; i < l; i++) {
     char = str[i];
@@ -1071,7 +1072,7 @@ function _clearRepeat(str) {
     include: _createRegExp('<' + escapeExprRule + 'include([^>]*)>', 'ig'),
     newlineSplit: _createRegExp('\\\\n(?![^' + firstChar + lastChar + ']*' + lastChar + ')', 'g')
   });
-};;
+};
 
 /***/ }),
 /* 7 */
@@ -1371,8 +1372,8 @@ function verifySelfCloseTag(tagName) {
 //Extract parameters inside the xml open tag
 function getOpenTagParams(tag) {
   var pattern = tmplRule.openTagParams,
-      matchArr,
-      ret;
+      matchArr = void 0,
+      ret = void 0;
 
   while (matchArr = pattern.exec(tag)) {
     var key = matchArr[1];
@@ -1422,7 +1423,7 @@ function getInsideBraceParam(obj) {
 
 //判断块表达式并返回参数
 function isExpr(obj) {
-  var ret,
+  var ret = void 0,
       ret1 = tmplRule.expr.exec(obj);
   if (ret1) {
     ret = [ret1[1]];
@@ -1461,14 +1462,14 @@ function addTmpl(node, parent, name) {
     paramsP.tmpls = __WEBPACK_IMPORTED_MODULE_2__transformParam__["a" /* compiledParam */](objT);
   } else {
     //Insert the compiled template to the parameter name for "tmpls"'s "strs" array.
-    var objT = tmpls.strs[0],
-        len = objT.length;
+    var _objT = tmpls.strs[0],
+        len = _objT.length;
 
     if (name != null) {
-      objT[name] = node;
+      _objT[name] = node;
     } else {
-      objT[len] = node;
-      objT.length = ++len;
+      _objT[len] = node;
+      _objT.length = ++len;
     }
   }
 }
@@ -1540,47 +1541,53 @@ function compiledProp(prop) {
 
   //If there are colons in the property,then use filter
   if (prop.indexOf('|') >= 0) {
-    var filters = [],
-        filtersTmp;
-    filtersTmp = prop.split('|');
-    prop = filtersTmp[0].trim(); //Extract property
+    (function () {
+      var filters = [],
+          filtersTmp = void 0;
+      filtersTmp = prop.split('|');
+      prop = filtersTmp[0].trim(); //Extract property
 
-    filtersTmp = filtersTmp.slice(1);
-    __WEBPACK_IMPORTED_MODULE_1__utils_tools__["h" /* each */](filtersTmp, function (filter) {
-      var retF = _getFilterParam(filter.trim()),
-          filterObj = __WEBPACK_IMPORTED_MODULE_1__utils_tools__["l" /* obj */](),
-          filterName = retF[1]; //Get filter name
+      filtersTmp = filtersTmp.slice(1);
+      __WEBPACK_IMPORTED_MODULE_1__utils_tools__["h" /* each */](filtersTmp, function (filter) {
+        var retF = _getFilterParam(filter.trim()),
+            filterObj = __WEBPACK_IMPORTED_MODULE_1__utils_tools__["l" /* obj */](),
+            filterName = retF[1]; //Get filter name
 
-      if (filterName) {
-        var paramsF = retF[3]; //Get filter param
+        if (filterName) {
+          var paramsF = retF[3]; //Get filter param
 
-        //Multiple params are separated by commas.
-        if (paramsF) {
-          var params = [];
-          __WEBPACK_IMPORTED_MODULE_1__utils_tools__["h" /* each */](paramsF.split(','), function (p) {
-            params[params.length] = compiledProp(p.trim());
-          }, false, true);
+          //Multiple params are separated by commas.
+          if (paramsF) {
+            (function () {
+              var params = [];
+              __WEBPACK_IMPORTED_MODULE_1__utils_tools__["h" /* each */](paramsF.split(','), function (p) {
+                params[params.length] = compiledProp(p.trim());
+              }, false, true);
 
-          filterObj.params = params;
+              filterObj.params = params;
+            })();
+          }
+
+          filterObj.name = filterName;
+          filters.push(filterObj);
         }
+      }, false, true);
 
-        filterObj.name = filterName;
-        filters.push(filterObj);
-      }
-    }, false, true);
-
-    ret.filters = filters;
+      ret.filters = filters;
+    })();
   }
 
   //Extract the parent data path
   if (prop.indexOf('../') === 0) {
-    var n = 0;
-    prop = prop.replace(/\.\.\//g, function () {
-      n++;
-      return '';
-    });
+    (function () {
+      var n = 0;
+      prop = prop.replace(/\.\.\//g, function () {
+        n++;
+        return '';
+      });
 
-    ret.parentNum = n;
+      ret.parentNum = n;
+    })();
   }
 
   //Extract the js property
@@ -1612,8 +1619,8 @@ var _quots = ['\'', '"'];
 
 function _getReplaceParam(obj, strs) {
   var pattern = tmplRule.replaceParam,
-      matchArr,
-      ret,
+      matchArr = void 0,
+      ret = void 0,
       i = 0;
 
   while (matchArr = pattern.exec(obj)) {
