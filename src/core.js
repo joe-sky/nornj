@@ -1,4 +1,4 @@
-﻿function nj() {
+﻿export default function nj() {
   return nj['tmplTag' + (nj.outputH ? 'H' : '')].apply(null, arguments);
 }
 
@@ -10,5 +10,3 @@ nj.tmplStrs = {};
 nj.errorTitle = '[NornJ]';
 nj.tmplRule = {};
 nj.outputH = false;
-
-module.exports = nj;

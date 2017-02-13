@@ -118,3 +118,11 @@ function _createRender(outputH) {
 
 export const render = _createRender();
 export const renderH = _createRender(true);
+
+tools.assign(nj, {
+  compile,
+  compileH,
+  precompile,
+  render,
+  renderH
+});

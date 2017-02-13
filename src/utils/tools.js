@@ -31,7 +31,7 @@ export function isString(obj) {
 }
 
 //获取属性值
-export function _getProperty(key) {
+function _getProperty(key) {
   return function(obj) {
     return obj == null ? void 0 : obj[key];
   };
@@ -168,3 +168,19 @@ export const assign = Object.assign || function(target) {
 
   return target;
 };
+
+assign(nj, {
+  arrayPush,
+  arraySlice,
+  isArray,
+  isObject,
+  isString,
+  isArrayLike,
+  each,
+  noop,
+  throwIf,
+  warn,
+  obj,
+  toCamelCase,
+  assign
+});

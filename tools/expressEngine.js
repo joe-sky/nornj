@@ -1,6 +1,6 @@
 'use strict';
 
-const nj = require('../lib/base'),
+const nj = require('../lib/base').default,
   includeParser = require('./includeParser'),
   fs = require('fs');
 

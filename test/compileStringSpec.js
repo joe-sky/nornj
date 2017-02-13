@@ -1,4 +1,4 @@
-﻿var nj = require('../src/base'),
+﻿var nj = require('../src/base').default,
   _ = require('lodash'),
   compile = require('../src/compiler/compile').compile,
   includeParser = require('../tools/includeParser');

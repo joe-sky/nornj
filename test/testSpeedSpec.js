@@ -1,4 +1,4 @@
-﻿var nj = require('../src/base'),
+﻿var nj = require('../src/base').default,
   compiler = require('../src/compiler/compile'),
   compile = compiler.compile,
   _ = require('lodash'),

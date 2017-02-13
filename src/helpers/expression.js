@@ -1,4 +1,5 @@
-﻿import * as tools from '../utils/tools';
+﻿import nj from '../core';
+import * as tools from '../utils/tools';
 import * as tranData from '../transforms/transformData';
 
 //Global expression list
@@ -254,3 +255,9 @@ export function registerExpr(name, expr, options) {
     }
   }, false, false);
 }
+
+tools.assign(nj, {
+  exprs,
+  exprConfig,
+  registerExpr
+});

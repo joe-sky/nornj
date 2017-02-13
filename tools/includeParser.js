@@ -1,6 +1,6 @@
 ﻿'use strict';
 
-const nj = require('../lib/base'),
+const nj = require('../lib/base').default,
   { getOpenTagParams } = require('../lib/transforms/transformElement'),
   fs = require('fs'),
   path = require('path'),

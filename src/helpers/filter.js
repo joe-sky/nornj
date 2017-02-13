@@ -1,4 +1,5 @@
-﻿import * as tools from '../utils/tools';
+﻿import nj from '../core';
+import * as tools from '../utils/tools';
 
 //Global filter list
 export const filters = {
@@ -97,3 +98,9 @@ export function registerFilter(name, filter, options) {
     }
   }, false, false);
 }
+
+tools.assign(nj, {
+  filters,
+  filterConfig,
+  registerFilter
+});
