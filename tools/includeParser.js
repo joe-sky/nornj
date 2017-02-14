@@ -1,7 +1,7 @@
 ﻿'use strict';
 
 const nj = require('../lib/base').default,
-  { getOpenTagParams } = require('../lib/transforms/transformElement'),
+  getOpenTagParams = require('../lib/transforms/transformElement').getOpenTagParams,
   fs = require('fs'),
   path = require('path'),
   tmplRule = nj.tmplRule;
