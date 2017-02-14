@@ -1,6 +1,9 @@
 # NornJ
 一款轻量级且使用场景丰富的javascript模板引擎。它不仅支持输出普通html字符串，还可以接入`React`或API与`React`类似的view层框架为它们输出虚拟dom，同时还能保证很高的渲染效率。
 
+[![NPM Version][npm-image]][npm-url]
+[![NPM Downloads][downloads-image]][npm-url]
+
 ### 模板基本示例
 ```html
 <template name="partial">
@@ -110,7 +113,7 @@ npm install nornj
 
 ### 浏览器支持
 
-* 可支持所有现代浏览器以及Internet Explorer 8+。
+* 可支持所有现代浏览器以及Internet Explorer 9+。
 
 ### 更多详细文档
 
@@ -124,3 +127,7 @@ npm install nornj
 ### License
 
 MIT
+
+[npm-image]: http://img.shields.io/npm/v/nornj.svg
+[downloads-image]: http://img.shields.io/npm/dm/nornj.svg
+[npm-url]: https://www.npmjs.org/package/nornj
