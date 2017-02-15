@@ -14,7 +14,6 @@ export default function compileStringTmpl(tmpl) {
     let isStr = tools.isString(tmpl),
       xmls = isStr ? [tmpl] : tmpl,
       l = xmls.length,
-      computedNos = [],
       fullXml = '';
 
     //Connection xml string
@@ -26,7 +25,6 @@ export default function compileStringTmpl(tmpl) {
           isComputed = lastChar === '#';
 
         if (isComputed) {
-          isComputed && computedNos.push(i);
           xml = xml.substr(0, last);
         }
 
@@ -42,8 +40,9 @@ export default function compileStringTmpl(tmpl) {
 
     //Resolve string to element
     ret = _checkStringElem(fullXml);
-    ret._njParamCount = l - 1;
-    ret._njComputedNos = computedNos;
+    Object.defineProperty(ret, '_njParamCount', {
+      value: l - 1
+    });
 
     //Save to the cache
     tmplStrs[tmplKey] = ret;
@@ -63,9 +62,17 @@ export default function compileStringTmpl(tmpl) {
   const tmplFn = function() {
     return nj['compile' + (outputH ? 'H' : '')](tmplFn, tmplKey).apply(this, params ? tools.arrayPush([params], arguments) : arguments);
   };
-  tmplFn._njTmpl = ret;
-  tmplFn._njTmplKey = tmplKey;
-  tmplFn._njParams = params;
+  Object.defineProperties(tmplFn, {
+    _njTmpl: {
+      value: ret
+    },
+    _njTmplKey: {
+      value: tmplKey
+    },
+    _njParams: {
+      value: params
+    }
+  });
 
   return tmplFn;
 }
@@ -97,7 +104,7 @@ function _checkStringElem(xml) {
 
     //Element tag
     if (elem) {
-      if (elem.indexOf('<!') === 0) {  //doctype等标签当做文本处理
+      if (elem.indexOf('<!') === 0) { //doctype等标签当做文本处理
         _setText(_formatNewline(elem), current.elem);
       } else {
         if (elemName[0] === '/') { //Close tag

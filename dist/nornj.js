@@ -1104,7 +1104,6 @@ function compileStringTmpl(tmpl) {
       var isStr = __WEBPACK_IMPORTED_MODULE_1__utils_tools__["f" /* isString */](tmpl),
           xmls = isStr ? [tmpl] : tmpl,
           l = xmls.length,
-          computedNos = [],
           fullXml = '';
 
       //Connection xml string
@@ -1116,7 +1115,6 @@ function compileStringTmpl(tmpl) {
               isComputed = lastChar === '#';
 
           if (isComputed) {
-            isComputed && computedNos.push(i);
             xml = xml.substr(0, last);
           }
 
@@ -1130,8 +1128,9 @@ function compileStringTmpl(tmpl) {
 
       //Resolve string to element
       ret = _checkStringElem(fullXml);
-      ret._njParamCount = l - 1;
-      ret._njComputedNos = computedNos;
+      Object.defineProperty(ret, '_njParamCount', {
+        value: l - 1
+      });
 
       //Save to the cache
       tmplStrs[tmplKey] = ret;
@@ -1152,9 +1151,17 @@ function compileStringTmpl(tmpl) {
   var tmplFn = function tmplFn() {
     return __WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */]['compile' + (outputH ? 'H' : '')](tmplFn, tmplKey).apply(this, params ? __WEBPACK_IMPORTED_MODULE_1__utils_tools__["b" /* arrayPush */]([params], arguments) : arguments);
   };
-  tmplFn._njTmpl = ret;
-  tmplFn._njTmplKey = tmplKey;
-  tmplFn._njParams = params;
+  Object.defineProperties(tmplFn, {
+    _njTmpl: {
+      value: ret
+    },
+    _njTmplKey: {
+      value: tmplKey
+    },
+    _njParams: {
+      value: params
+    }
+  });
 
   return tmplFn;
 }
