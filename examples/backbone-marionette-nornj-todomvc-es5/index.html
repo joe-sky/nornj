@@ -29,9 +29,14 @@
   </footer>
   <script type="text/html" id="template-footer">
     <span id="todo-count">
-      <strong>{activeCount}</strong>
-      ${' '}<#if {activeCount:equal(1)}>item<#else />items</#if>
-      ${' '}left
+      <strong>{{activeCount}}</strong>
+      {{' '}}<#if {{activeCount | ===(1)}}>
+               item
+               <#else>
+                 items
+               </#else>
+             </#if>
+      {{' '}}left
     </span>
     <ul id="filters">
       <li class="all">
@@ -46,8 +51,8 @@
     </ul>
     <button id="clear-completed">
       <#props>
-        <#unless {completedCount}>
-          <#prop {'class'}>hidden</#prop>
+        <#unless {{completedCount}}>
+          <@class>hidden</@class>
         </#unless>
       </#props>
       Clear completed
@@ -61,12 +66,12 @@
     <div class="view">
       <input class="toggle" type="checkbox">
         <#props>
-          <#if {completed}>
-            <#prop {'checked'} />
+          <#if {{completed}}>
+            <@checked />
           </#if>
         </#props>
       </input>
-      <label>{title}</label>
+      <label>{{title}}</label>
       <button class="destroy"></button>
     </div>
     <input class="edit" value="{title}" />
