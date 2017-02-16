@@ -1,15 +1,11 @@
 ﻿import nj from './core';
 import { assign } from './utils/tools';
-import escape from './utils/escape';
 import registerComponent from './utils/registerComponent';
-import replaceSpecialSymbol from './utils/replaceSpecialSymbol';
 import setTmplRule from './utils/setTmplRule';
 import config from './config';
 
 assign(nj, {
-  escape,
   registerComponent,
-  replaceSpecialSymbol,
   setTmplRule,
   config
 });
@@ -24,11 +20,10 @@ export * from './utils/tools';
 export * from './helpers/expression';
 export * from './helpers/filter';
 export * from './compiler/compile';
+export * from './utils/escape';
 export * from './utils/tmplTag';
 export {
-  escape,
   registerComponent,
-  replaceSpecialSymbol,
   setTmplRule,
   config
 };

@@ -1,7 +1,7 @@
 ﻿import nj from '../core';
 import * as tools from '../utils/tools';
 import * as tranData from '../transforms/transformData';
-import replaceSpecialSymbol from '../utils/replaceSpecialSymbol';
+import { unescape } from '../utils/escape';
 import { exprConfig } from '../helpers/expression';
 import { filterConfig } from '../helpers/filter';
 const { errorTitle } = nj;
@@ -181,7 +181,7 @@ function _buildEscape(valueStr, fns, escape) {
       return valueStr;
     }
   } else { //文本中的特殊字符需转义
-    return replaceSpecialSymbol(valueStr);
+    return unescape(valueStr);
   }
 }
 
@@ -369,7 +369,7 @@ function _buildNode(node, fns, counter, retType, level, useStringLocal) {
     if (useStringF) {
       fnStr += textStr;
     } else { //文本中的特殊字符需转义
-      fnStr += replaceSpecialSymbol(textStr);
+      fnStr += unescape(textStr);
     }
   } else if (node.type === 'nj_expr') { //块表达式节点
     let _exprC = counter._expr++,
