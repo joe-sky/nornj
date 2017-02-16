@@ -130,8 +130,8 @@ function arrayPush(arr1, arr2) {
   return arr1;
 }
 
-function arraySlice(arrLike, start) {
-  return nativeArraySlice.call(arrLike, start);
+function arraySlice(arrLike, start, end) {
+  return nativeArraySlice.call(arrLike, start, end);
 }
 
 //判断是否为数组
@@ -522,6 +522,23 @@ var exprs = {
     return options.props;
   },
 
+  list: function list() {
+    var args = arguments,
+        last = args.length - 1,
+        options = args[last];
+
+    if (last > 0) {
+      var ret = __WEBPACK_IMPORTED_MODULE_1__utils_tools__["c" /* arraySlice */](args, 0, last);
+      if (options.useString) {
+        ret = ret.join('');
+      }
+
+      return ret;
+    } else {
+      return [options.result()];
+    }
+  },
+
   block: function block(options) {
     return options.result();
   }
@@ -553,6 +570,7 @@ var exprConfig = {
   obj: _commonConfig({ newContext: false, useString: false })
 };
 exprConfig.elseif = _commonConfig(exprConfig['else']);
+exprConfig.list = _commonConfig(exprConfig.if);
 exprConfig.block = _commonConfig(exprConfig.obj);
 
 //Expression alias
@@ -812,8 +830,12 @@ function template(fns) {
 //Global filter list
 var filters = {
   //Get param properties
-  prop: function prop(value, _prop) {
-    return value[_prop];
+  prop: function prop(val, _prop) {
+    if (val != null) {
+      return val[_prop];
+    }
+
+    return val;
   },
 
   '==': function _(val1, val2) {
@@ -872,6 +894,16 @@ var filters = {
     }
 
     return Boolean(val);
+  },
+
+  //Execute method
+  '#': function _(val, method) {
+    if (val != null) {
+      var args = arguments;
+      return val[method].apply(val, __WEBPACK_IMPORTED_MODULE_1__utils_tools__["c" /* arraySlice */](args, 2, args.length - 1));
+    }
+
+    return val;
   }
 };
 
@@ -900,7 +932,8 @@ var filterConfig = {
   '-': _commonConfig(),
   int: _commonConfig(),
   float: _commonConfig(),
-  bool: _commonConfig()
+  bool: _commonConfig(),
+  '#': _commonConfig()
 };
 
 //Register filter and also can batch add

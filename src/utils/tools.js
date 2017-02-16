@@ -10,8 +10,8 @@ export function arrayPush(arr1, arr2) {
   return arr1;
 }
 
-export function arraySlice(arrLike, start) {
-  return nativeArraySlice.call(arrLike, start);
+export function arraySlice(arrLike, start, end) {
+  return nativeArraySlice.call(arrLike, start, end);
 }
 
 //判断是否为数组

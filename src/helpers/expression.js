@@ -49,7 +49,7 @@ export const exprs = {
     return ret;
   },
 
-  'else': (options) => options.exprProps['else'] = options.result,
+  'else': options => options.exprProps['else'] = options.result,
 
   'elseif': (value, options) => {
     const exprProps = options.exprProps;
@@ -188,9 +188,27 @@ export const exprs = {
     return ret;
   },
 
-  obj: (options) => options.props,
+  obj: options => options.props,
 
-  block: (options) => options.result()
+  list: function() {
+    let args = arguments,
+      last = args.length - 1,
+      options = args[last];
+
+    if(last > 0) {
+      let ret = tools.arraySlice(args, 0, last);
+      if(options.useString) {
+        ret = ret.join('');
+      }
+
+      return ret;
+    }
+    else {
+      return [options.result()];
+    }
+  },
+
+  block: options => options.result()
 };
 
 function _commonConfig(params) {
@@ -219,6 +237,7 @@ export const exprConfig = {
   obj: _commonConfig({ newContext: false, useString: false })
 };
 exprConfig.elseif = _commonConfig(exprConfig['else']);
+exprConfig.list = _commonConfig(exprConfig.if);
 exprConfig.block = _commonConfig(exprConfig.obj);
 
 //Expression alias

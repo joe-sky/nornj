@@ -4,7 +4,13 @@ import * as tools from '../utils/tools';
 //Global filter list
 export const filters = {
   //Get param properties
-  prop: (value, prop) => value[prop],
+  prop: (val, prop) => {
+    if (val != null) {
+      return val[prop];
+    }
+
+    return val;
+  },
 
   '==': (val1, val2) => val1 == val2,
 
@@ -40,6 +46,16 @@ export const filters = {
     }
 
     return Boolean(val);
+  },
+
+  //Execute method
+  '#': function(val, method) {
+    if (val != null) {
+      let args = arguments;
+      return val[method].apply(val, tools.arraySlice(args, 2, args.length - 1));
+    }
+
+    return val;
   }
 };
 
@@ -67,7 +83,8 @@ export const filterConfig = {
   '-': _commonConfig(),
   int: _commonConfig(),
   float: _commonConfig(),
-  bool: _commonConfig()
+  bool: _commonConfig(),
+  '#': _commonConfig()
 };
 
 //Register filter and also can batch add

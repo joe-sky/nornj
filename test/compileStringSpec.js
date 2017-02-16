@@ -203,13 +203,15 @@ describe('test compile string', function () {
               <@name>
                 1
                 2
+                <#list {{3}} {{4}} {{5}} />
               </@name>
             </img>
+            <#list {{1}} {{2}} />
           </@name>
         </#textExpr>
         <slider {{../name3}}>
           {${nj`<div>111</div>`()}}
-          #${nj`<div>{{../name3}}</div>`}
+          #${nj`<div>{{../name3 | #('substring', 0, 3)}}</div>`}
           <{{../sliderItem['a']|tagName(1,2)}} no1={{no}} no2="{{-0.05 | filter2}}" checked no='{{ ../sliderItem.b }}' />
         </slider>
       </#each>
