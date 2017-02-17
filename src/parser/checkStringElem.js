@@ -40,7 +40,7 @@ export default function compileStringTmpl(tmpl) {
 
     //Resolve string to element
     ret = _checkStringElem(fullXml);
-    Object.defineProperty(ret, '_njParamCount', {
+    tools.defineProp(ret, '_njParamCount', {
       value: l - 1
     });
 
@@ -62,7 +62,7 @@ export default function compileStringTmpl(tmpl) {
   const tmplFn = function() {
     return nj['compile' + (outputH ? 'H' : '')](tmplFn, tmplKey).apply(this, params ? tools.arrayPush([params], arguments) : arguments);
   };
-  Object.defineProperties(tmplFn, {
+  tools.defineProps(tmplFn, {
     _njTmpl: {
       value: ret
     },
@@ -137,17 +137,18 @@ function _checkStringElem(xml) {
   return root;
 }
 
-const SPECIAL_LOOKUP = {
+const SP_FILTER_LOOKUP = {
   '>(': 'gt(',
   '<(': 'lt(',
   '>=(': 'gte(',
-  '<=(': 'lte('
+  '<=(': 'lte(',
+  '||(': 'or('
 };
 
 function _clearNotesAndBlank(str) {
   const commentRule = tmplRule.commentRule;
   return str.replace(new RegExp('<!--' + commentRule + '[\\s\\S]*?' + commentRule + '-->', 'g'), '').replace(/>\s+([^\s<]*)\s+</g, '>$1<').trim()
-    .replace(/(>|<|>=|<=)\(/g, (match) => SPECIAL_LOOKUP[match]);
+    .replace(/\|[\s]*((>|<|>=|<=|\|\|)\()/g, (all, match) => '| ' + SP_FILTER_LOOKUP[match]);
 }
 
 function _formatNewline(str) {

@@ -101,19 +101,21 @@ nj.outputH = false;
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core__ = __webpack_require__(0);
-/* harmony export (immutable) */ __webpack_exports__["b"] = arrayPush;
-/* harmony export (immutable) */ __webpack_exports__["c"] = arraySlice;
-/* harmony export (immutable) */ __webpack_exports__["d"] = isArray;
-/* harmony export (immutable) */ __webpack_exports__["e"] = isObject;
-/* harmony export (immutable) */ __webpack_exports__["f"] = isString;
-/* harmony export (immutable) */ __webpack_exports__["g"] = isArrayLike;
-/* harmony export (immutable) */ __webpack_exports__["h"] = each;
-/* harmony export (immutable) */ __webpack_exports__["i"] = noop;
-/* harmony export (immutable) */ __webpack_exports__["j"] = throwIf;
-/* harmony export (immutable) */ __webpack_exports__["k"] = warn;
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return defineProp; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return defineProps; });
+/* harmony export (immutable) */ __webpack_exports__["d"] = arrayPush;
+/* harmony export (immutable) */ __webpack_exports__["e"] = arraySlice;
+/* harmony export (immutable) */ __webpack_exports__["f"] = isArray;
+/* harmony export (immutable) */ __webpack_exports__["g"] = isObject;
+/* harmony export (immutable) */ __webpack_exports__["h"] = isString;
+/* harmony export (immutable) */ __webpack_exports__["i"] = isArrayLike;
+/* harmony export (immutable) */ __webpack_exports__["j"] = each;
+/* harmony export (immutable) */ __webpack_exports__["k"] = noop;
+/* harmony export (immutable) */ __webpack_exports__["o"] = throwIf;
+/* harmony export (immutable) */ __webpack_exports__["p"] = warn;
 /* harmony export (immutable) */ __webpack_exports__["l"] = obj;
-/* harmony export (immutable) */ __webpack_exports__["m"] = clearQuot;
-/* harmony export (immutable) */ __webpack_exports__["n"] = toCamelCase;
+/* harmony export (immutable) */ __webpack_exports__["n"] = clearQuot;
+/* harmony export (immutable) */ __webpack_exports__["m"] = toCamelCase;
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return assign; });
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
@@ -123,8 +125,11 @@ var nativeArrayPush = Array.prototype.push,
     hasOwnProperty = Object.prototype.hasOwnProperty;
 var errorTitle = __WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */].errorTitle;
 
-//Push one by one to array
 
+var defineProp = Object.defineProperty;
+var defineProps = Object.defineProperties;
+
+//Push one by one to array
 function arrayPush(arr1, arr2) {
   nativeArrayPush.apply(arr1, arr2);
   return arr1;
@@ -290,6 +295,8 @@ var assign = Object.assign || function (target) {
 };
 
 assign(__WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */], {
+  defineProp: defineProp,
+  defineProps: defineProps,
   arrayPush: arrayPush,
   arraySlice: arraySlice,
   isArray: isArray,
@@ -345,7 +352,7 @@ var exprs = {
           if (props.elseifs) {
             (function () {
               var l = props.elseifs.length;
-              __WEBPACK_IMPORTED_MODULE_1__utils_tools__["h" /* each */](props.elseifs, function (elseif, i) {
+              __WEBPACK_IMPORTED_MODULE_1__utils_tools__["j" /* each */](props.elseifs, function (elseif, i) {
                 if (!!elseif.value) {
                   ret = elseif.fn();
                   return false;
@@ -392,7 +399,7 @@ var exprs = {
         props = options.props,
         l = props.elseifs.length;
 
-    __WEBPACK_IMPORTED_MODULE_1__utils_tools__["h" /* each */](props.elseifs, function (elseif, i) {
+    __WEBPACK_IMPORTED_MODULE_1__utils_tools__["j" /* each */](props.elseifs, function (elseif, i) {
       if (value === elseif.value) {
         ret = elseif.fn();
         return false;
@@ -424,7 +431,7 @@ var exprs = {
         }
 
         var props = options.props;
-        __WEBPACK_IMPORTED_MODULE_1__utils_tools__["h" /* each */](list, function (item, index, len) {
+        __WEBPACK_IMPORTED_MODULE_1__utils_tools__["j" /* each */](list, function (item, index, len) {
           var param = {
             data: item,
             index: index,
@@ -445,7 +452,7 @@ var exprs = {
           } else {
             ret.push(retI);
           }
-        }, false, __WEBPACK_IMPORTED_MODULE_1__utils_tools__["g" /* isArrayLike */](list));
+        }, false, __WEBPACK_IMPORTED_MODULE_1__utils_tools__["i" /* isArrayLike */](list));
 
         //Return null when not use string and result is empty.
         if (!useString && !ret.length) {
@@ -483,7 +490,7 @@ var exprs = {
 
   //Spread parameters
   spread: function spread(props, options) {
-    __WEBPACK_IMPORTED_MODULE_1__utils_tools__["h" /* each */](props, function (v, k) {
+    __WEBPACK_IMPORTED_MODULE_1__utils_tools__["j" /* each */](props, function (v, k) {
       options.exprProps[k] = v;
     }, false, false);
   },
@@ -528,7 +535,7 @@ var exprs = {
         options = args[last];
 
     if (last > 0) {
-      var ret = __WEBPACK_IMPORTED_MODULE_1__utils_tools__["c" /* arraySlice */](args, 0, last);
+      var ret = __WEBPACK_IMPORTED_MODULE_1__utils_tools__["e" /* arraySlice */](args, 0, last);
       if (options.useString) {
         ret = ret.join('');
       }
@@ -548,6 +555,7 @@ function _commonConfig(params) {
   var ret = {
     useString: true,
     exprProps: false,
+    isProp: false,
     newContext: true
   };
 
@@ -564,8 +572,8 @@ var exprConfig = {
   'switch': _commonConfig({ newContext: false }),
   unless: _commonConfig({ newContext: false }),
   each: _commonConfig(),
-  prop: _commonConfig({ newContext: false, exprProps: true }),
-  spread: _commonConfig({ newContext: false, useString: false, exprProps: true }),
+  prop: _commonConfig({ newContext: false, exprProps: true, isProp: true }),
+  spread: _commonConfig({ newContext: false, useString: false, exprProps: true, isProp: true }),
   'for': _commonConfig(),
   obj: _commonConfig({ newContext: false, useString: false })
 };
@@ -582,7 +590,7 @@ exprConfig['default'] = exprConfig['else'];
 //Register expression and also can batch add
 function registerExpr(name, expr, options) {
   var params = name;
-  if (!__WEBPACK_IMPORTED_MODULE_1__utils_tools__["e" /* isObject */](name)) {
+  if (!__WEBPACK_IMPORTED_MODULE_1__utils_tools__["g" /* isObject */](name)) {
     params = {};
     params[name] = {
       expr: expr,
@@ -590,7 +598,7 @@ function registerExpr(name, expr, options) {
     };
   }
 
-  __WEBPACK_IMPORTED_MODULE_1__utils_tools__["h" /* each */](params, function (v, name) {
+  __WEBPACK_IMPORTED_MODULE_1__utils_tools__["j" /* each */](params, function (v, name) {
     if (v) {
       var _expr = v.expr,
           _options = v.options;
@@ -640,7 +648,7 @@ var errorTitle = __WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */].errorTit
 
 function styleProps(obj) {
   //If the parameter is a style object,then direct return.
-  if (__WEBPACK_IMPORTED_MODULE_1__utils_tools__["e" /* isObject */](obj)) {
+  if (__WEBPACK_IMPORTED_MODULE_1__utils_tools__["g" /* isObject */](obj)) {
     return obj;
   }
 
@@ -663,7 +671,7 @@ function styleProps(obj) {
     }
 
     //将连字符转为驼峰命名
-    key = __WEBPACK_IMPORTED_MODULE_1__utils_tools__["n" /* toCamelCase */](key);
+    key = __WEBPACK_IMPORTED_MODULE_1__utils_tools__["m" /* toCamelCase */](key);
 
     ret[key] = value;
   }
@@ -719,7 +727,7 @@ function newContext(p2, p3) {
   }
 
   return {
-    data: newData.length ? __WEBPACK_IMPORTED_MODULE_1__utils_tools__["b" /* arrayPush */](newData, p2.data) : p2.data,
+    data: newData.length ? __WEBPACK_IMPORTED_MODULE_1__utils_tools__["d" /* arrayPush */](newData, p2.data) : p2.data,
     parent: p3 && p3.fallback ? p2 : p2.parent,
     index: p3 && 'index' in p3 ? p3.index : p2.index,
     getData: getData
@@ -763,10 +771,10 @@ function exprRet(p1, p2, fn, p4) {
 function tmplWrap(configs, main) {
   return function () {
     var initCtx = this,
-        data = __WEBPACK_IMPORTED_MODULE_1__utils_tools__["c" /* arraySlice */](arguments);
+        data = __WEBPACK_IMPORTED_MODULE_1__utils_tools__["e" /* arraySlice */](arguments);
 
     return main(configs, {
-      data: initCtx && initCtx._njData ? __WEBPACK_IMPORTED_MODULE_1__utils_tools__["b" /* arrayPush */](data, initCtx._njData) : data,
+      data: initCtx && initCtx._njData ? __WEBPACK_IMPORTED_MODULE_1__utils_tools__["d" /* arrayPush */](data, initCtx._njData) : data,
       parent: initCtx && initCtx._njParent ? initCtx._njParent : null,
       index: initCtx && initCtx._njIndex ? initCtx._njIndex : null,
       getData: getData
@@ -780,10 +788,10 @@ function template(fns) {
     useString: fns.useString,
     exprs: __WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */].exprs,
     filters: __WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */].filters,
-    noop: __WEBPACK_IMPORTED_MODULE_1__utils_tools__["i" /* noop */],
+    noop: __WEBPACK_IMPORTED_MODULE_1__utils_tools__["k" /* noop */],
     obj: __WEBPACK_IMPORTED_MODULE_1__utils_tools__["l" /* obj */],
-    throwIf: __WEBPACK_IMPORTED_MODULE_1__utils_tools__["j" /* throwIf */],
-    warn: __WEBPACK_IMPORTED_MODULE_1__utils_tools__["k" /* warn */],
+    throwIf: __WEBPACK_IMPORTED_MODULE_1__utils_tools__["o" /* throwIf */],
+    warn: __WEBPACK_IMPORTED_MODULE_1__utils_tools__["p" /* warn */],
     newContext: newContext,
     getComputedData: getComputedData,
     styleProps: styleProps,
@@ -799,7 +807,7 @@ function template(fns) {
     configs.escape = __WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */].escape;
   }
 
-  __WEBPACK_IMPORTED_MODULE_1__utils_tools__["h" /* each */](fns, function (v, k) {
+  __WEBPACK_IMPORTED_MODULE_1__utils_tools__["j" /* each */](fns, function (v, k) {
     if (k.indexOf('main') === 0) {
       //将每个主函数构建为可运行的模板函数
       configs[k] = tmplWrap(configs, v);
@@ -877,6 +885,18 @@ var filters = {
     return val ? val1 : val2;
   },
 
+  '!': function _(val1) {
+    return !val;
+  },
+
+  '&&': function _(val1, val2) {
+    return val1 && val2;
+  },
+
+  or: function or(val1, val2) {
+    return val1 || val2;
+  },
+
   //Convert to int 
   int: function int(val) {
     return parseInt(val, 10);
@@ -900,7 +920,7 @@ var filters = {
   '#': function _(val, method) {
     if (val != null) {
       var args = arguments;
-      return val[method].apply(val, __WEBPACK_IMPORTED_MODULE_1__utils_tools__["c" /* arraySlice */](args, 2, args.length - 1));
+      return val[method].apply(val, __WEBPACK_IMPORTED_MODULE_1__utils_tools__["e" /* arraySlice */](args, 2, args.length - 1));
     }
 
     return val;
@@ -930,6 +950,10 @@ var filterConfig = {
   gte: _commonConfig(),
   '+': _commonConfig(),
   '-': _commonConfig(),
+  '?': _commonConfig(),
+  '!': _commonConfig(),
+  '&&': _commonConfig(),
+  or: _commonConfig(),
   int: _commonConfig(),
   float: _commonConfig(),
   bool: _commonConfig(),
@@ -939,7 +963,7 @@ var filterConfig = {
 //Register filter and also can batch add
 function registerFilter(name, filter, options) {
   var params = name;
-  if (!__WEBPACK_IMPORTED_MODULE_1__utils_tools__["e" /* isObject */](name)) {
+  if (!__WEBPACK_IMPORTED_MODULE_1__utils_tools__["g" /* isObject */](name)) {
     params = {};
     params[name] = {
       filter: filter,
@@ -947,7 +971,7 @@ function registerFilter(name, filter, options) {
     };
   }
 
-  __WEBPACK_IMPORTED_MODULE_1__utils_tools__["h" /* each */](params, function (v, name) {
+  __WEBPACK_IMPORTED_MODULE_1__utils_tools__["j" /* each */](params, function (v, name) {
     if (v) {
       var _filter = v.filter,
           _options = v.options;
@@ -1166,13 +1190,13 @@ function compileStringTmpl(tmpl) {
   if (!ret) {
     (function () {
       //If the cache already has template data, direct return the template.
-      var isStr = __WEBPACK_IMPORTED_MODULE_1__utils_tools__["f" /* isString */](tmpl),
+      var isStr = __WEBPACK_IMPORTED_MODULE_1__utils_tools__["h" /* isString */](tmpl),
           xmls = isStr ? [tmpl] : tmpl,
           l = xmls.length,
           fullXml = '';
 
       //Connection xml string
-      __WEBPACK_IMPORTED_MODULE_1__utils_tools__["h" /* each */](xmls, function (xml, i) {
+      __WEBPACK_IMPORTED_MODULE_1__utils_tools__["j" /* each */](xmls, function (xml, i) {
         var split = '';
         if (i < l - 1) {
           var last = xml.length - 1,
@@ -1193,7 +1217,7 @@ function compileStringTmpl(tmpl) {
 
       //Resolve string to element
       ret = _checkStringElem(fullXml);
-      Object.defineProperty(ret, '_njParamCount', {
+      __WEBPACK_IMPORTED_MODULE_1__utils_tools__["b" /* defineProp */](ret, '_njParamCount', {
         value: l - 1
       });
 
@@ -1214,9 +1238,9 @@ function compileStringTmpl(tmpl) {
   }
 
   var tmplFn = function tmplFn() {
-    return __WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */]['compile' + (outputH ? 'H' : '')](tmplFn, tmplKey).apply(this, params ? __WEBPACK_IMPORTED_MODULE_1__utils_tools__["b" /* arrayPush */]([params], arguments) : arguments);
+    return __WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */]['compile' + (outputH ? 'H' : '')](tmplFn, tmplKey).apply(this, params ? __WEBPACK_IMPORTED_MODULE_1__utils_tools__["d" /* arrayPush */]([params], arguments) : arguments);
   };
-  Object.defineProperties(tmplFn, {
+  __WEBPACK_IMPORTED_MODULE_1__utils_tools__["c" /* defineProps */](tmplFn, {
     _njTmpl: {
       value: ret
     },
@@ -1295,17 +1319,18 @@ function _checkStringElem(xml) {
   return root;
 }
 
-var SPECIAL_LOOKUP = {
+var SP_FILTER_LOOKUP = {
   '>(': 'gt(',
   '<(': 'lt(',
   '>=(': 'gte(',
-  '<=(': 'lte('
+  '<=(': 'lte(',
+  '||(': 'or('
 };
 
 function _clearNotesAndBlank(str) {
   var commentRule = tmplRule.commentRule;
-  return str.replace(new RegExp('<!--' + commentRule + '[\\s\\S]*?' + commentRule + '-->', 'g'), '').replace(/>\s+([^\s<]*)\s+</g, '>$1<').trim().replace(/(>|<|>=|<=)\(/g, function (match) {
-    return SPECIAL_LOOKUP[match];
+  return str.replace(new RegExp('<!--' + commentRule + '[\\s\\S]*?' + commentRule + '-->', 'g'), '').replace(/>\s+([^\s<]*)\s+</g, '>$1<').trim().replace(/\|[\s]*((>|<|>=|<=|\|\|)\()/g, function (all, match) {
+    return '| ' + SP_FILTER_LOOKUP[match];
   });
 }
 
@@ -1461,7 +1486,7 @@ function getOpenTagParams(tag) {
     var value = matchArr[7],
         onlyBrace = matchArr[4];
     if (value != null) {
-      value = __WEBPACK_IMPORTED_MODULE_1__utils_tools__["m" /* clearQuot */](value); //Remove quotation marks
+      value = __WEBPACK_IMPORTED_MODULE_1__utils_tools__["n" /* clearQuot */](value); //Remove quotation marks
     } else {
       value = key; //Match to Similar to "checked" or "disabled" attribute.
     }
@@ -1485,7 +1510,7 @@ function getOpenTagParams(tag) {
 
 //判断xml close tag
 function isXmlCloseTag(obj, tagName) {
-  return __WEBPACK_IMPORTED_MODULE_1__utils_tools__["f" /* isString */](obj) && obj.toLowerCase() === '</' + tagName + '>';
+  return __WEBPACK_IMPORTED_MODULE_1__utils_tools__["h" /* isString */](obj) && obj.toLowerCase() === '</' + tagName + '>';
 }
 
 //get inside brace param
@@ -1567,16 +1592,15 @@ function addParamsExpr(node, parent, isExprProp) {
 
     parent.paramsExpr = exprPropsNode;
   } else {
-    __WEBPACK_IMPORTED_MODULE_1__utils_tools__["b" /* arrayPush */](parent.paramsExpr.content, isExprProp ? [node] : node.content);
+    __WEBPACK_IMPORTED_MODULE_1__utils_tools__["d" /* arrayPush */](parent.paramsExpr.content, isExprProp ? [node] : node.content);
   }
 }
 
-var PROP_EXPRS = ['prop', 'spread'];
 function isExprProp(name) {
   var config = __WEBPACK_IMPORTED_MODULE_3__helpers_expression__["b" /* exprConfig */][name];
   return {
     isExprProp: config ? config.exprProps : false,
-    isProp: PROP_EXPRS.indexOf(name) > -1
+    isProp: config ? config.isProp : false
   };
 }
 
@@ -1598,7 +1622,7 @@ var tmplRule = __WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */].tmplRule;
 
 function compiledParams(obj) {
   var ret = __WEBPACK_IMPORTED_MODULE_1__utils_tools__["l" /* obj */]();
-  __WEBPACK_IMPORTED_MODULE_1__utils_tools__["h" /* each */](obj, function (v, k) {
+  __WEBPACK_IMPORTED_MODULE_1__utils_tools__["j" /* each */](obj, function (v, k) {
     ret[k] = compiledParam(v);
   }, false, false);
 
@@ -1620,7 +1644,7 @@ function compiledProp(prop) {
       prop = filtersTmp[0].trim(); //Extract property
 
       filtersTmp = filtersTmp.slice(1);
-      __WEBPACK_IMPORTED_MODULE_1__utils_tools__["h" /* each */](filtersTmp, function (filter) {
+      __WEBPACK_IMPORTED_MODULE_1__utils_tools__["j" /* each */](filtersTmp, function (filter) {
         var retF = _getFilterParam(filter.trim()),
             filterObj = __WEBPACK_IMPORTED_MODULE_1__utils_tools__["l" /* obj */](),
             filterName = retF[1]; //Get filter name
@@ -1632,7 +1656,7 @@ function compiledProp(prop) {
           if (paramsF) {
             (function () {
               var params = [];
-              __WEBPACK_IMPORTED_MODULE_1__utils_tools__["h" /* each */](paramsF.split(','), function (p) {
+              __WEBPACK_IMPORTED_MODULE_1__utils_tools__["j" /* each */](paramsF.split(','), function (p) {
                 params[params.length] = compiledProp(p.trim());
               }, false, true);
 
@@ -1721,7 +1745,7 @@ function _getReplaceParam(obj, strs) {
 //Get compiled parameter
 function compiledParam(value) {
   var ret = __WEBPACK_IMPORTED_MODULE_1__utils_tools__["l" /* obj */](),
-      strs = __WEBPACK_IMPORTED_MODULE_1__utils_tools__["f" /* isString */](value) ? value.split(tmplRule.replaceSplit) : [value],
+      strs = __WEBPACK_IMPORTED_MODULE_1__utils_tools__["h" /* isString */](value) ? value.split(tmplRule.replaceSplit) : [value],
       props = null,
       isAll = false; //此处指替换符是否占满整个属性值;若无替换符时为false
 
@@ -1730,7 +1754,7 @@ function compiledParam(value) {
     var params = _getReplaceParam(value, strs);
     props = [];
 
-    __WEBPACK_IMPORTED_MODULE_1__utils_tools__["h" /* each */](params, function (param) {
+    __WEBPACK_IMPORTED_MODULE_1__utils_tools__["j" /* each */](params, function (param) {
       var retP = __WEBPACK_IMPORTED_MODULE_1__utils_tools__["l" /* obj */]();
       isAll = param[3] ? param[0] === value : false; //If there are several curly braces in one property value, "isAll" must be false.
       retP.prop = compiledProp(param[2]);
@@ -1777,7 +1801,7 @@ function _createCompile(outputH) {
     if (!tmpl) {
       return;
     }
-    if (__WEBPACK_IMPORTED_MODULE_1__utils_tools__["e" /* isObject */](tmplKey)) {
+    if (__WEBPACK_IMPORTED_MODULE_1__utils_tools__["g" /* isObject */](tmplKey)) {
       var options = tmplKey;
       tmplKey = options.tmplKey;
       fileName = options.fileName;
@@ -1789,7 +1813,7 @@ function _createCompile(outputH) {
       tmplFns = __WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */].templates[tmplKey];
     }
     if (!tmplFns) {
-      var isObj = __WEBPACK_IMPORTED_MODULE_1__utils_tools__["e" /* isObject */](tmpl),
+      var isObj = __WEBPACK_IMPORTED_MODULE_1__utils_tools__["g" /* isObject */](tmpl),
           fns = void 0;
       if (isObj && tmpl.main) {
         //直接传入预编译模板
@@ -1808,7 +1832,7 @@ function _createCompile(outputH) {
             root = _createAstRoot();
 
             //Auto transform string template to array
-            if (__WEBPACK_IMPORTED_MODULE_1__utils_tools__["f" /* isString */](tmpl)) {
+            if (__WEBPACK_IMPORTED_MODULE_1__utils_tools__["h" /* isString */](tmpl)) {
               //Merge all include blocks
               var includeParser = __WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */].includeParser;
               if (includeParser) {
@@ -1841,9 +1865,12 @@ function _createCompile(outputH) {
 
     if (tmpl._njParams) {
       var tmplFn = function tmplFn() {
-        return tmplFns.main.apply(this, __WEBPACK_IMPORTED_MODULE_1__utils_tools__["b" /* arrayPush */]([tmpl._njParams], arguments));
+        return tmplFns.main.apply(this, __WEBPACK_IMPORTED_MODULE_1__utils_tools__["d" /* arrayPush */]([tmpl._njParams], arguments));
       };
-      tmplFn._njTmpl = true;
+      __WEBPACK_IMPORTED_MODULE_1__utils_tools__["b" /* defineProp */](tmplFn, '_njTmpl', {
+        value: true
+      });
+
       return tmplFn;
     } else {
       return tmplFns.main;
@@ -1867,7 +1894,7 @@ function _createAstRoot() {
 function precompile(tmpl, outputH) {
   var root = _createAstRoot();
 
-  if (__WEBPACK_IMPORTED_MODULE_1__utils_tools__["f" /* isString */](tmpl)) {
+  if (__WEBPACK_IMPORTED_MODULE_1__utils_tools__["h" /* isString */](tmpl)) {
     tmpl = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_5__parser_checkStringElem__["a" /* default */])(tmpl);
   }
   __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_2__parser_checkElem__["a" /* default */])(tmpl._njTmpl, root);
@@ -1880,7 +1907,7 @@ function _createRender(outputH) {
     return (outputH ? compileH : compile)(tmpl, options ? {
       tmplKey: options.tmplKey ? options.tmplKey : tmpl._njTmplKey,
       fileName: options.fileName
-    } : tmpl._njTmplKey).apply(null, __WEBPACK_IMPORTED_MODULE_1__utils_tools__["c" /* arraySlice */](arguments, 1));
+    } : tmpl._njTmplKey).apply(null, __WEBPACK_IMPORTED_MODULE_1__utils_tools__["e" /* arraySlice */](arguments, 1));
   };
 }
 
@@ -1942,12 +1969,12 @@ __WEBPACK_IMPORTED_MODULE_1__utils_tools__["a" /* assign */](__WEBPACK_IMPORTED_
 //注册组件
 function registerComponent(name, component) {
   var params = name;
-  if (!__WEBPACK_IMPORTED_MODULE_1__tools__["e" /* isObject */](name)) {
+  if (!__WEBPACK_IMPORTED_MODULE_1__tools__["g" /* isObject */](name)) {
     params = {};
     params[name] = component;
   }
 
-  __WEBPACK_IMPORTED_MODULE_1__tools__["h" /* each */](params, function (v, k) {
+  __WEBPACK_IMPORTED_MODULE_1__tools__["j" /* each */](params, function (v, k) {
     __WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */].components[k.toLowerCase()] = v;
   }, false, false);
 
@@ -2033,7 +2060,7 @@ var errorTitle = __WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */].errorTit
 function _buildFn(content, fns, no, newContext, level, useStringLocal) {
   var fnStr = '',
       useString = useStringLocal != null ? useStringLocal : fns.useString,
-      isTmplExpr = __WEBPACK_IMPORTED_MODULE_1__utils_tools__["f" /* isString */](no),
+      isTmplExpr = __WEBPACK_IMPORTED_MODULE_1__utils_tools__["h" /* isString */](no),
       //如果no为字符串, 则本次将构建tmpl块模板函数
   main = isTmplExpr || no === 0,
 
@@ -2170,7 +2197,7 @@ function _buildPropData(obj, counter, fns, useStringLocal) {
       var valueStr = '_value' + counter._value++,
           filterStr = 'var ' + valueStr + ' = ' + dataValueStr + ';\n';
 
-      __WEBPACK_IMPORTED_MODULE_1__utils_tools__["h" /* each */](filters, function (o) {
+      __WEBPACK_IMPORTED_MODULE_1__utils_tools__["j" /* each */](filters, function (o) {
         var _filterC = counter._filter++,
             configF = __WEBPACK_IMPORTED_MODULE_5__helpers_filter__["b" /* filterConfig */][o.name],
             filterVarStr = '_filter' + _filterC,
@@ -2232,15 +2259,15 @@ function _buildProps(obj, counter, fns, useStringLocal) {
       valueStr = '',
       filterStr = '';
 
-  if (__WEBPACK_IMPORTED_MODULE_1__utils_tools__["f" /* isString */](str0)) {
+  if (__WEBPACK_IMPORTED_MODULE_1__utils_tools__["h" /* isString */](str0)) {
     //常规属性
     valueStr = !obj.isAll && str0 !== '' ? '\'' + _replaceQuot(str0) + '\'' : '';
     filterStr = '';
 
-    __WEBPACK_IMPORTED_MODULE_1__utils_tools__["h" /* each */](obj.props, function (o, i) {
+    __WEBPACK_IMPORTED_MODULE_1__utils_tools__["j" /* each */](obj.props, function (o, i) {
       var propData = _buildPropData(o, counter, fns, useStringLocal),
           dataValueStr = void 0;
-      if (__WEBPACK_IMPORTED_MODULE_1__utils_tools__["f" /* isString */](propData)) {
+      if (__WEBPACK_IMPORTED_MODULE_1__utils_tools__["h" /* isString */](propData)) {
         dataValueStr = propData;
       } else {
         dataValueStr = propData.valueStr;
@@ -2265,10 +2292,10 @@ function _buildProps(obj, counter, fns, useStringLocal) {
         return false;
       }
     }, false, true);
-  } else if (__WEBPACK_IMPORTED_MODULE_1__utils_tools__["e" /* isObject */](str0) && str0.length != null) {
+  } else if (__WEBPACK_IMPORTED_MODULE_1__utils_tools__["g" /* isObject */](str0) && str0.length != null) {
     //tmpl块表达式
     valueStr += '{\n';
-    __WEBPACK_IMPORTED_MODULE_1__utils_tools__["h" /* each */](str0, function (v, k, i, l) {
+    __WEBPACK_IMPORTED_MODULE_1__utils_tools__["j" /* each */](str0, function (v, k, i, l) {
       if (k !== 'length') {
         valueStr += '  "' + k + '": p1.main' + _buildFn(v.content, fns, 'T' + ++fns._noT);
       } else {
@@ -2323,7 +2350,7 @@ function _buildParams(node, fns, counter, useString) {
         //paramsStr += '\np1.assign(_params' + _paramsC + ', _paramsE' + _paramsEC + ');\n';
       } else {
         var keys = '';
-        __WEBPACK_IMPORTED_MODULE_1__utils_tools__["h" /* each */](params, function (v, k, i, l) {
+        __WEBPACK_IMPORTED_MODULE_1__utils_tools__["j" /* each */](params, function (v, k, i, l) {
           if (i == 0) {
             keys += '{ ';
           }
@@ -2349,9 +2376,9 @@ function _buildParams(node, fns, counter, useString) {
           paramsStr += '{\n';
         }
 
-        __WEBPACK_IMPORTED_MODULE_1__utils_tools__["h" /* each */](paramKeys, function (k, i) {
+        __WEBPACK_IMPORTED_MODULE_1__utils_tools__["j" /* each */](paramKeys, function (k, i) {
           var valueStr = _buildProps(params[k], counter, fns, useString);
-          if (__WEBPACK_IMPORTED_MODULE_1__utils_tools__["e" /* isObject */](valueStr)) {
+          if (__WEBPACK_IMPORTED_MODULE_1__utils_tools__["g" /* isObject */](valueStr)) {
             filterStr += valueStr.filterStr;
             valueStr = valueStr.valueStr;
           }
@@ -2403,7 +2430,7 @@ function _buildNode(node, fns, counter, retType, level, useStringLocal) {
     //文本节点
     var valueStr = _buildProps(node.content[0], counter, fns, useStringLocal),
         filterStr = void 0;
-    if (__WEBPACK_IMPORTED_MODULE_1__utils_tools__["e" /* isObject */](valueStr)) {
+    if (__WEBPACK_IMPORTED_MODULE_1__utils_tools__["g" /* isObject */](valueStr)) {
       filterStr = valueStr.filterStr;
       valueStr = valueStr.valueStr;
     }
@@ -2441,9 +2468,9 @@ function _buildNode(node, fns, counter, retType, level, useStringLocal) {
 
     if (node.args) {
       //构建匿名参数
-      __WEBPACK_IMPORTED_MODULE_1__utils_tools__["h" /* each */](node.args, function (arg, i) {
+      __WEBPACK_IMPORTED_MODULE_1__utils_tools__["j" /* each */](node.args, function (arg, i) {
         var valueStr = _buildProps(arg, counter, fns, useStringLocal);
-        if (__WEBPACK_IMPORTED_MODULE_1__utils_tools__["e" /* isObject */](valueStr)) {
+        if (__WEBPACK_IMPORTED_MODULE_1__utils_tools__["g" /* isObject */](valueStr)) {
           _filterStr += valueStr.filterStr;
           valueStr = valueStr.valueStr;
         }
@@ -2501,7 +2528,7 @@ function _buildNode(node, fns, counter, retType, level, useStringLocal) {
     if (node.typeRefer) {
       var _typeReferC = counter._typeRefer++,
           valueStrT = _buildProps(node.typeRefer, counter, fns);
-      if (__WEBPACK_IMPORTED_MODULE_1__utils_tools__["e" /* isObject */](valueStrT)) {
+      if (__WEBPACK_IMPORTED_MODULE_1__utils_tools__["g" /* isObject */](valueStrT)) {
         fnStr += valueStrT.filterStr;
         valueStrT = valueStrT.valueStr;
       }
@@ -2546,7 +2573,7 @@ function _buildContent(content, fns, counter, retType, level, useStringLocal) {
     return fnStr;
   }
 
-  __WEBPACK_IMPORTED_MODULE_1__utils_tools__["h" /* each */](content, function (node) {
+  __WEBPACK_IMPORTED_MODULE_1__utils_tools__["j" /* each */](content, function (node) {
     fnStr += _buildNode(node, fns, counter, retType, level, node.useString ? true : useStringLocal);
   }, false, true);
 
@@ -2657,9 +2684,9 @@ function _plainTextNode(obj, parent, parentContent) {
 function checkElem(obj, parent, hasExprProps) {
   var parentContent = 'content';
 
-  if (!__WEBPACK_IMPORTED_MODULE_1__utils_tools__["d" /* isArray */](obj)) {
+  if (!__WEBPACK_IMPORTED_MODULE_1__utils_tools__["f" /* isArray */](obj)) {
     //判断是否为文本节点
-    if (__WEBPACK_IMPORTED_MODULE_1__utils_tools__["f" /* isString */](obj) && (parent.expr || NO_SPLIT_NEWLINE.indexOf(parent.type.toLowerCase()) < 0)) {
+    if (__WEBPACK_IMPORTED_MODULE_1__utils_tools__["h" /* isString */](obj) && (parent.expr || NO_SPLIT_NEWLINE.indexOf(parent.type.toLowerCase()) < 0)) {
       var strs = obj.split(tmplRule.newlineSplit);
       strs.forEach(function (str, i) {
         str = str.trim();
@@ -2674,7 +2701,7 @@ function checkElem(obj, parent, hasExprProps) {
 
   var node = {},
       first = obj[0];
-  if (__WEBPACK_IMPORTED_MODULE_1__utils_tools__["f" /* isString */](first)) {
+  if (__WEBPACK_IMPORTED_MODULE_1__utils_tools__["h" /* isString */](first)) {
     //第一个子节点为字符串
     var len = obj.length,
         last = obj[len - 1],
@@ -2727,7 +2754,7 @@ function checkElem(obj, parent, hasExprProps) {
           node.args = [];
         }
 
-        __WEBPACK_IMPORTED_MODULE_1__utils_tools__["h" /* each */](exprParams, function (param) {
+        __WEBPACK_IMPORTED_MODULE_1__utils_tools__["j" /* each */](exprParams, function (param) {
           if (param.value === 'useString') {
             node.useString = true;
             return;
@@ -2769,7 +2796,7 @@ function checkElem(obj, parent, hasExprProps) {
             node.params = __WEBPACK_IMPORTED_MODULE_1__utils_tools__["l" /* obj */]();
           }
 
-          __WEBPACK_IMPORTED_MODULE_1__utils_tools__["h" /* each */](tagParams, function (param) {
+          __WEBPACK_IMPORTED_MODULE_1__utils_tools__["j" /* each */](tagParams, function (param) {
             //The parameter like "{prop}" needs to be replaced.
             node.params[param.onlyBrace ? param.onlyBrace.replace(/\.\.\//g, '') : param.key] = __WEBPACK_IMPORTED_MODULE_2__transforms_transformParam__["a" /* compiledParam */](param.value);
           }, false, true);
@@ -2813,7 +2840,7 @@ function checkElem(obj, parent, hasExprProps) {
       //如果不是元素节点,则为节点集合
       checkContentElem(obj, parent, hasExprProps);
     }
-  } else if (__WEBPACK_IMPORTED_MODULE_1__utils_tools__["d" /* isArray */](first)) {
+  } else if (__WEBPACK_IMPORTED_MODULE_1__utils_tools__["f" /* isArray */](first)) {
     //如果第一个子节点为数组,则该节点一定为节点集合(可以是多层数组嵌套的集合)
     checkContentElem(obj, parent, hasExprProps);
   }
@@ -2825,7 +2852,7 @@ function checkContentElem(obj, parent, hasExprProps) {
     parent.content = [];
   }
 
-  __WEBPACK_IMPORTED_MODULE_1__utils_tools__["h" /* each */](obj, function (item) {
+  __WEBPACK_IMPORTED_MODULE_1__utils_tools__["j" /* each */](obj, function (item) {
     checkElem(item, parent, hasExprProps);
   }, false, true);
 }
@@ -2841,20 +2868,19 @@ function checkContentElem(obj, parent, hasExprProps) {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__utils_registerComponent__ = __webpack_require__(12);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__utils_setTmplRule__ = __webpack_require__(6);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__config__ = __webpack_require__(11);
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "arrayPush", function() { return __WEBPACK_IMPORTED_MODULE_1__utils_tools__["b"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "arraySlice", function() { return __WEBPACK_IMPORTED_MODULE_1__utils_tools__["c"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "isArray", function() { return __WEBPACK_IMPORTED_MODULE_1__utils_tools__["d"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "isObject", function() { return __WEBPACK_IMPORTED_MODULE_1__utils_tools__["e"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "isString", function() { return __WEBPACK_IMPORTED_MODULE_1__utils_tools__["f"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "isArrayLike", function() { return __WEBPACK_IMPORTED_MODULE_1__utils_tools__["g"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "each", function() { return __WEBPACK_IMPORTED_MODULE_1__utils_tools__["h"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "noop", function() { return __WEBPACK_IMPORTED_MODULE_1__utils_tools__["i"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "throwIf", function() { return __WEBPACK_IMPORTED_MODULE_1__utils_tools__["j"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "warn", function() { return __WEBPACK_IMPORTED_MODULE_1__utils_tools__["k"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "obj", function() { return __WEBPACK_IMPORTED_MODULE_1__utils_tools__["l"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "clearQuot", function() { return __WEBPACK_IMPORTED_MODULE_1__utils_tools__["m"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "toCamelCase", function() { return __WEBPACK_IMPORTED_MODULE_1__utils_tools__["n"]; });
-/* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "assign", function() { return __WEBPACK_IMPORTED_MODULE_1__utils_tools__["a"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "defineProp", function() { return __WEBPACK_IMPORTED_MODULE_1__utils_tools__["b"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "defineProps", function() { return __WEBPACK_IMPORTED_MODULE_1__utils_tools__["c"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "arrayPush", function() { return __WEBPACK_IMPORTED_MODULE_1__utils_tools__["d"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "arraySlice", function() { return __WEBPACK_IMPORTED_MODULE_1__utils_tools__["e"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "isArray", function() { return __WEBPACK_IMPORTED_MODULE_1__utils_tools__["f"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "isObject", function() { return __WEBPACK_IMPORTED_MODULE_1__utils_tools__["g"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "isString", function() { return __WEBPACK_IMPORTED_MODULE_1__utils_tools__["h"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "isArrayLike", function() { return __WEBPACK_IMPORTED_MODULE_1__utils_tools__["i"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "each", function() { return __WEBPACK_IMPORTED_MODULE_1__utils_tools__["j"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "noop", function() { return __WEBPACK_IMPORTED_MODULE_1__utils_tools__["k"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "obj", function() { return __WEBPACK_IMPORTED_MODULE_1__utils_tools__["l"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "toCamelCase", function() { return __WEBPACK_IMPORTED_MODULE_1__utils_tools__["m"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "assign", function() { return __WEBPACK_IMPORTED_MODULE_1__utils_tools__["a"]; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__helpers_expression__ = __webpack_require__(2);
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "exprs", function() { return __WEBPACK_IMPORTED_MODULE_5__helpers_expression__["a"]; });
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "exprConfig", function() { return __WEBPACK_IMPORTED_MODULE_5__helpers_expression__["b"]; });

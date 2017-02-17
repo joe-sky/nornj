@@ -75,7 +75,10 @@ function _createCompile(outputH) {
       const tmplFn = function() {
         return tmplFns.main.apply(this, tools.arrayPush([tmpl._njParams], arguments));
       };
-      tmplFn._njTmpl = true;
+      tools.defineProp(tmplFn, '_njTmpl', {
+        value: true
+      });
+      
       return tmplFn;
     } else {
       return tmplFns.main;

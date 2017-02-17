@@ -33,6 +33,12 @@ export const filters = {
   //Ternary operator
   '?': (val, val1, val2) => val ? val1 : val2,
 
+  '!': val1 => !val,
+
+  '&&': (val1, val2) => val1 && val2,
+
+  or: (val1, val2) => val1 || val2,
+
   //Convert to int 
   int: val => parseInt(val, 10),
 
@@ -81,6 +87,10 @@ export const filterConfig = {
   gte: _commonConfig(),
   '+': _commonConfig(),
   '-': _commonConfig(),
+  '?': _commonConfig(),
+  '!': _commonConfig(),
+  '&&': _commonConfig(),
+  or: _commonConfig(),
   int: _commonConfig(),
   float: _commonConfig(),
   bool: _commonConfig(),

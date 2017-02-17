@@ -16,7 +16,21 @@ setTmplRule();
 const _global = typeof self !== 'undefined' ? self : global;
 _global.NornJ = _global.nj = nj;
 
-export * from './utils/tools';
+export {
+  defineProp,
+  defineProps,
+  arrayPush,
+  arraySlice,
+  isArray,
+  isObject,
+  isString,
+  isArrayLike,
+  each,
+  noop,
+  obj,
+  toCamelCase,
+  assign
+} from './utils/tools';
 export * from './helpers/expression';
 export * from './helpers/filter';
 export * from './compiler/compile';

@@ -4,6 +4,9 @@ const nativeArrayPush = Array.prototype.push,
   hasOwnProperty = Object.prototype.hasOwnProperty;
 const { errorTitle } = nj;
 
+export const defineProp = Object.defineProperty;
+export const defineProps = Object.defineProperties;
+
 //Push one by one to array
 export function arrayPush(arr1, arr2) {
   nativeArrayPush.apply(arr1, arr2);
@@ -170,6 +173,8 @@ export const assign = Object.assign || function(target) {
 };
 
 assign(nj, {
+  defineProp,
+  defineProps,
   arrayPush,
   arraySlice,
   isArray,

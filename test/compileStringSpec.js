@@ -184,7 +184,7 @@ describe('test compile string', function () {
             img
           </@name>
           <#props>
-            <#unless {{test0}}>
+            <#unless {{test0 | ||(true)}}>
               <@id1>d2</@id1>
             </#unless>
           </#props>

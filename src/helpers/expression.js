@@ -215,6 +215,7 @@ function _commonConfig(params) {
   let ret = {
     useString: true,
     exprProps: false,
+    isProp: false,
     newContext: true
   };
 
@@ -231,8 +232,8 @@ export const exprConfig = {
   'switch': _commonConfig({ newContext: false }),
   unless: _commonConfig({ newContext: false }),
   each: _commonConfig(),
-  prop: _commonConfig({ newContext: false, exprProps: true }),
-  spread: _commonConfig({ newContext: false, useString: false, exprProps: true }),
+  prop: _commonConfig({ newContext: false, exprProps: true, isProp: true }),
+  spread: _commonConfig({ newContext: false, useString: false, exprProps: true, isProp: true }),
   'for': _commonConfig(),
   obj: _commonConfig({ newContext: false, useString: false })
 };

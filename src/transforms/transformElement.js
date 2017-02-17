@@ -165,11 +165,10 @@ export function addParamsExpr(node, parent, isExprProp) {
   }
 }
 
-const PROP_EXPRS = ['prop', 'spread'];
 export function isExprProp(name) {
   const config = exprConfig[name];
   return {
     isExprProp: config ? config.exprProps : false,
-    isProp: PROP_EXPRS.indexOf(name) > -1
+    isProp: config ? config.isProp : false
   };
 }
