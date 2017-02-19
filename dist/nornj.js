@@ -554,6 +554,10 @@ var exprs = {
 
   block: function block(options) {
     return options.result();
+  },
+
+  pre: function pre(options) {
+    return options.result();
   }
 };
 
@@ -586,6 +590,7 @@ var exprConfig = {
 exprConfig.elseif = _commonConfig(exprConfig['else']);
 exprConfig.list = _commonConfig(exprConfig.if);
 exprConfig.block = _commonConfig(exprConfig.obj);
+exprConfig.pre = _commonConfig(exprConfig.obj);
 
 //Expression alias
 exprs['case'] = exprs.elseif;
@@ -704,7 +709,7 @@ function getData(prop, data) {
   }
 }
 
-function getComputedData(fn, p2) {
+function getComputedData(fn, p2, level) {
   if (fn == null) {
     return fn;
   }
@@ -714,7 +719,8 @@ function getComputedData(fn, p2) {
     return fn.call({
       _njData: p2.data,
       _njParent: p2.parent,
-      _njIndex: p2.index
+      _njIndex: p2.index,
+      _njLevel: level
     });
   } else {
     //普通函数
@@ -736,6 +742,7 @@ function newContext(p2, p3) {
     data: newData.length ? __WEBPACK_IMPORTED_MODULE_1__utils_tools__["d" /* arrayPush */](newData, p2.data) : p2.data,
     parent: p3 && p3.fallback ? p2 : p2.parent,
     index: p3 && 'index' in p3 ? p3.index : p2.index,
+    level: p2.level,
     getData: getData
   };
 }
@@ -781,11 +788,24 @@ function tmplWrap(configs, main) {
 
     return main(configs, {
       data: initCtx && initCtx._njData ? __WEBPACK_IMPORTED_MODULE_1__utils_tools__["d" /* arrayPush */](data, initCtx._njData) : data,
-      parent: initCtx && initCtx._njParent ? initCtx._njParent : null,
-      index: initCtx && initCtx._njIndex ? initCtx._njIndex : null,
+      parent: initCtx ? initCtx._njParent : null,
+      index: initCtx ? initCtx._njIndex : null,
+      level: initCtx ? initCtx._njLevel : null,
       getData: getData
     });
   };
+}
+
+function levelSpace(p2) {
+  var ret = '';
+  if (p2.level == null) {
+    return ret;
+  }
+
+  for (var i = 0; i < p2.level; i++) {
+    ret += '  ';
+  }
+  return ret;
 }
 
 //创建模板函数
@@ -807,10 +827,10 @@ function template(fns) {
   if (!configs.useString) {
     configs.h = __WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */].createElement;
     configs.components = __WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */].components;
-    //configs.assign = tools.assign;
   } else {
     configs.assignStringProp = assignStringProp;
     configs.escape = __WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */].escape;
+    configs.levelSpace = levelSpace;
   }
 
   __WEBPACK_IMPORTED_MODULE_1__utils_tools__["j" /* each */](fns, function (v, k) {
@@ -2147,7 +2167,7 @@ function _buildOptions(config, useStringLocal, node, fns, exprPropsStr, level, h
   return '{ _njOpts: true, ctx: p2, outputH: ' + !fns.useString + hashStr + ' }';
 }
 
-function _buildPropData(obj, counter, fns, useStringLocal) {
+function _buildPropData(obj, counter, fns, useStringLocal, level) {
   var dataValueStr = void 0,
       escape = obj.escape;
   var _obj$prop = obj.prop,
@@ -2187,10 +2207,10 @@ function _buildPropData(obj, counter, fns, useStringLocal) {
     }
 
     if (!special && !specialP) {
-      dataValueStr = (isComputed ? 'p1.getComputedData(' : '') + 'p2.getData(\'' + name + '\')' + (isComputed ? ', p2)' : '') + jsProp;
+      dataValueStr = (isComputed ? 'p1.getComputedData(' : '') + 'p2.getData(\'' + name + '\')' + (isComputed ? ', p2, ' + level + ')' : '') + jsProp;
     } else {
       var dataStr = 'p2.' + data;
-      dataValueStr = (special ? dataStr : (isComputed ? 'p1.getComputedData(' : '') + 'p2.getData(\'' + name + '\', ' + dataStr + ')' + (isComputed ? ', p2)' : '')) + jsProp;
+      dataValueStr = (special ? dataStr : (isComputed ? 'p1.getComputedData(' : '') + 'p2.getData(\'' + name + '\', ' + dataStr + ')' + (isComputed ? ', p2, ' + level + ')' : '')) + jsProp;
     }
   } else {
     dataValueStr = obj.prop.name + jsProp;
@@ -2224,7 +2244,7 @@ function _buildPropData(obj, counter, fns, useStringLocal) {
           return p + ', ' + _buildPropData({
             prop: c,
             escape: escape
-          }, counter, fns, useStringLocal);
+          }, counter, fns, useStringLocal, level);
         }, '') : '') + ', ' + _buildOptions(configF, useStringLocal, null, fns) + ']);\n';
         filterStr += '}\n';
       }, false, true);
@@ -2260,7 +2280,7 @@ function _replaceQuot(str) {
   return str.replace(/'/g, "\\'");
 }
 
-function _buildProps(obj, counter, fns, useStringLocal) {
+function _buildProps(obj, counter, fns, useStringLocal, level) {
   var str0 = obj.strs[0],
       valueStr = '',
       filterStr = '';
@@ -2271,7 +2291,7 @@ function _buildProps(obj, counter, fns, useStringLocal) {
     filterStr = '';
 
     __WEBPACK_IMPORTED_MODULE_1__utils_tools__["j" /* each */](obj.props, function (o, i) {
-      var propData = _buildPropData(o, counter, fns, useStringLocal),
+      var propData = _buildPropData(o, counter, fns, useStringLocal, level),
           dataValueStr = void 0;
       if (__WEBPACK_IMPORTED_MODULE_1__utils_tools__["h" /* isString */](propData)) {
         dataValueStr = propData;
@@ -2328,7 +2348,7 @@ function _buildProps(obj, counter, fns, useStringLocal) {
   }
 }
 
-function _buildParams(node, fns, counter, useString) {
+function _buildParams(node, fns, counter, useString, level) {
   //节点参数
   var params = node.params,
       paramsExpr = node.paramsExpr;
@@ -2383,7 +2403,7 @@ function _buildParams(node, fns, counter, useString) {
         }
 
         __WEBPACK_IMPORTED_MODULE_1__utils_tools__["j" /* each */](paramKeys, function (k, i) {
-          var valueStr = _buildProps(params[k], counter, fns, useString);
+          var valueStr = _buildProps(params[k], counter, fns, useString, level);
           if (__WEBPACK_IMPORTED_MODULE_1__utils_tools__["g" /* isObject */](valueStr)) {
             filterStr += valueStr.filterStr;
             valueStr = valueStr.valueStr;
@@ -2428,20 +2448,20 @@ function _buildParams(node, fns, counter, useString) {
   return [paramsStr, _paramsC];
 }
 
-function _buildNode(node, fns, counter, retType, level, useStringLocal) {
+function _buildNode(node, fns, counter, retType, level, useStringLocal, isFirst) {
   var fnStr = '',
       useStringF = fns.useString;
 
   if (node.type === 'nj_plaintext') {
     //文本节点
-    var valueStr = _buildProps(node.content[0], counter, fns, useStringLocal),
+    var valueStr = _buildProps(node.content[0], counter, fns, useStringLocal, level),
         filterStr = void 0;
     if (__WEBPACK_IMPORTED_MODULE_1__utils_tools__["g" /* isObject */](valueStr)) {
       filterStr = valueStr.filterStr;
       valueStr = valueStr.valueStr;
     }
 
-    var textStr = _buildRender(1, retType, { text: valueStr }, fns, level, useStringLocal, node.allowNewline);
+    var textStr = _buildRender(1, retType, { text: valueStr }, fns, level, useStringLocal, node.allowNewline, isFirst);
     if (filterStr) {
       textStr = filterStr + textStr;
     }
@@ -2475,7 +2495,7 @@ function _buildNode(node, fns, counter, retType, level, useStringLocal) {
     if (node.args) {
       //构建匿名参数
       __WEBPACK_IMPORTED_MODULE_1__utils_tools__["j" /* each */](node.args, function (arg, i) {
-        var valueStr = _buildProps(arg, counter, fns, useStringLocal);
+        var valueStr = _buildProps(arg, counter, fns, useStringLocal, level);
         if (__WEBPACK_IMPORTED_MODULE_1__utils_tools__["g" /* isObject */](valueStr)) {
           _filterStr += valueStr.filterStr;
           valueStr = valueStr.valueStr;
@@ -2492,7 +2512,7 @@ function _buildNode(node, fns, counter, retType, level, useStringLocal) {
     }
 
     //hash参数
-    var retP = _buildParams(node, fns, counter, false),
+    var retP = _buildParams(node, fns, counter, false, level),
         paramsStr = retP[0],
         _paramsC = retP[1];
 
@@ -2512,7 +2532,7 @@ function _buildNode(node, fns, counter, retType, level, useStringLocal) {
     fnStr += _buildRender(2, retType, {
       _expr: _exprC,
       _dataRefer: _dataReferC
-    }, fns, level, useStringLocal, node.allowNewline);
+    }, fns, level, useStringLocal, node.allowNewline, isFirst);
   } else {
     //元素节点
     //节点类型和typeRefer
@@ -2533,7 +2553,7 @@ function _buildNode(node, fns, counter, retType, level, useStringLocal) {
 
     if (node.typeRefer) {
       var _typeReferC = counter._typeRefer++,
-          valueStrT = _buildProps(node.typeRefer, counter, fns);
+          valueStrT = _buildProps(node.typeRefer, counter, fns, level);
       if (__WEBPACK_IMPORTED_MODULE_1__utils_tools__["g" /* isObject */](valueStrT)) {
         fnStr += valueStrT.filterStr;
         valueStrT = valueStrT.valueStr;
@@ -2546,7 +2566,7 @@ function _buildNode(node, fns, counter, retType, level, useStringLocal) {
     }
 
     //节点参数
-    var _retP = _buildParams(node, fns, counter, useStringF),
+    var _retP = _buildParams(node, fns, counter, useStringF, level),
         _paramsStr = _retP[0],
         _paramsC2 = _retP[1];
     fnStr += _paramsStr;
@@ -2567,7 +2587,7 @@ function _buildNode(node, fns, counter, retType, level, useStringLocal) {
     fnStr += _buildContent(node.content, fns, counter, !useStringF ? { _compParam: '_compParam' + _compParamC } : { _children: '_children' + _childrenC }, level != null ? level + 1 : level, useStringLocal);
 
     //渲染
-    fnStr += _buildRender(3, retType, !useStringF ? { _compParam: _compParamC } : { _type: _typeC, _params: _paramsStr !== '' ? _paramsC2 : null, _children: _childrenC, _selfClose: node.selfCloseTag }, fns, level, useStringLocal, node.allowNewline);
+    fnStr += _buildRender(3, retType, !useStringF ? { _compParam: _compParamC } : { _type: _typeC, _params: _paramsStr !== '' ? _paramsC2 : null, _children: _childrenC, _selfClose: node.selfCloseTag }, fns, level, useStringLocal, node.allowNewline, isFirst);
   }
 
   return fnStr;
@@ -2579,14 +2599,18 @@ function _buildContent(content, fns, counter, retType, level, useStringLocal) {
     return fnStr;
   }
 
-  __WEBPACK_IMPORTED_MODULE_1__utils_tools__["j" /* each */](content, function (node) {
-    fnStr += _buildNode(node, fns, counter, retType, level, node.useString ? true : useStringLocal);
+  __WEBPACK_IMPORTED_MODULE_1__utils_tools__["j" /* each */](content, function (node, i) {
+    fnStr += _buildNode(node, fns, counter, retType, level, node.useString ? true : useStringLocal, fns._firstNode && level == 0);
+    if (fns._firstNode) {
+      //输出字符串时模板第一个节点前面不加换行符
+      fns._firstNode = false;
+    }
   }, false, true);
 
   return fnStr;
 }
 
-function _buildRender(nodeType, retType, params, fns, level, useStringLocal, allowNewline) {
+function _buildRender(nodeType, retType, params, fns, level, useStringLocal, allowNewline, isFirst) {
   var retStr = void 0,
       useStringF = fns.useString,
       useString = useStringLocal != null ? useStringLocal : useStringF;
@@ -2594,7 +2618,7 @@ function _buildRender(nodeType, retType, params, fns, level, useStringLocal, all
   switch (nodeType) {
     case 1:
       //文本节点
-      retStr = _buildLevelSpace(level, fns, allowNewline) + params.text + (!useStringF || allowNewline || level == null ? '' : ' + \'\\n\'');
+      retStr = (!useStringF || allowNewline || level == null || isFirst ? '' : '\'\\n\' + ') + _buildLevelSpace(level, fns, allowNewline) + _buildLevelSpaceRt(useStringF, isFirst || level == null) + params.text;
       break;
     case 2:
       //块表达式
@@ -2606,13 +2630,18 @@ function _buildRender(nodeType, retType, params, fns, level, useStringLocal, all
         retStr = 'p1.h.apply(null, _compParam' + params._compParam + ')';
       } else {
         var levelSpace = _buildLevelSpace(level, fns, allowNewline);
-        retStr = levelSpace + '\'<\' + _type' + params._type + ' + ' + (params._params != null ? '_params' + params._params + ' + ' : '');
+        retStr = '';
+
+        if ((!allowNewline || allowNewline === 'nlElem') && level != null && !isFirst) {
+          retStr += '\'\\n\' + ';
+        }
+        retStr += levelSpace + _buildLevelSpaceRt(useStringF, isFirst || level == null) + '\'<\' + _type' + params._type + ' + ' + (params._params != null ? '_params' + params._params + ' + ' : '');
         if (!params._selfClose) {
-          retStr += '\'>' + (allowNewline ? '' : '\\n') + '\'';
+          retStr += '\'>\'';
           retStr += ' + _children' + params._children + ' + ';
-          retStr += levelSpace + '\'</\' + _type' + params._type + ' + \'>' + (allowNewline && allowNewline !== 'nlElem' ? '' : '\\n') + '\'';
+          retStr += (allowNewline || level == null ? '' : '\'\\n\' + ') + levelSpace + _buildLevelSpaceRt(useStringF, level == null) + '\'</\' + _type' + params._type + ' + \'>\'';
         } else {
-          retStr += '\' />' + (allowNewline && allowNewline !== 'nlElem' ? '' : '\\n') + '\'';
+          retStr += '\' />\'';
         }
       }
       break;
@@ -2654,11 +2683,19 @@ function _buildLevelSpace(level, fns, allowNewline) {
   return ret;
 }
 
+function _buildLevelSpaceRt(useString, noSpace) {
+  if (useString && !noSpace) {
+    return 'p1.levelSpace(p2) + ';
+  }
+  return '';
+}
+
 /* harmony default export */ __webpack_exports__["a"] = function (ast, useString) {
   var fns = {
     useString: useString,
     _no: 0, //块表达式函数计数
-    _noT: 0 //tmpl块模板函数计数
+    _noT: 0, //tmpl块模板函数计数
+    _firstNode: true
   };
 
   _buildFn(ast, fns, fns._no, null, 0);
@@ -2840,6 +2877,11 @@ function checkElem(obj, parent, hasExprProps, noSplitNewline, isLast) {
           pushContent = false;
         } else if (needAddToProps) {
           pushContent = false;
+        }
+
+        if (noSplitNewline == null && node.expr === 'pre') {
+          noSplitNewline = true;
+          node.allowNewline = 'nlElem';
         }
       }
 

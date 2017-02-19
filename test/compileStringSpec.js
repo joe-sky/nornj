@@ -3,7 +3,7 @@
   compile = require('../src/compiler/compile').compile,
   includeParser = require('../tools/includeParser');
 
-xdescribe('test compile string', function () {
+describe('test compile string', function () {
   beforeAll(function () {
     nj.registerFilter('filter1', function (v, p1) {
       //console.log(this.getData('name1'));
@@ -146,7 +146,7 @@ xdescribe('test compile string', function () {
             <img />
             sky:{{{ 'name555' }}},{{ id | filter2 }}
             <section>
-            {${tmpl1()}}
+            #${tmpl1}
             </section>
             <input type=button />
             #${nj`
@@ -183,12 +183,15 @@ xdescribe('test compile string', function () {
         }
       </script>
       <#each {{ list2 }}>
-        <!--
-          aaa
-        -->
+        <#pre>
+        <!-- aaa -->
         <![CDATA[
+          function() {
+            console.log(' <img /> ');
+          }
           <message> Welcome to YiiBai </message>
         ]]>
+        </#pre>
         <div {{...props}}>
           <@id>d1</@id>
           <@name>
@@ -211,19 +214,19 @@ xdescribe('test compile string', function () {
           <img /><img />
           <@name>
             img
-            <img>
+            <div>
               <@name>
                 1
                 2
                 <#list {{3}} {{4}} {{5}} />
               </@name>
-            </img>
+            </div>
             <#list {{1}} {{2}} />
           </@name>
         </#textExpr>
         <slider {{../name3}}>
           <#vm-include src="../a.vm" />
-          {${nj`<div>111</div>`()}}
+          #${nj`<div>111</div>`}
           #${nj`<div>{{../name3 | #('substring', 0, 3)}}</div>`}
           <{{../sliderItem['a']|tagName(1,2)}} no1={{no}} no2="{{-0.05 | filter2}}" checked no='{{ ../sliderItem.b }}' />
         </slider>
@@ -240,7 +243,7 @@ xdescribe('test compile string', function () {
       expect(html).toBeTruthy();
     });
 
-    xit('test include parser', function () {
+    it('test include parser', function () {
       nj.config({ includeParser });
 
       const tmpl = `
@@ -259,7 +262,7 @@ xdescribe('test compile string', function () {
         </template>
       `;
 
-      console.log(includeParser(tmpl, __filename, true));
+      //console.log(includeParser(tmpl, __filename, true));
 
       var html = nj.compile(tmpl, { fileName: __filename })();
       console.log(html);

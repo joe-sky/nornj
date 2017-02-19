@@ -160,6 +160,11 @@ export default function checkElem(obj, parent, hasExprProps, noSplitNewline, isL
         } else if (needAddToProps) {
           pushContent = false;
         }
+
+        if (noSplitNewline == null && node.expr === 'pre') {
+          noSplitNewline = true;
+          node.allowNewline = 'nlElem';
+        }
       }
 
       //放入父节点content内

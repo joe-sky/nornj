@@ -208,7 +208,9 @@ export const exprs = {
     }
   },
 
-  block: options => options.result()
+  block: options => options.result(),
+
+  pre: options => options.result()
 };
 
 function _commonConfig(params) {
@@ -240,6 +242,7 @@ export const exprConfig = {
 exprConfig.elseif = _commonConfig(exprConfig['else']);
 exprConfig.list = _commonConfig(exprConfig.if);
 exprConfig.block = _commonConfig(exprConfig.obj);
+exprConfig.pre = _commonConfig(exprConfig.obj);
 
 //Expression alias
 exprs['case'] = exprs.elseif;

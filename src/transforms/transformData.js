@@ -53,19 +53,19 @@ export function getData(prop, data) {
   }
 }
 
-export function getComputedData(fn, p2) {
+export function getComputedData(fn, p2, level) {
   if (fn == null) {
     return fn;
   }
 
-  if (fn._njTmpl) {  //模板函数
+  if (fn._njTmpl) { //模板函数
     return fn.call({
       _njData: p2.data,
       _njParent: p2.parent,
-      _njIndex: p2.index
+      _njIndex: p2.index,
+      _njLevel: level
     });
-  }
-  else {  //普通函数
+  } else { //普通函数
     return fn(p2);
   }
 }
@@ -84,6 +84,7 @@ export function newContext(p2, p3) {
     data: newData.length ? tools.arrayPush(newData, p2.data) : p2.data,
     parent: p3 && p3.fallback ? p2 : p2.parent,
     index: p3 && 'index' in p3 ? p3.index : p2.index,
+    level: p2.level,
     getData
   };
 }
@@ -129,11 +130,24 @@ export function tmplWrap(configs, main) {
 
     return main(configs, {
       data: initCtx && initCtx._njData ? tools.arrayPush(data, initCtx._njData) : data,
-      parent: initCtx && initCtx._njParent ? initCtx._njParent : null,
-      index: initCtx && initCtx._njIndex ? initCtx._njIndex : null,
+      parent: initCtx ? initCtx._njParent : null,
+      index: initCtx ? initCtx._njIndex : null,
+      level: initCtx ? initCtx._njLevel : null,
       getData
     });
   };
+}
+
+function levelSpace(p2) {
+  let ret = '';
+  if (p2.level == null) {
+    return ret;
+  }
+
+  for (let i = 0; i < p2.level; i++) {
+    ret += '  ';
+  }
+  return ret;
 }
 
 //创建模板函数
@@ -155,10 +169,10 @@ export function template(fns) {
   if (!configs.useString) {
     configs.h = nj.createElement;
     configs.components = nj.components;
-    //configs.assign = tools.assign;
   } else {
     configs.assignStringProp = assignStringProp;
     configs.escape = nj.escape;
+    configs.levelSpace = levelSpace;
   }
 
   tools.each(fns, (v, k) => {
