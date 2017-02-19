@@ -361,7 +361,7 @@ function _buildNode(node, fns, counter, retType, level, useStringLocal) {
       valueStr = valueStr.valueStr;
     }
 
-    let textStr = _buildRender(1, retType, { text: valueStr }, fns, level, useStringLocal);
+    let textStr = _buildRender(1, retType, { text: valueStr }, fns, level, useStringLocal, node.allowNewline);
     if (filterStr) {
       textStr = filterStr + textStr;
     }
@@ -428,7 +428,7 @@ function _buildNode(node, fns, counter, retType, level, useStringLocal) {
     fnStr += _buildRender(2, retType, {
       _expr: _exprC,
       _dataRefer: _dataReferC
-    }, fns, level, useStringLocal);
+    }, fns, level, useStringLocal, node.allowNewline);
   } else { //元素节点
     //节点类型和typeRefer
     let _typeC = counter._type++,
@@ -479,7 +479,7 @@ function _buildNode(node, fns, counter, retType, level, useStringLocal) {
     fnStr += _buildContent(node.content, fns, counter, !useStringF ? { _compParam: '_compParam' + _compParamC } : { _children: '_children' + _childrenC }, level != null ? level + 1 : level, useStringLocal);
 
     //渲染
-    fnStr += _buildRender(3, retType, !useStringF ? { _compParam: _compParamC } : { _type: _typeC, _params: paramsStr !== '' ? _paramsC : null, _children: _childrenC, _selfClose: node.selfCloseTag }, fns, level, useStringLocal);
+    fnStr += _buildRender(3, retType, !useStringF ? { _compParam: _compParamC } : { _type: _typeC, _params: paramsStr !== '' ? _paramsC : null, _children: _childrenC, _selfClose: node.selfCloseTag }, fns, level, useStringLocal, node.allowNewline);
   }
 
   return fnStr;
@@ -498,14 +498,14 @@ function _buildContent(content, fns, counter, retType, level, useStringLocal) {
   return fnStr;
 }
 
-function _buildRender(nodeType, retType, params, fns, level, useStringLocal) {
+function _buildRender(nodeType, retType, params, fns, level, useStringLocal, allowNewline) {
   let retStr,
     useStringF = fns.useString,
     useString = useStringLocal != null ? useStringLocal : useStringF;
 
   switch (nodeType) {
     case 1: //文本节点
-      retStr = _buildLevelSpace(level, fns) + params.text + (!useStringF || level == null ? '' : ' + \'\\n\'');
+      retStr = _buildLevelSpace(level, fns, allowNewline) + params.text + (!useStringF || allowNewline || level == null ? '' : ' + \'\\n\'');
       break;
     case 2: //块表达式
       retStr = '_expr' + params._expr + '.apply(p2, _dataRefer' + params._dataRefer + ')';
@@ -514,14 +514,14 @@ function _buildRender(nodeType, retType, params, fns, level, useStringLocal) {
       if (!useStringF) {
         retStr = 'p1.h.apply(null, _compParam' + params._compParam + ')';
       } else {
-        let levelSpace = _buildLevelSpace(level, fns);
+        let levelSpace = _buildLevelSpace(level, fns, allowNewline);
         retStr = levelSpace + '\'<\' + _type' + params._type + ' + ' + (params._params != null ? '_params' + params._params + ' + ' : '');
         if (!params._selfClose) {
-          retStr += '\'>\\n\'';
+          retStr += '\'>' + (allowNewline ? '' : '\\n') + '\'';
           retStr += ' + _children' + params._children + ' + ';
-          retStr += levelSpace + '\'</\' + _type' + params._type + ' + \'>\\n\'';
+          retStr += levelSpace + '\'</\' + _type' + params._type + ' + \'>' + (allowNewline && allowNewline !== 'nlElem' ? '' : '\\n') + '\'';
         } else {
-          retStr += '\' />\\n\'';
+          retStr += '\' />' + (allowNewline && allowNewline !== 'nlElem' ? '' : '\\n') + '\'';
         }
       }
       break;
@@ -547,8 +547,12 @@ function _buildRender(nodeType, retType, params, fns, level, useStringLocal) {
   }
 }
 
-function _buildLevelSpace(level, fns) {
+function _buildLevelSpace(level, fns, allowNewline) {
   let ret = '';
+  if (allowNewline && allowNewline !== 'nlElem') {
+    return ret;
+  }
+
   if (fns.useString && level != null && level > 0) {
     ret += '\'';
     for (let i = 0; i < level; i++) {

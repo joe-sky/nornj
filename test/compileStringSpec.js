@@ -3,7 +3,7 @@
   compile = require('../src/compiler/compile').compile,
   includeParser = require('../tools/includeParser');
 
-describe('test compile string', function () {
+xdescribe('test compile string', function () {
   beforeAll(function () {
     nj.registerFilter('filter1', function (v, p1) {
       //console.log(this.getData('name1'));
@@ -22,6 +22,17 @@ describe('test compile string', function () {
     nj.registerExpr('textExpr', function (opts) {
       //return opts.props.tmpls[0]();
       return opts.props.name;
+    });
+
+    nj.registerExpr('vm-include', function (opts) {
+      const env = this.getData('env');
+
+      if(env === 'vm') {
+        return `#parse("${opts.props.src}")`;
+      }
+      else {
+        return `<$include src="${opts.props.src}" />`;
+      }
     });
   });
 
@@ -166,7 +177,8 @@ describe('test compile string', function () {
           console.log(1);
 
           function test2() {
-            console.log(2);
+            console.log('    <div  >a<img    />  b  </div>  <div>  '
+              + ' <img /> </div>  ');
           }
         }
       </script>
@@ -210,6 +222,7 @@ describe('test compile string', function () {
           </@name>
         </#textExpr>
         <slider {{../name3}}>
+          <#vm-include src="../a.vm" />
           {${nj`<div>111</div>`()}}
           #${nj`<div>{{../name3 | #('substring', 0, 3)}}</div>`}
           <{{../sliderItem['a']|tagName(1,2)}} no1={{no}} no2="{{-0.05 | filter2}}" checked no='{{ ../sliderItem.b }}' />

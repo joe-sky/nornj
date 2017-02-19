@@ -36,7 +36,7 @@ export default function compileStringTmpl(tmpl) {
       fullXml += xml + split;
     }, false, true);
 
-    fullXml = _clearNotesAndBlank(fullXml);
+    fullXml = _formatAll(fullXml);
 
     //Resolve string to element
     ret = _checkStringElem(fullXml);
@@ -145,14 +145,14 @@ const SP_FILTER_LOOKUP = {
   '||(': 'or('
 };
 
-function _clearNotesAndBlank(str) {
+function _formatAll(str) {
   const commentRule = tmplRule.commentRule;
-  return str.replace(new RegExp('<!--' + commentRule + '[\\s\\S]*?' + commentRule + '-->', 'g'), '').replace(/>\s+([^\s<]*)\s+</g, '>$1<').trim()
+  return str.replace(new RegExp('<!--' + commentRule + '[\\s\\S]*?' + commentRule + '-->', 'g'), '')
     .replace(/\|[\s]*((>|<|>=|<=|\|\|)\()/g, (all, match) => '| ' + SP_FILTER_LOOKUP[match]);
 }
 
 function _formatNewline(str) {
-  return str.trim().replace(/\n/g, '\\n').replace(/\r/g, '');
+  return str.replace(/\n/g, '\\n').replace(/\r/g, '');
 }
 
 //Set element node

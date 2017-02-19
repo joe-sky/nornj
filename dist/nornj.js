@@ -110,6 +110,7 @@ nj.outputH = false;
 /* harmony export (immutable) */ __webpack_exports__["h"] = isString;
 /* harmony export (immutable) */ __webpack_exports__["i"] = isArrayLike;
 /* harmony export (immutable) */ __webpack_exports__["j"] = each;
+/* harmony export (immutable) */ __webpack_exports__["q"] = trimRight;
 /* harmony export (immutable) */ __webpack_exports__["k"] = noop;
 /* harmony export (immutable) */ __webpack_exports__["o"] = throwIf;
 /* harmony export (immutable) */ __webpack_exports__["p"] = warn;
@@ -203,6 +204,11 @@ function each(obj, func, context, isArr) {
       }
     }
   }
+}
+
+var REGEX_TRIM_RIGHT = /[\s\xA0]+$/;
+function trimRight(str) {
+  return str.replace(REGEX_TRIM_RIGHT, '');
 }
 
 //Noop function
@@ -1213,7 +1219,7 @@ function compileStringTmpl(tmpl) {
         fullXml += xml + split;
       }, false, true);
 
-      fullXml = _clearNotesAndBlank(fullXml);
+      fullXml = _formatAll(fullXml);
 
       //Resolve string to element
       ret = _checkStringElem(fullXml);
@@ -1327,15 +1333,15 @@ var SP_FILTER_LOOKUP = {
   '||(': 'or('
 };
 
-function _clearNotesAndBlank(str) {
+function _formatAll(str) {
   var commentRule = tmplRule.commentRule;
-  return str.replace(new RegExp('<!--' + commentRule + '[\\s\\S]*?' + commentRule + '-->', 'g'), '').replace(/>\s+([^\s<]*)\s+</g, '>$1<').trim().replace(/\|[\s]*((>|<|>=|<=|\|\|)\()/g, function (all, match) {
+  return str.replace(new RegExp('<!--' + commentRule + '[\\s\\S]*?' + commentRule + '-->', 'g'), '').replace(/\|[\s]*((>|<|>=|<=|\|\|)\()/g, function (all, match) {
     return '| ' + SP_FILTER_LOOKUP[match];
   });
 }
 
 function _formatNewline(str) {
-  return str.trim().replace(/\n/g, '\\n').replace(/\r/g, '');
+  return str.replace(/\n/g, '\\n').replace(/\r/g, '');
 }
 
 //Set element node
@@ -2435,7 +2441,7 @@ function _buildNode(node, fns, counter, retType, level, useStringLocal) {
       valueStr = valueStr.valueStr;
     }
 
-    var textStr = _buildRender(1, retType, { text: valueStr }, fns, level, useStringLocal);
+    var textStr = _buildRender(1, retType, { text: valueStr }, fns, level, useStringLocal, node.allowNewline);
     if (filterStr) {
       textStr = filterStr + textStr;
     }
@@ -2506,7 +2512,7 @@ function _buildNode(node, fns, counter, retType, level, useStringLocal) {
     fnStr += _buildRender(2, retType, {
       _expr: _exprC,
       _dataRefer: _dataReferC
-    }, fns, level, useStringLocal);
+    }, fns, level, useStringLocal, node.allowNewline);
   } else {
     //元素节点
     //节点类型和typeRefer
@@ -2561,7 +2567,7 @@ function _buildNode(node, fns, counter, retType, level, useStringLocal) {
     fnStr += _buildContent(node.content, fns, counter, !useStringF ? { _compParam: '_compParam' + _compParamC } : { _children: '_children' + _childrenC }, level != null ? level + 1 : level, useStringLocal);
 
     //渲染
-    fnStr += _buildRender(3, retType, !useStringF ? { _compParam: _compParamC } : { _type: _typeC, _params: _paramsStr !== '' ? _paramsC2 : null, _children: _childrenC, _selfClose: node.selfCloseTag }, fns, level, useStringLocal);
+    fnStr += _buildRender(3, retType, !useStringF ? { _compParam: _compParamC } : { _type: _typeC, _params: _paramsStr !== '' ? _paramsC2 : null, _children: _childrenC, _selfClose: node.selfCloseTag }, fns, level, useStringLocal, node.allowNewline);
   }
 
   return fnStr;
@@ -2580,7 +2586,7 @@ function _buildContent(content, fns, counter, retType, level, useStringLocal) {
   return fnStr;
 }
 
-function _buildRender(nodeType, retType, params, fns, level, useStringLocal) {
+function _buildRender(nodeType, retType, params, fns, level, useStringLocal, allowNewline) {
   var retStr = void 0,
       useStringF = fns.useString,
       useString = useStringLocal != null ? useStringLocal : useStringF;
@@ -2588,7 +2594,7 @@ function _buildRender(nodeType, retType, params, fns, level, useStringLocal) {
   switch (nodeType) {
     case 1:
       //文本节点
-      retStr = _buildLevelSpace(level, fns) + params.text + (!useStringF || level == null ? '' : ' + \'\\n\'');
+      retStr = _buildLevelSpace(level, fns, allowNewline) + params.text + (!useStringF || allowNewline || level == null ? '' : ' + \'\\n\'');
       break;
     case 2:
       //块表达式
@@ -2599,14 +2605,14 @@ function _buildRender(nodeType, retType, params, fns, level, useStringLocal) {
       if (!useStringF) {
         retStr = 'p1.h.apply(null, _compParam' + params._compParam + ')';
       } else {
-        var levelSpace = _buildLevelSpace(level, fns);
+        var levelSpace = _buildLevelSpace(level, fns, allowNewline);
         retStr = levelSpace + '\'<\' + _type' + params._type + ' + ' + (params._params != null ? '_params' + params._params + ' + ' : '');
         if (!params._selfClose) {
-          retStr += '\'>\\n\'';
+          retStr += '\'>' + (allowNewline ? '' : '\\n') + '\'';
           retStr += ' + _children' + params._children + ' + ';
-          retStr += levelSpace + '\'</\' + _type' + params._type + ' + \'>\\n\'';
+          retStr += levelSpace + '\'</\' + _type' + params._type + ' + \'>' + (allowNewline && allowNewline !== 'nlElem' ? '' : '\\n') + '\'';
         } else {
-          retStr += '\' />\\n\'';
+          retStr += '\' />' + (allowNewline && allowNewline !== 'nlElem' ? '' : '\\n') + '\'';
         }
       }
       break;
@@ -2632,8 +2638,12 @@ function _buildRender(nodeType, retType, params, fns, level, useStringLocal) {
   }
 }
 
-function _buildLevelSpace(level, fns) {
+function _buildLevelSpace(level, fns, allowNewline) {
   var ret = '';
+  if (allowNewline && allowNewline !== 'nlElem') {
+    return ret;
+  }
+
   if (fns.useString && level != null && level > 0) {
     ret += '\'';
     for (var i = 0; i < level; i++) {
@@ -2673,27 +2683,32 @@ var tmplRule = __WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */].tmplRule;
 
 var NO_SPLIT_NEWLINE = ['style', 'script', 'textarea', 'pre', 'xmp', 'template'];
 
-function _plainTextNode(obj, parent, parentContent) {
+function _plainTextNode(obj, parent, parentContent, noSplitNewline) {
   var node = {};
   node.type = 'nj_plaintext';
   node.content = [__WEBPACK_IMPORTED_MODULE_2__transforms_transformParam__["a" /* compiledParam */](obj)];
+  node.allowNewline = noSplitNewline;
   parent[parentContent].push(node);
 }
 
 //检测元素节点
-function checkElem(obj, parent, hasExprProps) {
+function checkElem(obj, parent, hasExprProps, noSplitNewline, isLast) {
   var parentContent = 'content';
 
   if (!__WEBPACK_IMPORTED_MODULE_1__utils_tools__["f" /* isArray */](obj)) {
     //判断是否为文本节点
-    if (__WEBPACK_IMPORTED_MODULE_1__utils_tools__["h" /* isString */](obj) && (parent.expr || NO_SPLIT_NEWLINE.indexOf(parent.type.toLowerCase()) < 0)) {
-      var strs = obj.split(tmplRule.newlineSplit);
-      strs.forEach(function (str, i) {
-        str = str.trim();
-        str !== '' && _plainTextNode(str, parent, parentContent);
-      });
+    if (__WEBPACK_IMPORTED_MODULE_1__utils_tools__["h" /* isString */](obj)) {
+      if (!noSplitNewline) {
+        var strs = obj.split(tmplRule.newlineSplit);
+        strs.forEach(function (str, i) {
+          str = str.trim();
+          str !== '' && _plainTextNode(str, parent, parentContent, noSplitNewline);
+        });
+      } else {
+        _plainTextNode(isLast && parent.allowNewline === 'nlElem' ? __WEBPACK_IMPORTED_MODULE_1__utils_tools__["q" /* trimRight */](obj) : obj, parent, parentContent, noSplitNewline);
+      }
     } else {
-      _plainTextNode(obj, parent, parentContent);
+      _plainTextNode(obj, parent, parentContent, noSplitNewline);
     }
 
     return;
@@ -2779,6 +2794,9 @@ function checkElem(obj, parent, hasExprProps) {
     if (isElemNode) {
       //判断是否为元素节点
       var pushContent = true;
+      if (noSplitNewline) {
+        node.allowNewline = true;
+      }
 
       if (!expr) {
         node.type = openTagName;
@@ -2806,6 +2824,11 @@ function checkElem(obj, parent, hasExprProps) {
         if (!node.selfCloseTag) {
           node.selfCloseTag = __WEBPACK_IMPORTED_MODULE_3__transforms_transformElement__["j" /* verifySelfCloseTag */](openTagName);
         }
+
+        if (noSplitNewline == null && NO_SPLIT_NEWLINE.indexOf(openTagName.toLowerCase()) > -1) {
+          noSplitNewline = true;
+          node.allowNewline = 'nlElem';
+        }
       } else {
         if (isTmpl) {
           //模板元素
@@ -2829,7 +2852,7 @@ function checkElem(obj, parent, hasExprProps) {
       var end = len - (hasCloseTag ? 1 : 0),
           content = obj.slice(1, end);
       if (content && content.length) {
-        checkContentElem(content, node, isParamsExpr || hasExprProps && !isProp);
+        checkContentElem(content, node, isParamsExpr || hasExprProps && !isProp, noSplitNewline);
       }
 
       //If this is params block, set on the "paramsExpr" property of the parent node.
@@ -2838,22 +2861,22 @@ function checkElem(obj, parent, hasExprProps) {
       }
     } else {
       //如果不是元素节点,则为节点集合
-      checkContentElem(obj, parent, hasExprProps);
+      checkContentElem(obj, parent, hasExprProps, noSplitNewline);
     }
   } else if (__WEBPACK_IMPORTED_MODULE_1__utils_tools__["f" /* isArray */](first)) {
     //如果第一个子节点为数组,则该节点一定为节点集合(可以是多层数组嵌套的集合)
-    checkContentElem(obj, parent, hasExprProps);
+    checkContentElem(obj, parent, hasExprProps, noSplitNewline);
   }
 }
 
 //检测子元素节点
-function checkContentElem(obj, parent, hasExprProps) {
+function checkContentElem(obj, parent, hasExprProps, noSplitNewline) {
   if (!parent.content) {
     parent.content = [];
   }
 
-  __WEBPACK_IMPORTED_MODULE_1__utils_tools__["j" /* each */](obj, function (item) {
-    checkElem(item, parent, hasExprProps);
+  __WEBPACK_IMPORTED_MODULE_1__utils_tools__["j" /* each */](obj, function (item, i, l) {
+    checkElem(item, parent, hasExprProps, noSplitNewline, i == l - 1);
   }, false, true);
 }
 

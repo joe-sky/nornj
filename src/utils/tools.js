@@ -83,6 +83,11 @@ export function each(obj, func, context, isArr) {
   }
 }
 
+const REGEX_TRIM_RIGHT = /[\s\xA0]+$/;
+export function trimRight(str) {
+  return str.replace(REGEX_TRIM_RIGHT, '');
+}
+
 //Noop function
 export function noop() {}
 
