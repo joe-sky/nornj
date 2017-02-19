@@ -226,7 +226,10 @@ describe('test compile string', function () {
         </#textExpr>
         <slider {{../name3}}>
           <#vm-include src="../a.vm" />
-          #${nj`<div>111</div>`}
+          #${nj`<div>
+                  111
+                  #${nj`<span>1</span>`}
+                </div>`}
           #${nj`<div>{{../name3 | #('substring', 0, 3)}}</div>`}
           <{{../sliderItem['a']|tagName(1,2)}} no1={{no}} no2="{{-0.05 | filter2}}" checked no='{{ ../sliderItem.b }}' />
         </slider>

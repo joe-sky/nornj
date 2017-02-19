@@ -491,7 +491,7 @@ function _buildContent(content, fns, counter, retType, level, useStringLocal) {
     return fnStr;
   }
 
-  tools.each(content, (node, i) => {
+  tools.each(content, (node) => {
     fnStr += _buildNode(node, fns, counter, retType, level, node.useString ? true : useStringLocal, fns._firstNode && level == 0);
     if (fns._firstNode) { //输出字符串时模板第一个节点前面不加换行符
       fns._firstNode = false;

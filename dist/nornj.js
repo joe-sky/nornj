@@ -716,6 +716,10 @@ function getComputedData(fn, p2, level) {
 
   if (fn._njTmpl) {
     //模板函数
+    if (level != null && p2.level != null) {
+      level += p2.level;
+    }
+
     return fn.call({
       _njData: p2.data,
       _njParent: p2.parent,
@@ -2599,7 +2603,7 @@ function _buildContent(content, fns, counter, retType, level, useStringLocal) {
     return fnStr;
   }
 
-  __WEBPACK_IMPORTED_MODULE_1__utils_tools__["j" /* each */](content, function (node, i) {
+  __WEBPACK_IMPORTED_MODULE_1__utils_tools__["j" /* each */](content, function (node) {
     fnStr += _buildNode(node, fns, counter, retType, level, node.useString ? true : useStringLocal, fns._firstNode && level == 0);
     if (fns._firstNode) {
       //输出字符串时模板第一个节点前面不加换行符

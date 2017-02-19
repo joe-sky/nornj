@@ -59,6 +59,10 @@ export function getComputedData(fn, p2, level) {
   }
 
   if (fn._njTmpl) { //模板函数
+    if (level != null && p2.level != null) {
+      level += p2.level;
+    }
+
     return fn.call({
       _njData: p2.data,
       _njParent: p2.parent,
