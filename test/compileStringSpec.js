@@ -26,12 +26,21 @@ describe('test compile string', function () {
 
     nj.registerExpr('vm-include', function (opts) {
       const env = this.getData('env');
-
       if(env === 'vm') {
         return `#parse("${opts.props.src}")`;
       }
       else {
         return `<$include src="${opts.props.src}" />`;
+      }
+    });
+
+    nj.registerFilter('vm-var', function (val, opts) {
+      const env = this.getData('env');
+      if(env === 'vm') {
+        return `$!${val}`;
+      }
+      else {
+        return `{${val}}`;
       }
     });
   });
@@ -224,7 +233,8 @@ describe('test compile string', function () {
             <#list {{1}} {{2}} />
           </@name>
         </#textExpr>
-        <slider {{../name3}}>
+        <slider {{../name3}} step="{{'name5' | vm-var}}">
+          <#prop {{'name1' | vm-var}} />
           <#vm-include src="../a.vm" />
           #${nj`<div>
                   111

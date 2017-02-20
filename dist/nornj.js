@@ -2617,12 +2617,13 @@ function _buildContent(content, fns, counter, retType, level, useStringLocal) {
 function _buildRender(nodeType, retType, params, fns, level, useStringLocal, allowNewline, isFirst) {
   var retStr = void 0,
       useStringF = fns.useString,
-      useString = useStringLocal != null ? useStringLocal : useStringF;
+      useString = useStringLocal != null ? useStringLocal : useStringF,
+      noLevel = level == null;
 
   switch (nodeType) {
     case 1:
       //文本节点
-      retStr = (!useStringF || allowNewline || level == null || isFirst ? '' : '\'\\n\' + ') + _buildLevelSpace(level, fns, allowNewline) + _buildLevelSpaceRt(useStringF, isFirst || level == null) + params.text;
+      retStr = (!useStringF || allowNewline || noLevel || isFirst ? '' : '\'\\n\' + ') + _buildLevelSpace(level, fns, allowNewline) + _buildLevelSpaceRt(useStringF, isFirst || noLevel) + params.text;
       break;
     case 2:
       //块表达式
@@ -2636,14 +2637,14 @@ function _buildRender(nodeType, retType, params, fns, level, useStringLocal, all
         var levelSpace = _buildLevelSpace(level, fns, allowNewline);
         retStr = '';
 
-        if ((!allowNewline || allowNewline === 'nlElem') && level != null && !isFirst) {
+        if ((!allowNewline || allowNewline === 'nlElem') && !noLevel && !isFirst) {
           retStr += '\'\\n\' + ';
         }
-        retStr += levelSpace + _buildLevelSpaceRt(useStringF, isFirst || level == null) + '\'<\' + _type' + params._type + ' + ' + (params._params != null ? '_params' + params._params + ' + ' : '');
+        retStr += levelSpace + _buildLevelSpaceRt(useStringF, isFirst || noLevel) + '\'<\' + _type' + params._type + ' + ' + (params._params != null ? '_params' + params._params + ' + ' : '');
         if (!params._selfClose) {
           retStr += '\'>\'';
           retStr += ' + _children' + params._children + ' + ';
-          retStr += (allowNewline || level == null ? '' : '\'\\n\' + ') + levelSpace + _buildLevelSpaceRt(useStringF, level == null) + '\'</\' + _type' + params._type + ' + \'>\'';
+          retStr += (allowNewline || noLevel ? '' : '\'\\n\' + ') + levelSpace + _buildLevelSpaceRt(useStringF, noLevel) + '\'</\' + _type' + params._type + ' + \'>\'';
         } else {
           retStr += '\' />\'';
         }
