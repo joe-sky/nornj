@@ -234,6 +234,8 @@ describe('test compile string', function () {
           </@name>
         </#textExpr>
         <slider {{../name3}} step="{{'name5' | vm-var}}">
+          <div></div>
+          <script></script>
           <#prop {{'name1' | vm-var}} />
           <#vm-include src="../a.vm" />
           #${nj`<div>

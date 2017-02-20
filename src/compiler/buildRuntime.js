@@ -361,7 +361,7 @@ function _buildNode(node, fns, counter, retType, level, useStringLocal, isFirst)
       valueStr = valueStr.valueStr;
     }
 
-    let textStr = _buildRender(1, retType, { text: valueStr }, fns, level, useStringLocal, node.allowNewline, isFirst);
+    let textStr = _buildRender(node, 1, retType, { text: valueStr }, fns, level, useStringLocal, node.allowNewline, isFirst);
     if (filterStr) {
       textStr = filterStr + textStr;
     }
@@ -425,7 +425,7 @@ function _buildNode(node, fns, counter, retType, level, useStringLocal, isFirst)
     fnStr += 'p1.throwIf(_expr' + _exprC + ', \'' + node.expr + '\', \'expr\');\n';
 
     //渲染
-    fnStr += _buildRender(2, retType, {
+    fnStr += _buildRender(node, 2, retType, {
       _expr: _exprC,
       _dataRefer: _dataReferC
     }, fns, level, useStringLocal, node.allowNewline, isFirst);
@@ -479,7 +479,7 @@ function _buildNode(node, fns, counter, retType, level, useStringLocal, isFirst)
     fnStr += _buildContent(node.content, fns, counter, !useStringF ? { _compParam: '_compParam' + _compParamC } : { _children: '_children' + _childrenC }, level != null ? level + 1 : level, useStringLocal);
 
     //渲染
-    fnStr += _buildRender(3, retType, !useStringF ? { _compParam: _compParamC } : { _type: _typeC, _params: paramsStr !== '' ? _paramsC : null, _children: _childrenC, _selfClose: node.selfCloseTag }, fns, level, useStringLocal, node.allowNewline, isFirst);
+    fnStr += _buildRender(node, 3, retType, !useStringF ? { _compParam: _compParamC } : { _type: _typeC, _params: paramsStr !== '' ? _paramsC : null, _children: _childrenC, _selfClose: node.selfCloseTag }, fns, level, useStringLocal, node.allowNewline, isFirst);
   }
 
   return fnStr;
@@ -501,11 +501,12 @@ function _buildContent(content, fns, counter, retType, level, useStringLocal) {
   return fnStr;
 }
 
-function _buildRender(nodeType, retType, params, fns, level, useStringLocal, allowNewline, isFirst) {
+function _buildRender(node, nodeType, retType, params, fns, level, useStringLocal, allowNewline, isFirst) {
   let retStr,
     useStringF = fns.useString,
     useString = useStringLocal != null ? useStringLocal : useStringF,
-    noLevel = level == null;
+    noLevel = level == null,
+    content = node.content;
 
   switch (nodeType) {
     case 1: //文本节点
@@ -528,7 +529,8 @@ function _buildRender(nodeType, retType, params, fns, level, useStringLocal, all
         if (!params._selfClose) {
           retStr += '\'>\'';
           retStr += ' + _children' + params._children + ' + ';
-          retStr += (allowNewline || noLevel ? '' : '\'\\n\' + ') + levelSpace + _buildLevelSpaceRt(useStringF, noLevel) + '\'</\' + _type' + params._type + ' + \'>\'';
+          retStr += (!content || allowNewline || noLevel ? '' : '\'\\n\' + ') + (content ? levelSpace : '')  //如果子节点为空则不输出缩进空格和换行符
+            + _buildLevelSpaceRt(useStringF, noLevel) + '\'</\' + _type' + params._type + ' + \'>\'';
         } else {
           retStr += '\' />\'';
         }
