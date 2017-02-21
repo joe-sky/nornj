@@ -510,7 +510,7 @@ function _buildRender(node, parent, nodeType, retType, params, fns, level, useSt
 
   switch (nodeType) {
     case 1: //文本节点
-      retStr = (!useStringF || allowNewline || noLevel ? '' : ((isFirst ? (parent.type !== 'nj_root' ? 'p1.firstNewline(p2)' : '') : '\'\\n\'') + ' + ')) + _buildLevelSpace(level, fns, allowNewline) + _buildLevelSpaceRt(useStringF, isFirst || noLevel) + params.text;
+      retStr = (!useStringF || allowNewline || noLevel ? '' : (isFirst ? (parent.type !== 'nj_root' ? 'p1.firstNewline(p2) + ' : '') : '\'\\n\' + ')) + _buildLevelSpace(level, fns, allowNewline) + _buildLevelSpaceRt(useStringF, isFirst || noLevel) + params.text;
       break;
     case 2: //块表达式
       retStr = '_expr' + params._expr + '.apply(p2, _dataRefer' + params._dataRefer + ')';

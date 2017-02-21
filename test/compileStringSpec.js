@@ -176,6 +176,7 @@ describe('test compile string', function () {
       `;
 
       var tmplTest = nj`
+      <!DOCTYPE html>
       <#each {{list}}>
         <div>{{this}}</div>
         {{this}}
@@ -260,7 +261,7 @@ describe('test compile string', function () {
       // var html = tmplFn.apply(null, data);
       // var html = nj.render.call(null, tmplTest, data[0], data[1]);
       var html = tmplTest.apply(null, data);
-
+      
       //console.log(JSON.stringify(nj.asts['tmplString']));
       console.log(html);
       expect(html).toBeTruthy();
