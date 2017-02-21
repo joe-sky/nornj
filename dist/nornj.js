@@ -2609,10 +2609,9 @@ function _buildContent(content, parent, fns, counter, retType, level, useStringL
   }
 
   __WEBPACK_IMPORTED_MODULE_1__utils_tools__["j" /* each */](content, function (node) {
-    var isFirst = fns._firstNode && level == 0;
-    fnStr += _buildNode(node, parent, fns, counter, retType, level, node.useString ? true : useStringLocal, isFirst);
+    fnStr += _buildNode(node, parent, fns, counter, retType, level, node.useString ? true : useStringLocal, fns._firstNode && level == 0);
 
-    if (isFirst) {
+    if (fns._firstNode) {
       //输出字符串时模板第一个节点前面不加换行符
       fns._firstNode = false;
     }

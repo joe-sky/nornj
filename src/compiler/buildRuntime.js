@@ -490,12 +490,11 @@ function _buildContent(content, parent, fns, counter, retType, level, useStringL
   if (!content) {
     return fnStr;
   }
-  
+
   tools.each(content, (node) => {
-    const isFirst = fns._firstNode && level == 0;
-    fnStr += _buildNode(node, parent, fns, counter, retType, level, node.useString ? true : useStringLocal, isFirst);
+    fnStr += _buildNode(node, parent, fns, counter, retType, level, node.useString ? true : useStringLocal, fns._firstNode && level == 0);
     
-    if (isFirst) { //输出字符串时模板第一个节点前面不加换行符
+    if (fns._firstNode) { //输出字符串时模板第一个节点前面不加换行符
       fns._firstNode = false;
     }
   }, false, true);
