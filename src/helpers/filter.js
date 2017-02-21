@@ -33,7 +33,7 @@ export const filters = {
   //Ternary operator
   '?': (val, val1, val2) => val ? val1 : val2,
 
-  '!': val1 => !val,
+  '!': val => !val,
 
   '&&': (val1, val2) => val1 && val2,
 

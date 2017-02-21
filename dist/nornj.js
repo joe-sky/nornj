@@ -920,7 +920,7 @@ var filters = {
     return val ? val1 : val2;
   },
 
-  '!': function _(val1) {
+  '!': function _(val) {
     return !val;
   },
 
