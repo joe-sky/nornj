@@ -60,7 +60,7 @@ function _createCompile(outputH) {
           }
         }
 
-        fns = buildRuntime(root.content, !outputH);
+        fns = buildRuntime(root.content, root, !outputH);
       }
 
       tmplFns = tranData.template(fns);
@@ -107,7 +107,7 @@ export function precompile(tmpl, outputH) {
   }
   checkElem(tmpl._njTmpl, root);
 
-  return buildRuntime(root.content, !outputH);
+  return buildRuntime(root.content, root, !outputH);
 }
 
 function _createRender(outputH) {

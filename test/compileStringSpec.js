@@ -176,6 +176,10 @@ describe('test compile string', function () {
       `;
 
       var tmplTest = nj`
+      <#each {{list}}>
+        <div>{{this}}</div>
+        {{this}}
+      </#each>
       <style>
         .class1 {
           margin-left: 10px;
@@ -238,7 +242,11 @@ describe('test compile string', function () {
           <script></script>
           <#prop {{'name1' | vm-var}} />
           <#vm-include src="../a.vm" />
-          #${nj`<div>
+          #${nj`<#each {{list}}>
+                  {{this}}
+                  {{this}}
+                </#each>
+                <div>
                   111
                   #${nj`<span>1</span>`}
                 </div>`}

@@ -801,15 +801,19 @@ function tmplWrap(configs, main) {
 }
 
 function levelSpace(p2) {
-  var ret = '';
   if (p2.level == null) {
-    return ret;
+    return '';
   }
 
+  var ret = '';
   for (var i = 0; i < p2.level; i++) {
     ret += '  ';
   }
   return ret;
+}
+
+function firstNewline(p2) {
+  return p2.index == null ? '' : p2.index == 0 ? '' : '\n';
 }
 
 //创建模板函数
@@ -835,6 +839,7 @@ function template(fns) {
     configs.assignStringProp = assignStringProp;
     configs.escape = __WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */].escape;
     configs.levelSpace = levelSpace;
+    configs.firstNewline = firstNewline;
   }
 
   __WEBPACK_IMPORTED_MODULE_1__utils_tools__["j" /* each */](fns, function (v, k) {
@@ -1882,7 +1887,7 @@ function _createCompile(outputH) {
           }
         }
 
-        fns = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4__buildRuntime__["a" /* default */])(root.content, !outputH);
+        fns = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4__buildRuntime__["a" /* default */])(root.content, root, !outputH);
       }
 
       tmplFns = __WEBPACK_IMPORTED_MODULE_3__transforms_transformData__["a" /* template */](fns);
@@ -1929,7 +1934,7 @@ function precompile(tmpl, outputH) {
   }
   __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_2__parser_checkElem__["a" /* default */])(tmpl._njTmpl, root);
 
-  return __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4__buildRuntime__["a" /* default */])(root.content, !outputH);
+  return __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4__buildRuntime__["a" /* default */])(root.content, root, !outputH);
 }
 
 function _createRender(outputH) {
@@ -2087,7 +2092,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 var errorTitle = __WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */].errorTitle;
 
 
-function _buildFn(content, fns, no, newContext, level, useStringLocal) {
+function _buildFn(content, node, fns, no, newContext, level, useStringLocal) {
   var fnStr = '',
       useString = useStringLocal != null ? useStringLocal : fns.useString,
       isTmplExpr = __WEBPACK_IMPORTED_MODULE_1__utils_tools__["h" /* isString */](no),
@@ -2131,7 +2136,7 @@ function _buildFn(content, fns, no, newContext, level, useStringLocal) {
     }
   }
 
-  fnStr += _buildContent(content, fns, counter, retType, level, useStringLocal);
+  fnStr += _buildContent(content, node, fns, counter, retType, level, useStringLocal);
 
   if (retType === '2') {
     fnStr += 'return ret;';
@@ -2161,7 +2166,7 @@ function _buildOptions(config, useStringLocal, node, fns, exprPropsStr, level, h
       hashStr += ', exprProps: ' + exprPropsStr;
     }
 
-    hashStr += ', result: ' + (node.content ? 'p1.exprRet(p1, p2, p1.fn' + _buildFn(node.content, fns, ++fns._no, newContext, level, useStringLocal) + ', ' + exprPropsStr + ')' : 'p1.noop');
+    hashStr += ', result: ' + (node.content ? 'p1.exprRet(p1, p2, p1.fn' + _buildFn(node.content, node, fns, ++fns._no, newContext, level, useStringLocal) + ', ' + exprPropsStr + ')' : 'p1.noop');
 
     if (hashProps != null) {
       hashStr += ', props: ' + hashProps;
@@ -2327,7 +2332,7 @@ function _buildProps(obj, counter, fns, useStringLocal, level) {
     valueStr += '{\n';
     __WEBPACK_IMPORTED_MODULE_1__utils_tools__["j" /* each */](str0, function (v, k, i, l) {
       if (k !== 'length') {
-        valueStr += '  "' + k + '": p1.main' + _buildFn(v.content, fns, 'T' + ++fns._noT);
+        valueStr += '  "' + k + '": p1.main' + _buildFn(v.content, v, fns, 'T' + ++fns._noT);
       } else {
         valueStr += '  length: ' + v;
       }
@@ -2372,7 +2377,7 @@ function _buildParams(node, fns, counter, useString, level) {
       paramsStr += 'var _paramsE' + _paramsEC + ' = {};\n';
 
       //params块的子节点
-      paramsStr += _buildContent(paramsExpr.content, fns, counter, { _paramsE: '_paramsE' + _paramsEC }, null, useString);
+      paramsStr += _buildContent(paramsExpr.content, paramsExpr, fns, counter, { _paramsE: '_paramsE' + _paramsEC }, null, useString);
 
       //合并params块的值
       if (!useString) {
@@ -2452,7 +2457,7 @@ function _buildParams(node, fns, counter, useString, level) {
   return [paramsStr, _paramsC];
 }
 
-function _buildNode(node, fns, counter, retType, level, useStringLocal, isFirst) {
+function _buildNode(node, parent, fns, counter, retType, level, useStringLocal, isFirst) {
   var fnStr = '',
       useStringF = fns.useString;
 
@@ -2465,7 +2470,7 @@ function _buildNode(node, fns, counter, retType, level, useStringLocal, isFirst)
       valueStr = valueStr.valueStr;
     }
 
-    var textStr = _buildRender(node, 1, retType, { text: valueStr }, fns, level, useStringLocal, node.allowNewline, isFirst);
+    var textStr = _buildRender(node, parent, 1, retType, { text: valueStr }, fns, level, useStringLocal, node.allowNewline, isFirst);
     if (filterStr) {
       textStr = filterStr + textStr;
     }
@@ -2533,7 +2538,7 @@ function _buildNode(node, fns, counter, retType, level, useStringLocal, isFirst)
     fnStr += 'p1.throwIf(_expr' + _exprC + ', \'' + node.expr + '\', \'expr\');\n';
 
     //渲染
-    fnStr += _buildRender(node, 2, retType, {
+    fnStr += _buildRender(node, parent, 2, retType, {
       _expr: _exprC,
       _dataRefer: _dataReferC
     }, fns, level, useStringLocal, node.allowNewline, isFirst);
@@ -2588,24 +2593,26 @@ function _buildNode(node, fns, counter, retType, level, useStringLocal, isFirst)
     }
 
     //子节点
-    fnStr += _buildContent(node.content, fns, counter, !useStringF ? { _compParam: '_compParam' + _compParamC } : { _children: '_children' + _childrenC }, level != null ? level + 1 : level, useStringLocal);
+    fnStr += _buildContent(node.content, node, fns, counter, !useStringF ? { _compParam: '_compParam' + _compParamC } : { _children: '_children' + _childrenC }, level != null ? level + 1 : level, useStringLocal);
 
     //渲染
-    fnStr += _buildRender(node, 3, retType, !useStringF ? { _compParam: _compParamC } : { _type: _typeC, _params: _paramsStr !== '' ? _paramsC2 : null, _children: _childrenC, _selfClose: node.selfCloseTag }, fns, level, useStringLocal, node.allowNewline, isFirst);
+    fnStr += _buildRender(node, parent, 3, retType, !useStringF ? { _compParam: _compParamC } : { _type: _typeC, _params: _paramsStr !== '' ? _paramsC2 : null, _children: _childrenC, _selfClose: node.selfCloseTag }, fns, level, useStringLocal, node.allowNewline, isFirst);
   }
 
   return fnStr;
 }
 
-function _buildContent(content, fns, counter, retType, level, useStringLocal) {
+function _buildContent(content, parent, fns, counter, retType, level, useStringLocal) {
   var fnStr = '';
   if (!content) {
     return fnStr;
   }
 
   __WEBPACK_IMPORTED_MODULE_1__utils_tools__["j" /* each */](content, function (node) {
-    fnStr += _buildNode(node, fns, counter, retType, level, node.useString ? true : useStringLocal, fns._firstNode && level == 0);
-    if (fns._firstNode) {
+    var isFirst = fns._firstNode && level == 0;
+    fnStr += _buildNode(node, parent, fns, counter, retType, level, node.useString ? true : useStringLocal, isFirst);
+
+    if (isFirst) {
       //输出字符串时模板第一个节点前面不加换行符
       fns._firstNode = false;
     }
@@ -2614,17 +2621,16 @@ function _buildContent(content, fns, counter, retType, level, useStringLocal) {
   return fnStr;
 }
 
-function _buildRender(node, nodeType, retType, params, fns, level, useStringLocal, allowNewline, isFirst) {
+function _buildRender(node, parent, nodeType, retType, params, fns, level, useStringLocal, allowNewline, isFirst) {
   var retStr = void 0,
       useStringF = fns.useString,
       useString = useStringLocal != null ? useStringLocal : useStringF,
-      noLevel = level == null,
-      content = node.content;
+      noLevel = level == null;
 
   switch (nodeType) {
     case 1:
       //文本节点
-      retStr = (!useStringF || allowNewline || noLevel || isFirst ? '' : '\'\\n\' + ') + _buildLevelSpace(level, fns, allowNewline) + _buildLevelSpaceRt(useStringF, isFirst || noLevel) + params.text;
+      retStr = (!useStringF || allowNewline || noLevel ? '' : (isFirst ? parent.type !== 'nj_root' ? 'p1.firstNewline(p2)' : '' : '\'\\n\'') + ' + ') + _buildLevelSpace(level, fns, allowNewline) + _buildLevelSpaceRt(useStringF, isFirst || noLevel) + params.text;
       break;
     case 2:
       //块表达式
@@ -2636,17 +2642,22 @@ function _buildRender(node, nodeType, retType, params, fns, level, useStringLoca
         retStr = 'p1.h.apply(null, _compParam' + params._compParam + ')';
       } else {
         var levelSpace = _buildLevelSpace(level, fns, allowNewline);
-        retStr = '';
+        var content = node.content;
 
-        if ((!allowNewline || allowNewline === 'nlElem') && !noLevel && !isFirst) {
-          retStr += '\'\\n\' + ';
+        if (allowNewline && allowNewline !== 'nlElem' || noLevel) {
+          retStr = '';
+        } else if (isFirst) {
+          retStr = parent.type !== 'nj_root' ? 'p1.firstNewline(p2) + ' : '';
+        } else {
+          retStr = '\'\\n\' + ';
         }
+
         retStr += levelSpace + _buildLevelSpaceRt(useStringF, isFirst || noLevel) + '\'<\' + _type' + params._type + ' + ' + (params._params != null ? '_params' + params._params + ' + ' : '');
         if (!params._selfClose) {
           retStr += '\'>\'';
           retStr += ' + _children' + params._children + ' + ';
-          retStr += (!content || allowNewline || noLevel ? '' : '\'\\n\' + ') + (content ? levelSpace : '') //如果子节点为空则不输出缩进空格和换行符
-          + _buildLevelSpaceRt(useStringF, noLevel) + '\'</\' + _type' + params._type + ' + \'>\'';
+          retStr += (!content || allowNewline || noLevel ? '' : '\'\\n\' + ') + (content ? levelSpace : '') + //如果子节点为空则不输出缩进空格和换行符
+          _buildLevelSpaceRt(useStringF, noLevel) + '\'</\' + _type' + params._type + ' + \'>\'';
         } else {
           retStr += '\' />\'';
         }
@@ -2697,7 +2708,7 @@ function _buildLevelSpaceRt(useString, noSpace) {
   return '';
 }
 
-/* harmony default export */ __webpack_exports__["a"] = function (ast, useString) {
+/* harmony default export */ __webpack_exports__["a"] = function (astContent, ast, useString) {
   var fns = {
     useString: useString,
     _no: 0, //块表达式函数计数
@@ -2705,7 +2716,7 @@ function _buildLevelSpaceRt(useString, noSpace) {
     _firstNode: true
   };
 
-  _buildFn(ast, fns, fns._no, null, 0);
+  _buildFn(astContent, ast, fns, fns._no, null, 0);
   return fns;
 };
 

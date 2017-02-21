@@ -143,15 +143,19 @@ export function tmplWrap(configs, main) {
 }
 
 function levelSpace(p2) {
-  let ret = '';
   if (p2.level == null) {
-    return ret;
+    return '';
   }
 
+  let ret = '';
   for (let i = 0; i < p2.level; i++) {
     ret += '  ';
   }
   return ret;
+}
+
+function firstNewline(p2) {
+  return p2.index == null ? '' : (p2.index == 0 ? '' : '\n');
 }
 
 //创建模板函数
@@ -177,6 +181,7 @@ export function template(fns) {
     configs.assignStringProp = assignStringProp;
     configs.escape = nj.escape;
     configs.levelSpace = levelSpace;
+    configs.firstNewline = firstNewline;
   }
 
   tools.each(fns, (v, k) => {
