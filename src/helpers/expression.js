@@ -212,9 +212,8 @@ export const exprs = {
 
   pre: options => options.result(),
 
-  'with': function (name, options) {
-    const props = options.props,
-      originalData = this.getData(name);
+  'with': function (originalData, options) {
+    const props = options.props;
 
     return options.result({
       data: props && props.as ? {

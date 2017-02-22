@@ -562,9 +562,8 @@ var exprs = {
     return options.result();
   },
 
-  'with': function _with(name, options) {
-    var props = options.props,
-        originalData = this.getData(name);
+  'with': function _with(originalData, options) {
+    var props = options.props;
 
     return options.result({
       data: props && props.as ? _defineProperty({}, props.as, originalData) : originalData
