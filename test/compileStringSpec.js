@@ -177,6 +177,7 @@ describe('test compile string', function () {
 
       var tmplTest = nj`
       <!DOCTYPE html>
+      <#with {{name3}} as=name5>{{name5}}</#with>
       <#each {{list}}>
         <div>{{this}}</div>
         {{this}}

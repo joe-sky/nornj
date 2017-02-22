@@ -329,6 +329,8 @@ assign(__WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */], {
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return exprs; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return exprConfig; });
 /* harmony export (immutable) */ __webpack_exports__["c"] = registerExpr;
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 
 
 
@@ -558,6 +560,15 @@ var exprs = {
 
   pre: function pre(options) {
     return options.result();
+  },
+
+  'with': function _with(name, options) {
+    var props = options.props,
+        originalData = this.getData(name);
+
+    return options.result({
+      data: props && props.as ? _defineProperty({}, props.as, originalData) : originalData
+    });
   }
 };
 
@@ -585,7 +596,8 @@ var exprConfig = {
   prop: _commonConfig({ newContext: false, exprProps: true, isProp: true }),
   spread: _commonConfig({ newContext: false, useString: false, exprProps: true, isProp: true }),
   'for': _commonConfig(),
-  obj: _commonConfig({ newContext: false, useString: false })
+  obj: _commonConfig({ newContext: false, useString: false }),
+  'with': _commonConfig({ useString: false })
 };
 exprConfig.elseif = _commonConfig(exprConfig['else']);
 exprConfig.list = _commonConfig(exprConfig.if);

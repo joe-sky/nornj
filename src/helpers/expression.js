@@ -210,7 +210,18 @@ export const exprs = {
 
   block: options => options.result(),
 
-  pre: options => options.result()
+  pre: options => options.result(),
+
+  'with': function (name, options) {
+    const props = options.props,
+      originalData = this.getData(name);
+
+    return options.result({
+      data: props && props.as ? {
+        [props.as]: originalData
+      } : originalData
+    });
+  }
 };
 
 function _commonConfig(params) {
@@ -237,7 +248,8 @@ export const exprConfig = {
   prop: _commonConfig({ newContext: false, exprProps: true, isProp: true }),
   spread: _commonConfig({ newContext: false, useString: false, exprProps: true, isProp: true }),
   'for': _commonConfig(),
-  obj: _commonConfig({ newContext: false, useString: false })
+  obj: _commonConfig({ newContext: false, useString: false }),
+  'with': _commonConfig({ useString: false })
 };
 exprConfig.elseif = _commonConfig(exprConfig['else']);
 exprConfig.list = _commonConfig(exprConfig.if);
