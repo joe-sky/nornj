@@ -2,7 +2,7 @@
 import * as tools from '../utils/tools';
 import * as tranData from '../transforms/transformData';
 import { unescape } from '../utils/escape';
-import { exprConfig } from '../helpers/expression';
+import { exprConfig } from '../helpers/extension';
 import { filterConfig } from '../helpers/filter';
 const { errorTitle } = nj;
 

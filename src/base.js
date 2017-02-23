@@ -17,28 +17,22 @@ const _global = typeof self !== 'undefined' ? self : global;
 _global.NornJ = _global.nj = nj;
 
 export {
-  defineProp,
-  defineProps,
-  arrayPush,
-  arraySlice,
-  isArray,
   isObject,
   isString,
   isArrayLike,
   each,
+  trimRight,
   noop,
-  obj,
   toCamelCase,
   assign
 } from './utils/tools';
-export * from './helpers/expression';
+export * from './helpers/extension';
 export * from './helpers/filter';
 export * from './compiler/compile';
 export * from './utils/escape';
 export * from './utils/tmplTag';
 export {
   registerComponent,
-  setTmplRule,
   config
 };
 export default nj;

@@ -1,7 +1,7 @@
 ﻿import nj from '../core';
 import * as tools from '../utils/tools';
 import * as tranParam from './transformParam';
-import { exprConfig } from '../helpers/expression';
+import { exprConfig } from '../helpers/extension';
 const { tmplRule } = nj;
 
 //提取xml open tag
