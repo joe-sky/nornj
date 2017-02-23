@@ -96,6 +96,10 @@ export const filterConfig = {
   bool: _commonConfig(),
   '#': _commonConfig()
 };
+filterConfig['.'] = filterConfig.prop;
+
+//Filter alias
+filters['.'] = filters.prop;
 
 //Register filter and also can batch add
 export function registerFilter(name, filter, options) {
