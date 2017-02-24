@@ -74,6 +74,11 @@ export function getComputedData(fn, p2, level) {
   }
 }
 
+export function getElement(name, p1) {
+  const element = p1.components[name];
+  return element ? element : name;
+}
+
 //Rebuild local variables in the new context
 export function newContext(p2, p3) {
   const newData = [];
@@ -171,7 +176,8 @@ export function template(fns) {
     newContext,
     getComputedData,
     styleProps,
-    exprRet
+    exprRet,
+    getElement
   };
 
   if (!configs.useString) {

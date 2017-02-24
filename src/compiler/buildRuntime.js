@@ -360,6 +360,9 @@ function _buildNode(node, parent, fns, counter, retType, level, useStringLocal, 
       filterStr = valueStr.filterStr;
       valueStr = valueStr.valueStr;
     }
+    if (valueStr === '') {
+      return fnStr;
+    }
 
     let textStr = _buildRender(node, parent, 1, retType, { text: valueStr }, fns, level, useStringLocal, node.allowNewline, isFirst);
     if (filterStr) {
@@ -441,7 +444,7 @@ function _buildNode(node, parent, fns, counter, retType, level, useStringLocal, 
 
     let typeStr;
     if (!useStringF) {
-      typeStr = 'p1.components[\'' + _type.toLowerCase() + '\'] ? p1.components[\'' + _type.toLowerCase() + '\'] : \'' + _type + '\'';
+      typeStr = 'p1.getElement(\'' + _type.toLowerCase() + '\', p1)';
     } else {
       typeStr = '\'' + _type + '\'';
     }
@@ -493,7 +496,7 @@ function _buildContent(content, parent, fns, counter, retType, level, useStringL
 
   tools.each(content, (node) => {
     fnStr += _buildNode(node, parent, fns, counter, retType, level, node.useString ? true : useStringLocal, fns._firstNode && level == 0);
-    
+
     if (fns._firstNode) { //输出字符串时模板第一个节点前面不加换行符
       fns._firstNode = false;
     }

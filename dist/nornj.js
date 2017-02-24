@@ -206,10 +206,10 @@ function each(obj, func, context, isArr) {
   }
 }
 
-var REGEX_TRIM_RIGHT = /(\n)?[\s\xA0]+$/;
+var REGEX_TRIM_RIGHT = /(\n|\r)?[\s\xA0]+$/;
 function trimRight(str) {
   return str.replace(REGEX_TRIM_RIGHT, function (all, s1) {
-    return s1 ? s1 + '' : '';
+    return s1 ? '\n' : '';
   });
 }
 
@@ -670,6 +670,7 @@ __WEBPACK_IMPORTED_MODULE_1__utils_tools__["a" /* assign */](__WEBPACK_IMPORTED_
 /* unused harmony export styleProps */
 /* unused harmony export getData */
 /* unused harmony export getComputedData */
+/* unused harmony export getElement */
 /* unused harmony export newContext */
 /* harmony export (immutable) */ __webpack_exports__["b"] = fixPropName;
 /* unused harmony export assignStringProp */
@@ -755,6 +756,11 @@ function getComputedData(fn, p2, level) {
     //普通函数
     return fn(p2);
   }
+}
+
+function getElement(name, p1) {
+  var element = p1.components[name];
+  return element ? element : name;
 }
 
 //Rebuild local variables in the new context
@@ -854,7 +860,8 @@ function template(fns) {
     newContext: newContext,
     getComputedData: getComputedData,
     styleProps: styleProps,
-    exprRet: exprRet
+    exprRet: exprRet,
+    getElement: getElement
   };
 
   if (!configs.useString) {
@@ -2513,6 +2520,9 @@ function _buildNode(node, parent, fns, counter, retType, level, useStringLocal, 
       filterStr = valueStr.filterStr;
       valueStr = valueStr.valueStr;
     }
+    if (valueStr === '') {
+      return fnStr;
+    }
 
     var textStr = _buildRender(node, parent, 1, retType, { text: valueStr }, fns, level, useStringLocal, node.allowNewline, isFirst);
     if (filterStr) {
@@ -2599,7 +2609,7 @@ function _buildNode(node, parent, fns, counter, retType, level, useStringLocal, 
 
     var typeStr = void 0;
     if (!useStringF) {
-      typeStr = 'p1.components[\'' + _type.toLowerCase() + '\'] ? p1.components[\'' + _type.toLowerCase() + '\'] : \'' + _type + '\'';
+      typeStr = 'p1.getElement(\'' + _type.toLowerCase() + '\', p1)';
     } else {
       typeStr = '\'' + _type + '\'';
     }
