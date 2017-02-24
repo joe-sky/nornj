@@ -27,7 +27,12 @@ export function compiledProp(prop) {
 
     filtersTmp = filtersTmp.slice(1);
     tools.each(filtersTmp, (filter) => {
-      let retF = _getFilterParam(filter.trim()),
+      filter = filter.trim();
+      if(filter === '') {
+        return;
+      }
+
+      let retF = _getFilterParam(filter),
         filterObj = tools.obj(),
         filterName = retF[1]; //Get filter name
 
@@ -92,7 +97,7 @@ const SP_FILTER_LOOKUP = {
   '||(': 'or('
 };
 const REGEX_SP_FILTER = /[\s]+((\|\|)\()/g;
-const REGEX_FIX_FILTER = /(\|)?([\s]+[^\s]+\()/g;
+const REGEX_FIX_FILTER = /(\|)?[\s]+([^\s]+\()/g;
 
 function _getReplaceParam(obj) {
   let pattern = tmplRule.replaceParam,

@@ -1387,12 +1387,12 @@ var SP_FILTER_LOOKUP = {
   '>=(': 'gte(',
   '<=(': 'lte('
 };
-var REGEX_SP_FILTER = /\|[\s]*((>|<|>=|<=)\()/g;
+var REGEX_SP_FILTER = /(\|)?[\s]+((>|<|>=|<=)\()/g;
 
 function _formatAll(str) {
   var commentRule = tmplRule.commentRule;
-  return str.replace(new RegExp('<!--' + commentRule + '[\\s\\S]*?' + commentRule + '-->', 'g'), '').replace(REGEX_SP_FILTER, function (all, match) {
-    return '| ' + SP_FILTER_LOOKUP[match];
+  return str.replace(new RegExp('<!--' + commentRule + '[\\s\\S]*?' + commentRule + '-->', 'g'), '').replace(REGEX_SP_FILTER, function (all, s1, match) {
+    return '|' + SP_FILTER_LOOKUP[match];
   });
 }
 
@@ -1703,7 +1703,12 @@ function compiledProp(prop) {
 
       filtersTmp = filtersTmp.slice(1);
       __WEBPACK_IMPORTED_MODULE_1__utils_tools__["e" /* each */](filtersTmp, function (filter) {
-        var retF = _getFilterParam(filter.trim()),
+        filter = filter.trim();
+        if (filter === '') {
+          return;
+        }
+
+        var retF = _getFilterParam(filter),
             filterObj = __WEBPACK_IMPORTED_MODULE_1__utils_tools__["l" /* obj */](),
             filterName = retF[1]; //Get filter name
 
@@ -1774,7 +1779,7 @@ var SP_FILTER_LOOKUP = {
   '||(': 'or('
 };
 var REGEX_SP_FILTER = /[\s]+((\|\|)\()/g;
-var REGEX_FIX_FILTER = /(\|)?([\s]+[^\s]+\()/g;
+var REGEX_FIX_FILTER = /(\|)?[\s]+([^\s]+\()/g;
 
 function _getReplaceParam(obj) {
   var pattern = tmplRule.replaceParam,
