@@ -21,7 +21,6 @@ export {
   isString,
   isArrayLike,
   each,
-  trimRight,
   noop,
   toCamelCase,
   assign

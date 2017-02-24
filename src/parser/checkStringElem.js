@@ -98,14 +98,13 @@ function _checkStringElem(xml) {
 
     //Text before tag
     if (textBefore && textBefore !== '\n') {
-      textBefore = _formatNewline(textBefore);
       _setText(textBefore, current.elem);
     }
 
     //Element tag
     if (elem) {
       if (elem.indexOf('<!') === 0) { //doctype等标签当做文本处理
-        _setText(_formatNewline(elem), current.elem);
+        _setText(elem, current.elem);
       } else {
         if (elemName[0] === '/') { //Close tag
           if (elemName === '/' + current.elemName) {
@@ -129,7 +128,6 @@ function _checkStringElem(xml) {
 
     //Text after tag
     if (textAfter && textAfter !== '\n') {
-      textAfter = _formatNewline(textAfter);
       _setText(textAfter, current.elem);
     }
   }
@@ -141,18 +139,14 @@ const SP_FILTER_LOOKUP = {
   '>(': 'gt(',
   '<(': 'lt(',
   '>=(': 'gte(',
-  '<=(': 'lte(',
-  '||(': 'or('
+  '<=(': 'lte('
 };
+const REGEX_SP_FILTER = /\|[\s]*((>|<|>=|<=)\()/g;
 
 function _formatAll(str) {
   const commentRule = tmplRule.commentRule;
   return str.replace(new RegExp('<!--' + commentRule + '[\\s\\S]*?' + commentRule + '-->', 'g'), '')
-    .replace(/\|[\s]*((>|<|>=|<=|\|\|)\()/g, (all, match) => '| ' + SP_FILTER_LOOKUP[match]);
-}
-
-function _formatNewline(str) {
-  return str.replace(/\n/g, '\\n').replace(/\r/g, '');
+    .replace(REGEX_SP_FILTER, (all, match) => '| ' + SP_FILTER_LOOKUP[match]);
 }
 
 //Set element node

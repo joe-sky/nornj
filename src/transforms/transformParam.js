@@ -88,8 +88,13 @@ function _getFilterParam(obj) {
 
 //Extract replace parameters
 const _quots = ['\'', '"'];
+const SP_FILTER_LOOKUP = {
+  '||(': 'or('
+};
+const REGEX_SP_FILTER = /[\s]+((\|\|)\()/g;
+const REGEX_FIX_FILTER = /(\|)?([\s]+[^\s]+\()/g;
 
-function _getReplaceParam(obj, strs) {
+function _getReplaceParam(obj) {
   let pattern = tmplRule.replaceParam,
     matchArr, ret, i = 0;
 
@@ -98,15 +103,17 @@ function _getReplaceParam(obj, strs) {
       ret = [];
     }
 
-    let prop = matchArr[3],
+    let prop = matchArr[2],
       item = [matchArr[0], matchArr[1], null, true];
 
     if (i > 0) {
       item[3] = false; //Sign not contain all of placehorder
     }
 
-    //Clear parameter at both ends of the space.
-    prop = prop.trim();
+    //替换特殊过滤器名称并且为简化过滤器补全"|"符
+    prop = prop.trim()
+      .replace(REGEX_SP_FILTER, (all, match) => ' ' + SP_FILTER_LOOKUP[match])
+      .replace(REGEX_FIX_FILTER, (all, s1, s2) => s1 ? all : '|' + s2);
 
     item[2] = prop;
     ret.push(item);
@@ -119,13 +126,18 @@ function _getReplaceParam(obj, strs) {
 //Get compiled parameter
 export function compiledParam(value) {
   let ret = tools.obj(),
-    strs = tools.isString(value) ? value.split(tmplRule.replaceSplit) : [value],
+    isStr = tools.isString(value),
+    strs = isStr ? value.split(tmplRule.replaceSplit) : [value],
     props = null,
     isAll = false; //此处指替换符是否占满整个属性值;若无替换符时为false
 
+  if (isStr) {  //替换插值变量以外的文本中的换行符
+    strs = strs.map(str => str.replace(/\n/g, '\\n').replace(/\r/g, ''));
+  }
+
   //If have placehorder
   if (strs.length > 1) {
-    const params = _getReplaceParam(value, strs);
+    const params = _getReplaceParam(value);
     props = [];
 
     tools.each(params, (param) => {

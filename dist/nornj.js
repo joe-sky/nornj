@@ -101,22 +101,22 @@ nj.outputH = false;
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core__ = __webpack_require__(0);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "i", function() { return defineProp; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "k", function() { return defineProps; });
-/* harmony export (immutable) */ __webpack_exports__["j"] = arrayPush;
-/* harmony export (immutable) */ __webpack_exports__["n"] = arraySlice;
-/* harmony export (immutable) */ __webpack_exports__["q"] = isArray;
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "h", function() { return defineProp; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "j", function() { return defineProps; });
+/* harmony export (immutable) */ __webpack_exports__["i"] = arrayPush;
+/* harmony export (immutable) */ __webpack_exports__["m"] = arraySlice;
+/* harmony export (immutable) */ __webpack_exports__["p"] = isArray;
 /* harmony export (immutable) */ __webpack_exports__["b"] = isObject;
 /* harmony export (immutable) */ __webpack_exports__["c"] = isString;
 /* harmony export (immutable) */ __webpack_exports__["d"] = isArrayLike;
 /* harmony export (immutable) */ __webpack_exports__["e"] = each;
-/* harmony export (immutable) */ __webpack_exports__["f"] = trimRight;
-/* harmony export (immutable) */ __webpack_exports__["g"] = noop;
-/* harmony export (immutable) */ __webpack_exports__["o"] = throwIf;
-/* harmony export (immutable) */ __webpack_exports__["p"] = warn;
-/* harmony export (immutable) */ __webpack_exports__["m"] = obj;
-/* harmony export (immutable) */ __webpack_exports__["l"] = clearQuot;
-/* harmony export (immutable) */ __webpack_exports__["h"] = toCamelCase;
+/* harmony export (immutable) */ __webpack_exports__["q"] = trimRight;
+/* harmony export (immutable) */ __webpack_exports__["f"] = noop;
+/* harmony export (immutable) */ __webpack_exports__["n"] = throwIf;
+/* harmony export (immutable) */ __webpack_exports__["o"] = warn;
+/* harmony export (immutable) */ __webpack_exports__["l"] = obj;
+/* harmony export (immutable) */ __webpack_exports__["k"] = clearQuot;
+/* harmony export (immutable) */ __webpack_exports__["g"] = toCamelCase;
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return assign; });
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
@@ -206,9 +206,11 @@ function each(obj, func, context, isArr) {
   }
 }
 
-var REGEX_TRIM_RIGHT = /[\s\xA0]+$/;
+var REGEX_TRIM_RIGHT = /(\n)?[\s\xA0]+$/;
 function trimRight(str) {
-  return str.replace(REGEX_TRIM_RIGHT, '');
+  return str.replace(REGEX_TRIM_RIGHT, function (all, s1) {
+    return s1 ? s1 + '' : '';
+  });
 }
 
 //Noop function
@@ -546,7 +548,7 @@ var exprs = {
         options = args[last];
 
     if (last > 0) {
-      var ret = __WEBPACK_IMPORTED_MODULE_1__utils_tools__["n" /* arraySlice */](args, 0, last);
+      var ret = __WEBPACK_IMPORTED_MODULE_1__utils_tools__["m" /* arraySlice */](args, 0, last);
       if (options.useString) {
         ret = ret.join('');
       }
@@ -705,7 +707,7 @@ function styleProps(obj) {
     }
 
     //将连字符转为驼峰命名
-    key = __WEBPACK_IMPORTED_MODULE_1__utils_tools__["h" /* toCamelCase */](key);
+    key = __WEBPACK_IMPORTED_MODULE_1__utils_tools__["g" /* toCamelCase */](key);
 
     ret[key] = value;
   }
@@ -766,7 +768,7 @@ function newContext(p2, p3) {
   }
 
   return {
-    data: newData.length ? __WEBPACK_IMPORTED_MODULE_1__utils_tools__["j" /* arrayPush */](newData, p2.data) : p2.data,
+    data: newData.length ? __WEBPACK_IMPORTED_MODULE_1__utils_tools__["i" /* arrayPush */](newData, p2.data) : p2.data,
     parent: p3 && p3.fallback ? p2 : p2.parent,
     index: p3 && 'index' in p3 ? p3.index : p2.index,
     level: p2.level,
@@ -811,10 +813,10 @@ function exprRet(p1, p2, fn, p4) {
 function tmplWrap(configs, main) {
   return function () {
     var initCtx = this,
-        data = __WEBPACK_IMPORTED_MODULE_1__utils_tools__["n" /* arraySlice */](arguments);
+        data = __WEBPACK_IMPORTED_MODULE_1__utils_tools__["m" /* arraySlice */](arguments);
 
     return main(configs, {
-      data: initCtx && initCtx._njData ? __WEBPACK_IMPORTED_MODULE_1__utils_tools__["j" /* arrayPush */](data, initCtx._njData) : data,
+      data: initCtx && initCtx._njData ? __WEBPACK_IMPORTED_MODULE_1__utils_tools__["i" /* arrayPush */](data, initCtx._njData) : data,
       parent: initCtx ? initCtx._njParent : null,
       index: initCtx ? initCtx._njIndex : null,
       level: initCtx ? initCtx._njLevel : null,
@@ -845,10 +847,10 @@ function template(fns) {
     useString: fns.useString,
     exprs: __WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */].exprs,
     filters: __WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */].filters,
-    noop: __WEBPACK_IMPORTED_MODULE_1__utils_tools__["g" /* noop */],
-    obj: __WEBPACK_IMPORTED_MODULE_1__utils_tools__["m" /* obj */],
-    throwIf: __WEBPACK_IMPORTED_MODULE_1__utils_tools__["o" /* throwIf */],
-    warn: __WEBPACK_IMPORTED_MODULE_1__utils_tools__["p" /* warn */],
+    noop: __WEBPACK_IMPORTED_MODULE_1__utils_tools__["f" /* noop */],
+    obj: __WEBPACK_IMPORTED_MODULE_1__utils_tools__["l" /* obj */],
+    throwIf: __WEBPACK_IMPORTED_MODULE_1__utils_tools__["n" /* throwIf */],
+    warn: __WEBPACK_IMPORTED_MODULE_1__utils_tools__["o" /* warn */],
     newContext: newContext,
     getComputedData: getComputedData,
     styleProps: styleProps,
@@ -978,7 +980,7 @@ var filters = {
   '#': function _(val, method) {
     if (val != null) {
       var args = arguments;
-      return val[method].apply(val, __WEBPACK_IMPORTED_MODULE_1__utils_tools__["n" /* arraySlice */](args, 2, args.length - 1));
+      return val[method].apply(val, __WEBPACK_IMPORTED_MODULE_1__utils_tools__["m" /* arraySlice */](args, 2, args.length - 1));
     }
 
     return val;
@@ -1217,11 +1219,11 @@ function _clearRepeat(str) {
     insideBraceParam: _createRegExp('([' + firstChar + ']?' + startRule + ')([^' + allRules + ']+)(' + endRule + '[' + lastChar + ']?)', 'i'),
     spreadProp: _createRegExp('[\\s]+([' + firstChar + ']?' + startRule + ')[\\s]*(\\.\\.\\.[^' + allRules + ']+)(' + endRule + '[' + lastChar + ']?)', 'g'),
     replaceSplit: _createRegExp('(?:[' + firstChar + ']?' + startRule + ')[^' + allRules + ']+(?:' + endRule + '[' + lastChar + ']?)'),
-    replaceParam: _createRegExp('(([' + firstChar + ']?' + startRule + '))([^' + allRules + ']+)(' + endRule + '[' + lastChar + ']?)', 'g'),
+    replaceParam: _createRegExp('([' + firstChar + ']?' + startRule + ')([^' + allRules + ']+)' + endRule + '[' + lastChar + ']?', 'g'),
     checkElem: _createRegExp('([^>]*)(<([a-z/!' + firstChar + exprRules + '][^\\s>]*)([^>]*)>)([^<]*)', 'ig'),
     expr: _createRegExp('^' + escapeExprRule + '([^\\s]+)', 'i'),
     include: _createRegExp('<' + escapeExprRule + 'include([^>]*)>', 'ig'),
-    newlineSplit: _createRegExp('\\\\n(?![^' + firstChar + lastChar + ']*' + lastChar + ')', 'g')
+    newlineSplit: _createRegExp('\\n(?![^' + firstChar + lastChar + ']*' + lastChar + ')', 'g')
   });
 };
 
@@ -1279,7 +1281,7 @@ function compileStringTmpl(tmpl) {
 
       //Resolve string to element
       ret = _checkStringElem(fullXml);
-      __WEBPACK_IMPORTED_MODULE_1__utils_tools__["i" /* defineProp */](ret, '_njParamCount', {
+      __WEBPACK_IMPORTED_MODULE_1__utils_tools__["h" /* defineProp */](ret, '_njParamCount', {
         value: l - 1
       });
 
@@ -1300,9 +1302,9 @@ function compileStringTmpl(tmpl) {
   }
 
   var tmplFn = function tmplFn() {
-    return __WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */]['compile' + (outputH ? 'H' : '')](tmplFn, tmplKey).apply(this, params ? __WEBPACK_IMPORTED_MODULE_1__utils_tools__["j" /* arrayPush */]([params], arguments) : arguments);
+    return __WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */]['compile' + (outputH ? 'H' : '')](tmplFn, tmplKey).apply(this, params ? __WEBPACK_IMPORTED_MODULE_1__utils_tools__["i" /* arrayPush */]([params], arguments) : arguments);
   };
-  __WEBPACK_IMPORTED_MODULE_1__utils_tools__["k" /* defineProps */](tmplFn, {
+  __WEBPACK_IMPORTED_MODULE_1__utils_tools__["j" /* defineProps */](tmplFn, {
     _njTmpl: {
       value: ret
     },
@@ -1338,7 +1340,6 @@ function _checkStringElem(xml) {
 
     //Text before tag
     if (textBefore && textBefore !== '\n') {
-      textBefore = _formatNewline(textBefore);
       _setText(textBefore, current.elem);
     }
 
@@ -1346,7 +1347,7 @@ function _checkStringElem(xml) {
     if (elem) {
       if (elem.indexOf('<!') === 0) {
         //doctype等标签当做文本处理
-        _setText(_formatNewline(elem), current.elem);
+        _setText(elem, current.elem);
       } else {
         if (elemName[0] === '/') {
           //Close tag
@@ -1373,7 +1374,6 @@ function _checkStringElem(xml) {
 
     //Text after tag
     if (textAfter && textAfter !== '\n') {
-      textAfter = _formatNewline(textAfter);
       _setText(textAfter, current.elem);
     }
   }
@@ -1385,19 +1385,15 @@ var SP_FILTER_LOOKUP = {
   '>(': 'gt(',
   '<(': 'lt(',
   '>=(': 'gte(',
-  '<=(': 'lte(',
-  '||(': 'or('
+  '<=(': 'lte('
 };
+var REGEX_SP_FILTER = /\|[\s]*((>|<|>=|<=)\()/g;
 
 function _formatAll(str) {
   var commentRule = tmplRule.commentRule;
-  return str.replace(new RegExp('<!--' + commentRule + '[\\s\\S]*?' + commentRule + '-->', 'g'), '').replace(/\|[\s]*((>|<|>=|<=|\|\|)\()/g, function (all, match) {
+  return str.replace(new RegExp('<!--' + commentRule + '[\\s\\S]*?' + commentRule + '-->', 'g'), '').replace(REGEX_SP_FILTER, function (all, match) {
     return '| ' + SP_FILTER_LOOKUP[match];
   });
-}
-
-function _formatNewline(str) {
-  return str.replace(/\n/g, '\\n').replace(/\r/g, '');
 }
 
 //Set element node
@@ -1548,7 +1544,7 @@ function getOpenTagParams(tag) {
     var value = matchArr[7],
         onlyBrace = matchArr[4];
     if (value != null) {
-      value = __WEBPACK_IMPORTED_MODULE_1__utils_tools__["l" /* clearQuot */](value); //Remove quotation marks
+      value = __WEBPACK_IMPORTED_MODULE_1__utils_tools__["k" /* clearQuot */](value); //Remove quotation marks
     } else {
       value = key; //Match to Similar to "checked" or "disabled" attribute.
     }
@@ -1605,7 +1601,7 @@ function isTmpl(obj) {
 function addTmpl(node, parent, name) {
   var paramsP = parent.params;
   if (!paramsP) {
-    paramsP = parent.params = __WEBPACK_IMPORTED_MODULE_1__utils_tools__["m" /* obj */]();
+    paramsP = parent.params = __WEBPACK_IMPORTED_MODULE_1__utils_tools__["l" /* obj */]();
   }
 
   var tmpls = paramsP.tmpls;
@@ -1654,7 +1650,7 @@ function addParamsExpr(node, parent, isExprProp) {
 
     parent.paramsExpr = exprPropsNode;
   } else {
-    __WEBPACK_IMPORTED_MODULE_1__utils_tools__["j" /* arrayPush */](parent.paramsExpr.content, isExprProp ? [node] : node.content);
+    __WEBPACK_IMPORTED_MODULE_1__utils_tools__["i" /* arrayPush */](parent.paramsExpr.content, isExprProp ? [node] : node.content);
   }
 }
 
@@ -1683,7 +1679,7 @@ var tmplRule = __WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */].tmplRule;
 //Get compiled parameters from a object
 
 function compiledParams(obj) {
-  var ret = __WEBPACK_IMPORTED_MODULE_1__utils_tools__["m" /* obj */]();
+  var ret = __WEBPACK_IMPORTED_MODULE_1__utils_tools__["l" /* obj */]();
   __WEBPACK_IMPORTED_MODULE_1__utils_tools__["e" /* each */](obj, function (v, k) {
     ret[k] = compiledParam(v);
   }, false, false);
@@ -1695,7 +1691,7 @@ function compiledParams(obj) {
 var REGEX_JS_PROP = /(('[^']*')|("[^"]*")|(-?([0-9][0-9]*)(\.\d+)?)|true|false|null|undefined|([#]*)([^.[\]()]+))([^\s()]*)/;
 
 function compiledProp(prop) {
-  var ret = __WEBPACK_IMPORTED_MODULE_1__utils_tools__["m" /* obj */]();
+  var ret = __WEBPACK_IMPORTED_MODULE_1__utils_tools__["l" /* obj */]();
 
   //If there are colons in the property,then use filter
   if (prop.indexOf('|') >= 0) {
@@ -1708,7 +1704,7 @@ function compiledProp(prop) {
       filtersTmp = filtersTmp.slice(1);
       __WEBPACK_IMPORTED_MODULE_1__utils_tools__["e" /* each */](filtersTmp, function (filter) {
         var retF = _getFilterParam(filter.trim()),
-            filterObj = __WEBPACK_IMPORTED_MODULE_1__utils_tools__["m" /* obj */](),
+            filterObj = __WEBPACK_IMPORTED_MODULE_1__utils_tools__["l" /* obj */](),
             filterName = retF[1]; //Get filter name
 
         if (filterName) {
@@ -1774,8 +1770,13 @@ function _getFilterParam(obj) {
 
 //Extract replace parameters
 var _quots = ['\'', '"'];
+var SP_FILTER_LOOKUP = {
+  '||(': 'or('
+};
+var REGEX_SP_FILTER = /[\s]+((\|\|)\()/g;
+var REGEX_FIX_FILTER = /(\|)?([\s]+[^\s]+\()/g;
 
-function _getReplaceParam(obj, strs) {
+function _getReplaceParam(obj) {
   var pattern = tmplRule.replaceParam,
       matchArr = void 0,
       ret = void 0,
@@ -1786,15 +1787,19 @@ function _getReplaceParam(obj, strs) {
       ret = [];
     }
 
-    var prop = matchArr[3],
+    var prop = matchArr[2],
         item = [matchArr[0], matchArr[1], null, true];
 
     if (i > 0) {
       item[3] = false; //Sign not contain all of placehorder
     }
 
-    //Clear parameter at both ends of the space.
-    prop = prop.trim();
+    //替换特殊过滤器名称并且为简化过滤器补全"|"符
+    prop = prop.trim().replace(REGEX_SP_FILTER, function (all, match) {
+      return ' ' + SP_FILTER_LOOKUP[match];
+    }).replace(REGEX_FIX_FILTER, function (all, s1, s2) {
+      return s1 ? all : '|' + s2;
+    });
 
     item[2] = prop;
     ret.push(item);
@@ -1806,18 +1811,26 @@ function _getReplaceParam(obj, strs) {
 
 //Get compiled parameter
 function compiledParam(value) {
-  var ret = __WEBPACK_IMPORTED_MODULE_1__utils_tools__["m" /* obj */](),
-      strs = __WEBPACK_IMPORTED_MODULE_1__utils_tools__["c" /* isString */](value) ? value.split(tmplRule.replaceSplit) : [value],
+  var ret = __WEBPACK_IMPORTED_MODULE_1__utils_tools__["l" /* obj */](),
+      isStr = __WEBPACK_IMPORTED_MODULE_1__utils_tools__["c" /* isString */](value),
+      strs = isStr ? value.split(tmplRule.replaceSplit) : [value],
       props = null,
       isAll = false; //此处指替换符是否占满整个属性值;若无替换符时为false
 
+  if (isStr) {
+    //替换插值变量以外的文本中的换行符
+    strs = strs.map(function (str) {
+      return str.replace(/\n/g, '\\n').replace(/\r/g, '');
+    });
+  }
+
   //If have placehorder
   if (strs.length > 1) {
-    var params = _getReplaceParam(value, strs);
+    var params = _getReplaceParam(value);
     props = [];
 
     __WEBPACK_IMPORTED_MODULE_1__utils_tools__["e" /* each */](params, function (param) {
-      var retP = __WEBPACK_IMPORTED_MODULE_1__utils_tools__["m" /* obj */]();
+      var retP = __WEBPACK_IMPORTED_MODULE_1__utils_tools__["l" /* obj */]();
       isAll = param[3] ? param[0] === value : false; //If there are several curly braces in one property value, "isAll" must be false.
       retP.prop = compiledProp(param[2]);
 
@@ -1927,9 +1940,9 @@ function _createCompile(outputH) {
 
     if (tmpl._njParams) {
       var tmplFn = function tmplFn() {
-        return tmplFns.main.apply(this, __WEBPACK_IMPORTED_MODULE_1__utils_tools__["j" /* arrayPush */]([tmpl._njParams], arguments));
+        return tmplFns.main.apply(this, __WEBPACK_IMPORTED_MODULE_1__utils_tools__["i" /* arrayPush */]([tmpl._njParams], arguments));
       };
-      __WEBPACK_IMPORTED_MODULE_1__utils_tools__["i" /* defineProp */](tmplFn, '_njTmpl', {
+      __WEBPACK_IMPORTED_MODULE_1__utils_tools__["h" /* defineProp */](tmplFn, '_njTmpl', {
         value: true
       });
 
@@ -1945,7 +1958,7 @@ var compileH = _createCompile(true);
 
 //Create template root object
 function _createAstRoot() {
-  var root = __WEBPACK_IMPORTED_MODULE_1__utils_tools__["m" /* obj */]();
+  var root = __WEBPACK_IMPORTED_MODULE_1__utils_tools__["l" /* obj */]();
   root.type = 'nj_root';
   root.content = [];
 
@@ -1969,7 +1982,7 @@ function _createRender(outputH) {
     return (outputH ? compileH : compile)(tmpl, options ? {
       tmplKey: options.tmplKey ? options.tmplKey : tmpl._njTmplKey,
       fileName: options.fileName
-    } : tmpl._njTmplKey).apply(null, __WEBPACK_IMPORTED_MODULE_1__utils_tools__["n" /* arraySlice */](arguments, 1));
+    } : tmpl._njTmplKey).apply(null, __WEBPACK_IMPORTED_MODULE_1__utils_tools__["m" /* arraySlice */](arguments, 1));
   };
 }
 
@@ -2340,11 +2353,10 @@ function _buildProps(obj, counter, fns, useStringLocal, level) {
         var strI = obj.strs[i + 1],
             prefixStr = str0 === '' && i == 0 ? '' : ' + ';
 
-        if (strI.trim() === '\\n') {
-          //如果只包含换行符号则忽略
-          valueStr += prefixStr + dataValueStr;
-          return;
-        }
+        // if (strI.trim() === '\\n') { //如果只包含换行符号则忽略
+        //   valueStr += prefixStr + dataValueStr;
+        //   return;
+        // }
 
         dataValueStr = prefixStr + '(' + dataValueStr + ')' + (strI !== '' ? ' + \'' + _replaceQuot(strI) + '\'' : '');
       }
@@ -2776,7 +2788,7 @@ function _plainTextNode(obj, parent, parentContent, noSplitNewline) {
 function checkElem(obj, parent, hasExprProps, noSplitNewline, isLast) {
   var parentContent = 'content';
 
-  if (!__WEBPACK_IMPORTED_MODULE_1__utils_tools__["q" /* isArray */](obj)) {
+  if (!__WEBPACK_IMPORTED_MODULE_1__utils_tools__["p" /* isArray */](obj)) {
     //判断是否为文本节点
     if (__WEBPACK_IMPORTED_MODULE_1__utils_tools__["c" /* isString */](obj)) {
       if (!noSplitNewline) {
@@ -2786,7 +2798,7 @@ function checkElem(obj, parent, hasExprProps, noSplitNewline, isLast) {
           str !== '' && _plainTextNode(str, parent, parentContent, noSplitNewline);
         });
       } else {
-        _plainTextNode(isLast && parent.allowNewline === 'nlElem' ? __WEBPACK_IMPORTED_MODULE_1__utils_tools__["f" /* trimRight */](obj) : obj, parent, parentContent, noSplitNewline);
+        _plainTextNode(isLast && parent.allowNewline === 'nlElem' ? __WEBPACK_IMPORTED_MODULE_1__utils_tools__["q" /* trimRight */](obj) : obj, parent, parentContent, noSplitNewline);
       }
     } else {
       _plainTextNode(obj, parent, parentContent, noSplitNewline);
@@ -2862,7 +2874,7 @@ function checkElem(obj, parent, hasExprProps, noSplitNewline, isLast) {
             node.args.push(paramV);
           } else {
             if (!node.params) {
-              node.params = __WEBPACK_IMPORTED_MODULE_1__utils_tools__["m" /* obj */]();
+              node.params = __WEBPACK_IMPORTED_MODULE_1__utils_tools__["l" /* obj */]();
             }
             node.params[param.key] = paramV;
           }
@@ -2892,7 +2904,7 @@ function checkElem(obj, parent, hasExprProps, noSplitNewline, isLast) {
         var tagParams = __WEBPACK_IMPORTED_MODULE_3__transforms_transformElement__["i" /* getOpenTagParams */](first);
         if (tagParams) {
           if (!node.params) {
-            node.params = __WEBPACK_IMPORTED_MODULE_1__utils_tools__["m" /* obj */]();
+            node.params = __WEBPACK_IMPORTED_MODULE_1__utils_tools__["l" /* obj */]();
           }
 
           __WEBPACK_IMPORTED_MODULE_1__utils_tools__["e" /* each */](tagParams, function (param) {
@@ -2949,7 +2961,7 @@ function checkElem(obj, parent, hasExprProps, noSplitNewline, isLast) {
       //如果不是元素节点,则为节点集合
       checkContentElem(obj, parent, hasExprProps, noSplitNewline);
     }
-  } else if (__WEBPACK_IMPORTED_MODULE_1__utils_tools__["q" /* isArray */](first)) {
+  } else if (__WEBPACK_IMPORTED_MODULE_1__utils_tools__["p" /* isArray */](first)) {
     //如果第一个子节点为数组,则该节点一定为节点集合(可以是多层数组嵌套的集合)
     checkContentElem(obj, parent, hasExprProps, noSplitNewline);
   }
@@ -2981,9 +2993,8 @@ function checkContentElem(obj, parent, hasExprProps, noSplitNewline) {
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "isString", function() { return __WEBPACK_IMPORTED_MODULE_1__utils_tools__["c"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "isArrayLike", function() { return __WEBPACK_IMPORTED_MODULE_1__utils_tools__["d"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "each", function() { return __WEBPACK_IMPORTED_MODULE_1__utils_tools__["e"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "trimRight", function() { return __WEBPACK_IMPORTED_MODULE_1__utils_tools__["f"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "noop", function() { return __WEBPACK_IMPORTED_MODULE_1__utils_tools__["g"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "toCamelCase", function() { return __WEBPACK_IMPORTED_MODULE_1__utils_tools__["h"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "noop", function() { return __WEBPACK_IMPORTED_MODULE_1__utils_tools__["f"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "toCamelCase", function() { return __WEBPACK_IMPORTED_MODULE_1__utils_tools__["g"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "assign", function() { return __WEBPACK_IMPORTED_MODULE_1__utils_tools__["a"]; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__helpers_extension__ = __webpack_require__(2);
 /* harmony namespace reexport (by provided) */ __webpack_require__.d(__webpack_exports__, "exprs", function() { return __WEBPACK_IMPORTED_MODULE_5__helpers_extension__["a"]; });

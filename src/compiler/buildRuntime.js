@@ -212,10 +212,10 @@ function _buildProps(obj, counter, fns, useStringLocal, level) {
         let strI = obj.strs[i + 1],
           prefixStr = (str0 === '' && i == 0 ? '' : ' + ');
 
-        if (strI.trim() === '\\n') { //如果只包含换行符号则忽略
-          valueStr += prefixStr + dataValueStr;
-          return;
-        }
+        // if (strI.trim() === '\\n') { //如果只包含换行符号则忽略
+        //   valueStr += prefixStr + dataValueStr;
+        //   return;
+        // }
 
         dataValueStr = prefixStr +
           '(' + dataValueStr + ')' +
