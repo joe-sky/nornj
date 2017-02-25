@@ -140,7 +140,8 @@ function _buildPropData(obj, counter, fns, useStringLocal, level) {
       let _filterC = counter._filter++,
         configF = filterConfig[o.name],
         filterVarStr = '_filter' + _filterC,
-        globalFilterStr = 'p1.filters[\'' + o.name + '\']';
+        globalFilterStr = 'p1.filters[\'' + o.name + '\']',
+        filterStrI = '';
 
       if (configF) {
         filterStr += '\nvar ' + filterVarStr + ' = ' + globalFilterStr + ';\n';
@@ -152,15 +153,28 @@ function _buildPropData(obj, counter, fns, useStringLocal, level) {
       filterStr += '  p1.warn(\'' + o.name + '\', \'filter\');\n';
       filterStr += '}\n';
       filterStr += 'else {\n';
-      filterStr += '  ' + valueStr + ' = ' + filterVarStr + '.apply(p2, [' + valueStr +
+
+      const _filterStr = '  ' + valueStr + ' = ' + filterVarStr + '.apply(p2, [' + valueStr +
         (o.params ? o.params.reduce((p, c) => {
-          return p + ', ' + _buildPropData({
+          const propStr = _buildPropData({
             prop: c,
             escape
           }, counter, fns, useStringLocal, level);
+
+          if (tools.isString(propStr)) {
+            return p + ', ' + propStr;
+          } else {
+            filterStrI += propStr.filterStr;
+            return p + ', ' + propStr.valueStr;
+          }
         }, '') : '') +
         ', ' + _buildOptions(configF, useStringLocal, null, fns) +
         ']);\n';
+
+      if (filterStrI !== '') {
+        filterStr += filterStrI;
+      }
+      filterStr += _filterStr;
       filterStr += '}\n';
     }, false, true);
 
@@ -419,7 +433,7 @@ function _buildNode(node, parent, fns, counter, retType, level, useStringLocal, 
     dataReferStr += '\n];\n';
 
     //添加匿名参数
-    if(paramsStr !== '') {
+    if (paramsStr !== '') {
       dataReferStr += 'p1.addArgs(_params' + _paramsC + ', _dataRefer' + _dataReferC + ');\n';
     }
 

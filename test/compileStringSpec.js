@@ -215,7 +215,7 @@ describe('test compile string', function () {
             img
           </@name>
           <#props>
-            <#if {{'test0 ' ||(true)}}>
+            <#if {{id >(50) &&(id <=(100))}}>
               <@id1>d2</@id1>
             </#if>
           </#props>
@@ -261,6 +261,25 @@ describe('test compile string', function () {
       </#each>
       `;
 
+      // let str1 = `
+      //   <div name1=../111>
+      //     <form-item wrapperCol=@{{'[1, 2]'}}>
+      //     <span>
+      //       <img />
+      //       sky:{{name}},@{{ id | filter2(1, 2) }}{{'[1]'}}end
+      //     </span>
+      //   </div>
+      // `;
+
+      // let reg = /\([^()]*(\([\s\S]*?\))*[\s\S]*?\)/g;
+      // //let reg1 = /@\{[^{}]*(?:\{[\s\S]*?\})*[^{}]*\}/g;
+      // let str = '1 +(2, 3 +(4) +(5) +(6 +(7)) +(2)) +(2) +(2, 3 +(4))'.replace(reg, function(all, s1, s2) {
+      //   console.log(all);
+      //   return '';
+      // });
+      // //let str = str1.split(reg1);
+      // console.log(str);
+
       // var tmplFn = compile(tmpl3, 'tmplString');
       // var html = tmplFn.apply(null, data);
       // var html = nj.render.call(null, tmplTest, data[0], data[1]);
@@ -271,7 +290,7 @@ describe('test compile string', function () {
       expect(html).toBeTruthy();
     });
 
-    it('test include parser', function () {
+    xit('test include parser', function () {
       nj.config({ includeParser });
 
       const tmpl = `

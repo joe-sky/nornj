@@ -15,10 +15,10 @@ export function compiledParams(obj) {
 //Get compiled property
 const REGEX_JS_PROP = /(('[^']*')|("[^"]*")|(-?([0-9][0-9]*)(\.\d+)?)|true|false|null|undefined|([#]*)([^.[\]()]+))([^\s()]*)/;
 
-export function compiledProp(prop) {
+export function compiledProp(prop, innerBrackets) {
   let ret = tools.obj();
 
-  //If there are colons in the property,then use filter
+  //If there are vertical lines in the property,then use filter
   if (prop.indexOf('|') >= 0) {
     let filters = [],
       filtersTmp;
@@ -28,22 +28,22 @@ export function compiledProp(prop) {
     filtersTmp = filtersTmp.slice(1);
     tools.each(filtersTmp, (filter) => {
       filter = filter.trim();
-      if(filter === '') {
+      if (filter === '') {
         return;
       }
 
       let retF = _getFilterParam(filter),
         filterObj = tools.obj(),
-        filterName = retF[1]; //Get filter name
+        filterName = retF[0]; //Get filter name
 
       if (filterName) {
-        const paramsF = retF[3]; //Get filter param
+        const paramsF = retF[1]; //Get filter param
 
         //Multiple params are separated by commas.
-        if (paramsF) {
+        if (paramsF != null) {
           let params = [];
-          tools.each(paramsF.split(','), (p) => {
-            params[params.length] = compiledProp(p.trim());
+          tools.each(innerBrackets[paramsF].split(','), (p) => {
+            params[params.length] = compiledProp(p.trim(), innerBrackets);
           }, false, true);
 
           filterObj.params = params;
@@ -85,10 +85,10 @@ export function compiledProp(prop) {
 }
 
 //Get filter param
-const REGEX_FILTER_PARAM = /([^\s()]+)(\(([^()]+)\))*/;
+const REGEX_FILTER_PARAM = /([^\s]+)(_njBracket_([\d]+))*/;
 
 function _getFilterParam(obj) {
-  return REGEX_FILTER_PARAM.exec(obj);
+  return obj.split('_njBracket_');
 }
 
 //Extract replace parameters
@@ -128,6 +128,21 @@ function _getReplaceParam(obj) {
   return ret;
 }
 
+const REGEX_INNER_BRACKET = /\(([^()]*)\)/g;
+
+function _replaceInnerBrackets(prop, counter, innerBrackets) {
+  let propR = prop.replace(REGEX_INNER_BRACKET, (all, s1) => {
+    innerBrackets.push(s1);
+    return '_njBracket_' + counter++;
+  });
+
+  if (propR !== prop) {
+    return _replaceInnerBrackets(propR, counter, innerBrackets);
+  } else {
+    return propR;
+  }
+}
+
 //Get compiled parameter
 export function compiledParam(value) {
   let ret = tools.obj(),
@@ -136,7 +151,7 @@ export function compiledParam(value) {
     props = null,
     isAll = false; //此处指替换符是否占满整个属性值;若无替换符时为false
 
-  if (isStr) {  //替换插值变量以外的文本中的换行符
+  if (isStr) { //替换插值变量以外的文本中的换行符
     strs = strs.map(str => str.replace(/\n/g, '\\n').replace(/\r/g, ''));
   }
 
@@ -146,9 +161,12 @@ export function compiledParam(value) {
     props = [];
 
     tools.each(params, (param) => {
-      let retP = tools.obj();
+      let retP = tools.obj(),
+        innerBrackets = [];
+
       isAll = param[3] ? param[0] === value : false; //If there are several curly braces in one property value, "isAll" must be false.
-      retP.prop = compiledProp(param[2]);
+      const prop = _replaceInnerBrackets(param[2], 0, innerBrackets);
+      retP.prop = compiledProp(prop, innerBrackets);
 
       //To determine whether it is necessary to escape
       retP.escape = param[1] !== tmplRule.firstChar + tmplRule.startRule;
