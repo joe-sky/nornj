@@ -79,6 +79,15 @@ export function getElement(name, p1) {
   return element ? element : name;
 }
 
+export function addArgs(props, dataRefer) {
+  const { args } = props;
+  if (args) {
+    for (let i = args.length; i--;) {
+      dataRefer.unshift(args[i]);
+    }
+  }
+}
+
 //Rebuild local variables in the new context
 export function newContext(p2, p3) {
   const newData = [];
@@ -177,7 +186,8 @@ export function template(fns) {
     getComputedData,
     styleProps,
     exprRet,
-    getElement
+    getElement,
+    addArgs
   };
 
   if (!configs.useString) {

@@ -19,9 +19,10 @@ describe('test compile string', function () {
     nj.registerFilter('tagName', function (v) {
       return v + 'Tmp';
     });
-    nj.registerExpr('textExpr', function (opts) {
+    nj.registerExpr('textExpr', function (arg1, arg2, opts) {
       //return opts.props.tmpls[0]();
-      return opts.props.name;
+      //console.log(opts.props.args);
+      return arg2;
     });
 
     nj.registerExpr('vm-include', function (opts) {
@@ -226,6 +227,8 @@ describe('test compile string', function () {
           <#tmpl>
             <TextExpr name="{{no}}" />
           </#tmpl>
+          <#arg>1</#arg>
+          <#arg>{{1 +(2)}}</#arg>
           <img /><img />
           <@name>
             img

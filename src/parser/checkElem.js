@@ -21,7 +21,7 @@ function _plainTextNode(obj, parent, parentContent, noSplitNewline) {
 }
 
 //检测元素节点
-export default function checkElem(obj, parent, hasExprProps, noSplitNewline, isLast) {
+export default function checkElem(obj, parent, hasExProps, noSplitNewline, isLast) {
   const parentContent = 'content';
 
   if (!tools.isArray(obj)) { //判断是否为文本节点
@@ -57,7 +57,7 @@ export default function checkElem(obj, parent, hasExprProps, noSplitNewline, isL
       isTmpl,
       isParamsExpr,
       isProp,
-      isExprProp,
+      isExProp,
       needAddToProps;
 
     expr = tranElem.isExpr(first);
@@ -79,10 +79,10 @@ export default function checkElem(obj, parent, hasExprProps, noSplitNewline, isL
       isTmpl = tranElem.isTmpl(exprName);
       isParamsExpr = tranElem.isParamsExpr(exprName);
       if (!isParamsExpr) {
-        let exprProp = tranElem.isExprProp(exprName);
-        isProp = exprProp.isProp;
-        isExprProp = exprProp.isExprProp;
-        needAddToProps = isProp ? !hasExprProps : isExprProp;
+        let exProp = tranElem.isExProp(exprName);
+        isProp = exProp.isProp;
+        isExProp = exProp.isExProp;
+        needAddToProps = isProp ? !hasExProps : isExProp;
       }
 
       node.type = 'nj_expr';
@@ -176,28 +176,28 @@ export default function checkElem(obj, parent, hasExprProps, noSplitNewline, isL
       const end = len - (hasCloseTag ? 1 : 0),
         content = obj.slice(1, end);
       if (content && content.length) {
-        checkContentElem(content, node, isParamsExpr || (hasExprProps && !isProp), noSplitNewline);
+        checkContentElem(content, node, isParamsExpr || (hasExProps && !isProp), noSplitNewline);
       }
 
       //If this is params block, set on the "paramsExpr" property of the parent node.
       if (isParamsExpr || needAddToProps) {
-        tranElem.addParamsExpr(node, parent, isExprProp);
+        tranElem.addParamsExpr(node, parent, isExProp);
       }
     } else { //如果不是元素节点,则为节点集合
-      checkContentElem(obj, parent, hasExprProps, noSplitNewline);
+      checkContentElem(obj, parent, hasExProps, noSplitNewline);
     }
   } else if (tools.isArray(first)) { //如果第一个子节点为数组,则该节点一定为节点集合(可以是多层数组嵌套的集合)
-    checkContentElem(obj, parent, hasExprProps, noSplitNewline);
+    checkContentElem(obj, parent, hasExProps, noSplitNewline);
   }
 }
 
 //检测子元素节点
-function checkContentElem(obj, parent, hasExprProps, noSplitNewline) {
+function checkContentElem(obj, parent, hasExProps, noSplitNewline) {
   if (!parent.content) {
     parent.content = [];
   }
 
   tools.each(obj, (item, i, l) => {
-    checkElem(item, parent, hasExprProps, noSplitNewline, i == l - 1);
+    checkElem(item, parent, hasExProps, noSplitNewline, i == l - 1);
   }, false, true);
 }

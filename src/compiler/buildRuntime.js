@@ -64,7 +64,7 @@ function _buildFn(content, node, fns, no, newContext, level, useStringLocal) {
   return no;
 }
 
-function _buildOptions(config, useStringLocal, node, fns, exprPropsStr, level, hashProps) {
+function _buildOptions(config, useStringLocal, node, fns, exPropsStr, level, hashProps) {
   let hashStr = '',
     noConfig = !config;
 
@@ -73,11 +73,11 @@ function _buildOptions(config, useStringLocal, node, fns, exprPropsStr, level, h
   }
   if (node) { //块表达式
     let newContext = config ? config.newContext : true;
-    if (noConfig || config.exprProps) {
-      hashStr += ', exprProps: ' + exprPropsStr;
+    if (noConfig || config.exProps) {
+      hashStr += ', exProps: ' + exPropsStr;
     }
 
-    hashStr += ', result: ' + (node.content ? 'p1.exprRet(p1, p2, p1.fn' + _buildFn(node.content, node, fns, ++fns._no, newContext, level, useStringLocal) + ', ' + exprPropsStr + ')' : 'p1.noop');
+    hashStr += ', result: ' + (node.content ? 'p1.exprRet(p1, p2, p1.fn' + _buildFn(node.content, node, fns, ++fns._no, newContext, level, useStringLocal) + ', ' + exPropsStr + ')' : 'p1.noop');
 
     if (hashProps != null) {
       hashStr += ', props: ' + hashProps;
@@ -405,9 +405,9 @@ function _buildNode(node, parent, fns, counter, retType, level, useStringLocal, 
     }
 
     //props块
-    let exprPropsStr = 'p4';
+    let exPropsStr = 'p4';
     if (retType && retType._paramsE) {
-      exprPropsStr = retType._paramsE;
+      exPropsStr = retType._paramsE;
     }
 
     //hash参数
@@ -415,8 +415,13 @@ function _buildNode(node, parent, fns, counter, retType, level, useStringLocal, 
       paramsStr = retP[0],
       _paramsC = retP[1];
 
-    dataReferStr += _buildOptions(configE, useStringLocal, node, fns, exprPropsStr, level, paramsStr !== '' ? '_params' + _paramsC : null);
+    dataReferStr += _buildOptions(configE, useStringLocal, node, fns, exPropsStr, level, paramsStr !== '' ? '_params' + _paramsC : null);
     dataReferStr += '\n];\n';
+
+    //添加匿名参数
+    if(paramsStr !== '') {
+      dataReferStr += 'p1.addArgs(_params' + _paramsC + ', _dataRefer' + _dataReferC + ');\n';
+    }
 
     if (filterStr !== '') {
       dataReferStr = filterStr + dataReferStr;

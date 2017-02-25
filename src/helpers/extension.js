@@ -49,14 +49,14 @@ export const exprs = {
     return ret;
   },
 
-  'else': options => options.exprProps['else'] = options.result,
+  'else': options => options.exProps['else'] = options.result,
 
   'elseif': (value, options) => {
-    const exprProps = options.exprProps;
-    if (!exprProps.elseifs) {
-      exprProps.elseifs = [];
+    const exProps = options.exProps;
+    if (!exProps.elseifs) {
+      exProps.elseifs = [];
     }
-    exprProps.elseifs.push({
+    exProps.elseifs.push({
       value,
       fn: options.result
     });
@@ -149,13 +149,13 @@ export const exprs = {
       value = !options.useString ? true : name;
     }
 
-    options.exprProps[options.outputH ? tranData.fixPropName(name) : name] = value;
+    options.exProps[options.outputH ? tranData.fixPropName(name) : name] = value;
   },
 
   //Spread parameters
   spread: (props, options) => {
     tools.each(props, (v, k) => {
-      options.exprProps[k] = v;
+      options.exProps[k] = v;
     }, false, false);
   },
 
@@ -210,7 +210,7 @@ export const exprs = {
 
   block: options => options.result(),
 
-  pre: options => options.result(),
+  pre: options => exprs.block(options),
 
   'with': function (originalData, options) {
     const props = options.props;
@@ -220,13 +220,22 @@ export const exprs = {
         [props.as]: originalData
       } : originalData
     });
-  }
+  },
+
+  arg: (options) => {
+    const { exProps } = options;
+    if(!exProps.args) {
+      exProps.args = [];
+    }
+
+    exProps.args.push(options.result());
+  },
 };
 
 function _commonConfig(params) {
   let ret = {
     useString: true,
-    exprProps: false,
+    exProps: false,
     isProp: false,
     newContext: true
   };
@@ -242,12 +251,12 @@ export const extensions = exprs;
 //Expression default config
 export const exprConfig = {
   'if': _commonConfig({ newContext: false }),
-  'else': _commonConfig({ newContext: false, useString: false, exprProps: true }),
+  'else': _commonConfig({ newContext: false, useString: false, exProps: true }),
   'switch': _commonConfig({ newContext: false }),
   unless: _commonConfig({ newContext: false }),
   each: _commonConfig(),
-  prop: _commonConfig({ newContext: false, exprProps: true, isProp: true }),
-  spread: _commonConfig({ newContext: false, useString: false, exprProps: true, isProp: true }),
+  prop: _commonConfig({ newContext: false, exProps: true, isProp: true }),
+  spread: _commonConfig({ newContext: false, useString: false, exProps: true, isProp: true }),
   'for': _commonConfig(),
   obj: _commonConfig({ newContext: false, useString: false }),
   'with': _commonConfig({ useString: false })
@@ -256,6 +265,7 @@ exprConfig.elseif = _commonConfig(exprConfig['else']);
 exprConfig.list = _commonConfig(exprConfig.if);
 exprConfig.block = _commonConfig(exprConfig.obj);
 exprConfig.pre = _commonConfig(exprConfig.obj);
+exprConfig.arg = _commonConfig(exprConfig.prop);
 
 //Expression alias
 exprs['case'] = exprs.elseif;
