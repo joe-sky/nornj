@@ -261,6 +261,29 @@ describe('test compile string', function () {
       </#each>
       `;
 
+      var tmplTest2 = nj.compile(`
+      <div>
+        <#props>
+          <#if {{false}}>
+            <@id1>2</@id1>
+            <#else>
+              <#props>
+                <@id21>21</@id21>
+              </#props>
+              <@id2>2</@id2>
+              <@id3>2</@id3>
+              <#if {{false}}>
+                <@id4>2</@id4>
+                <#else>
+                  <@id5>2</@id5>
+                </#else>
+              </#if>
+            </#else>
+          </#if>
+        </#props>
+      </div>
+      `, 'test2');
+
       // let str1 = `
       //   <div name1=../111>
       //     <form-item wrapperCol=@{{'[1, 2]'}}>
@@ -285,7 +308,15 @@ describe('test compile string', function () {
       // var html = nj.render.call(null, tmplTest, data[0], data[1]);
       var html = tmplTest.apply(null, data);
       
+      // const fns = nj.templates['test2'];
+      // console.log('0:\n', fns._main.toString());
+      // console.log('\n1:\n', fns.fn1.toString());
+      // console.log('\n2:\n', fns.fn2.toString());
+      // console.log('\n3:\n', fns.fn3.toString());
+      // console.log('\n4:\n', fns.fn4.toString());
       //console.log(JSON.stringify(nj.asts['tmplString']));
+
+      //var html = tmplTest2.apply(null, data);
       console.log(html);
       expect(html).toBeTruthy();
     });

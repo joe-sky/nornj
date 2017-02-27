@@ -57,7 +57,7 @@ export default function checkElem(obj, parent, hasExProps, noSplitNewline, isLas
       isTmpl,
       isParamsExpr,
       isProp,
-      isExProp,
+      isSub,
       needAddToProps;
 
     expr = tranElem.isExpr(first);
@@ -81,8 +81,8 @@ export default function checkElem(obj, parent, hasExProps, noSplitNewline, isLas
       if (!isParamsExpr) {
         let exProp = tranElem.isExProp(exprName);
         isProp = exProp.isProp;
-        isExProp = exProp.isExProp;
-        needAddToProps = isProp ? !hasExProps : isExProp;
+        isSub = exProp.isSub;
+        needAddToProps = isProp ? !hasExProps : isSub;
       }
 
       node.type = 'nj_expr';
@@ -155,9 +155,7 @@ export default function checkElem(obj, parent, hasExProps, noSplitNewline, isLas
 
           //将模板添加到父节点的params中
           tranElem.addTmpl(node, parent, exprParams ? exprParams[0].value : null);
-        } else if (isParamsExpr) {
-          pushContent = false;
-        } else if (needAddToProps) {
+        } else if (isParamsExpr || needAddToProps) {
           pushContent = false;
         }
 
@@ -181,7 +179,7 @@ export default function checkElem(obj, parent, hasExProps, noSplitNewline, isLas
 
       //If this is params block, set on the "paramsExpr" property of the parent node.
       if (isParamsExpr || needAddToProps) {
-        tranElem.addParamsExpr(node, parent, isExProp);
+        tranElem.addParamsExpr(node, parent, isProp, isSub);
       }
     } else { //如果不是元素节点,则为节点集合
       checkContentElem(obj, parent, hasExProps, noSplitNewline);

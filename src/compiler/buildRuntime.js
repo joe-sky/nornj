@@ -58,13 +58,14 @@ function _buildFn(content, node, fns, no, newContext, level, useStringLocal) {
    p1: 模板全局数据
    p2: 节点上下文数据
    p3: 块表达式内调用result及inverse方法传递的参数
-   p4: #props块变量
+   p4: #props变量
+   p5：子扩展标签#props变量
   */
-  fns[main ? 'main' + (isTmplExpr ? no : '') : 'fn' + no] = new Function('p1', 'p2', 'p3', 'p4', fnStr);
+  fns[main ? 'main' + (isTmplExpr ? no : '') : 'fn' + no] = new Function('p1', 'p2', 'p3', 'p4', 'p5', fnStr);
   return no;
 }
 
-function _buildOptions(config, useStringLocal, node, fns, exPropsStr, level, hashProps) {
+function _buildOptions(config, useStringLocal, node, fns, exPropsStr, subExPropsStr, level, hashProps) {
   let hashStr = '',
     noConfig = !config;
 
@@ -76,8 +77,11 @@ function _buildOptions(config, useStringLocal, node, fns, exPropsStr, level, has
     if (noConfig || config.exProps) {
       hashStr += ', exProps: ' + exPropsStr;
     }
+    if (noConfig || config.subExProps) {
+      hashStr += ', subExProps: ' + subExPropsStr;
+    }
 
-    hashStr += ', result: ' + (node.content ? 'p1.exprRet(p1, p2, p1.fn' + _buildFn(node.content, node, fns, ++fns._no, newContext, level, useStringLocal) + ', ' + exPropsStr + ')' : 'p1.noop');
+    hashStr += ', result: ' + (node.content ? 'p1.exprRet(p1, p2, p1.fn' + _buildFn(node.content, node, fns, ++fns._no, newContext, level, useStringLocal) + ', ' + exPropsStr + ', ' + subExPropsStr + ')' : 'p1.noop');
 
     if (hashProps != null) {
       hashStr += ', props: ' + hashProps;
@@ -268,7 +272,7 @@ function _buildProps(obj, counter, fns, useStringLocal, level) {
   }
 }
 
-function _buildParams(node, fns, counter, useString, level) {
+function _buildParams(node, fns, counter, useString, level, exPropsStr) {
   //节点参数
   const { params, paramsExpr } = node;
   let paramsStr = '',
@@ -281,12 +285,22 @@ function _buildParams(node, fns, counter, useString, level) {
 
     //params块
     if (paramsExpr) {
+      const { isSub } = paramsExpr;
       let _paramsEC = counter._paramsE++;
       paramsStr += (useString ? '\'\'' : 'null') + ';\n';
       paramsStr += 'var _paramsE' + _paramsEC + ' = {};\n';
 
+      const _paramsE = {};
+      if(isSub) {
+        _paramsE._paramsSE = '_paramsE' + _paramsEC;
+        _paramsE._paramsE = exPropsStr;
+      }
+      else {
+        _paramsE._paramsE = '_paramsE' + _paramsEC;
+      }
+
       //params块的子节点
-      paramsStr += _buildContent(paramsExpr.content, paramsExpr, fns, counter, { _paramsE: '_paramsE' + _paramsEC }, null, useString);
+      paramsStr += _buildContent(paramsExpr.content, paramsExpr, fns, counter, _paramsE, null, useString);
 
       //合并params块的值
       if (!useString) {
@@ -423,13 +437,17 @@ function _buildNode(node, parent, fns, counter, retType, level, useStringLocal, 
     if (retType && retType._paramsE) {
       exPropsStr = retType._paramsE;
     }
+    let subExPropsStr = 'p5';
+    if (retType && retType._paramsSE) {
+      subExPropsStr = retType._paramsSE;
+    }
 
     //hash参数
-    let retP = _buildParams(node, fns, counter, false, level),
+    let retP = _buildParams(node, fns, counter, false, level, exPropsStr),
       paramsStr = retP[0],
       _paramsC = retP[1];
 
-    dataReferStr += _buildOptions(configE, useStringLocal, node, fns, exPropsStr, level, paramsStr !== '' ? '_params' + _paramsC : null);
+    dataReferStr += _buildOptions(configE, useStringLocal, node, fns, exPropsStr, subExPropsStr, level, paramsStr !== '' ? '_params' + _paramsC : null);
     dataReferStr += '\n];\n';
 
     //添加匿名参数
@@ -574,7 +592,7 @@ function _buildRender(node, parent, nodeType, retType, params, fns, level, useSt
     } else {
       return '\nret += ' + retStr + ';\n';
     }
-  } else if (retType._paramsE) {
+  } else if (retType._paramsE || retType._paramsSE) {
     return '\n' + retStr + ';\n';
   } else {
     if (!useStringF) {

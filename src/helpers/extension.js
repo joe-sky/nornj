@@ -49,10 +49,10 @@ export const exprs = {
     return ret;
   },
 
-  'else': options => options.exProps['else'] = options.result,
+  'else': options => options.subExProps['else'] = options.result,
 
   'elseif': (value, options) => {
-    const exProps = options.exProps;
+    const exProps = options.subExProps;
     if (!exProps.elseifs) {
       exProps.elseifs = [];
     }
@@ -237,6 +237,8 @@ function _commonConfig(params) {
     useString: true,
     exProps: false,
     isProp: false,
+    subExProps: false,
+    isSub: false,
     newContext: true
   };
 
@@ -251,12 +253,12 @@ export const extensions = exprs;
 //Expression default config
 export const exprConfig = {
   'if': _commonConfig({ newContext: false }),
-  'else': _commonConfig({ newContext: false, useString: false, exProps: true }),
+  'else': _commonConfig({ newContext: false, useString: false, subExProps: true, isSub: true }),
   'switch': _commonConfig({ newContext: false }),
   unless: _commonConfig({ newContext: false }),
   each: _commonConfig(),
-  prop: _commonConfig({ newContext: false, exProps: true, isProp: true }),
-  spread: _commonConfig({ newContext: false, useString: false, exProps: true, isProp: true }),
+  prop: _commonConfig({ newContext: false, exProps: true, subExProps: true, isProp: true }),
+  spread: _commonConfig({ newContext: false, useString: false, exProps: true, subExProps: true, isProp: true }),
   'for': _commonConfig(),
   obj: _commonConfig({ newContext: false, useString: false }),
   'with': _commonConfig({ useString: false })

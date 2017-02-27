@@ -146,29 +146,33 @@ export function isParamsExpr(name) {
 }
 
 //Add to the "paramsExpr" property of the parent node
-export function addParamsExpr(node, parent, isExProp) {
+export function addParamsExpr(node, parent, isProp, isSub) {
   if (!parent.paramsExpr) {
     let exPropsNode;
-    if (isExProp) {
+    if (isProp || isSub) {
       exPropsNode = {
         type: 'nj_expr',
         expr: 'props',
         content: [node]
       };
+
+      if (isSub) {
+        exPropsNode.isSub = true;
+      }
     } else {
       exPropsNode = node;
     }
 
     parent.paramsExpr = exPropsNode;
   } else {
-    tools.arrayPush(parent.paramsExpr.content, isExProp ? [node] : node.content);
+    tools.arrayPush(parent.paramsExpr.content, isProp || isSub ? [node] : node.content);
   }
 }
 
 export function isExProp(name) {
   const config = exprConfig[name];
   return {
-    isExProp: config ? config.exProps : false,
+    isSub: config ? config.isSub : false,
     isProp: config ? config.isProp : false
   };
 }

@@ -134,9 +134,9 @@ export function assignStringProp(paramsE, keys) {
 }
 
 //创建块表达式子节点函数
-export function exprRet(p1, p2, fn, p4) {
+export function exprRet(p1, p2, fn, p4, p5) {
   return function(param) {
-    return fn(p1, p2, param, p4);
+    return fn(p1, p2, param, p4, p5);
   };
 }
 
