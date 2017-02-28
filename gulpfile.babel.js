@@ -9,6 +9,7 @@ import eslint from 'gulp-eslint';
 import notify from 'gulp-notify';
 import { argv } from 'yargs';
 import env from 'gulp-env';
+import { Server } from 'karma';
 
 //Handle error
 function handlebuildError() {
@@ -83,6 +84,14 @@ gulp.task("test", () => gulp.src(["./test/**/**Spec.js"])
     includeStackTrace: true
   }))
 );
+
+//Run all tests with Karma
+gulp.task("tests", function (done) {
+  new Server({
+    configFile: __dirname + '/karma.conf.js',
+    singleRun: true
+  }, () => done()).start();
+});
 
 //Run eslint
 gulp.task('eslint', () => gulp.src(['./src/**/*.js'])
