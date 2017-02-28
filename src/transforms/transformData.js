@@ -122,7 +122,7 @@ export function fixPropName(name) {
 }
 
 //合并字符串属性
-export function assignStringProp(paramsE, keys) {
+export function assignStrProps(paramsE, keys) {
   let ret = '';
   for (let k in paramsE) {
     if (!keys || !keys[k]) {
@@ -187,14 +187,15 @@ export function template(fns) {
     styleProps,
     exprRet,
     getElement,
-    addArgs
+    addArgs,
+    assign: tools.assign
   };
 
   if (!configs.useString) {
     configs.h = nj.createElement;
     configs.components = nj.components;
   } else {
-    configs.assignStringProp = assignStringProp;
+    configs.assignStrProps = assignStrProps;
     configs.escape = nj.escape;
     configs.levelSpace = levelSpace;
     configs.firstNewline = firstNewline;

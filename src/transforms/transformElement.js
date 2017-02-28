@@ -147,7 +147,8 @@ export function isParamsExpr(name) {
 
 //Add to the "paramsExpr" property of the parent node
 export function addParamsExpr(node, parent, isProp, isSub) {
-  if (!parent.paramsExpr) {
+  const exPropsName = isSub ? 'propsExS' : 'paramsExpr';
+  if (!parent[exPropsName]) {
     let exPropsNode;
     if (isProp || isSub) {
       exPropsNode = {
@@ -155,17 +156,13 @@ export function addParamsExpr(node, parent, isProp, isSub) {
         expr: 'props',
         content: [node]
       };
-
-      if (isSub) {
-        exPropsNode.isSub = true;
-      }
     } else {
       exPropsNode = node;
     }
 
-    parent.paramsExpr = exPropsNode;
+    parent[exPropsName] = exPropsNode;
   } else {
-    tools.arrayPush(parent.paramsExpr.content, isProp || isSub ? [node] : node.content);
+    tools.arrayPush(parent[exPropsName].content, isProp || isSub ? [node] : node.content);
   }
 }
 

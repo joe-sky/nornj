@@ -393,11 +393,11 @@ var exprs = {
   },
 
   'else': function _else(options) {
-    return options.exProps['else'] = options.result;
+    return options.subExProps['else'] = options.result;
   },
 
   'elseif': function elseif(value, options) {
-    var exProps = options.exProps;
+    var exProps = options.subExProps;
     if (!exProps.elseifs) {
       exProps.elseifs = [];
     }
@@ -591,6 +591,8 @@ function _commonConfig(params) {
     useString: true,
     exProps: false,
     isProp: false,
+    subExProps: false,
+    isSub: false,
     newContext: true
   };
 
@@ -605,12 +607,12 @@ var extensions = exprs;
 //Expression default config
 var exprConfig = {
   'if': _commonConfig({ newContext: false }),
-  'else': _commonConfig({ newContext: false, useString: false, exProps: true }),
+  'else': _commonConfig({ newContext: false, useString: false, subExProps: true, isSub: true }),
   'switch': _commonConfig({ newContext: false }),
   unless: _commonConfig({ newContext: false }),
   each: _commonConfig(),
-  prop: _commonConfig({ newContext: false, exProps: true, isProp: true }),
-  spread: _commonConfig({ newContext: false, useString: false, exProps: true, isProp: true }),
+  prop: _commonConfig({ newContext: false, exProps: true, subExProps: true, isProp: true }),
+  spread: _commonConfig({ newContext: false, useString: false, exProps: true, subExProps: true, isProp: true }),
   'for': _commonConfig(),
   obj: _commonConfig({ newContext: false, useString: false }),
   'with': _commonConfig({ useString: false })
@@ -685,7 +687,7 @@ __WEBPACK_IMPORTED_MODULE_1__utils_tools__["a" /* assign */](__WEBPACK_IMPORTED_
 /* unused harmony export addArgs */
 /* unused harmony export newContext */
 /* harmony export (immutable) */ __webpack_exports__["a"] = fixPropName;
-/* unused harmony export assignStringProp */
+/* unused harmony export assignStrProps */
 /* unused harmony export exprRet */
 /* unused harmony export tmplWrap */
 /* harmony export (immutable) */ __webpack_exports__["b"] = template;
@@ -819,7 +821,7 @@ function fixPropName(name) {
 }
 
 //合并字符串属性
-function assignStringProp(paramsE, keys) {
+function assignStrProps(paramsE, keys) {
   var ret = '';
   for (var k in paramsE) {
     if (!keys || !keys[k]) {
@@ -831,9 +833,9 @@ function assignStringProp(paramsE, keys) {
 }
 
 //创建块表达式子节点函数
-function exprRet(p1, p2, fn, p4) {
+function exprRet(p1, p2, fn, p4, p5) {
   return function (param) {
-    return fn(p1, p2, param, p4);
+    return fn(p1, p2, param, p4, p5);
   };
 }
 
@@ -884,14 +886,15 @@ function template(fns) {
     styleProps: styleProps,
     exprRet: exprRet,
     getElement: getElement,
-    addArgs: addArgs
+    addArgs: addArgs,
+    assign: __WEBPACK_IMPORTED_MODULE_1__utils_tools__["a" /* assign */]
   };
 
   if (!configs.useString) {
     configs.h = __WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */].createElement;
     configs.components = __WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */].components;
   } else {
-    configs.assignStringProp = assignStringProp;
+    configs.assignStrProps = assignStrProps;
     configs.escape = __WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */].escape;
     configs.levelSpace = levelSpace;
     configs.firstNewline = firstNewline;
@@ -1665,10 +1668,11 @@ function isParamsExpr(name) {
 }
 
 //Add to the "paramsExpr" property of the parent node
-function addParamsExpr(node, parent, isExProp) {
-  if (!parent.paramsExpr) {
+function addParamsExpr(node, parent, isProp, isSub) {
+  var exPropsName = isSub ? 'propsExS' : 'paramsExpr';
+  if (!parent[exPropsName]) {
     var exPropsNode = void 0;
-    if (isExProp) {
+    if (isProp || isSub) {
       exPropsNode = {
         type: 'nj_expr',
         expr: 'props',
@@ -1678,16 +1682,16 @@ function addParamsExpr(node, parent, isExProp) {
       exPropsNode = node;
     }
 
-    parent.paramsExpr = exPropsNode;
+    parent[exPropsName] = exPropsNode;
   } else {
-    __WEBPACK_IMPORTED_MODULE_1__utils_tools__["e" /* arrayPush */](parent.paramsExpr.content, isExProp ? [node] : node.content);
+    __WEBPACK_IMPORTED_MODULE_1__utils_tools__["e" /* arrayPush */](parent[exPropsName].content, isProp || isSub ? [node] : node.content);
   }
 }
 
 function isExProp(name) {
   var config = __WEBPACK_IMPORTED_MODULE_3__helpers_extension__["c" /* exprConfig */][name];
   return {
-    isExProp: config ? config.exProps : false,
+    isSub: config ? config.isSub : false,
     isProp: config ? config.isProp : false
   };
 }
@@ -2239,13 +2243,14 @@ function _buildFn(content, node, fns, no, newContext, level, useStringLocal) {
    p1: 模板全局数据
    p2: 节点上下文数据
    p3: 块表达式内调用result及inverse方法传递的参数
-   p4: #props块变量
+   p4: #props变量
+   p5：子扩展标签#props变量
   */
-  fns[main ? 'main' + (isTmplExpr ? no : '') : 'fn' + no] = new Function('p1', 'p2', 'p3', 'p4', fnStr);
+  fns[main ? 'main' + (isTmplExpr ? no : '') : 'fn' + no] = new Function('p1', 'p2', 'p3', 'p4', 'p5', fnStr);
   return no;
 }
 
-function _buildOptions(config, useStringLocal, node, fns, exPropsStr, level, hashProps) {
+function _buildOptions(config, useStringLocal, node, fns, exPropsStr, subExPropsStr, level, hashProps) {
   var hashStr = '',
       noConfig = !config;
 
@@ -2258,8 +2263,11 @@ function _buildOptions(config, useStringLocal, node, fns, exPropsStr, level, has
     if (noConfig || config.exProps) {
       hashStr += ', exProps: ' + exPropsStr;
     }
+    if (noConfig || config.subExProps) {
+      hashStr += ', subExProps: ' + subExPropsStr;
+    }
 
-    hashStr += ', result: ' + (node.content ? 'p1.exprRet(p1, p2, p1.fn' + _buildFn(node.content, node, fns, ++fns._no, newContext, level, useStringLocal) + ', ' + exPropsStr + ')' : 'p1.noop');
+    hashStr += ', result: ' + (node.content ? 'p1.exprRet(p1, p2, p1.fn' + _buildFn(node.content, node, fns, ++fns._no, newContext, level, useStringLocal) + ', ' + exPropsStr + ', ' + subExPropsStr + ')' : 'p1.noop');
 
     if (hashProps != null) {
       hashStr += ', props: ' + hashProps;
@@ -2463,32 +2471,61 @@ function _buildProps(obj, counter, fns, useStringLocal, level) {
   }
 }
 
-function _buildParams(node, fns, counter, useString, level) {
+function _buildPropsEx(isSub, paramsEC, propsEx, fns, counter, useString, exPropsStr, subExPropsStr) {
+  var paramsStr = 'var _paramsE' + paramsEC + ' = {};\n';
+
+  var ret = {};
+  if (isSub) {
+    ret._paramsE = exPropsStr;
+    ret._paramsSE = '_paramsE' + paramsEC;
+  } else {
+    ret._paramsE = '_paramsE' + paramsEC;
+    ret._paramsSE = subExPropsStr;
+  }
+
+  //params块的子节点
+  paramsStr += _buildContent(propsEx.content, propsEx, fns, counter, ret, null, useString);
+  return paramsStr;
+}
+
+function _buildParams(node, fns, counter, useString, level, exPropsStr, subExPropsStr) {
   //节点参数
   var params = node.params,
-      paramsExpr = node.paramsExpr;
+      paramsExpr = node.paramsExpr,
+      propsExS = node.propsExS;
 
+  var useStringF = fns.useString,
+      hasPropsEx = paramsExpr || propsExS;
   var paramsStr = '',
-      _paramsC = void 0,
-      useStringF = fns.useString;
+      _paramsC = void 0;
 
-  if (params || paramsExpr) {
+  if (params || hasPropsEx) {
     _paramsC = counter._params++;
     paramsStr = 'var _params' + _paramsC + ' = ';
 
-    //params块
-    if (paramsExpr) {
-      var _paramsEC = counter._paramsE++;
-      paramsStr += (useString ? '\'\'' : 'null') + ';\n';
-      paramsStr += 'var _paramsE' + _paramsEC + ' = {};\n';
+    //props tag
+    if (hasPropsEx) {
+      var bothPropsEx = paramsExpr && propsExS,
+          _paramsEC = void 0,
+          _paramsSEC = void 0;
+      paramsStr += (useString ? '\'\'' : bothPropsEx ? '{}' : 'null') + ';\n';
 
-      //params块的子节点
-      paramsStr += _buildContent(paramsExpr.content, paramsExpr, fns, counter, { _paramsE: '_paramsE' + _paramsEC }, null, useString);
+      if (paramsExpr) {
+        _paramsEC = counter._paramsE++;
+        paramsStr += _buildPropsEx(false, _paramsEC, paramsExpr, fns, counter, useString, exPropsStr, subExPropsStr);
+      }
+      if (propsExS) {
+        _paramsSEC = counter._paramsE++;
+        paramsStr += _buildPropsEx(true, _paramsSEC, propsExS, fns, counter, useString, exPropsStr, subExPropsStr);
+      }
 
       //合并params块的值
       if (!useString) {
-        paramsStr += '\n_params' + _paramsC + ' = _paramsE' + _paramsEC + ';\n';
-        //paramsStr += '\np1.assign(_params' + _paramsC + ', _paramsE' + _paramsEC + ');\n';
+        if (bothPropsEx) {
+          paramsStr += '\np1.assign(_params' + _paramsC + ', _paramsE' + _paramsEC + ', _paramsE' + _paramsSEC + ');\n';
+        } else {
+          paramsStr += '\n_params' + _paramsC + ' = _paramsE' + (_paramsEC != null ? _paramsEC : _paramsSEC) + ';\n';
+        }
       } else {
         var keys = '';
         __WEBPACK_IMPORTED_MODULE_1__utils_tools__["c" /* each */](params, function (v, k, i, l) {
@@ -2503,7 +2540,8 @@ function _buildParams(node, fns, counter, useString, level) {
             keys += ' }';
           }
         }, false, false);
-        paramsStr += '_params' + _paramsC + ' += p1.assignStringProp(_paramsE' + _paramsEC + ', ' + (keys === '' ? 'null' : keys) + ');\n';
+
+        paramsStr += '\n_params' + _paramsC + ' += p1.assignStrProps(_paramsE' + _paramsEC + ', ' + (keys === '' ? 'null' : keys) + ');\n';
       }
     }
 
@@ -2513,7 +2551,7 @@ function _buildParams(node, fns, counter, useString, level) {
             len = paramKeys.length,
             filterStr = '';
 
-        if (!useString && !paramsExpr) {
+        if (!useString && !hasPropsEx) {
           paramsStr += '{\n';
         }
 
@@ -2534,7 +2572,7 @@ function _buildParams(node, fns, counter, useString, level) {
           if (!useStringF) {
             key = __WEBPACK_IMPORTED_MODULE_2__transforms_transformData__["a" /* fixPropName */](k);
           }
-          if (!paramsExpr) {
+          if (!hasPropsEx) {
             if (!useString) {
               paramsStr += '  \'' + key + '\': ' + (!onlyKey ? valueStr : 'true') + (i < len - 1 ? ',\n' : '');
             } else {
@@ -2549,7 +2587,7 @@ function _buildParams(node, fns, counter, useString, level) {
           }
         }, false, false);
 
-        if (!useString && !paramsExpr) {
+        if (!useString && !hasPropsEx) {
           paramsStr += '\n};\n';
         }
 
@@ -2624,17 +2662,26 @@ function _buildNode(node, parent, fns, counter, retType, level, useStringLocal, 
     }
 
     //props块
-    var exPropsStr = 'p4';
-    if (retType && retType._paramsE) {
-      exPropsStr = retType._paramsE;
+    var exPropsStr = 'p4',
+        subExPropsStr = 'p5';
+    if (retType) {
+      var _paramsE = retType._paramsE,
+          _paramsSE = retType._paramsSE;
+
+      if (_paramsE) {
+        exPropsStr = _paramsE;
+      }
+      if (_paramsSE) {
+        subExPropsStr = _paramsSE;
+      }
     }
 
     //hash参数
-    var retP = _buildParams(node, fns, counter, false, level),
+    var retP = _buildParams(node, fns, counter, false, level, exPropsStr, subExPropsStr),
         paramsStr = retP[0],
         _paramsC = retP[1];
 
-    dataReferStr += _buildOptions(configE, useStringLocal, node, fns, exPropsStr, level, paramsStr !== '' ? '_params' + _paramsC : null);
+    dataReferStr += _buildOptions(configE, useStringLocal, node, fns, exPropsStr, subExPropsStr, level, paramsStr !== '' ? '_params' + _paramsC : null);
     dataReferStr += '\n];\n';
 
     //添加匿名参数
@@ -2787,7 +2834,7 @@ function _buildRender(node, parent, nodeType, retType, params, fns, level, useSt
     } else {
       return '\nret += ' + retStr + ';\n';
     }
-  } else if (retType._paramsE) {
+  } else if (retType._paramsE || retType._paramsSE) {
     return '\n' + retStr + ';\n';
   } else {
     if (!useStringF) {
@@ -2898,7 +2945,7 @@ function checkElem(obj, parent, hasExProps, noSplitNewline, isLast) {
         isTmpl = void 0,
         isParamsExpr = void 0,
         isProp = void 0,
-        isExProp = void 0,
+        isSub = void 0,
         needAddToProps = void 0;
 
     expr = __WEBPACK_IMPORTED_MODULE_3__transforms_transformElement__["a" /* isExpr */](first);
@@ -2926,8 +2973,8 @@ function checkElem(obj, parent, hasExProps, noSplitNewline, isLast) {
       if (!isParamsExpr) {
         var exProp = __WEBPACK_IMPORTED_MODULE_3__transforms_transformElement__["g" /* isExProp */](exprName);
         isProp = exProp.isProp;
-        isExProp = exProp.isExProp;
-        needAddToProps = isProp ? !hasExProps : isExProp;
+        isSub = exProp.isSub;
+        needAddToProps = isProp ? !hasExProps : isSub;
       }
 
       node.type = 'nj_expr';
@@ -3004,9 +3051,7 @@ function checkElem(obj, parent, hasExProps, noSplitNewline, isLast) {
 
           //将模板添加到父节点的params中
           __WEBPACK_IMPORTED_MODULE_3__transforms_transformElement__["k" /* addTmpl */](node, parent, exprParams ? exprParams[0].value : null);
-        } else if (isParamsExpr) {
-          pushContent = false;
-        } else if (needAddToProps) {
+        } else if (isParamsExpr || needAddToProps) {
           pushContent = false;
         }
 
@@ -3030,7 +3075,7 @@ function checkElem(obj, parent, hasExProps, noSplitNewline, isLast) {
 
       //If this is params block, set on the "paramsExpr" property of the parent node.
       if (isParamsExpr || needAddToProps) {
-        __WEBPACK_IMPORTED_MODULE_3__transforms_transformElement__["l" /* addParamsExpr */](node, parent, isExProp);
+        __WEBPACK_IMPORTED_MODULE_3__transforms_transformElement__["l" /* addParamsExpr */](node, parent, isProp, isSub);
       }
     } else {
       //如果不是元素节点,则为节点集合

@@ -272,40 +272,57 @@ function _buildProps(obj, counter, fns, useStringLocal, level) {
   }
 }
 
-function _buildParams(node, fns, counter, useString, level, exPropsStr) {
-  //节点参数
-  const { params, paramsExpr } = node;
-  let paramsStr = '',
-    _paramsC,
-    useStringF = fns.useString;
+function _buildPropsEx(isSub, paramsEC, propsEx, fns, counter, useString, exPropsStr, subExPropsStr) {
+  let paramsStr = 'var _paramsE' + paramsEC + ' = {};\n';
 
-  if (params || paramsExpr) {
+  const ret = {};
+  if (isSub) {
+    ret._paramsE = exPropsStr;
+    ret._paramsSE = '_paramsE' + paramsEC;
+  } else {
+    ret._paramsE = '_paramsE' + paramsEC;
+    ret._paramsSE = subExPropsStr;
+  }
+
+  //params块的子节点
+  paramsStr += _buildContent(propsEx.content, propsEx, fns, counter, ret, null, useString);
+  return paramsStr;
+}
+
+function _buildParams(node, fns, counter, useString, level, exPropsStr, subExPropsStr) {
+  //节点参数
+  const { params, paramsExpr, propsExS } = node;
+  const useStringF = fns.useString,
+    hasPropsEx = paramsExpr || propsExS;
+  let paramsStr = '',
+    _paramsC;
+
+  if (params || hasPropsEx) {
     _paramsC = counter._params++;
     paramsStr = 'var _params' + _paramsC + ' = ';
 
-    //params块
-    if (paramsExpr) {
-      const { isSub } = paramsExpr;
-      let _paramsEC = counter._paramsE++;
-      paramsStr += (useString ? '\'\'' : 'null') + ';\n';
-      paramsStr += 'var _paramsE' + _paramsEC + ' = {};\n';
+    //props tag
+    if (hasPropsEx) {
+      let bothPropsEx = paramsExpr && propsExS,
+        _paramsEC, _paramsSEC;
+      paramsStr += (useString ? '\'\'' : (bothPropsEx ? '{}' : 'null')) + ';\n';
 
-      const _paramsE = {};
-      if(isSub) {
-        _paramsE._paramsSE = '_paramsE' + _paramsEC;
-        _paramsE._paramsE = exPropsStr;
+      if (paramsExpr) {
+        _paramsEC = counter._paramsE++;
+        paramsStr += _buildPropsEx(false, _paramsEC, paramsExpr, fns, counter, useString, exPropsStr, subExPropsStr);
       }
-      else {
-        _paramsE._paramsE = '_paramsE' + _paramsEC;
+      if (propsExS) {
+        _paramsSEC = counter._paramsE++;
+        paramsStr += _buildPropsEx(true, _paramsSEC, propsExS, fns, counter, useString, exPropsStr, subExPropsStr);
       }
-
-      //params块的子节点
-      paramsStr += _buildContent(paramsExpr.content, paramsExpr, fns, counter, _paramsE, null, useString);
 
       //合并params块的值
       if (!useString) {
-        paramsStr += '\n_params' + _paramsC + ' = _paramsE' + _paramsEC + ';\n';
-        //paramsStr += '\np1.assign(_params' + _paramsC + ', _paramsE' + _paramsEC + ');\n';
+        if (bothPropsEx) {
+          paramsStr += '\np1.assign(_params' + _paramsC + ', _paramsE' + _paramsEC + ', _paramsE' + _paramsSEC + ');\n';
+        } else {
+          paramsStr += '\n_params' + _paramsC + ' = _paramsE' + (_paramsEC != null ? _paramsEC : _paramsSEC) + ';\n';
+        }
       } else {
         let keys = '';
         tools.each(params, function(v, k, i, l) {
@@ -320,7 +337,8 @@ function _buildParams(node, fns, counter, useString, level, exPropsStr) {
             keys += ' }';
           }
         }, false, false);
-        paramsStr += '_params' + _paramsC + ' += p1.assignStringProp(_paramsE' + _paramsEC + ', ' + (keys === '' ? 'null' : keys) + ');\n';
+
+        paramsStr += '\n_params' + _paramsC + ' += p1.assignStrProps(_paramsE' + _paramsEC + ', ' + (keys === '' ? 'null' : keys) + ');\n';
       }
     }
 
@@ -329,7 +347,7 @@ function _buildParams(node, fns, counter, useString, level, exPropsStr) {
         len = paramKeys.length,
         filterStr = '';
 
-      if (!useString && !paramsExpr) {
+      if (!useString && !hasPropsEx) {
         paramsStr += '{\n';
       }
 
@@ -349,7 +367,7 @@ function _buildParams(node, fns, counter, useString, level, exPropsStr) {
         if (!useStringF) {
           key = tranData.fixPropName(k);
         }
-        if (!paramsExpr) {
+        if (!hasPropsEx) {
           if (!useString) {
             paramsStr += '  \'' + key + '\': ' + (!onlyKey ? valueStr : 'true') + (i < len - 1 ? ',\n' : '');
           } else {
@@ -364,7 +382,7 @@ function _buildParams(node, fns, counter, useString, level, exPropsStr) {
         }
       }, false, false);
 
-      if (!useString && !paramsExpr) {
+      if (!useString && !hasPropsEx) {
         paramsStr += '\n};\n';
       }
 
@@ -433,17 +451,20 @@ function _buildNode(node, parent, fns, counter, retType, level, useStringLocal, 
     }
 
     //props块
-    let exPropsStr = 'p4';
-    if (retType && retType._paramsE) {
-      exPropsStr = retType._paramsE;
-    }
-    let subExPropsStr = 'p5';
-    if (retType && retType._paramsSE) {
-      subExPropsStr = retType._paramsSE;
+    let exPropsStr = 'p4',
+      subExPropsStr = 'p5';
+    if (retType) {
+      const { _paramsE, _paramsSE } = retType;
+      if (_paramsE) {
+        exPropsStr = _paramsE;
+      }
+      if (_paramsSE) {
+        subExPropsStr = _paramsSE;
+      }
     }
 
     //hash参数
-    let retP = _buildParams(node, fns, counter, false, level, exPropsStr),
+    let retP = _buildParams(node, fns, counter, false, level, exPropsStr, subExPropsStr),
       paramsStr = retP[0],
       _paramsC = retP[1];
 

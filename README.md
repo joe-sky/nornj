@@ -9,7 +9,7 @@
 
 ```html
 <template name="partial">
-  <#if {{i >(0) &&(i <=(10))}}>
+  <#if {{i >(0) ||(i <=(-10))}}>
     <input id=test onclick={{click}} />
   </#if>
 </template>
@@ -24,14 +24,14 @@
 </template>
 ```
 
-如上例，`NornJ`的语法与html几乎一致，而且`if`、`each`、`>`、`<=`等都是支持自定义扩展的模板语法！^_^
+如上例，`NornJ`的语法在可以展现一定逻辑性的同时结构与html几乎一致，而且`if`、`each`、`>`、`<=`等都是支持自定义扩展的模板语法！^_^
 
 ### 特色
 
 传统js模板引擎如`Handlebars`、`EJS`等通常只支持输出html字符串，`NornJ`与它们相比，相同点和不同点都有：
 
 * 支持`React`作为JSX的替代模板语言；可支持模板预编译，也可以直接在浏览器中运行。
-* 支持处理数据并输出html字符串，故它也可以像传统js模板引擎一样支持`Backbone`或`Express`等。
+* 支持读取数据并输出html字符串，故它也可以像传统js模板引擎一样支持`Backbone`或`Express`等。
 * 它的语法偏向弱逻辑，和`Handlebars`更类似一些，但也有自己独特的地方。
 
 ### 与React配合示例

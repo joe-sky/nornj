@@ -266,10 +266,16 @@ describe('test compile string', function () {
         <#props>
           <#if {{false}}>
             <@id1>2</@id1>
+            <#props>
+              <@id1>2</@id1>
+            </#props>
+            <#elseif {{true}}>
+              <@id0>2</@id0>
+            </#elseif>
             <#else>
-              <#props>
+              <!--#<#props>
                 <@id21>21</@id21>
-              </#props>
+              </#props>#-->
               <@id2>2</@id2>
               <@id3>2</@id3>
               <#if {{false}}>
@@ -306,7 +312,7 @@ describe('test compile string', function () {
       // var tmplFn = compile(tmpl3, 'tmplString');
       // var html = tmplFn.apply(null, data);
       // var html = nj.render.call(null, tmplTest, data[0], data[1]);
-      var html = tmplTest.apply(null, data);
+      // var html = tmplTest2.apply(null, data);
       
       // const fns = nj.templates['test2'];
       // console.log('0:\n', fns._main.toString());
@@ -316,7 +322,7 @@ describe('test compile string', function () {
       // console.log('\n4:\n', fns.fn4.toString());
       //console.log(JSON.stringify(nj.asts['tmplString']));
 
-      //var html = tmplTest2.apply(null, data);
+      var html = tmplTest.apply(null, data);
       console.log(html);
       expect(html).toBeTruthy();
     });
