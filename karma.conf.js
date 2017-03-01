@@ -1,6 +1,4 @@
-'use strict';
-
-module.exports = function(config) {
+export default function(config) {
   config.set({
     // base path that will be used to resolve all patterns (eg. files, exclude)
     basePath: '',
@@ -16,6 +14,12 @@ module.exports = function(config) {
 
     // list of files to exclude
     exclude: [],
+
+    // preprocess matching files before serving them to the browser
+    // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
+    preprocessors: {
+      'test/**/*.js': ['babel', 'commonjs']
+    },
 
     // test results reporter to use
     // possible values: 'dots', 'progress'
@@ -56,6 +60,8 @@ module.exports = function(config) {
       'karma-jasmine',
       'karma-coverage',
       'karma-spec-reporter',
+      'karma-commonjs',
+      'karma-babel-preprocessor',
       'karma-phantomjs-launcher'
     ],
 
