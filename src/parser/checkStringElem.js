@@ -22,14 +22,18 @@ export default function compileStringTmpl(tmpl) {
       if (i < l - 1) {
         const last = xml.length - 1,
           lastChar = xml[last],
-          isComputed = lastChar === '#';
+          lastChar3 = xml.substr(last - 2),
+          isComputed = lastChar === '#',
+          isSpread = lastChar3 === '...';
 
         if (isComputed) {
           xml = xml.substr(0, last);
+        } else if (isSpread) {
+          xml = xml.substr(0, last - 2);
         }
 
         split = tmplRule.startRule +
-          (isComputed ? '#' : '') + SPLIT_FLAG + i +
+          (isComputed ? '#' : (isSpread ? '...' : '')) + SPLIT_FLAG + i +
           tmplRule.endRule;
       }
 

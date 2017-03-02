@@ -208,7 +208,7 @@ describe('test compile string', function () {
           <message> Welcome to YiiBai </message>
         ]]>
         </#pre>
-        <div {{...props}}>
+        <div {{...props}} ...${{ id10: 'id_10' }}>
           <@id>d1</@id>
           <@name>
             img
