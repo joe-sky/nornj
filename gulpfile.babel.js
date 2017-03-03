@@ -79,14 +79,14 @@ gulp.task("lib", () => gulp.src('./src/**/*.js')
 );
 
 //Unit testing
-gulp.task("test", () => gulp.src(["./test/**/**Spec.js"])
+gulp.task("tdd", () => gulp.src(["./test/**/*.spec.js"])
   .pipe(jasmine({
     includeStackTrace: true
   }))
 );
 
-//Run all tests with Karma
-gulp.task("tests", function (done) {
+//Run test specs with Karma
+gulp.task("test", function (done) {
   new Server({
     configFile: __dirname + '/karma.conf.js',
     singleRun: true
