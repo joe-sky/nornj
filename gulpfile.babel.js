@@ -70,7 +70,7 @@ gulp.task('build', () => {
 });
 
 //Convert es6 code to es5 from src to lib
-gulp.task("lib", () => gulp.src('./src/**/*.js')
+gulp.task('lib', () => gulp.src('./src/**/*.js')
   .pipe(env.set({
     BABEL_ENV: 'development'
   }))
@@ -79,14 +79,14 @@ gulp.task("lib", () => gulp.src('./src/**/*.js')
 );
 
 //Unit testing
-gulp.task("tdd", () => gulp.src(["./test/**/*.spec.js"])
+gulp.task('tdd', () => gulp.src('./test/**/*.spec.js')
   .pipe(jasmine({
     includeStackTrace: true
   }))
 );
 
 //Run test specs with Karma
-gulp.task("test", function (done) {
+gulp.task('test', done => {
   new Server({
     configFile: __dirname + '/karma.conf.js',
     singleRun: true
@@ -94,7 +94,7 @@ gulp.task("test", function (done) {
 });
 
 //Run eslint
-gulp.task('eslint', () => gulp.src(['./src/**/*.js'])
+gulp.task('eslint', () => gulp.src('./src/**/*.js')
   .pipe(eslint())
   .pipe(eslint.format())
   .pipe(eslint.failAfterError())

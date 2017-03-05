@@ -1158,6 +1158,7 @@ __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__tools__["a" /* assign */])(__
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__tools__ = __webpack_require__(1);
+/* harmony export (immutable) */ __webpack_exports__["a"] = setTmplRule;
 
 
 
@@ -1182,7 +1183,7 @@ function _clearRepeat(str) {
   return ret;
 }
 
-/* harmony default export */ __webpack_exports__["a"] = function () {
+function setTmplRule() {
   var rules = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
   var _nj$tmplRule = __WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */].tmplRule,
       _nj$tmplRule$startRul = _nj$tmplRule.startRule,
@@ -1253,12 +1254,15 @@ function _clearRepeat(str) {
     spreadProp: _createRegExp('[\\s]+([' + firstChar + ']?' + startRule + ')[\\s]*(\\.\\.\\.[^' + allRules + ']+)(' + endRule + '[' + lastChar + ']?)', 'g'),
     replaceSplit: _createRegExp('(?:[' + firstChar + ']?' + startRule + ')[^' + allRules + ']+(?:' + endRule + '[' + lastChar + ']?)'),
     replaceParam: _createRegExp('([' + firstChar + ']?' + startRule + ')([^' + allRules + ']+)' + endRule + '[' + lastChar + ']?', 'g'),
-    checkElem: _createRegExp('([^>]*)(<([a-z/!' + firstChar + exprRules + '][^\\s>]*)([^>]*)>)([^<]*)', 'ig'),
+    checkElem: _createRegExp('([^<>]+)|(<([a-z/!' + firstChar + exprRules + '][^\\s>]*)([^>]*)>)([^<]*)', 'ig'),
     expr: _createRegExp('^' + escapeExprRule + '([^\\s]+)', 'i'),
     include: _createRegExp('<' + escapeExprRule + 'include([^>]*)>', 'ig'),
     newlineSplit: _createRegExp('\\n(?![^' + firstChar + lastChar + ']*' + lastChar + ')', 'g')
   });
 };
+
+//Set default template rules
+setTmplRule();
 
 /***/ }),
 /* 7 */
@@ -3142,9 +3146,6 @@ __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils_tools__["a" /* assign *
   setTmplRule: __WEBPACK_IMPORTED_MODULE_3__utils_setTmplRule__["a" /* default */],
   config: __WEBPACK_IMPORTED_MODULE_4__config__["a" /* default */]
 });
-
-//Set default template rules
-__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__utils_setTmplRule__["a" /* default */])();
 
 var _global = typeof self !== 'undefined' ? self : global;
 _global.NornJ = _global.nj = __WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */];

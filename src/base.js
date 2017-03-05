@@ -10,9 +10,6 @@ assign(nj, {
   config
 });
 
-//Set default template rules
-setTmplRule();
-
 const _global = typeof self !== 'undefined' ? self : global;
 _global.NornJ = _global.nj = nj;
 

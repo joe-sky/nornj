@@ -22,7 +22,7 @@ function _clearRepeat(str) {
   return ret;
 }
 
-export default (rules = {}) => {
+export default function setTmplRule(rules = {}) {
   let {
     startRule = '{{',
     endRule = '}}',
@@ -88,9 +88,12 @@ export default (rules = {}) => {
     spreadProp: _createRegExp('[\\s]+([' + firstChar + ']?' + startRule + ')[\\s]*(\\.\\.\\.[^' + allRules + ']+)(' + endRule + '[' + lastChar + ']?)', 'g'),
     replaceSplit: _createRegExp('(?:[' + firstChar + ']?' + startRule + ')[^' + allRules + ']+(?:' + endRule + '[' + lastChar + ']?)'),
     replaceParam: _createRegExp('([' + firstChar + ']?' + startRule + ')([^' + allRules + ']+)' + endRule + '[' + lastChar + ']?', 'g'),
-    checkElem: _createRegExp('([^>]*)(<([a-z/!' + firstChar + exprRules + '][^\\s>]*)([^>]*)>)([^<]*)', 'ig'),
+    checkElem: _createRegExp('([^<>]+)|(<([a-z/!' + firstChar + exprRules + '][^\\s>]*)([^>]*)>)([^<]*)', 'ig'),
     expr: _createRegExp('^' + escapeExprRule + '([^\\s]+)', 'i'),
     include: _createRegExp('<' + escapeExprRule + 'include([^>]*)>', 'ig'),
     newlineSplit: _createRegExp('\\n(?![^' + firstChar + lastChar + ']*' + lastChar + ')', 'g'),
   });
 };
+
+//Set default template rules
+setTmplRule();

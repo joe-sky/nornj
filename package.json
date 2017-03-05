@@ -47,7 +47,6 @@
     "karma-phantomjs-launcher": "^1.0.2",
     "karma-spec-reporter": "0.0.30",
     "lodash": "^4.13.1",
-    "phantomjs-prebuilt": "^2.1.14",
     "react": "^0.14.7",
     "react-dom": "^0.14.7",
     "webpack": "^2.2.1",
