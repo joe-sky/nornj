@@ -14,8 +14,16 @@ describe('filter', () => {
     expect(render('{{ 2 >(1) }}')).toBe(true);
   });
 
+  it('>=', () => {
+    expect(render('{{ 2 >=(2) }}')).toBe(true);
+  });
+
   it('<', () => {
     expect(render('{{ 2 <(1) }}')).toBe(false);
+  });
+
+  it('<=', () => {
+    expect(render('{{ 2 <=(1) }}')).toBe(false);
   });
 
   it('==', () => {
@@ -28,5 +36,13 @@ describe('filter', () => {
 
   it('!', () => {
     expect(render('{{ true | ! }}')).toBe(false);
+  });
+
+  it('+', () => {
+    expect(render('{{ 1 +(2 +(3)) }}')).toBe(6);
+  });
+
+  it('-', () => {
+    expect(render('{{ 3 -(2) -(1) }}')).toBe(0);
   });
 });
