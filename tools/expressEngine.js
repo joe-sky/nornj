@@ -2,19 +2,55 @@
 
 const nj = require('../lib/base').default,
   includeParser = require('./includeParser'),
-  fs = require('fs');
+  fs = require('fs'),
+  path = require('path');
 
 nj.config({
   includeParser
 });
 
-module.exports = (configs) => {
+module.exports = (configs = {}) => {
+  let {
+    extname = '.html', layoutsDir = 'views/layouts/', defaultLayout
+  } = configs;
+
   return (filePath, options, callback) => {
-    fs.readFile(filePath, function (err, content) {
+    let layout;
+    if (defaultLayout != null) {
+      layout = defaultLayout;
+    }
+    if (options && options.layout != null) {
+      if (nj.isString(options.layout)) {
+        layout = options.layout;
+      } else if (options.layout === false) {
+        layout = null;
+      }
+    }
+
+    const viewsPath = options.settings && options.settings.views;
+    if (viewsPath) {
+      layoutsDir = path.join(viewsPath, 'layouts/');
+    }
+
+    let layoutHtml;
+    if (layout) {
+      layoutHtml = fs.readFileSync(layoutsDir + layout + extname, 'utf-8');
+    }
+
+    fs.readFile(filePath, function(err, content) {
       if (err) {
         return callback(new Error(err));
       }
-      return callback(null, nj.compile(content.toString(), { fileName: filePath })(options));
+
+      let bodyHtml = nj.compile(content.toString(), { fileName: filePath })(options),
+        html = null;
+      if (layoutHtml) {
+        html = nj.compile(layoutHtml, { fileName: filePath })(Object.assign(options, { body: bodyHtml }));
+      } else {
+        html = bodyHtml;
+      }
+
+      return callback(null, html);
     });
   }
 };
