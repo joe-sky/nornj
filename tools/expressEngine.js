@@ -11,7 +11,10 @@ nj.config({
 
 module.exports = (configs = {}) => {
   let {
-    extname = '.html', layoutsDir = 'views/layouts/', defaultLayout
+    extname = '.html',
+    layoutsDir = 'views/layouts/',
+    defaultLayout,
+    bodyPlaceholder = 'body'
   } = configs;
 
   return (filePath, options, callback) => {
@@ -32,20 +35,24 @@ module.exports = (configs = {}) => {
       layoutsDir = path.join(viewsPath, 'layouts/');
     }
 
-    let layoutHtml;
+    let layoutFilePath = layoutsDir + layout + extname,
+      layoutTmpl;
     if (layout) {
-      layoutHtml = fs.readFileSync(layoutsDir + layout + extname, 'utf-8');
+      layoutTmpl = fs.readFileSync(layoutFilePath, 'utf-8');
     }
 
-    fs.readFile(filePath, function(err, content) {
+    fs.readFile(filePath, (err, content) => {
       if (err) {
         return callback(new Error(err));
       }
 
       let bodyHtml = nj.compile(content.toString(), { fileName: filePath })(options),
         html = null;
-      if (layoutHtml) {
-        html = nj.compile(layoutHtml, { fileName: filePath })(Object.assign(options, { body: bodyHtml }));
+      if (layoutTmpl) {
+        const layoutOpts = {};
+        layoutOpts[bodyPlaceholder] = bodyHtml;
+
+        html = nj.compile(layoutTmpl, { fileName: layoutFilePath })(layoutOpts, options);
       } else {
         html = bodyHtml;
       }
