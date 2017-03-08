@@ -88,9 +88,9 @@ function nj() {
 
 nj.createElement = null;
 nj.components = {};
+nj.preAsts = {};
 nj.asts = {};
 nj.templates = {};
-nj.tmplStrs = {};
 nj.errorTitle = '[NornJ]';
 nj.tmplRule = {};
 nj.outputH = false;
@@ -1277,7 +1277,7 @@ setTmplRule();
 
 
 var tmplRule = __WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */].tmplRule,
-    tmplStrs = __WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */].tmplStrs;
+    preAsts = __WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */].preAsts;
 
 var SPLIT_FLAG = '_nj_split';
 
@@ -1285,7 +1285,7 @@ var SPLIT_FLAG = '_nj_split';
 function compileStringTmpl(tmpl) {
   var tmplKey = tmpl.toString(),
       //Get unique key
-  ret = tmplStrs[tmplKey],
+  ret = preAsts[tmplKey],
       outputH = this ? this.outputH : false;
 
   if (!ret) {
@@ -1327,7 +1327,7 @@ function compileStringTmpl(tmpl) {
       });
 
       //Save to the cache
-      tmplStrs[tmplKey] = ret;
+      preAsts[tmplKey] = ret;
     })();
   }
 

@@ -12,7 +12,7 @@ nj.config({
 module.exports = (configs = {}) => {
   let {
     extname = '.html',
-    layoutsDir = 'views/layouts/',
+    layoutsDir = 'layouts/',
     defaultLayout,
     bodyPlaceholder = 'body'
   } = configs;
@@ -30,12 +30,13 @@ module.exports = (configs = {}) => {
       }
     }
 
-    const viewsPath = options.settings && options.settings.views;
+    let viewsPath = options.settings && options.settings.views,
+      _layoutsDir = layoutsDir;
     if (viewsPath) {
-      layoutsDir = path.join(viewsPath, 'layouts/');
+      _layoutsDir = path.join(viewsPath, layoutsDir);
     }
 
-    let layoutFilePath = layoutsDir + layout + extname,
+    let layoutFilePath = _layoutsDir + layout + extname,
       layoutTmpl;
     if (layout) {
       layoutTmpl = fs.readFileSync(layoutFilePath, 'utf-8');

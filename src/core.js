@@ -4,9 +4,9 @@
 
 nj.createElement = null;
 nj.components = {};
+nj.preAsts = {};
 nj.asts = {};
 nj.templates = {};
-nj.tmplStrs = {};
 nj.errorTitle = '[NornJ]';
 nj.tmplRule = {};
 nj.outputH = false;
