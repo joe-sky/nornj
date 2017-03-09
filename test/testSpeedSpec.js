@@ -7,16 +7,16 @@
   ReactDOMServer = require('react-dom/server'),
   Handlebars = require('handlebars');
 
-// nj.config({
-//   createElement: React.createElement,
-//   outputH: true,
-//   delimiters: {
-//     start: '{',
-//     end: '}'
-//   }
-// });
+nj.config({
+  createElement: React.createElement,
+  outputH: true,
+  delimiters: {
+    start: '{',
+    end: '}'
+  }
+});
 
-xdescribe('test speed', function() {
+describe('test speed', function() {
   var t1 = nj `
   <img src="t1" />
   `;
@@ -121,13 +121,14 @@ xdescribe('test speed', function() {
             </#props>
             <span>span{no}</span>
             <i>{no}</i>
+            <#once><i><i>1000</i></i></#once>
           </div>
         </#each>
       </span>
       <#if {@index | five(1)}>
-        <br />
+        <#once><br /></#once>
         <#else>
-          <img />
+          <#once><img /></#once>
         </#else>
       </#if>
     </#each>
@@ -397,7 +398,8 @@ xdescribe('test speed', function() {
               list2.map(function(p, j) {
                 return React.createElement('div', i % 5 == 0 ? { name: 'five', key: j } : { key: j },
                   React.createElement('span', null, 'span' + p.no),
-                  React.createElement('i', null, p.no)
+                  React.createElement('i', null, p.no),
+                  React.createElement('i', null, React.createElement('i', null, '1000'))
                 );
               })
             ),
@@ -431,7 +433,7 @@ xdescribe('test speed', function() {
       list: [{ no: 1, b: 1 }, { no: 2, b: 0 }, { no: 3, b: 1 }]
     }))));
 
-    console.log('avg:' + (sum / 10));
+    //console.log('avg:' + (sum / 10));
 
     //console.log(html);
     expect(html).toBeTruthy();
@@ -475,7 +477,7 @@ xdescribe('test speed', function() {
           num: 100
         };
       },
-      template: nj.compileH(tmpl, 'tmpl1'),
+      template: nj.compileH(tmpl2, 'tmpl1'),
       onClick: function() {
         this.setState({ num: Date.now() }, function() {
           console.log('total:' + (Date.now() - start));
@@ -545,34 +547,34 @@ xdescribe('test speed', function() {
       }
     });
 
-    var list2 = _.times(5, function(n) {
+    var list2 = _.times(100, function(n) {
       return { no: n + 1 };
     });
 
-    var html = ReactDOMServer.renderToStaticMarkup(React.createElement('div', null, _.times(1, (i) => React.createElement(TestComponent, {
-      key: i,
-      arr: _.times(2, function(n) {
-        return n;
-      }),
-      a: 1,
-      list: [{ no: 1, b: 1 }, { no: 2, b: 0 }, { no: 3, b: 1 }]
-    }))));
+    // var html = ReactDOMServer.renderToStaticMarkup(React.createElement('div', null, _.times(1, (i) => React.createElement(TestComponent, {
+    //   key: i,
+    //   arr: _.times(100, function(n) {
+    //     return n;
+    //   }),
+    //   a: 1,
+    //   list: [{ no: 1, b: 1 }, { no: 2, b: 0 }, { no: 3, b: 1 }]
+    // }))));
 
     //console.log('avg:' + (sum / 10));
 
-    // var html = ReactDOMServer.renderToStaticMarkup(React.createElement('div', null, _.times(10, (n) => {
-    //   return React.createElement(TestComponent, {
-    //     key: n,
-    //     arr: _.times(100, function(n) {
-    //       return n;
-    //     }),
-    //     a: 1,
-    //     list: [{ no: 1, b: 1 }, { no: 2, b: 0 }, { no: 3, b: 1 }]
-    //   })
-    // })));
+    var html = ReactDOMServer.renderToStaticMarkup(React.createElement('div', null, _.times(10, (n) => {
+      return React.createElement(TestComponent, {
+        key: n,
+        arr: _.times(100, function(n) {
+          return n;
+        }),
+        a: 1,
+        list: [{ no: 1, b: 1 }, { no: 2, b: 0 }, { no: 3, b: 1 }]
+      })
+    })));
 
     //console.log(JSON.stringify(nj.asts['tmpl1']));
-    console.log(html);
+    //console.log(html);
     expect(html).toBeTruthy();
   });
 });

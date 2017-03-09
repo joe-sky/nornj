@@ -177,27 +177,30 @@ describe('test compile string', function () {
       `;
 
       var tmplTest = nj`
-      <!DOCTYPE html>
-      <#with {{name3}} as=name5>{{name5}}</#with>
-      <#each {{list}}>
-        <div>{{this}}</div>
-        {{this}}
-      </#each>
-      <style>
-        .class1 {
-          margin-left: 10px;
-        }
-      </style>
-      <script>
-        function test() {
-          console.log(1);
-
-          function test2() {
-            console.log('    <div  >a<img    />  b  </div>  <div>  '
-              + ' <img /> </div>  ');
+      <#once>
+        <@resetList><#list {{id}} {{c1}} /></@resetList>
+        <!DOCTYPE html>
+        <#with {{name3}} as=name5>{{name5}}</#with>
+        <#each {{list}}>
+          <div>{{this}}</div>
+          {{this}}
+        </#each>
+        <style>
+          .class1 {
+            margin-left: 10px;
           }
-        }
-      </script>
+        </style>
+        <script>
+          function test() {
+            console.log(1);
+
+            function test2() {
+              console.log('    <div  >a<img    />  b  </div>  <div>  '
+                + ' <img /> </div>  ');
+            }
+          }
+        </script>
+      </#once>
       <#each {{ list2 }}>
         <#pre>
         <!-- aaa -->
@@ -323,6 +326,7 @@ describe('test compile string', function () {
       //console.log(JSON.stringify(nj.asts['tmplString']));
 
       var html = tmplTest.apply(null, data);
+      var html2 = tmplTest.call(null, { id: 200, c1: 100 }, data[0]);
       console.log(html);
       expect(html).toBeTruthy();
     });

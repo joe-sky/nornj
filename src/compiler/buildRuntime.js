@@ -54,10 +54,10 @@ function _buildFn(content, node, fns, no, newContext, level, useStringLocal) {
     fnStr += 'return ret;';
   }
 
-  /* 构建块表达式函数
+  /* 构建扩展标签函数
    p1: 模板全局数据
    p2: 节点上下文数据
-   p3: 块表达式内调用result及inverse方法传递的参数
+   p3: 扩展标签内调用result及inverse方法传递的参数
    p4: #props变量
    p5：子扩展标签#props变量
   */
@@ -88,7 +88,7 @@ function _buildOptions(config, useStringLocal, node, fns, exPropsStr, subExProps
     }
   }
 
-  return '{ _njOpts: true, ctx: p2, outputH: ' + !fns.useString + hashStr + ' }';
+  return '{ _njOpts: true, _njFnsNo: ' + fns._no + ', global: p1, context: p2, outputH: ' + !fns.useString + hashStr + ' }';
 }
 
 function _buildPropData(obj, counter, fns, useStringLocal, level) {

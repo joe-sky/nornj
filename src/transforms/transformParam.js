@@ -160,7 +160,7 @@ export function compiledParam(value) {
     const params = _getReplaceParam(value);
     props = [];
 
-    tools.each(params, (param) => {
+    tools.each(params, param => {
       let retP = tools.obj(),
         innerBrackets = [];
 

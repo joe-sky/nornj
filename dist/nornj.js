@@ -583,6 +583,51 @@ var exprs = {
     }
 
     exProps.args.push(options.result());
+  },
+
+  once: function once(options) {
+    var props = options.props;
+
+    var cacheObj = void 0;
+    if (props && props.cacheTo != null) {
+      cacheObj = props.cacheTo;
+    } else {
+      cacheObj = options.global;
+    }
+
+    var cacheKey = '_njOnceCache_' + options._njFnsNo,
+        cache = cacheObj[cacheKey],
+        useCache = void 0;
+
+    if (props && (props.reset !== undefined || props.resetList !== undefined)) {
+      (function () {
+        var reset = props.reset,
+            resetList = props.resetList;
+
+        var cacheValKey = cacheKey + 'V';
+        useCache = true;
+
+        if (reset !== undefined) {
+          resetList = [reset];
+        }
+        resetList.forEach(function (r, i) {
+          var key = cacheValKey + i,
+              cacheVal = cacheObj[key];
+
+          if (cacheVal !== r) {
+            useCache = false;
+            cacheObj[key] = r;
+          }
+        });
+      })();
+    } else {
+      useCache = cache !== undefined;
+    }
+
+    if (!useCache) {
+      cache = cacheObj[cacheKey] = options.result();
+    }
+    return cache;
   }
 };
 
@@ -622,6 +667,7 @@ exprConfig.list = _commonConfig(exprConfig.if);
 exprConfig.block = _commonConfig(exprConfig.obj);
 exprConfig.pre = _commonConfig(exprConfig.obj);
 exprConfig.arg = _commonConfig(exprConfig.prop);
+exprConfig.once = _commonConfig(exprConfig.obj);
 
 //Expression alias
 exprs['case'] = exprs.elseif;
@@ -2247,10 +2293,10 @@ function _buildFn(content, node, fns, no, newContext, level, useStringLocal) {
     fnStr += 'return ret;';
   }
 
-  /* 构建块表达式函数
+  /* 构建扩展标签函数
    p1: 模板全局数据
    p2: 节点上下文数据
-   p3: 块表达式内调用result及inverse方法传递的参数
+   p3: 扩展标签内调用result及inverse方法传递的参数
    p4: #props变量
    p5：子扩展标签#props变量
   */
@@ -2282,7 +2328,7 @@ function _buildOptions(config, useStringLocal, node, fns, exPropsStr, subExProps
     }
   }
 
-  return '{ _njOpts: true, ctx: p2, outputH: ' + !fns.useString + hashStr + ' }';
+  return '{ _njOpts: true, _njFnsNo: ' + fns._no + ', global: p1, context: p2, outputH: ' + !fns.useString + hashStr + ' }';
 }
 
 function _buildPropData(obj, counter, fns, useStringLocal, level) {

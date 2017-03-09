@@ -195,15 +195,14 @@ export const exprs = {
       last = args.length - 1,
       options = args[last];
 
-    if(last > 0) {
+    if (last > 0) {
       let ret = tools.arraySlice(args, 0, last);
-      if(options.useString) {
+      if (options.useString) {
         ret = ret.join('');
       }
 
       return ret;
-    }
-    else {
+    } else {
       return [options.result()];
     }
   },
@@ -212,7 +211,7 @@ export const exprs = {
 
   pre: options => exprs.block(options),
 
-  'with': function (originalData, options) {
+  'with': function(originalData, options) {
     const props = options.props;
 
     return options.result({
@@ -222,14 +221,54 @@ export const exprs = {
     });
   },
 
-  arg: (options) => {
+  arg: options => {
     const { exProps } = options;
-    if(!exProps.args) {
+    if (!exProps.args) {
       exProps.args = [];
     }
 
     exProps.args.push(options.result());
   },
+
+  once: options => {
+    const { props } = options;
+    let cacheObj;
+    if (props && props.cacheTo != null) {
+      cacheObj = props.cacheTo;
+    } else {
+      cacheObj = options.global;
+    }
+
+    let cacheKey = '_njOnceCache_' + options._njFnsNo,
+      cache = cacheObj[cacheKey],
+      useCache;
+
+    if (props && (props.reset !== undefined || props.resetList !== undefined)) {
+      let { reset, resetList } = props;
+      let cacheValKey = cacheKey + 'V';
+      useCache = true;
+
+      if (reset !== undefined) {
+        resetList = [reset];
+      }
+      resetList.forEach((r, i) => {
+        let key = cacheValKey + i,
+          cacheVal = cacheObj[key];
+
+        if (cacheVal !== r) {
+          useCache = false;
+          cacheObj[key] = r;
+        }
+      });
+    } else {
+      useCache = cache !== undefined;
+    }
+
+    if (!useCache) {
+      cache = cacheObj[cacheKey] = options.result();
+    }
+    return cache;
+  }
 };
 
 function _commonConfig(params) {
@@ -268,6 +307,7 @@ exprConfig.list = _commonConfig(exprConfig.if);
 exprConfig.block = _commonConfig(exprConfig.obj);
 exprConfig.pre = _commonConfig(exprConfig.obj);
 exprConfig.arg = _commonConfig(exprConfig.prop);
+exprConfig.once = _commonConfig(exprConfig.obj);
 
 //Expression alias
 exprs['case'] = exprs.elseif;
