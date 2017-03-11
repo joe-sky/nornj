@@ -328,20 +328,20 @@ assign(__WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */], {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils_tools__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__transforms_transformData__ = __webpack_require__(3);
-/* unused harmony export exprs */
 /* unused harmony export extensions */
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return exprConfig; });
+/* unused harmony export exprs */
 /* unused harmony export extensionConfig */
-/* harmony export (immutable) */ __webpack_exports__["a"] = registerExpr;
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return registerExtension; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return exprConfig; });
+/* harmony export (immutable) */ __webpack_exports__["b"] = registerExtension;
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return registerExpr; });
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 
 
 
 
-//Global expression list
-var exprs = {
+//Global extension list
+var extensions = {
   'if': function _if(value, options) {
     if (value === 'false') {
       value = false;
@@ -428,7 +428,7 @@ var exprs = {
 
   unless: function unless(value, options) {
     options.useUnless = true;
-    return exprs['if'](value, options);
+    return extensions['if'](value, options);
   },
 
   each: function each(list, options) {
@@ -564,7 +564,7 @@ var exprs = {
   },
 
   pre: function pre(options) {
-    return exprs.block(options);
+    return extensions.block(options);
   },
 
   'with': function _with(originalData, options) {
@@ -631,7 +631,7 @@ var exprs = {
   }
 };
 
-function _commonConfig(params) {
+function _eConfig(params) {
   var ret = {
     useString: true,
     exProps: false,
@@ -647,68 +647,64 @@ function _commonConfig(params) {
   return ret;
 }
 
-var extensions = exprs;
+var exprs = extensions;
 
 //Expression default config
-var exprConfig = {
-  'if': _commonConfig({ newContext: false }),
-  'else': _commonConfig({ newContext: false, useString: false, subExProps: true, isSub: true }),
-  'switch': _commonConfig({ newContext: false }),
-  unless: _commonConfig({ newContext: false }),
-  each: _commonConfig(),
-  prop: _commonConfig({ newContext: false, exProps: true, subExProps: true, isProp: true }),
-  spread: _commonConfig({ newContext: false, useString: false, exProps: true, subExProps: true, isProp: true }),
-  'for': _commonConfig(),
-  obj: _commonConfig({ newContext: false, useString: false }),
-  'with': _commonConfig({ useString: false })
+var extensionConfig = {
+  'if': _eConfig({ newContext: false }),
+  'else': _eConfig({ newContext: false, useString: false, subExProps: true, isSub: true }),
+  'switch': _eConfig({ newContext: false }),
+  unless: _eConfig({ newContext: false }),
+  each: _eConfig(),
+  prop: _eConfig({ newContext: false, exProps: true, subExProps: true, isProp: true }),
+  spread: _eConfig({ newContext: false, useString: false, exProps: true, subExProps: true, isProp: true }),
+  'for': _eConfig(),
+  obj: _eConfig({ newContext: false, useString: false }),
+  'with': _eConfig({ useString: false })
 };
-exprConfig.elseif = _commonConfig(exprConfig['else']);
-exprConfig.list = _commonConfig(exprConfig.if);
-exprConfig.block = _commonConfig(exprConfig.obj);
-exprConfig.pre = _commonConfig(exprConfig.obj);
-exprConfig.arg = _commonConfig(exprConfig.prop);
-exprConfig.once = _commonConfig(exprConfig.obj);
+extensionConfig.elseif = _eConfig(extensionConfig['else']);
+extensionConfig.list = _eConfig(extensionConfig.if);
+extensionConfig.block = _eConfig(extensionConfig.obj);
+extensionConfig.pre = _eConfig(extensionConfig.obj);
+extensionConfig.arg = _eConfig(extensionConfig.prop);
+extensionConfig.once = _eConfig(extensionConfig.obj);
 
 //Expression alias
-exprs['case'] = exprs.elseif;
-exprConfig['case'] = exprConfig.elseif;
-exprs['default'] = exprs['else'];
-exprConfig['default'] = exprConfig['else'];
+extensions['case'] = extensions.elseif;
+extensionConfig['case'] = extensionConfig.elseif;
+extensions['default'] = extensions['else'];
+extensionConfig['default'] = extensionConfig['else'];
 
-var extensionConfig = exprConfig;
+var exprConfig = extensionConfig;
 
 //Register expression and also can batch add
-function registerExpr(name, expr, options) {
+function registerExtension(name, extension, options) {
   var params = name;
   if (!__WEBPACK_IMPORTED_MODULE_1__utils_tools__["k" /* isObject */](name)) {
     params = {};
     params[name] = {
-      expr: expr,
+      extension: extension,
       options: options
     };
   }
 
   __WEBPACK_IMPORTED_MODULE_1__utils_tools__["c" /* each */](params, function (v, name) {
     if (v) {
-      var _expr = v.expr,
+      var _extension = v.extension,
           _options = v.options;
 
 
-      if (_expr || _options) {
-        if (_expr) {
-          exprs[name] = _expr;
-        }
-        if (_options) {
-          exprConfig[name] = _commonConfig(_options);
-        }
+      if (_extension) {
+        extensions[name] = _extension;
       } else {
-        exprs[name] = v;
+        extensions[name] = v;
       }
+      extensionConfig[name] = _eConfig(_options);
     }
   }, false, false);
 }
 
-var registerExtension = registerExpr;
+var registerExpr = registerExtension;
 
 __WEBPACK_IMPORTED_MODULE_1__utils_tools__["a" /* assign */](__WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */], {
   exprs: exprs,
@@ -993,6 +989,14 @@ var filters = {
     return val1 === val2;
   },
 
+  '!=': function _(val1, val2) {
+    return val1 != val2;
+  },
+
+  '!==': function _(val1, val2) {
+    return val1 !== val2;
+  },
+
   //Less than
   lt: function lt(val1, val2) {
     return val1 < val2;
@@ -1017,6 +1021,18 @@ var filters = {
 
   '-': function _(val1, val2) {
     return val1 - val2;
+  },
+
+  '*': function _(val1, val2) {
+    return val1 * val2;
+  },
+
+  '/': function _(val1, val2) {
+    return val1 / val2;
+  },
+
+  '%': function _(val1, val2) {
+    return val1 % val2;
   },
 
   //Ternary operator
@@ -1067,7 +1083,7 @@ var filters = {
 };
 
 
-function _commonConfig(params) {
+function _fConfig(params) {
   var ret = {
     useString: false
   };
@@ -1080,28 +1096,33 @@ function _commonConfig(params) {
 
 //Filter default config
 var filterConfig = {
-  prop: _commonConfig(),
-  '==': _commonConfig(),
-  '===': _commonConfig(),
-  lt: _commonConfig(),
-  lte: _commonConfig(),
-  gt: _commonConfig(),
-  gte: _commonConfig(),
-  '+': _commonConfig(),
-  '-': _commonConfig(),
-  '?': _commonConfig(),
-  '!': _commonConfig(),
-  '&&': _commonConfig(),
-  or: _commonConfig(),
-  int: _commonConfig(),
-  float: _commonConfig(),
-  bool: _commonConfig(),
-  '#': _commonConfig()
+  prop: _fConfig(),
+  '==': _fConfig(),
+  '===': _fConfig(),
+  '!=': _fConfig(),
+  '!==': _fConfig(),
+  lt: _fConfig(),
+  lte: _fConfig(),
+  gt: _fConfig(),
+  gte: _fConfig(),
+  '+': _fConfig(),
+  '-': _fConfig(),
+  '*': _fConfig(),
+  '/': _fConfig(),
+  '%': _fConfig(),
+  '?': _fConfig(),
+  '!': _fConfig(),
+  '&&': _fConfig(),
+  or: _fConfig(),
+  int: _fConfig(),
+  float: _fConfig(),
+  bool: _fConfig(),
+  '#': _fConfig()
 };
-filterConfig['.'] = filterConfig.prop;
 
 //Filter alias
 filters['.'] = filters.prop;
+filterConfig['.'] = filterConfig.prop;
 
 //Register filter and also can batch add
 function registerFilter(name, filter, options) {
@@ -1120,16 +1141,12 @@ function registerFilter(name, filter, options) {
           _options = v.options;
 
 
-      if (_filter || _options) {
-        if (_filter) {
-          filters[name] = _filter;
-        }
-        if (_options) {
-          filterConfig[name] = _commonConfig(_options);
-        }
+      if (_filter) {
+        filters[name] = _filter;
       } else {
         filters[name] = v;
       }
+      filterConfig[name] = _fConfig(_options);
     }
   }, false, false);
 }

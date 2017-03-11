@@ -34,6 +34,18 @@ describe('filter', () => {
     expect(render('{{ 1 ===(1) }}')).toBe(true);
   });
 
+  it('!=', () => {
+    expect(render('{{ 1 !=(2) }}')).toBe(true);
+  });
+
+  it('!==', () => {
+    expect(render('{{ undefined !==(null) }}')).toBe(true);
+  });
+
+  it('?', () => {
+    expect(render('{{ 1 >(2) ?(true, false) }}')).toBe(false);
+  });
+
   it('!', () => {
     expect(render('{{ true | ! }}')).toBe(false);
   });
@@ -44,5 +56,37 @@ describe('filter', () => {
 
   it('-', () => {
     expect(render('{{ 3 -(2) -(1) }}')).toBe(0);
+  });
+
+  it('*', () => {
+    expect(render('{{ 3 *(5) }}')).toBe(15);
+  });
+
+  it('/', () => {
+    expect(render('{{ 15 /(3) }}')).toBe(5);
+  });
+
+  it('%', () => {
+    expect(render('{{ 10 %(3) }}')).toBe(1);
+  });
+
+  it('&&', () => {
+    expect(render("{{ 1 ==('1') &&(1 ==('2')) }}")).toBe(false);
+  });
+
+  it('||', () => {
+    expect(render("{{ 1 ==('1') ||(1 ==('2')) }}")).toBe(true);
+  });
+
+  it('int & float', () => {
+    expect(render('{{ 20.5 | int *(10.05 | float) }}')).toBe(201);
+  });
+
+  it('bool', () => {
+    expect(render("{{ 'false' | bool }}")).toBe(false);
+  });
+
+  it('#', () => {
+    expect(render("{{ 'abc' #('substr', 1) }}")).toBe('bc');
   });
 });

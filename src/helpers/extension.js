@@ -2,8 +2,8 @@
 import * as tools from '../utils/tools';
 import * as tranData from '../transforms/transformData';
 
-//Global expression list
-export const exprs = {
+//Global extension list
+export const extensions = {
   'if': (value, options) => {
     if (value === 'false') {
       value = false;
@@ -83,7 +83,7 @@ export const exprs = {
 
   unless: (value, options) => {
     options.useUnless = true;
-    return exprs['if'](value, options);
+    return extensions['if'](value, options);
   },
 
   each: (list, options) => {
@@ -209,7 +209,7 @@ export const exprs = {
 
   block: options => options.result(),
 
-  pre: options => exprs.block(options),
+  pre: options => extensions.block(options),
 
   'with': function(originalData, options) {
     const props = options.props;
@@ -271,7 +271,7 @@ export const exprs = {
   }
 };
 
-function _commonConfig(params) {
+function _eConfig(params) {
   let ret = {
     useString: true,
     exProps: false,
@@ -287,66 +287,62 @@ function _commonConfig(params) {
   return ret;
 }
 
-export const extensions = exprs;
+export const exprs = extensions;
 
 //Expression default config
-export const exprConfig = {
-  'if': _commonConfig({ newContext: false }),
-  'else': _commonConfig({ newContext: false, useString: false, subExProps: true, isSub: true }),
-  'switch': _commonConfig({ newContext: false }),
-  unless: _commonConfig({ newContext: false }),
-  each: _commonConfig(),
-  prop: _commonConfig({ newContext: false, exProps: true, subExProps: true, isProp: true }),
-  spread: _commonConfig({ newContext: false, useString: false, exProps: true, subExProps: true, isProp: true }),
-  'for': _commonConfig(),
-  obj: _commonConfig({ newContext: false, useString: false }),
-  'with': _commonConfig({ useString: false })
+export const extensionConfig = {
+  'if': _eConfig({ newContext: false }),
+  'else': _eConfig({ newContext: false, useString: false, subExProps: true, isSub: true }),
+  'switch': _eConfig({ newContext: false }),
+  unless: _eConfig({ newContext: false }),
+  each: _eConfig(),
+  prop: _eConfig({ newContext: false, exProps: true, subExProps: true, isProp: true }),
+  spread: _eConfig({ newContext: false, useString: false, exProps: true, subExProps: true, isProp: true }),
+  'for': _eConfig(),
+  obj: _eConfig({ newContext: false, useString: false }),
+  'with': _eConfig({ useString: false })
 };
-exprConfig.elseif = _commonConfig(exprConfig['else']);
-exprConfig.list = _commonConfig(exprConfig.if);
-exprConfig.block = _commonConfig(exprConfig.obj);
-exprConfig.pre = _commonConfig(exprConfig.obj);
-exprConfig.arg = _commonConfig(exprConfig.prop);
-exprConfig.once = _commonConfig(exprConfig.obj);
+extensionConfig.elseif = _eConfig(extensionConfig['else']);
+extensionConfig.list = _eConfig(extensionConfig.if);
+extensionConfig.block = _eConfig(extensionConfig.obj);
+extensionConfig.pre = _eConfig(extensionConfig.obj);
+extensionConfig.arg = _eConfig(extensionConfig.prop);
+extensionConfig.once = _eConfig(extensionConfig.obj);
 
 //Expression alias
-exprs['case'] = exprs.elseif;
-exprConfig['case'] = exprConfig.elseif;
-exprs['default'] = exprs['else'];
-exprConfig['default'] = exprConfig['else'];
+extensions['case'] = extensions.elseif;
+extensionConfig['case'] = extensionConfig.elseif;
+extensions['default'] = extensions['else'];
+extensionConfig['default'] = extensionConfig['else'];
 
-export const extensionConfig = exprConfig;
+export const exprConfig = extensionConfig;
 
 //Register expression and also can batch add
-export function registerExpr(name, expr, options) {
+export function registerExtension(name, extension, options) {
   let params = name;
   if (!tools.isObject(name)) {
     params = {};
     params[name] = {
-      expr: expr,
-      options: options
+      extension,
+      options
     };
   }
 
   tools.each(params, function(v, name) {
     if (v) {
-      const { expr, options } = v;
+      const { extension, options } = v;
 
-      if (expr || options) {
-        if (expr) {
-          exprs[name] = expr;
-        }
-        if (options) {
-          exprConfig[name] = _commonConfig(options);
-        }
+      if (extension) {
+        extensions[name] = extension;
       } else {
-        exprs[name] = v;
+        extensions[name] = v;
       }
+      extensionConfig[name] = _eConfig(options);
     }
   }, false, false);
 }
 
-export const registerExtension = registerExpr;
+export const registerExpr = registerExtension;
 
 tools.assign(nj, {
   exprs,

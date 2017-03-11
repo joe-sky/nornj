@@ -16,6 +16,10 @@ export const filters = {
 
   '===': (val1, val2) => val1 === val2,
 
+  '!=': (val1, val2) => val1 != val2,
+
+  '!==': (val1, val2) => val1 !== val2,
+
   //Less than
   lt: (val1, val2) => val1 < val2,
 
@@ -29,6 +33,12 @@ export const filters = {
   '+': (val1, val2) => val1 + val2,
 
   '-': (val1, val2) => val1 - val2,
+
+  '*': (val1, val2) => val1 * val2,
+
+  '/': (val1, val2) => val1 / val2,
+
+  '%': (val1, val2) => val1 % val2,
 
   //Ternary operator
   '?': (val, val1, val2) => val ? val1 : val2,
@@ -65,7 +75,7 @@ export const filters = {
   }
 };
 
-function _commonConfig(params) {
+function _fConfig(params) {
   let ret = {
     useString: false
   };
@@ -78,28 +88,33 @@ function _commonConfig(params) {
 
 //Filter default config
 export const filterConfig = {
-  prop: _commonConfig(),
-  '==': _commonConfig(),
-  '===': _commonConfig(),
-  lt: _commonConfig(),
-  lte: _commonConfig(),
-  gt: _commonConfig(),
-  gte: _commonConfig(),
-  '+': _commonConfig(),
-  '-': _commonConfig(),
-  '?': _commonConfig(),
-  '!': _commonConfig(),
-  '&&': _commonConfig(),
-  or: _commonConfig(),
-  int: _commonConfig(),
-  float: _commonConfig(),
-  bool: _commonConfig(),
-  '#': _commonConfig()
+  prop: _fConfig(),
+  '==': _fConfig(),
+  '===': _fConfig(),
+  '!=': _fConfig(),
+  '!==': _fConfig(),
+  lt: _fConfig(),
+  lte: _fConfig(),
+  gt: _fConfig(),
+  gte: _fConfig(),
+  '+': _fConfig(),
+  '-': _fConfig(),
+  '*': _fConfig(),
+  '/': _fConfig(),
+  '%': _fConfig(),
+  '?': _fConfig(),
+  '!': _fConfig(),
+  '&&': _fConfig(),
+  or: _fConfig(),
+  int: _fConfig(),
+  float: _fConfig(),
+  bool: _fConfig(),
+  '#': _fConfig()
 };
-filterConfig['.'] = filterConfig.prop;
 
 //Filter alias
 filters['.'] = filters.prop;
+filterConfig['.'] = filterConfig.prop;
 
 //Register filter and also can batch add
 export function registerFilter(name, filter, options) {
@@ -107,8 +122,8 @@ export function registerFilter(name, filter, options) {
   if (!tools.isObject(name)) {
     params = {};
     params[name] = {
-      filter: filter,
-      options: options
+      filter,
+      options
     };
   }
 
@@ -116,16 +131,12 @@ export function registerFilter(name, filter, options) {
     if (v) {
       const { filter, options } = v;
 
-      if (filter || options) {
-        if (filter) {
-          filters[name] = filter;
-        }
-        if (options) {
-          filterConfig[name] = _commonConfig(options);
-        }
+      if (filter) {
+        filters[name] = filter;
       } else {
         filters[name] = v;
       }
+      filterConfig[name] = _fConfig(options);
     }
   }, false, false);
 }
