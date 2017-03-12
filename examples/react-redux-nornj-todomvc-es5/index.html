@@ -8,7 +8,7 @@
 <body>
   <div>
     <script type="text/nornj" autoRender>
-      <Provider class="nj-component" store={store}>
+      <Provider {store}>
         <Router history={hashHistory}>
           <Route path="/" component={App}>
             <Route path="/all" />
@@ -20,11 +20,54 @@
       </Provider>
     </script>
   </div>
-  <!--[if lt IE 9]>
-  <script src="../vendor/console-polyfill.js"></script>
-  <script src="../vendor/es5-shim.min.js"></script>
-  <script src="../vendor/es5-sham.min.js"></script>
-  <![endif]-->
+  <script type="text/nornj" id="template-app">
+    <div>
+      <AddTodo onAddClick={addClick} />
+      <TodoList todos={visibleTodos} onTodoClick={todoClick} />
+      <Footer filter={visibilityFilter} />
+    </div>
+  </script>
+  <script type="text/nornj" id="template-addTodo">
+    <div>
+      <input type=text ref=input />
+      <button onClick={handleClick}>
+        Add
+      </button>
+    </div>
+  </script>
+  <script type="text/nornj" id="template-footer">
+    <p>
+      {'Show: '}
+      <#each {filters}>
+        <#if {filter ==(currentFilter)}>
+          {name}
+          <#else>
+            <router-Link to="/{filter | todoState}">
+              {name}
+            </router-Link>
+          </#else>
+        </#if>
+        <#if {name ==('Active')}>
+          .
+          <#else>
+            {', '}
+          </#else>
+        </#if>
+      </#each>
+    </p>
+  </script>
+  <script type="text/nornj" id="template-todo">
+    <li onClick={click} style="text-decoration:{completed | textDecoration};cursor:{completed | cursor};">
+      {text}
+    </li>
+  </script>
+  <script type="text/nornj" id="template-todoList">
+    <ul>
+      <#each {todos}>
+        <Todo {text} {completed} key={@index} index={@index} onClick={todoClick} />
+      </#each>
+    </ul>
+  </script>
   <script src="../vendor/react.min.js"></script>
   <script src="../vendor/react-dom.min.js"></script>
   <script src="../vendor/redux.js"></script>
@@ -32,18 +75,14 @@
   <script src="../vendor/react-router.js"></script>
   <script src="../vendor/react-router-redux.js"></script>
   <script src="../../dist/nornj.js"></script>
+  <script src="../vendor/nornj-react.min.js"></script>
   <script src="njConfig.js"></script>
   <script src="actions/actions.js"></script>
   <script src="reducers/reducers.js"></script>
-  <script src="components/AddTodo.tmpl.js"></script>
   <script src="components/AddTodo.js"></script>
-  <script src="components/Footer.tmpl.js"></script>
   <script src="components/Footer.js"></script>
-  <script src="components/Todo.tmpl.js"></script>
   <script src="components/Todo.js"></script>
-  <script src="components/TodoList.tmpl.js"></script>
   <script src="components/TodoList.js"></script>
-  <script src="containers/App.tmpl.js"></script>
   <script src="containers/App.js"></script>
   <script src="store/configureStore.js"></script>
   <script src="index.js"></script>

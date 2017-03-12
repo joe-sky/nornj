@@ -11,26 +11,21 @@
     ]).isRequired
   },
 
-  template: nj.compileComponent(AppTmpl),
+  template: nj.compileH(document.getElementById('template-app').innerHTML),
 
-  addClick: function (text) {
+  addClick: function(text) {
     this.props.dispatch(addTodo(text));
   },
 
-  todoClick: function (index) {
+  todoClick: function(index) {
     this.props.dispatch(completeTodo(index));
   },
 
-  render: function () {
-    return this.template(
-      [
-        this.props,
-        {
-          addClick: this.addClick,
-          todoClick: this.todoClick
-        }
-      ]
-    );
+  render: function() {
+    return this.template(this.props, {
+      addClick: this.addClick,
+      todoClick: this.todoClick
+    });
   }
 });
 
@@ -39,11 +34,11 @@ function selectTodos(todos, filter) {
     case VisibilityFilters.SHOW_ALL:
       return todos
     case VisibilityFilters.SHOW_COMPLETED:
-      return todos.filter(function (todo) {
+      return todos.filter(function(todo) {
         return todo.completed;
       });
     case VisibilityFilters.SHOW_ACTIVE:
-      return todos.filter(function (todo) {
+      return todos.filter(function(todo) {
         return !todo.completed;
       });
   }

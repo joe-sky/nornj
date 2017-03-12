@@ -3,7 +3,7 @@
     onAddClick: React.PropTypes.func.isRequired
   },
 
-  template: nj.compileComponent(AddTodoTmpl),
+  template: nj.compileH(document.getElementById('template-addTodo').innerHTML),
 
   handleClick: function (e) {
     var node = this.refs.input;

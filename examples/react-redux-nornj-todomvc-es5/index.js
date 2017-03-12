@@ -1,5 +1,5 @@
 ﻿//Set default data for first render NornJ html template.
-nj.setInitTagData({
+njr.setInitialData({
   store: store,
   hashHistory: ReactRouter.hashHistory,
   App: App

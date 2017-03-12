@@ -1,31 +1,16 @@
-﻿nj.setTmplRule(null, null, '$');
-nj.registerComponent({
+﻿nj.registerComponent({
   Provider: ReactRedux.Provider,
   Router: ReactRouter.Router,
   Route: ReactRouter.Route,
   Redirect: ReactRouter.Redirect,
-  Linkto: ReactRouter.Link
+  'router-Link': ReactRouter.Link
 });
 
 nj.registerFilter({
-  isCurrent: function (obj) {
-    return obj === this.parent.data.currentFilter;
+  textDecoration: function (val) {
+    return val ? 'line-through' : 'none';
   },
-  todoState: function (obj) {
-    switch (obj) {
-      case VisibilityFilters.SHOW_ACTIVE:
-        return 'active';
-      case VisibilityFilters.SHOW_COMPLETED:
-        return 'completed';
-      case VisibilityFilters.SHOW_ALL:
-      default:
-        return 'all';
-    }
-  },
-  textDecoration: function (obj) {
-    return obj ? 'line-through' : 'none';
-  },
-  cursor: function (obj) {
-    return obj ? 'default' : 'pointer';
+  cursor: function (val) {
+    return val ? 'default' : 'pointer';
   }
 });

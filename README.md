@@ -96,7 +96,7 @@ render(nj`<TestComponent no=100 />`(), document.body);
 
 ### 在ES5环境下使用
 
-除了使用ES6模板字符串外，NornJ也可以支持在es5环境下使用普通的字符串：
+除了使用ES6模板字符串外，`NornJ`也可以支持在es5环境下使用普通的字符串：
 
 ```html
 <script id="template" type="text/nornj">
@@ -134,6 +134,12 @@ console.log(html);
 ```sh
 npm install nornj
 ```
+
+### 示例项目
+
+* [react-redux-nornj-todomvc](https://github.com/joe-sky/nornj/blob/master/examples/react-redux-nornj-todomvc)
+* [react-redux-nornj-todomvc-es5](https://github.com/joe-sky/nornj/blob/master/examples/react-redux-nornj-todomvc-es5)
+* [backbone-marionette-nornj-todomvc](https://github.com/joe-sky/nornj/blob/master/examples/backbone-marionette-nornj-todomvc)
 
 ### 浏览器支持
 

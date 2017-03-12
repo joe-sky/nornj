@@ -7,7 +7,19 @@
     ]).isRequired
   },
 
-  template: nj.compileComponent(FooterTmpl),
+  template: nj.compileH(document.getElementById('template-footer').innerHTML),
+
+  todoState: function(obj) {
+    switch (obj) {
+      case VisibilityFilters.SHOW_ACTIVE:
+        return 'active';
+      case VisibilityFilters.SHOW_COMPLETED:
+        return 'completed';
+      case VisibilityFilters.SHOW_ALL:
+      default:
+        return 'all';
+    }
+  },
 
   render: function () {
     return this.template({
@@ -17,6 +29,6 @@
         { filter: VisibilityFilters.SHOW_ACTIVE, name: 'Active' }
       ],
       currentFilter: this.props.filter
-    });
+    }, this);
   }
 }));

@@ -5,18 +5,13 @@
     completed: React.PropTypes.bool.isRequired
   },
 
-  template: nj.compileComponent(TodoTmpl),
+  template: nj.compileH(document.getElementById('template-todo').innerHTML),
 
   click: function () {
     this.props.onClick(this.props.index);
   },
 
   render: function () {
-    return this.template(
-      [
-        this.props,
-        { click: this.click }
-      ]
-    );
+    return this.template(this.props, this);
   }
 }));

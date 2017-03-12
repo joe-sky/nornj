@@ -7,18 +7,13 @@
     }).isRequired).isRequired
   },
 
-  template: nj.compileComponent(TodoListTmpl),
+  template: nj.compileH(document.getElementById('template-todoList').innerHTML),
 
   todoClick: function (index) {
     this.props.onTodoClick(index);
   },
 
   render: function () {
-    return this.template(
-      [
-        this.props,
-        { todoClick: this.todoClick }
-      ]
-    );
+    return this.template(this.props, this);
   }
 }));
