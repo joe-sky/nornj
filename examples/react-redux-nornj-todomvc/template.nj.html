@@ -1,0 +1,52 @@
+<template name="app">
+  <div>
+    <AddTodo onAddClick={addClick} />
+    <TodoList todos={visibleTodos} onTodoClick={todoClick} />
+    <Footer filter={visibilityFilter} />
+  </div>
+</template>
+
+<template name="addTodo">
+  <div>
+    <input type=text ref=input />
+    <button onClick={handleClick}>
+      Add
+    </button>
+  </div>
+</template>
+
+<template name="footer">
+  <p>
+    {'Show: '}
+    <#each {filters}>
+      <#if {filter ==(currentFilter)}>
+        {name}
+        <#else>
+          <router-Link to="/{filter | todoState}">
+            {name}
+          </router-Link>
+        </#else>
+      </#if>
+      <#if {name ==('Active')}>
+        .
+        <#else>
+          {', '}
+        </#else>
+      </#if>
+    </#each>
+  </p>
+</template>
+
+<template name="todo">
+  <li onClick={handleClick} style="text-decoration:{completed | textDecoration};cursor:{completed | cursor};">
+    {text}
+  </li>
+</template>
+
+<template name="todoList">
+  <ul>
+    <#each {todos}>
+      <Todo {text} {completed} key={@index} index={@index} onClick={handleClick} />
+    </#each>
+  </ul>
+</template>

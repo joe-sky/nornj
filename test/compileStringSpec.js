@@ -135,7 +135,7 @@ describe('test compile string', function () {
       `;
 
       var tmpl3 = nj`
-        <div class="{{id}} {{name3}}" {{name3}} {{ ...props}} name={{name1}} autofocus name1={{a.c.d}} name2="{{a.e .('f') .('g')}}" a="/%'aaa'%//">
+        <div class="{{id}} {{name3}}" {{name3}} {{ ...props}} name={{name1}} autofocus name1={{a.c.d}} name2="{{a.e .('f') .('g')}}" a="/%'aaa'%/">
           <@name checked>{{test0 | filter1}}{{'test1' | filter2}}test2</@name>
           <@checked />
           <@data-name10>
@@ -259,7 +259,7 @@ describe('test compile string', function () {
                   #${nj`<span>1</span>`}
                 </div>`}
           #${nj`<div>{{../name3 | #('substring', 0, 3)}}</div>`}
-          <{{../sliderItem['a']|tagName(1,2)}} no1={{no}} no2="{{-0.05 | filter2}}" checked no='{{ ../sliderItem.b }}' />
+          <{{../sliderItem['a']|tagName(1,2)}} no0="/" no1={{no}} no2="{{-0.05 | filter2}}" checked no='{{ ../sliderItem.b }}' />
         </slider>
       </#each>
       `;

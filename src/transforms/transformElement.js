@@ -63,10 +63,12 @@ export function getOpenTagParams(tag) {
     }
 
     //Removed at the end of "/>", ">" or "/".
-    if (/\/>$/.test(value)) {
-      value = value.substr(0, value.length - 2);
-    } else if (/>$/.test(value) || /\/$/.test(value)) {
-      value = value.substr(0, value.length - 1);
+    if (!matchArr[8] && !matchArr[9]) {
+      if (/\/>$/.test(value)) {
+        value = value.substr(0, value.length - 2);
+      } else if (/>$/.test(value) || /\/$/.test(value)) {
+        value = value.substr(0, value.length - 1);
+      }
     }
 
     ret.push({

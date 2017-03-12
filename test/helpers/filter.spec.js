@@ -3,9 +3,11 @@ import '../../src/utils/setTmplRule';
 
 describe('filter', () => {
   it('.', () => {
-    expect(render("{{ a .('b') .('length') }}", {
+    expect(render("{{ a.b .('c') .('length') }}", {
       a: {
-        b: 'abc'
+        b: {
+          c: 'abc'
+        }
       }
     })).toBe(3);
   });
@@ -86,7 +88,7 @@ describe('filter', () => {
     expect(render("{{ 'false' | bool }}")).toBe(false);
   });
 
-  it('#', () => {
+  it('#(method)', () => {
     expect(render("{{ 'abc' #('substr', 1) }}")).toBe('bc');
   });
 });
