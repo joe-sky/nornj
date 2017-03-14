@@ -1,21 +1,10 @@
 ﻿import nj from '../core';
 import * as tools from '../utils/tools';
-const { tmplRule } = nj;
-
-//Get compiled parameters from a object
-export function compiledParams(obj) {
-  let ret = tools.obj();
-  tools.each(obj, function(v, k) {
-    ret[k] = compiledParam(v);
-  }, false, false);
-
-  return ret;
-}
 
 //Get compiled property
 const REGEX_JS_PROP = /(('[^']*')|("[^"]*")|(-?([0-9][0-9]*)(\.\d+)?)|true|false|null|undefined|([#]*)([^.[\]()]+))([^\s()]*)/;
 
-export function compiledProp(prop, innerBrackets) {
+function _compiledProp(prop, innerBrackets) {
   let ret = tools.obj();
 
   //If there are vertical lines in the property,then use filter
@@ -43,7 +32,7 @@ export function compiledProp(prop, innerBrackets) {
         if (paramsF != null) {
           let params = [];
           tools.each(innerBrackets[paramsF].split(','), (p) => {
-            params[params.length] = compiledProp(p.trim(), innerBrackets);
+            params[params.length] = _compiledProp(p.trim(), innerBrackets);
           }, false, true);
 
           filterObj.params = params;
@@ -99,7 +88,7 @@ const SP_FILTER_LOOKUP = {
 const REGEX_SP_FILTER = /[\s]+((\|\|)\()/g;
 const REGEX_FIX_FILTER = /(\|)?[\s]+([^\s]+\()/g;
 
-function _getReplaceParam(obj) {
+function _getReplaceParam(obj, tmplRule) {
   let pattern = tmplRule.replaceParam,
     matchArr, ret, i = 0;
 
@@ -144,7 +133,7 @@ function _replaceInnerBrackets(prop, counter, innerBrackets) {
 }
 
 //Get compiled parameter
-export function compiledParam(value) {
+export function compiledParam(value, tmplRule) {
   let ret = tools.obj(),
     isStr = tools.isString(value),
     strs = isStr ? value.split(tmplRule.replaceSplit) : [value],
@@ -157,7 +146,7 @@ export function compiledParam(value) {
 
   //If have placehorder
   if (strs.length > 1) {
-    const params = _getReplaceParam(value);
+    const params = _getReplaceParam(value, tmplRule);
     props = [];
 
     tools.each(params, param => {
@@ -166,7 +155,7 @@ export function compiledParam(value) {
 
       isAll = param[3] ? param[0] === value : false; //If there are several curly braces in one property value, "isAll" must be false.
       const prop = _replaceInnerBrackets(param[2], 0, innerBrackets);
-      retP.prop = compiledProp(prop, innerBrackets);
+      retP.prop = _compiledProp(prop, innerBrackets);
 
       //To determine whether it is necessary to escape
       retP.escape = param[1] !== tmplRule.firstChar + tmplRule.startRule;

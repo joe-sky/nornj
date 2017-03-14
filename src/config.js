@@ -1,5 +1,5 @@
 ﻿import nj from './core';
-import setTmplRule from './utils/setTmplRule';
+import createTmplRule from './utils/createTmplRule';
 
 export default function (configs) {
   const delimiters = configs.delimiters,
@@ -8,7 +8,7 @@ export default function (configs) {
     outputH = configs.outputH;
 
   if(delimiters) {
-    setTmplRule(delimiters);
+    createTmplRule(delimiters, true);
   }
 
   if(includeParser) {

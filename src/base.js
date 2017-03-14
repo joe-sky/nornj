@@ -1,12 +1,12 @@
 ﻿import nj from './core';
 import { assign } from './utils/tools';
 import registerComponent from './utils/registerComponent';
-import setTmplRule from './utils/setTmplRule';
+import createTmplRule from './utils/createTmplRule';
 import config from './config';
 
 assign(nj, {
   registerComponent,
-  setTmplRule,
+  createTmplRule,
   config
 });
 

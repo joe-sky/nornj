@@ -1,14 +1,14 @@
 ﻿import nj from '../core';
 import * as tools from '../utils/tools';
 import * as tranElem from '../transforms/transformElement';
-const { tmplRule, preAsts } = nj;
+const { preAsts } = nj;
 const SPLIT_FLAG = '_nj_split';
 
 //Compile string template
 export default function compileStringTmpl(tmpl) {
   let tmplKey = tmpl.toString(), //Get unique key
-    ret = preAsts[tmplKey],
-    outputH = this ? this.outputH : false;
+    ret = preAsts[tmplKey];
+  const { outputH, tmplRule } = this;
 
   if (!ret) { //If the cache already has template data, direct return the template.
     let isStr = tools.isString(tmpl),
@@ -40,10 +40,10 @@ export default function compileStringTmpl(tmpl) {
       fullXml += xml + split;
     }, false, true);
 
-    fullXml = _formatAll(fullXml);
+    fullXml = _formatAll(fullXml, tmplRule);
 
     //Resolve string to element
-    ret = _checkStringElem(fullXml);
+    ret = _checkStringElem(fullXml, tmplRule);
     tools.defineProp(ret, '_njParamCount', {
       value: l - 1
     });
@@ -64,7 +64,7 @@ export default function compileStringTmpl(tmpl) {
   }
 
   const tmplFn = function() {
-    return nj['compile' + (outputH ? 'H' : '')](tmplFn, tmplKey).apply(this, params ? tools.arrayPush([params], arguments) : arguments);
+    return nj['compile' + (outputH ? 'H' : '')](tmplFn, { tmplKey, tmplRule }).apply(this, params ? tools.arrayPush([params], arguments) : arguments);
   };
   tools.defineProps(tmplFn, {
     _njTmpl: {
@@ -82,7 +82,7 @@ export default function compileStringTmpl(tmpl) {
 }
 
 //Resolve string to element
-function _checkStringElem(xml) {
+function _checkStringElem(xml, tmplRule) {
   let root = [],
     current = {
       elem: root,
@@ -115,7 +115,7 @@ function _checkStringElem(xml) {
             current = current.parent;
           }
         } else if (elem[elem.length - 2] === '/') { //Self close tag
-          _setSelfCloseElem(elem, elemName, elemParams, current.elem);
+          _setSelfCloseElem(elem, elemName, elemParams, current.elem, tmplRule);
         } else { //Open tag
           parent = current;
           current = {
@@ -125,7 +125,7 @@ function _checkStringElem(xml) {
           };
 
           parent.elem.push(current.elem);
-          _setElem(elem, elemName, elemParams, current.elem);
+          _setElem(elem, elemName, elemParams, current.elem, null, tmplRule);
         }
       }
     }
@@ -147,21 +147,21 @@ const SP_FILTER_LOOKUP = {
 };
 const REGEX_SP_FILTER = /(\|)?[\s]+((>|<|>=|<=)\()/g;
 
-function _formatAll(str) {
+function _formatAll(str, tmplRule) {
   const commentRule = tmplRule.commentRule;
   return str.replace(new RegExp('<!--' + commentRule + '[\\s\\S]*?' + commentRule + '-->', 'g'), '')
     .replace(REGEX_SP_FILTER, (all, s1, match) => '|' + SP_FILTER_LOOKUP[match]);
 }
 
 //Set element node
-function _setElem(elem, elemName, elemParams, elemArr, bySelfClose) {
+function _setElem(elem, elemName, elemParams, elemArr, bySelfClose, tmplRule) {
   let ret, paramsExpr;
   if (elemName[0] === tmplRule.exprRule) {
     ret = elem.substring(1, elem.length - 1);
   } else if (elemName.indexOf(tmplRule.propRule) === 0) {
     ret = tmplRule.exprRule + 'prop ' + tmplRule.startRule + '\'' + elemName.substr(tmplRule.propRule.length) + '\'' + tmplRule.endRule + elemParams;
   } else {
-    const retS = _getSplitParams(elem);
+    const retS = _getSplitParams(elem, tmplRule);
     ret = retS.elem;
     paramsExpr = retS.params;
   }
@@ -182,7 +182,7 @@ function _setElem(elem, elemName, elemParams, elemArr, bySelfClose) {
 }
 
 //Extract split parameters
-function _getSplitParams(elem) {
+function _getSplitParams(elem, tmplRule) {
   const { exprRule, startRule, endRule } = tmplRule;
   let paramsExpr;
 
@@ -205,8 +205,8 @@ function _getSplitParams(elem) {
 }
 
 //Set self close element node
-function _setSelfCloseElem(elem, elemName, elemParams, elemArr) {
-  _setElem(elem, elemName, elemParams, elemArr, true);
+function _setSelfCloseElem(elem, elemName, elemParams, elemArr, tmplRule) {
+  _setElem(elem, elemName, elemParams, elemArr, true, tmplRule);
 }
 
 //Set text node

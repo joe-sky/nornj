@@ -2,10 +2,9 @@
 import * as tools from '../utils/tools';
 import * as tranParam from './transformParam';
 import { exprConfig } from '../helpers/extension';
-const { tmplRule } = nj;
 
 //提取xml open tag
-export function getXmlOpenTag(obj) {
+export function getXmlOpenTag(obj, tmplRule) {
   return tmplRule.xmlOpenTag.exec(obj);
 }
 
@@ -40,7 +39,7 @@ export function verifySelfCloseTag(tagName) {
 }
 
 //Extract parameters inside the xml open tag
-export function getOpenTagParams(tag) {
+export function getOpenTagParams(tag, tmplRule) {
   let pattern = tmplRule.openTagParams,
     matchArr, ret;
 
@@ -87,17 +86,17 @@ export function isXmlCloseTag(obj, tagName) {
 }
 
 //get inside brace param
-export function getInsideBraceParam(obj) {
+export function getInsideBraceParam(obj, tmplRule) {
   return tmplRule.insideBraceParam.exec(obj);
 }
 
 //判断块表达式并返回参数
-export function isExpr(obj) {
+export function isExpr(obj, tmplRule) {
   let ret, ret1 = tmplRule.expr.exec(obj);
   if (ret1) {
     ret = [ret1[1]];
 
-    const params = getOpenTagParams(obj); //提取各参数
+    const params = getOpenTagParams(obj, tmplRule); //提取各参数
     if (params) {
       ret.push(params);
     }

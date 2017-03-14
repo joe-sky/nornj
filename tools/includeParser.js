@@ -3,10 +3,9 @@
 const nj = require('../lib/base').default,
   getOpenTagParams = require('../lib/transforms/transformElement').getOpenTagParams,
   fs = require('fs'),
-  path = require('path'),
-  tmplRule = nj.tmplRule;
+  path = require('path');
 
-function getIncludeTmpl(tmplString, fileName, isAll, tmplStrs, tmplName) {
+function getIncludeTmpl(tmplString, fileName, isAll, tmplStrs, tmplName, tmplRule) {
   //解析template块
   if (!tmplStrs) {
     tmplStrs = {};
@@ -15,7 +14,7 @@ function getIncludeTmpl(tmplString, fileName, isAll, tmplStrs, tmplName) {
       matchArr, hasTemplate;
 
     while (matchArr = pattern.exec(tmplString)) {
-      let props = getOpenTagParams(matchArr[1]),
+      let props = getOpenTagParams(matchArr[1], tmplRule),
         name = 'main',
         isLocal = false;
 
@@ -62,7 +61,7 @@ function getIncludeTmpl(tmplString, fileName, isAll, tmplStrs, tmplName) {
   tmplStrList.forEach(function (obj) {
     //解析include块
     const _ret = obj.tmpl.replace(tmplRule.include, function (all, params) {
-      let props = getOpenTagParams(params),
+      let props = getOpenTagParams(params, tmplRule),
         src, name;
 
       props.forEach(function (prop) {
@@ -81,10 +80,10 @@ function getIncludeTmpl(tmplString, fileName, isAll, tmplStrs, tmplName) {
           targetFileName = path.resolve(basePath, src),
           targetTmplString = fs.readFileSync(targetFileName, 'utf-8');
 
-        return getIncludeTmpl(targetTmplString, targetFileName, false, null, name);
+        return getIncludeTmpl(targetTmplString, targetFileName, false, null, name, tmplRule);
       }
       else {  //读取当前文件中的模板
-        return getIncludeTmpl(null, fileName, false, tmplStrs, name);
+        return getIncludeTmpl(null, fileName, false, tmplStrs, name, tmplRule);
       }
     });
 

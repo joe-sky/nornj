@@ -4,10 +4,11 @@ import checkElem from '../parser/checkElem';
 import * as tranData from '../transforms/transformData';
 import buildRuntime from './buildRuntime';
 import compileStringTmpl from '../parser/checkStringElem';
+import createTmplRule from '../utils/createTmplRule';
 
 //编译模板并返回转换函数
 function _createCompile(outputH) {
-  return (tmpl, tmplKey, fileName) => {
+  return (tmpl, tmplKey, fileName, delimiters, tmplRule) => {
     if (!tmpl) {
       return;
     }
@@ -15,6 +16,8 @@ function _createCompile(outputH) {
       const options = tmplKey;
       tmplKey = options.tmplKey;
       fileName = options.fileName;
+      delimiters = options.delimiters;
+      tmplRule = options.tmplRule;
     }
 
     //编译模板函数
@@ -37,6 +40,9 @@ function _createCompile(outputH) {
           if (isObj && tmpl.type === 'nj_root') {
             root = tmpl;
           } else {
+            if (!tmplRule) {
+              tmplRule = delimiters ? createTmplRule(delimiters) : nj.tmplRule;
+            }
             root = _createAstRoot();
 
             //Auto transform string template to array
@@ -44,14 +50,14 @@ function _createCompile(outputH) {
               //Merge all include blocks
               const includeParser = nj.includeParser;
               if (includeParser) {
-                tmpl = includeParser(tmpl, fileName);
+                tmpl = includeParser(tmpl, fileName, null, null, null, tmplRule);
               }
 
-              tmpl = compileStringTmpl(tmpl);
+              tmpl = compileStringTmpl.call({ tmplRule, outputH }, tmpl);
             }
 
             //分析传入参数并转换为节点树对象
-            checkElem(tmpl._njTmpl, root);
+            checkElem(tmpl._njTmpl, root, null, null, null, tmplRule);
           }
 
           //保存模板AST编译结果到全局集合中
@@ -78,7 +84,7 @@ function _createCompile(outputH) {
       tools.defineProp(tmplFn, '_njTmpl', {
         value: true
       });
-      
+
       return tmplFn;
     } else {
       return tmplFns.main;
@@ -99,13 +105,13 @@ function _createAstRoot() {
 }
 
 //Precompile template
-export function precompile(tmpl, outputH) {
+export function precompile(tmpl, outputH, tmplRule) {
   const root = _createAstRoot();
 
   if (tools.isString(tmpl)) {
-    tmpl = compileStringTmpl(tmpl);
+    tmpl = compileStringTmpl.call({ tmplRule, outputH }, tmpl);
   }
-  checkElem(tmpl._njTmpl, root);
+  checkElem(tmpl._njTmpl, root, null, null, null, tmplRule);
 
   return buildRuntime(root.content, root, !outputH);
 }
@@ -114,7 +120,8 @@ function _createRender(outputH) {
   return function(tmpl, options) {
     return (outputH ? compileH : compile)(tmpl, options ? {
       tmplKey: options.tmplKey ? options.tmplKey : tmpl._njTmplKey,
-      fileName: options.fileName
+      fileName: options.fileName,
+      delimiters: options.delimiters
     } : tmpl._njTmplKey).apply(null, tools.arraySlice(arguments, 1));
   };
 }

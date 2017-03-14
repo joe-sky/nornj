@@ -22,7 +22,7 @@ function _clearRepeat(str) {
   return ret;
 }
 
-export default function setTmplRule(rules = {}) {
+export default function createTmplRule(rules = {}, isGlobal) {
   let {
     startRule = '{{',
     endRule = '}}',
@@ -71,8 +71,7 @@ export default function setTmplRule(rules = {}) {
     exprRules = _clearRepeat(exprRule + propRule + tagSpRule),
     escapeExprRule = exprRule.replace(/\$/g, '\\$');
 
-  //Reset the regexs to global list
-  tools.assign(nj.tmplRule, {
+  const tmplRules = {
     startRule,
     endRule,
     exprRule,
@@ -92,8 +91,15 @@ export default function setTmplRule(rules = {}) {
     expr: _createRegExp('^' + escapeExprRule + '([^\\s]+)', 'i'),
     include: _createRegExp('<' + escapeExprRule + 'include([^>]*)>', 'ig'),
     newlineSplit: _createRegExp('\\n(?![^' + firstChar + lastChar + ']*' + lastChar + ')', 'g'),
-  });
+  };
+  
+  if(isGlobal) {  //Reset the regexs to global list
+    tools.assign(nj.tmplRule, tmplRules);
+  }
+  else {
+    return tmplRules;
+  }
 };
 
-//Set default template rules
-setTmplRule();
+//Set global template rules
+createTmplRule({}, true);

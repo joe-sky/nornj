@@ -14,8 +14,10 @@ module.exports = (configs = {}) => {
     extname = '.html',
     layoutsDir = 'layouts/',
     defaultLayout,
-    bodyPlaceholder = 'body'
+    bodyPlaceholder = 'body',
+    delimiters
   } = configs;
+  const tmplRule = delimiters ? nj.createTmplRule(delimiters) : nj.tmplRule;
 
   return (filePath, options, callback) => {
     let layout;
@@ -47,13 +49,13 @@ module.exports = (configs = {}) => {
         return callback(new Error(err));
       }
 
-      let bodyHtml = nj.compile(content.toString(), { fileName: filePath })(options),
+      let bodyHtml = nj.compile(content.toString(), { fileName: filePath, tmplRule })(options),
         html = null;
       if (layoutTmpl) {
         const layoutOpts = {};
         layoutOpts[bodyPlaceholder] = bodyHtml;
 
-        html = nj.compile(layoutTmpl, { fileName: layoutFilePath })(layoutOpts, options);
+        html = nj.compile(layoutTmpl, { fileName: layoutFilePath, tmplRule })(layoutOpts, options);
       } else {
         html = bodyHtml;
       }

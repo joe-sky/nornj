@@ -2,7 +2,6 @@
 import * as tools from '../utils/tools';
 import * as tranParam from '../transforms/transformParam';
 import * as tranElem from '../transforms/transformElement';
-const { tmplRule } = nj;
 const NO_SPLIT_NEWLINE = [
   'style',
   'script',
@@ -12,16 +11,16 @@ const NO_SPLIT_NEWLINE = [
   'template'
 ];
 
-function _plainTextNode(obj, parent, parentContent, noSplitNewline) {
+function _plainTextNode(obj, parent, parentContent, noSplitNewline, tmplRule) {
   const node = {};
   node.type = 'nj_plaintext';
-  node.content = [tranParam.compiledParam(obj)];
+  node.content = [tranParam.compiledParam(obj, tmplRule)];
   node.allowNewline = noSplitNewline;
   parent[parentContent].push(node);
 }
 
 //检测元素节点
-export default function checkElem(obj, parent, hasExProps, noSplitNewline, isLast) {
+export default function checkElem(obj, parent, hasExProps, noSplitNewline, isLast, tmplRule) {
   const parentContent = 'content';
 
   if (!tools.isArray(obj)) { //判断是否为文本节点
@@ -30,13 +29,13 @@ export default function checkElem(obj, parent, hasExProps, noSplitNewline, isLas
         let strs = obj.split(tmplRule.newlineSplit);
         strs.forEach((str, i) => {
           str = str.trim();
-          str !== '' && _plainTextNode(str, parent, parentContent, noSplitNewline);
+          str !== '' && _plainTextNode(str, parent, parentContent, noSplitNewline, tmplRule);
         });
       } else {
-        _plainTextNode(isLast && parent.allowNewline === 'nlElem' ? tools.trimRight(obj) : obj, parent, parentContent, noSplitNewline);
+        _plainTextNode(isLast && parent.allowNewline === 'nlElem' ? tools.trimRight(obj) : obj, parent, parentContent, noSplitNewline, tmplRule);
       }
     } else {
-      _plainTextNode(obj, parent, parentContent, noSplitNewline);
+      _plainTextNode(obj, parent, parentContent, noSplitNewline, tmplRule);
     }
 
     return;
@@ -60,9 +59,9 @@ export default function checkElem(obj, parent, hasExProps, noSplitNewline, isLas
       isSub,
       needAddToProps;
 
-    expr = tranElem.isExpr(first);
+    expr = tranElem.isExpr(first, tmplRule);
     if (!expr) {
-      const xmlOpenTag = tranElem.getXmlOpenTag(first);
+      const xmlOpenTag = tranElem.getXmlOpenTag(first, tmplRule);
       if (xmlOpenTag) { //tagname为xml标签时,则认为是元素节点
         openTagName = xmlOpenTag[1];
 
@@ -98,7 +97,7 @@ export default function checkElem(obj, parent, hasExProps, noSplitNewline, isLas
             return;
           }
 
-          let paramV = tranParam.compiledParam(param.value);
+          let paramV = tranParam.compiledParam(param.value, tmplRule);
           if (param.onlyBrace) { //提取匿名参数
             node.args.push(paramV);
           } else {
@@ -123,20 +122,20 @@ export default function checkElem(obj, parent, hasExProps, noSplitNewline, isLas
         node.type = openTagName;
 
         //If open tag has a brace,add the typeRefer param.
-        const typeRefer = tranElem.getInsideBraceParam(openTagName);
+        const typeRefer = tranElem.getInsideBraceParam(openTagName, tmplRule);
         if (typeRefer) {
-          node.typeRefer = tranParam.compiledParam(typeRefer[0]);
+          node.typeRefer = tranParam.compiledParam(typeRefer[0], tmplRule);
         }
 
         //获取openTag内参数
-        const tagParams = tranElem.getOpenTagParams(first);
+        const tagParams = tranElem.getOpenTagParams(first, tmplRule);
         if (tagParams) {
           if (!node.params) {
             node.params = tools.obj();
           }
 
           tools.each(tagParams, (param) => { //The parameter like "{prop}" needs to be replaced.
-            node.params[param.onlyBrace ? param.onlyBrace.replace(/\.\.\//g, '') : param.key] = tranParam.compiledParam(param.value);
+            node.params[param.onlyBrace ? param.onlyBrace.replace(/\.\.\//g, '') : param.key] = tranParam.compiledParam(param.value, tmplRule);
           }, false, true);
         }
 
@@ -174,7 +173,7 @@ export default function checkElem(obj, parent, hasExProps, noSplitNewline, isLas
       const end = len - (hasCloseTag ? 1 : 0),
         content = obj.slice(1, end);
       if (content && content.length) {
-        checkContentElem(content, node, isParamsExpr || (hasExProps && !isProp), noSplitNewline);
+        _checkContentElem(content, node, isParamsExpr || (hasExProps && !isProp), noSplitNewline, tmplRule);
       }
 
       //If this is params block, set on the "paramsExpr" property of the parent node.
@@ -182,20 +181,20 @@ export default function checkElem(obj, parent, hasExProps, noSplitNewline, isLas
         tranElem.addParamsExpr(node, parent, isProp, isSub);
       }
     } else { //如果不是元素节点,则为节点集合
-      checkContentElem(obj, parent, hasExProps, noSplitNewline);
+      _checkContentElem(obj, parent, hasExProps, noSplitNewline, tmplRule);
     }
   } else if (tools.isArray(first)) { //如果第一个子节点为数组,则该节点一定为节点集合(可以是多层数组嵌套的集合)
-    checkContentElem(obj, parent, hasExProps, noSplitNewline);
+    _checkContentElem(obj, parent, hasExProps, noSplitNewline, tmplRule);
   }
 }
 
 //检测子元素节点
-function checkContentElem(obj, parent, hasExProps, noSplitNewline) {
+function _checkContentElem(obj, parent, hasExProps, noSplitNewline, tmplRule) {
   if (!parent.content) {
     parent.content = [];
   }
 
   tools.each(obj, (item, i, l) => {
-    checkElem(item, parent, hasExProps, noSplitNewline, i == l - 1);
+    checkElem(item, parent, hasExProps, noSplitNewline, i == l - 1, tmplRule);
   }, false, true);
 }
