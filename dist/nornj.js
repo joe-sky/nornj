@@ -2215,7 +2215,7 @@ function createTmplTag(opts) {
 }
 
 var tmplTag = createTmplTag({ outputH: false });
-var tmplTagH = createTmplTag({ outputH: false });
+var tmplTagH = createTmplTag({ outputH: true });
 
 __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils_tools__["a" /* assign */])(__WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */], {
   createTmplTag: createTmplTag,

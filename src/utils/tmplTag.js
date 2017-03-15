@@ -13,7 +13,7 @@ export function createTmplTag(opts) {
 }
 
 export const tmplTag = createTmplTag({ outputH: false });
-export const tmplTagH = createTmplTag({ outputH: false });
+export const tmplTagH = createTmplTag({ outputH: true });
 
 assign(nj, {
   createTmplTag,
