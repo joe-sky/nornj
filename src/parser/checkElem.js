@@ -20,7 +20,7 @@ function _plainTextNode(obj, parent, parentContent, noSplitNewline, tmplRule) {
 }
 
 //检测元素节点
-export default function checkElem(obj, parent, hasExProps, noSplitNewline, isLast, tmplRule) {
+export default function checkElem(obj, parent, tmplRule, hasExProps, noSplitNewline, isLast) {
   const parentContent = 'content';
 
   if (!tools.isArray(obj)) { //判断是否为文本节点
@@ -173,7 +173,7 @@ export default function checkElem(obj, parent, hasExProps, noSplitNewline, isLas
       const end = len - (hasCloseTag ? 1 : 0),
         content = obj.slice(1, end);
       if (content && content.length) {
-        _checkContentElem(content, node, isParamsExpr || (hasExProps && !isProp), noSplitNewline, tmplRule);
+        _checkContentElem(content, node, tmplRule, isParamsExpr || (hasExProps && !isProp), noSplitNewline, tmplRule);
       }
 
       //If this is params block, set on the "paramsExpr" property of the parent node.
@@ -181,20 +181,20 @@ export default function checkElem(obj, parent, hasExProps, noSplitNewline, isLas
         tranElem.addParamsExpr(node, parent, isProp, isSub);
       }
     } else { //如果不是元素节点,则为节点集合
-      _checkContentElem(obj, parent, hasExProps, noSplitNewline, tmplRule);
+      _checkContentElem(obj, parent, tmplRule, hasExProps, noSplitNewline);
     }
   } else if (tools.isArray(first)) { //如果第一个子节点为数组,则该节点一定为节点集合(可以是多层数组嵌套的集合)
-    _checkContentElem(obj, parent, hasExProps, noSplitNewline, tmplRule);
+    _checkContentElem(obj, parent, tmplRule, hasExProps, noSplitNewline);
   }
 }
 
 //检测子元素节点
-function _checkContentElem(obj, parent, hasExProps, noSplitNewline, tmplRule) {
+function _checkContentElem(obj, parent, tmplRule, hasExProps, noSplitNewline) {
   if (!parent.content) {
     parent.content = [];
   }
 
   tools.each(obj, (item, i, l) => {
-    checkElem(item, parent, hasExProps, noSplitNewline, i == l - 1, tmplRule);
+    checkElem(item, parent, tmplRule, hasExProps, noSplitNewline, i == l - 1);
   }, false, true);
 }

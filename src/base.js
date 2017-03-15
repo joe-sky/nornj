@@ -3,6 +3,7 @@ import { assign } from './utils/tools';
 import registerComponent from './utils/registerComponent';
 import createTmplRule from './utils/createTmplRule';
 import config from './config';
+import './utils/escape';
 
 assign(nj, {
   registerComponent,
@@ -17,12 +18,20 @@ export {
   registerExpr,
   registerExtension
 } from './helpers/extension';
-export { registerFilter } from './helpers/filter';
-export * from './compiler/compile';
-export { escape } from './utils/escape';
-export * from './utils/tmplTag';
 export {
-  registerComponent,
-  config
+  registerFilter
+} from './helpers/filter';
+export {
+  compile,
+  compileH,
+  render,
+  renderH
+} from './compiler/compile';
+export {
+  tmplTag,
+  tmplTagH
+} from './utils/tmplTag';
+export {
+  registerComponent
 };
 export default nj;

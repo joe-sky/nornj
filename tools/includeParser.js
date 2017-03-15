@@ -5,7 +5,7 @@ const nj = require('../lib/base').default,
   fs = require('fs'),
   path = require('path');
 
-function getIncludeTmpl(tmplString, fileName, isAll, tmplStrs, tmplName, tmplRule) {
+function getIncludeTmpl(tmplString, fileName, tmplRule, isAll, tmplStrs, tmplName) {
   //解析template块
   if (!tmplStrs) {
     tmplStrs = {};
@@ -80,10 +80,10 @@ function getIncludeTmpl(tmplString, fileName, isAll, tmplStrs, tmplName, tmplRul
           targetFileName = path.resolve(basePath, src),
           targetTmplString = fs.readFileSync(targetFileName, 'utf-8');
 
-        return getIncludeTmpl(targetTmplString, targetFileName, false, null, name, tmplRule);
+        return getIncludeTmpl(targetTmplString, targetFileName, tmplRule, false, null, name);
       }
       else {  //读取当前文件中的模板
-        return getIncludeTmpl(null, fileName, false, tmplStrs, name, tmplRule);
+        return getIncludeTmpl(null, fileName, tmplRule, false, tmplStrs, name);
       }
     });
 

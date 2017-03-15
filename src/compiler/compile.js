@@ -50,14 +50,14 @@ function _createCompile(outputH) {
               //Merge all include blocks
               const includeParser = nj.includeParser;
               if (includeParser) {
-                tmpl = includeParser(tmpl, fileName, null, null, null, tmplRule);
+                tmpl = includeParser(tmpl, fileName, tmplRule);
               }
 
               tmpl = compileStringTmpl.call({ tmplRule, outputH }, tmpl);
             }
 
             //分析传入参数并转换为节点树对象
-            checkElem(tmpl._njTmpl, root, null, null, null, tmplRule);
+            checkElem(tmpl._njTmpl, root, tmplRule);
           }
 
           //保存模板AST编译结果到全局集合中
@@ -111,7 +111,7 @@ export function precompile(tmpl, outputH, tmplRule) {
   if (tools.isString(tmpl)) {
     tmpl = compileStringTmpl.call({ tmplRule, outputH }, tmpl);
   }
-  checkElem(tmpl._njTmpl, root, null, null, null, tmplRule);
+  checkElem(tmpl._njTmpl, root, tmplRule);
 
   return buildRuntime(root.content, root, !outputH);
 }
