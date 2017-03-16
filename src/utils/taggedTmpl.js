@@ -3,7 +3,7 @@ import { assign } from '../utils/tools';
 import compileStringTmpl from '../parser/checkStringElem';
 import createTmplRule from '../utils/createTmplRule';
 
-export function createTmplTag(opts) {
+export function createTaggedTmpl(opts) {
   const { outputH, delimiters } = opts;
   const tmplRule = delimiters ? createTmplRule(delimiters) : nj.tmplRule;
 
@@ -12,11 +12,11 @@ export function createTmplTag(opts) {
   }
 }
 
-export const tmplTag = createTmplTag({ outputH: false });
-export const tmplTagH = createTmplTag({ outputH: true });
+export const taggedTmpl = createTmplTag({ outputH: false });
+export const taggedTmplH = createTmplTag({ outputH: true });
 
 assign(nj, {
-  createTmplTag,
-  tmplTag,
-  tmplTagH
+  createTaggedTmpl,
+  taggedTmpl,
+  taggedTmplH
 });

@@ -15,7 +15,6 @@ const _global = typeof self !== 'undefined' ? self : global;
 _global.NornJ = _global.nj = nj;
 
 export {
-  registerExpr,
   registerExtension
 } from './helpers/extension';
 export {
@@ -28,9 +27,9 @@ export {
   renderH
 } from './compiler/compile';
 export {
-  tmplTag,
-  tmplTagH
-} from './utils/tmplTag';
+  taggedTmpl,
+  taggedTmplH
+} from './utils/taggedTmpl';
 export {
   registerComponent
 };

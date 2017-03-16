@@ -287,8 +287,6 @@ function _eConfig(params) {
   return ret;
 }
 
-export const exprs = extensions;
-
 //Expression default config
 export const extensionConfig = {
   'if': _eConfig({ newContext: false }),
@@ -315,8 +313,6 @@ extensionConfig['case'] = extensionConfig.elseif;
 extensions['default'] = extensions['else'];
 extensionConfig['default'] = extensionConfig['else'];
 
-export const exprConfig = extensionConfig;
-
 //Register expression and also can batch add
 export function registerExtension(name, extension, options) {
   let params = name;
@@ -342,12 +338,7 @@ export function registerExtension(name, extension, options) {
   }, false, false);
 }
 
-export const registerExpr = registerExtension;
-
 tools.assign(nj, {
-  exprs,
-  exprConfig,
-  registerExpr,
   extensions,
   extensionConfig,
   registerExtension

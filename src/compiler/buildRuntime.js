@@ -2,7 +2,7 @@
 import * as tools from '../utils/tools';
 import * as tranData from '../transforms/transformData';
 import { unescape } from '../utils/escape';
-import { exprConfig } from '../helpers/extension';
+import { extensionConfig } from '../helpers/extension';
 import { filterConfig } from '../helpers/filter';
 const { errorTitle } = nj;
 
@@ -425,7 +425,7 @@ function _buildNode(node, parent, fns, counter, retType, level, useStringLocal, 
       _dataReferC = counter._dataRefer++,
       dataReferStr = '',
       filterStr = '',
-      configE = exprConfig[node.expr],
+      configE = extensionConfig[node.expr],
       exprVarStr = '_expr' + _exprC,
       globalExprStr = 'p1.exprs[\'' + node.expr + '\']';
 

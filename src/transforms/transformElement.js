@@ -1,7 +1,7 @@
 ﻿import nj from '../core';
 import * as tools from '../utils/tools';
 import * as tranParam from './transformParam';
-import { exprConfig } from '../helpers/extension';
+import { extensionConfig } from '../helpers/extension';
 
 //提取xml open tag
 export function getXmlOpenTag(obj, tmplRule) {
@@ -168,7 +168,7 @@ export function addParamsExpr(node, parent, isProp, isSub) {
 }
 
 export function isExProp(name) {
-  const config = exprConfig[name];
+  const config = extensionConfig[name];
   return {
     isSub: config ? config.isSub : false,
     isProp: config ? config.isProp : false

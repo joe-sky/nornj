@@ -1,5 +1,5 @@
 ﻿export default function nj() {
-  return nj['tmplTag' + (nj.outputH ? 'H' : '')].apply(null, arguments);
+  return nj['taggedTmpl' + (nj.outputH ? 'H' : '')].apply(null, arguments);
 }
 
 nj.createElement = null;

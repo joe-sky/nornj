@@ -83,7 +83,7 @@ return /******/ (function(modules) { // webpackBootstrap
 "use strict";
 /* harmony export (immutable) */ __webpack_exports__["a"] = nj;
 function nj() {
-  return nj['tmplTag' + (nj.outputH ? 'H' : '')].apply(null, arguments);
+  return nj['taggedTmpl' + (nj.outputH ? 'H' : '')].apply(null, arguments);
 }
 
 nj.createElement = null;
@@ -449,11 +449,8 @@ createTmplRule({}, true);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils_tools__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__transforms_transformData__ = __webpack_require__(4);
 /* unused harmony export extensions */
-/* unused harmony export exprs */
-/* unused harmony export extensionConfig */
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return exprConfig; });
-/* harmony export (immutable) */ __webpack_exports__["b"] = registerExtension;
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return registerExpr; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return extensionConfig; });
+/* harmony export (immutable) */ __webpack_exports__["a"] = registerExtension;
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 
@@ -767,8 +764,6 @@ function _eConfig(params) {
   return ret;
 }
 
-var exprs = extensions;
-
 //Expression default config
 var extensionConfig = {
   'if': _eConfig({ newContext: false }),
@@ -794,8 +789,6 @@ extensions['case'] = extensions.elseif;
 extensionConfig['case'] = extensionConfig.elseif;
 extensions['default'] = extensions['else'];
 extensionConfig['default'] = extensionConfig['else'];
-
-var exprConfig = extensionConfig;
 
 //Register expression and also can batch add
 function registerExtension(name, extension, options) {
@@ -824,12 +817,7 @@ function registerExtension(name, extension, options) {
   }, false, false);
 }
 
-var registerExpr = registerExtension;
-
 __WEBPACK_IMPORTED_MODULE_1__utils_tools__["a" /* assign */](__WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */], {
-  exprs: exprs,
-  exprConfig: exprConfig,
-  registerExpr: registerExpr,
   extensions: extensions,
   extensionConfig: extensionConfig,
   registerExtension: registerExtension
@@ -1768,7 +1756,7 @@ function addParamsExpr(node, parent, isProp, isSub) {
 }
 
 function isExProp(name) {
-  var config = __WEBPACK_IMPORTED_MODULE_3__helpers_extension__["c" /* exprConfig */][name];
+  var config = __WEBPACK_IMPORTED_MODULE_3__helpers_extension__["b" /* extensionConfig */][name];
   return {
     isSub: config ? config.isSub : false,
     isProp: config ? config.isProp : false
@@ -2195,15 +2183,15 @@ function registerComponent(name, component) {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils_tools__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__parser_checkStringElem__ = __webpack_require__(7);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__utils_createTmplRule__ = __webpack_require__(2);
-/* unused harmony export createTmplTag */
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return tmplTag; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return tmplTagH; });
+/* unused harmony export createTaggedTmpl */
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return taggedTmpl; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return taggedTmplH; });
 
 
 
 
 
-function createTmplTag(opts) {
+function createTaggedTmpl(opts) {
   var outputH = opts.outputH,
       delimiters = opts.delimiters;
 
@@ -2214,13 +2202,13 @@ function createTmplTag(opts) {
   };
 }
 
-var tmplTag = createTmplTag({ outputH: false });
-var tmplTagH = createTmplTag({ outputH: true });
+var taggedTmpl = createTmplTag({ outputH: false });
+var taggedTmplH = createTmplTag({ outputH: true });
 
 __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils_tools__["a" /* assign */])(__WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */], {
-  createTmplTag: createTmplTag,
-  tmplTag: tmplTag,
-  tmplTagH: tmplTagH
+  createTaggedTmpl: createTaggedTmpl,
+  taggedTmpl: taggedTmpl,
+  taggedTmplH: taggedTmplH
 });
 
 /***/ }),
@@ -2717,7 +2705,7 @@ function _buildNode(node, parent, fns, counter, retType, level, useStringLocal, 
         _dataReferC = counter._dataRefer++,
         dataReferStr = '',
         _filterStr2 = '',
-        configE = __WEBPACK_IMPORTED_MODULE_4__helpers_extension__["c" /* exprConfig */][node.expr],
+        configE = __WEBPACK_IMPORTED_MODULE_4__helpers_extension__["b" /* extensionConfig */][node.expr],
         exprVarStr = '_expr' + _exprC,
         globalExprStr = 'p1.exprs[\'' + node.expr + '\']';
 
@@ -3192,8 +3180,7 @@ function _checkContentElem(obj, parent, tmplRule, hasExProps, noSplitNewline) {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__config__ = __webpack_require__(11);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__utils_escape__ = __webpack_require__(6);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__helpers_extension__ = __webpack_require__(3);
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "registerExpr", function() { return __WEBPACK_IMPORTED_MODULE_6__helpers_extension__["a"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "registerExtension", function() { return __WEBPACK_IMPORTED_MODULE_6__helpers_extension__["b"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "registerExtension", function() { return __WEBPACK_IMPORTED_MODULE_6__helpers_extension__["a"]; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__helpers_filter__ = __webpack_require__(5);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "registerFilter", function() { return __WEBPACK_IMPORTED_MODULE_7__helpers_filter__["a"]; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__compiler_compile__ = __webpack_require__(10);
@@ -3201,9 +3188,9 @@ function _checkContentElem(obj, parent, tmplRule, hasExProps, noSplitNewline) {
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "compileH", function() { return __WEBPACK_IMPORTED_MODULE_8__compiler_compile__["b"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "render", function() { return __WEBPACK_IMPORTED_MODULE_8__compiler_compile__["c"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "renderH", function() { return __WEBPACK_IMPORTED_MODULE_8__compiler_compile__["d"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__utils_tmplTag__ = __webpack_require__(13);
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "tmplTag", function() { return __WEBPACK_IMPORTED_MODULE_9__utils_tmplTag__["a"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "tmplTagH", function() { return __WEBPACK_IMPORTED_MODULE_9__utils_tmplTag__["b"]; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__utils_taggedTmpl__ = __webpack_require__(13);
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "taggedTmpl", function() { return __WEBPACK_IMPORTED_MODULE_9__utils_taggedTmpl__["a"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "taggedTmplH", function() { return __WEBPACK_IMPORTED_MODULE_9__utils_taggedTmpl__["b"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "registerComponent", function() { return __WEBPACK_IMPORTED_MODULE_2__utils_registerComponent__["a"]; });
 
 
