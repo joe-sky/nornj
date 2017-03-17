@@ -220,8 +220,8 @@ function noop() {}
 function throwIf(val, msg, type) {
   if (!val) {
     switch (type) {
-      case 'expr':
-        throw Error(errorTitle + 'Expression "' + msg + '" is undefined, please check it has been registered.');
+      case 'ex':
+        throw Error(errorTitle + 'Extension tag "' + msg + '" is undefined, please check it has been registered.');
       default:
         throw Error(errorTitle + (msg || val));
     }
@@ -360,8 +360,8 @@ function createTmplRule() {
       startRule = _nj$tmplRule$startRul === undefined ? '{{' : _nj$tmplRule$startRul,
       _nj$tmplRule$endRule = _nj$tmplRule.endRule,
       endRule = _nj$tmplRule$endRule === undefined ? '}}' : _nj$tmplRule$endRule,
-      _nj$tmplRule$exprRule = _nj$tmplRule.exprRule,
-      exprRule = _nj$tmplRule$exprRule === undefined ? '#' : _nj$tmplRule$exprRule,
+      _nj$tmplRule$extensio = _nj$tmplRule.extensionRule,
+      extensionRule = _nj$tmplRule$extensio === undefined ? '#' : _nj$tmplRule$extensio,
       _nj$tmplRule$propRule = _nj$tmplRule.propRule,
       propRule = _nj$tmplRule$propRule === undefined ? '@' : _nj$tmplRule$propRule,
       _nj$tmplRule$template = _nj$tmplRule.templateRule,
@@ -372,7 +372,7 @@ function createTmplRule() {
       commentRule = _nj$tmplRule$commentR === undefined ? '#' : _nj$tmplRule$commentR;
   var start = rules.start,
       end = rules.end,
-      expr = rules.expr,
+      extension = rules.extension,
       prop = rules.prop,
       template = rules.template,
       tagSp = rules.tagSp,
@@ -385,8 +385,8 @@ function createTmplRule() {
   if (end) {
     endRule = end;
   }
-  if (expr) {
-    exprRule = expr;
+  if (extension) {
+    extensionRule = extension;
   }
   if (prop) {
     propRule = prop;
@@ -404,28 +404,28 @@ function createTmplRule() {
   var allRules = _clearRepeat(startRule + endRule),
       firstChar = startRule[0],
       lastChar = endRule[endRule.length - 1],
-      exprRules = _clearRepeat(exprRule + propRule + tagSpRule),
-      escapeExprRule = exprRule.replace(/\$/g, '\\$');
+      extensionRules = _clearRepeat(extensionRule + propRule + tagSpRule),
+      escapeExtensionRule = extensionRule.replace(/\$/g, '\\$');
 
   var tmplRules = {
     startRule: startRule,
     endRule: endRule,
-    exprRule: exprRule,
+    extensionRule: extensionRule,
     propRule: propRule,
     templateRule: templateRule,
     tagSpRule: tagSpRule,
     commentRule: commentRule,
     firstChar: firstChar,
     lastChar: lastChar,
-    xmlOpenTag: _createRegExp('^<([a-z' + firstChar + exprRules + '][^\\s>]*)[^>]*>$', 'i'),
+    xmlOpenTag: _createRegExp('^<([a-z' + firstChar + extensionRules + '][^\\s>]*)[^>]*>$', 'i'),
     openTagParams: _createRegExp('[\\s]+((([' + firstChar + ']?' + startRule + ')([^' + allRules + ']+)(' + endRule + '[' + lastChar + ']?))|[^\\s=>]+)(=((\'[^\']+\')|("[^"]+")|([^"\'\\s]+)))?', 'g'),
     insideBraceParam: _createRegExp('([' + firstChar + ']?' + startRule + ')([^' + allRules + ']+)(' + endRule + '[' + lastChar + ']?)', 'i'),
     spreadProp: _createRegExp('[\\s]+([' + firstChar + ']?' + startRule + ')[\\s]*(\\.\\.\\.[^' + allRules + ']+)(' + endRule + '[' + lastChar + ']?)', 'g'),
     replaceSplit: _createRegExp('(?:[' + firstChar + ']?' + startRule + ')[^' + allRules + ']+(?:' + endRule + '[' + lastChar + ']?)'),
     replaceParam: _createRegExp('([' + firstChar + ']?' + startRule + ')([^' + allRules + ']+)' + endRule + '[' + lastChar + ']?', 'g'),
-    checkElem: _createRegExp('([^<>]+)|(<([a-z/!' + firstChar + exprRules + '][^\\s>]*)([^>]*)>)([^<]*)', 'ig'),
-    expr: _createRegExp('^' + escapeExprRule + '([^\\s]+)', 'i'),
-    include: _createRegExp('<' + escapeExprRule + 'include([^>]*)>', 'ig'),
+    checkElem: _createRegExp('([^<>]+)|(<([a-z/!' + firstChar + extensionRules + '][^\\s>]*)([^>]*)>)([^<]*)', 'ig'),
+    extension: _createRegExp('^' + escapeExtensionRule + '([^\\s]+)', 'i'),
+    include: _createRegExp('<' + escapeExtensionRule + 'include([^>]*)>', 'ig'),
     newlineSplit: _createRegExp('\\n(?![^' + firstChar + lastChar + ']*' + lastChar + ')', 'g')
   };
 
@@ -764,7 +764,7 @@ function _eConfig(params) {
   return ret;
 }
 
-//Expression default config
+//Extension default config
 var extensionConfig = {
   'if': _eConfig({ newContext: false }),
   'else': _eConfig({ newContext: false, useString: false, subExProps: true, isSub: true }),
@@ -784,13 +784,13 @@ extensionConfig.pre = _eConfig(extensionConfig.obj);
 extensionConfig.arg = _eConfig(extensionConfig.prop);
 extensionConfig.once = _eConfig(extensionConfig.obj);
 
-//Expression alias
+//Extension alias
 extensions['case'] = extensions.elseif;
 extensionConfig['case'] = extensionConfig.elseif;
 extensions['default'] = extensions['else'];
 extensionConfig['default'] = extensionConfig['else'];
 
-//Register expression and also can batch add
+//Register extension and also can batch add
 function registerExtension(name, extension, options) {
   var params = name;
   if (!__WEBPACK_IMPORTED_MODULE_1__utils_tools__["k" /* isObject */](name)) {
@@ -838,7 +838,7 @@ __WEBPACK_IMPORTED_MODULE_1__utils_tools__["a" /* assign */](__WEBPACK_IMPORTED_
 /* unused harmony export newContext */
 /* harmony export (immutable) */ __webpack_exports__["a"] = fixPropName;
 /* unused harmony export assignStrProps */
-/* unused harmony export exprRet */
+/* unused harmony export exRet */
 /* unused harmony export tmplWrap */
 /* harmony export (immutable) */ __webpack_exports__["b"] = template;
 
@@ -982,8 +982,8 @@ function assignStrProps(paramsE, keys) {
   return ret;
 }
 
-//创建块表达式子节点函数
-function exprRet(p1, p2, fn, p4, p5) {
+//创建扩展标签子节点函数
+function exRet(p1, p2, fn, p4, p5) {
   return function (param) {
     return fn(p1, p2, param, p4, p5);
   };
@@ -1025,7 +1025,7 @@ function firstNewline(p2) {
 function template(fns) {
   var configs = {
     useString: fns.useString,
-    exprs: __WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */].exprs,
+    extensions: __WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */].extensions,
     filters: __WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */].filters,
     noop: __WEBPACK_IMPORTED_MODULE_1__utils_tools__["m" /* noop */],
     obj: __WEBPACK_IMPORTED_MODULE_1__utils_tools__["h" /* obj */],
@@ -1034,7 +1034,7 @@ function template(fns) {
     newContext: newContext,
     getComputedData: getComputedData,
     styleProps: styleProps,
-    exprRet: exprRet,
+    exRet: exRet,
     getElement: getElement,
     addArgs: addArgs,
     assign: __WEBPACK_IMPORTED_MODULE_1__utils_tools__["a" /* assign */]
@@ -1057,7 +1057,7 @@ function template(fns) {
       configs[k]._njTmpl = true;
       configs['_' + k] = v;
     } else if (k.indexOf('fn') === 0) {
-      //块表达式函数
+      //扩展标签函数
       configs[k] = v;
     }
   }, false, false);
@@ -1499,55 +1499,55 @@ function _formatAll(str, tmplRule) {
 //Set element node
 function _setElem(elem, elemName, elemParams, elemArr, bySelfClose, tmplRule) {
   var ret = void 0,
-      paramsExpr = void 0;
-  if (elemName[0] === tmplRule.exprRule) {
+      paramsEx = void 0;
+  if (elemName[0] === tmplRule.extensionRule) {
     ret = elem.substring(1, elem.length - 1);
   } else if (elemName.indexOf(tmplRule.propRule) === 0) {
-    ret = tmplRule.exprRule + 'prop ' + tmplRule.startRule + '\'' + elemName.substr(tmplRule.propRule.length) + '\'' + tmplRule.endRule + elemParams;
+    ret = tmplRule.extensionRule + 'prop ' + tmplRule.startRule + '\'' + elemName.substr(tmplRule.propRule.length) + '\'' + tmplRule.endRule + elemParams;
   } else {
     var retS = _getSplitParams(elem, tmplRule);
     ret = retS.elem;
-    paramsExpr = retS.params;
+    paramsEx = retS.params;
   }
 
   if (bySelfClose) {
     var retC = [ret];
-    if (paramsExpr) {
-      retC.push(paramsExpr);
+    if (paramsEx) {
+      retC.push(paramsEx);
     }
 
     elemArr.push(retC);
   } else {
     elemArr.push(ret);
-    if (paramsExpr) {
-      elemArr.push(paramsExpr);
+    if (paramsEx) {
+      elemArr.push(paramsEx);
     }
   }
 }
 
 //Extract split parameters
 function _getSplitParams(elem, tmplRule) {
-  var exprRule = tmplRule.exprRule,
+  var extensionRule = tmplRule.extensionRule,
       startRule = tmplRule.startRule,
       endRule = tmplRule.endRule;
 
-  var paramsExpr = void 0;
+  var paramsEx = void 0;
 
   //Replace the parameter like "{...props}".
   elem = elem.replace(tmplRule.spreadProp, function (all, begin, prop) {
     prop = prop.trim();
 
-    if (!paramsExpr) {
-      paramsExpr = [exprRule + 'props'];
+    if (!paramsEx) {
+      paramsEx = [extensionRule + 'props'];
     }
 
-    paramsExpr.push([exprRule + 'spread ' + startRule + prop.replace(/\.\.\./g, '') + endRule + '/']);
+    paramsEx.push([extensionRule + 'spread ' + startRule + prop.replace(/\.\.\./g, '') + endRule + '/']);
     return ' ';
   });
 
   return {
     elem: elem,
-    params: paramsExpr
+    params: paramsEx
   };
 }
 
@@ -1576,11 +1576,11 @@ function _setText(text, elemArr) {
 /* harmony export (immutable) */ __webpack_exports__["i"] = getOpenTagParams;
 /* harmony export (immutable) */ __webpack_exports__["d"] = isXmlCloseTag;
 /* harmony export (immutable) */ __webpack_exports__["h"] = getInsideBraceParam;
-/* harmony export (immutable) */ __webpack_exports__["a"] = isExpr;
+/* harmony export (immutable) */ __webpack_exports__["a"] = isEx;
 /* harmony export (immutable) */ __webpack_exports__["e"] = isTmpl;
 /* harmony export (immutable) */ __webpack_exports__["k"] = addTmpl;
-/* harmony export (immutable) */ __webpack_exports__["f"] = isParamsExpr;
-/* harmony export (immutable) */ __webpack_exports__["l"] = addParamsExpr;
+/* harmony export (immutable) */ __webpack_exports__["f"] = isParamsEx;
+/* harmony export (immutable) */ __webpack_exports__["l"] = addParamsEx;
 /* harmony export (immutable) */ __webpack_exports__["g"] = isExProp;
 
 
@@ -1676,10 +1676,10 @@ function getInsideBraceParam(obj, tmplRule) {
   return tmplRule.insideBraceParam.exec(obj);
 }
 
-//判断块表达式并返回参数
-function isExpr(obj, tmplRule) {
+//判断扩展标签并返回参数
+function isEx(obj, tmplRule) {
   var ret = void 0,
-      ret1 = tmplRule.expr.exec(obj);
+      ret1 = tmplRule.extension.exec(obj);
   if (ret1) {
     ret = [ret1[1]];
 
@@ -1729,20 +1729,20 @@ function addTmpl(node, parent, name) {
   }
 }
 
-//Test whether as parameters expression
-function isParamsExpr(name) {
+//Test whether as parameters extension
+function isParamsEx(name) {
   return name === 'params' || name === 'props';
 }
 
-//Add to the "paramsExpr" property of the parent node
-function addParamsExpr(node, parent, isProp, isSub) {
-  var exPropsName = isSub ? 'propsExS' : 'paramsExpr';
+//Add to the "paramsEx" property of the parent node
+function addParamsEx(node, parent, isProp, isSub) {
+  var exPropsName = isSub ? 'propsExS' : 'paramsEx';
   if (!parent[exPropsName]) {
     var exPropsNode = void 0;
     if (isProp || isSub) {
       exPropsNode = {
-        type: 'nj_expr',
-        expr: 'props',
+        type: 'nj_ex',
+        ex: 'props',
         content: [node]
       };
     } else {
@@ -2202,8 +2202,8 @@ function createTaggedTmpl(opts) {
   };
 }
 
-var taggedTmpl = createTmplTag({ outputH: false });
-var taggedTmplH = createTmplTag({ outputH: true });
+var taggedTmpl = createTaggedTmpl({ outputH: false });
+var taggedTmplH = createTaggedTmpl({ outputH: true });
 
 __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils_tools__["a" /* assign */])(__WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */], {
   createTaggedTmpl: createTaggedTmpl,
@@ -2263,9 +2263,9 @@ var errorTitle = __WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */].errorTit
 function _buildFn(content, node, fns, no, newContext, level, useStringLocal) {
   var fnStr = '',
       useString = useStringLocal != null ? useStringLocal : fns.useString,
-      isTmplExpr = __WEBPACK_IMPORTED_MODULE_1__utils_tools__["b" /* isString */](no),
+      isTmplEx = __WEBPACK_IMPORTED_MODULE_1__utils_tools__["b" /* isString */](no),
       //如果no为字符串, 则本次将构建tmpl块模板函数
-  main = isTmplExpr || no === 0,
+  main = isTmplEx || no === 0,
 
   /* retType
    1: 只有单个子节点
@@ -2280,7 +2280,7 @@ function _buildFn(content, node, fns, no, newContext, level, useStringLocal) {
     _paramsE: 0,
     _compParam: 0,
     _dataRefer: 0,
-    _expr: 0,
+    _ex: 0,
     _value: 0,
     _filter: 0,
     newContext: newContext
@@ -2317,7 +2317,7 @@ function _buildFn(content, node, fns, no, newContext, level, useStringLocal) {
    p4: #props变量
    p5：子扩展标签#props变量
   */
-  fns[main ? 'main' + (isTmplExpr ? no : '') : 'fn' + no] = new Function('p1', 'p2', 'p3', 'p4', 'p5', fnStr);
+  fns[main ? 'main' + (isTmplEx ? no : '') : 'fn' + no] = new Function('p1', 'p2', 'p3', 'p4', 'p5', fnStr);
   return no;
 }
 
@@ -2329,7 +2329,7 @@ function _buildOptions(config, useStringLocal, node, fns, exPropsStr, subExProps
     hashStr += ', useString: ' + (useStringLocal == null ? 'p1.useString' : useStringLocal ? 'true' : 'false');
   }
   if (node) {
-    //块表达式
+    //扩展标签
     var newContext = config ? config.newContext : true;
     if (noConfig || config.exProps) {
       hashStr += ', exProps: ' + exPropsStr;
@@ -2338,7 +2338,7 @@ function _buildOptions(config, useStringLocal, node, fns, exPropsStr, subExProps
       hashStr += ', subExProps: ' + subExPropsStr;
     }
 
-    hashStr += ', result: ' + (node.content ? 'p1.exprRet(p1, p2, p1.fn' + _buildFn(node.content, node, fns, ++fns._no, newContext, level, useStringLocal) + ', ' + exPropsStr + ', ' + subExPropsStr + ')' : 'p1.noop');
+    hashStr += ', result: ' + (node.content ? 'p1.exRet(p1, p2, p1.fn' + _buildFn(node.content, node, fns, ++fns._no, newContext, level, useStringLocal) + ', ' + exPropsStr + ', ' + subExPropsStr + ')' : 'p1.noop');
 
     if (hashProps != null) {
       hashStr += ', props: ' + hashProps;
@@ -2513,7 +2513,7 @@ function _buildProps(obj, counter, fns, useStringLocal, level) {
       }
     }, false, true);
   } else if (__WEBPACK_IMPORTED_MODULE_1__utils_tools__["k" /* isObject */](str0) && str0.length != null) {
-    //tmpl块表达式
+    //tmpl标签
     valueStr += '{\n';
     __WEBPACK_IMPORTED_MODULE_1__utils_tools__["c" /* each */](str0, function (v, k, i, l) {
       if (k !== 'length') {
@@ -2562,11 +2562,11 @@ function _buildPropsEx(isSub, paramsEC, propsEx, fns, counter, useString, exProp
 function _buildParams(node, fns, counter, useString, level, exPropsStr, subExPropsStr) {
   //节点参数
   var params = node.params,
-      paramsExpr = node.paramsExpr,
+      paramsEx = node.paramsEx,
       propsExS = node.propsExS;
 
   var useStringF = fns.useString,
-      hasPropsEx = paramsExpr || propsExS;
+      hasPropsEx = paramsEx || propsExS;
   var paramsStr = '',
       _paramsC = void 0;
 
@@ -2576,14 +2576,14 @@ function _buildParams(node, fns, counter, useString, level, exPropsStr, subExPro
 
     //props tag
     if (hasPropsEx) {
-      var bothPropsEx = paramsExpr && propsExS,
+      var bothPropsEx = paramsEx && propsExS,
           _paramsEC = void 0,
           _paramsSEC = void 0;
       paramsStr += (useString ? '\'\'' : bothPropsEx ? '{}' : 'null') + ';\n';
 
-      if (paramsExpr) {
+      if (paramsEx) {
         _paramsEC = counter._paramsE++;
-        paramsStr += _buildPropsEx(false, _paramsEC, paramsExpr, fns, counter, useString, exPropsStr, subExPropsStr);
+        paramsStr += _buildPropsEx(false, _paramsEC, paramsEx, fns, counter, useString, exPropsStr, subExPropsStr);
       }
       if (propsExS) {
         _paramsSEC = counter._paramsE++;
@@ -2699,22 +2699,22 @@ function _buildNode(node, parent, fns, counter, retType, level, useStringLocal, 
       //文本中的特殊字符需转义
       fnStr += __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__utils_escape__["a" /* unescape */])(textStr);
     }
-  } else if (node.type === 'nj_expr') {
-    //块表达式节点
-    var _exprC = counter._expr++,
+  } else if (node.type === 'nj_ex') {
+    //扩展标签节点
+    var _exC = counter._ex++,
         _dataReferC = counter._dataRefer++,
         dataReferStr = '',
         _filterStr2 = '',
-        configE = __WEBPACK_IMPORTED_MODULE_4__helpers_extension__["b" /* extensionConfig */][node.expr],
-        exprVarStr = '_expr' + _exprC,
-        globalExprStr = 'p1.exprs[\'' + node.expr + '\']';
+        configE = __WEBPACK_IMPORTED_MODULE_4__helpers_extension__["b" /* extensionConfig */][node.ex],
+        exVarStr = '_ex' + _exC,
+        globalExStr = 'p1.extensions[\'' + node.ex + '\']';
 
     if (configE) {
-      fnStr += '\nvar ' + exprVarStr + ' = ' + globalExprStr + ';\n';
+      fnStr += '\nvar ' + exVarStr + ' = ' + globalExStr + ';\n';
     } else {
       //如果全局配置不存在,先从p2.data中获取
-      fnStr += '\nvar ' + exprVarStr + ' = p2.getData(\'' + node.expr + '\');\n';
-      fnStr += 'if(!' + exprVarStr + ') ' + exprVarStr + ' = ' + globalExprStr + ';\n';
+      fnStr += '\nvar ' + exVarStr + ' = p2.getData(\'' + node.ex + '\');\n';
+      fnStr += 'if(!' + exVarStr + ') ' + exVarStr + ' = ' + globalExStr + ';\n';
     }
 
     dataReferStr += 'var _dataRefer' + _dataReferC + ' = [\n';
@@ -2766,12 +2766,12 @@ function _buildNode(node, parent, fns, counter, retType, level, useStringLocal, 
 
     fnStr += paramsStr + dataReferStr;
 
-    //如果块表达式不存在则打印警告信息
-    fnStr += 'p1.throwIf(_expr' + _exprC + ', \'' + node.expr + '\', \'expr\');\n';
+    //如果扩展标签不存在则打印警告信息
+    fnStr += 'p1.throwIf(_ex' + _exC + ', \'' + node.ex + '\', \'ex\');\n';
 
     //渲染
     fnStr += _buildRender(node, parent, 2, retType, {
-      _expr: _exprC,
+      _ex: _exC,
       _dataRefer: _dataReferC
     }, fns, level, useStringLocal, node.allowNewline, isFirst);
   } else {
@@ -2864,8 +2864,8 @@ function _buildRender(node, parent, nodeType, retType, params, fns, level, useSt
       retStr = (!useStringF || allowNewline || noLevel ? '' : isFirst ? parent.type !== 'nj_root' ? 'p1.firstNewline(p2) + ' : '' : '\'\\n\' + ') + _buildLevelSpace(level, fns, allowNewline) + _buildLevelSpaceRt(useStringF, isFirst || noLevel) + params.text;
       break;
     case 2:
-      //块表达式
-      retStr = '_expr' + params._expr + '.apply(p2, _dataRefer' + params._dataRefer + ')';
+      //扩展标签
+      retStr = '_ex' + params._ex + '.apply(p2, _dataRefer' + params._dataRefer + ')';
       break;
     case 3:
       //元素节点
@@ -2942,7 +2942,7 @@ function _buildLevelSpaceRt(useString, noSpace) {
 /* harmony default export */ __webpack_exports__["a"] = function (astContent, ast, useString) {
   var fns = {
     useString: useString,
-    _no: 0, //块表达式函数计数
+    _no: 0, //扩展标签函数计数
     _noT: 0, //tmpl块模板函数计数
     _firstNode: true
   };
@@ -3005,20 +3005,20 @@ function checkElem(obj, parent, tmplRule, hasExProps, noSplitNewline, isLast) {
     var len = obj.length,
         last = obj[len - 1],
         isElemNode = false,
-        expr = void 0,
-        exprParams = void 0;
+        ex = void 0,
+        exParams = void 0;
 
     //判断是否为xml标签
     var openTagName = void 0,
         hasCloseTag = false,
         isTmpl = void 0,
-        isParamsExpr = void 0,
+        isParamsEx = void 0,
         isProp = void 0,
         isSub = void 0,
         needAddToProps = void 0;
 
-    expr = __WEBPACK_IMPORTED_MODULE_3__transforms_transformElement__["a" /* isExpr */](first, tmplRule);
-    if (!expr) {
+    ex = __WEBPACK_IMPORTED_MODULE_3__transforms_transformElement__["a" /* isEx */](first, tmplRule);
+    if (!ex) {
       var xmlOpenTag = __WEBPACK_IMPORTED_MODULE_3__transforms_transformElement__["b" /* getXmlOpenTag */](first, tmplRule);
       if (xmlOpenTag) {
         //tagname为xml标签时,则认为是元素节点
@@ -3034,26 +3034,26 @@ function checkElem(obj, parent, tmplRule, hasExProps, noSplitNewline, isLast) {
         isElemNode = true;
       }
     } else {
-      //为块表达式,也可视为一个元素节点
-      var exprName = expr[0];
-      exprParams = expr[1];
-      isTmpl = __WEBPACK_IMPORTED_MODULE_3__transforms_transformElement__["e" /* isTmpl */](exprName);
-      isParamsExpr = __WEBPACK_IMPORTED_MODULE_3__transforms_transformElement__["f" /* isParamsExpr */](exprName);
-      if (!isParamsExpr) {
-        var exProp = __WEBPACK_IMPORTED_MODULE_3__transforms_transformElement__["g" /* isExProp */](exprName);
+      //为扩展标签,也可视为一个元素节点
+      var exName = ex[0];
+      exParams = ex[1];
+      isTmpl = __WEBPACK_IMPORTED_MODULE_3__transforms_transformElement__["e" /* isTmpl */](exName);
+      isParamsEx = __WEBPACK_IMPORTED_MODULE_3__transforms_transformElement__["f" /* isParamsEx */](exName);
+      if (!isParamsEx) {
+        var exProp = __WEBPACK_IMPORTED_MODULE_3__transforms_transformElement__["g" /* isExProp */](exName);
         isProp = exProp.isProp;
         isSub = exProp.isSub;
         needAddToProps = isProp ? !hasExProps : isSub;
       }
 
-      node.type = 'nj_expr';
-      node.expr = exprName;
-      if (exprParams != null && !isTmpl && !isParamsExpr) {
+      node.type = 'nj_ex';
+      node.ex = exName;
+      if (exParams != null && !isTmpl && !isParamsEx) {
         if (!node.args) {
           node.args = [];
         }
 
-        __WEBPACK_IMPORTED_MODULE_1__utils_tools__["c" /* each */](exprParams, function (param) {
+        __WEBPACK_IMPORTED_MODULE_1__utils_tools__["c" /* each */](exParams, function (param) {
           if (param.value === 'useString') {
             node.useString = true;
             return;
@@ -3082,7 +3082,7 @@ function checkElem(obj, parent, tmplRule, hasExProps, noSplitNewline, isLast) {
         node.allowNewline = true;
       }
 
-      if (!expr) {
+      if (!ex) {
         node.type = openTagName;
 
         //If open tag has a brace,add the typeRefer param.
@@ -3119,12 +3119,12 @@ function checkElem(obj, parent, tmplRule, hasExProps, noSplitNewline, isLast) {
           pushContent = false;
 
           //将模板添加到父节点的params中
-          __WEBPACK_IMPORTED_MODULE_3__transforms_transformElement__["k" /* addTmpl */](node, parent, exprParams ? exprParams[0].value : null);
-        } else if (isParamsExpr || needAddToProps) {
+          __WEBPACK_IMPORTED_MODULE_3__transforms_transformElement__["k" /* addTmpl */](node, parent, exParams ? exParams[0].value : null);
+        } else if (isParamsEx || needAddToProps) {
           pushContent = false;
         }
 
-        if (noSplitNewline == null && node.expr === 'pre') {
+        if (noSplitNewline == null && node.ex === 'pre') {
           noSplitNewline = true;
           node.allowNewline = 'nlElem';
         }
@@ -3139,12 +3139,12 @@ function checkElem(obj, parent, tmplRule, hasExProps, noSplitNewline, isLast) {
       var end = len - (hasCloseTag ? 1 : 0),
           content = obj.slice(1, end);
       if (content && content.length) {
-        _checkContentElem(content, node, tmplRule, isParamsExpr || hasExProps && !isProp, noSplitNewline, tmplRule);
+        _checkContentElem(content, node, tmplRule, isParamsEx || hasExProps && !isProp, noSplitNewline, tmplRule);
       }
 
-      //If this is params block, set on the "paramsExpr" property of the parent node.
-      if (isParamsExpr || needAddToProps) {
-        __WEBPACK_IMPORTED_MODULE_3__transforms_transformElement__["l" /* addParamsExpr */](node, parent, isProp, isSub);
+      //If this is params block, set on the "paramsEx" property of the parent node.
+      if (isParamsEx || needAddToProps) {
+        __WEBPACK_IMPORTED_MODULE_3__transforms_transformElement__["l" /* addParamsEx */](node, parent, isProp, isSub);
       }
     } else {
       //如果不是元素节点,则为节点集合

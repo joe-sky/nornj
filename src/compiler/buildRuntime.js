@@ -9,8 +9,8 @@ const { errorTitle } = nj;
 function _buildFn(content, node, fns, no, newContext, level, useStringLocal) {
   let fnStr = '',
     useString = useStringLocal != null ? useStringLocal : fns.useString,
-    isTmplExpr = tools.isString(no), //如果no为字符串, 则本次将构建tmpl块模板函数
-    main = isTmplExpr || no === 0,
+    isTmplEx = tools.isString(no), //如果no为字符串, 则本次将构建tmpl块模板函数
+    main = isTmplEx || no === 0,
     /* retType
      1: 只有单个子节点
      2: 有多个子节点
@@ -24,7 +24,7 @@ function _buildFn(content, node, fns, no, newContext, level, useStringLocal) {
       _paramsE: 0,
       _compParam: 0,
       _dataRefer: 0,
-      _expr: 0,
+      _ex: 0,
       _value: 0,
       _filter: 0,
       newContext: newContext
@@ -61,7 +61,7 @@ function _buildFn(content, node, fns, no, newContext, level, useStringLocal) {
    p4: #props变量
    p5：子扩展标签#props变量
   */
-  fns[main ? 'main' + (isTmplExpr ? no : '') : 'fn' + no] = new Function('p1', 'p2', 'p3', 'p4', 'p5', fnStr);
+  fns[main ? 'main' + (isTmplEx ? no : '') : 'fn' + no] = new Function('p1', 'p2', 'p3', 'p4', 'p5', fnStr);
   return no;
 }
 
@@ -72,7 +72,7 @@ function _buildOptions(config, useStringLocal, node, fns, exPropsStr, subExProps
   if (noConfig || config.useString) {
     hashStr += ', useString: ' + (useStringLocal == null ? 'p1.useString' : (useStringLocal ? 'true' : 'false'));
   }
-  if (node) { //块表达式
+  if (node) { //扩展标签
     let newContext = config ? config.newContext : true;
     if (noConfig || config.exProps) {
       hashStr += ', exProps: ' + exPropsStr;
@@ -81,7 +81,7 @@ function _buildOptions(config, useStringLocal, node, fns, exPropsStr, subExProps
       hashStr += ', subExProps: ' + subExPropsStr;
     }
 
-    hashStr += ', result: ' + (node.content ? 'p1.exprRet(p1, p2, p1.fn' + _buildFn(node.content, node, fns, ++fns._no, newContext, level, useStringLocal) + ', ' + exPropsStr + ', ' + subExPropsStr + ')' : 'p1.noop');
+    hashStr += ', result: ' + (node.content ? 'p1.exRet(p1, p2, p1.fn' + _buildFn(node.content, node, fns, ++fns._no, newContext, level, useStringLocal) + ', ' + exPropsStr + ', ' + subExPropsStr + ')' : 'p1.noop');
 
     if (hashProps != null) {
       hashStr += ', props: ' + hashProps;
@@ -245,7 +245,7 @@ function _buildProps(obj, counter, fns, useStringLocal, level) {
         return false;
       }
     }, false, true);
-  } else if (tools.isObject(str0) && str0.length != null) { //tmpl块表达式
+  } else if (tools.isObject(str0) && str0.length != null) { //tmpl标签
     valueStr += '{\n';
     tools.each(str0, function(v, k, i, l) {
       if (k !== 'length') {
@@ -291,9 +291,9 @@ function _buildPropsEx(isSub, paramsEC, propsEx, fns, counter, useString, exProp
 
 function _buildParams(node, fns, counter, useString, level, exPropsStr, subExPropsStr) {
   //节点参数
-  const { params, paramsExpr, propsExS } = node;
+  const { params, paramsEx, propsExS } = node;
   const useStringF = fns.useString,
-    hasPropsEx = paramsExpr || propsExS;
+    hasPropsEx = paramsEx || propsExS;
   let paramsStr = '',
     _paramsC;
 
@@ -303,13 +303,13 @@ function _buildParams(node, fns, counter, useString, level, exPropsStr, subExPro
 
     //props tag
     if (hasPropsEx) {
-      let bothPropsEx = paramsExpr && propsExS,
+      let bothPropsEx = paramsEx && propsExS,
         _paramsEC, _paramsSEC;
       paramsStr += (useString ? '\'\'' : (bothPropsEx ? '{}' : 'null')) + ';\n';
 
-      if (paramsExpr) {
+      if (paramsEx) {
         _paramsEC = counter._paramsE++;
-        paramsStr += _buildPropsEx(false, _paramsEC, paramsExpr, fns, counter, useString, exPropsStr, subExPropsStr);
+        paramsStr += _buildPropsEx(false, _paramsEC, paramsEx, fns, counter, useString, exPropsStr, subExPropsStr);
       }
       if (propsExS) {
         _paramsSEC = counter._paramsE++;
@@ -420,20 +420,20 @@ function _buildNode(node, parent, fns, counter, retType, level, useStringLocal, 
     } else { //文本中的特殊字符需转义
       fnStr += unescape(textStr);
     }
-  } else if (node.type === 'nj_expr') { //块表达式节点
-    let _exprC = counter._expr++,
+  } else if (node.type === 'nj_ex') { //扩展标签节点
+    let _exC = counter._ex++,
       _dataReferC = counter._dataRefer++,
       dataReferStr = '',
       filterStr = '',
-      configE = extensionConfig[node.expr],
-      exprVarStr = '_expr' + _exprC,
-      globalExprStr = 'p1.exprs[\'' + node.expr + '\']';
+      configE = extensionConfig[node.ex],
+      exVarStr = '_ex' + _exC,
+      globalExStr = 'p1.extensions[\'' + node.ex + '\']';
 
     if (configE) {
-      fnStr += '\nvar ' + exprVarStr + ' = ' + globalExprStr + ';\n';
+      fnStr += '\nvar ' + exVarStr + ' = ' + globalExStr + ';\n';
     } else { //如果全局配置不存在,先从p2.data中获取
-      fnStr += '\nvar ' + exprVarStr + ' = p2.getData(\'' + node.expr + '\');\n';
-      fnStr += 'if(!' + exprVarStr + ') ' + exprVarStr + ' = ' + globalExprStr + ';\n';
+      fnStr += '\nvar ' + exVarStr + ' = p2.getData(\'' + node.ex + '\');\n';
+      fnStr += 'if(!' + exVarStr + ') ' + exVarStr + ' = ' + globalExStr + ';\n';
     }
 
     dataReferStr += 'var _dataRefer' + _dataReferC + ' = [\n';
@@ -482,12 +482,12 @@ function _buildNode(node, parent, fns, counter, retType, level, useStringLocal, 
 
     fnStr += paramsStr + dataReferStr;
 
-    //如果块表达式不存在则打印警告信息
-    fnStr += 'p1.throwIf(_expr' + _exprC + ', \'' + node.expr + '\', \'expr\');\n';
+    //如果扩展标签不存在则打印警告信息
+    fnStr += 'p1.throwIf(_ex' + _exC + ', \'' + node.ex + '\', \'ex\');\n';
 
     //渲染
     fnStr += _buildRender(node, parent, 2, retType, {
-      _expr: _exprC,
+      _ex: _exC,
       _dataRefer: _dataReferC
     }, fns, level, useStringLocal, node.allowNewline, isFirst);
   } else { //元素节点
@@ -573,8 +573,8 @@ function _buildRender(node, parent, nodeType, retType, params, fns, level, useSt
     case 1: //文本节点
       retStr = (!useStringF || allowNewline || noLevel ? '' : (isFirst ? (parent.type !== 'nj_root' ? 'p1.firstNewline(p2) + ' : '') : '\'\\n\' + ')) + _buildLevelSpace(level, fns, allowNewline) + _buildLevelSpaceRt(useStringF, isFirst || noLevel) + params.text;
       break;
-    case 2: //块表达式
-      retStr = '_expr' + params._expr + '.apply(p2, _dataRefer' + params._dataRefer + ')';
+    case 2: //扩展标签
+      retStr = '_ex' + params._ex + '.apply(p2, _dataRefer' + params._dataRefer + ')';
       break;
     case 3: //元素节点
       if (!useStringF) {
@@ -650,7 +650,7 @@ function _buildLevelSpaceRt(useString, noSpace) {
 export default (astContent, ast, useString) => {
   const fns = {
     useString,
-    _no: 0, //块表达式函数计数
+    _no: 0, //扩展标签函数计数
     _noT: 0, //tmpl块模板函数计数
     _firstNode: true
   };

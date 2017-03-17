@@ -95,8 +95,8 @@ export function noop() {}
 export function throwIf(val, msg, type) {
   if (!val) {
     switch (type) {
-      case 'expr':
-        throw Error(errorTitle + 'Expression "' + msg + '" is undefined, please check it has been registered.');
+      case 'ex':
+        throw Error(errorTitle + 'Extension tag "' + msg + '" is undefined, please check it has been registered.');
       default:
         throw Error(errorTitle + (msg || val));
     }

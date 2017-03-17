@@ -12,8 +12,8 @@ export function createTaggedTmpl(opts) {
   }
 }
 
-export const taggedTmpl = createTmplTag({ outputH: false });
-export const taggedTmplH = createTmplTag({ outputH: true });
+export const taggedTmpl = createTaggedTmpl({ outputH: false });
+export const taggedTmplH = createTaggedTmpl({ outputH: true });
 
 assign(nj, {
   createTaggedTmpl,

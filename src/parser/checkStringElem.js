@@ -155,52 +155,52 @@ function _formatAll(str, tmplRule) {
 
 //Set element node
 function _setElem(elem, elemName, elemParams, elemArr, bySelfClose, tmplRule) {
-  let ret, paramsExpr;
-  if (elemName[0] === tmplRule.exprRule) {
+  let ret, paramsEx;
+  if (elemName[0] === tmplRule.extensionRule) {
     ret = elem.substring(1, elem.length - 1);
   } else if (elemName.indexOf(tmplRule.propRule) === 0) {
-    ret = tmplRule.exprRule + 'prop ' + tmplRule.startRule + '\'' + elemName.substr(tmplRule.propRule.length) + '\'' + tmplRule.endRule + elemParams;
+    ret = tmplRule.extensionRule + 'prop ' + tmplRule.startRule + '\'' + elemName.substr(tmplRule.propRule.length) + '\'' + tmplRule.endRule + elemParams;
   } else {
     const retS = _getSplitParams(elem, tmplRule);
     ret = retS.elem;
-    paramsExpr = retS.params;
+    paramsEx = retS.params;
   }
 
   if (bySelfClose) {
     const retC = [ret];
-    if (paramsExpr) {
-      retC.push(paramsExpr);
+    if (paramsEx) {
+      retC.push(paramsEx);
     }
 
     elemArr.push(retC);
   } else {
     elemArr.push(ret);
-    if (paramsExpr) {
-      elemArr.push(paramsExpr);
+    if (paramsEx) {
+      elemArr.push(paramsEx);
     }
   }
 }
 
 //Extract split parameters
 function _getSplitParams(elem, tmplRule) {
-  const { exprRule, startRule, endRule } = tmplRule;
-  let paramsExpr;
+  const { extensionRule, startRule, endRule } = tmplRule;
+  let paramsEx;
 
   //Replace the parameter like "{...props}".
   elem = elem.replace(tmplRule.spreadProp, (all, begin, prop) => {
     prop = prop.trim();
 
-    if (!paramsExpr) {
-      paramsExpr = [exprRule + 'props'];
+    if (!paramsEx) {
+      paramsEx = [extensionRule + 'props'];
     }
 
-    paramsExpr.push([exprRule + 'spread ' + startRule + prop.replace(/\.\.\./g, '') + endRule + '/']);
+    paramsEx.push([extensionRule + 'spread ' + startRule + prop.replace(/\.\.\./g, '') + endRule + '/']);
     return ' ';
   });
 
   return {
     elem: elem,
-    params: paramsExpr
+    params: paramsEx
   };
 }
 

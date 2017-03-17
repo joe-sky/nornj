@@ -90,9 +90,9 @@ export function getInsideBraceParam(obj, tmplRule) {
   return tmplRule.insideBraceParam.exec(obj);
 }
 
-//判断块表达式并返回参数
-export function isExpr(obj, tmplRule) {
-  let ret, ret1 = tmplRule.expr.exec(obj);
+//判断扩展标签并返回参数
+export function isEx(obj, tmplRule) {
+  let ret, ret1 = tmplRule.extension.exec(obj);
   if (ret1) {
     ret = [ret1[1]];
 
@@ -141,20 +141,20 @@ export function addTmpl(node, parent, name) {
   }
 }
 
-//Test whether as parameters expression
-export function isParamsExpr(name) {
+//Test whether as parameters extension
+export function isParamsEx(name) {
   return name === 'params' || name === 'props';
 }
 
-//Add to the "paramsExpr" property of the parent node
-export function addParamsExpr(node, parent, isProp, isSub) {
-  const exPropsName = isSub ? 'propsExS' : 'paramsExpr';
+//Add to the "paramsEx" property of the parent node
+export function addParamsEx(node, parent, isProp, isSub) {
+  const exPropsName = isSub ? 'propsExS' : 'paramsEx';
   if (!parent[exPropsName]) {
     let exPropsNode;
     if (isProp || isSub) {
       exPropsNode = {
-        type: 'nj_expr',
-        expr: 'props',
+        type: 'nj_ex',
+        ex: 'props',
         content: [node]
       };
     } else {

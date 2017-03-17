@@ -287,7 +287,7 @@ function _eConfig(params) {
   return ret;
 }
 
-//Expression default config
+//Extension default config
 export const extensionConfig = {
   'if': _eConfig({ newContext: false }),
   'else': _eConfig({ newContext: false, useString: false, subExProps: true, isSub: true }),
@@ -307,13 +307,13 @@ extensionConfig.pre = _eConfig(extensionConfig.obj);
 extensionConfig.arg = _eConfig(extensionConfig.prop);
 extensionConfig.once = _eConfig(extensionConfig.obj);
 
-//Expression alias
+//Extension alias
 extensions['case'] = extensions.elseif;
 extensionConfig['case'] = extensionConfig.elseif;
 extensions['default'] = extensions['else'];
 extensionConfig['default'] = extensionConfig['else'];
 
-//Register expression and also can batch add
+//Register extension and also can batch add
 export function registerExtension(name, extension, options) {
   let params = name;
   if (!tools.isObject(name)) {

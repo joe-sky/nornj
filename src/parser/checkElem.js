@@ -47,20 +47,20 @@ export default function checkElem(obj, parent, tmplRule, hasExProps, noSplitNewl
     let len = obj.length,
       last = obj[len - 1],
       isElemNode = false,
-      expr,
-      exprParams;
+      ex,
+      exParams;
 
     //判断是否为xml标签
     let openTagName,
       hasCloseTag = false,
       isTmpl,
-      isParamsExpr,
+      isParamsEx,
       isProp,
       isSub,
       needAddToProps;
 
-    expr = tranElem.isExpr(first, tmplRule);
-    if (!expr) {
+    ex = tranElem.isEx(first, tmplRule);
+    if (!ex) {
       const xmlOpenTag = tranElem.getXmlOpenTag(first, tmplRule);
       if (xmlOpenTag) { //tagname为xml标签时,则认为是元素节点
         openTagName = xmlOpenTag[1];
@@ -72,26 +72,26 @@ export default function checkElem(obj, parent, tmplRule, hasExProps, noSplitNewl
         }
         isElemNode = true;
       }
-    } else { //为块表达式,也可视为一个元素节点
-      const exprName = expr[0];
-      exprParams = expr[1];
-      isTmpl = tranElem.isTmpl(exprName);
-      isParamsExpr = tranElem.isParamsExpr(exprName);
-      if (!isParamsExpr) {
-        let exProp = tranElem.isExProp(exprName);
+    } else { //为扩展标签,也可视为一个元素节点
+      const exName = ex[0];
+      exParams = ex[1];
+      isTmpl = tranElem.isTmpl(exName);
+      isParamsEx = tranElem.isParamsEx(exName);
+      if (!isParamsEx) {
+        let exProp = tranElem.isExProp(exName);
         isProp = exProp.isProp;
         isSub = exProp.isSub;
         needAddToProps = isProp ? !hasExProps : isSub;
       }
 
-      node.type = 'nj_expr';
-      node.expr = exprName;
-      if (exprParams != null && !isTmpl && !isParamsExpr) {
+      node.type = 'nj_ex';
+      node.ex = exName;
+      if (exParams != null && !isTmpl && !isParamsEx) {
         if (!node.args) {
           node.args = [];
         }
 
-        tools.each(exprParams, (param) => {
+        tools.each(exParams, (param) => {
           if (param.value === 'useString') {
             node.useString = true;
             return;
@@ -118,7 +118,7 @@ export default function checkElem(obj, parent, tmplRule, hasExProps, noSplitNewl
         node.allowNewline = true;
       }
 
-      if (!expr) {
+      if (!ex) {
         node.type = openTagName;
 
         //If open tag has a brace,add the typeRefer param.
@@ -153,12 +153,12 @@ export default function checkElem(obj, parent, tmplRule, hasExProps, noSplitNewl
           pushContent = false;
 
           //将模板添加到父节点的params中
-          tranElem.addTmpl(node, parent, exprParams ? exprParams[0].value : null);
-        } else if (isParamsExpr || needAddToProps) {
+          tranElem.addTmpl(node, parent, exParams ? exParams[0].value : null);
+        } else if (isParamsEx || needAddToProps) {
           pushContent = false;
         }
 
-        if (noSplitNewline == null && node.expr === 'pre') {
+        if (noSplitNewline == null && node.ex === 'pre') {
           noSplitNewline = true;
           node.allowNewline = 'nlElem';
         }
@@ -173,12 +173,12 @@ export default function checkElem(obj, parent, tmplRule, hasExProps, noSplitNewl
       const end = len - (hasCloseTag ? 1 : 0),
         content = obj.slice(1, end);
       if (content && content.length) {
-        _checkContentElem(content, node, tmplRule, isParamsExpr || (hasExProps && !isProp), noSplitNewline, tmplRule);
+        _checkContentElem(content, node, tmplRule, isParamsEx || (hasExProps && !isProp), noSplitNewline, tmplRule);
       }
 
-      //If this is params block, set on the "paramsExpr" property of the parent node.
-      if (isParamsExpr || needAddToProps) {
-        tranElem.addParamsExpr(node, parent, isProp, isSub);
+      //If this is params block, set on the "paramsEx" property of the parent node.
+      if (isParamsEx || needAddToProps) {
+        tranElem.addParamsEx(node, parent, isProp, isSub);
       }
     } else { //如果不是元素节点,则为节点集合
       _checkContentElem(obj, parent, tmplRule, hasExProps, noSplitNewline);

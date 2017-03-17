@@ -19,13 +19,13 @@ describe('test compile string', function () {
     nj.registerFilter('tagName', function (v) {
       return v + 'Tmp';
     });
-    nj.registerExpr('textExpr', function (arg1, arg2, opts) {
+    nj.registerExtension('textExpr', function (arg1, arg2, opts) {
       //return opts.props.tmpls[0]();
       //console.log(opts.props.args);
       return arg2;
     });
 
-    nj.registerExpr('vm-include', function (opts) {
+    nj.registerExtension('vm-include', function (opts) {
       const env = this.getData('env');
       if(env === 'vm') {
         return `#parse("${opts.props.src}")`;

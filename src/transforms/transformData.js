@@ -133,8 +133,8 @@ export function assignStrProps(paramsE, keys) {
   return ret;
 }
 
-//创建块表达式子节点函数
-export function exprRet(p1, p2, fn, p4, p5) {
+//创建扩展标签子节点函数
+export function exRet(p1, p2, fn, p4, p5) {
   return function(param) {
     return fn(p1, p2, param, p4, p5);
   };
@@ -176,7 +176,7 @@ function firstNewline(p2) {
 export function template(fns) {
   const configs = {
     useString: fns.useString,
-    exprs: nj.exprs,
+    extensions: nj.extensions,
     filters: nj.filters,
     noop: tools.noop,
     obj: tools.obj,
@@ -185,7 +185,7 @@ export function template(fns) {
     newContext,
     getComputedData,
     styleProps,
-    exprRet,
+    exRet,
     getElement,
     addArgs,
     assign: tools.assign
@@ -206,7 +206,7 @@ export function template(fns) {
       configs[k] = tmplWrap(configs, v);
       configs[k]._njTmpl = true;
       configs['_' + k] = v;
-    } else if (k.indexOf('fn') === 0) { //块表达式函数
+    } else if (k.indexOf('fn') === 0) { //扩展标签函数
       configs[k] = v;
     }
   }, false, false);
