@@ -159,7 +159,7 @@ function _buildPropData(obj, counter, fns, useStringLocal, level) {
       filterStr += 'else {\n';
 
       const _filterStr = '  ' + valueStr + ' = ' + filterVarStr + '.apply(p2, [' + valueStr +
-        (o.params ? o.params.reduce((p, c) => {
+        ((o.params && o.params.length) ? o.params.reduce((p, c) => {
           const propStr = _buildPropData({
             prop: c,
             escape

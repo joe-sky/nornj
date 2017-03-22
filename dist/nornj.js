@@ -1807,7 +1807,9 @@ function _compiledProp(prop, innerBrackets) {
             (function () {
               var params = [];
               __WEBPACK_IMPORTED_MODULE_1__utils_tools__["c" /* each */](innerBrackets[paramsF].split(','), function (p) {
-                params[params.length] = _compiledProp(p.trim(), innerBrackets);
+                if (p !== '') {
+                  params[params.length] = _compiledProp(p.trim(), innerBrackets);
+                }
               }, false, true);
 
               filterObj.params = params;
@@ -2423,7 +2425,7 @@ function _buildPropData(obj, counter, fns, useStringLocal, level) {
         filterStr += '}\n';
         filterStr += 'else {\n';
 
-        var _filterStr = '  ' + valueStr + ' = ' + filterVarStr + '.apply(p2, [' + valueStr + (o.params ? o.params.reduce(function (p, c) {
+        var _filterStr = '  ' + valueStr + ' = ' + filterVarStr + '.apply(p2, [' + valueStr + (o.params && o.params.length ? o.params.reduce(function (p, c) {
           var propStr = _buildPropData({
             prop: c,
             escape: escape
@@ -2965,7 +2967,7 @@ function _buildLevelSpaceRt(useString, noSpace) {
 
 
 
-var NO_SPLIT_NEWLINE = ['style', 'script', 'textarea', 'pre', 'xmp', 'template'];
+var NO_SPLIT_NEWLINE = ['style', 'script', 'textarea', 'pre', 'xmp', 'template', 'noscript'];
 
 function _plainTextNode(obj, parent, parentContent, noSplitNewline, tmplRule) {
   var node = {};

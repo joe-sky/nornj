@@ -31,8 +31,10 @@ function _compiledProp(prop, innerBrackets) {
         //Multiple params are separated by commas.
         if (paramsF != null) {
           let params = [];
-          tools.each(innerBrackets[paramsF].split(','), (p) => {
-            params[params.length] = _compiledProp(p.trim(), innerBrackets);
+          tools.each(innerBrackets[paramsF].split(','), p => {
+            if (p !== '') {
+              params[params.length] = _compiledProp(p.trim(), innerBrackets);
+            }
           }, false, true);
 
           filterObj.params = params;

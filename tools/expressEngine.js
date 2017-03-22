@@ -12,10 +12,11 @@ nj.config({
 module.exports = (configs = {}) => {
   let {
     extname = '.html',
-    layoutsDir = 'layouts/',
-    defaultLayout,
-    bodyPlaceholder = 'body',
-    delimiters
+      layoutsDir = 'layouts/',
+      defaultLayout,
+      bodyPlaceholder = 'body',
+      delimiters,
+      cache = false
   } = configs;
   const tmplRule = delimiters ? nj.createTmplRule(delimiters) : nj.tmplRule;
 
@@ -49,13 +50,22 @@ module.exports = (configs = {}) => {
         return callback(new Error(err));
       }
 
-      let bodyHtml = nj.compile(content.toString(), { fileName: filePath, tmplRule })(options),
-        html = null;
+      let html = null;
+      const bodyHtml = nj.compile(content.toString(), {
+        fileName: filePath,
+        tmplKey: cache ? filePath : null,
+        tmplRule
+      })(options);
+
       if (layoutTmpl) {
         const layoutOpts = {};
         layoutOpts[bodyPlaceholder] = bodyHtml;
 
-        html = nj.compile(layoutTmpl, { fileName: layoutFilePath, tmplRule })(layoutOpts, options);
+        html = nj.compile(layoutTmpl, {
+          fileName: layoutFilePath,
+          tmplKey: cache ? layoutFilePath : null,
+          tmplRule
+        })(layoutOpts, options);
       } else {
         html = bodyHtml;
       }

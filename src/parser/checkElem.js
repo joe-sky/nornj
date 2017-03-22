@@ -8,7 +8,8 @@ const NO_SPLIT_NEWLINE = [
   'textarea',
   'pre',
   'xmp',
-  'template'
+  'template',
+  'noscript'
 ];
 
 function _plainTextNode(obj, parent, parentContent, noSplitNewline, tmplRule) {

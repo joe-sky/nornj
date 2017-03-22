@@ -6,6 +6,7 @@
 \ \ \/\ \   _\_\ \ `<div>
  \ \_\ \_\ /\_____\   Hello World!
   \/_/\/_/ \/_____/ </div>`();
+
 ```
 
 `NornJ`是一个渲染效率高，语法可读性好，可扩展性超强，适用场景丰富的javascript模板引擎。
@@ -13,7 +14,7 @@
 [![NPM Version][npm-image]][npm-url]
 [![NPM Downloads][downloads-image]][npm-url]
 
-### 模板基本示例
+## 模板基本示例
 
 ```html
 <template name="partial">
@@ -34,7 +35,7 @@
 
 如上例，`NornJ`的语法在可以展现一定逻辑性的同时结构与html几乎一致，而且`if`、`each`、`>`、`<=`等都是支持自定义扩展的模板语法！^_^
 
-### 特色
+## 特色
 
 传统js模板引擎如`Handlebars`、`EJS`等通常只支持输出html字符串，`NornJ`与它们相比，相同点和不同点都有：
 
@@ -42,7 +43,7 @@
 * 支持读取数据并输出html字符串，故它也可以像传统js模板引擎一样支持`Backbone`或`Express`等。
 * 它的语法偏向弱逻辑，和`Handlebars`更类似一些，但也有自己独特的地方。
 
-### 与React配合示例
+## 与React配合示例
 
 NornJ可以替代JSX输出React组件，用它可以将React组件的逻辑与结构更优雅地实现解藕：
 
@@ -94,7 +95,7 @@ render(nj`<TestComponent no=100 />`(), document.body);
 </body>
 ```
 
-### 在ES5环境下使用
+## 在ES5环境下使用
 
 除了使用ES6模板字符串外，`NornJ`也可以支持在es5环境下使用普通的字符串：
 
@@ -127,7 +128,7 @@ console.log(html);
 */
 ```
 
-### 安装
+## 安装
 
 使用npm安装:
 
@@ -135,17 +136,17 @@ console.log(html);
 npm install nornj
 ```
 
-### 示例项目
+## 示例项目
 
 * [react-redux-nornj-todomvc](https://github.com/joe-sky/nornj/blob/master/examples/react-redux-nornj-todomvc)
 * [react-redux-nornj-todomvc-es5](https://github.com/joe-sky/nornj/blob/master/examples/react-redux-nornj-todomvc-es5)
 * [backbone-marionette-nornj-todomvc](https://github.com/joe-sky/nornj/blob/master/examples/backbone-marionette-nornj-todomvc)
 
-### 浏览器支持
+## 浏览器支持
 
 * 可支持所有现代浏览器以及Internet Explorer 9+。
 
-### 更多详细文档
+## 更多详细文档
 
 * [模板语法](https://github.com/joe-sky/nornj/blob/master/docs/模板语法.md)
 * [编译模板并输出html字符串](https://github.com/joe-sky/nornj/blob/master/docs/编译模板并输出html字符串.md)
@@ -154,7 +155,7 @@ npm install nornj
 * [在html dom中渲染React组件](https://github.com/joe-sky/nornj/blob/master/docs/在html%20dom中渲染React组件.md)
 * [模板全局配置](https://github.com/joe-sky/nornj/blob/master/docs/模板全局配置.md)
 
-### License
+## License
 
 MIT
 
