@@ -834,6 +834,8 @@ __WEBPACK_IMPORTED_MODULE_1__utils_tools__["a" /* assign */](__WEBPACK_IMPORTED_
 /* unused harmony export getData */
 /* unused harmony export getComputedData */
 /* unused harmony export getElement */
+/* unused harmony export getElementRefer */
+/* unused harmony export getElementName */
 /* unused harmony export addArgs */
 /* unused harmony export newContext */
 /* harmony export (immutable) */ __webpack_exports__["a"] = fixPropName;
@@ -925,6 +927,14 @@ function getComputedData(fn, p2, level) {
 function getElement(name, p1) {
   var element = p1.components[name];
   return element ? element : name;
+}
+
+function getElementRefer(refer, name, p1) {
+  return refer != null ? __WEBPACK_IMPORTED_MODULE_1__utils_tools__["b" /* isString */](refer) ? getElement(refer.toLowerCase(), p1) : refer : getElement(name, p1);
+}
+
+function getElementName(refer, name) {
+  return refer != null && refer !== '' ? refer : name;
 }
 
 function addArgs(props, dataRefer) {
@@ -1036,6 +1046,8 @@ function template(fns) {
     styleProps: styleProps,
     exRet: exRet,
     getElement: getElement,
+    getElementRefer: getElementRefer,
+    getElementName: getElementName,
     addArgs: addArgs,
     assign: __WEBPACK_IMPORTED_MODULE_1__utils_tools__["a" /* assign */]
   };
@@ -2277,7 +2289,6 @@ function _buildFn(content, node, fns, no, newContext, level, useStringLocal) {
   retType = content.length === 1 ? '1' : '2',
       counter = {
     _type: 0,
-    _typeRefer: 0,
     _params: 0,
     _paramsE: 0,
     _compParam: 0,
@@ -2780,8 +2791,17 @@ function _buildNode(node, parent, fns, counter, retType, level, useStringLocal, 
     //元素节点
     //节点类型和typeRefer
     var _typeC = counter._type++,
-        _type = void 0;
+        _type = void 0,
+        _typeRefer = void 0;
+
     if (node.typeRefer) {
+      var valueStrT = _buildProps(node.typeRefer, counter, fns, level);
+      if (__WEBPACK_IMPORTED_MODULE_1__utils_tools__["k" /* isObject */](valueStrT)) {
+        fnStr += valueStrT.filterStr;
+        valueStrT = valueStrT.valueStr;
+      }
+
+      _typeRefer = valueStrT;
       _type = node.typeRefer.props[0].prop.name;
     } else {
       _type = node.type;
@@ -2789,24 +2809,12 @@ function _buildNode(node, parent, fns, counter, retType, level, useStringLocal, 
 
     var typeStr = void 0;
     if (!useStringF) {
-      typeStr = 'p1.getElement(\'' + _type.toLowerCase() + '\', p1)';
+      var _typeL = _type.toLowerCase();
+      typeStr = _typeRefer ? 'p1.getElementRefer(' + _typeRefer + ', \'' + _typeL + '\', p1)' : 'p1.getElement(\'' + _typeL + '\', p1)';
     } else {
-      typeStr = '\'' + _type + '\'';
+      typeStr = _typeRefer ? 'p1.getElementName(' + _typeRefer + ', \'' + _type + '\')' : '\'' + _type + '\'';
     }
-
-    if (node.typeRefer) {
-      var _typeReferC = counter._typeRefer++,
-          valueStrT = _buildProps(node.typeRefer, counter, fns, level);
-      if (__WEBPACK_IMPORTED_MODULE_1__utils_tools__["k" /* isObject */](valueStrT)) {
-        fnStr += valueStrT.filterStr;
-        valueStrT = valueStrT.valueStr;
-      }
-
-      fnStr += '\nvar _typeRefer' + _typeReferC + ' = ' + valueStrT + ';\n';
-      fnStr += 'var _type' + _typeC + ' = _typeRefer' + _typeReferC + ' ? _typeRefer' + _typeReferC + ' : (' + typeStr + ');\n';
-    } else {
-      fnStr += '\nvar _type' + _typeC + ' = ' + typeStr + ';\n';
-    }
+    fnStr += '\nvar _type' + _typeC + ' = ' + typeStr + ';\n';
 
     //节点参数
     var _retP = _buildParams(node, fns, counter, useStringF, level),

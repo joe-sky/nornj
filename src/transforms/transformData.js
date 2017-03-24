@@ -79,6 +79,14 @@ export function getElement(name, p1) {
   return element ? element : name;
 }
 
+export function getElementRefer(refer, name, p1) {
+  return refer != null ? (tools.isString(refer) ? getElement(refer.toLowerCase(), p1) : refer) : getElement(name, p1);
+}
+
+export function getElementName(refer, name) {
+  return (refer != null && refer !== '') ? refer : name;
+}
+
 export function addArgs(props, dataRefer) {
   const { args } = props;
   if (args) {
@@ -187,6 +195,8 @@ export function template(fns) {
     styleProps,
     exRet,
     getElement,
+    getElementRefer,
+    getElementName,
     addArgs,
     assign: tools.assign
   };
