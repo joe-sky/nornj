@@ -2,7 +2,7 @@
 import * as tools from '../utils/tools';
 
 //Get compiled property
-const REGEX_JS_PROP = /(('[^']*')|("[^"]*")|(-?([0-9][0-9]*)(\.\d+)?)|true|false|null|undefined|([#]*)([^.[\]()]+))([^\s()]*)/;
+const REGEX_JS_PROP = /(('[^']*')|("[^"]*")|(-?([0-9][0-9]*)(\.\d+)?)|true|false|null|undefined|Object|Array|Math|Date|([#]*)([^.[\]()]+))([^\s()]*)/;
 
 function _compiledProp(prop, innerBrackets) {
   let ret = tools.obj();

@@ -1787,7 +1787,7 @@ function isExProp(name) {
 
 
 //Get compiled property
-var REGEX_JS_PROP = /(('[^']*')|("[^"]*")|(-?([0-9][0-9]*)(\.\d+)?)|true|false|null|undefined|([#]*)([^.[\]()]+))([^\s()]*)/;
+var REGEX_JS_PROP = /(('[^']*')|("[^"]*")|(-?([0-9][0-9]*)(\.\d+)?)|true|false|null|undefined|Object|Array|Math|Date|([#]*)([^.[\]()]+))([^\s()]*)/;
 
 function _compiledProp(prop, innerBrackets) {
   var ret = __WEBPACK_IMPORTED_MODULE_1__utils_tools__["h" /* obj */]();

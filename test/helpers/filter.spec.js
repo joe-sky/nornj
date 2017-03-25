@@ -1,5 +1,5 @@
 ﻿import { render } from '../../src/compiler/compile';
-import '../../src/utils/setTmplRule';
+import '../../src/utils/createTmplRule';
 
 describe('filter', () => {
   it('.', () => {
@@ -81,7 +81,7 @@ describe('filter', () => {
   });
 
   it('int & float', () => {
-    expect(render('{{ 20.5 | int *(10.05 | float) }}')).toBe(201);
+    expect(render("{{ 20.5 | int *(10.05 | float) +(Math #('pow', 2, 3)) }}")).toBe(209);
   });
 
   it('bool', () => {
