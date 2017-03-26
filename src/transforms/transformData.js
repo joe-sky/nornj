@@ -198,7 +198,8 @@ export function template(fns) {
     getElementRefer,
     getElementName,
     addArgs,
-    assign: tools.assign
+    assign: tools.assign,
+    global: nj.global
   };
 
   if (!configs.useString) {

@@ -10,3 +10,4 @@ nj.templates = {};
 nj.errorTitle = '[NornJ]';
 nj.tmplRule = {};
 nj.outputH = false;
+nj.global = typeof self !== 'undefined' ? self : global;

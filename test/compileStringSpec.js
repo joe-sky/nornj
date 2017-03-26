@@ -201,6 +201,7 @@ describe('test compile string', function () {
           }
         </script>
       </#once>
+      {{JSON #('stringify', @data[0])}}
       <#each {{ list2 }}>
         <#pre>
         <!-- aaa -->
@@ -219,9 +220,10 @@ describe('test compile string', function () {
           </@name>
           <#props>
             <#if {{id >(50) &&(id <=(100))}}>
-              <@id1>d2</@id1>
+              <@id1>d{{@global #('parseInt', 2.01, 10)}}</@id1>
             </#if>
           </#props>
+          <@name1>{{../@data[2].name1}}</@name1>
         </div>
         <#each {{list}}>
           {{../../list2.length}}${'split1'}{{../@index}}

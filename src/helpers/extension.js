@@ -271,7 +271,7 @@ export const extensions = {
   }
 };
 
-function _eConfig(params) {
+function _config(params) {
   let ret = {
     useString: true,
     exProps: false,
@@ -289,23 +289,23 @@ function _eConfig(params) {
 
 //Extension default config
 export const extensionConfig = {
-  'if': _eConfig({ newContext: false }),
-  'else': _eConfig({ newContext: false, useString: false, subExProps: true, isSub: true }),
-  'switch': _eConfig({ newContext: false }),
-  unless: _eConfig({ newContext: false }),
-  each: _eConfig(),
-  prop: _eConfig({ newContext: false, exProps: true, subExProps: true, isProp: true }),
-  spread: _eConfig({ newContext: false, useString: false, exProps: true, subExProps: true, isProp: true }),
-  'for': _eConfig(),
-  obj: _eConfig({ newContext: false, useString: false }),
-  'with': _eConfig({ useString: false })
+  'if': _config({ newContext: false }),
+  'else': _config({ newContext: false, useString: false, subExProps: true, isSub: true }),
+  'switch': _config({ newContext: false }),
+  unless: _config({ newContext: false }),
+  each: _config(),
+  prop: _config({ newContext: false, exProps: true, subExProps: true, isProp: true }),
+  spread: _config({ newContext: false, useString: false, exProps: true, subExProps: true, isProp: true }),
+  'for': _config(),
+  obj: _config({ newContext: false, useString: false }),
+  'with': _config({ useString: false })
 };
-extensionConfig.elseif = _eConfig(extensionConfig['else']);
-extensionConfig.list = _eConfig(extensionConfig.if);
-extensionConfig.block = _eConfig(extensionConfig.obj);
-extensionConfig.pre = _eConfig(extensionConfig.obj);
-extensionConfig.arg = _eConfig(extensionConfig.prop);
-extensionConfig.once = _eConfig(extensionConfig.obj);
+extensionConfig.elseif = _config(extensionConfig['else']);
+extensionConfig.list = _config(extensionConfig.if);
+extensionConfig.block = _config(extensionConfig.obj);
+extensionConfig.pre = _config(extensionConfig.obj);
+extensionConfig.arg = _config(extensionConfig.prop);
+extensionConfig.once = _config(extensionConfig.obj);
 
 //Extension alias
 extensions['case'] = extensions.elseif;
@@ -333,7 +333,7 @@ export function registerExtension(name, extension, options) {
       } else {
         extensions[name] = v;
       }
-      extensionConfig[name] = _eConfig(options);
+      extensionConfig[name] = _config(options);
     }
   }, false, false);
 }

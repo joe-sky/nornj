@@ -81,7 +81,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony export (immutable) */ __webpack_exports__["a"] = nj;
+/* WEBPACK VAR INJECTION */(function(global) {/* harmony export (immutable) */ __webpack_exports__["a"] = nj;
 function nj() {
   return nj['taggedTmpl' + (nj.outputH ? 'H' : '')].apply(null, arguments);
 }
@@ -94,6 +94,8 @@ nj.templates = {};
 nj.errorTitle = '[NornJ]';
 nj.tmplRule = {};
 nj.outputH = false;
+nj.global = typeof self !== 'undefined' ? self : global;
+/* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(16)))
 
 /***/ }),
 /* 1 */
@@ -102,8 +104,8 @@ nj.outputH = false;
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core__ = __webpack_require__(0);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "d", function() { return defineProp; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "f", function() { return defineProps; });
-/* harmony export (immutable) */ __webpack_exports__["e"] = arrayPush;
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "e", function() { return defineProps; });
+/* harmony export (immutable) */ __webpack_exports__["h"] = arrayPush;
 /* harmony export (immutable) */ __webpack_exports__["j"] = arraySlice;
 /* harmony export (immutable) */ __webpack_exports__["p"] = isArray;
 /* harmony export (immutable) */ __webpack_exports__["k"] = isObject;
@@ -114,8 +116,8 @@ nj.outputH = false;
 /* harmony export (immutable) */ __webpack_exports__["m"] = noop;
 /* harmony export (immutable) */ __webpack_exports__["n"] = throwIf;
 /* harmony export (immutable) */ __webpack_exports__["o"] = warn;
-/* harmony export (immutable) */ __webpack_exports__["h"] = obj;
-/* harmony export (immutable) */ __webpack_exports__["g"] = clearQuot;
+/* harmony export (immutable) */ __webpack_exports__["g"] = obj;
+/* harmony export (immutable) */ __webpack_exports__["f"] = clearQuot;
 /* harmony export (immutable) */ __webpack_exports__["l"] = toCamelCase;
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return assign; });
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
@@ -748,7 +750,7 @@ var extensions = {
   }
 };
 
-function _eConfig(params) {
+function _config(params) {
   var ret = {
     useString: true,
     exProps: false,
@@ -766,23 +768,23 @@ function _eConfig(params) {
 
 //Extension default config
 var extensionConfig = {
-  'if': _eConfig({ newContext: false }),
-  'else': _eConfig({ newContext: false, useString: false, subExProps: true, isSub: true }),
-  'switch': _eConfig({ newContext: false }),
-  unless: _eConfig({ newContext: false }),
-  each: _eConfig(),
-  prop: _eConfig({ newContext: false, exProps: true, subExProps: true, isProp: true }),
-  spread: _eConfig({ newContext: false, useString: false, exProps: true, subExProps: true, isProp: true }),
-  'for': _eConfig(),
-  obj: _eConfig({ newContext: false, useString: false }),
-  'with': _eConfig({ useString: false })
+  'if': _config({ newContext: false }),
+  'else': _config({ newContext: false, useString: false, subExProps: true, isSub: true }),
+  'switch': _config({ newContext: false }),
+  unless: _config({ newContext: false }),
+  each: _config(),
+  prop: _config({ newContext: false, exProps: true, subExProps: true, isProp: true }),
+  spread: _config({ newContext: false, useString: false, exProps: true, subExProps: true, isProp: true }),
+  'for': _config(),
+  obj: _config({ newContext: false, useString: false }),
+  'with': _config({ useString: false })
 };
-extensionConfig.elseif = _eConfig(extensionConfig['else']);
-extensionConfig.list = _eConfig(extensionConfig.if);
-extensionConfig.block = _eConfig(extensionConfig.obj);
-extensionConfig.pre = _eConfig(extensionConfig.obj);
-extensionConfig.arg = _eConfig(extensionConfig.prop);
-extensionConfig.once = _eConfig(extensionConfig.obj);
+extensionConfig.elseif = _config(extensionConfig['else']);
+extensionConfig.list = _config(extensionConfig.if);
+extensionConfig.block = _config(extensionConfig.obj);
+extensionConfig.pre = _config(extensionConfig.obj);
+extensionConfig.arg = _config(extensionConfig.prop);
+extensionConfig.once = _config(extensionConfig.obj);
 
 //Extension alias
 extensions['case'] = extensions.elseif;
@@ -812,7 +814,7 @@ function registerExtension(name, extension, options) {
       } else {
         extensions[name] = v;
       }
-      extensionConfig[name] = _eConfig(_options);
+      extensionConfig[name] = _config(_options);
     }
   }, false, false);
 }
@@ -958,7 +960,7 @@ function newContext(p2, p3) {
   }
 
   return {
-    data: newData.length ? __WEBPACK_IMPORTED_MODULE_1__utils_tools__["e" /* arrayPush */](newData, p2.data) : p2.data,
+    data: newData.length ? __WEBPACK_IMPORTED_MODULE_1__utils_tools__["h" /* arrayPush */](newData, p2.data) : p2.data,
     parent: p3 && p3.fallback ? p2 : p2.parent,
     index: p3 && 'index' in p3 ? p3.index : p2.index,
     level: p2.level,
@@ -1006,7 +1008,7 @@ function tmplWrap(configs, main) {
         data = __WEBPACK_IMPORTED_MODULE_1__utils_tools__["j" /* arraySlice */](arguments);
 
     return main(configs, {
-      data: initCtx && initCtx._njData ? __WEBPACK_IMPORTED_MODULE_1__utils_tools__["e" /* arrayPush */](data, initCtx._njData) : data,
+      data: initCtx && initCtx._njData ? __WEBPACK_IMPORTED_MODULE_1__utils_tools__["h" /* arrayPush */](data, initCtx._njData) : data,
       parent: initCtx ? initCtx._njParent : null,
       index: initCtx ? initCtx._njIndex : null,
       level: initCtx ? initCtx._njLevel : null,
@@ -1038,7 +1040,7 @@ function template(fns) {
     extensions: __WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */].extensions,
     filters: __WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */].filters,
     noop: __WEBPACK_IMPORTED_MODULE_1__utils_tools__["m" /* noop */],
-    obj: __WEBPACK_IMPORTED_MODULE_1__utils_tools__["h" /* obj */],
+    obj: __WEBPACK_IMPORTED_MODULE_1__utils_tools__["g" /* obj */],
     throwIf: __WEBPACK_IMPORTED_MODULE_1__utils_tools__["n" /* throwIf */],
     warn: __WEBPACK_IMPORTED_MODULE_1__utils_tools__["o" /* warn */],
     newContext: newContext,
@@ -1049,7 +1051,8 @@ function template(fns) {
     getElementRefer: getElementRefer,
     getElementName: getElementName,
     addArgs: addArgs,
-    assign: __WEBPACK_IMPORTED_MODULE_1__utils_tools__["a" /* assign */]
+    assign: __WEBPACK_IMPORTED_MODULE_1__utils_tools__["a" /* assign */],
+    global: __WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */].global
   };
 
   if (!configs.useString) {
@@ -1092,13 +1095,23 @@ function template(fns) {
 
 //Global filter list
 var filters = {
-  //Get param properties
-  prop: function prop(val, _prop) {
-    if (val != null) {
-      return val[_prop];
+  //Get object properties
+  prop: function prop(obj, _prop) {
+    if (obj != null) {
+      return obj[_prop];
     }
 
-    return val;
+    return obj;
+  },
+
+  //Call object method
+  '#': function _(obj, method) {
+    if (obj != null) {
+      var args = arguments;
+      return obj[method].apply(obj, __WEBPACK_IMPORTED_MODULE_1__utils_tools__["j" /* arraySlice */](args, 2, args.length - 1));
+    }
+
+    return obj;
   },
 
   '==': function _(val1, val2) {
@@ -1189,21 +1202,11 @@ var filters = {
     }
 
     return Boolean(val);
-  },
-
-  //Execute method
-  '#': function _(val, method) {
-    if (val != null) {
-      var args = arguments;
-      return val[method].apply(val, __WEBPACK_IMPORTED_MODULE_1__utils_tools__["j" /* arraySlice */](args, 2, args.length - 1));
-    }
-
-    return val;
   }
 };
 
 
-function _fConfig(params) {
+function _config(params) {
   var ret = {
     useString: false
   };
@@ -1216,28 +1219,28 @@ function _fConfig(params) {
 
 //Filter default config
 var filterConfig = {
-  prop: _fConfig(),
-  '==': _fConfig(),
-  '===': _fConfig(),
-  '!=': _fConfig(),
-  '!==': _fConfig(),
-  lt: _fConfig(),
-  lte: _fConfig(),
-  gt: _fConfig(),
-  gte: _fConfig(),
-  '+': _fConfig(),
-  '-': _fConfig(),
-  '*': _fConfig(),
-  '/': _fConfig(),
-  '%': _fConfig(),
-  '?': _fConfig(),
-  '!': _fConfig(),
-  '&&': _fConfig(),
-  or: _fConfig(),
-  int: _fConfig(),
-  float: _fConfig(),
-  bool: _fConfig(),
-  '#': _fConfig()
+  prop: _config(),
+  '==': _config(),
+  '===': _config(),
+  '!=': _config(),
+  '!==': _config(),
+  lt: _config(),
+  lte: _config(),
+  gt: _config(),
+  gte: _config(),
+  '+': _config(),
+  '-': _config(),
+  '*': _config(),
+  '/': _config(),
+  '%': _config(),
+  '?': _config(),
+  '!': _config(),
+  '&&': _config(),
+  or: _config(),
+  int: _config(),
+  float: _config(),
+  bool: _config(),
+  '#': _config()
 };
 
 //Filter alias
@@ -1266,7 +1269,7 @@ function registerFilter(name, filter, options) {
       } else {
         filters[name] = v;
       }
-      filterConfig[name] = _fConfig(_options);
+      filterConfig[name] = _config(_options);
     }
   }, false, false);
 }
@@ -1414,9 +1417,9 @@ function compileStringTmpl(tmpl) {
   }
 
   var tmplFn = function tmplFn() {
-    return __WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */]['compile' + (outputH ? 'H' : '')](tmplFn, { tmplKey: tmplKey, tmplRule: tmplRule }).apply(this, params ? __WEBPACK_IMPORTED_MODULE_1__utils_tools__["e" /* arrayPush */]([params], arguments) : arguments);
+    return __WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */]['compile' + (outputH ? 'H' : '')](tmplFn, { tmplKey: tmplKey, tmplRule: tmplRule }).apply(this, arguments);
   };
-  __WEBPACK_IMPORTED_MODULE_1__utils_tools__["f" /* defineProps */](tmplFn, {
+  __WEBPACK_IMPORTED_MODULE_1__utils_tools__["e" /* defineProps */](tmplFn, {
     _njTmpl: {
       value: ret
     },
@@ -1654,7 +1657,7 @@ function getOpenTagParams(tag, tmplRule) {
     var value = matchArr[7],
         onlyBrace = matchArr[4];
     if (value != null) {
-      value = __WEBPACK_IMPORTED_MODULE_1__utils_tools__["g" /* clearQuot */](value); //Remove quotation marks
+      value = __WEBPACK_IMPORTED_MODULE_1__utils_tools__["f" /* clearQuot */](value); //Remove quotation marks
     } else {
       value = key; //Match to Similar to "checked" or "disabled" attribute.
     }
@@ -1713,7 +1716,7 @@ function isTmpl(obj) {
 function addTmpl(node, parent, name) {
   var paramsP = parent.params;
   if (!paramsP) {
-    paramsP = parent.params = __WEBPACK_IMPORTED_MODULE_1__utils_tools__["h" /* obj */]();
+    paramsP = parent.params = __WEBPACK_IMPORTED_MODULE_1__utils_tools__["g" /* obj */]();
   }
 
   var tmpls = paramsP.tmpls;
@@ -1763,7 +1766,7 @@ function addParamsEx(node, parent, isProp, isSub) {
 
     parent[exPropsName] = exPropsNode;
   } else {
-    __WEBPACK_IMPORTED_MODULE_1__utils_tools__["e" /* arrayPush */](parent[exPropsName].content, isProp || isSub ? [node] : node.content);
+    __WEBPACK_IMPORTED_MODULE_1__utils_tools__["h" /* arrayPush */](parent[exPropsName].content, isProp || isSub ? [node] : node.content);
   }
 }
 
@@ -1787,10 +1790,10 @@ function isExProp(name) {
 
 
 //Get compiled property
-var REGEX_JS_PROP = /(('[^']*')|("[^"]*")|(-?([0-9][0-9]*)(\.\d+)?)|true|false|null|undefined|Object|Array|Math|Date|([#]*)([^.[\]()]+))([^\s()]*)/;
+var REGEX_JS_PROP = /(('[^']*')|("[^"]*")|(-?([0-9][0-9]*)(\.\d+)?)|true|false|null|undefined|Object|Array|Math|Date|JSON|([#]*)([^.[\]()]+))([^\s()]*)/;
 
 function _compiledProp(prop, innerBrackets) {
-  var ret = __WEBPACK_IMPORTED_MODULE_1__utils_tools__["h" /* obj */]();
+  var ret = __WEBPACK_IMPORTED_MODULE_1__utils_tools__["g" /* obj */]();
 
   //If there are vertical lines in the property,then use filter
   if (prop.indexOf('|') >= 0) {
@@ -1808,7 +1811,7 @@ function _compiledProp(prop, innerBrackets) {
         }
 
         var retF = _getFilterParam(filter),
-            filterObj = __WEBPACK_IMPORTED_MODULE_1__utils_tools__["h" /* obj */](),
+            filterObj = __WEBPACK_IMPORTED_MODULE_1__utils_tools__["g" /* obj */](),
             filterName = retF[0]; //Get filter name
 
         if (filterName) {
@@ -1932,7 +1935,7 @@ function _replaceInnerBrackets(prop, counter, innerBrackets) {
 
 //Get compiled parameter
 function compiledParam(value, tmplRule) {
-  var ret = __WEBPACK_IMPORTED_MODULE_1__utils_tools__["h" /* obj */](),
+  var ret = __WEBPACK_IMPORTED_MODULE_1__utils_tools__["g" /* obj */](),
       isStr = __WEBPACK_IMPORTED_MODULE_1__utils_tools__["b" /* isString */](value),
       strs = isStr ? value.split(tmplRule.replaceSplit) : [value],
       props = null,
@@ -1951,7 +1954,7 @@ function compiledParam(value, tmplRule) {
     props = [];
 
     __WEBPACK_IMPORTED_MODULE_1__utils_tools__["c" /* each */](params, function (param) {
-      var retP = __WEBPACK_IMPORTED_MODULE_1__utils_tools__["h" /* obj */](),
+      var retP = __WEBPACK_IMPORTED_MODULE_1__utils_tools__["g" /* obj */](),
           innerBrackets = [];
 
       isAll = param[3] ? param[0] === value : false; //If there are several curly braces in one property value, "isAll" must be false.
@@ -1978,9 +1981,9 @@ function compiledParam(value, tmplRule) {
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils_tools__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__parser_checkElem__ = __webpack_require__(16);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__parser_checkElem__ = __webpack_require__(15);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__transforms_transformData__ = __webpack_require__(4);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__buildRuntime__ = __webpack_require__(15);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__buildRuntime__ = __webpack_require__(14);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__parser_checkStringElem__ = __webpack_require__(7);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__utils_createTmplRule__ = __webpack_require__(2);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return compile; });
@@ -2071,7 +2074,7 @@ function _createCompile(outputH) {
 
     if (tmpl._njParams) {
       var tmplFn = function tmplFn() {
-        return tmplFns.main.apply(this, __WEBPACK_IMPORTED_MODULE_1__utils_tools__["e" /* arrayPush */]([tmpl._njParams], arguments));
+        return tmplFns.main.apply(this, __WEBPACK_IMPORTED_MODULE_1__utils_tools__["h" /* arrayPush */]([tmpl._njParams], arguments));
       };
       __WEBPACK_IMPORTED_MODULE_1__utils_tools__["d" /* defineProp */](tmplFn, '_njTmpl', {
         value: true
@@ -2089,7 +2092,7 @@ var compileH = _createCompile(true);
 
 //Create template root object
 function _createAstRoot() {
-  var root = __WEBPACK_IMPORTED_MODULE_1__utils_tools__["h" /* obj */]();
+  var root = __WEBPACK_IMPORTED_MODULE_1__utils_tools__["g" /* obj */]();
   root.type = 'nj_root';
   root.content = [];
 
@@ -2227,33 +2230,6 @@ __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils_tools__["a" /* assign *
 
 /***/ }),
 /* 14 */
-/***/ (function(module, exports) {
-
-var g;
-
-// This works in non-strict mode
-g = (function() {
-	return this;
-})();
-
-try {
-	// This works if eval is allowed (see CSP)
-	g = g || Function("return this")() || (1,eval)("this");
-} catch(e) {
-	// This works if the window reference is available
-	if(typeof window === "object")
-		g = window;
-}
-
-// g can still be undefined, but nothing to do about it...
-// We return undefined, instead of nothing here, so it's
-// easier to handle this case. if(!global) { ...}
-
-module.exports = g;
-
-
-/***/ }),
-/* 15 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -2379,12 +2355,23 @@ function _buildPropData(obj, counter, fns, useStringLocal, level) {
         special = false,
         specialP = false;
 
-    if (name === '@index') {
-      data = 'index';
-      special = true;
-    } else if (name === 'this') {
-      data = 'data[0]';
-      special = true;
+    switch (name) {
+      case '@index':
+        data = 'index';
+        special = true;
+        break;
+      case 'this':
+        data = 'data[0]';
+        special = true;
+        break;
+      case '@data':
+        data = 'data';
+        special = true;
+        break;
+      case '@global':
+        data = 'p1.global';
+        special = 'custom';
+        break;
     }
 
     if (parentNum) {
@@ -2403,7 +2390,7 @@ function _buildPropData(obj, counter, fns, useStringLocal, level) {
     if (!special && !specialP) {
       dataValueStr = (isComputed ? 'p1.getComputedData(' : '') + 'p2.getData(\'' + name + '\')' + (isComputed ? ', p2, ' + level + ')' : '') + jsProp;
     } else {
-      var dataStr = 'p2.' + data;
+      var dataStr = special === 'custom' ? data : 'p2.' + data;
       dataValueStr = (special ? dataStr : (isComputed ? 'p1.getComputedData(' : '') + 'p2.getData(\'' + name + '\', ' + dataStr + ')' + (isComputed ? ', p2, ' + level + ')' : '')) + jsProp;
     }
   } else {
@@ -2962,7 +2949,7 @@ function _buildLevelSpaceRt(useString, noSpace) {
 };
 
 /***/ }),
-/* 16 */
+/* 15 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3075,7 +3062,7 @@ function checkElem(obj, parent, tmplRule, hasExProps, noSplitNewline, isLast) {
             node.args.push(paramV);
           } else {
             if (!node.params) {
-              node.params = __WEBPACK_IMPORTED_MODULE_1__utils_tools__["h" /* obj */]();
+              node.params = __WEBPACK_IMPORTED_MODULE_1__utils_tools__["g" /* obj */]();
             }
             node.params[param.key] = paramV;
           }
@@ -3105,7 +3092,7 @@ function checkElem(obj, parent, tmplRule, hasExProps, noSplitNewline, isLast) {
         var tagParams = __WEBPACK_IMPORTED_MODULE_3__transforms_transformElement__["i" /* getOpenTagParams */](first, tmplRule);
         if (tagParams) {
           if (!node.params) {
-            node.params = __WEBPACK_IMPORTED_MODULE_1__utils_tools__["h" /* obj */]();
+            node.params = __WEBPACK_IMPORTED_MODULE_1__utils_tools__["g" /* obj */]();
           }
 
           __WEBPACK_IMPORTED_MODULE_1__utils_tools__["c" /* each */](tagParams, function (param) {
@@ -3178,11 +3165,38 @@ function _checkContentElem(obj, parent, tmplRule, hasExProps, noSplitNewline) {
 }
 
 /***/ }),
+/* 16 */
+/***/ (function(module, exports) {
+
+var g;
+
+// This works in non-strict mode
+g = (function() {
+	return this;
+})();
+
+try {
+	// This works if eval is allowed (see CSP)
+	g = g || Function("return this")() || (1,eval)("this");
+} catch(e) {
+	// This works if the window reference is available
+	if(typeof window === "object")
+		g = window;
+}
+
+// g can still be undefined, but nothing to do about it...
+// We return undefined, instead of nothing here, so it's
+// easier to handle this case. if(!global) { ...}
+
+module.exports = g;
+
+
+/***/ }),
 /* 17 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* WEBPACK VAR INJECTION */(function(global) {Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils_tools__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__utils_registerComponent__ = __webpack_require__(12);
@@ -3215,7 +3229,8 @@ __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils_tools__["a" /* assign *
   config: __WEBPACK_IMPORTED_MODULE_4__config__["a" /* default */]
 });
 
-var _global = typeof self !== 'undefined' ? self : global;
+var _global = __WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */].global;
+
 _global.NornJ = _global.nj = __WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */];
 
 
@@ -3224,7 +3239,6 @@ _global.NornJ = _global.nj = __WEBPACK_IMPORTED_MODULE_0__core__["a" /* default 
 
 
 /* harmony default export */ __webpack_exports__["default"] = __WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */];
-/* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(14)))
 
 /***/ })
 /******/ ]);

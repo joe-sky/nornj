@@ -11,7 +11,7 @@ assign(nj, {
   config
 });
 
-const _global = typeof self !== 'undefined' ? self : global;
+const { global: _global } = nj;
 _global.NornJ = _global.nj = nj;
 
 export {

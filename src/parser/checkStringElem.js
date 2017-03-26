@@ -64,7 +64,7 @@ export default function compileStringTmpl(tmpl) {
   }
 
   const tmplFn = function() {
-    return nj['compile' + (outputH ? 'H' : '')](tmplFn, { tmplKey, tmplRule }).apply(this, params ? tools.arrayPush([params], arguments) : arguments);
+    return nj['compile' + (outputH ? 'H' : '')](tmplFn, { tmplKey, tmplRule }).apply(this, arguments);
   };
   tools.defineProps(tmplFn, {
     _njTmpl: {

@@ -102,12 +102,23 @@ function _buildPropData(obj, counter, fns, useStringLocal, level) {
       special = false,
       specialP = false;
 
-    if (name === '@index') {
-      data = 'index';
-      special = true;
-    } else if (name === 'this') {
-      data = 'data[0]';
-      special = true;
+    switch (name) {
+      case '@index':
+        data = 'index';
+        special = true;
+        break;
+      case 'this':
+        data = 'data[0]';
+        special = true;
+        break;
+      case '@data':
+        data = 'data';
+        special = true;
+        break;
+      case '@global':
+        data = 'p1.global';
+        special = 'custom';
+        break;
     }
 
     if (parentNum) {
@@ -126,7 +137,7 @@ function _buildPropData(obj, counter, fns, useStringLocal, level) {
     if (!special && !specialP) {
       dataValueStr = (isComputed ? 'p1.getComputedData(' : '') + 'p2.getData(\'' + name + '\')' + (isComputed ? ', p2, ' + level + ')' : '') + jsProp;
     } else {
-      let dataStr = 'p2.' + data;
+      let dataStr = special === 'custom' ? data : 'p2.' + data;
       dataValueStr = (special ? dataStr : (isComputed ? 'p1.getComputedData(' : '') + 'p2.getData(\'' + name + '\', ' + dataStr + ')' + (isComputed ? ', p2, ' + level + ')' : '')) + jsProp;
     }
   } else {
@@ -493,7 +504,7 @@ function _buildNode(node, parent, fns, counter, retType, level, useStringLocal, 
     //节点类型和typeRefer
     let _typeC = counter._type++,
       _type, _typeRefer;
-      
+
     if (node.typeRefer) {
       let valueStrT = _buildProps(node.typeRefer, counter, fns, level);
       if (tools.isObject(valueStrT)) {

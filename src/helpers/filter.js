@@ -3,13 +3,23 @@ import * as tools from '../utils/tools';
 
 //Global filter list
 export const filters = {
-  //Get param properties
-  prop: (val, prop) => {
-    if (val != null) {
-      return val[prop];
+  //Get object properties
+  prop: (obj, prop) => {
+    if (obj != null) {
+      return obj[prop];
     }
 
-    return val;
+    return obj;
+  },
+
+  //Call object method
+  '#': function(obj, method) {
+    if (obj != null) {
+      let args = arguments;
+      return obj[method].apply(obj, tools.arraySlice(args, 2, args.length - 1));
+    }
+
+    return obj;
   },
 
   '==': (val1, val2) => val1 == val2,
@@ -62,20 +72,10 @@ export const filters = {
     }
 
     return Boolean(val);
-  },
-
-  //Execute method
-  '#': function(val, method) {
-    if (val != null) {
-      let args = arguments;
-      return val[method].apply(val, tools.arraySlice(args, 2, args.length - 1));
-    }
-
-    return val;
   }
 };
 
-function _fConfig(params) {
+function _config(params) {
   let ret = {
     useString: false
   };
@@ -88,28 +88,28 @@ function _fConfig(params) {
 
 //Filter default config
 export const filterConfig = {
-  prop: _fConfig(),
-  '==': _fConfig(),
-  '===': _fConfig(),
-  '!=': _fConfig(),
-  '!==': _fConfig(),
-  lt: _fConfig(),
-  lte: _fConfig(),
-  gt: _fConfig(),
-  gte: _fConfig(),
-  '+': _fConfig(),
-  '-': _fConfig(),
-  '*': _fConfig(),
-  '/': _fConfig(),
-  '%': _fConfig(),
-  '?': _fConfig(),
-  '!': _fConfig(),
-  '&&': _fConfig(),
-  or: _fConfig(),
-  int: _fConfig(),
-  float: _fConfig(),
-  bool: _fConfig(),
-  '#': _fConfig()
+  prop: _config(),
+  '==': _config(),
+  '===': _config(),
+  '!=': _config(),
+  '!==': _config(),
+  lt: _config(),
+  lte: _config(),
+  gt: _config(),
+  gte: _config(),
+  '+': _config(),
+  '-': _config(),
+  '*': _config(),
+  '/': _config(),
+  '%': _config(),
+  '?': _config(),
+  '!': _config(),
+  '&&': _config(),
+  or: _config(),
+  int: _config(),
+  float: _config(),
+  bool: _config(),
+  '#': _config()
 };
 
 //Filter alias
@@ -136,7 +136,7 @@ export function registerFilter(name, filter, options) {
       } else {
         filters[name] = v;
       }
-      filterConfig[name] = _fConfig(options);
+      filterConfig[name] = _config(options);
     }
   }, false, false);
 }
