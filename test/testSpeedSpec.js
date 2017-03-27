@@ -547,7 +547,7 @@ describe('test speed', function() {
       }
     });
 
-    var list2 = _.times(5, function(n) {
+    var list2 = _.times(100, function(n) {
       return { no: n + 1 };
     });
 
@@ -562,10 +562,10 @@ describe('test speed', function() {
 
     //console.log('avg:' + (sum / 10));
 
-    var html = ReactDOMServer.renderToStaticMarkup(React.createElement('div', null, _.times(1, (n) => {
+    var html = ReactDOMServer.renderToStaticMarkup(React.createElement('div', null, _.times(10, (n) => {
       return React.createElement(TestComponent, {
         key: n,
-        arr: _.times(2, function(n) {
+        arr: _.times(100, function(n) {
           return n;
         }),
         a: 1,
@@ -574,7 +574,7 @@ describe('test speed', function() {
     })));
 
     //console.log(JSON.stringify(nj.asts['tmpl1']));
-    console.log(html);
+    //console.log(html);
     expect(html).toBeTruthy();
   });
 });
