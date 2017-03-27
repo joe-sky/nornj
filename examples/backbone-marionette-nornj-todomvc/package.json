@@ -8,7 +8,7 @@
     "backbone.marionette": "^2.4.1",
     "backbone.radio": "^1.0.1",
     "jquery": "^1.11.2",
-    "nornj": "^0.4.1-rc.14",
+    "nornj": "^0.4.1-rc.25",
     "todomvc-app-css": "^1.0.1",
     "todomvc-common": "^1.0.1",
     "underscore": "^1.6.0"

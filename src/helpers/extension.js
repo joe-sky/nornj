@@ -207,12 +207,28 @@ export const extensions = {
     }
   },
 
+  fn: options => {
+    const { props } = options;
+
+    return function() {
+      let params;
+      if (props) {
+        params = {};
+
+        const paramNames = Object.keys(props);
+        paramNames.forEach((v, i) => params[paramNames[i]] = arguments[i]);
+      }
+
+      return options.result(params);
+    };
+  },
+
   block: options => options.result(),
 
   pre: options => extensions.block(options),
 
   'with': function(originalData, options) {
-    const props = options.props;
+    const { props } = options;
 
     return options.result({
       data: props && props.as ? {
@@ -306,6 +322,7 @@ extensionConfig.block = _config(extensionConfig.obj);
 extensionConfig.pre = _config(extensionConfig.obj);
 extensionConfig.arg = _config(extensionConfig.prop);
 extensionConfig.once = _config(extensionConfig.obj);
+extensionConfig.fn = _config(extensionConfig['with']);
 
 //Extension alias
 extensions['case'] = extensions.elseif;

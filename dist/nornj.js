@@ -678,6 +678,29 @@ var extensions = {
     }
   },
 
+  fn: function fn(options) {
+    var props = options.props;
+
+
+    return function () {
+      var _arguments = arguments;
+
+      var params = void 0;
+      if (props) {
+        (function () {
+          params = {};
+
+          var paramNames = Object.keys(props);
+          paramNames.forEach(function (v, i) {
+            return params[paramNames[i]] = _arguments[i];
+          });
+        })();
+      }
+
+      return options.result(params);
+    };
+  },
+
   block: function block(options) {
     return options.result();
   },
@@ -688,6 +711,7 @@ var extensions = {
 
   'with': function _with(originalData, options) {
     var props = options.props;
+
 
     return options.result({
       data: props && props.as ? _defineProperty({}, props.as, originalData) : originalData
@@ -785,6 +809,7 @@ extensionConfig.block = _config(extensionConfig.obj);
 extensionConfig.pre = _config(extensionConfig.obj);
 extensionConfig.arg = _config(extensionConfig.prop);
 extensionConfig.once = _config(extensionConfig.obj);
+extensionConfig.fn = _config(extensionConfig['with']);
 
 //Extension alias
 extensions['case'] = extensions.elseif;

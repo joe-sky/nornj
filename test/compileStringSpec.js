@@ -176,6 +176,15 @@ describe('test compile string', function () {
         </div>
       `;
 
+      var obj = {
+        a: function() {
+          console.log(this.b);
+        },
+        b: 111
+      };
+
+      console.log(obj.a.bind.apply(obj.a, [{ b: 121 }])());
+
       var tmplTest = nj`
       <#once>
         <@resetList><#list {{id}} {{c1}} /></@resetList>
@@ -329,7 +338,7 @@ describe('test compile string', function () {
 
       var html = tmplTest.apply(null, data);
       var html2 = tmplTest.call(null, { id: 200, c1: 100 }, data[0]);
-      console.log(html);
+      //console.log(html);
       expect(html).toBeTruthy();
     });
 
