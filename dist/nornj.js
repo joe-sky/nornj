@@ -644,7 +644,8 @@ var extensions = {
 
     for (; start <= end; start++) {
       var retI = options.result({
-        index: start
+        index: start,
+        fallback: true
       });
 
       if (useString) {
@@ -697,7 +698,7 @@ var extensions = {
         })();
       }
 
-      return options.result(params);
+      return options.result({ data: params });
     };
   },
 
@@ -776,12 +777,13 @@ var extensions = {
 
 function _config(params) {
   var ret = {
+    onlyGlobal: false,
     useString: true,
+    newContext: true,
     exProps: false,
     isProp: false,
     subExProps: false,
-    isSub: false,
-    newContext: true
+    isSub: false
   };
 
   if (params) {
@@ -790,26 +792,28 @@ function _config(params) {
   return ret;
 }
 
+var _defaultCfg = { onlyGlobal: true, newContext: false };
+
 //Extension default config
 var extensionConfig = {
-  'if': _config({ newContext: false }),
-  'else': _config({ newContext: false, useString: false, subExProps: true, isSub: true }),
-  'switch': _config({ newContext: false }),
-  unless: _config({ newContext: false }),
-  each: _config(),
-  prop: _config({ newContext: false, exProps: true, subExProps: true, isProp: true }),
-  spread: _config({ newContext: false, useString: false, exProps: true, subExProps: true, isProp: true }),
-  'for': _config(),
-  obj: _config({ newContext: false, useString: false }),
-  'with': _config({ useString: false })
+  'if': _config(_defaultCfg),
+  'else': _config({ onlyGlobal: true, newContext: false, useString: false, subExProps: true, isSub: true }),
+  'switch': _config(_defaultCfg),
+  unless: _config(_defaultCfg),
+  each: _config({ onlyGlobal: true }),
+  prop: _config({ onlyGlobal: true, newContext: false, exProps: true, subExProps: true, isProp: true }),
+  spread: _config({ onlyGlobal: true, newContext: false, useString: false, exProps: true, subExProps: true, isProp: true }),
+  obj: _config({ onlyGlobal: true, newContext: false, useString: false }),
+  list: _config(_defaultCfg),
+  fn: _config({ onlyGlobal: true, useString: false }),
+  'with': _config(_defaultCfg)
 };
 extensionConfig.elseif = _config(extensionConfig['else']);
-extensionConfig.list = _config(extensionConfig.if);
+extensionConfig['for'] = _config(extensionConfig.each);
 extensionConfig.block = _config(extensionConfig.obj);
 extensionConfig.pre = _config(extensionConfig.obj);
 extensionConfig.arg = _config(extensionConfig.prop);
 extensionConfig.once = _config(extensionConfig.obj);
-extensionConfig.fn = _config(extensionConfig['with']);
 
 //Extension alias
 extensions['case'] = extensions.elseif;
@@ -976,18 +980,22 @@ function addArgs(props, dataRefer) {
 
 //Rebuild local variables in the new context
 function newContext(p2, p3) {
+  if (!p3) {
+    return p2;
+  }
+
   var newData = [];
-  if (p3 && 'data' in p3) {
+  if ('data' in p3) {
     newData.push(p3.data);
   }
-  if (p3 && 'extra' in p3) {
+  if ('extra' in p3) {
     newData.push(p3.extra);
   }
 
   return {
     data: newData.length ? __WEBPACK_IMPORTED_MODULE_1__utils_tools__["h" /* arrayPush */](newData, p2.data) : p2.data,
-    parent: p3 && p3.fallback ? p2 : p2.parent,
-    index: p3 && 'index' in p3 ? p3.index : p2.index,
+    parent: p3.fallback ? p2 : p2.parent,
+    index: 'index' in p3 ? p3.index : p2.index,
     level: p2.level,
     getData: getData
   };
@@ -1121,9 +1129,9 @@ function template(fns) {
 //Global filter list
 var filters = {
   //Get object properties
-  prop: function prop(obj, _prop) {
+  '.': function _(obj, prop) {
     if (obj != null) {
-      return obj[_prop];
+      return obj[prop];
     }
 
     return obj;
@@ -1230,9 +1238,9 @@ var filters = {
   }
 };
 
-
 function _config(params) {
   var ret = {
+    onlyGlobal: false,
     useString: false
   };
 
@@ -1242,35 +1250,37 @@ function _config(params) {
   return ret;
 }
 
+var _defaultCfg = { onlyGlobal: true };
+
 //Filter default config
 var filterConfig = {
-  prop: _config(),
-  '==': _config(),
-  '===': _config(),
-  '!=': _config(),
-  '!==': _config(),
-  lt: _config(),
-  lte: _config(),
-  gt: _config(),
-  gte: _config(),
-  '+': _config(),
-  '-': _config(),
-  '*': _config(),
-  '/': _config(),
-  '%': _config(),
-  '?': _config(),
-  '!': _config(),
-  '&&': _config(),
-  or: _config(),
-  int: _config(),
-  float: _config(),
-  bool: _config(),
-  '#': _config()
+  '.': _config(_defaultCfg),
+  '#': _config(_defaultCfg),
+  '==': _config(_defaultCfg),
+  '===': _config(_defaultCfg),
+  '!=': _config(_defaultCfg),
+  '!==': _config(_defaultCfg),
+  lt: _config(_defaultCfg),
+  lte: _config(_defaultCfg),
+  gt: _config(_defaultCfg),
+  gte: _config(_defaultCfg),
+  '+': _config(_defaultCfg),
+  '-': _config(_defaultCfg),
+  '*': _config(_defaultCfg),
+  '/': _config(_defaultCfg),
+  '%': _config(_defaultCfg),
+  '?': _config(_defaultCfg),
+  '!': _config(_defaultCfg),
+  '&&': _config(_defaultCfg),
+  or: _config(_defaultCfg),
+  int: _config(_defaultCfg),
+  float: _config(_defaultCfg),
+  bool: _config(_defaultCfg)
 };
 
 //Filter alias
-filters['.'] = filters.prop;
-filterConfig['.'] = filterConfig.prop;
+filters.prop = filters['.'];
+filterConfig.prop = filterConfig['.'];
 
 //Register filter and also can batch add
 function registerFilter(name, filter, options) {
@@ -2436,10 +2446,11 @@ function _buildPropData(obj, counter, fns, useStringLocal, level) {
             globalFilterStr = 'p1.filters[\'' + o.name + '\']',
             filterStrI = '';
 
-        if (configF) {
+        if (configF && configF.onlyGlobal) {
+          //只能从全局获取
           filterStr += '\nvar ' + filterVarStr + ' = ' + globalFilterStr + ';\n';
         } else {
-          //如果全局配置不存在,先从p2.data中获取
+          //优先从p2.data中获取
           filterStr += '\nvar ' + filterVarStr + ' = p2.getData(\'' + o.name + '\');\n';
           filterStr += 'if(!' + filterVarStr + ') ' + filterVarStr + ' = ' + globalFilterStr + ';\n';
         }
@@ -2734,10 +2745,11 @@ function _buildNode(node, parent, fns, counter, retType, level, useStringLocal, 
         exVarStr = '_ex' + _exC,
         globalExStr = 'p1.extensions[\'' + node.ex + '\']';
 
-    if (configE) {
+    if (configE && configE.onlyGlobal) {
+      //只能从全局获取
       fnStr += '\nvar ' + exVarStr + ' = ' + globalExStr + ';\n';
     } else {
-      //如果全局配置不存在,先从p2.data中获取
+      //优先从p2.data中获取
       fnStr += '\nvar ' + exVarStr + ' = p2.getData(\'' + node.ex + '\');\n';
       fnStr += 'if(!' + exVarStr + ') ' + exVarStr + ' = ' + globalExStr + ';\n';
     }

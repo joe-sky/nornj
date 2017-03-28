@@ -26,7 +26,7 @@ function _buildFn(content, node, fns, no, newContext, level, useStringLocal) {
       _ex: 0,
       _value: 0,
       _filter: 0,
-      newContext: newContext
+      newContext
     };
 
   if (!useString) {
@@ -157,9 +157,9 @@ function _buildPropData(obj, counter, fns, useStringLocal, level) {
         globalFilterStr = 'p1.filters[\'' + o.name + '\']',
         filterStrI = '';
 
-      if (configF) {
+      if (configF && configF.onlyGlobal) { //只能从全局获取
         filterStr += '\nvar ' + filterVarStr + ' = ' + globalFilterStr + ';\n';
-      } else { //如果全局配置不存在,先从p2.data中获取
+      } else { //优先从p2.data中获取
         filterStr += '\nvar ' + filterVarStr + ' = p2.getData(\'' + o.name + '\');\n';
         filterStr += 'if(!' + filterVarStr + ') ' + filterVarStr + ' = ' + globalFilterStr + ';\n';
       }
@@ -439,9 +439,9 @@ function _buildNode(node, parent, fns, counter, retType, level, useStringLocal, 
       exVarStr = '_ex' + _exC,
       globalExStr = 'p1.extensions[\'' + node.ex + '\']';
 
-    if (configE) {
+    if (configE && configE.onlyGlobal) { //只能从全局获取
       fnStr += '\nvar ' + exVarStr + ' = ' + globalExStr + ';\n';
-    } else { //如果全局配置不存在,先从p2.data中获取
+    } else { //优先从p2.data中获取
       fnStr += '\nvar ' + exVarStr + ' = p2.getData(\'' + node.ex + '\');\n';
       fnStr += 'if(!' + exVarStr + ') ' + exVarStr + ' = ' + globalExStr + ';\n';
     }

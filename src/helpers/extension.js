@@ -175,7 +175,8 @@ export const extensions = {
 
     for (; start <= end; start++) {
       let retI = options.result({
-        index: start
+        index: start,
+        fallback: true
       });
 
       if (useString) {
@@ -219,7 +220,7 @@ export const extensions = {
         paramNames.forEach((v, i) => params[paramNames[i]] = arguments[i]);
       }
 
-      return options.result(params);
+      return options.result({ data: params });
     };
   },
 
@@ -289,12 +290,13 @@ export const extensions = {
 
 function _config(params) {
   let ret = {
+    onlyGlobal: false,
     useString: true,
+    newContext: true,
     exProps: false,
     isProp: false,
     subExProps: false,
-    isSub: false,
-    newContext: true
+    isSub: false
   };
 
   if (params) {
@@ -303,26 +305,28 @@ function _config(params) {
   return ret;
 }
 
+const _defaultCfg = { onlyGlobal: true, newContext: false };
+
 //Extension default config
 export const extensionConfig = {
-  'if': _config({ newContext: false }),
-  'else': _config({ newContext: false, useString: false, subExProps: true, isSub: true }),
-  'switch': _config({ newContext: false }),
-  unless: _config({ newContext: false }),
-  each: _config(),
-  prop: _config({ newContext: false, exProps: true, subExProps: true, isProp: true }),
-  spread: _config({ newContext: false, useString: false, exProps: true, subExProps: true, isProp: true }),
-  'for': _config(),
-  obj: _config({ newContext: false, useString: false }),
-  'with': _config({ useString: false })
+  'if': _config(_defaultCfg),
+  'else': _config({ onlyGlobal: true, newContext: false, useString: false, subExProps: true, isSub: true }),
+  'switch': _config(_defaultCfg),
+  unless: _config(_defaultCfg),
+  each: _config({ onlyGlobal: true }),
+  prop: _config({ onlyGlobal: true, newContext: false, exProps: true, subExProps: true, isProp: true }),
+  spread: _config({ onlyGlobal: true, newContext: false, useString: false, exProps: true, subExProps: true, isProp: true }),
+  obj: _config({ onlyGlobal: true, newContext: false, useString: false }),
+  list: _config(_defaultCfg),
+  fn: _config({ onlyGlobal: true, useString: false }),
+  'with': _config(_defaultCfg)
 };
 extensionConfig.elseif = _config(extensionConfig['else']);
-extensionConfig.list = _config(extensionConfig.if);
+extensionConfig['for'] = _config(extensionConfig.each);
 extensionConfig.block = _config(extensionConfig.obj);
 extensionConfig.pre = _config(extensionConfig.obj);
 extensionConfig.arg = _config(extensionConfig.prop);
 extensionConfig.once = _config(extensionConfig.obj);
-extensionConfig.fn = _config(extensionConfig['with']);
 
 //Extension alias
 extensions['case'] = extensions.elseif;

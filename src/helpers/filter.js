@@ -4,7 +4,7 @@ import * as tools from '../utils/tools';
 //Global filter list
 export const filters = {
   //Get object properties
-  prop: (obj, prop) => {
+  '.': (obj, prop) => {
     if (obj != null) {
       return obj[prop];
     }
@@ -77,6 +77,7 @@ export const filters = {
 
 function _config(params) {
   let ret = {
+    onlyGlobal: false,
     useString: false
   };
 
@@ -86,35 +87,37 @@ function _config(params) {
   return ret;
 }
 
+const _defaultCfg = { onlyGlobal: true };
+
 //Filter default config
 export const filterConfig = {
-  prop: _config(),
-  '==': _config(),
-  '===': _config(),
-  '!=': _config(),
-  '!==': _config(),
-  lt: _config(),
-  lte: _config(),
-  gt: _config(),
-  gte: _config(),
-  '+': _config(),
-  '-': _config(),
-  '*': _config(),
-  '/': _config(),
-  '%': _config(),
-  '?': _config(),
-  '!': _config(),
-  '&&': _config(),
-  or: _config(),
-  int: _config(),
-  float: _config(),
-  bool: _config(),
-  '#': _config()
+  '.': _config(_defaultCfg),
+  '#': _config(_defaultCfg),
+  '==': _config(_defaultCfg),
+  '===': _config(_defaultCfg),
+  '!=': _config(_defaultCfg),
+  '!==': _config(_defaultCfg),
+  lt: _config(_defaultCfg),
+  lte: _config(_defaultCfg),
+  gt: _config(_defaultCfg),
+  gte: _config(_defaultCfg),
+  '+': _config(_defaultCfg),
+  '-': _config(_defaultCfg),
+  '*': _config(_defaultCfg),
+  '/': _config(_defaultCfg),
+  '%': _config(_defaultCfg),
+  '?': _config(_defaultCfg),
+  '!': _config(_defaultCfg),
+  '&&': _config(_defaultCfg),
+  or: _config(_defaultCfg),
+  int: _config(_defaultCfg),
+  float: _config(_defaultCfg),
+  bool: _config(_defaultCfg)
 };
 
 //Filter alias
-filters['.'] = filters.prop;
-filterConfig['.'] = filterConfig.prop;
+filters.prop = filters['.'];
+filterConfig.prop = filterConfig['.'];
 
 //Register filter and also can batch add
 export function registerFilter(name, filter, options) {

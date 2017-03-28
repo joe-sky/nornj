@@ -98,18 +98,22 @@ export function addArgs(props, dataRefer) {
 
 //Rebuild local variables in the new context
 export function newContext(p2, p3) {
+  if (!p3) {
+    return p2;
+  }
+
   const newData = [];
-  if (p3 && 'data' in p3) {
+  if ('data' in p3) {
     newData.push(p3.data);
   }
-  if (p3 && 'extra' in p3) {
+  if ('extra' in p3) {
     newData.push(p3.extra);
   }
 
   return {
     data: newData.length ? tools.arrayPush(newData, p2.data) : p2.data,
-    parent: p3 && p3.fallback ? p2 : p2.parent,
-    index: p3 && 'index' in p3 ? p3.index : p2.index,
+    parent: p3.fallback ? p2 : p2.parent,
+    index: 'index' in p3 ? p3.index : p2.index,
     level: p2.level,
     getData
   };
