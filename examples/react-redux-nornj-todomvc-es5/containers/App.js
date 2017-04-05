@@ -11,8 +11,6 @@
     ]).isRequired
   },
 
-  template: nj.compileH(document.getElementById('template-app').innerHTML),
-
   addClick: function(text) {
     this.props.dispatch(addTodo(text));
   },
@@ -54,4 +52,6 @@ function select(state) {
 }
 
 //Wrap component,inject dispatch and state into its default connect(select)(App)
-var App = nj.registerComponent('App', ReactRedux.connect(select)(_App));
+var App = nj.registerComponent('App', ReactRedux.connect(select)(
+  njr.registerTmpl({ template: '#template-app' })(_App)
+));

@@ -1,4 +1,4 @@
-﻿nj.registerComponent('Footer', React.createClass({
+﻿njr.registerTmpl('Footer', '#template-footer')(React.createClass({
   propTypes: {
     filter: React.PropTypes.oneOf([
       VisibilityFilters.SHOW_ALL,
@@ -6,8 +6,6 @@
       VisibilityFilters.SHOW_ACTIVE
     ]).isRequired
   },
-
-  template: nj.compileH(document.getElementById('template-footer').innerHTML),
 
   todoState: function(obj) {
     switch (obj) {

@@ -1,4 +1,4 @@
-﻿nj.registerComponent('TodoList', React.createClass({
+﻿njr.registerTmpl('TodoList', '#template-todoList')(React.createClass({
   propTypes: {
     onTodoClick: React.PropTypes.func.isRequired,
     todos: React.PropTypes.arrayOf(React.PropTypes.shape({
@@ -6,8 +6,6 @@
       completed: React.PropTypes.bool.isRequired
     }).isRequired).isRequired
   },
-
-  template: nj.compileH(document.getElementById('template-todoList').innerHTML),
 
   todoClick: function (index) {
     this.props.onTodoClick(index);

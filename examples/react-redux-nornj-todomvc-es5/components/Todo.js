@@ -1,4 +1,4 @@
-﻿nj.registerComponent('Todo', React.createClass({
+﻿njr.registerTmpl('Todo', '#template-todo')(React.createClass({
   propTypes: {
     onClick: React.PropTypes.func.isRequired,
     text: React.PropTypes.string.isRequired,
