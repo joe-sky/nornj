@@ -92,11 +92,16 @@ function _buildOptions(config, useStringLocal, node, fns, exPropsStr, subExProps
 
 function _buildPropData(obj, counter, fns, useStringLocal, level) {
   let dataValueStr,
-    escape = obj.escape;
+    escape = obj.escape,
+    isEmpty = false;
   const { jsProp, isComputed } = obj.prop;
 
   //先生成数据值
-  if (!obj.prop.isBasicType) {
+  if (obj.prop.isBasicType) {
+    dataValueStr = obj.prop.name + jsProp;
+  } else if (obj.prop.isEmpty) {
+    isEmpty = true;
+  } else {
     const { name, parentNum } = obj.prop;
     let data = '',
       special = false,
@@ -140,15 +145,13 @@ function _buildPropData(obj, counter, fns, useStringLocal, level) {
       let dataStr = special === 'custom' ? data : 'p2.' + data;
       dataValueStr = (special ? dataStr : (isComputed ? 'p1.getComputedData(' : '') + 'p2.getData(\'' + name + '\', ' + dataStr + ')' + (isComputed ? ', p2, ' + level + ')' : '')) + jsProp;
     }
-  } else {
-    dataValueStr = obj.prop.name + jsProp;
   }
 
   //有过滤器时需要生成"_value"值
   let filters = obj.prop.filters;
   if (filters) {
     let valueStr = '_value' + counter._value++,
-      filterStr = 'var ' + valueStr + ' = ' + dataValueStr + ';\n';
+      filterStr = 'var ' + valueStr + ' = ' + (!isEmpty ? dataValueStr : 'null') + ';\n';
 
     tools.each(filters, function(o) {
       let _filterC = counter._filter++,
@@ -168,7 +171,7 @@ function _buildPropData(obj, counter, fns, useStringLocal, level) {
       filterStr += '}\n';
       filterStr += 'else {\n';
 
-      const _filterStr = '  ' + valueStr + ' = ' + filterVarStr + '.apply(p2, [' + valueStr +
+      const _filterStr = '  ' + valueStr + ' = ' + filterVarStr + '.apply(p2, [' + (!isEmpty ? valueStr + ', ' : '') +
         ((o.params && o.params.length) ? o.params.reduce((p, c) => {
           const propStr = _buildPropData({
             prop: c,
@@ -176,13 +179,13 @@ function _buildPropData(obj, counter, fns, useStringLocal, level) {
           }, counter, fns, useStringLocal, level);
 
           if (tools.isString(propStr)) {
-            return p + ', ' + propStr;
+            return p + propStr + ', ';
           } else {
             filterStrI += propStr.filterStr;
-            return p + ', ' + propStr.valueStr;
+            return p + propStr.valueStr + ', ';
           }
         }, '') : '') +
-        ', ' + _buildOptions(configF, useStringLocal, null, fns) +
+        _buildOptions(configF, useStringLocal, null, fns) +
         ']);\n';
 
       if (filterStrI !== '') {

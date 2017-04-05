@@ -19,6 +19,10 @@ describe('test compile string', function () {
     nj.registerFilter('tagName', function (v) {
       return v + 'Tmp';
     });
+    nj.registerFilter('emptyFilter', function (n) {
+      return 'emptyFilter' + n;
+    });
+
     nj.registerExtension('textExpr', function (arg1, arg2, opts) {
       //return opts.props.tmpls[0]();
       //console.log(opts.props.args);
@@ -180,7 +184,17 @@ describe('test compile string', function () {
       <#once>
         <@resetList><#list {{id}} {{c1}} /></@resetList>
         <!DOCTYPE html>
-        <#with {{name3}} as=name5>{{name5}}</#with>
+        <#with {{name3}} as=name5>{{{
+          JSON #('stringify', 
+            list(
+              1,
+              obj(
+                'a' :(1),
+                'b' :(2)
+              )
+            )
+          )
+        }}}</#with>
         <#each {{list}}>
           <div>{{this}}</div>
           {{this}}
@@ -201,7 +215,7 @@ describe('test compile string', function () {
           }
         </script>
       </#once>
-      {{JSON #('stringify', @data[0])}}
+      {{{JSON #('stringify', @data[0])}}}
       <#each {{ list2 }}>
         <#pre>
         <!-- aaa -->

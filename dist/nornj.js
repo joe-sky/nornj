@@ -806,7 +806,7 @@ var extensionConfig = {
   obj: _config({ onlyGlobal: true, newContext: false, useString: false }),
   list: _config(_defaultCfg),
   fn: _config({ onlyGlobal: true, useString: false }),
-  'with': _config(_defaultCfg)
+  'with': _config({ onlyGlobal: true })
 };
 extensionConfig.elseif = _config(extensionConfig['else']);
 extensionConfig['for'] = _config(extensionConfig.each);
@@ -1235,6 +1235,33 @@ var filters = {
     }
 
     return Boolean(val);
+  },
+
+  obj: function obj() {
+    var args = arguments,
+        ret = {};
+
+    if (args.length > 1) {
+      __WEBPACK_IMPORTED_MODULE_1__utils_tools__["c" /* each */](args, function (v, i, l) {
+        if (i < l - 1) {
+          ret[v.key] = v.val;
+        }
+      }, false, true);
+    }
+    return ret;
+  },
+
+  ':': function _(key, val) {
+    return { key: key, val: val };
+  },
+
+  list: function list() {
+    var args = arguments;
+    if (args.length === 1) {
+      return [];
+    } else {
+      return __WEBPACK_IMPORTED_MODULE_1__utils_tools__["j" /* arraySlice */](args, 0, args.length - 1);
+    }
   }
 };
 
@@ -1275,7 +1302,10 @@ var filterConfig = {
   or: _config(_defaultCfg),
   int: _config(_defaultCfg),
   float: _config(_defaultCfg),
-  bool: _config(_defaultCfg)
+  bool: _config(_defaultCfg),
+  obj: _config(_defaultCfg),
+  ':': _config(_defaultCfg),
+  list: _config(_defaultCfg)
 };
 
 //Filter alias
@@ -1889,25 +1919,27 @@ function _compiledProp(prop, innerBrackets) {
   }
 
   //Extract the js property
-  prop = REGEX_JS_PROP.exec(prop);
-  var hasComputed = prop[7];
-  ret.name = hasComputed ? prop[8] : prop[1];
-  ret.jsProp = prop[9];
+  if (prop !== '') {
+    prop = REGEX_JS_PROP.exec(prop);
+    var hasComputed = prop[7];
+    ret.name = hasComputed ? prop[8] : prop[1];
+    ret.jsProp = prop[9];
 
-  if (!prop[8]) {
-    //Sign the parameter is a basic type value.
-    ret.isBasicType = true;
-  }
-  if (hasComputed) {
-    ret.isComputed = true;
+    if (!prop[8]) {
+      //Sign the parameter is a basic type value.
+      ret.isBasicType = true;
+    }
+    if (hasComputed) {
+      ret.isComputed = true;
+    }
+  } else {
+    ret.isEmpty = true;
   }
 
   return ret;
 }
 
 //Get filter param
-var REGEX_FILTER_PARAM = /([^\s]+)(_njBracket_([\d]+))*/;
-
 function _getFilterParam(obj) {
   return obj.split('_njBracket_');
 }
@@ -1939,13 +1971,13 @@ function _getReplaceParam(obj, tmplRule) {
     }
 
     //替换特殊过滤器名称并且为简化过滤器补全"|"符
-    prop = prop.trim().replace(REGEX_SP_FILTER, function (all, match) {
+    prop = prop.replace(REGEX_SP_FILTER, function (all, match) {
       return ' ' + SP_FILTER_LOOKUP[match];
     }).replace(REGEX_FIX_FILTER, function (all, s1, s2) {
       return s1 ? all : '|' + s2;
     });
 
-    item[2] = prop;
+    item[2] = prop.trim();
     ret.push(item);
     i++;
   }
@@ -2374,14 +2406,19 @@ function _buildOptions(config, useStringLocal, node, fns, exPropsStr, subExProps
 
 function _buildPropData(obj, counter, fns, useStringLocal, level) {
   var dataValueStr = void 0,
-      escape = obj.escape;
+      escape = obj.escape,
+      isEmpty = false;
   var _obj$prop = obj.prop,
       jsProp = _obj$prop.jsProp,
       isComputed = _obj$prop.isComputed;
 
   //先生成数据值
 
-  if (!obj.prop.isBasicType) {
+  if (obj.prop.isBasicType) {
+    dataValueStr = obj.prop.name + jsProp;
+  } else if (obj.prop.isEmpty) {
+    isEmpty = true;
+  } else {
     var _obj$prop2 = obj.prop,
         name = _obj$prop2.name,
         parentNum = _obj$prop2.parentNum;
@@ -2428,8 +2465,6 @@ function _buildPropData(obj, counter, fns, useStringLocal, level) {
       var dataStr = special === 'custom' ? data : 'p2.' + data;
       dataValueStr = (special ? dataStr : (isComputed ? 'p1.getComputedData(' : '') + 'p2.getData(\'' + name + '\', ' + dataStr + ')' + (isComputed ? ', p2, ' + level + ')' : '')) + jsProp;
     }
-  } else {
-    dataValueStr = obj.prop.name + jsProp;
   }
 
   //有过滤器时需要生成"_value"值
@@ -2437,7 +2472,7 @@ function _buildPropData(obj, counter, fns, useStringLocal, level) {
   if (filters) {
     var _ret = function () {
       var valueStr = '_value' + counter._value++,
-          filterStr = 'var ' + valueStr + ' = ' + dataValueStr + ';\n';
+          filterStr = 'var ' + valueStr + ' = ' + (!isEmpty ? dataValueStr : 'null') + ';\n';
 
       __WEBPACK_IMPORTED_MODULE_1__utils_tools__["c" /* each */](filters, function (o) {
         var _filterC = counter._filter++,
@@ -2459,19 +2494,19 @@ function _buildPropData(obj, counter, fns, useStringLocal, level) {
         filterStr += '}\n';
         filterStr += 'else {\n';
 
-        var _filterStr = '  ' + valueStr + ' = ' + filterVarStr + '.apply(p2, [' + valueStr + (o.params && o.params.length ? o.params.reduce(function (p, c) {
+        var _filterStr = '  ' + valueStr + ' = ' + filterVarStr + '.apply(p2, [' + (!isEmpty ? valueStr + ', ' : '') + (o.params && o.params.length ? o.params.reduce(function (p, c) {
           var propStr = _buildPropData({
             prop: c,
             escape: escape
           }, counter, fns, useStringLocal, level);
 
           if (__WEBPACK_IMPORTED_MODULE_1__utils_tools__["b" /* isString */](propStr)) {
-            return p + ', ' + propStr;
+            return p + propStr + ', ';
           } else {
             filterStrI += propStr.filterStr;
-            return p + ', ' + propStr.valueStr;
+            return p + propStr.valueStr + ', ';
           }
-        }, '') : '') + ', ' + _buildOptions(configF, useStringLocal, null, fns) + ']);\n';
+        }, '') : '') + _buildOptions(configF, useStringLocal, null, fns) + ']);\n';
 
         if (filterStrI !== '') {
           filterStr += filterStrI;

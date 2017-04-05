@@ -60,24 +60,26 @@ function _compiledProp(prop, innerBrackets) {
   }
 
   //Extract the js property
-  prop = REGEX_JS_PROP.exec(prop);
-  const hasComputed = prop[7];
-  ret.name = hasComputed ? prop[8] : prop[1];
-  ret.jsProp = prop[9];
+  if (prop !== '') {
+    prop = REGEX_JS_PROP.exec(prop);
+    const hasComputed = prop[7];
+    ret.name = hasComputed ? prop[8] : prop[1];
+    ret.jsProp = prop[9];
 
-  if (!prop[8]) { //Sign the parameter is a basic type value.
-    ret.isBasicType = true;
-  }
-  if (hasComputed) {
-    ret.isComputed = true;
+    if (!prop[8]) { //Sign the parameter is a basic type value.
+      ret.isBasicType = true;
+    }
+    if (hasComputed) {
+      ret.isComputed = true;
+    }
+  } else {
+    ret.isEmpty = true;
   }
 
   return ret;
 }
 
 //Get filter param
-const REGEX_FILTER_PARAM = /([^\s]+)(_njBracket_([\d]+))*/;
-
 function _getFilterParam(obj) {
   return obj.split('_njBracket_');
 }
@@ -107,11 +109,10 @@ function _getReplaceParam(obj, tmplRule) {
     }
 
     //替换特殊过滤器名称并且为简化过滤器补全"|"符
-    prop = prop.trim()
-      .replace(REGEX_SP_FILTER, (all, match) => ' ' + SP_FILTER_LOOKUP[match])
+    prop = prop.replace(REGEX_SP_FILTER, (all, match) => ' ' + SP_FILTER_LOOKUP[match])
       .replace(REGEX_FIX_FILTER, (all, s1, s2) => s1 ? all : '|' + s2);
 
-    item[2] = prop;
+    item[2] = prop.trim();
     ret.push(item);
     i++;
   }

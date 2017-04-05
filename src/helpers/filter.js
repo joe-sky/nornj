@@ -72,6 +72,33 @@ export const filters = {
     }
 
     return Boolean(val);
+  },
+
+  obj: function() {
+    let args = arguments,
+      ret = {};
+
+    if (args.length > 1) {
+      tools.each(args, (v, i, l) => {
+        if (i < l - 1) {
+          ret[v.key] = v.val;
+        }
+      }, false, true);
+    }
+    return ret;
+  },
+
+  ':': (key, val) => {
+    return { key, val };
+  },
+
+  list: function() {
+    let args = arguments;
+    if (args.length === 1) {
+      return [];
+    } else {
+      return tools.arraySlice(args, 0, args.length - 1);
+    }
   }
 };
 
@@ -112,7 +139,10 @@ export const filterConfig = {
   or: _config(_defaultCfg),
   int: _config(_defaultCfg),
   float: _config(_defaultCfg),
-  bool: _config(_defaultCfg)
+  bool: _config(_defaultCfg),
+  obj: _config(_defaultCfg),
+  ':': _config(_defaultCfg),
+  list: _config(_defaultCfg)
 };
 
 //Filter alias

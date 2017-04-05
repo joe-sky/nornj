@@ -319,7 +319,7 @@ export const extensionConfig = {
   obj: _config({ onlyGlobal: true, newContext: false, useString: false }),
   list: _config(_defaultCfg),
   fn: _config({ onlyGlobal: true, useString: false }),
-  'with': _config(_defaultCfg)
+  'with': _config({ onlyGlobal: true })
 };
 extensionConfig.elseif = _config(extensionConfig['else']);
 extensionConfig['for'] = _config(extensionConfig.each);
