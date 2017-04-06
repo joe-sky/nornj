@@ -1633,6 +1633,9 @@ function _getSplitParams(elem, tmplRule) {
 
 //Set self close element node
 function _setSelfCloseElem(elem, elemName, elemParams, elemArr, tmplRule) {
+  if (/\/$/.test(elemName)) {
+    elemName = elemName.substr(0, elemName.length - 1);
+  }
   _setElem(elem, elemName, elemParams, elemArr, true, tmplRule);
 }
 
@@ -1662,6 +1665,8 @@ function _setText(text, elemArr) {
 /* harmony export (immutable) */ __webpack_exports__["f"] = isParamsEx;
 /* harmony export (immutable) */ __webpack_exports__["l"] = addParamsEx;
 /* harmony export (immutable) */ __webpack_exports__["g"] = isExProp;
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 
 
 
@@ -1786,26 +1791,18 @@ function addTmpl(node, parent, name) {
 
   var tmpls = paramsP.tmpls;
   if (!tmpls) {
-    var objT = { length: 0 };
-    if (name != null) {
-      objT[name] = node;
-    } else {
-      objT['0'] = node;
-      objT.length = 1;
-    }
+    var _objT;
+
+    var objT = (_objT = {}, _defineProperty(_objT, name != null ? name : '_njT0', { node: node, no: 0 }), _defineProperty(_objT, '_njLen', 1), _objT);
 
     paramsP.tmpls = __WEBPACK_IMPORTED_MODULE_2__transformParam__["a" /* compiledParam */](objT);
   } else {
     //Insert the compiled template to the parameter name for "tmpls"'s "strs" array.
-    var _objT = tmpls.strs[0],
-        len = _objT.length;
+    var _objT2 = tmpls.strs[0],
+        len = _objT2._njLen;
 
-    if (name != null) {
-      _objT[name] = node;
-    } else {
-      _objT[len] = node;
-      _objT.length = ++len;
-    }
+    _objT2[name != null ? name : '_njT' + len] = { node: node, no: len };
+    _objT2._njLen = ++len;
   }
 }
 
@@ -2107,9 +2104,9 @@ function _createCompile(outputH) {
             }
             root = _createAstRoot();
 
-            //Auto transform string template to array
+            //Transform string template to preAst
             if (__WEBPACK_IMPORTED_MODULE_1__utils_tools__["b" /* isString */](tmpl)) {
-              //Merge all include blocks
+              //Merge all include tags
               var includeParser = __WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */].includeParser;
               if (includeParser) {
                 tmpl = includeParser(tmpl, fileName, tmplRule);
@@ -2275,7 +2272,8 @@ function registerComponent(name, component) {
 
 
 
-function createTaggedTmpl(opts) {
+function createTaggedTmpl() {
+  var opts = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
   var outputH = opts.outputH,
       delimiters = opts.delimiters;
 
@@ -2583,12 +2581,16 @@ function _buildProps(obj, counter, fns, useStringLocal, level) {
         return false;
       }
     }, false, true);
-  } else if (__WEBPACK_IMPORTED_MODULE_1__utils_tools__["k" /* isObject */](str0) && str0.length != null) {
+  } else if (__WEBPACK_IMPORTED_MODULE_1__utils_tools__["k" /* isObject */](str0) && str0._njLen != null) {
     //tmpl标签
     valueStr += '{\n';
     __WEBPACK_IMPORTED_MODULE_1__utils_tools__["c" /* each */](str0, function (v, k, i, l) {
-      if (k !== 'length') {
-        valueStr += '  "' + k + '": p1.main' + _buildFn(v.content, v, fns, 'T' + ++fns._noT);
+      if (k !== '_njLen') {
+        var fnStr = 'p1.main' + _buildFn(v.node.content, v.node, fns, 'T' + ++fns._noT);
+        valueStr += '  "' + v.no + '": ' + fnStr;
+        if (k.indexOf('_njT') !== 0) {
+          valueStr += ',\n  "' + k + '": ' + fnStr;
+        }
       } else {
         valueStr += '  length: ' + v;
       }
@@ -3092,6 +3094,9 @@ function checkElem(obj, parent, tmplRule, hasExProps, noSplitNewline, isLast) {
       if (xmlOpenTag) {
         //tagname为xml标签时,则认为是元素节点
         openTagName = xmlOpenTag[1];
+        if (/\/$/.test(openTagName)) {
+          openTagName = openTagName.substr(0, openTagName.length - 1);
+        }
 
         if (!__WEBPACK_IMPORTED_MODULE_3__transforms_transformElement__["c" /* isXmlSelfCloseTag */](first)) {
           //非自闭合标签才验证是否存在关闭标签

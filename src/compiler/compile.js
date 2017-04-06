@@ -45,9 +45,9 @@ function _createCompile(outputH) {
             }
             root = _createAstRoot();
 
-            //Auto transform string template to array
+            //Transform string template to preAst
             if (tools.isString(tmpl)) {
-              //Merge all include blocks
+              //Merge all include tags
               const includeParser = nj.includeParser;
               if (includeParser) {
                 tmpl = includeParser(tmpl, fileName, tmplRule);

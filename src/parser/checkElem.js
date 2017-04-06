@@ -65,6 +65,9 @@ export default function checkElem(obj, parent, tmplRule, hasExProps, noSplitNewl
       const xmlOpenTag = tranElem.getXmlOpenTag(first, tmplRule);
       if (xmlOpenTag) { //tagname为xml标签时,则认为是元素节点
         openTagName = xmlOpenTag[1];
+        if (/\/$/.test(openTagName)) {
+          openTagName = openTagName.substr(0, openTagName.length - 1);
+        }
 
         if (!tranElem.isXmlSelfCloseTag(first)) { //非自闭合标签才验证是否存在关闭标签
           hasCloseTag = tranElem.isXmlCloseTag(last, openTagName);

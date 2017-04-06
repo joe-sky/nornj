@@ -199,13 +199,16 @@ function _getSplitParams(elem, tmplRule) {
   });
 
   return {
-    elem: elem,
+    elem,
     params: paramsEx
   };
 }
 
 //Set self close element node
 function _setSelfCloseElem(elem, elemName, elemParams, elemArr, tmplRule) {
+  if (/\/$/.test(elemName)) {
+    elemName = elemName.substr(0, elemName.length - 1);
+  }
   _setElem(elem, elemName, elemParams, elemArr, true, tmplRule);
 }
 

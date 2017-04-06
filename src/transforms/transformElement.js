@@ -119,25 +119,18 @@ export function addTmpl(node, parent, name) {
 
   const tmpls = paramsP.tmpls;
   if (!tmpls) {
-    let objT = { length: 0 };
-    if (name != null) {
-      objT[name] = node;
-    } else {
-      objT['0'] = node;
-      objT.length = 1;
-    }
+    const objT = {
+      [name != null ? name : '_njT0']: { node, no: 0 },
+      _njLen: 1
+    };
 
     paramsP.tmpls = tranParam.compiledParam(objT);
   } else { //Insert the compiled template to the parameter name for "tmpls"'s "strs" array.
     let objT = tmpls.strs[0],
-      len = objT.length;
+      len = objT._njLen;
 
-    if (name != null) {
-      objT[name] = node;
-    } else {
-      objT[len] = node;
-      objT.length = ++len;
-    }
+    objT[name != null ? name : ('_njT' + len)] = { node, no: len };
+    objT._njLen = ++len;
   }
 }
 

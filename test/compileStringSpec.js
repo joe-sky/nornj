@@ -208,6 +208,10 @@ describe('test compile string', function () {
           function test() {
             console.log(1);
 
+            if(i <img1 /> 10) {
+              return;
+            }
+
             function test2() {
               console.log('    <div  >a<img    />  b  </div>  <div>  '
                 + ' <img /> </div>  ');

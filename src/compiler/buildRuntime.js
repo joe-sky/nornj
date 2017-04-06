@@ -258,11 +258,15 @@ function _buildProps(obj, counter, fns, useStringLocal, level) {
         return false;
       }
     }, false, true);
-  } else if (tools.isObject(str0) && str0.length != null) { //tmpl标签
+  } else if (tools.isObject(str0) && str0._njLen != null) { //tmpl标签
     valueStr += '{\n';
     tools.each(str0, function(v, k, i, l) {
-      if (k !== 'length') {
-        valueStr += '  "' + k + '": p1.main' + _buildFn(v.content, v, fns, 'T' + ++fns._noT);
+      if (k !== '_njLen') {
+        const fnStr = 'p1.main' + _buildFn(v.node.content, v.node, fns, 'T' + ++fns._noT);
+        valueStr += '  "' + v.no + '": ' + fnStr;
+        if(k.indexOf('_njT') !== 0) {
+          valueStr += ',\n  "' + k + '": ' + fnStr;
+        }
       } else {
         valueStr += '  length: ' + v;
       }

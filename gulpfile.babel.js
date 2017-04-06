@@ -79,7 +79,7 @@ gulp.task('lib', () => gulp.src('./src/**/*.js')
 );
 
 //Unit testing
-gulp.task('tdd', () => gulp.src('./test/**/*.spec.js')
+gulp.task('tdd', () => gulp.src('./test/compileStringSpec.js')
   .pipe(jasmine({
     includeStackTrace: true
   }))
