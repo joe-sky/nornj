@@ -1519,7 +1519,7 @@ function _checkStringElem(xml, tmplRule) {
         textAfter = matchArr[5];
 
     //Text before tag
-    if (textBefore && textBefore !== '\n') {
+    if (textBefore && textBefore !== '') {
       _setText(textBefore, current.elem);
     }
 
@@ -1553,7 +1553,7 @@ function _checkStringElem(xml, tmplRule) {
     }
 
     //Text after tag
-    if (textAfter && textAfter !== '\n') {
+    if (textAfter && textAfter !== '') {
       _setText(textAfter, current.elem);
     }
   }
@@ -2008,7 +2008,7 @@ function compiledParam(value, tmplRule) {
   if (isStr) {
     //替换插值变量以外的文本中的换行符
     strs = strs.map(function (str) {
-      return str.replace(/\n/g, '\\n').replace(/\r/g, '');
+      return str.replace(/\n/g, '_njNl_').replace(/\r/g, '');
     });
   }
 
@@ -2464,6 +2464,9 @@ function _buildPropData(obj, counter, fns, useStringLocal, level) {
       dataValueStr = (special ? dataStr : (isComputed ? 'p1.getComputedData(' : '') + 'p2.getData(\'' + name + '\', ' + dataStr + ')' + (isComputed ? ', p2, ' + level + ')' : '')) + jsProp;
     }
   }
+  if (dataValueStr) {
+    dataValueStr = _replaceBackslash(dataValueStr);
+  }
 
   //有过滤器时需要生成"_value"值
   var filters = obj.prop.filters;
@@ -2540,8 +2543,12 @@ function _buildEscape(valueStr, fns, escape) {
   }
 }
 
-function _replaceQuot(str) {
-  return str.replace(/'/g, "\\'");
+function _replaceStrs(str) {
+  return _replaceBackslash(str).replace(/_njNl_/g, '\\n').replace(/'/g, "\\'");
+}
+
+function _replaceBackslash(str) {
+  return str = str.replace(/\\/g, '\\\\');
 }
 
 function _buildProps(obj, counter, fns, useStringLocal, level) {
@@ -2551,7 +2558,7 @@ function _buildProps(obj, counter, fns, useStringLocal, level) {
 
   if (__WEBPACK_IMPORTED_MODULE_1__utils_tools__["b" /* isString */](str0)) {
     //常规属性
-    valueStr = !obj.isAll && str0 !== '' ? '\'' + _replaceQuot(str0) + '\'' : '';
+    valueStr = !obj.isAll && str0 !== '' ? '\'' + _replaceStrs(str0) + '\'' : '';
     filterStr = '';
 
     __WEBPACK_IMPORTED_MODULE_1__utils_tools__["c" /* each */](obj.props, function (o, i) {
@@ -2573,7 +2580,7 @@ function _buildProps(obj, counter, fns, useStringLocal, level) {
         //   return;
         // }
 
-        dataValueStr = prefixStr + '(' + dataValueStr + ')' + (strI !== '' ? ' + \'' + _replaceQuot(strI) + '\'' : '');
+        dataValueStr = prefixStr + '(' + dataValueStr + ')' + (strI !== '' ? ' + \'' + _replaceStrs(strI) + '\'' : '');
       }
 
       valueStr += dataValueStr;

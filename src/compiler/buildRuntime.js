@@ -146,6 +146,9 @@ function _buildPropData(obj, counter, fns, useStringLocal, level) {
       dataValueStr = (special ? dataStr : (isComputed ? 'p1.getComputedData(' : '') + 'p2.getData(\'' + name + '\', ' + dataStr + ')' + (isComputed ? ', p2, ' + level + ')' : '')) + jsProp;
     }
   }
+  if (dataValueStr) {
+    dataValueStr = _replaceBackslash(dataValueStr);
+  }
 
   //有过滤器时需要生成"_value"值
   let filters = obj.prop.filters;
@@ -197,7 +200,7 @@ function _buildPropData(obj, counter, fns, useStringLocal, level) {
 
     return {
       valueStr: _buildEscape(valueStr, fns, isComputed ? false : escape),
-      filterStr: filterStr
+      filterStr
     };
   } else {
     return _buildEscape(dataValueStr, fns, isComputed ? false : escape);
@@ -216,8 +219,12 @@ function _buildEscape(valueStr, fns, escape) {
   }
 }
 
-function _replaceQuot(str) {
-  return str.replace(/'/g, "\\'");
+function _replaceStrs(str) {
+  return _replaceBackslash(str).replace(/_njNl_/g, '\\n').replace(/'/g, "\\'");
+}
+
+function _replaceBackslash(str) {
+  return str = str.replace(/\\/g, '\\\\');
 }
 
 function _buildProps(obj, counter, fns, useStringLocal, level) {
@@ -226,7 +233,7 @@ function _buildProps(obj, counter, fns, useStringLocal, level) {
     filterStr = '';
 
   if (tools.isString(str0)) { //常规属性
-    valueStr = !obj.isAll && str0 !== '' ? ('\'' + _replaceQuot(str0) + '\'') : '';
+    valueStr = !obj.isAll && str0 !== '' ? ('\'' + _replaceStrs(str0) + '\'') : '';
     filterStr = '';
 
     tools.each(obj.props, function(o, i) {
@@ -250,7 +257,7 @@ function _buildProps(obj, counter, fns, useStringLocal, level) {
 
         dataValueStr = prefixStr +
           '(' + dataValueStr + ')' +
-          (strI !== '' ? ' + \'' + _replaceQuot(strI) + '\'' : '');
+          (strI !== '' ? ' + \'' + _replaceStrs(strI) + '\'' : '');
       }
 
       valueStr += dataValueStr;
@@ -264,7 +271,7 @@ function _buildProps(obj, counter, fns, useStringLocal, level) {
       if (k !== '_njLen') {
         const fnStr = 'p1.main' + _buildFn(v.node.content, v.node, fns, 'T' + ++fns._noT);
         valueStr += '  "' + v.no + '": ' + fnStr;
-        if(k.indexOf('_njT') !== 0) {
+        if (k.indexOf('_njT') !== 0) {
           valueStr += ',\n  "' + k + '": ' + fnStr;
         }
       } else {

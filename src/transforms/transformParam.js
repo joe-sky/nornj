@@ -144,7 +144,7 @@ export function compiledParam(value, tmplRule) {
     isAll = false; //此处指替换符是否占满整个属性值;若无替换符时为false
 
   if (isStr) { //替换插值变量以外的文本中的换行符
-    strs = strs.map(str => str.replace(/\n/g, '\\n').replace(/\r/g, ''));
+    strs = strs.map(str => str.replace(/\n/g, '_njNl_').replace(/\r/g, ''));
   }
 
   //If have placehorder

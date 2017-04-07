@@ -208,6 +208,8 @@ describe('test compile string', function () {
           function test() {
             console.log(1);
 
+            var reg = /\\n+/;
+
             if(i <img1 /> 10) {
               return;
             }
@@ -231,7 +233,7 @@ describe('test compile string', function () {
         ]]>
         </#pre>
         <div {{...props}} ...${{ id10: 'id_10' }}>
-          <@id>d1</@id>
+          <@id>{{'\\d'}}</@id>
           <@name>
             img
             img

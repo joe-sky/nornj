@@ -101,7 +101,7 @@ function _checkStringElem(xml, tmplRule) {
       textAfter = matchArr[5];
 
     //Text before tag
-    if (textBefore && textBefore !== '\n') {
+    if (textBefore && textBefore !== '') {
       _setText(textBefore, current.elem);
     }
 
@@ -131,7 +131,7 @@ function _checkStringElem(xml, tmplRule) {
     }
 
     //Text after tag
-    if (textAfter && textAfter !== '\n') {
+    if (textAfter && textAfter !== '') {
       _setText(textAfter, current.elem);
     }
   }
