@@ -2402,6 +2402,7 @@ function _buildOptions(config, useStringLocal, node, fns, exPropsStr, subExProps
   return '{ _njOpts: true, _njFnsNo: ' + fns._no + ', global: p1, context: p2, outputH: ' + !fns.useString + hashStr + ' }';
 }
 
+var CUSTOM_VAR = 'nj_custom';
 function _buildPropData(obj, counter, fns, useStringLocal, level) {
   var dataValueStr = void 0,
       escape = obj.escape,
@@ -2440,7 +2441,23 @@ function _buildPropData(obj, counter, fns, useStringLocal, level) {
         break;
       case '@global':
         data = 'p1.global';
-        special = 'custom';
+        special = CUSTOM_VAR;
+        break;
+      case '@lt':
+        data = '\'<\'';
+        special = CUSTOM_VAR;
+        break;
+      case '@gt':
+        data = '\'>\'';
+        special = CUSTOM_VAR;
+        break;
+      case '@lb':
+        data = '\'{\'';
+        special = CUSTOM_VAR;
+        break;
+      case '@rb':
+        data = '\'}\'';
+        special = CUSTOM_VAR;
         break;
     }
 
@@ -2460,7 +2477,7 @@ function _buildPropData(obj, counter, fns, useStringLocal, level) {
     if (!special && !specialP) {
       dataValueStr = (isComputed ? 'p1.getComputedData(' : '') + 'p2.getData(\'' + name + '\')' + (isComputed ? ', p2, ' + level + ')' : '') + jsProp;
     } else {
-      var dataStr = special === 'custom' ? data : 'p2.' + data;
+      var dataStr = special === CUSTOM_VAR ? data : 'p2.' + data;
       dataValueStr = (special ? dataStr : (isComputed ? 'p1.getComputedData(' : '') + 'p2.getData(\'' + name + '\', ' + dataStr + ')' + (isComputed ? ', p2, ' + level + ')' : '')) + jsProp;
     }
   }

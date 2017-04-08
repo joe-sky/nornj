@@ -210,7 +210,7 @@ describe('test compile string', function () {
 
             var reg = /\\n+/;
 
-            if(i <img1 /> 10) {
+            if(i {{{@lt}}} 10) {
               return;
             }
 
