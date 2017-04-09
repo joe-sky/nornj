@@ -91,6 +91,8 @@ export default function createTmplRule(rules = {}, isGlobal) {
     extension: _createRegExp('^' + escapeExtensionRule + '([^\\s]+)', 'i'),
     include: _createRegExp('<' + escapeExtensionRule + 'include([^>]*)>', 'ig'),
     newlineSplit: _createRegExp('\\n(?![^' + firstChar + lastChar + ']*' + lastChar + ')', 'g'),
+    incompleteStart: _createRegExp('[' + firstChar + ']?' + startRule + '[^' + allRules + ']*$'),
+    incompleteEnd: _createRegExp('^[^' + allRules + ']*' + endRule + '[' + lastChar + ']?')
   };
   
   if(isGlobal) {  //Reset the regexs to global list

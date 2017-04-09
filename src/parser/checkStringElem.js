@@ -14,7 +14,8 @@ export default function compileStringTmpl(tmpl) {
     let isStr = tools.isString(tmpl),
       xmls = isStr ? [tmpl] : tmpl,
       l = xmls.length,
-      fullXml = '';
+      fullXml = '',
+      isInBrace = false;
 
     //Connection xml string
     tools.each(xmls, (xml, i) => {
@@ -26,15 +27,22 @@ export default function compileStringTmpl(tmpl) {
           isComputed = lastChar === '#',
           isSpread = lastChar3 === '...';
 
+        if (isInBrace) {
+          isInBrace = !tmplRule.incompleteEnd.test(xml);
+        }
+        if (!isInBrace && tmplRule.incompleteStart.test(xml)) {
+          isInBrace = true;
+        }
         if (isComputed) {
           xml = xml.substr(0, last);
         } else if (isSpread) {
           xml = xml.substr(0, last - 2);
         }
 
-        split = tmplRule.startRule +
-          (isComputed ? '#' : (isSpread ? '...' : '')) + SPLIT_FLAG + i +
-          tmplRule.endRule;
+        split = (isComputed ? '#' : (isSpread ? '...' : '')) + SPLIT_FLAG + i;
+        if (!isInBrace) {
+          split = tmplRule.startRule + split + tmplRule.endRule;
+        }
       }
 
       fullXml += xml + split;

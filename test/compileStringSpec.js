@@ -233,7 +233,7 @@ describe('test compile string', function () {
         ]]>
         </#pre>
         <div {{...props}} ...${{ id10: 'id_10' }}>
-          <@id>{{'\\d'}}</@id>
+          <@id>{{'bbb' +(${'aaa'}) +(${'ccc'} | filter2)}}</@id>
           <@name>
             img
             img

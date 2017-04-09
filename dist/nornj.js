@@ -428,7 +428,9 @@ function createTmplRule() {
     checkElem: _createRegExp('([^<>]+)|(<([a-z/!' + firstChar + extensionRules + '][^\\s>]*)([^>]*)>)([^<]*)', 'ig'),
     extension: _createRegExp('^' + escapeExtensionRule + '([^\\s]+)', 'i'),
     include: _createRegExp('<' + escapeExtensionRule + 'include([^>]*)>', 'ig'),
-    newlineSplit: _createRegExp('\\n(?![^' + firstChar + lastChar + ']*' + lastChar + ')', 'g')
+    newlineSplit: _createRegExp('\\n(?![^' + firstChar + lastChar + ']*' + lastChar + ')', 'g'),
+    incompleteStart: _createRegExp('[' + firstChar + ']?' + startRule + '[^' + allRules + ']*$'),
+    incompleteEnd: _createRegExp('^[^' + allRules + ']*' + endRule + '[' + lastChar + ']?')
   };
 
   if (isGlobal) {
@@ -1433,7 +1435,8 @@ function compileStringTmpl(tmpl) {
       var isStr = __WEBPACK_IMPORTED_MODULE_1__utils_tools__["b" /* isString */](tmpl),
           xmls = isStr ? [tmpl] : tmpl,
           l = xmls.length,
-          fullXml = '';
+          fullXml = '',
+          isInBrace = false;
 
       //Connection xml string
       __WEBPACK_IMPORTED_MODULE_1__utils_tools__["c" /* each */](xmls, function (xml, i) {
@@ -1445,13 +1448,22 @@ function compileStringTmpl(tmpl) {
               isComputed = lastChar === '#',
               isSpread = lastChar3 === '...';
 
+          if (isInBrace) {
+            isInBrace = !tmplRule.incompleteEnd.test(xml);
+          }
+          if (!isInBrace && tmplRule.incompleteStart.test(xml)) {
+            isInBrace = true;
+          }
           if (isComputed) {
             xml = xml.substr(0, last);
           } else if (isSpread) {
             xml = xml.substr(0, last - 2);
           }
 
-          split = tmplRule.startRule + (isComputed ? '#' : isSpread ? '...' : '') + SPLIT_FLAG + i + tmplRule.endRule;
+          split = (isComputed ? '#' : isSpread ? '...' : '') + SPLIT_FLAG + i;
+          if (!isInBrace) {
+            split = tmplRule.startRule + split + tmplRule.endRule;
+          }
         }
 
         fullXml += xml + split;
