@@ -6,7 +6,7 @@ const REGEX_JS_PROP = /(('[^']*')|("[^"]*")|(-?([0-9][0-9]*)(\.\d+)?)|true|false
 
 function _compiledProp(prop, innerBrackets) {
   let ret = tools.obj();
-
+  
   //If there are vertical lines in the property,then use filter
   if (prop.indexOf('|') >= 0) {
     let filters = [],
@@ -110,7 +110,7 @@ function _getReplaceParam(obj, tmplRule) {
 
     //替换特殊过滤器名称并且为简化过滤器补全"|"符
     prop = prop.replace(REGEX_SP_FILTER, (all, match) => ' ' + SP_FILTER_LOOKUP[match])
-      .replace(REGEX_FIX_FILTER, (all, s1, s2) => s1 ? all : '|' + s2);
+      .replace(REGEX_FIX_FILTER, (all, s1, s2) => s1 ? all : ' | ' + s2);
 
     item[2] = prop.trim();
     ret.push(item);

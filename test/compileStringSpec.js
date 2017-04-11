@@ -209,28 +209,31 @@ describe('test compile string', function () {
             console.log(1);
 
             var reg = /\\n+/;
+            var a = '{{ @lt +('test') +(@gt) }}';
 
-            if(i {{{@lt}}} 10) {
+            if(i {{@lt}} 10) {
               return;
             }
 
             function test2() {
-              console.log('    <div  >a<img    />  b  </div>  <div>  '
+              console.log('    {{@lt}}div  >a{{@lt}}img    />  b  </div>  <div>  '
                 + ' <img /> </div>  ');
             }
+
+            var scriptUrl = '{{@lt}}script src="'+prefix+'/resources/app/pages/'+path+'index.js">' + '{{@lt}}/' + 'script>';
           }
         </script>
       </#once>
       {{{JSON #('stringify', @data[0])}}}
       <#each {{ list2 }}>
         <#pre>
-        <!-- aaa -->
-        <![CDATA[
-          function() {
-            console.log(' <img /> ');
-          }
-          <message> Welcome to YiiBai </message>
-        ]]>
+          <#comment> <message> Welcome to YiiBai </message> </#comment>
+          <#cdata>
+            function() {
+              console.log(' <img /> ');
+            }
+            <message> Welcome to YiiBai </message>
+          </#cdata>
         </#pre>
         <div {{...props}} ...${{ id10: 'id_10' }}>
           <@id>{{'bbb' +(${'aaa'}) +(${'ccc'} | filter2)}}</@id>
@@ -285,6 +288,8 @@ describe('test compile string', function () {
         </slider>
       </#each>
       `;
+
+      console.log(tmplTest._njTmpl);
 
       var tmplTest2 = nj.compile(`
       <div>

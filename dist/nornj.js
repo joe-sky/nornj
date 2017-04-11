@@ -774,6 +774,14 @@ var extensions = {
       cache = cacheObj[cacheKey] = options.result();
     }
     return cache;
+  },
+
+  comment: function comment(options) {
+    return '<!--' + options.result() + '-->';
+  },
+
+  cdata: function cdata(options) {
+    return '<![CDATA[' + options.result() + ']]>';
   }
 };
 
@@ -816,6 +824,8 @@ extensionConfig.block = _config(extensionConfig.obj);
 extensionConfig.pre = _config(extensionConfig.obj);
 extensionConfig.arg = _config(extensionConfig.prop);
 extensionConfig.once = _config(extensionConfig.obj);
+extensionConfig.comment = _config(extensionConfig.obj);
+extensionConfig.cdata = _config(extensionConfig.obj);
 
 //Extension alias
 extensions['case'] = extensions.elseif;
@@ -1584,7 +1594,7 @@ var REGEX_SP_FILTER = /(\|)?[\s]+((>|<|>=|<=)\()/g;
 function _formatAll(str, tmplRule) {
   var commentRule = tmplRule.commentRule;
   return str.replace(new RegExp('<!--' + commentRule + '[\\s\\S]*?' + commentRule + '-->', 'g'), '').replace(REGEX_SP_FILTER, function (all, s1, match) {
-    return '|' + SP_FILTER_LOOKUP[match];
+    return ' | ' + SP_FILTER_LOOKUP[match];
   });
 }
 
@@ -1983,7 +1993,7 @@ function _getReplaceParam(obj, tmplRule) {
     prop = prop.replace(REGEX_SP_FILTER, function (all, match) {
       return ' ' + SP_FILTER_LOOKUP[match];
     }).replace(REGEX_FIX_FILTER, function (all, s1, s2) {
-      return s1 ? all : '|' + s2;
+      return s1 ? all : ' | ' + s2;
     });
 
     item[2] = prop.trim();
@@ -2418,7 +2428,8 @@ var CUSTOM_VAR = 'nj_custom';
 function _buildPropData(obj, counter, fns, useStringLocal, level) {
   var dataValueStr = void 0,
       escape = obj.escape,
-      isEmpty = false;
+      isEmpty = false,
+      special = false;
   var _obj$prop = obj.prop,
       jsProp = _obj$prop.jsProp,
       isComputed = _obj$prop.isComputed;
@@ -2435,7 +2446,6 @@ function _buildPropData(obj, counter, fns, useStringLocal, level) {
         parentNum = _obj$prop2.parentNum;
 
     var data = '',
-        special = false,
         specialP = false;
 
     switch (name) {
@@ -2547,7 +2557,7 @@ function _buildPropData(obj, counter, fns, useStringLocal, level) {
 
       return {
         v: {
-          valueStr: _buildEscape(valueStr, fns, isComputed ? false : escape),
+          valueStr: _buildEscape(valueStr, fns, isComputed ? false : escape, special),
           filterStr: filterStr
         }
       };
@@ -2555,13 +2565,13 @@ function _buildPropData(obj, counter, fns, useStringLocal, level) {
 
     if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
   } else {
-    return _buildEscape(dataValueStr, fns, isComputed ? false : escape);
+    return _buildEscape(dataValueStr, fns, isComputed ? false : escape, special);
   }
 }
 
-function _buildEscape(valueStr, fns, escape) {
+function _buildEscape(valueStr, fns, escape, special) {
   if (fns.useString) {
-    if (escape) {
+    if (escape && special !== CUSTOM_VAR) {
       return 'p1.escape(' + valueStr + ')';
     } else {
       return valueStr;

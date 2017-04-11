@@ -285,7 +285,11 @@ export const extensions = {
       cache = cacheObj[cacheKey] = options.result();
     }
     return cache;
-  }
+  },
+
+  comment: options => '<!--' + options.result() + '-->',
+
+  cdata: options => '<![CDATA[' + options.result() + ']]>'
 };
 
 function _config(params) {
@@ -327,6 +331,8 @@ extensionConfig.block = _config(extensionConfig.obj);
 extensionConfig.pre = _config(extensionConfig.obj);
 extensionConfig.arg = _config(extensionConfig.prop);
 extensionConfig.once = _config(extensionConfig.obj);
+extensionConfig.comment = _config(extensionConfig.obj);
+extensionConfig.cdata = _config(extensionConfig.obj);
 
 //Extension alias
 extensions['case'] = extensions.elseif;

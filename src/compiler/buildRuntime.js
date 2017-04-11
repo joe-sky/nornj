@@ -94,7 +94,8 @@ const CUSTOM_VAR = 'nj_custom';
 function _buildPropData(obj, counter, fns, useStringLocal, level) {
   let dataValueStr,
     escape = obj.escape,
-    isEmpty = false;
+    isEmpty = false,
+    special = false;
   const { jsProp, isComputed } = obj.prop;
 
   //先生成数据值
@@ -105,7 +106,6 @@ function _buildPropData(obj, counter, fns, useStringLocal, level) {
   } else {
     const { name, parentNum } = obj.prop;
     let data = '',
-      special = false,
       specialP = false;
 
     switch (name) {
@@ -216,17 +216,17 @@ function _buildPropData(obj, counter, fns, useStringLocal, level) {
     }, false, true);
 
     return {
-      valueStr: _buildEscape(valueStr, fns, isComputed ? false : escape),
+      valueStr: _buildEscape(valueStr, fns, isComputed ? false : escape, special),
       filterStr
     };
   } else {
-    return _buildEscape(dataValueStr, fns, isComputed ? false : escape);
+    return _buildEscape(dataValueStr, fns, isComputed ? false : escape, special);
   }
 }
 
-function _buildEscape(valueStr, fns, escape) {
+function _buildEscape(valueStr, fns, escape, special) {
   if (fns.useString) {
-    if (escape) {
+    if (escape && special !== CUSTOM_VAR) {
       return 'p1.escape(' + valueStr + ')';
     } else {
       return valueStr;
