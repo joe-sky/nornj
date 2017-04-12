@@ -211,29 +211,33 @@ describe('test compile string', function () {
             var reg = /\\n+/;
             var a = '{{ @lt +('test') +(@gt) }}';
 
-            if(i {{@lt}} 10) {
+            if(i < 10) {
               return;
             }
 
             function test2() {
-              console.log('    {{@lt}}div  >a{{@lt}}img    />  b  </div>  <div>  '
+              console.log('    <div  >a<img    />  b  </div>  <div>  '
                 + ' <img /> </div>  ');
             }
 
-            var scriptUrl = '{{@lt}}script src="'+prefix+'/resources/app/pages/'+path+'index.js">' + '{{@lt}}/' + 'script>';
+            var scriptUrl = '<' + 'script src="'+prefix+'/resources/app/pages/'+path+'index.js">' + '<' + '/script>';
           }
         </script>
       </#once>
       {{{JSON #('stringify', @data[0])}}}
       <#each {{ list2 }}>
+        <!--<i>test</i>-->
+        <![CDATA[
+          test2
+        ]]>
         <#pre>
-          <#comment> <message> Welcome to YiiBai </message> </#comment>
-          <#cdata>
+          <!-- <message> Welcome to YiiBai </message> -->
+          <![CDATA[
             function() {
               console.log(' <img /> ');
             }
             <message> Welcome to YiiBai </message>
-          </#cdata>
+          ]]>
         </#pre>
         <div {{...props}} ...${{ id10: 'id_10' }}>
           <@id>{{'bbb' +(${'aaa'}) +(${'ccc'} | filter2)}}</@id>

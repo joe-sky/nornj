@@ -115,26 +115,33 @@ function _checkStringElem(xml, tmplRule) {
 
     //Element tag
     if (elem) {
-      if (elem.indexOf('<!') === 0) { //doctype等标签当做文本处理
-        _setText(elem, current.elem);
-      } else {
-        if (elemName[0] === '/') { //Close tag
-          if (elemName === '/' + current.elemName) {
-            current = current.parent;
-          }
-        } else if (elem[elem.length - 2] === '/') { //Self close tag
-          _setSelfCloseElem(elem, elemName, elemParams, current.elem, tmplRule);
-        } else { //Open tag
-          parent = current;
-          current = {
-            elem: [],
-            elemName: elemName,
-            parent: parent
-          };
+      if (elem !== '<') {
+        if (elem.indexOf('<!') === 0) { //一些特殊标签当做文本处理
+          _setText(elem, current.elem);
+        } else {
+          if (elemName[0] === '/') { //Close tag
+            if (elemName === '/' + current.elemName) {
+              current = current.parent;
+            }
+          } else if (elem[elem.length - 2] === '/') { //Self close tag
+            _setSelfCloseElem(elem, elemName, elemParams, current.elem, tmplRule);
+          } else { //Open tag
+            parent = current;
+            current = {
+              elem: [],
+              elemName: elemName,
+              parent: parent
+            };
 
-          parent.elem.push(current.elem);
-          _setElem(elem, elemName, elemParams, current.elem, null, tmplRule);
+            parent.elem.push(current.elem);
+            _setElem(elem, elemName, elemParams, current.elem, null, tmplRule);
+          }
         }
+      } else {  //单独的"<"和后面的文本拼合在一起
+        if (textAfter == null) {
+          textAfter = '';
+        }
+        textAfter = elem + textAfter;
       }
     }
 

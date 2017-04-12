@@ -425,7 +425,7 @@ function createTmplRule() {
     spreadProp: _createRegExp('[\\s]+([' + firstChar + ']?' + startRule + ')[\\s]*(\\.\\.\\.[^' + allRules + ']+)(' + endRule + '[' + lastChar + ']?)', 'g'),
     replaceSplit: _createRegExp('(?:[' + firstChar + ']?' + startRule + ')[^' + allRules + ']+(?:' + endRule + '[' + lastChar + ']?)'),
     replaceParam: _createRegExp('([' + firstChar + ']?' + startRule + ')([^' + allRules + ']+)' + endRule + '[' + lastChar + ']?', 'g'),
-    checkElem: _createRegExp('([^<>]+)|(<([a-z/!' + firstChar + extensionRules + '][^\\s>]*)([^>]*)>)([^<]*)', 'ig'),
+    checkElem: _createRegExp('([^<>]+)|(<([a-z/!' + firstChar + extensionRules + '][^\\s<>]*)([^<>]*)>|<)([^<]*)', 'ig'),
     extension: _createRegExp('^' + escapeExtensionRule + '([^\\s]+)', 'i'),
     include: _createRegExp('<' + escapeExtensionRule + 'include([^>]*)>', 'ig'),
     newlineSplit: _createRegExp('\\n(?![^' + firstChar + lastChar + ']*' + lastChar + ')', 'g'),
@@ -774,14 +774,6 @@ var extensions = {
       cache = cacheObj[cacheKey] = options.result();
     }
     return cache;
-  },
-
-  comment: function comment(options) {
-    return '<!--' + options.result() + '-->';
-  },
-
-  cdata: function cdata(options) {
-    return '<![CDATA[' + options.result() + ']]>';
   }
 };
 
@@ -824,8 +816,6 @@ extensionConfig.block = _config(extensionConfig.obj);
 extensionConfig.pre = _config(extensionConfig.obj);
 extensionConfig.arg = _config(extensionConfig.prop);
 extensionConfig.once = _config(extensionConfig.obj);
-extensionConfig.comment = _config(extensionConfig.obj);
-extensionConfig.cdata = _config(extensionConfig.obj);
 
 //Extension alias
 extensions['case'] = extensions.elseif;
@@ -1547,30 +1537,38 @@ function _checkStringElem(xml, tmplRule) {
 
     //Element tag
     if (elem) {
-      if (elem.indexOf('<!') === 0) {
-        //doctype等标签当做文本处理
-        _setText(elem, current.elem);
-      } else {
-        if (elemName[0] === '/') {
-          //Close tag
-          if (elemName === '/' + current.elemName) {
-            current = current.parent;
-          }
-        } else if (elem[elem.length - 2] === '/') {
-          //Self close tag
-          _setSelfCloseElem(elem, elemName, elemParams, current.elem, tmplRule);
+      if (elem !== '<') {
+        if (elem.indexOf('<!') === 0) {
+          //一些特殊标签当做文本处理
+          _setText(elem, current.elem);
         } else {
-          //Open tag
-          parent = current;
-          current = {
-            elem: [],
-            elemName: elemName,
-            parent: parent
-          };
+          if (elemName[0] === '/') {
+            //Close tag
+            if (elemName === '/' + current.elemName) {
+              current = current.parent;
+            }
+          } else if (elem[elem.length - 2] === '/') {
+            //Self close tag
+            _setSelfCloseElem(elem, elemName, elemParams, current.elem, tmplRule);
+          } else {
+            //Open tag
+            parent = current;
+            current = {
+              elem: [],
+              elemName: elemName,
+              parent: parent
+            };
 
-          parent.elem.push(current.elem);
-          _setElem(elem, elemName, elemParams, current.elem, null, tmplRule);
+            parent.elem.push(current.elem);
+            _setElem(elem, elemName, elemParams, current.elem, null, tmplRule);
+          }
         }
+      } else {
+        //单独的"<"和后面的文本拼合在一起
+        if (textAfter == null) {
+          textAfter = '';
+        }
+        textAfter = elem + textAfter;
       }
     }
 
