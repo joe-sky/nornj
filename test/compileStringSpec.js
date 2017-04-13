@@ -205,24 +205,30 @@ describe('test compile string', function () {
           }
         </style>
         <script>
+          <@type>text</@type>
           function test() {
             console.log(1);
 
-            var reg = /\\n+/;
+            <#if {{true}}>var reg = /\\n+/;</#if>
             var a = '{{ @lt +('test') +(@gt) }}';
 
             if(i < 10) {
               return;
             }
 
+            var num = <#each><#arg>{{ list(1, 2, 3) }}</#arg>{{this}}</#each>;
+
             function test2() {
               console.log('    <div  >a<img    />  b  </div>  <div>  '
                 + ' <img /> </div>  ');
             }
 
-            var scriptUrl = '<' + 'script src="'+prefix+'/resources/app/pages/'+path+'index.js">' + '<' + '/script>';
+            var scriptUrl = '<script src="'+prefix+'/resources/app/pages/'+path+'index.js">' + '<' + '/script>';
           }
         </script>
+        <textarea>
+          1 < 123
+        </textarea>
       </#once>
       {{{JSON #('stringify', @data[0])}}}
       <#each {{ list2 }}>

@@ -354,6 +354,10 @@ function _clearRepeat(str) {
   return ret;
 }
 
+function _replace$(str) {
+  return str.replace(/\$/g, '\\$');
+}
+
 function createTmplRule() {
   var rules = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
   var isGlobal = arguments[1];
@@ -407,7 +411,7 @@ function createTmplRule() {
       firstChar = startRule[0],
       lastChar = endRule[endRule.length - 1],
       extensionRules = _clearRepeat(extensionRule + propRule + tagSpRule),
-      escapeExtensionRule = extensionRule.replace(/\$/g, '\\$');
+      escapeExtensionRule = _replace$(extensionRule);
 
   var tmplRules = {
     startRule: startRule,
@@ -427,6 +431,7 @@ function createTmplRule() {
     replaceParam: _createRegExp('([' + firstChar + ']?' + startRule + ')([^' + allRules + ']+)' + endRule + '[' + lastChar + ']?', 'g'),
     checkElem: _createRegExp('([^<>]+)|(<([a-z/!' + firstChar + extensionRules + '][^\\s<>]*)([^<>]*)>|<)([^<]*)', 'ig'),
     extension: _createRegExp('^' + escapeExtensionRule + '([^\\s]+)', 'i'),
+    exAll: _createRegExp('^[/]?(' + escapeExtensionRule + '|' + _replace$(propRule) + ')', 'i'),
     include: _createRegExp('<' + escapeExtensionRule + 'include([^>]*)>', 'ig'),
     newlineSplit: _createRegExp('\\n(?![^' + firstChar + lastChar + ']*' + lastChar + ')', 'g'),
     incompleteStart: _createRegExp('[' + firstChar + ']?' + startRule + '[^' + allRules + ']*$'),
@@ -1419,6 +1424,7 @@ __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__tools__["a" /* assign */])(__
 var preAsts = __WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */].preAsts;
 
 var SPLIT_FLAG = '_nj_split';
+var TEXT_CONTENT = ['style', 'script', 'textarea', 'xmp'];
 
 //Compile string template
 function compileStringTmpl(tmpl) {
@@ -1521,7 +1527,8 @@ function _checkStringElem(xml, tmplRule) {
   },
       parent = null,
       pattern = tmplRule.checkElem,
-      matchArr = void 0;
+      matchArr = void 0,
+      inTextContent = false;
 
   while (matchArr = pattern.exec(xml)) {
     var textBefore = matchArr[1],
@@ -1542,25 +1549,46 @@ function _checkStringElem(xml, tmplRule) {
           //一些特殊标签当做文本处理
           _setText(elem, current.elem);
         } else {
+          var isEx = __WEBPACK_IMPORTED_MODULE_2__transforms_transformElement__["a" /* isExAll */](elemName, tmplRule);
           if (elemName[0] === '/') {
             //Close tag
-            if (elemName === '/' + current.elemName) {
-              current = current.parent;
+            if (TEXT_CONTENT.indexOf(elemName.substr(1).toLowerCase()) > -1) {
+              inTextContent = false;
+            }
+
+            if (isEx || !inTextContent) {
+              if (elemName === '/' + current.elemName) {
+                current = current.parent;
+              }
+            } else {
+              _setText(elem, current.elem);
             }
           } else if (elem[elem.length - 2] === '/') {
             //Self close tag
-            _setSelfCloseElem(elem, elemName, elemParams, current.elem, tmplRule);
+            if (isEx || !inTextContent) {
+              _setSelfCloseElem(elem, elemName, elemParams, current.elem, tmplRule);
+            } else {
+              _setText(elem, current.elem);
+            }
           } else {
             //Open tag
-            parent = current;
-            current = {
-              elem: [],
-              elemName: elemName,
-              parent: parent
-            };
+            if (isEx || !inTextContent) {
+              if (TEXT_CONTENT.indexOf(elemName.toLowerCase()) > -1) {
+                inTextContent = true;
+              }
 
-            parent.elem.push(current.elem);
-            _setElem(elem, elemName, elemParams, current.elem, null, tmplRule);
+              parent = current;
+              current = {
+                elem: [],
+                elemName: elemName,
+                parent: parent
+              };
+
+              parent.elem.push(current.elem);
+              _setElem(elem, elemName, elemParams, current.elem, null, tmplRule);
+            } else {
+              _setText(elem, current.elem);
+            }
           }
         }
       } else {
@@ -1673,18 +1701,19 @@ function _setText(text, elemArr) {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils_tools__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__transformParam__ = __webpack_require__(9);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__helpers_extension__ = __webpack_require__(3);
-/* harmony export (immutable) */ __webpack_exports__["b"] = getXmlOpenTag;
-/* harmony export (immutable) */ __webpack_exports__["c"] = isXmlSelfCloseTag;
-/* harmony export (immutable) */ __webpack_exports__["j"] = verifySelfCloseTag;
-/* harmony export (immutable) */ __webpack_exports__["i"] = getOpenTagParams;
-/* harmony export (immutable) */ __webpack_exports__["d"] = isXmlCloseTag;
-/* harmony export (immutable) */ __webpack_exports__["h"] = getInsideBraceParam;
-/* harmony export (immutable) */ __webpack_exports__["a"] = isEx;
-/* harmony export (immutable) */ __webpack_exports__["e"] = isTmpl;
-/* harmony export (immutable) */ __webpack_exports__["k"] = addTmpl;
-/* harmony export (immutable) */ __webpack_exports__["f"] = isParamsEx;
-/* harmony export (immutable) */ __webpack_exports__["l"] = addParamsEx;
-/* harmony export (immutable) */ __webpack_exports__["g"] = isExProp;
+/* harmony export (immutable) */ __webpack_exports__["c"] = getXmlOpenTag;
+/* harmony export (immutable) */ __webpack_exports__["d"] = isXmlSelfCloseTag;
+/* harmony export (immutable) */ __webpack_exports__["k"] = verifySelfCloseTag;
+/* harmony export (immutable) */ __webpack_exports__["j"] = getOpenTagParams;
+/* harmony export (immutable) */ __webpack_exports__["e"] = isXmlCloseTag;
+/* harmony export (immutable) */ __webpack_exports__["i"] = getInsideBraceParam;
+/* harmony export (immutable) */ __webpack_exports__["b"] = isEx;
+/* harmony export (immutable) */ __webpack_exports__["a"] = isExAll;
+/* harmony export (immutable) */ __webpack_exports__["f"] = isTmpl;
+/* harmony export (immutable) */ __webpack_exports__["l"] = addTmpl;
+/* harmony export (immutable) */ __webpack_exports__["g"] = isParamsEx;
+/* harmony export (immutable) */ __webpack_exports__["m"] = addParamsEx;
+/* harmony export (immutable) */ __webpack_exports__["h"] = isExProp;
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 
@@ -1782,7 +1811,7 @@ function getInsideBraceParam(obj, tmplRule) {
 }
 
 //判断扩展标签并返回参数
-function isEx(obj, tmplRule) {
+function isEx(obj, tmplRule, isAll) {
   var ret = void 0,
       ret1 = tmplRule.extension.exec(obj);
   if (ret1) {
@@ -1795,6 +1824,10 @@ function isEx(obj, tmplRule) {
   }
 
   return ret;
+}
+
+function isExAll(obj, tmplRule) {
+  return tmplRule.exAll.test(obj);
 }
 
 //判断是否模板元素
@@ -3132,9 +3165,9 @@ function checkElem(obj, parent, tmplRule, hasExProps, noSplitNewline, isLast) {
         isSub = void 0,
         needAddToProps = void 0;
 
-    ex = __WEBPACK_IMPORTED_MODULE_3__transforms_transformElement__["a" /* isEx */](first, tmplRule);
+    ex = __WEBPACK_IMPORTED_MODULE_3__transforms_transformElement__["b" /* isEx */](first, tmplRule);
     if (!ex) {
-      var xmlOpenTag = __WEBPACK_IMPORTED_MODULE_3__transforms_transformElement__["b" /* getXmlOpenTag */](first, tmplRule);
+      var xmlOpenTag = __WEBPACK_IMPORTED_MODULE_3__transforms_transformElement__["c" /* getXmlOpenTag */](first, tmplRule);
       if (xmlOpenTag) {
         //tagname为xml标签时,则认为是元素节点
         openTagName = xmlOpenTag[1];
@@ -3142,9 +3175,9 @@ function checkElem(obj, parent, tmplRule, hasExProps, noSplitNewline, isLast) {
           openTagName = openTagName.substr(0, openTagName.length - 1);
         }
 
-        if (!__WEBPACK_IMPORTED_MODULE_3__transforms_transformElement__["c" /* isXmlSelfCloseTag */](first)) {
+        if (!__WEBPACK_IMPORTED_MODULE_3__transforms_transformElement__["d" /* isXmlSelfCloseTag */](first)) {
           //非自闭合标签才验证是否存在关闭标签
-          hasCloseTag = __WEBPACK_IMPORTED_MODULE_3__transforms_transformElement__["d" /* isXmlCloseTag */](last, openTagName);
+          hasCloseTag = __WEBPACK_IMPORTED_MODULE_3__transforms_transformElement__["e" /* isXmlCloseTag */](last, openTagName);
         } else {
           //自闭合标签
           node.selfCloseTag = true;
@@ -3155,10 +3188,10 @@ function checkElem(obj, parent, tmplRule, hasExProps, noSplitNewline, isLast) {
       //为扩展标签,也可视为一个元素节点
       var exName = ex[0];
       exParams = ex[1];
-      isTmpl = __WEBPACK_IMPORTED_MODULE_3__transforms_transformElement__["e" /* isTmpl */](exName);
-      isParamsEx = __WEBPACK_IMPORTED_MODULE_3__transforms_transformElement__["f" /* isParamsEx */](exName);
+      isTmpl = __WEBPACK_IMPORTED_MODULE_3__transforms_transformElement__["f" /* isTmpl */](exName);
+      isParamsEx = __WEBPACK_IMPORTED_MODULE_3__transforms_transformElement__["g" /* isParamsEx */](exName);
       if (!isParamsEx) {
-        var exProp = __WEBPACK_IMPORTED_MODULE_3__transforms_transformElement__["g" /* isExProp */](exName);
+        var exProp = __WEBPACK_IMPORTED_MODULE_3__transforms_transformElement__["h" /* isExProp */](exName);
         isProp = exProp.isProp;
         isSub = exProp.isSub;
         needAddToProps = isProp ? !hasExProps : isSub;
@@ -3204,13 +3237,13 @@ function checkElem(obj, parent, tmplRule, hasExProps, noSplitNewline, isLast) {
         node.type = openTagName;
 
         //If open tag has a brace,add the typeRefer param.
-        var typeRefer = __WEBPACK_IMPORTED_MODULE_3__transforms_transformElement__["h" /* getInsideBraceParam */](openTagName, tmplRule);
+        var typeRefer = __WEBPACK_IMPORTED_MODULE_3__transforms_transformElement__["i" /* getInsideBraceParam */](openTagName, tmplRule);
         if (typeRefer) {
           node.typeRefer = __WEBPACK_IMPORTED_MODULE_2__transforms_transformParam__["a" /* compiledParam */](typeRefer[0], tmplRule);
         }
 
         //获取openTag内参数
-        var tagParams = __WEBPACK_IMPORTED_MODULE_3__transforms_transformElement__["i" /* getOpenTagParams */](first, tmplRule);
+        var tagParams = __WEBPACK_IMPORTED_MODULE_3__transforms_transformElement__["j" /* getOpenTagParams */](first, tmplRule);
         if (tagParams) {
           if (!node.params) {
             node.params = __WEBPACK_IMPORTED_MODULE_1__utils_tools__["g" /* obj */]();
@@ -3224,7 +3257,7 @@ function checkElem(obj, parent, tmplRule, hasExProps, noSplitNewline, isLast) {
 
         //Verify if self closing tag again, because the tag may be similar to "<br></br>".
         if (!node.selfCloseTag) {
-          node.selfCloseTag = __WEBPACK_IMPORTED_MODULE_3__transforms_transformElement__["j" /* verifySelfCloseTag */](openTagName);
+          node.selfCloseTag = __WEBPACK_IMPORTED_MODULE_3__transforms_transformElement__["k" /* verifySelfCloseTag */](openTagName);
         }
 
         if (noSplitNewline == null && NO_SPLIT_NEWLINE.indexOf(openTagName.toLowerCase()) > -1) {
@@ -3237,7 +3270,7 @@ function checkElem(obj, parent, tmplRule, hasExProps, noSplitNewline, isLast) {
           pushContent = false;
 
           //将模板添加到父节点的params中
-          __WEBPACK_IMPORTED_MODULE_3__transforms_transformElement__["k" /* addTmpl */](node, parent, exParams ? exParams[0].value : null);
+          __WEBPACK_IMPORTED_MODULE_3__transforms_transformElement__["l" /* addTmpl */](node, parent, exParams ? exParams[0].value : null);
         } else if (isParamsEx || needAddToProps) {
           pushContent = false;
         }
@@ -3262,7 +3295,7 @@ function checkElem(obj, parent, tmplRule, hasExProps, noSplitNewline, isLast) {
 
       //If this is params block, set on the "paramsEx" property of the parent node.
       if (isParamsEx || needAddToProps) {
-        __WEBPACK_IMPORTED_MODULE_3__transforms_transformElement__["l" /* addParamsEx */](node, parent, isProp, isSub);
+        __WEBPACK_IMPORTED_MODULE_3__transforms_transformElement__["m" /* addParamsEx */](node, parent, isProp, isSub);
       }
     } else {
       //如果不是元素节点,则为节点集合

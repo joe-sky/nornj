@@ -3,6 +3,12 @@ import * as tools from '../utils/tools';
 import * as tranElem from '../transforms/transformElement';
 const { preAsts } = nj;
 const SPLIT_FLAG = '_nj_split';
+const TEXT_CONTENT = [
+  'style',
+  'script',
+  'textarea',
+  'xmp'
+];
 
 //Compile string template
 export default function compileStringTmpl(tmpl) {
@@ -99,7 +105,8 @@ function _checkStringElem(xml, tmplRule) {
     },
     parent = null,
     pattern = tmplRule.checkElem,
-    matchArr;
+    matchArr,
+    inTextContent = false;
 
   while (matchArr = pattern.exec(xml)) {
     let textBefore = matchArr[1],
@@ -119,25 +126,46 @@ function _checkStringElem(xml, tmplRule) {
         if (elem.indexOf('<!') === 0) { //一些特殊标签当做文本处理
           _setText(elem, current.elem);
         } else {
+          const isEx = tranElem.isExAll(elemName, tmplRule);
           if (elemName[0] === '/') { //Close tag
-            if (elemName === '/' + current.elemName) {
-              current = current.parent;
+            if (TEXT_CONTENT.indexOf(elemName.substr(1).toLowerCase()) > -1) {  //取消纯文本子节点标记
+              inTextContent = false;
+            }
+
+            if (isEx || !inTextContent) {
+              if (elemName === '/' + current.elemName) {
+                current = current.parent;
+              }
+            } else {
+              _setText(elem, current.elem);
             }
           } else if (elem[elem.length - 2] === '/') { //Self close tag
-            _setSelfCloseElem(elem, elemName, elemParams, current.elem, tmplRule);
+            if (isEx || !inTextContent) {
+              _setSelfCloseElem(elem, elemName, elemParams, current.elem, tmplRule);
+            } else {
+              _setText(elem, current.elem);
+            }
           } else { //Open tag
-            parent = current;
-            current = {
-              elem: [],
-              elemName: elemName,
-              parent: parent
-            };
+            if (isEx || !inTextContent) {
+              if (TEXT_CONTENT.indexOf(elemName.toLowerCase()) > -1) {  //标记该标签为纯文本子节点
+                inTextContent = true;
+              }
 
-            parent.elem.push(current.elem);
-            _setElem(elem, elemName, elemParams, current.elem, null, tmplRule);
+              parent = current;
+              current = {
+                elem: [],
+                elemName,
+                parent
+              };
+
+              parent.elem.push(current.elem);
+              _setElem(elem, elemName, elemParams, current.elem, null, tmplRule);
+            } else {
+              _setText(elem, current.elem);
+            }
           }
         }
-      } else {  //单独的"<"和后面的文本拼合在一起
+      } else { //单独的"<"和后面的文本拼合在一起
         if (textAfter == null) {
           textAfter = '';
         }

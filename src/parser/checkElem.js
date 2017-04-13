@@ -138,7 +138,7 @@ export default function checkElem(obj, parent, tmplRule, hasExProps, noSplitNewl
             node.params = tools.obj();
           }
 
-          tools.each(tagParams, (param) => { //The parameter like "{prop}" needs to be replaced.
+          tools.each(tagParams, param => { //The parameter like "{prop}" needs to be replaced.
             node.params[param.onlyBrace ? param.onlyBrace.replace(/\.\.\//g, '') : param.key] = tranParam.compiledParam(param.value, tmplRule);
           }, false, true);
         }

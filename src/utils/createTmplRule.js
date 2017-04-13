@@ -22,15 +22,19 @@ function _clearRepeat(str) {
   return ret;
 }
 
+function _replace$(str) {
+  return str.replace(/\$/g, '\\$');
+}
+
 export default function createTmplRule(rules = {}, isGlobal) {
   let {
     startRule = '{{',
-    endRule = '}}',
-    extensionRule = '#',
-    propRule = '@',
-    templateRule = 'template',
-    tagSpRule = '#$@',
-    commentRule = '#'
+      endRule = '}}',
+      extensionRule = '#',
+      propRule = '@',
+      templateRule = 'template',
+      tagSpRule = '#$@',
+      commentRule = '#'
   } = nj.tmplRule;
 
   let {
@@ -69,7 +73,7 @@ export default function createTmplRule(rules = {}, isGlobal) {
     firstChar = startRule[0],
     lastChar = endRule[endRule.length - 1],
     extensionRules = _clearRepeat(extensionRule + propRule + tagSpRule),
-    escapeExtensionRule = extensionRule.replace(/\$/g, '\\$');
+    escapeExtensionRule = _replace$(extensionRule);
 
   const tmplRules = {
     startRule,
@@ -89,16 +93,16 @@ export default function createTmplRule(rules = {}, isGlobal) {
     replaceParam: _createRegExp('([' + firstChar + ']?' + startRule + ')([^' + allRules + ']+)' + endRule + '[' + lastChar + ']?', 'g'),
     checkElem: _createRegExp('([^<>]+)|(<([a-z/!' + firstChar + extensionRules + '][^\\s<>]*)([^<>]*)>|<)([^<]*)', 'ig'),
     extension: _createRegExp('^' + escapeExtensionRule + '([^\\s]+)', 'i'),
+    exAll: _createRegExp('^[/]?(' + escapeExtensionRule + '|' + _replace$(propRule) + ')', 'i'),
     include: _createRegExp('<' + escapeExtensionRule + 'include([^>]*)>', 'ig'),
     newlineSplit: _createRegExp('\\n(?![^' + firstChar + lastChar + ']*' + lastChar + ')', 'g'),
     incompleteStart: _createRegExp('[' + firstChar + ']?' + startRule + '[^' + allRules + ']*$'),
     incompleteEnd: _createRegExp('^[^' + allRules + ']*' + endRule + '[' + lastChar + ']?')
   };
-  
-  if(isGlobal) {  //Reset the regexs to global list
+
+  if (isGlobal) { //Reset the regexs to global list
     tools.assign(nj.tmplRule, tmplRules);
-  }
-  else {
+  } else {
     return tmplRules;
   }
 };

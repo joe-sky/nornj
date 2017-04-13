@@ -91,7 +91,7 @@ export function getInsideBraceParam(obj, tmplRule) {
 }
 
 //判断扩展标签并返回参数
-export function isEx(obj, tmplRule) {
+export function isEx(obj, tmplRule, isAll) {
   let ret, ret1 = tmplRule.extension.exec(obj);
   if (ret1) {
     ret = [ret1[1]];
@@ -103,6 +103,10 @@ export function isEx(obj, tmplRule) {
   }
 
   return ret;
+}
+
+export function isExAll(obj, tmplRule) {
+  return tmplRule.exAll.test(obj);
 }
 
 //判断是否模板元素
