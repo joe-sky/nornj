@@ -164,10 +164,11 @@ export function addParamsEx(node, parent, isProp, isSub) {
   }
 }
 
-export function isExProp(name) {
+export function exCompileConfig(name) {
   const config = extensionConfig[name];
   return {
     isSub: config ? config.isSub : false,
-    isProp: config ? config.isProp : false
+    isProp: config ? config.isProp : false,
+    useString: config ? config.useString : false
   };
 }

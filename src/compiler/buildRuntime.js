@@ -56,7 +56,7 @@ function _buildFn(content, node, fns, no, newContext, level, useStringLocal) {
   /* 构建扩展标签函数
    p1: 模板全局数据
    p2: 节点上下文数据
-   p3: 扩展标签内调用result及inverse方法传递的参数
+   p3: 扩展标签内调用result方法传递的参数
    p4: #props变量
    p5：子扩展标签#props变量
   */
@@ -65,12 +65,9 @@ function _buildFn(content, node, fns, no, newContext, level, useStringLocal) {
 }
 
 function _buildOptions(config, useStringLocal, node, fns, exPropsStr, subExPropsStr, level, hashProps) {
-  let hashStr = '',
+  let hashStr = ', useString: ' + (useStringLocal == null ? 'p1.useString' : (useStringLocal ? 'true' : 'false')),
     noConfig = !config;
 
-  if (noConfig || config.useString) {
-    hashStr += ', useString: ' + (useStringLocal == null ? 'p1.useString' : (useStringLocal ? 'true' : 'false'));
-  }
   if (node) { //扩展标签
     let newContext = config ? config.newContext : true;
     if (noConfig || config.exProps) {
@@ -91,6 +88,7 @@ function _buildOptions(config, useStringLocal, node, fns, exPropsStr, subExProps
 }
 
 const CUSTOM_VAR = 'nj_custom';
+
 function _buildPropData(obj, counter, fns, useStringLocal, level) {
   let dataValueStr,
     escape = obj.escape,
@@ -325,7 +323,7 @@ function _buildPropsEx(isSub, paramsEC, propsEx, fns, counter, useString, exProp
     ret._paramsSE = subExPropsStr;
   }
 
-  //params块的子节点
+  //props标签的子节点
   paramsStr += _buildContent(propsEx.content, propsEx, fns, counter, ret, null, useString);
   return paramsStr;
 }
@@ -589,8 +587,9 @@ function _buildContent(content, parent, fns, counter, retType, level, useStringL
     return fnStr;
   }
 
-  tools.each(content, (node) => {
-    fnStr += _buildNode(node, parent, fns, counter, retType, level, node.useString ? true : useStringLocal, fns._firstNode && level == 0);
+  tools.each(content, node => {
+    const { useString } = node;
+    fnStr += _buildNode(node, parent, fns, counter, retType, level, useString != null ? useString : useStringLocal, fns._firstNode && level == 0);
 
     if (fns._firstNode) { //输出字符串时模板第一个节点前面不加换行符
       fns._firstNode = false;

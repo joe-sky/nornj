@@ -621,7 +621,7 @@ var extensions = {
       value = ret;
     } else {
       //Match to Similar to "checked" or "disabled" attribute.
-      value = !options.useString ? true : name;
+      value = options.outputH ? true : name;
     }
 
     options.exProps[options.outputH ? __WEBPACK_IMPORTED_MODULE_2__transforms_transformData__["a" /* fixPropName */](name) : name] = value;
@@ -785,7 +785,7 @@ var extensions = {
 function _config(params) {
   var ret = {
     onlyGlobal: false,
-    useString: true,
+    useString: false,
     newContext: true,
     exProps: false,
     isProp: false,
@@ -804,15 +804,15 @@ var _defaultCfg = { onlyGlobal: true, newContext: false };
 //Extension default config
 var extensionConfig = {
   'if': _config(_defaultCfg),
-  'else': _config({ onlyGlobal: true, newContext: false, useString: false, subExProps: true, isSub: true }),
+  'else': _config({ onlyGlobal: true, newContext: false, subExProps: true, isSub: true }),
   'switch': _config(_defaultCfg),
   unless: _config(_defaultCfg),
   each: _config({ onlyGlobal: true }),
   prop: _config({ onlyGlobal: true, newContext: false, exProps: true, subExProps: true, isProp: true }),
-  spread: _config({ onlyGlobal: true, newContext: false, useString: false, exProps: true, subExProps: true, isProp: true }),
-  obj: _config({ onlyGlobal: true, newContext: false, useString: false }),
+  spread: _config({ onlyGlobal: true, newContext: false, exProps: true, subExProps: true, isProp: true }),
+  obj: _config({ onlyGlobal: true, newContext: false }),
   list: _config(_defaultCfg),
-  fn: _config({ onlyGlobal: true, useString: false }),
+  fn: _config({ onlyGlobal: true }),
   'with': _config({ onlyGlobal: true })
 };
 extensionConfig.elseif = _config(extensionConfig['else']);
@@ -821,12 +821,14 @@ extensionConfig.block = _config(extensionConfig.obj);
 extensionConfig.pre = _config(extensionConfig.obj);
 extensionConfig.arg = _config(extensionConfig.prop);
 extensionConfig.once = _config(extensionConfig.obj);
+extensionConfig.strProp = __WEBPACK_IMPORTED_MODULE_1__utils_tools__["a" /* assign */](_config(extensionConfig.prop), { useString: true });
 
 //Extension alias
 extensions['case'] = extensions.elseif;
 extensionConfig['case'] = extensionConfig.elseif;
 extensions['default'] = extensions['else'];
 extensionConfig['default'] = extensionConfig['else'];
+extensions.strProp = extensions.prop;
 
 //Register extension and also can batch add
 function registerExtension(name, extension, options) {
@@ -1274,8 +1276,7 @@ var filters = {
 
 function _config(params) {
   var ret = {
-    onlyGlobal: false,
-    useString: false
+    onlyGlobal: false
   };
 
   if (params) {
@@ -1553,6 +1554,7 @@ function _checkStringElem(xml, tmplRule) {
           if (elemName[0] === '/') {
             //Close tag
             if (TEXT_CONTENT.indexOf(elemName.substr(1).toLowerCase()) > -1) {
+              //取消纯文本子节点标记
               inTextContent = false;
             }
 
@@ -1574,6 +1576,7 @@ function _checkStringElem(xml, tmplRule) {
             //Open tag
             if (isEx || !inTextContent) {
               if (TEXT_CONTENT.indexOf(elemName.toLowerCase()) > -1) {
+                //标记该标签为纯文本子节点
                 inTextContent = true;
               }
 
@@ -1713,7 +1716,7 @@ function _setText(text, elemArr) {
 /* harmony export (immutable) */ __webpack_exports__["l"] = addTmpl;
 /* harmony export (immutable) */ __webpack_exports__["g"] = isParamsEx;
 /* harmony export (immutable) */ __webpack_exports__["m"] = addParamsEx;
-/* harmony export (immutable) */ __webpack_exports__["h"] = isExProp;
+/* harmony export (immutable) */ __webpack_exports__["h"] = exCompileConfig;
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 
@@ -1885,11 +1888,12 @@ function addParamsEx(node, parent, isProp, isSub) {
   }
 }
 
-function isExProp(name) {
+function exCompileConfig(name) {
   var config = __WEBPACK_IMPORTED_MODULE_3__helpers_extension__["b" /* extensionConfig */][name];
   return {
     isSub: config ? config.isSub : false,
-    isProp: config ? config.isProp : false
+    isProp: config ? config.isProp : false,
+    useString: config ? config.useString : false
   };
 }
 
@@ -2429,12 +2433,9 @@ function _buildFn(content, node, fns, no, newContext, level, useStringLocal) {
 }
 
 function _buildOptions(config, useStringLocal, node, fns, exPropsStr, subExPropsStr, level, hashProps) {
-  var hashStr = '',
+  var hashStr = ', useString: ' + (useStringLocal == null ? 'p1.useString' : useStringLocal ? 'true' : 'false'),
       noConfig = !config;
 
-  if (noConfig || config.useString) {
-    hashStr += ', useString: ' + (useStringLocal == null ? 'p1.useString' : useStringLocal ? 'true' : 'false');
-  }
   if (node) {
     //扩展标签
     var newContext = config ? config.newContext : true;
@@ -2456,6 +2457,7 @@ function _buildOptions(config, useStringLocal, node, fns, exPropsStr, subExProps
 }
 
 var CUSTOM_VAR = 'nj_custom';
+
 function _buildPropData(obj, counter, fns, useStringLocal, level) {
   var dataValueStr = void 0,
       escape = obj.escape,
@@ -2704,7 +2706,7 @@ function _buildPropsEx(isSub, paramsEC, propsEx, fns, counter, useString, exProp
     ret._paramsSE = subExPropsStr;
   }
 
-  //params块的子节点
+  //props标签的子节点
   paramsStr += _buildContent(propsEx.content, propsEx, fns, counter, ret, null, useString);
   return paramsStr;
 }
@@ -2989,7 +2991,9 @@ function _buildContent(content, parent, fns, counter, retType, level, useStringL
   }
 
   __WEBPACK_IMPORTED_MODULE_1__utils_tools__["c" /* each */](content, function (node) {
-    fnStr += _buildNode(node, parent, fns, counter, retType, level, node.useString ? true : useStringLocal, fns._firstNode && level == 0);
+    var useString = node.useString;
+
+    fnStr += _buildNode(node, parent, fns, counter, retType, level, useString != null ? useString : useStringLocal, fns._firstNode && level == 0);
 
     if (fns._firstNode) {
       //输出字符串时模板第一个节点前面不加换行符
@@ -3191,10 +3195,14 @@ function checkElem(obj, parent, tmplRule, hasExProps, noSplitNewline, isLast) {
       isTmpl = __WEBPACK_IMPORTED_MODULE_3__transforms_transformElement__["f" /* isTmpl */](exName);
       isParamsEx = __WEBPACK_IMPORTED_MODULE_3__transforms_transformElement__["g" /* isParamsEx */](exName);
       if (!isParamsEx) {
-        var exProp = __WEBPACK_IMPORTED_MODULE_3__transforms_transformElement__["h" /* isExProp */](exName);
-        isProp = exProp.isProp;
-        isSub = exProp.isSub;
+        var exConfig = __WEBPACK_IMPORTED_MODULE_3__transforms_transformElement__["h" /* exCompileConfig */](exName);
+        isProp = exConfig.isProp;
+        isSub = exConfig.isSub;
         needAddToProps = isProp ? !hasExProps : isSub;
+
+        if (exConfig.useString) {
+          node.useString = exConfig.useString;
+        }
       }
 
       node.type = 'nj_ex';
@@ -3205,12 +3213,15 @@ function checkElem(obj, parent, tmplRule, hasExProps, noSplitNewline, isLast) {
         }
 
         __WEBPACK_IMPORTED_MODULE_1__utils_tools__["c" /* each */](exParams, function (param) {
-          if (param.value === 'useString') {
-            node.useString = true;
+          var key = param.key,
+              value = param.value;
+
+          if (key === 'useString') {
+            node.useString = !(value === 'false');
             return;
           }
 
-          var paramV = __WEBPACK_IMPORTED_MODULE_2__transforms_transformParam__["a" /* compiledParam */](param.value, tmplRule);
+          var paramV = __WEBPACK_IMPORTED_MODULE_2__transforms_transformParam__["a" /* compiledParam */](value, tmplRule);
           if (param.onlyBrace) {
             //提取匿名参数
             node.args.push(paramV);
@@ -3218,7 +3229,7 @@ function checkElem(obj, parent, tmplRule, hasExProps, noSplitNewline, isLast) {
             if (!node.params) {
               node.params = __WEBPACK_IMPORTED_MODULE_1__utils_tools__["g" /* obj */]();
             }
-            node.params[param.key] = paramV;
+            node.params[key] = paramV;
           }
         }, false, true);
       }

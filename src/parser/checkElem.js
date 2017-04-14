@@ -82,10 +82,14 @@ export default function checkElem(obj, parent, tmplRule, hasExProps, noSplitNewl
       isTmpl = tranElem.isTmpl(exName);
       isParamsEx = tranElem.isParamsEx(exName);
       if (!isParamsEx) {
-        let exProp = tranElem.isExProp(exName);
-        isProp = exProp.isProp;
-        isSub = exProp.isSub;
+        let exConfig = tranElem.exCompileConfig(exName);
+        isProp = exConfig.isProp;
+        isSub = exConfig.isSub;
         needAddToProps = isProp ? !hasExProps : isSub;
+
+        if (exConfig.useString) {
+          node.useString = exConfig.useString;
+        }
       }
 
       node.type = 'nj_ex';
@@ -95,20 +99,21 @@ export default function checkElem(obj, parent, tmplRule, hasExProps, noSplitNewl
           node.args = [];
         }
 
-        tools.each(exParams, (param) => {
-          if (param.value === 'useString') {
-            node.useString = true;
+        tools.each(exParams, param => {
+          const { key, value } = param;
+          if (key === 'useString') {
+            node.useString = !(value === 'false');
             return;
           }
 
-          let paramV = tranParam.compiledParam(param.value, tmplRule);
+          let paramV = tranParam.compiledParam(value, tmplRule);
           if (param.onlyBrace) { //提取匿名参数
             node.args.push(paramV);
           } else {
             if (!node.params) {
               node.params = tools.obj();
             }
-            node.params[param.key] = paramV;
+            node.params[key] = paramV;
           }
         }, false, true);
       }

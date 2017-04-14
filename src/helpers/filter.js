@@ -104,8 +104,7 @@ export const filters = {
 
 function _config(params) {
   let ret = {
-    onlyGlobal: false,
-    useString: false
+    onlyGlobal: false
   };
 
   if (params) {

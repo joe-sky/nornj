@@ -146,7 +146,7 @@ export const extensions = {
     if (ret !== undefined) {
       value = ret;
     } else { //Match to Similar to "checked" or "disabled" attribute.
-      value = !options.useString ? true : name;
+      value = options.outputH ? true : name;
     }
 
     options.exProps[options.outputH ? tranData.fixPropName(name) : name] = value;
@@ -291,7 +291,7 @@ export const extensions = {
 function _config(params) {
   let ret = {
     onlyGlobal: false,
-    useString: true,
+    useString: false,
     newContext: true,
     exProps: false,
     isProp: false,
@@ -310,15 +310,15 @@ const _defaultCfg = { onlyGlobal: true, newContext: false };
 //Extension default config
 export const extensionConfig = {
   'if': _config(_defaultCfg),
-  'else': _config({ onlyGlobal: true, newContext: false, useString: false, subExProps: true, isSub: true }),
+  'else': _config({ onlyGlobal: true, newContext: false, subExProps: true, isSub: true }),
   'switch': _config(_defaultCfg),
   unless: _config(_defaultCfg),
   each: _config({ onlyGlobal: true }),
   prop: _config({ onlyGlobal: true, newContext: false, exProps: true, subExProps: true, isProp: true }),
-  spread: _config({ onlyGlobal: true, newContext: false, useString: false, exProps: true, subExProps: true, isProp: true }),
-  obj: _config({ onlyGlobal: true, newContext: false, useString: false }),
+  spread: _config({ onlyGlobal: true, newContext: false, exProps: true, subExProps: true, isProp: true }),
+  obj: _config({ onlyGlobal: true, newContext: false }),
   list: _config(_defaultCfg),
-  fn: _config({ onlyGlobal: true, useString: false }),
+  fn: _config({ onlyGlobal: true }),
   'with': _config({ onlyGlobal: true })
 };
 extensionConfig.elseif = _config(extensionConfig['else']);
@@ -327,12 +327,14 @@ extensionConfig.block = _config(extensionConfig.obj);
 extensionConfig.pre = _config(extensionConfig.obj);
 extensionConfig.arg = _config(extensionConfig.prop);
 extensionConfig.once = _config(extensionConfig.obj);
+extensionConfig.strProp = tools.assign(_config(extensionConfig.prop), { useString: true });
 
 //Extension alias
 extensions['case'] = extensions.elseif;
 extensionConfig['case'] = extensionConfig.elseif;
 extensions['default'] = extensions['else'];
 extensionConfig['default'] = extensionConfig['else'];
+extensions.strProp = extensions.prop;
 
 //Register extension and also can batch add
 export function registerExtension(name, extension, options) {

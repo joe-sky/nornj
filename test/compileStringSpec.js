@@ -26,7 +26,8 @@ describe('test compile string', function () {
     nj.registerExtension('textExpr', function (arg1, arg2, opts) {
       //return opts.props.tmpls[0]();
       //console.log(opts.props.args);
-      return arg2;
+      console.log(opts.props.a);
+      return arg1;
     });
 
     nj.registerExtension('vm-include', function (opts) {
@@ -182,7 +183,7 @@ describe('test compile string', function () {
 
       var tmplTest = nj`
       <#once>
-        <@resetList><#list {{id}} {{c1}} /></@resetList>
+        <@resetList>{{ list(id, c1) }}</@resetList>
         <!DOCTYPE html>
         <#with {{name3}} as=name5>{{{
           JSON #('stringify', 
@@ -265,7 +266,16 @@ describe('test compile string', function () {
           <#tmpl>
             <TextExpr name="{{no}}" />
           </#tmpl>
-          <#arg>1</#arg>
+          <@a />
+          <#arg>
+            num:
+            <#block>
+              <#list {{1}} {{2}} {{3}} />
+            </#block>
+            <#block>
+              <#list {{4}} {{5}} {{6}} useString="false" />
+            </#block>
+          </#arg>
           <#arg>{{1 +(2)}}</#arg>
           <img /><img />
           <@name>
