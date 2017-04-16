@@ -1,6 +1,6 @@
 {
   "name": "nornj",
-  "version": "0.4.2-alpha.18",
+  "version": "0.4.2-alpha.19",
   "description": "A multipurpose javascript template engine",
   "main": "lib/base.js",
   "files": [

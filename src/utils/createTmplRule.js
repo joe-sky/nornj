@@ -78,7 +78,9 @@ export default function createTmplRule(rules = {}, isGlobal) {
     firstChar = startRule[0],
     lastChar = endRule[endRule.length - 1],
     extensionRules = _clearRepeat(extensionRule + propRule + strPropRule + tagSpRule),
-    escapeExtensionRule = _replace$(extensionRule);
+    escapeExtensionRule = _replace$(extensionRule),
+    escapePropRule = _replace$(propRule),
+    escapeStrPropRule = _replace$(strPropRule);
 
   const tmplRules = {
     startRule,
@@ -99,7 +101,7 @@ export default function createTmplRule(rules = {}, isGlobal) {
     replaceParam: _createRegExp('([' + firstChar + ']?' + startRule + ')([^' + allRules + ']+)' + endRule + '[' + lastChar + ']?', 'g'),
     checkElem: _createRegExp('([^<>]+)|(<([a-z/!' + firstChar + extensionRules + '][^\\s<>]*)([^<>]*)>|<)([^<]*)', 'ig'),
     extension: _createRegExp('^' + escapeExtensionRule + '([^\\s]+)', 'i'),
-    exAll: _createRegExp('^[/]?(' + escapeExtensionRule + '|' + _replace$(strPropRule) + '|' + _replace$(propRule) + ')', 'i'),
+    exAll: _createRegExp('^[/]?(' + escapeExtensionRule + '|' + escapeStrPropRule + escapePropRule + '|' + escapePropRule + ')', 'i'),
     include: _createRegExp('<' + escapeExtensionRule + 'include([^>]*)>', 'ig'),
     newlineSplit: _createRegExp('\\n(?![^' + firstChar + lastChar + ']*' + lastChar + ')', 'g'),
     incompleteStart: _createRegExp('[' + firstChar + ']?' + startRule + '[^' + allRules + ']*$'),

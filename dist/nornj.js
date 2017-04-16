@@ -417,7 +417,9 @@ function createTmplRule() {
       firstChar = startRule[0],
       lastChar = endRule[endRule.length - 1],
       extensionRules = _clearRepeat(extensionRule + propRule + strPropRule + tagSpRule),
-      escapeExtensionRule = _replace$(extensionRule);
+      escapeExtensionRule = _replace$(extensionRule),
+      escapePropRule = _replace$(propRule),
+      escapeStrPropRule = _replace$(strPropRule);
 
   var tmplRules = {
     startRule: startRule,
@@ -438,7 +440,7 @@ function createTmplRule() {
     replaceParam: _createRegExp('([' + firstChar + ']?' + startRule + ')([^' + allRules + ']+)' + endRule + '[' + lastChar + ']?', 'g'),
     checkElem: _createRegExp('([^<>]+)|(<([a-z/!' + firstChar + extensionRules + '][^\\s<>]*)([^<>]*)>|<)([^<]*)', 'ig'),
     extension: _createRegExp('^' + escapeExtensionRule + '([^\\s]+)', 'i'),
-    exAll: _createRegExp('^[/]?(' + escapeExtensionRule + '|' + _replace$(propRule) + '|' + _replace$(strPropRule) + ')', 'i'),
+    exAll: _createRegExp('^[/]?(' + escapeExtensionRule + '|' + escapeStrPropRule + escapePropRule + '|' + escapePropRule + ')', 'i'),
     include: _createRegExp('<' + escapeExtensionRule + 'include([^>]*)>', 'ig'),
     newlineSplit: _createRegExp('\\n(?![^' + firstChar + lastChar + ']*' + lastChar + ')', 'g'),
     incompleteStart: _createRegExp('[' + firstChar + ']?' + startRule + '[^' + allRules + ']*$'),
