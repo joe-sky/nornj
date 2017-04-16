@@ -196,13 +196,19 @@ function _formatAll(str, tmplRule) {
     .replace(REGEX_SP_FILTER, (all, s1, match) => ' | ' + SP_FILTER_LOOKUP[match]);
 }
 
+function _transformToEx(isStr, elemName, elemParams, tmplRule) {
+  return tmplRule.extensionRule + (isStr ? 'strProp' : 'prop') + ' ' + tmplRule.startRule + '\'' + elemName.substr((isStr ? tmplRule.strPropRule.length : 0) + tmplRule.propRule.length) + '\'' + tmplRule.endRule + elemParams;
+}
+
 //Set element node
 function _setElem(elem, elemName, elemParams, elemArr, bySelfClose, tmplRule) {
   let ret, paramsEx;
   if (elemName[0] === tmplRule.extensionRule) {
     ret = elem.substring(1, elem.length - 1);
+  } else if (elemName.indexOf(tmplRule.strPropRule + tmplRule.propRule) === 0) {
+    ret = _transformToEx(true, elemName, elemParams, tmplRule);
   } else if (elemName.indexOf(tmplRule.propRule) === 0) {
-    ret = tmplRule.extensionRule + 'prop ' + tmplRule.startRule + '\'' + elemName.substr(tmplRule.propRule.length) + '\'' + tmplRule.endRule + elemParams;
+    ret = _transformToEx(false, elemName, elemParams, tmplRule);
   } else {
     const retS = _getSplitParams(elem, tmplRule);
     ret = retS.elem;

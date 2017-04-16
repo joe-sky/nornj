@@ -32,6 +32,7 @@ export default function createTmplRule(rules = {}, isGlobal) {
       endRule = '}}',
       extensionRule = '#',
       propRule = '@',
+      strPropRule = '@',
       templateRule = 'template',
       tagSpRule = '#$@',
       commentRule = '#'
@@ -42,6 +43,7 @@ export default function createTmplRule(rules = {}, isGlobal) {
     end,
     extension,
     prop,
+    strProp,
     template,
     tagSp,
     comment
@@ -59,6 +61,9 @@ export default function createTmplRule(rules = {}, isGlobal) {
   if (prop) {
     propRule = prop;
   }
+  if (strProp) {
+    strPropRule = strProp;
+  }
   if (template) {
     templateRule = template;
   }
@@ -72,7 +77,7 @@ export default function createTmplRule(rules = {}, isGlobal) {
   const allRules = _clearRepeat(startRule + endRule),
     firstChar = startRule[0],
     lastChar = endRule[endRule.length - 1],
-    extensionRules = _clearRepeat(extensionRule + propRule + tagSpRule),
+    extensionRules = _clearRepeat(extensionRule + propRule + strPropRule + tagSpRule),
     escapeExtensionRule = _replace$(extensionRule);
 
   const tmplRules = {
@@ -80,6 +85,7 @@ export default function createTmplRule(rules = {}, isGlobal) {
     endRule,
     extensionRule,
     propRule,
+    strPropRule,
     templateRule,
     tagSpRule,
     commentRule,
@@ -93,7 +99,7 @@ export default function createTmplRule(rules = {}, isGlobal) {
     replaceParam: _createRegExp('([' + firstChar + ']?' + startRule + ')([^' + allRules + ']+)' + endRule + '[' + lastChar + ']?', 'g'),
     checkElem: _createRegExp('([^<>]+)|(<([a-z/!' + firstChar + extensionRules + '][^\\s<>]*)([^<>]*)>|<)([^<]*)', 'ig'),
     extension: _createRegExp('^' + escapeExtensionRule + '([^\\s]+)', 'i'),
-    exAll: _createRegExp('^[/]?(' + escapeExtensionRule + '|' + _replace$(propRule) + ')', 'i'),
+    exAll: _createRegExp('^[/]?(' + escapeExtensionRule + '|' + _replace$(strPropRule) + '|' + _replace$(propRule) + ')', 'i'),
     include: _createRegExp('<' + escapeExtensionRule + 'include([^>]*)>', 'ig'),
     newlineSplit: _createRegExp('\\n(?![^' + firstChar + lastChar + ']*' + lastChar + ')', 'g'),
     incompleteStart: _createRegExp('[' + firstChar + ']?' + startRule + '[^' + allRules + ']*$'),

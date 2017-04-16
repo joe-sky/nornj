@@ -266,8 +266,8 @@ describe('test compile string', function () {
           <#tmpl>
             <TextExpr name="{{no}}" />
           </#tmpl>
-          <@a />
-          <#arg>
+          <@@a />
+          <#strArg>
             num:
             <#block>
               <#list {{1}} {{2}} {{3}} />
@@ -275,10 +275,10 @@ describe('test compile string', function () {
             <#block>
               <#list {{4}} {{5}} {{6}} useString="false" />
             </#block>
-          </#arg>
+          </#strArg>
           <#arg>{{1 +(2)}}</#arg>
           <img /><img />
-          <@name>
+          <@@name>
             img
             <div>
               <@name>
@@ -288,7 +288,7 @@ describe('test compile string', function () {
               </@name>
             </div>
             <#list {{1}} {{2}} />
-          </@name>
+          </@@name>
         </#textExpr>
         <slider {{../name3}} step="{{'name5' | vm-var}}">
           <div></div>

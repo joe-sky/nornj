@@ -370,6 +370,8 @@ function createTmplRule() {
       extensionRule = _nj$tmplRule$extensio === undefined ? '#' : _nj$tmplRule$extensio,
       _nj$tmplRule$propRule = _nj$tmplRule.propRule,
       propRule = _nj$tmplRule$propRule === undefined ? '@' : _nj$tmplRule$propRule,
+      _nj$tmplRule$strPropR = _nj$tmplRule.strPropRule,
+      strPropRule = _nj$tmplRule$strPropR === undefined ? '@' : _nj$tmplRule$strPropR,
       _nj$tmplRule$template = _nj$tmplRule.templateRule,
       templateRule = _nj$tmplRule$template === undefined ? 'template' : _nj$tmplRule$template,
       _nj$tmplRule$tagSpRul = _nj$tmplRule.tagSpRule,
@@ -380,6 +382,7 @@ function createTmplRule() {
       end = rules.end,
       extension = rules.extension,
       prop = rules.prop,
+      strProp = rules.strProp,
       template = rules.template,
       tagSp = rules.tagSp,
       comment = rules.comment;
@@ -397,6 +400,9 @@ function createTmplRule() {
   if (prop) {
     propRule = prop;
   }
+  if (strProp) {
+    strPropRule = strProp;
+  }
   if (template) {
     templateRule = template;
   }
@@ -410,7 +416,7 @@ function createTmplRule() {
   var allRules = _clearRepeat(startRule + endRule),
       firstChar = startRule[0],
       lastChar = endRule[endRule.length - 1],
-      extensionRules = _clearRepeat(extensionRule + propRule + tagSpRule),
+      extensionRules = _clearRepeat(extensionRule + propRule + strPropRule + tagSpRule),
       escapeExtensionRule = _replace$(extensionRule);
 
   var tmplRules = {
@@ -418,6 +424,7 @@ function createTmplRule() {
     endRule: endRule,
     extensionRule: extensionRule,
     propRule: propRule,
+    strPropRule: strPropRule,
     templateRule: templateRule,
     tagSpRule: tagSpRule,
     commentRule: commentRule,
@@ -431,7 +438,7 @@ function createTmplRule() {
     replaceParam: _createRegExp('([' + firstChar + ']?' + startRule + ')([^' + allRules + ']+)' + endRule + '[' + lastChar + ']?', 'g'),
     checkElem: _createRegExp('([^<>]+)|(<([a-z/!' + firstChar + extensionRules + '][^\\s<>]*)([^<>]*)>|<)([^<]*)', 'ig'),
     extension: _createRegExp('^' + escapeExtensionRule + '([^\\s]+)', 'i'),
-    exAll: _createRegExp('^[/]?(' + escapeExtensionRule + '|' + _replace$(propRule) + ')', 'i'),
+    exAll: _createRegExp('^[/]?(' + escapeExtensionRule + '|' + _replace$(propRule) + '|' + _replace$(strPropRule) + ')', 'i'),
     include: _createRegExp('<' + escapeExtensionRule + 'include([^>]*)>', 'ig'),
     newlineSplit: _createRegExp('\\n(?![^' + firstChar + lastChar + ']*' + lastChar + ')', 'g'),
     incompleteStart: _createRegExp('[' + firstChar + ']?' + startRule + '[^' + allRules + ']*$'),
@@ -621,7 +628,7 @@ var extensions = {
       value = ret;
     } else {
       //Match to Similar to "checked" or "disabled" attribute.
-      value = options.outputH ? true : name;
+      value = !options.useString ? true : name;
     }
 
     options.exProps[options.outputH ? __WEBPACK_IMPORTED_MODULE_2__transforms_transformData__["a" /* fixPropName */](name) : name] = value;
@@ -821,7 +828,6 @@ extensionConfig.block = _config(extensionConfig.obj);
 extensionConfig.pre = _config(extensionConfig.obj);
 extensionConfig.arg = _config(extensionConfig.prop);
 extensionConfig.once = _config(extensionConfig.obj);
-extensionConfig.strProp = __WEBPACK_IMPORTED_MODULE_1__utils_tools__["a" /* assign */](_config(extensionConfig.prop), { useString: true });
 
 //Extension alias
 extensions['case'] = extensions.elseif;
@@ -829,6 +835,9 @@ extensionConfig['case'] = extensionConfig.elseif;
 extensions['default'] = extensions['else'];
 extensionConfig['default'] = extensionConfig['else'];
 extensions.strProp = extensions.prop;
+extensionConfig.strProp = __WEBPACK_IMPORTED_MODULE_1__utils_tools__["a" /* assign */](_config(extensionConfig.prop), { useString: true });
+extensions.strArg = extensions.arg;
+extensionConfig.strArg = _config(extensionConfig.strProp);
 
 //Register extension and also can batch add
 function registerExtension(name, extension, options) {
@@ -1627,14 +1636,20 @@ function _formatAll(str, tmplRule) {
   });
 }
 
+function _transformToEx(isStr, elemName, elemParams, tmplRule) {
+  return tmplRule.extensionRule + (isStr ? 'strProp' : 'prop') + ' ' + tmplRule.startRule + '\'' + elemName.substr((isStr ? tmplRule.strPropRule.length : 0) + tmplRule.propRule.length) + '\'' + tmplRule.endRule + elemParams;
+}
+
 //Set element node
 function _setElem(elem, elemName, elemParams, elemArr, bySelfClose, tmplRule) {
   var ret = void 0,
       paramsEx = void 0;
   if (elemName[0] === tmplRule.extensionRule) {
     ret = elem.substring(1, elem.length - 1);
+  } else if (elemName.indexOf(tmplRule.strPropRule + tmplRule.propRule) === 0) {
+    ret = _transformToEx(true, elemName, elemParams, tmplRule);
   } else if (elemName.indexOf(tmplRule.propRule) === 0) {
-    ret = tmplRule.extensionRule + 'prop ' + tmplRule.startRule + '\'' + elemName.substr(tmplRule.propRule.length) + '\'' + tmplRule.endRule + elemParams;
+    ret = _transformToEx(false, elemName, elemParams, tmplRule);
   } else {
     var retS = _getSplitParams(elem, tmplRule);
     ret = retS.elem;
@@ -2424,7 +2439,7 @@ function _buildFn(content, node, fns, no, newContext, level, useStringLocal) {
   /* 构建扩展标签函数
    p1: 模板全局数据
    p2: 节点上下文数据
-   p3: 扩展标签内调用result及inverse方法传递的参数
+   p3: 扩展标签内调用result方法传递的参数
    p4: #props变量
    p5：子扩展标签#props变量
   */

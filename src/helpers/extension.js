@@ -146,7 +146,7 @@ export const extensions = {
     if (ret !== undefined) {
       value = ret;
     } else { //Match to Similar to "checked" or "disabled" attribute.
-      value = options.outputH ? true : name;
+      value = !options.useString ? true : name;
     }
 
     options.exProps[options.outputH ? tranData.fixPropName(name) : name] = value;
@@ -327,7 +327,6 @@ extensionConfig.block = _config(extensionConfig.obj);
 extensionConfig.pre = _config(extensionConfig.obj);
 extensionConfig.arg = _config(extensionConfig.prop);
 extensionConfig.once = _config(extensionConfig.obj);
-extensionConfig.strProp = tools.assign(_config(extensionConfig.prop), { useString: true });
 
 //Extension alias
 extensions['case'] = extensions.elseif;
@@ -335,6 +334,9 @@ extensionConfig['case'] = extensionConfig.elseif;
 extensions['default'] = extensions['else'];
 extensionConfig['default'] = extensionConfig['else'];
 extensions.strProp = extensions.prop;
+extensionConfig.strProp = tools.assign(_config(extensionConfig.prop), { useString: true });
+extensions.strArg = extensions.arg;
+extensionConfig.strArg = _config(extensionConfig.strProp);
 
 //Register extension and also can batch add
 export function registerExtension(name, extension, options) {
