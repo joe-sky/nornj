@@ -14,6 +14,32 @@
 [![NPM Version][npm-image]][npm-url]
 [![NPM Downloads][downloads-image]][npm-url]
 
+## 概述
+
+`NornJ`是一款同时支持渲染`html(或xml)字符串`和`HyperScript`的模板引擎。
+
+> 什么是`HyperScript`?
+
+[`HyperScript`](https://github.com/hyperhype/hyperscript)可以说是一种创建用户界面元素的语法规范，即：`h (tag, attrs, [text?, Elements?,...])`语法。各大前端框架中对于它的应用，最著名的当属`React`。`React`的`createElement`方法即为`HyperScript`的一种实现，`React`使用它来创建`虚拟dom`对象。
+
+而`NornJ`可将同样语法规范的模板，转换为多种方式渲染：
+
+```
+                  +-----------------+
+                  ¦ template string ¦
+                  +-----------------+
+                           |
+                           |
+           +-------------------------------+
+           |                               |
+           |                               |
+ +------------------+      +--------------------------------+
+ ¦ html(xml) string ¦      ¦ HyperScript(React virtual dom) ¦
+ +------------------+      +--------------------------------+
+```
+
+故`NornJ`不但可以作为`Express`服务器的界面模板引擎，还可以替代`JSX`作为`React`的界面模板引擎。它的语法和`JSX`并不互相排斥，可共存一起运行。
+
 ## 模板基本示例
 
 ```html
