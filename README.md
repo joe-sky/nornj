@@ -20,7 +20,7 @@
 
 > 什么是`HyperScript`?
 
-[`HyperScript`](https://github.com/hyperhype/hyperscript)可以说是一种创建用户界面元素的语法规范，即：`h (tag, attrs, [text?, Elements?,...])`语法。各大前端框架中对于它的应用，最著名的当属`React`。`React`的`createElement`方法即为`HyperScript`的一种实现，`React`使用它来创建`虚拟dom`对象。
+[`HyperScript`](https://github.com/hyperhype/hyperscript)可以说是一种创建用户界面元素的语法规范，即：`h (tag, attrs, [text?, Elements?,...])`语法。各大前端框架中对于它的应用，最著名的当属`React`。`React`的`createElement`方法即为`HyperScript`的一种实现，`React`使用它来创建`virtual dom`对象。
 
 而`NornJ`可将同样语法规范的模板，转换为多种方式渲染：
 
@@ -63,15 +63,18 @@
 
 ## 特色
 
-传统js模板引擎如`Handlebars`、`EJS`等通常只支持输出html字符串，`NornJ`与它们相比，相同点和不同点都有：
+传统js模板引擎如`Handlebars`、`EJS`等通常只支持渲染html字符串，`NornJ`与它们相比，相同点和不同点都有：
 
-* 支持`React`作为JSX的替代模板语言；可支持模板预编译，也可以直接在浏览器中运行。
-* 支持读取数据并输出html字符串，故它也可以像传统js模板引擎一样支持`Backbone`或`Express`等。
-* 它的语法偏向弱逻辑，和`Handlebars`更类似一些，但也有自己独特的地方。
+* 支持渲染`React`的`virtual dom`对象，作为`JSX`的替代模板语言。
+* 支持渲染html字符串，故它也可以像传统js模板引擎一样支持`Backbone`或`Express`等。
+* 它的语法注重表现与逻辑的隔离性，和`Handlebars`更类似一些，但也有很多独特的地方。
+* 语法拥有非常强大的可扩展性，例如模板中的每个`运算符`及`语句`都是可以扩展的。
+* 它有多种使用方式适应不同场景，可用单独的模板文件定义；可以写在html中；还可以支持直接在js文件中编写。
+* 可支持模板预编译，也可以直接在浏览器中运行。
 
 ## 与React配合示例
 
-NornJ可以替代JSX输出React组件，用它可以将React组件的逻辑与结构更优雅地实现解藕：
+NornJ可以替代JSX输出React组件，用它可以将React组件的表现与逻辑更优雅地实现解藕：
 
 ```js
 import { Component } from 'react';
