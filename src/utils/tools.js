@@ -1,7 +1,8 @@
 ﻿import nj from '../core';
 const nativeArrayPush = Array.prototype.push,
   nativeArraySlice = Array.prototype.slice,
-  hasOwnProperty = Object.prototype.hasOwnProperty;
+  hasOwnProperty = Object.prototype.hasOwnProperty,
+  toString = Object.prototype.toString;
 const { errorTitle } = nj;
 
 export const defineProp = Object.defineProperty;
@@ -28,9 +29,14 @@ export function isObject(obj) {
   return !isArray(obj) && (type === 'function' || type === 'object' && !!obj);
 }
 
+//判断是否为数字
+export function isNumber(obj) {
+  return toString.call(obj) === '[object Number]';
+}
+
 //判断是否为字符串
 export function isString(obj) {
-  return Object.prototype.toString.call(obj) === '[object String]';
+  return toString.call(obj) === '[object String]';
 }
 
 //获取属性值
@@ -184,6 +190,7 @@ assign(nj, {
   arraySlice,
   isArray,
   isObject,
+  isNumber,
   isString,
   isArrayLike,
   each,

@@ -5,7 +5,7 @@ const { errorTitle } = nj;
 //提取style内参数
 export function styleProps(obj) {
   //If the parameter is a style object,then direct return.
-  if (tools.isObject(obj)) {
+  if (tools.isObject(obj) || tools.isNumber(obj)) {
     return obj;
   }
 

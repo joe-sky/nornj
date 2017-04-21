@@ -107,25 +107,27 @@ nj.global = typeof self !== 'undefined' ? self : global;
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "e", function() { return defineProps; });
 /* harmony export (immutable) */ __webpack_exports__["h"] = arrayPush;
 /* harmony export (immutable) */ __webpack_exports__["j"] = arraySlice;
-/* harmony export (immutable) */ __webpack_exports__["p"] = isArray;
+/* harmony export (immutable) */ __webpack_exports__["q"] = isArray;
 /* harmony export (immutable) */ __webpack_exports__["k"] = isObject;
+/* harmony export (immutable) */ __webpack_exports__["l"] = isNumber;
 /* harmony export (immutable) */ __webpack_exports__["b"] = isString;
 /* harmony export (immutable) */ __webpack_exports__["i"] = isArrayLike;
 /* harmony export (immutable) */ __webpack_exports__["c"] = each;
-/* harmony export (immutable) */ __webpack_exports__["q"] = trimRight;
-/* harmony export (immutable) */ __webpack_exports__["m"] = noop;
-/* harmony export (immutable) */ __webpack_exports__["n"] = throwIf;
-/* harmony export (immutable) */ __webpack_exports__["o"] = warn;
+/* harmony export (immutable) */ __webpack_exports__["r"] = trimRight;
+/* harmony export (immutable) */ __webpack_exports__["n"] = noop;
+/* harmony export (immutable) */ __webpack_exports__["o"] = throwIf;
+/* harmony export (immutable) */ __webpack_exports__["p"] = warn;
 /* harmony export (immutable) */ __webpack_exports__["g"] = obj;
 /* harmony export (immutable) */ __webpack_exports__["f"] = clearQuot;
-/* harmony export (immutable) */ __webpack_exports__["l"] = toCamelCase;
+/* harmony export (immutable) */ __webpack_exports__["m"] = toCamelCase;
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return assign; });
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
 
 var nativeArrayPush = Array.prototype.push,
     nativeArraySlice = Array.prototype.slice,
-    hasOwnProperty = Object.prototype.hasOwnProperty;
+    hasOwnProperty = Object.prototype.hasOwnProperty,
+    toString = Object.prototype.toString;
 var errorTitle = __WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */].errorTitle;
 
 
@@ -153,9 +155,14 @@ function isObject(obj) {
   return !isArray(obj) && (type === 'function' || type === 'object' && !!obj);
 }
 
+//判断是否为数字
+function isNumber(obj) {
+  return toString.call(obj) === '[object Number]';
+}
+
 //判断是否为字符串
 function isString(obj) {
-  return Object.prototype.toString.call(obj) === '[object String]';
+  return toString.call(obj) === '[object String]';
 }
 
 //获取属性值
@@ -311,6 +318,7 @@ assign(__WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */], {
   arraySlice: arraySlice,
   isArray: isArray,
   isObject: isObject,
+  isNumber: isNumber,
   isString: isString,
   isArrayLike: isArrayLike,
   each: each,
@@ -902,7 +910,7 @@ var errorTitle = __WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */].errorTit
 
 function styleProps(obj) {
   //If the parameter is a style object,then direct return.
-  if (__WEBPACK_IMPORTED_MODULE_1__utils_tools__["k" /* isObject */](obj)) {
+  if (__WEBPACK_IMPORTED_MODULE_1__utils_tools__["k" /* isObject */](obj) || __WEBPACK_IMPORTED_MODULE_1__utils_tools__["l" /* isNumber */](obj)) {
     return obj;
   }
 
@@ -925,7 +933,7 @@ function styleProps(obj) {
     }
 
     //将连字符转为驼峰命名
-    key = __WEBPACK_IMPORTED_MODULE_1__utils_tools__["l" /* toCamelCase */](key);
+    key = __WEBPACK_IMPORTED_MODULE_1__utils_tools__["m" /* toCamelCase */](key);
 
     ret[key] = value;
   }
@@ -1092,10 +1100,10 @@ function template(fns) {
     useString: fns.useString,
     extensions: __WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */].extensions,
     filters: __WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */].filters,
-    noop: __WEBPACK_IMPORTED_MODULE_1__utils_tools__["m" /* noop */],
+    noop: __WEBPACK_IMPORTED_MODULE_1__utils_tools__["n" /* noop */],
     obj: __WEBPACK_IMPORTED_MODULE_1__utils_tools__["g" /* obj */],
-    throwIf: __WEBPACK_IMPORTED_MODULE_1__utils_tools__["n" /* throwIf */],
-    warn: __WEBPACK_IMPORTED_MODULE_1__utils_tools__["o" /* warn */],
+    throwIf: __WEBPACK_IMPORTED_MODULE_1__utils_tools__["o" /* throwIf */],
+    warn: __WEBPACK_IMPORTED_MODULE_1__utils_tools__["p" /* warn */],
     newContext: newContext,
     getComputedData: getComputedData,
     styleProps: styleProps,
@@ -3148,7 +3156,7 @@ function _plainTextNode(obj, parent, parentContent, noSplitNewline, tmplRule) {
 function checkElem(obj, parent, tmplRule, hasExProps, noSplitNewline, isLast) {
   var parentContent = 'content';
 
-  if (!__WEBPACK_IMPORTED_MODULE_1__utils_tools__["p" /* isArray */](obj)) {
+  if (!__WEBPACK_IMPORTED_MODULE_1__utils_tools__["q" /* isArray */](obj)) {
     //判断是否为文本节点
     if (__WEBPACK_IMPORTED_MODULE_1__utils_tools__["b" /* isString */](obj)) {
       if (!noSplitNewline) {
@@ -3158,7 +3166,7 @@ function checkElem(obj, parent, tmplRule, hasExProps, noSplitNewline, isLast) {
           str !== '' && _plainTextNode(str, parent, parentContent, noSplitNewline, tmplRule);
         });
       } else {
-        _plainTextNode(isLast && parent.allowNewline === 'nlElem' ? __WEBPACK_IMPORTED_MODULE_1__utils_tools__["q" /* trimRight */](obj) : obj, parent, parentContent, noSplitNewline, tmplRule);
+        _plainTextNode(isLast && parent.allowNewline === 'nlElem' ? __WEBPACK_IMPORTED_MODULE_1__utils_tools__["r" /* trimRight */](obj) : obj, parent, parentContent, noSplitNewline, tmplRule);
       }
     } else {
       _plainTextNode(obj, parent, parentContent, noSplitNewline, tmplRule);
@@ -3329,7 +3337,7 @@ function checkElem(obj, parent, tmplRule, hasExProps, noSplitNewline, isLast) {
       //如果不是元素节点,则为节点集合
       _checkContentElem(obj, parent, tmplRule, hasExProps, noSplitNewline);
     }
-  } else if (__WEBPACK_IMPORTED_MODULE_1__utils_tools__["p" /* isArray */](first)) {
+  } else if (__WEBPACK_IMPORTED_MODULE_1__utils_tools__["q" /* isArray */](first)) {
     //如果第一个子节点为数组,则该节点一定为节点集合(可以是多层数组嵌套的集合)
     _checkContentElem(obj, parent, tmplRule, hasExProps, noSplitNewline);
   }
