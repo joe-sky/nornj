@@ -229,8 +229,15 @@ describe('test compile string', function () {
         </script>
         <textarea>
           1 < 123
+          <img src="test1.png">
         </textarea>
       </#once>
+      <img src="test1.png">
+      <img src="test1.png">
+        <#prop {{'id'}}>img</#prop>
+        <@id1>img1</@id1>
+      </img>
+      <img src="test1.png">
       {{{JSON #('stringify', @data[0])}}}
       <#each {{ list2 }}>
         <!--<i>test</i>-->
@@ -306,7 +313,7 @@ describe('test compile string', function () {
           #${nj`<div>{{../name3 | #('substring', 0, 3)}}</div>`}
           <{{../sliderItem['a']|tagName(1,2)}} no0="/" no1={{no}} no2="{{-0.05 | filter2}}" checked no='{{ ../sliderItem.b }}' />
         </slider>
-      </#each>
+      </#each><img src="test1.png">
       `;
 
       console.log(tmplTest._njTmpl);

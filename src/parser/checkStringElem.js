@@ -9,6 +9,7 @@ const TEXT_CONTENT = [
   'textarea',
   'xmp'
 ];
+const { OMITTED_CLOSE_TAGS } = tranElem;
 
 //Compile string template
 export default function compileStringTmpl(tmpl) {
@@ -95,6 +96,21 @@ export default function compileStringTmpl(tmpl) {
   return tmplFn;
 }
 
+function _createCurrent(elemName, parent) {
+  const current = {
+    elem: [],
+    elemName,
+    parent
+  };
+
+  parent.elem.push(current.elem);
+  return current;
+}
+
+function _setTextAfter(textAfter, current) {
+  textAfter && textAfter !== '' && _setText(textAfter, current.elem);
+}
+
 //Resolve string to element
 function _checkStringElem(xml, tmplRule) {
   let root = [],
@@ -106,7 +122,8 @@ function _checkStringElem(xml, tmplRule) {
     parent = null,
     pattern = tmplRule.checkElem,
     matchArr,
-    inTextContent = false;
+    inTextContent = false,
+    omittedCloseElem = null;
 
   while (matchArr = pattern.exec(xml)) {
     let textBefore = matchArr[1],
@@ -114,6 +131,26 @@ function _checkStringElem(xml, tmplRule) {
       elemName = matchArr[3],
       elemParams = matchArr[4],
       textAfter = matchArr[5];
+
+    //处理上一次循环中的
+    if (omittedCloseElem) {
+      const [_elem, _elemName, _elemParams, _textAfter] = omittedCloseElem;
+      let isEx = elem ? tranElem.isExAll(elemName, tmplRule) : false;
+
+      if (isEx && !isEx[1] && (tranElem.isPropS(elemName, tmplRule) ||
+          tranElem.isStrPropS(elemName, tmplRule) ||
+          tranElem.isParamsEx(isEx[3]) ||
+          tranElem.exCompileConfig(isEx[3]).isProp)) {
+        parent = current;
+        current = _createCurrent(_elemName, parent);
+        _setElem(_elem, _elemName, _elemParams, current.elem, null, tmplRule);
+      } else {
+        _setSelfCloseElem(_elem, _elemName, _elemParams, current.elem, tmplRule);
+      }
+
+      _setTextAfter(_textAfter, current);
+      omittedCloseElem = null;
+    }
 
     //Text before tag
     if (textBefore && textBefore !== '') {
@@ -128,7 +165,7 @@ function _checkStringElem(xml, tmplRule) {
         } else {
           const isEx = tranElem.isExAll(elemName, tmplRule);
           if (elemName[0] === '/') { //Close tag
-            if (TEXT_CONTENT.indexOf(elemName.substr(1).toLowerCase()) > -1) {  //取消纯文本子节点标记
+            if (TEXT_CONTENT.indexOf(elemName.substr(1).toLowerCase()) > -1) { //取消纯文本子节点标记
               inTextContent = false;
             }
 
@@ -147,19 +184,17 @@ function _checkStringElem(xml, tmplRule) {
             }
           } else { //Open tag
             if (isEx || !inTextContent) {
-              if (TEXT_CONTENT.indexOf(elemName.toLowerCase()) > -1) {  //标记该标签为纯文本子节点
-                inTextContent = true;
+              if (!inTextContent && OMITTED_CLOSE_TAGS[elemName.toLowerCase()]) { //img等可不闭合标签
+                omittedCloseElem = [elem, elemName, elemParams, textAfter];
+              } else {
+                if (TEXT_CONTENT.indexOf(elemName.toLowerCase()) > -1) { //标记该标签为纯文本子节点
+                  inTextContent = true;
+                }
+
+                parent = current;
+                current = _createCurrent(elemName, parent);
+                _setElem(elem, elemName, elemParams, current.elem, null, tmplRule);
               }
-
-              parent = current;
-              current = {
-                elem: [],
-                elemName,
-                parent
-              };
-
-              parent.elem.push(current.elem);
-              _setElem(elem, elemName, elemParams, current.elem, null, tmplRule);
             } else {
               _setText(elem, current.elem);
             }
@@ -174,9 +209,14 @@ function _checkStringElem(xml, tmplRule) {
     }
 
     //Text after tag
-    if (textAfter && textAfter !== '') {
-      _setText(textAfter, current.elem);
-    }
+    !omittedCloseElem && _setTextAfter(textAfter, current);
+  }
+
+  if (omittedCloseElem) {
+    const [_elem, _elemName, _elemParams, _textAfter] = omittedCloseElem;
+
+    _setSelfCloseElem(_elem, _elemName, _elemParams, current.elem, tmplRule);
+    _setTextAfter(_textAfter, current);
   }
 
   return root;
@@ -205,9 +245,9 @@ function _setElem(elem, elemName, elemParams, elemArr, bySelfClose, tmplRule) {
   let ret, paramsEx;
   if (elemName[0] === tmplRule.extensionRule) {
     ret = elem.substring(1, elem.length - 1);
-  } else if (elemName.indexOf(tmplRule.strPropRule + tmplRule.propRule) === 0) {
+  } else if (tranElem.isStrPropS(elemName, tmplRule)) {
     ret = _transformToEx(true, elemName, elemParams, tmplRule);
-  } else if (elemName.indexOf(tmplRule.propRule) === 0) {
+  } else if (tranElem.isPropS(elemName, tmplRule)) {
     ret = _transformToEx(false, elemName, elemParams, tmplRule);
   } else {
     const retS = _getSplitParams(elem, tmplRule);

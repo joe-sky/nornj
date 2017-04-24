@@ -16,7 +16,7 @@ export function isXmlSelfCloseTag(obj) {
 }
 
 //Verify self close tag name
-const OMITTED_CLOSE_TAGS = {
+export const OMITTED_CLOSE_TAGS = {
   'area': true,
   'base': true,
   'br': true,
@@ -106,7 +106,7 @@ export function isEx(obj, tmplRule, isAll) {
 }
 
 export function isExAll(obj, tmplRule) {
-  return tmplRule.exAll.test(obj);
+  return obj.match(tmplRule.exAll);
 }
 
 //判断是否模板元素
@@ -171,4 +171,12 @@ export function exCompileConfig(name) {
     isProp: config ? config.isProp : false,
     useString: config ? config.useString : false
   };
+}
+
+export function isPropS(elemName, tmplRule) {
+  return elemName.indexOf(tmplRule.propRule) === 0;
+}
+
+export function isStrPropS(elemName, tmplRule) {
+  return elemName.indexOf(tmplRule.strPropRule + tmplRule.propRule) === 0;
 }
