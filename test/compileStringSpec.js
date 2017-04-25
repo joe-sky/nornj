@@ -313,10 +313,12 @@ describe('test compile string', function () {
           #${nj`<div>{{../name3 | #('substring', 0, 3)}}</div>`}
           <{{../sliderItem['a']|tagName(1,2)}} no0="/" no1={{no}} no2="{{-0.05 | filter2}}" checked no='{{ ../sliderItem.b }}' />
         </slider>
-      </#each><img src="test1.png">
+      </#each>
+      <$if {a .('length')}>1</$if>
+      <img src="test1.png">
       `;
 
-      console.log(tmplTest._njTmpl);
+      //console.log(tmplTest._njTmpl);
 
       var tmplTest2 = nj.compile(`
       <div>
@@ -380,7 +382,7 @@ describe('test compile string', function () {
       //console.log(JSON.stringify(nj.asts['tmplString']));
 
       var html = tmplTest.apply(null, data);
-      var html2 = tmplTest.call(null, { id: 200, c1: 100 }, data[0]);
+      // var html2 = tmplTest.call(null, { id: 200, c1: 100 }, data[0]);
       console.log(html);
       expect(html).toBeTruthy();
     });

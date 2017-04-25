@@ -401,10 +401,10 @@ function _buildParams(node, fns, counter, useString, level, exPropsStr, subExPro
           valueStr = 'p1.styleProps(' + valueStr + ')';
         }
 
-        let key = k,
+        let key = _replaceStrs(k),
           onlyKey = ('\'' + key + '\'') === valueStr;
         if (!useStringF) {
-          key = tranData.fixPropName(k);
+          key = tranData.fixPropName(key);
         }
         if (!hasPropsEx) {
           if (!useString) {

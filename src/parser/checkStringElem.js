@@ -132,7 +132,7 @@ function _checkStringElem(xml, tmplRule) {
       elemParams = matchArr[4],
       textAfter = matchArr[5];
 
-    //处理上一次循环中的
+    //处理上一次循环中的可省略闭合标签
     if (omittedCloseElem) {
       const [_elem, _elemName, _elemParams, _textAfter] = omittedCloseElem;
       let isEx = elem ? tranElem.isExAll(elemName, tmplRule) : false;
@@ -212,6 +212,7 @@ function _checkStringElem(xml, tmplRule) {
     !omittedCloseElem && _setTextAfter(textAfter, current);
   }
 
+  //处理最后一次循环中遗留的可省略闭合标签
   if (omittedCloseElem) {
     const [_elem, _elemName, _elemParams, _textAfter] = omittedCloseElem;
 

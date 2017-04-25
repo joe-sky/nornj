@@ -1577,7 +1577,7 @@ function _checkStringElem(xml, tmplRule) {
         elemParams = matchArr[4],
         textAfter = matchArr[5];
 
-    //处理上一次循环中的
+    //处理上一次循环中的可省略闭合标签
     if (omittedCloseElem) {
       var _omittedCloseElem = omittedCloseElem,
           _omittedCloseElem2 = _slicedToArray(_omittedCloseElem, 4),
@@ -1668,6 +1668,7 @@ function _checkStringElem(xml, tmplRule) {
     !omittedCloseElem && _setTextAfter(textAfter, current);
   }
 
+  //处理最后一次循环中遗留的可省略闭合标签
   if (omittedCloseElem) {
     var _omittedCloseElem3 = omittedCloseElem,
         _omittedCloseElem4 = _slicedToArray(_omittedCloseElem3, 4),
@@ -2878,10 +2879,10 @@ function _buildParams(node, fns, counter, useString, level, exPropsStr, subExPro
             valueStr = 'p1.styleProps(' + valueStr + ')';
           }
 
-          var key = k,
+          var key = _replaceStrs(k),
               onlyKey = '\'' + key + '\'' === valueStr;
           if (!useStringF) {
-            key = __WEBPACK_IMPORTED_MODULE_2__transforms_transformData__["a" /* fixPropName */](k);
+            key = __WEBPACK_IMPORTED_MODULE_2__transforms_transformData__["a" /* fixPropName */](key);
           }
           if (!hasPropsEx) {
             if (!useString) {
