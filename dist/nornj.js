@@ -659,7 +659,9 @@ var extensions = {
     }
 
     var ret = void 0,
-        useString = options.useString;
+        useString = options.useString,
+        props = options.props,
+        loopLast = props && props.loopLast;
     if (useString) {
       ret = '';
     } else {
@@ -667,6 +669,10 @@ var extensions = {
     }
 
     for (; start <= end; start++) {
+      if (!loopLast && start === end) {
+        break;
+      }
+
       var retI = options.result({
         index: start,
         fallback: true
@@ -1131,6 +1137,10 @@ function template(fns) {
       //将每个主函数构建为可运行的模板函数
       configs[k] = tmplWrap(configs, v);
       configs[k]._njTmpl = true;
+      if (v._njName != null) {
+        //设置函数名
+        configs[k].tmplName = v._njName;
+      }
       configs['_' + k] = v;
     } else if (k.indexOf('fn') === 0) {
       //扩展标签函数
@@ -2461,7 +2471,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 var errorTitle = __WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */].errorTitle;
 
 
-function _buildFn(content, node, fns, no, newContext, level, useStringLocal) {
+function _buildFn(content, node, fns, no, newContext, level, useStringLocal, name) {
   var fnStr = '',
       useString = useStringLocal != null ? useStringLocal : fns.useString,
       isTmplEx = __WEBPACK_IMPORTED_MODULE_1__utils_tools__["b" /* isString */](no),
@@ -2517,7 +2527,11 @@ function _buildFn(content, node, fns, no, newContext, level, useStringLocal) {
    p4: #props变量
    p5：子扩展标签#props变量
   */
-  fns[main ? 'main' + (isTmplEx ? no : '') : 'fn' + no] = new Function('p1', 'p2', 'p3', 'p4', 'p5', fnStr);
+  var fn = fns[main ? 'main' + (isTmplEx ? no : '') : 'fn' + no] = new Function('p1', 'p2', 'p3', 'p4', 'p5', fnStr);
+  if (isTmplEx && name != null) {
+    //设置函数名
+    fn._njName = name;
+  }
   return no;
 }
 
@@ -2754,9 +2768,11 @@ function _buildProps(obj, counter, fns, useStringLocal, level) {
     valueStr += '{\n';
     __WEBPACK_IMPORTED_MODULE_1__utils_tools__["c" /* each */](str0, function (v, k, i, l) {
       if (k !== '_njLen') {
-        var fnStr = 'p1.main' + _buildFn(v.node.content, v.node, fns, 'T' + ++fns._noT);
+        var hasName = k.indexOf('_njT') !== 0,
+            fnStr = 'p1.main' + _buildFn(v.node.content, v.node, fns, 'T' + ++fns._noT, null, null, null, hasName ? k : null);
+
         valueStr += '  "' + v.no + '": ' + fnStr;
-        if (k.indexOf('_njT') !== 0) {
+        if (hasName) {
           valueStr += ',\n  "' + k + '": ' + fnStr;
         }
       } else {

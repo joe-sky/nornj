@@ -6,7 +6,7 @@ import { extensionConfig } from '../helpers/extension';
 import { filterConfig } from '../helpers/filter';
 const { errorTitle } = nj;
 
-function _buildFn(content, node, fns, no, newContext, level, useStringLocal) {
+function _buildFn(content, node, fns, no, newContext, level, useStringLocal, name) {
   let fnStr = '',
     useString = useStringLocal != null ? useStringLocal : fns.useString,
     isTmplEx = tools.isString(no), //如果no为字符串, 则本次将构建tmpl块模板函数
@@ -60,7 +60,10 @@ function _buildFn(content, node, fns, no, newContext, level, useStringLocal) {
    p4: #props变量
    p5：子扩展标签#props变量
   */
-  fns[main ? 'main' + (isTmplEx ? no : '') : 'fn' + no] = new Function('p1', 'p2', 'p3', 'p4', 'p5', fnStr);
+  const fn = fns[main ? 'main' + (isTmplEx ? no : '') : 'fn' + no] = new Function('p1', 'p2', 'p3', 'p4', 'p5', fnStr);
+  if(isTmplEx && name != null) {  //设置函数名
+    fn._njName = name;
+  }
   return no;
 }
 
@@ -284,9 +287,11 @@ function _buildProps(obj, counter, fns, useStringLocal, level) {
     valueStr += '{\n';
     tools.each(str0, function(v, k, i, l) {
       if (k !== '_njLen') {
-        const fnStr = 'p1.main' + _buildFn(v.node.content, v.node, fns, 'T' + ++fns._noT);
+        const hasName = k.indexOf('_njT') !== 0,
+          fnStr = 'p1.main' + _buildFn(v.node.content, v.node, fns, 'T' + ++fns._noT, null, null, null, hasName ? k : null);
+
         valueStr += '  "' + v.no + '": ' + fnStr;
-        if (k.indexOf('_njT') !== 0) {
+        if (hasName) {
           valueStr += ',\n  "' + k + '": ' + fnStr;
         }
       } else {

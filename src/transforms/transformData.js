@@ -220,6 +220,9 @@ export function template(fns) {
     if (k.indexOf('main') === 0) { //将每个主函数构建为可运行的模板函数
       configs[k] = tmplWrap(configs, v);
       configs[k]._njTmpl = true;
+      if (v._njName != null) {  //设置函数名
+        configs[k].tmplName = v._njName;
+      }
       configs['_' + k] = v;
     } else if (k.indexOf('fn') === 0) { //扩展标签函数
       configs[k] = v;

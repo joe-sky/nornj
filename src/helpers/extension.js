@@ -166,7 +166,9 @@ export const extensions = {
       start = 0;
     }
 
-    let ret, useString = options.useString;
+    let ret, useString = options.useString,
+      props = options.props,
+      loopLast = props && props.loopLast;
     if (useString) {
       ret = '';
     } else {
@@ -174,6 +176,10 @@ export const extensions = {
     }
 
     for (; start <= end; start++) {
+      if (!loopLast && start === end) {
+        break;
+      }
+
       let retI = options.result({
         index: start,
         fallback: true
