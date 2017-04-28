@@ -90,7 +90,8 @@ const SP_FILTER_LOOKUP = {
   '||(': 'or('
 };
 const REGEX_SP_FILTER = /[\s]+((\|\|)\()/g;
-const REGEX_FIX_FILTER = /(\|)?[\s]+([^\s]+\()/g;
+const REGEX_SPACE_FILTER = /[(,]/g;
+const REGEX_FIX_FILTER = /(\|)?(([.#]\()|[\s]+([^\s.#|]+\())/g;
 
 function _getReplaceParam(obj, tmplRule) {
   let pattern = tmplRule.replaceParam,
@@ -101,7 +102,7 @@ function _getReplaceParam(obj, tmplRule) {
       ret = [];
     }
 
-    let prop = matchArr[2],
+    let prop = ' ' + matchArr[2],
       item = [matchArr[0], matchArr[1], null, true];
 
     if (i > 0) {
@@ -110,7 +111,10 @@ function _getReplaceParam(obj, tmplRule) {
 
     //替换特殊过滤器名称并且为简化过滤器补全"|"符
     prop = prop.replace(REGEX_SP_FILTER, (all, match) => ' ' + SP_FILTER_LOOKUP[match])
-      .replace(REGEX_FIX_FILTER, (all, s1, s2) => s1 ? all : ' | ' + s2);
+      .replace(REGEX_SPACE_FILTER, all => all + ' ')
+      .replace(REGEX_FIX_FILTER, (all, g1, g2, g3, g4) => {
+        return (g1 ? all : ' | ' + (g3 ? g3 : g4));
+      });
 
     item[2] = prop.trim();
     ret.push(item);

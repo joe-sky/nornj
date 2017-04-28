@@ -311,10 +311,12 @@ describe('test compile string', function () {
                   #${nj`<span>1</span>`}
                 </div>`}
           #${nj`<div>{{../name3 | #('substring', 0, 3)}}</div>`}
-          <{{../sliderItem['a']|tagName(1,2)}} no0="/" no1={{no}} no2="{{-0.05 | filter2}}" checked no='{{ ../sliderItem.b }}' />
+          <{{../sliderItem.('a')|tagName(1,2)}} no0="/" no1={{no}} no2="{{-0.05 | filter2}}" checked no='{{ ../sliderItem.b }}' />
         </slider>
       </#each>
       <$if {a .('length')}>1</$if>
+      {{a.c.('d')#('substr', 1) +(@comma)}}
+      {{list(list(JSON#('stringify', obj('a' :(1))), 2))}}
       <img src="test1.png">
       `;
 

@@ -2103,7 +2103,8 @@ var SP_FILTER_LOOKUP = {
   '||(': 'or('
 };
 var REGEX_SP_FILTER = /[\s]+((\|\|)\()/g;
-var REGEX_FIX_FILTER = /(\|)?[\s]+([^\s]+\()/g;
+var REGEX_SPACE_FILTER = /[(,]/g;
+var REGEX_FIX_FILTER = /(\|)?(([.#]\()|[\s]+([^\s.#|]+\())/g;
 
 function _getReplaceParam(obj, tmplRule) {
   var pattern = tmplRule.replaceParam,
@@ -2116,7 +2117,7 @@ function _getReplaceParam(obj, tmplRule) {
       ret = [];
     }
 
-    var prop = matchArr[2],
+    var prop = ' ' + matchArr[2],
         item = [matchArr[0], matchArr[1], null, true];
 
     if (i > 0) {
@@ -2126,8 +2127,10 @@ function _getReplaceParam(obj, tmplRule) {
     //替换特殊过滤器名称并且为简化过滤器补全"|"符
     prop = prop.replace(REGEX_SP_FILTER, function (all, match) {
       return ' ' + SP_FILTER_LOOKUP[match];
-    }).replace(REGEX_FIX_FILTER, function (all, s1, s2) {
-      return s1 ? all : ' | ' + s2;
+    }).replace(REGEX_SPACE_FILTER, function (all) {
+      return all + ' ';
+    }).replace(REGEX_FIX_FILTER, function (all, g1, g2, g3, g4) {
+      return g1 ? all : ' | ' + (g3 ? g3 : g4);
     });
 
     item[2] = prop.trim();
@@ -2615,6 +2618,18 @@ function _buildPropData(obj, counter, fns, useStringLocal, level) {
         break;
       case '@rb':
         data = '\'}\'';
+        special = CUSTOM_VAR;
+        break;
+      case '@lp':
+        data = '\'(\'';
+        special = CUSTOM_VAR;
+        break;
+      case '@rp':
+        data = '\')\'';
+        special = CUSTOM_VAR;
+        break;
+      case '@comma':
+        data = '\',\'';
         special = CUSTOM_VAR;
         break;
     }

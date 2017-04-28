@@ -142,6 +142,18 @@ function _buildPropData(obj, counter, fns, useStringLocal, level) {
         data = '\'}\'';
         special = CUSTOM_VAR;
         break;
+      case '@lp':
+        data = '\'(\'';
+        special = CUSTOM_VAR;
+        break;
+      case '@rp':
+        data = '\')\'';
+        special = CUSTOM_VAR;
+        break;
+      case '@comma':
+        data = '\',\'';
+        special = CUSTOM_VAR;
+        break;
     }
 
     if (parentNum) {
