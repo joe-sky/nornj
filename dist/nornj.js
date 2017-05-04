@@ -2009,6 +2009,7 @@ function isStrPropS(elemName, tmplRule) {
 
 //Get compiled property
 var REGEX_JS_PROP = /(('[^']*')|("[^"]*")|(-?([0-9][0-9]*)(\.\d+)?)|true|false|null|undefined|Object|Array|Math|Date|JSON|([#]*)([^.[\]()]+))([^\s()]*)/;
+var REGEX_REPLACE_CHAR = /(_njCo_)|(_njLp_)|(_njRp_)/g;
 
 function _compiledProp(prop, innerBrackets) {
   var ret = __WEBPACK_IMPORTED_MODULE_1__utils_tools__["g" /* obj */]();
@@ -2058,6 +2059,22 @@ function _compiledProp(prop, innerBrackets) {
     })();
   }
 
+  //替换特殊字符
+  prop = prop.replace(REGEX_REPLACE_CHAR, function (all, g1, g2, g3) {
+    var s = all;
+    if (g1) {
+      s = ',';
+    }
+    if (g2) {
+      s = '(';
+    }
+    if (g3) {
+      s = ')';
+    }
+
+    return s;
+  });
+
   //Extract the parent data path
   if (prop.indexOf('../') === 0) {
     (function () {
@@ -2098,7 +2115,8 @@ function _getFilterParam(obj) {
 }
 
 //Extract replace parameters
-var _quots = ['\'', '"'];
+var REGEX_QUOTE = /"[^"]+"|'[^']+'/g;
+var REGEX_CHAR_IN_QUOTE = /(,)|(\()|(\))/g;
 var SP_FILTER_LOOKUP = {
   '||(': 'or('
 };
@@ -2125,7 +2143,22 @@ function _getReplaceParam(obj, tmplRule) {
     }
 
     //替换特殊过滤器名称并且为简化过滤器补全"|"符
-    prop = prop.replace(REGEX_SP_FILTER, function (all, match) {
+    prop = prop.replace(REGEX_QUOTE, function (match) {
+      return match.replace(REGEX_CHAR_IN_QUOTE, function (all, g1, g2, g3) {
+        var s = all;
+        if (g1) {
+          s = '_njCo_';
+        }
+        if (g2) {
+          s = '_njLp_';
+        }
+        if (g3) {
+          s = '_njRp_';
+        }
+
+        return s;
+      });
+    }).replace(REGEX_SP_FILTER, function (all, match) {
       return ' ' + SP_FILTER_LOOKUP[match];
     }).replace(REGEX_SPACE_FILTER, function (all) {
       return all + ' ';
@@ -2620,16 +2653,12 @@ function _buildPropData(obj, counter, fns, useStringLocal, level) {
         data = '\'}\'';
         special = CUSTOM_VAR;
         break;
-      case '@lp':
-        data = '\'(\'';
+      case '@q':
+        data = '\'"\'';
         special = CUSTOM_VAR;
         break;
-      case '@rp':
-        data = '\')\'';
-        special = CUSTOM_VAR;
-        break;
-      case '@comma':
-        data = '\',\'';
+      case '@sq':
+        data = '"\'"';
         special = CUSTOM_VAR;
         break;
     }

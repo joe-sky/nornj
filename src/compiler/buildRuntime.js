@@ -142,16 +142,12 @@ function _buildPropData(obj, counter, fns, useStringLocal, level) {
         data = '\'}\'';
         special = CUSTOM_VAR;
         break;
-      case '@lp':
-        data = '\'(\'';
+      case '@q':
+        data = '\'"\'';
         special = CUSTOM_VAR;
         break;
-      case '@rp':
-        data = '\')\'';
-        special = CUSTOM_VAR;
-        break;
-      case '@comma':
-        data = '\',\'';
+      case '@sq':
+        data = '"\'"';
         special = CUSTOM_VAR;
         break;
     }

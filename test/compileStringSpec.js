@@ -315,7 +315,7 @@ describe('test compile string', function () {
         </slider>
       </#each>
       <$if {a .('length')}>1</$if>
-      {{a.c.('d')#('substr', 1) +(@comma)}}
+      {{{a.c.('d')#('substr', 1) +("a,(b)" +(@sq)) +('a,b')}}}
       {{list(list(JSON#('stringify', obj('a' :(1))), 2))}}
       <img src="test1.png">
       `;

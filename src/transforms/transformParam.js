@@ -3,10 +3,11 @@ import * as tools from '../utils/tools';
 
 //Get compiled property
 const REGEX_JS_PROP = /(('[^']*')|("[^"]*")|(-?([0-9][0-9]*)(\.\d+)?)|true|false|null|undefined|Object|Array|Math|Date|JSON|([#]*)([^.[\]()]+))([^\s()]*)/;
+const REGEX_REPLACE_CHAR = /(_njCo_)|(_njLp_)|(_njRp_)/g;
 
 function _compiledProp(prop, innerBrackets) {
   let ret = tools.obj();
-  
+
   //If there are vertical lines in the property,then use filter
   if (prop.indexOf('|') >= 0) {
     let filters = [],
@@ -48,6 +49,22 @@ function _compiledProp(prop, innerBrackets) {
     ret.filters = filters;
   }
 
+  //替换特殊字符
+  prop = prop.replace(REGEX_REPLACE_CHAR, (all, g1, g2, g3) => {
+    let s = all;
+    if (g1) {
+      s = ',';
+    }
+    if (g2) {
+      s = '(';
+    }
+    if (g3) {
+      s = ')';
+    }
+
+    return s;
+  });
+
   //Extract the parent data path
   if (prop.indexOf('../') === 0) {
     let n = 0;
@@ -85,7 +102,8 @@ function _getFilterParam(obj) {
 }
 
 //Extract replace parameters
-const _quots = ['\'', '"'];
+const REGEX_QUOTE = /"[^"]+"|'[^']+'/g;
+const REGEX_CHAR_IN_QUOTE = /(,)|(\()|(\))/g;
 const SP_FILTER_LOOKUP = {
   '||(': 'or('
 };
@@ -110,7 +128,21 @@ function _getReplaceParam(obj, tmplRule) {
     }
 
     //替换特殊过滤器名称并且为简化过滤器补全"|"符
-    prop = prop.replace(REGEX_SP_FILTER, (all, match) => ' ' + SP_FILTER_LOOKUP[match])
+    prop = prop.replace(REGEX_QUOTE, match => match.replace(REGEX_CHAR_IN_QUOTE, (all, g1, g2, g3) => {
+        let s = all;
+        if (g1) {
+          s = '_njCo_';
+        }
+        if (g2) {
+          s = '_njLp_';
+        }
+        if (g3) {
+          s = '_njRp_';
+        }
+
+        return s;
+      }))
+      .replace(REGEX_SP_FILTER, (all, match) => ' ' + SP_FILTER_LOOKUP[match])
       .replace(REGEX_SPACE_FILTER, all => all + ' ')
       .replace(REGEX_FIX_FILTER, (all, g1, g2, g3, g4) => {
         return (g1 ? all : ' | ' + (g3 ? g3 : g4));
