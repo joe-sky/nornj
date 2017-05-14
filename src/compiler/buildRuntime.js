@@ -167,10 +167,10 @@ function _buildPropData(obj, counter, fns, useStringLocal, level) {
     }
 
     if (!special && !specialP) {
-      dataValueStr = (isComputed ? 'p1.getComputedData(' : '') + 'p2.getData(\'' + name + '\'' + (isComputed ? ', true' : '') + ')' + (isComputed ? ', p2, ' + level + ')' : '') + jsProp;
+      dataValueStr = (isComputed ? 'p1.getComputedData(' : '') + 'p2.getData(\'' + name + '\'' + (isComputed ? ', null, true' : '') + ')' + (isComputed ? ', p2, ' + level + ')' : '') + jsProp;
     } else {
       let dataStr = special === CUSTOM_VAR ? data : 'p2.' + data;
-      dataValueStr = (special ? dataStr : (isComputed ? 'p1.getComputedData(' : '') + 'p2.getData(\'' + name + '\', ' + (isComputed ? 'true' : 'null') + ', ' + dataStr + ')' + (isComputed ? ', p2, ' + level + ')' : '')) + jsProp;
+      dataValueStr = (special ? dataStr : (isComputed ? 'p1.getComputedData(' : '') + 'p2.getData(\'' + name + '\', ' + dataStr + (isComputed ? ', true' : '') + ')' + (isComputed ? ', p2, ' + level + ')' : '')) + jsProp;
     }
   }
   if (dataValueStr) {
@@ -195,7 +195,7 @@ function _buildPropData(obj, counter, fns, useStringLocal, level) {
         filterStr += '\nvar ' + filterVarStr + ' = ' + globalFilterStr + ';\n';
       } else { //优先从p2.data中获取
         fnHVarStr = '_fnH' + counter._fnH++;
-        filterStr += '\nvar ' + fnHVarStr + ' = p2.getData(\'' + o.name + '\', true);\n';
+        filterStr += '\nvar ' + fnHVarStr + ' = p2.getData(\'' + o.name + '\', null, true);\n';
 
         filterStr += 'if (' + fnHVarStr + ') {\n';
         filterStr += '  ' + filterVarStr + ' = ' + fnHVarStr + '.val;\n';
@@ -493,7 +493,7 @@ function _buildNode(node, parent, fns, counter, retType, level, useStringLocal, 
       fnStr += '\nvar ' + exVarStr + ' = ' + globalExStr + ';\n';
     } else { //优先从p2.data中获取
       fnHVarStr = '_fnH' + counter._fnH++;
-      fnStr += '\nvar ' + fnHVarStr + ' = p2.getData(\'' + node.ex + '\', true);\n';
+      fnStr += '\nvar ' + fnHVarStr + ' = p2.getData(\'' + node.ex + '\', null, true);\n';
 
       fnStr += 'if (' + fnHVarStr + ') {\n';
       fnStr += '  ' + exVarStr + ' = ' + fnHVarStr + '.val;\n';

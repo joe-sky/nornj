@@ -36,9 +36,9 @@ export function styleProps(obj) {
 }
 
 //Get value from multiple datas
-export function getData(prop, hasCtx, data) {
+export function getData(prop, data, hasCtx) {
   let ret, obj;
-  if (data === undefined) {
+  if (data == null) {
     data = this.data;
   }
 
