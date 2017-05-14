@@ -948,7 +948,7 @@ function styleProps(obj) {
 }
 
 //Get value from multiple datas
-function getData(prop, data) {
+function getData(prop, hasCtx, data) {
   var ret = void 0,
       obj = void 0;
   if (data === undefined) {
@@ -960,6 +960,13 @@ function getData(prop, data) {
     if (obj) {
       ret = obj[prop];
       if (ret !== undefined) {
+        if (hasCtx) {
+          return {
+            ctx: obj,
+            val: ret
+          };
+        }
+
         return ret;
       }
     }
@@ -971,13 +978,13 @@ function getComputedData(fn, p2, level) {
     return fn;
   }
 
-  if (fn._njTmpl) {
+  if (fn.val._njTmpl) {
     //模板函数
     if (level != null && p2.level != null) {
       level += p2.level;
     }
 
-    return fn.call({
+    return fn.val.call({
       _njData: p2.data,
       _njParent: p2.parent,
       _njIndex: p2.index,
@@ -985,7 +992,7 @@ function getComputedData(fn, p2, level) {
     });
   } else {
     //普通函数
-    return fn(p2);
+    return fn.val.call(fn.ctx, p2);
   }
 }
 
@@ -1300,6 +1307,14 @@ var filters = {
     } else {
       return __WEBPACK_IMPORTED_MODULE_1__utils_tools__["j" /* arraySlice */](args, 0, args.length - 1);
     }
+  },
+
+  reg: function reg(pattern, flags) {
+    if (flags._njOpts) {
+      flags = '';
+    }
+
+    return new RegExp(pattern, flags);
   }
 };
 
@@ -1342,7 +1357,8 @@ var filterConfig = {
   bool: _config(_defaultCfg),
   obj: _config(_defaultCfg),
   ':': _config(_defaultCfg),
-  list: _config(_defaultCfg)
+  list: _config(_defaultCfg),
+  reg: _config(_defaultCfg)
 };
 
 //Filter alias
@@ -2529,6 +2545,7 @@ function _buildFn(content, node, fns, no, newContext, level, useStringLocal, nam
     _ex: 0,
     _value: 0,
     _filter: 0,
+    _fnH: 0,
     newContext: newContext
   };
 
@@ -2677,10 +2694,10 @@ function _buildPropData(obj, counter, fns, useStringLocal, level) {
     }
 
     if (!special && !specialP) {
-      dataValueStr = (isComputed ? 'p1.getComputedData(' : '') + 'p2.getData(\'' + name + '\')' + (isComputed ? ', p2, ' + level + ')' : '') + jsProp;
+      dataValueStr = (isComputed ? 'p1.getComputedData(' : '') + 'p2.getData(\'' + name + '\'' + (isComputed ? ', true' : '') + ')' + (isComputed ? ', p2, ' + level + ')' : '') + jsProp;
     } else {
       var dataStr = special === CUSTOM_VAR ? data : 'p2.' + data;
-      dataValueStr = (special ? dataStr : (isComputed ? 'p1.getComputedData(' : '') + 'p2.getData(\'' + name + '\', ' + dataStr + ')' + (isComputed ? ', p2, ' + level + ')' : '')) + jsProp;
+      dataValueStr = (special ? dataStr : (isComputed ? 'p1.getComputedData(' : '') + 'p2.getData(\'' + name + '\', ' + (isComputed ? 'true' : 'null') + ', ' + dataStr + ')' + (isComputed ? ', p2, ' + level + ')' : '')) + jsProp;
     }
   }
   if (dataValueStr) {
@@ -2694,27 +2711,33 @@ function _buildPropData(obj, counter, fns, useStringLocal, level) {
       var valueStr = '_value' + counter._value++,
           filterStr = 'var ' + valueStr + ' = ' + (!isEmpty ? dataValueStr : 'null') + ';\n';
 
-      __WEBPACK_IMPORTED_MODULE_1__utils_tools__["c" /* each */](filters, function (o) {
+      __WEBPACK_IMPORTED_MODULE_1__utils_tools__["c" /* each */](filters, function (o, i) {
         var _filterC = counter._filter++,
             configF = __WEBPACK_IMPORTED_MODULE_5__helpers_filter__["b" /* filterConfig */][o.name],
             filterVarStr = '_filter' + _filterC,
             globalFilterStr = 'p1.filters[\'' + o.name + '\']',
-            filterStrI = '';
+            filterStrI = '',
+            fnHVarStr = void 0;
 
         if (configF && configF.onlyGlobal) {
           //只能从全局获取
           filterStr += '\nvar ' + filterVarStr + ' = ' + globalFilterStr + ';\n';
         } else {
           //优先从p2.data中获取
-          filterStr += '\nvar ' + filterVarStr + ' = p2.getData(\'' + o.name + '\');\n';
-          filterStr += 'if(!' + filterVarStr + ') ' + filterVarStr + ' = ' + globalFilterStr + ';\n';
+          fnHVarStr = '_fnH' + counter._fnH++;
+          filterStr += '\nvar ' + fnHVarStr + ' = p2.getData(\'' + o.name + '\', true);\n';
+
+          filterStr += 'if (' + fnHVarStr + ') {\n';
+          filterStr += '  ' + filterVarStr + ' = ' + fnHVarStr + '.val;\n';
+          filterStr += '} else {\n';
+          filterStr += '  ' + filterVarStr + ' = ' + globalFilterStr + ';\n';
+          filterStr += '}\n';
         }
         filterStr += 'if (!' + filterVarStr + ') {\n';
         filterStr += '  p1.warn(\'' + o.name + '\', \'filter\');\n';
-        filterStr += '}\n';
-        filterStr += 'else {\n';
+        filterStr += '} else {\n';
 
-        var _filterStr = '  ' + valueStr + ' = ' + filterVarStr + '.apply(p2, [' + (!isEmpty ? valueStr + ', ' : '') + (o.params && o.params.length ? o.params.reduce(function (p, c) {
+        var _filterStr = '  ' + valueStr + ' = ' + filterVarStr + '.apply(' + (fnHVarStr ? fnHVarStr + ' ? ' + fnHVarStr + '.ctx : p2' : 'p2') + ', [' + (!isEmpty || i > 0 ? valueStr + ', ' : '') + (o.params && o.params.length ? o.params.reduce(function (p, c) {
           var propStr = _buildPropData({
             prop: c,
             escape: escape
@@ -3008,15 +3031,22 @@ function _buildNode(node, parent, fns, counter, retType, level, useStringLocal, 
         _filterStr2 = '',
         configE = __WEBPACK_IMPORTED_MODULE_4__helpers_extension__["b" /* extensionConfig */][node.ex],
         exVarStr = '_ex' + _exC,
-        globalExStr = 'p1.extensions[\'' + node.ex + '\']';
+        globalExStr = 'p1.extensions[\'' + node.ex + '\']',
+        fnHVarStr = void 0;
 
     if (configE && configE.onlyGlobal) {
       //只能从全局获取
       fnStr += '\nvar ' + exVarStr + ' = ' + globalExStr + ';\n';
     } else {
       //优先从p2.data中获取
-      fnStr += '\nvar ' + exVarStr + ' = p2.getData(\'' + node.ex + '\');\n';
-      fnStr += 'if(!' + exVarStr + ') ' + exVarStr + ' = ' + globalExStr + ';\n';
+      fnHVarStr = '_fnH' + counter._fnH++;
+      fnStr += '\nvar ' + fnHVarStr + ' = p2.getData(\'' + node.ex + '\', true);\n';
+
+      fnStr += 'if (' + fnHVarStr + ') {\n';
+      fnStr += '  ' + exVarStr + ' = ' + fnHVarStr + '.val;\n';
+      fnStr += '} else {\n';
+      fnStr += '  ' + exVarStr + ' = ' + globalExStr + ';\n';
+      fnStr += '}\n';
     }
 
     dataReferStr += 'var _dataRefer' + _dataReferC + ' = [\n';
@@ -3074,7 +3104,8 @@ function _buildNode(node, parent, fns, counter, retType, level, useStringLocal, 
     //渲染
     fnStr += _buildRender(node, parent, 2, retType, {
       _ex: _exC,
-      _dataRefer: _dataReferC
+      _dataRefer: _dataReferC,
+      fnH: fnHVarStr
     }, fns, level, useStringLocal, node.allowNewline, isFirst);
   } else {
     //元素节点
@@ -3166,7 +3197,7 @@ function _buildRender(node, parent, nodeType, retType, params, fns, level, useSt
       break;
     case 2:
       //扩展标签
-      retStr = '_ex' + params._ex + '.apply(p2, _dataRefer' + params._dataRefer + ')';
+      retStr = '_ex' + params._ex + '.apply(' + (params.fnH ? params.fnH + ' ? ' + params.fnH + '.ctx : p2' : 'p2') + ', _dataRefer' + params._dataRefer + ')';
       break;
     case 3:
       //元素节点

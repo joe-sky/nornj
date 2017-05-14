@@ -76,6 +76,13 @@ describe('test compile string', function () {
     it('test compile 1', function () {
       var data = [
         {
+          f1: function() {
+            return '__f1__' + this.name3;
+          },
+          e1: function (options) {
+            return '<e1 name=' + this.name3 + '>' + options.result() + '</e1>';
+          },
+          //env: 'vm',
           name: "<i>joe_sky1</i>",
           name3: 'name3',
           props: {
@@ -317,6 +324,9 @@ describe('test compile string', function () {
       <$if {a .('length')}>1</$if>
       {{{a.c.('d')#('substr', 1) +("a,(b)" +(@sq)) +('a,b')}}}
       {{list(list(JSON#('stringify', obj('a' :(1))), 2))}}
+      {{reg('^[abc]$', 'i')#('test', 'A')}}
+      {{#f1}}
+      <#e1>111</#e1>
       <img src="test1.png">
       `;
 

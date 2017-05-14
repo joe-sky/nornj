@@ -26,6 +26,7 @@ function _buildFn(content, node, fns, no, newContext, level, useStringLocal, nam
       _ex: 0,
       _value: 0,
       _filter: 0,
+      _fnH: 0,
       newContext
     };
 
@@ -61,7 +62,7 @@ function _buildFn(content, node, fns, no, newContext, level, useStringLocal, nam
    p5：子扩展标签#props变量
   */
   const fn = fns[main ? 'main' + (isTmplEx ? no : '') : 'fn' + no] = new Function('p1', 'p2', 'p3', 'p4', 'p5', fnStr);
-  if(isTmplEx && name != null) {  //设置函数名
+  if (isTmplEx && name != null) { //设置函数名
     fn._njName = name;
   }
   return no;
@@ -166,10 +167,10 @@ function _buildPropData(obj, counter, fns, useStringLocal, level) {
     }
 
     if (!special && !specialP) {
-      dataValueStr = (isComputed ? 'p1.getComputedData(' : '') + 'p2.getData(\'' + name + '\')' + (isComputed ? ', p2, ' + level + ')' : '') + jsProp;
+      dataValueStr = (isComputed ? 'p1.getComputedData(' : '') + 'p2.getData(\'' + name + '\'' + (isComputed ? ', true' : '') + ')' + (isComputed ? ', p2, ' + level + ')' : '') + jsProp;
     } else {
       let dataStr = special === CUSTOM_VAR ? data : 'p2.' + data;
-      dataValueStr = (special ? dataStr : (isComputed ? 'p1.getComputedData(' : '') + 'p2.getData(\'' + name + '\', ' + dataStr + ')' + (isComputed ? ', p2, ' + level + ')' : '')) + jsProp;
+      dataValueStr = (special ? dataStr : (isComputed ? 'p1.getComputedData(' : '') + 'p2.getData(\'' + name + '\', ' + (isComputed ? 'true' : 'null') + ', ' + dataStr + ')' + (isComputed ? ', p2, ' + level + ')' : '')) + jsProp;
     }
   }
   if (dataValueStr) {
@@ -182,25 +183,31 @@ function _buildPropData(obj, counter, fns, useStringLocal, level) {
     let valueStr = '_value' + counter._value++,
       filterStr = 'var ' + valueStr + ' = ' + (!isEmpty ? dataValueStr : 'null') + ';\n';
 
-    tools.each(filters, function(o) {
+    tools.each(filters, (o, i) => {
       let _filterC = counter._filter++,
         configF = filterConfig[o.name],
         filterVarStr = '_filter' + _filterC,
         globalFilterStr = 'p1.filters[\'' + o.name + '\']',
-        filterStrI = '';
+        filterStrI = '',
+        fnHVarStr;
 
       if (configF && configF.onlyGlobal) { //只能从全局获取
         filterStr += '\nvar ' + filterVarStr + ' = ' + globalFilterStr + ';\n';
       } else { //优先从p2.data中获取
-        filterStr += '\nvar ' + filterVarStr + ' = p2.getData(\'' + o.name + '\');\n';
-        filterStr += 'if(!' + filterVarStr + ') ' + filterVarStr + ' = ' + globalFilterStr + ';\n';
+        fnHVarStr = '_fnH' + counter._fnH++;
+        filterStr += '\nvar ' + fnHVarStr + ' = p2.getData(\'' + o.name + '\', true);\n';
+
+        filterStr += 'if (' + fnHVarStr + ') {\n';
+        filterStr += '  ' + filterVarStr + ' = ' + fnHVarStr + '.val;\n';
+        filterStr += '} else {\n';
+        filterStr += '  ' + filterVarStr + ' = ' + globalFilterStr + ';\n';
+        filterStr += '}\n';
       }
       filterStr += 'if (!' + filterVarStr + ') {\n';
       filterStr += '  p1.warn(\'' + o.name + '\', \'filter\');\n';
-      filterStr += '}\n';
-      filterStr += 'else {\n';
+      filterStr += '} else {\n';
 
-      const _filterStr = '  ' + valueStr + ' = ' + filterVarStr + '.apply(p2, [' + (!isEmpty ? valueStr + ', ' : '') +
+      const _filterStr = '  ' + valueStr + ' = ' + filterVarStr + '.apply(' + (fnHVarStr ? fnHVarStr + ' ? ' + fnHVarStr + '.ctx : p2' : 'p2') + ', [' + ((!isEmpty || i > 0) ? valueStr + ', ' : '') +
         ((o.params && o.params.length) ? o.params.reduce((p, c) => {
           const propStr = _buildPropData({
             prop: c,
@@ -479,13 +486,20 @@ function _buildNode(node, parent, fns, counter, retType, level, useStringLocal, 
       filterStr = '',
       configE = extensionConfig[node.ex],
       exVarStr = '_ex' + _exC,
-      globalExStr = 'p1.extensions[\'' + node.ex + '\']';
+      globalExStr = 'p1.extensions[\'' + node.ex + '\']',
+      fnHVarStr;
 
     if (configE && configE.onlyGlobal) { //只能从全局获取
       fnStr += '\nvar ' + exVarStr + ' = ' + globalExStr + ';\n';
     } else { //优先从p2.data中获取
-      fnStr += '\nvar ' + exVarStr + ' = p2.getData(\'' + node.ex + '\');\n';
-      fnStr += 'if(!' + exVarStr + ') ' + exVarStr + ' = ' + globalExStr + ';\n';
+      fnHVarStr = '_fnH' + counter._fnH++;
+      fnStr += '\nvar ' + fnHVarStr + ' = p2.getData(\'' + node.ex + '\', true);\n';
+
+      fnStr += 'if (' + fnHVarStr + ') {\n';
+      fnStr += '  ' + exVarStr + ' = ' + fnHVarStr + '.val;\n';
+      fnStr += '} else {\n';
+      fnStr += '  ' + exVarStr + ' = ' + globalExStr + ';\n';
+      fnStr += '}\n';
     }
 
     dataReferStr += 'var _dataRefer' + _dataReferC + ' = [\n';
@@ -540,7 +554,8 @@ function _buildNode(node, parent, fns, counter, retType, level, useStringLocal, 
     //渲染
     fnStr += _buildRender(node, parent, 2, retType, {
       _ex: _exC,
-      _dataRefer: _dataReferC
+      _dataRefer: _dataReferC,
+      fnH: fnHVarStr
     }, fns, level, useStringLocal, node.allowNewline, isFirst);
   } else { //元素节点
     //节点类型和typeRefer
@@ -623,7 +638,7 @@ function _buildRender(node, parent, nodeType, retType, params, fns, level, useSt
       retStr = (!useStringF || allowNewline || noLevel ? '' : (isFirst ? (parent.type !== 'nj_root' ? 'p1.firstNewline(p2) + ' : '') : '\'\\n\' + ')) + _buildLevelSpace(level, fns, allowNewline) + _buildLevelSpaceRt(useStringF, isFirst || noLevel) + params.text;
       break;
     case 2: //扩展标签
-      retStr = '_ex' + params._ex + '.apply(p2, _dataRefer' + params._dataRefer + ')';
+      retStr = '_ex' + params._ex + '.apply(' + (params.fnH ? params.fnH + ' ? ' + params.fnH + '.ctx : p2' : 'p2') + ', _dataRefer' + params._dataRefer + ')';
       break;
     case 3: //元素节点
       if (!useStringF) {

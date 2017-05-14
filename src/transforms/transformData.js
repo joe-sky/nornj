@@ -36,7 +36,7 @@ export function styleProps(obj) {
 }
 
 //Get value from multiple datas
-export function getData(prop, data) {
+export function getData(prop, hasCtx, data) {
   let ret, obj;
   if (data === undefined) {
     data = this.data;
@@ -47,6 +47,13 @@ export function getData(prop, data) {
     if (obj) {
       ret = obj[prop];
       if (ret !== undefined) {
+        if (hasCtx) {
+          return {
+            ctx: obj,
+            val: ret
+          };
+        }
+
         return ret;
       }
     }
@@ -58,19 +65,19 @@ export function getComputedData(fn, p2, level) {
     return fn;
   }
 
-  if (fn._njTmpl) { //模板函数
+  if (fn.val._njTmpl) { //模板函数
     if (level != null && p2.level != null) {
       level += p2.level;
     }
 
-    return fn.call({
+    return fn.val.call({
       _njData: p2.data,
       _njParent: p2.parent,
       _njIndex: p2.index,
       _njLevel: level
     });
   } else { //普通函数
-    return fn(p2);
+    return fn.val.call(fn.ctx, p2);
   }
 }
 
@@ -220,7 +227,7 @@ export function template(fns) {
     if (k.indexOf('main') === 0) { //将每个主函数构建为可运行的模板函数
       configs[k] = tmplWrap(configs, v);
       configs[k]._njTmpl = true;
-      if (v._njName != null) {  //设置函数名
+      if (v._njName != null) { //设置函数名
         configs[k].tmplName = v._njName;
       }
       configs['_' + k] = v;

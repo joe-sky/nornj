@@ -99,6 +99,14 @@ export const filters = {
     } else {
       return tools.arraySlice(args, 0, args.length - 1);
     }
+  },
+
+  reg: (pattern, flags) => {
+    if (flags._njOpts) {
+      flags = '';
+    }
+
+    return new RegExp(pattern, flags);
   }
 };
 
@@ -141,7 +149,8 @@ export const filterConfig = {
   bool: _config(_defaultCfg),
   obj: _config(_defaultCfg),
   ':': _config(_defaultCfg),
-  list: _config(_defaultCfg)
+  list: _config(_defaultCfg),
+  reg: _config(_defaultCfg)
 };
 
 //Filter alias
