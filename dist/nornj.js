@@ -2725,7 +2725,8 @@ function _buildPropData(obj, counter, fns, useStringLocal, level) {
         } else {
           //优先从p2.data中获取
           fnHVarStr = '_fnH' + counter._fnH++;
-          filterStr += '\nvar ' + fnHVarStr + ' = p2.getData(\'' + o.name + '\', null, true);\n';
+          filterStr += '\nvar ' + filterVarStr + ';\n';
+          filterStr += 'var ' + fnHVarStr + ' = p2.getData(\'' + o.name + '\', null, true);\n';
 
           filterStr += 'if (' + fnHVarStr + ') {\n';
           filterStr += '  ' + filterVarStr + ' = ' + fnHVarStr + '.val;\n';
@@ -3040,7 +3041,8 @@ function _buildNode(node, parent, fns, counter, retType, level, useStringLocal, 
     } else {
       //优先从p2.data中获取
       fnHVarStr = '_fnH' + counter._fnH++;
-      fnStr += '\nvar ' + fnHVarStr + ' = p2.getData(\'' + node.ex + '\', null, true);\n';
+      fnStr += '\nvar ' + exVarStr + ';\n';
+      fnStr += 'var ' + fnHVarStr + ' = p2.getData(\'' + node.ex + '\', null, true);\n';
 
       fnStr += 'if (' + fnHVarStr + ') {\n';
       fnStr += '  ' + exVarStr + ' = ' + fnHVarStr + '.val;\n';
