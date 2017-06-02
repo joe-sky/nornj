@@ -102,7 +102,7 @@ function _getFilterParam(obj) {
 }
 
 //Extract replace parameters
-const REGEX_QUOTE = /"[^"]+"|'[^']+'/g;
+const REGEX_QUOTE = /"[^"]*"|'[^']*'/g;
 const REGEX_CHAR_IN_QUOTE = /(,)|(\()|(\))/g;
 const SP_FILTER_LOOKUP = {
   '||(': 'or('

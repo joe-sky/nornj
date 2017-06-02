@@ -2131,7 +2131,7 @@ function _getFilterParam(obj) {
 }
 
 //Extract replace parameters
-var REGEX_QUOTE = /"[^"]+"|'[^']+'/g;
+var REGEX_QUOTE = /"[^"]*"|'[^']*'/g;
 var REGEX_CHAR_IN_QUOTE = /(,)|(\()|(\))/g;
 var SP_FILTER_LOOKUP = {
   '||(': 'or('
