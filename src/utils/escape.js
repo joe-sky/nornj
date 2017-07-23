@@ -35,6 +35,13 @@ const UNESCAPE_LOOKUP = {
 
 const REGEX_UNESCAPE = new RegExp('&(' + Object.keys(UNESCAPE_LOOKUP).join('|') + ');', 'g');
 export function unescape(str) {
+  if (str == null) {
+    return '';
+  }
+  else if(!str.replace) {
+    return str;
+  }
+
   return str.replace(REGEX_UNESCAPE, (all, match) => UNESCAPE_LOOKUP[match]);
 }
 

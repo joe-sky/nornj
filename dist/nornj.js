@@ -1467,6 +1467,12 @@ var UNESCAPE_LOOKUP = {
 
 var REGEX_UNESCAPE = new RegExp('&(' + Object.keys(UNESCAPE_LOOKUP).join('|') + ');', 'g');
 function unescape(str) {
+  if (str == null) {
+    return '';
+  } else if (!str.replace) {
+    return str;
+  }
+
   return str.replace(REGEX_UNESCAPE, function (all, match) {
     return UNESCAPE_LOOKUP[match];
   });
