@@ -3,16 +3,36 @@ import * as tools from '../utils/tools';
 
 //Global filter list
 export const filters = {
-  //Get object properties
+  //Get properties
   '.': (obj, prop) => {
     if (obj != null) {
-      return obj[prop];
+      if (prop == null) {
+        return null;
+      } else if (!prop._njMethod) { //获取属性
+        return obj[prop];
+      } else { //执行方法
+        return obj[prop.method].apply(obj, prop.args);
+      }
     }
 
     return obj;
   },
 
-  //Call object method
+  //Call method
+  method: function(method) {
+    if (method == null) {
+      return method;
+    }
+
+    const args = arguments;
+    return {
+      method,
+      args: tools.arraySlice(args, 1, args.length - 1),
+      _njMethod: true
+    };
+  },
+
+  //Get computed properties
   '#': function(obj, method) {
     if (obj != null) {
       let args = arguments;

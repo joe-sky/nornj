@@ -317,16 +317,17 @@ describe('test compile string', function () {
                   111
                   #${nj`<span>1</span>`}
                 </div>`}
-          #${nj`<div>{{../name3 | #('substring', 0, 3)}}</div>`}
+          #${nj`<div>{{../name3.('substring' (0, 3))}}</div>`}
           <{{../sliderItem.('a')|tagName(1,2)}} no0="/" no1={{no}} no2="{{-0.05 | filter2}}" checked no='{{ ../sliderItem.b }}' />
         </slider>
       </#each>
       <$if {a .('length')}>1</$if>
-      {{{a.c.('d')#('substr', 1) +("a,(b)" +(@sq)) +('a,b')}}}
-      {{list(list(JSON#('stringify', obj('a' :(1))), 2))}}
-      {{reg('^[abc]$', 'i')#('test', 'A')}}
+      {{{a.c.('d').('substr' (1)) +("a,(b)" +(@sq)) +('a,b')}}}
+      {{list(list(JSON.('stringify' (obj('a' :(1)))), 2))}}
+      {{reg('^[abc]$', 'i').('test' ('A'))}}
       {{#f1}}
       <#e1>111</#e1>
+      {{Date.('now' ())}}
       <img src="test1.png">
       `;
 

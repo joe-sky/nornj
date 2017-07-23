@@ -1173,16 +1173,38 @@ function template(fns) {
 
 //Global filter list
 var filters = {
-  //Get object properties
+  //Get properties
   '.': function _(obj, prop) {
     if (obj != null) {
-      return obj[prop];
+      if (prop == null) {
+        return null;
+      } else if (!prop._njMethod) {
+        //获取属性
+        return obj[prop];
+      } else {
+        //执行方法
+        return obj[prop.method].apply(obj, prop.args);
+      }
     }
 
     return obj;
   },
 
-  //Call object method
+  //Call method
+  method: function method(_method) {
+    if (_method == null) {
+      return _method;
+    }
+
+    var args = arguments;
+    return {
+      method: _method,
+      args: __WEBPACK_IMPORTED_MODULE_1__utils_tools__["j" /* arraySlice */](args, 1, args.length - 1),
+      _njMethod: true
+    };
+  },
+
+  //Get computed properties
   '#': function _(obj, method) {
     if (obj != null) {
       var args = arguments;
@@ -2134,9 +2156,10 @@ function _getFilterParam(obj) {
 var REGEX_QUOTE = /"[^"]*"|'[^']*'/g;
 var REGEX_CHAR_IN_QUOTE = /(,)|(\()|(\))/g;
 var SP_FILTER_LOOKUP = {
+  '(': 'method(',
   '||(': 'or('
 };
-var REGEX_SP_FILTER = /[\s]+((\|\|)\()/g;
+var REGEX_SP_FILTER = /[\s]+((\|\|)?\()/g;
 var REGEX_SPACE_FILTER = /[(,]/g;
 var REGEX_FIX_FILTER = /(\|)?(([.#]\()|[\s]+([^\s.#|]+\())/g;
 
