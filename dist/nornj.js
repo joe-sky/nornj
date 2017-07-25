@@ -107,13 +107,14 @@ nj.global = typeof self !== 'undefined' ? self : global;
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "e", function() { return defineProps; });
 /* harmony export (immutable) */ __webpack_exports__["h"] = arrayPush;
 /* harmony export (immutable) */ __webpack_exports__["j"] = arraySlice;
-/* harmony export (immutable) */ __webpack_exports__["q"] = isArray;
+/* harmony export (immutable) */ __webpack_exports__["r"] = isArray;
 /* harmony export (immutable) */ __webpack_exports__["k"] = isObject;
+/* harmony export (immutable) */ __webpack_exports__["q"] = isFunction;
 /* harmony export (immutable) */ __webpack_exports__["l"] = isNumber;
 /* harmony export (immutable) */ __webpack_exports__["b"] = isString;
 /* harmony export (immutable) */ __webpack_exports__["i"] = isArrayLike;
 /* harmony export (immutable) */ __webpack_exports__["c"] = each;
-/* harmony export (immutable) */ __webpack_exports__["r"] = trimRight;
+/* harmony export (immutable) */ __webpack_exports__["s"] = trimRight;
 /* harmony export (immutable) */ __webpack_exports__["n"] = noop;
 /* harmony export (immutable) */ __webpack_exports__["o"] = throwIf;
 /* harmony export (immutable) */ __webpack_exports__["p"] = warn;
@@ -153,6 +154,12 @@ function isArray(obj) {
 function isObject(obj) {
   var type = typeof obj === 'undefined' ? 'undefined' : _typeof(obj);
   return !isArray(obj) && (type === 'function' || type === 'object' && !!obj);
+}
+
+//判断是否为函数
+function isFunction(functionToCheck) {
+  var getType = {};
+  return functionToCheck && getType.toString.call(functionToCheck) === '[object Function]';
 }
 
 //判断是否为数字
@@ -1191,17 +1198,23 @@ var filters = {
   },
 
   //Call method
-  method: function method(_method) {
-    if (_method == null) {
-      return _method;
+  call: function call(method) {
+    if (method == null) {
+      return method;
     }
 
     var args = arguments;
-    return {
-      method: _method,
-      args: __WEBPACK_IMPORTED_MODULE_1__utils_tools__["j" /* arraySlice */](args, 1, args.length - 1),
-      _njMethod: true
-    };
+    args = __WEBPACK_IMPORTED_MODULE_1__utils_tools__["j" /* arraySlice */](args, 1, args.length - 1);
+
+    if (__WEBPACK_IMPORTED_MODULE_1__utils_tools__["q" /* isFunction */](method)) {
+      return method.apply(null, args);
+    } else {
+      return {
+        method: method,
+        args: args,
+        _njMethod: true
+      };
+    }
   },
 
   //Get computed properties
@@ -2162,7 +2175,7 @@ function _getFilterParam(obj) {
 var REGEX_QUOTE = /"[^"]*"|'[^']*'/g;
 var REGEX_CHAR_IN_QUOTE = /(,)|(\()|(\))/g;
 var SP_FILTER_LOOKUP = {
-  '(': 'method(',
+  '(': 'call(',
   '||(': 'or('
 };
 var REGEX_SP_FILTER = /[\s]+((\|\|)?\()/g;
@@ -3342,7 +3355,7 @@ function _plainTextNode(obj, parent, parentContent, noSplitNewline, tmplRule) {
 function checkElem(obj, parent, tmplRule, hasExProps, noSplitNewline, isLast) {
   var parentContent = 'content';
 
-  if (!__WEBPACK_IMPORTED_MODULE_1__utils_tools__["q" /* isArray */](obj)) {
+  if (!__WEBPACK_IMPORTED_MODULE_1__utils_tools__["r" /* isArray */](obj)) {
     //判断是否为文本节点
     if (__WEBPACK_IMPORTED_MODULE_1__utils_tools__["b" /* isString */](obj)) {
       if (!noSplitNewline) {
@@ -3352,7 +3365,7 @@ function checkElem(obj, parent, tmplRule, hasExProps, noSplitNewline, isLast) {
           str !== '' && _plainTextNode(str, parent, parentContent, noSplitNewline, tmplRule);
         });
       } else {
-        _plainTextNode(isLast && parent.allowNewline === 'nlElem' ? __WEBPACK_IMPORTED_MODULE_1__utils_tools__["r" /* trimRight */](obj) : obj, parent, parentContent, noSplitNewline, tmplRule);
+        _plainTextNode(isLast && parent.allowNewline === 'nlElem' ? __WEBPACK_IMPORTED_MODULE_1__utils_tools__["s" /* trimRight */](obj) : obj, parent, parentContent, noSplitNewline, tmplRule);
       }
     } else {
       _plainTextNode(obj, parent, parentContent, noSplitNewline, tmplRule);
@@ -3523,7 +3536,7 @@ function checkElem(obj, parent, tmplRule, hasExProps, noSplitNewline, isLast) {
       //如果不是元素节点,则为节点集合
       _checkContentElem(obj, parent, tmplRule, hasExProps, noSplitNewline);
     }
-  } else if (__WEBPACK_IMPORTED_MODULE_1__utils_tools__["q" /* isArray */](first)) {
+  } else if (__WEBPACK_IMPORTED_MODULE_1__utils_tools__["r" /* isArray */](first)) {
     //如果第一个子节点为数组,则该节点一定为节点集合(可以是多层数组嵌套的集合)
     _checkContentElem(obj, parent, tmplRule, hasExProps, noSplitNewline);
   }

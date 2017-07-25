@@ -19,17 +19,23 @@ export const filters = {
   },
 
   //Call method
-  method: function(method) {
+  call: function(method) {
     if (method == null) {
       return method;
     }
 
-    const args = arguments;
-    return {
-      method,
-      args: tools.arraySlice(args, 1, args.length - 1),
-      _njMethod: true
-    };
+    let args = arguments;
+    args = tools.arraySlice(args, 1, args.length - 1);
+
+    if (tools.isFunction(method)) {
+      return method.apply(null, args);
+    } else {
+      return {
+        method,
+        args,
+        _njMethod: true
+      };
+    }
   },
 
   //Get computed properties

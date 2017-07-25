@@ -29,6 +29,12 @@ export function isObject(obj) {
   return !isArray(obj) && (type === 'function' || type === 'object' && !!obj);
 }
 
+//判断是否为函数
+export function isFunction(functionToCheck) {
+  const getType = {};
+  return functionToCheck && getType.toString.call(functionToCheck) === '[object Function]';
+}
+
 //判断是否为数字
 export function isNumber(obj) {
   return toString.call(obj) === '[object Number]';
