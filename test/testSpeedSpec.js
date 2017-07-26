@@ -161,6 +161,18 @@ describe('test speed', function() {
         _value0 = _filter0.apply(p2, [_value0, { useString: p1.useString }]);
       }
 
+      // var _value0 = p2.parent.index
+      //   _tmp0, _valueP0;
+
+      // var _filter0 = p1.filters['five'];
+      // if (!_filter0) {
+      //   p1.warn('five', 'filter');
+      // } else {
+      //   _tmp0 = _filter0.apply(p2, [_value0, { useString: p1.useString }]);
+      //   _valueP0 = _value0;
+      //   _value0 = _tmp0;
+      // }
+
       p1.throwIf(_expr0, 'if', 'expr');
 
       _expr0.apply(p2, [_value0, { useString: p1.useString, result: p1.exprRet(p1, p2, p1.fn3, _paramsE0), inverse: p1.noop }]);
