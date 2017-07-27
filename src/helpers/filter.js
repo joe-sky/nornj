@@ -5,17 +5,11 @@ import * as tools from '../utils/tools';
 export const filters = {
   //Get properties
   '.': (obj, prop) => {
-    if (obj != null) {
-      if (prop == null) {
-        return null;
-      } else if (!prop._njMethod) { //获取属性
-        return obj[prop];
-      } else { //执行方法
-        return obj[prop.method].apply(obj, prop.args);
-      }
+    if (obj == null) {
+      return obj;
     }
 
-    return obj;
+    return obj[prop];
   },
 
   //Call method
@@ -24,18 +18,8 @@ export const filters = {
       return method;
     }
 
-    let args = arguments;
-    args = tools.arraySlice(args, 1, args.length - 1);
-
-    if (tools.isFunction(method)) {
-      return method.apply(null, args);
-    } else {
-      return {
-        method,
-        args,
-        _njMethod: true
-      };
-    }
+    const args = arguments;
+    return method.apply(args[args.length - 1].lastValue, tools.arraySlice(args, 1, args.length - 1));
   },
 
   //Get computed properties

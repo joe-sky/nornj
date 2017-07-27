@@ -27,6 +27,7 @@ function _buildFn(content, node, fns, no, newContext, level, useStringLocal, nam
       _value: 0,
       _filter: 0,
       _fnH: 0,
+      _tmp: 0,
       newContext
     };
 
@@ -68,7 +69,7 @@ function _buildFn(content, node, fns, no, newContext, level, useStringLocal, nam
   return no;
 }
 
-function _buildOptions(config, useStringLocal, node, fns, exPropsStr, subExPropsStr, level, hashProps) {
+function _buildOptions(config, useStringLocal, node, fns, exPropsStr, subExPropsStr, level, hashProps, valueL) {
   let hashStr = ', useString: ' + (useStringLocal == null ? 'p1.useString' : (useStringLocal ? 'true' : 'false')),
     noConfig = !config;
 
@@ -88,7 +89,7 @@ function _buildOptions(config, useStringLocal, node, fns, exPropsStr, subExProps
     }
   }
 
-  return '{ _njOpts: true, _njFnsNo: ' + fns._no + ', global: p1, context: p2, outputH: ' + !fns.useString + hashStr + ' }';
+  return '{ _njOpts: true, _njFnsNo: ' + fns._no + ', global: p1, context: p2, outputH: ' + !fns.useString + hashStr + (valueL ? ', lastValue: ' + valueL : '') + ' }';
 }
 
 const CUSTOM_VAR = 'nj_custom';
@@ -180,8 +181,16 @@ function _buildPropData(obj, counter, fns, useStringLocal, level) {
   //有过滤器时需要生成"_value"值
   let filters = obj.prop.filters;
   if (filters) {
-    let valueStr = '_value' + counter._value++,
-      filterStr = 'var ' + valueStr + ' = ' + (!isEmpty ? dataValueStr : 'null') + ';\n';
+    const counterValue = counter._value++;
+    let valueStr = '_value' + counterValue,
+      valueStrL = '_valueL' + counterValue,
+      filterStr = 'var ' + valueStr + ' = ' + (!isEmpty ? dataValueStr : 'null') + ', ' + valueStrL + ';\n';
+      
+    const tmpStr = '_tmp';
+    if(!counter._tmp) {  //在同一函数作用域内_tmp变量只创建一次
+      filterStr += 'var ' + tmpStr + ';\n';
+      counter._tmp++;
+    }
 
     tools.each(filters, (o, i) => {
       let _filterC = counter._filter++,
@@ -208,7 +217,7 @@ function _buildPropData(obj, counter, fns, useStringLocal, level) {
       filterStr += '  p1.warn(\'' + o.name + '\', \'filter\');\n';
       filterStr += '} else {\n';
 
-      const _filterStr = '  ' + valueStr + ' = ' + filterVarStr + '.apply(' + (fnHVarStr ? fnHVarStr + ' ? ' + fnHVarStr + '.ctx : p2' : 'p2') + ', [' + ((!isEmpty || i > 0) ? valueStr + ', ' : '') +
+      let _filterStr = '  ' + tmpStr + ' = ' + filterVarStr + '.apply(' + (fnHVarStr ? fnHVarStr + ' ? ' + fnHVarStr + '.ctx : p2' : 'p2') + ', [' + ((!isEmpty || i > 0) ? valueStr + ', ' : '') +
         ((o.params && o.params.length) ? o.params.reduce((p, c) => {
           const propStr = _buildPropData({
             prop: c,
@@ -222,8 +231,10 @@ function _buildPropData(obj, counter, fns, useStringLocal, level) {
             return p + propStr.valueStr + ', ';
           }
         }, '') : '') +
-        _buildOptions(configF, useStringLocal, null, fns) +
+        _buildOptions(configF, useStringLocal, null, fns, null, null, null, null, valueStrL) +
         ']);\n';
+      _filterStr += '  ' + valueStrL + ' = ' + valueStr + ';\n';
+      _filterStr += '  ' + valueStr + ' = ' + tmpStr + ';\n';
 
       if (filterStrI !== '') {
         filterStr += filterStrI;

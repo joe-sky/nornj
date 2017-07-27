@@ -107,14 +107,13 @@ nj.global = typeof self !== 'undefined' ? self : global;
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "e", function() { return defineProps; });
 /* harmony export (immutable) */ __webpack_exports__["h"] = arrayPush;
 /* harmony export (immutable) */ __webpack_exports__["j"] = arraySlice;
-/* harmony export (immutable) */ __webpack_exports__["r"] = isArray;
+/* harmony export (immutable) */ __webpack_exports__["q"] = isArray;
 /* harmony export (immutable) */ __webpack_exports__["k"] = isObject;
-/* harmony export (immutable) */ __webpack_exports__["q"] = isFunction;
 /* harmony export (immutable) */ __webpack_exports__["l"] = isNumber;
 /* harmony export (immutable) */ __webpack_exports__["b"] = isString;
 /* harmony export (immutable) */ __webpack_exports__["i"] = isArrayLike;
 /* harmony export (immutable) */ __webpack_exports__["c"] = each;
-/* harmony export (immutable) */ __webpack_exports__["s"] = trimRight;
+/* harmony export (immutable) */ __webpack_exports__["r"] = trimRight;
 /* harmony export (immutable) */ __webpack_exports__["n"] = noop;
 /* harmony export (immutable) */ __webpack_exports__["o"] = throwIf;
 /* harmony export (immutable) */ __webpack_exports__["p"] = warn;
@@ -154,12 +153,6 @@ function isArray(obj) {
 function isObject(obj) {
   var type = typeof obj === 'undefined' ? 'undefined' : _typeof(obj);
   return !isArray(obj) && (type === 'function' || type === 'object' && !!obj);
-}
-
-//判断是否为函数
-function isFunction(functionToCheck) {
-  var getType = {};
-  return functionToCheck && getType.toString.call(functionToCheck) === '[object Function]';
 }
 
 //判断是否为数字
@@ -1182,19 +1175,11 @@ function template(fns) {
 var filters = {
   //Get properties
   '.': function _(obj, prop) {
-    if (obj != null) {
-      if (prop == null) {
-        return null;
-      } else if (!prop._njMethod) {
-        //获取属性
-        return obj[prop];
-      } else {
-        //执行方法
-        return obj[prop.method].apply(obj, prop.args);
-      }
+    if (obj == null) {
+      return obj;
     }
 
-    return obj;
+    return obj[prop];
   },
 
   //Call method
@@ -1204,17 +1189,7 @@ var filters = {
     }
 
     var args = arguments;
-    args = __WEBPACK_IMPORTED_MODULE_1__utils_tools__["j" /* arraySlice */](args, 1, args.length - 1);
-
-    if (__WEBPACK_IMPORTED_MODULE_1__utils_tools__["q" /* isFunction */](method)) {
-      return method.apply(null, args);
-    } else {
-      return {
-        method: method,
-        args: args,
-        _njMethod: true
-      };
-    }
+    return method.apply(args[args.length - 1].lastValue, __WEBPACK_IMPORTED_MODULE_1__utils_tools__["j" /* arraySlice */](args, 1, args.length - 1));
   },
 
   //Get computed properties
@@ -2588,6 +2563,7 @@ function _buildFn(content, node, fns, no, newContext, level, useStringLocal, nam
     _value: 0,
     _filter: 0,
     _fnH: 0,
+    _tmp: 0,
     newContext: newContext
   };
 
@@ -2630,7 +2606,7 @@ function _buildFn(content, node, fns, no, newContext, level, useStringLocal, nam
   return no;
 }
 
-function _buildOptions(config, useStringLocal, node, fns, exPropsStr, subExPropsStr, level, hashProps) {
+function _buildOptions(config, useStringLocal, node, fns, exPropsStr, subExPropsStr, level, hashProps, valueL) {
   var hashStr = ', useString: ' + (useStringLocal == null ? 'p1.useString' : useStringLocal ? 'true' : 'false'),
       noConfig = !config;
 
@@ -2651,7 +2627,7 @@ function _buildOptions(config, useStringLocal, node, fns, exPropsStr, subExProps
     }
   }
 
-  return '{ _njOpts: true, _njFnsNo: ' + fns._no + ', global: p1, context: p2, outputH: ' + !fns.useString + hashStr + ' }';
+  return '{ _njOpts: true, _njFnsNo: ' + fns._no + ', global: p1, context: p2, outputH: ' + !fns.useString + hashStr + (valueL ? ', lastValue: ' + valueL : '') + ' }';
 }
 
 var CUSTOM_VAR = 'nj_custom';
@@ -2750,8 +2726,17 @@ function _buildPropData(obj, counter, fns, useStringLocal, level) {
   var filters = obj.prop.filters;
   if (filters) {
     var _ret = function () {
-      var valueStr = '_value' + counter._value++,
-          filterStr = 'var ' + valueStr + ' = ' + (!isEmpty ? dataValueStr : 'null') + ';\n';
+      var counterValue = counter._value++;
+      var valueStr = '_value' + counterValue,
+          valueStrL = '_valueL' + counterValue,
+          filterStr = 'var ' + valueStr + ' = ' + (!isEmpty ? dataValueStr : 'null') + ', ' + valueStrL + ';\n';
+
+      var tmpStr = '_tmp';
+      if (!counter._tmp) {
+        //在同一函数作用域内_tmp变量只创建一次
+        filterStr += 'var ' + tmpStr + ';\n';
+        counter._tmp++;
+      }
 
       __WEBPACK_IMPORTED_MODULE_1__utils_tools__["c" /* each */](filters, function (o, i) {
         var _filterC = counter._filter++,
@@ -2780,7 +2765,7 @@ function _buildPropData(obj, counter, fns, useStringLocal, level) {
         filterStr += '  p1.warn(\'' + o.name + '\', \'filter\');\n';
         filterStr += '} else {\n';
 
-        var _filterStr = '  ' + valueStr + ' = ' + filterVarStr + '.apply(' + (fnHVarStr ? fnHVarStr + ' ? ' + fnHVarStr + '.ctx : p2' : 'p2') + ', [' + (!isEmpty || i > 0 ? valueStr + ', ' : '') + (o.params && o.params.length ? o.params.reduce(function (p, c) {
+        var _filterStr = '  ' + tmpStr + ' = ' + filterVarStr + '.apply(' + (fnHVarStr ? fnHVarStr + ' ? ' + fnHVarStr + '.ctx : p2' : 'p2') + ', [' + (!isEmpty || i > 0 ? valueStr + ', ' : '') + (o.params && o.params.length ? o.params.reduce(function (p, c) {
           var propStr = _buildPropData({
             prop: c,
             escape: escape
@@ -2792,7 +2777,9 @@ function _buildPropData(obj, counter, fns, useStringLocal, level) {
             filterStrI += propStr.filterStr;
             return p + propStr.valueStr + ', ';
           }
-        }, '') : '') + _buildOptions(configF, useStringLocal, null, fns) + ']);\n';
+        }, '') : '') + _buildOptions(configF, useStringLocal, null, fns, null, null, null, null, valueStrL) + ']);\n';
+        _filterStr += '  ' + valueStrL + ' = ' + valueStr + ';\n';
+        _filterStr += '  ' + valueStr + ' = ' + tmpStr + ';\n';
 
         if (filterStrI !== '') {
           filterStr += filterStrI;
@@ -3355,7 +3342,7 @@ function _plainTextNode(obj, parent, parentContent, noSplitNewline, tmplRule) {
 function checkElem(obj, parent, tmplRule, hasExProps, noSplitNewline, isLast) {
   var parentContent = 'content';
 
-  if (!__WEBPACK_IMPORTED_MODULE_1__utils_tools__["r" /* isArray */](obj)) {
+  if (!__WEBPACK_IMPORTED_MODULE_1__utils_tools__["q" /* isArray */](obj)) {
     //判断是否为文本节点
     if (__WEBPACK_IMPORTED_MODULE_1__utils_tools__["b" /* isString */](obj)) {
       if (!noSplitNewline) {
@@ -3365,7 +3352,7 @@ function checkElem(obj, parent, tmplRule, hasExProps, noSplitNewline, isLast) {
           str !== '' && _plainTextNode(str, parent, parentContent, noSplitNewline, tmplRule);
         });
       } else {
-        _plainTextNode(isLast && parent.allowNewline === 'nlElem' ? __WEBPACK_IMPORTED_MODULE_1__utils_tools__["s" /* trimRight */](obj) : obj, parent, parentContent, noSplitNewline, tmplRule);
+        _plainTextNode(isLast && parent.allowNewline === 'nlElem' ? __WEBPACK_IMPORTED_MODULE_1__utils_tools__["r" /* trimRight */](obj) : obj, parent, parentContent, noSplitNewline, tmplRule);
       }
     } else {
       _plainTextNode(obj, parent, parentContent, noSplitNewline, tmplRule);
@@ -3536,7 +3523,7 @@ function checkElem(obj, parent, tmplRule, hasExProps, noSplitNewline, isLast) {
       //如果不是元素节点,则为节点集合
       _checkContentElem(obj, parent, tmplRule, hasExProps, noSplitNewline);
     }
-  } else if (__WEBPACK_IMPORTED_MODULE_1__utils_tools__["r" /* isArray */](first)) {
+  } else if (__WEBPACK_IMPORTED_MODULE_1__utils_tools__["q" /* isArray */](first)) {
     //如果第一个子节点为数组,则该节点一定为节点集合(可以是多层数组嵌套的集合)
     _checkContentElem(obj, parent, tmplRule, hasExProps, noSplitNewline);
   }
