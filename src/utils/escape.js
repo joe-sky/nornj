@@ -13,8 +13,7 @@ const REGEX_ESCAPE = /[&><"']/g;
 export function escape(str) {
   if (str == null) {
     return '';
-  }
-  else if(!str.replace) {
+  } else if (!str.replace) {
     return str;
   }
 
@@ -37,8 +36,7 @@ const REGEX_UNESCAPE = new RegExp('&(' + Object.keys(UNESCAPE_LOOKUP).join('|') 
 export function unescape(str) {
   if (str == null) {
     return '';
-  }
-  else if(!str.replace) {
+  } else if (!str.replace) {
     return str;
   }
 
