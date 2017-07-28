@@ -3,120 +3,117 @@
   compile = require('../src/compiler/compile').compile,
   includeParser = require('../tools/includeParser');
 
-describe('test compile string', function () {
-  beforeAll(function () {
-    nj.registerFilter('filter1', function (v, p1) {
-      //console.log(this.getData('name1'));
-      return v * 2 + ((p1 != null && !p1._njOpts) ? parseInt(p1, 10) : 0);
-    });
-    nj.registerFilter('filter2', function (v, p1, p2) {
-      //console.log(p1 + '_' + p2);
-      return v + 5;
-    });
-    nj.registerFilter('filter3', function (v) {
-      return !!!v;
-    });
-    nj.registerFilter('tagName', function (v1, v2, v3, options) {
-      console.log(options.lastValue);
-      return v1 + 'Tmp';
-    });
-    nj.registerFilter('emptyFilter', function (n) {
-      return 'emptyFilter' + n;
-    });
+describe('test compile string', function() {
+      beforeAll(function() {
+        nj.registerFilter('filter1', function(v, p1) {
+          //console.log(this.getData('name1'));
+          return v * 2 + ((p1 != null && !p1._njOpts) ? parseInt(p1, 10) : 0);
+        });
+        nj.registerFilter('filter2', function(v, p1, p2) {
+          //console.log(p1 + '_' + p2);
+          return v + 5;
+        });
+        nj.registerFilter('filter3', function(v) {
+          return !!!v;
+        });
+        nj.registerFilter('tagName', function(v1, v2, v3, options) {
+          console.log(options.lastValue);
+          return v1 + 'Tmp';
+        });
+        nj.registerFilter('emptyFilter', function(n) {
+          return 'emptyFilter' + n;
+        });
 
-    nj.registerExtension('textExpr', function (arg1, arg2, opts) {
-      //return opts.props.tmpls[0]();
-      //console.log(opts.props.args);
-      console.log(opts.props.a);
-      return arg1;
-    });
+        nj.registerExtension('textExpr', function(arg1, arg2, opts) {
+          //return opts.props.tmpls[0]();
+          //console.log(opts.props.args);
+          console.log(opts.props.a);
+          return arg1;
+        });
 
-    nj.registerExtension('vm-include', function (opts) {
-      const env = this.getData('env');
-      if(env === 'vm') {
-        return `#parse("${opts.props.src}")`;
-      }
-      else {
-        return `<$include src="${opts.props.src}" />`;
-      }
-    });
+        nj.registerExtension('vm-include', function(opts) {
+          const env = this.getData('env');
+          if (env === 'vm') {
+            return `#parse("${opts.props.src}")`;
+          } else {
+            return `<$include src="${opts.props.src}" />`;
+          }
+        });
 
-    nj.registerFilter('vm-var', function (val, opts) {
-      const env = this.getData('env');
-      if(env === 'vm') {
-        return `$!${val}`;
-      }
-      else {
-        return `{${val}}`;
-      }
-    });
-  });
+        nj.registerFilter('vm-var', function(val, opts) {
+          const env = this.getData('env');
+          if (env === 'vm') {
+            return `$!${val}`;
+          } else {
+            return `{${val}}`;
+          }
+        });
+      });
 
-  describe('compile string template to html', function () {
-    xit('test template string', function () {
-      let s = Date.now();
+      describe('compile string template to html', function() {
+            xit('test template string', function() {
+              let s = Date.now();
 
-      // const tmpl1 = nj`
-      //   <input />
-      // `;
+              // const tmpl1 = nj`
+              //   <input />
+              // `;
 
-      _.times(50000, () => {
-        let html = nj`
+              _.times(50000, () => {
+                let html = nj `
           <div name="t1">
             <img />
           </div>
-        `();
-      });
+        ` ();
+              });
 
-      console.log(Date.now() - s);
+              console.log(Date.now() - s);
 
-      //console.log(html);
-      //expect(html).toBeTruthy();
-    });
+              //console.log(html);
+              //expect(html).toBeTruthy();
+            });
 
-    it('test compile 1', function () {
-      var data = [
-        {
-          f1: function() {
-            return '__f1__' + this.name3;
-          },
-          e1: function (options) {
-            return '<e1 name=' + this.name3 + '>' + options.result() + '</e1>';
-          },
-          //env: 'vm',
-          name: "<i>joe_sky1</i>",
-          name3: 'name3',
-          props: {
-            n: 1,
-            n2: 2
-          },
-          id: 100,
-          test0: false,
-          list: [0, 1, 2],
-          list2: [{ no: 0 }, { no: 1 }, { no: 2 }],
-          c1: 100,
-          sliderItem: {
-            a: 'sliderItem',
-            b: 'sliderItem1'
-          },
-          a: {
-            b: '__abc',
-            c: {
-              d: 'bcd'
-            },
-            e: {
-              f: {
-                g: 'efg'
-              }
-            }
-          }
-        },
-        {
-          name1: 'joe_sky1'
-        }
-      ];
+            it('test compile 1', function() {
+                  var data = [{
+                      f1: function() {
+                        return '__f1__' + this.name3;
+                      },
+                      e1: function(options) {
+                        return '<e1 name=' + this.name3 + '>' + options.result() + '</e1>';
+                      },
+                      //env: 'vm',
+                      name: "<i>joe_sky1</i>",
+                      name3: 'name3',
+                      props: {
+                        n: 1,
+                        n2: 2
+                      },
+                      id: 100,
+                      test0: false,
+                      list: [0, 1, 2],
+                      list2: [{ no: 0 }, { no: 1 }, { no: 2 }],
+                      c1: 100,
+                      sliderItem: {
+                        a: 'sliderItem',
+                        b: 'sliderItem1'
+                      },
+                      a: {
+                        b: '__abc',
+                        c: {
+                          d: 'bcd'
+                        },
+                        e: {
+                          f: {
+                            g: 'efg'
+                          }
+                        }
+                      }
+                    },
+                    {
+                      name1: 'joe_sky1'
+                    }
+                  ];
 
-      var tmpl1 = nj`
+                  var tmpl1 = nj `
         <div name1="../111" class="{{ c1 }} c0{{ 5 | filter1 }}{{'!'}}{{ 10 | filter1(1) }} c2" id1=666 id2=777 name="my name:{{'name'}}{{name}},id:{{id}},name:{{name}}" id=test1>
           <span>
             sky:{{name}},{{id}}
@@ -137,7 +134,7 @@ describe('test compile string', function () {
         </div>
       `;
 
-      var tmpl2 = nj`
+                  var tmpl2 = nj `
         <div name1=../111>
           <form-item wrapperCol="{{'[1, 2]'}}">
           <span>
@@ -147,7 +144,7 @@ describe('test compile string', function () {
         </div>
       `;
 
-      var tmpl3 = nj`
+                  var tmpl3 = nj `
         <div class="{{id}} {{name3}}" {{name3}} {{ ...props}} name={{name1}} autofocus name1={{a.c.d}} name2="{{a.e .('f') .('g')}}" a="/%'aaa'%/">
           <@name checked>{{test0 | filter1}}{{'test1' | filter2}}test2</@name>
           <@checked />
@@ -318,17 +315,17 @@ describe('test compile string', function () {
                   111
                   #${nj`<span>1</span>`}
                 </div>`}
-          #${nj`<div>{{../name3.('substring') (0, 3)}}</div>`}
+          #${nj`<div>{{../name3.('substring')_(0, 3)}}</div>`}
           <{{../sliderItem.('a')|tagName(1,2)}} no0="/" no1={{no}} no2="{{-0.05 | filter2}}" checked no='{{ ../sliderItem.b }}' />
         </slider>
       </#each>
       <$if {a .('length')}>1</$if>
-      {{{a.c.('d').('substr') (1) +("a,(b)" +(@sq)) +('a,b')}}}
-      {{list(list(JSON.('stringify') (obj('a' :(1))), 2))}}
-      {{reg('^[abc]$', 'i').('test') ('A')}}
+      {{{a.c.('d').('substr')_(1) +("a,(b)" +(@sq)) +('a,b')}}}
+      {{list(list(JSON.('stringify')_(obj('a' :(1))), 2))}}
+      {{reg('^[abc]$', 'i').('test')_('A')}}
       {{#f1}}
       <#e1>111</#e1>
-      {{Date.('now') ()}} + {{Math.('max') (Math.('max') (10, 1), 2, 3)}}
+      {{Date.('now')_()}} + {{Math.('max')_(Math.('max')_(10, 1), 2, 3)}}
       <img src="test1.png">
       `;
 

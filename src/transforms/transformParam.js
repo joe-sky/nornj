@@ -105,12 +105,11 @@ function _getFilterParam(obj) {
 const REGEX_QUOTE = /"[^"]*"|'[^']*'/g;
 const REGEX_CHAR_IN_QUOTE = /(,)|(\()|(\))/g;
 const SP_FILTER_LOOKUP = {
-  '(': 'call(',
   '||(': 'or('
 };
-const REGEX_SP_FILTER = /[\s]+((\|\|)?\()/g;
+const REGEX_SP_FILTER = /[\s]+((\|\|)\()/g;
 const REGEX_SPACE_FILTER = /[(,]/g;
-const REGEX_FIX_FILTER = /(\|)?(([.#]\()|[\s]+([^\s.#|]+\())/g;
+const REGEX_FIX_FILTER = /(\|)?(([._#]\()|[\s]+([^\s._#|]+\())/g;
 
 function _getReplaceParam(obj, tmplRule) {
   let pattern = tmplRule.replaceParam,

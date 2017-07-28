@@ -13,7 +13,7 @@ export const filters = {
   },
 
   //Call method
-  call: function(method) {
+  _: function(method) {
     if (method == null) {
       return method;
     }

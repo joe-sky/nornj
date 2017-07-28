@@ -1183,7 +1183,7 @@ var filters = {
   },
 
   //Call method
-  call: function call(method) {
+  _: function _(method) {
     if (method == null) {
       return method;
     }
@@ -2150,12 +2150,11 @@ function _getFilterParam(obj) {
 var REGEX_QUOTE = /"[^"]*"|'[^']*'/g;
 var REGEX_CHAR_IN_QUOTE = /(,)|(\()|(\))/g;
 var SP_FILTER_LOOKUP = {
-  '(': 'call(',
   '||(': 'or('
 };
-var REGEX_SP_FILTER = /[\s]+((\|\|)?\()/g;
+var REGEX_SP_FILTER = /[\s]+((\|\|)\()/g;
 var REGEX_SPACE_FILTER = /[(,]/g;
-var REGEX_FIX_FILTER = /(\|)?(([.#]\()|[\s]+([^\s.#|]+\())/g;
+var REGEX_FIX_FILTER = /(\|)?(([._#]\()|[\s]+([^\s._#|]+\())/g;
 
 function _getReplaceParam(obj, tmplRule) {
   var pattern = tmplRule.replaceParam,
