@@ -77,6 +77,12 @@ describe('test compile string', function() {
                       f1: function() {
                         return '__f1__' + this.name3;
                       },
+                      f2: {
+                        f3: function() {
+                          return '__f3__' + this.name3;
+                        },
+                        name3: 'testF3'
+                      },
                       e1: function(options) {
                         return '<e1 name=' + this.name3 + '>' + options.result() + '</e1>';
                       },
@@ -191,12 +197,12 @@ describe('test compile string', function() {
         <@resetList>{{ list(id, c1) }}</@resetList>
         <!DOCTYPE html>
         <#with {{name3}} as=name5>{{{
-          JSON #('stringify', 
+          JSON.stringify_( 
             list(
               1,
               obj(
-                'a' :(1),
-                'b' :(2)
+                'a' : (1),
+                'b' : (2)
               )
             )
           )
@@ -243,7 +249,7 @@ describe('test compile string', function() {
         <@id1>img1</@id1>
       </img>
       <img src="test1.png">
-      {{{JSON #('stringify', @data[0])}}}
+      {{{JSON.stringify_(@data[0])}}}
       <#each {{ list2 }}>
         <!--<i>test</i>-->
         <![CDATA[
@@ -259,14 +265,14 @@ describe('test compile string', function() {
           ]]>
         </#pre>
         <div {{...props}} ...${{ id10: 'id_10' }}>
-          <@id>{{'bbb' +(${'aaa'}) +(${'ccc'} | filter2)}}</@id>
+          <@id>{{'bbb' + (${'aaa'}) + (${'ccc'} | filter2)}}</@id>
           <@name>
             img
             img
           </@name>
           <#props>
-            <#if {{id >(50) &&(id <=(100))}}>
-              <@id1>d{{@global #('parseInt', 2.01, 10)}}</@id1>
+            <#if {{id > (50) && (id <= (100))}}>
+              <@id1>d{{@g.parseInt_(2.01, 10)}}</@id1>
             </#if>
           </#props>
           <@name1>{{../@data[2].name1}}</@name1>
@@ -320,12 +326,13 @@ describe('test compile string', function() {
         </slider>
       </#each>
       <$if {a .('length')}>1</$if>
-      {{{a.c.('d').('substr')_(1) +("a,(b)" +(@sq)) +('a,b')}}}
-      {{list(list(JSON.('stringify')_(obj('a' :(1))), 2))}}
+      {{{a.c.('d').('substr')_(1) + ("a,(b)" + (@sq)) + ('a,b')}}}
+      {{list(list(JSON.stringify_(obj('a' : (1))), 2))}}
       {{reg('^[abc]$', 'i').('test')_('A')}}
       {{#f1}}
+      <div>{{f2#('f3')}}</div>
       <#e1>111</#e1>
-      {{Date.('now')_()}} + {{Math.('max')_(Math.('max')_(10, 1), 2, 3)}}
+      {{Date.now_()}} + {{Math.('max')_(Math.('max')_(10, 1), 2, 3)}}
       <img src="test1.png">
       `;
 

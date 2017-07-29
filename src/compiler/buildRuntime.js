@@ -89,7 +89,7 @@ function _buildOptions(config, useStringLocal, node, fns, exPropsStr, subExProps
     }
   }
 
-  return '{ _njOpts: true, _njFnsNo: ' + fns._no + ', global: p1, context: p2, outputH: ' + !fns.useString + hashStr + (valueL ? ', lastValue: ' + valueL : '') + ' }';
+  return '{ _njOpts: true, _njFnsNo: ' + fns._no + ', global: p1, context: p2, outputH: ' + !fns.useString + hashStr + (valueL ? ', lastValue: ' + valueL : '') + (level != null ? ', level: ' + level : '') + ' }';
 }
 
 const CUSTOM_VAR = 'nj_custom';
@@ -124,7 +124,7 @@ function _buildPropData(obj, counter, fns, useStringLocal, level) {
         data = 'data';
         special = true;
         break;
-      case '@global':
+      case '@g':
         data = 'p1.global';
         special = CUSTOM_VAR;
         break;
@@ -231,7 +231,7 @@ function _buildPropData(obj, counter, fns, useStringLocal, level) {
             return p + propStr.valueStr + ', ';
           }
         }, '') : '') +
-        _buildOptions(configF, useStringLocal, null, fns, null, null, null, null, valueStrL) +
+        _buildOptions(configF, useStringLocal, null, fns, null, null, level, null, valueStrL) +
         ']);\n';
       _filterStr += '  ' + valueStrL + ' = ' + valueStr + ';\n';
       _filterStr += '  ' + valueStr + ' = ' + tmpStr + ';\n';

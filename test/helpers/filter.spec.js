@@ -3,7 +3,7 @@ import '../../src/utils/createTmplRule';
 
 describe('filter', () => {
   it('.', () => {
-    expect(render("{{ a.b .('c') .('length') }}", {
+    expect(render("{{ a.b.('c').('length') }}", {
       a: {
         b: {
           c: 'abc'
@@ -13,39 +13,39 @@ describe('filter', () => {
   });
 
   it('>', () => {
-    expect(render('{{ 2 >(1) }}')).toBe(true);
+    expect(render('{{ 2 > (1) }}')).toBe(true);
   });
 
   it('>=', () => {
-    expect(render('{{ 2 >=(2) }}')).toBe(true);
+    expect(render('{{ 2 >= (2) }}')).toBe(true);
   });
 
   it('<', () => {
-    expect(render('{{ 2 <(1) }}')).toBe(false);
+    expect(render('{{ 2 < (1) }}')).toBe(false);
   });
 
   it('<=', () => {
-    expect(render('{{ 2 <=(1) }}')).toBe(false);
+    expect(render('{{ 2 <= (1) }}')).toBe(false);
   });
 
   it('==', () => {
-    expect(render('{{ 1 ==(1) }}')).toBe(true);
+    expect(render('{{ 1 == (1) }}')).toBe(true);
   });
 
   it('===', () => {
-    expect(render('{{ 1 ===(1) }}')).toBe(true);
+    expect(render('{{ 1 === (1) }}')).toBe(true);
   });
 
   it('!=', () => {
-    expect(render('{{ 1 !=(2) }}')).toBe(true);
+    expect(render('{{ 1 != (2) }}')).toBe(true);
   });
 
   it('!==', () => {
-    expect(render('{{ undefined !==(null) }}')).toBe(true);
+    expect(render('{{ undefined !== (null) }}')).toBe(true);
   });
 
   it('?', () => {
-    expect(render('{{ 1 >(2) ?(true, false) }}')).toBe(false);
+    expect(render('{{ 1 > (2) ? (true, false) }}')).toBe(false);
   });
 
   it('!', () => {
@@ -53,42 +53,42 @@ describe('filter', () => {
   });
 
   it('+', () => {
-    expect(render('{{ 1 +(2 +(3)) }}')).toBe(6);
+    expect(render('{{ 1 + (2 + (3)) }}')).toBe(6);
   });
 
   it('-', () => {
-    expect(render('{{ 3 -(2) -(1) }}')).toBe(0);
+    expect(render('{{ 3 - (2) - (1) }}')).toBe(0);
   });
 
   it('*', () => {
-    expect(render('{{ 3 *(5) }}')).toBe(15);
+    expect(render('{{ 3 * (5) }}')).toBe(15);
   });
 
   it('/', () => {
-    expect(render('{{ 15 /(3) }}')).toBe(5);
+    expect(render('{{ 15 / (3) }}')).toBe(5);
   });
 
   it('%', () => {
-    expect(render('{{ 10 %(3) }}')).toBe(1);
+    expect(render('{{ 10 % (3) }}')).toBe(1);
   });
 
   it('&&', () => {
-    expect(render("{{ 1 ==('1') &&(1 ==('2')) }}")).toBe(false);
+    expect(render("{{ 1 == ('1') && (1 == ('2')) }}")).toBe(false);
   });
 
   it('||', () => {
-    expect(render("{{ 1 ==('1') ||(1 ==('2')) }}")).toBe(true);
+    expect(render("{{ 1 == ('1') || (1 == ('2')) }}")).toBe(true);
   });
 
   it('int & float', () => {
-    expect(render("{{ 20.5 | int *(10.05 | float) +(Math #('pow', 2, 3)) }}")).toBe(209);
+    expect(render("{{ 20.5 | int * (10.05 | float) + (Math.pow_(2, 3)) }}")).toBe(209);
   });
 
   it('bool', () => {
     expect(render("{{ 'false' | bool }}")).toBe(false);
   });
 
-  it('#(method)', () => {
-    expect(render("{{ 'abc' #('substr', 1) }}")).toBe('bc');
+  it('_(method)', () => {
+    expect(render("{{ 'abc'.('substr')_(1) }}")).toBe('bc');
   });
 });

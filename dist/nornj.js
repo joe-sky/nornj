@@ -473,7 +473,277 @@ createTmplRule({}, true);
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils_tools__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__transforms_transformData__ = __webpack_require__(4);
+/* unused harmony export styleProps */
+/* unused harmony export getData */
+/* harmony export (immutable) */ __webpack_exports__["c"] = getComputedData;
+/* unused harmony export getElement */
+/* unused harmony export getElementRefer */
+/* unused harmony export getElementName */
+/* unused harmony export addArgs */
+/* unused harmony export newContext */
+/* harmony export (immutable) */ __webpack_exports__["a"] = fixPropName;
+/* unused harmony export assignStrProps */
+/* unused harmony export exRet */
+/* unused harmony export tmplWrap */
+/* harmony export (immutable) */ __webpack_exports__["b"] = template;
+
+
+var errorTitle = __WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */].errorTitle;
+
+//提取style内参数
+
+function styleProps(obj) {
+  //If the parameter is a style object,then direct return.
+  if (__WEBPACK_IMPORTED_MODULE_1__utils_tools__["k" /* isObject */](obj) || __WEBPACK_IMPORTED_MODULE_1__utils_tools__["l" /* isNumber */](obj)) {
+    return obj;
+  }
+
+  //参数为字符串
+  var pattern = /([^\s:]+)[\s]?:[\s]?([^;]+)[;]?/g,
+      matchArr = void 0,
+      ret = void 0;
+
+  while (matchArr = pattern.exec(obj)) {
+    var key = matchArr[1],
+        value = matchArr[2];
+
+    if (!ret) {
+      ret = {};
+    }
+
+    //Convert to lowercase when style name is all capital.
+    if (/^[A-Z-]+$/.test(key)) {
+      key = key.toLowerCase();
+    }
+
+    //将连字符转为驼峰命名
+    key = __WEBPACK_IMPORTED_MODULE_1__utils_tools__["m" /* toCamelCase */](key);
+
+    ret[key] = value;
+  }
+
+  return ret;
+}
+
+//Get value from multiple datas
+function getData(prop, data, hasCtx) {
+  var ret = void 0,
+      obj = void 0;
+  if (data == null) {
+    data = this.data;
+  }
+
+  for (var i = 0, l = data.length; i < l; i++) {
+    obj = data[i];
+    if (obj) {
+      ret = obj[prop];
+      if (ret !== undefined) {
+        if (hasCtx) {
+          return {
+            ctx: obj,
+            val: ret
+          };
+        }
+
+        return ret;
+      }
+    }
+  }
+}
+
+function getComputedData(fn, p2, level) {
+  if (fn == null) {
+    return fn;
+  }
+
+  if (fn.val._njTmpl) {
+    //模板函数
+    if (level != null && p2.level != null) {
+      level += p2.level;
+    }
+
+    return fn.val.call({
+      _njData: p2.data,
+      _njParent: p2.parent,
+      _njIndex: p2.index,
+      _njLevel: level
+    });
+  } else {
+    //普通函数
+    return fn.val.call(fn.ctx, p2);
+  }
+}
+
+function getElement(name, p1) {
+  var element = p1.components[name];
+  return element ? element : name;
+}
+
+function getElementRefer(refer, name, p1) {
+  return refer != null ? __WEBPACK_IMPORTED_MODULE_1__utils_tools__["b" /* isString */](refer) ? getElement(refer.toLowerCase(), p1) : refer : getElement(name, p1);
+}
+
+function getElementName(refer, name) {
+  return refer != null && refer !== '' ? refer : name;
+}
+
+function addArgs(props, dataRefer) {
+  var args = props.args;
+
+  if (args) {
+    for (var i = args.length; i--;) {
+      dataRefer.unshift(args[i]);
+    }
+  }
+}
+
+//Rebuild local variables in the new context
+function newContext(p2, p3) {
+  if (!p3) {
+    return p2;
+  }
+
+  var newData = [];
+  if ('data' in p3) {
+    newData.push(p3.data);
+  }
+  if ('extra' in p3) {
+    newData.push(p3.extra);
+  }
+
+  return {
+    data: newData.length ? __WEBPACK_IMPORTED_MODULE_1__utils_tools__["h" /* arrayPush */](newData, p2.data) : p2.data,
+    parent: p3.fallback ? p2 : p2.parent,
+    index: 'index' in p3 ? p3.index : p2.index,
+    level: p2.level,
+    getData: getData
+  };
+}
+
+//修正属性名
+function fixPropName(name) {
+  switch (name) {
+    case 'class':
+      name = 'className';
+      break;
+    case 'for':
+      name = 'htmlFor';
+      break;
+  }
+
+  return name;
+}
+
+//合并字符串属性
+function assignStrProps(paramsE, keys) {
+  var ret = '';
+  for (var k in paramsE) {
+    if (!keys || !keys[k]) {
+      var v = paramsE[k];
+      ret += ' ' + k + (k !== v ? '="' + v + '"' : ' ');
+    }
+  }
+  return ret;
+}
+
+//创建扩展标签子节点函数
+function exRet(p1, p2, fn, p4, p5) {
+  return function (param) {
+    return fn(p1, p2, param, p4, p5);
+  };
+}
+
+//构建可运行的模板函数
+function tmplWrap(configs, main) {
+  return function () {
+    var initCtx = this,
+        data = __WEBPACK_IMPORTED_MODULE_1__utils_tools__["j" /* arraySlice */](arguments);
+
+    return main(configs, {
+      data: initCtx && initCtx._njData ? __WEBPACK_IMPORTED_MODULE_1__utils_tools__["h" /* arrayPush */](data, initCtx._njData) : data,
+      parent: initCtx ? initCtx._njParent : null,
+      index: initCtx ? initCtx._njIndex : null,
+      level: initCtx ? initCtx._njLevel : null,
+      getData: getData
+    });
+  };
+}
+
+function levelSpace(p2) {
+  if (p2.level == null) {
+    return '';
+  }
+
+  var ret = '';
+  for (var i = 0; i < p2.level; i++) {
+    ret += '  ';
+  }
+  return ret;
+}
+
+function firstNewline(p2) {
+  return p2.index == null ? '' : p2.index == 0 ? '' : '\n';
+}
+
+//创建模板函数
+function template(fns) {
+  var configs = {
+    useString: fns.useString,
+    extensions: __WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */].extensions,
+    filters: __WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */].filters,
+    noop: __WEBPACK_IMPORTED_MODULE_1__utils_tools__["n" /* noop */],
+    obj: __WEBPACK_IMPORTED_MODULE_1__utils_tools__["g" /* obj */],
+    throwIf: __WEBPACK_IMPORTED_MODULE_1__utils_tools__["o" /* throwIf */],
+    warn: __WEBPACK_IMPORTED_MODULE_1__utils_tools__["p" /* warn */],
+    newContext: newContext,
+    getComputedData: getComputedData,
+    styleProps: styleProps,
+    exRet: exRet,
+    getElement: getElement,
+    getElementRefer: getElementRefer,
+    getElementName: getElementName,
+    addArgs: addArgs,
+    assign: __WEBPACK_IMPORTED_MODULE_1__utils_tools__["a" /* assign */],
+    global: __WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */].global
+  };
+
+  if (!configs.useString) {
+    configs.h = __WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */].createElement;
+    configs.components = __WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */].components;
+  } else {
+    configs.assignStrProps = assignStrProps;
+    configs.escape = __WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */].escape;
+    configs.levelSpace = levelSpace;
+    configs.firstNewline = firstNewline;
+  }
+
+  __WEBPACK_IMPORTED_MODULE_1__utils_tools__["c" /* each */](fns, function (v, k) {
+    if (k.indexOf('main') === 0) {
+      //将每个主函数构建为可运行的模板函数
+      configs[k] = tmplWrap(configs, v);
+      configs[k]._njTmpl = true;
+      if (v._njName != null) {
+        //设置函数名
+        configs[k].tmplName = v._njName;
+      }
+      configs['_' + k] = v;
+    } else if (k.indexOf('fn') === 0) {
+      //扩展标签函数
+      configs[k] = v;
+    }
+  }, false, false);
+
+  return configs;
+}
+
+/***/ }),
+/* 4 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils_tools__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__transforms_transformData__ = __webpack_require__(3);
 /* unused harmony export extensions */
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return extensionConfig; });
 /* harmony export (immutable) */ __webpack_exports__["a"] = registerExtension;
@@ -889,285 +1159,17 @@ __WEBPACK_IMPORTED_MODULE_1__utils_tools__["a" /* assign */](__WEBPACK_IMPORTED_
 });
 
 /***/ }),
-/* 4 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils_tools__ = __webpack_require__(1);
-/* unused harmony export styleProps */
-/* unused harmony export getData */
-/* unused harmony export getComputedData */
-/* unused harmony export getElement */
-/* unused harmony export getElementRefer */
-/* unused harmony export getElementName */
-/* unused harmony export addArgs */
-/* unused harmony export newContext */
-/* harmony export (immutable) */ __webpack_exports__["a"] = fixPropName;
-/* unused harmony export assignStrProps */
-/* unused harmony export exRet */
-/* unused harmony export tmplWrap */
-/* harmony export (immutable) */ __webpack_exports__["b"] = template;
-
-
-var errorTitle = __WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */].errorTitle;
-
-//提取style内参数
-
-function styleProps(obj) {
-  //If the parameter is a style object,then direct return.
-  if (__WEBPACK_IMPORTED_MODULE_1__utils_tools__["k" /* isObject */](obj) || __WEBPACK_IMPORTED_MODULE_1__utils_tools__["l" /* isNumber */](obj)) {
-    return obj;
-  }
-
-  //参数为字符串
-  var pattern = /([^\s:]+)[\s]?:[\s]?([^;]+)[;]?/g,
-      matchArr = void 0,
-      ret = void 0;
-
-  while (matchArr = pattern.exec(obj)) {
-    var key = matchArr[1],
-        value = matchArr[2];
-
-    if (!ret) {
-      ret = {};
-    }
-
-    //Convert to lowercase when style name is all capital.
-    if (/^[A-Z-]+$/.test(key)) {
-      key = key.toLowerCase();
-    }
-
-    //将连字符转为驼峰命名
-    key = __WEBPACK_IMPORTED_MODULE_1__utils_tools__["m" /* toCamelCase */](key);
-
-    ret[key] = value;
-  }
-
-  return ret;
-}
-
-//Get value from multiple datas
-function getData(prop, data, hasCtx) {
-  var ret = void 0,
-      obj = void 0;
-  if (data == null) {
-    data = this.data;
-  }
-
-  for (var i = 0, l = data.length; i < l; i++) {
-    obj = data[i];
-    if (obj) {
-      ret = obj[prop];
-      if (ret !== undefined) {
-        if (hasCtx) {
-          return {
-            ctx: obj,
-            val: ret
-          };
-        }
-
-        return ret;
-      }
-    }
-  }
-}
-
-function getComputedData(fn, p2, level) {
-  if (fn == null) {
-    return fn;
-  }
-
-  if (fn.val._njTmpl) {
-    //模板函数
-    if (level != null && p2.level != null) {
-      level += p2.level;
-    }
-
-    return fn.val.call({
-      _njData: p2.data,
-      _njParent: p2.parent,
-      _njIndex: p2.index,
-      _njLevel: level
-    });
-  } else {
-    //普通函数
-    return fn.val.call(fn.ctx, p2);
-  }
-}
-
-function getElement(name, p1) {
-  var element = p1.components[name];
-  return element ? element : name;
-}
-
-function getElementRefer(refer, name, p1) {
-  return refer != null ? __WEBPACK_IMPORTED_MODULE_1__utils_tools__["b" /* isString */](refer) ? getElement(refer.toLowerCase(), p1) : refer : getElement(name, p1);
-}
-
-function getElementName(refer, name) {
-  return refer != null && refer !== '' ? refer : name;
-}
-
-function addArgs(props, dataRefer) {
-  var args = props.args;
-
-  if (args) {
-    for (var i = args.length; i--;) {
-      dataRefer.unshift(args[i]);
-    }
-  }
-}
-
-//Rebuild local variables in the new context
-function newContext(p2, p3) {
-  if (!p3) {
-    return p2;
-  }
-
-  var newData = [];
-  if ('data' in p3) {
-    newData.push(p3.data);
-  }
-  if ('extra' in p3) {
-    newData.push(p3.extra);
-  }
-
-  return {
-    data: newData.length ? __WEBPACK_IMPORTED_MODULE_1__utils_tools__["h" /* arrayPush */](newData, p2.data) : p2.data,
-    parent: p3.fallback ? p2 : p2.parent,
-    index: 'index' in p3 ? p3.index : p2.index,
-    level: p2.level,
-    getData: getData
-  };
-}
-
-//修正属性名
-function fixPropName(name) {
-  switch (name) {
-    case 'class':
-      name = 'className';
-      break;
-    case 'for':
-      name = 'htmlFor';
-      break;
-  }
-
-  return name;
-}
-
-//合并字符串属性
-function assignStrProps(paramsE, keys) {
-  var ret = '';
-  for (var k in paramsE) {
-    if (!keys || !keys[k]) {
-      var v = paramsE[k];
-      ret += ' ' + k + (k !== v ? '="' + v + '"' : ' ');
-    }
-  }
-  return ret;
-}
-
-//创建扩展标签子节点函数
-function exRet(p1, p2, fn, p4, p5) {
-  return function (param) {
-    return fn(p1, p2, param, p4, p5);
-  };
-}
-
-//构建可运行的模板函数
-function tmplWrap(configs, main) {
-  return function () {
-    var initCtx = this,
-        data = __WEBPACK_IMPORTED_MODULE_1__utils_tools__["j" /* arraySlice */](arguments);
-
-    return main(configs, {
-      data: initCtx && initCtx._njData ? __WEBPACK_IMPORTED_MODULE_1__utils_tools__["h" /* arrayPush */](data, initCtx._njData) : data,
-      parent: initCtx ? initCtx._njParent : null,
-      index: initCtx ? initCtx._njIndex : null,
-      level: initCtx ? initCtx._njLevel : null,
-      getData: getData
-    });
-  };
-}
-
-function levelSpace(p2) {
-  if (p2.level == null) {
-    return '';
-  }
-
-  var ret = '';
-  for (var i = 0; i < p2.level; i++) {
-    ret += '  ';
-  }
-  return ret;
-}
-
-function firstNewline(p2) {
-  return p2.index == null ? '' : p2.index == 0 ? '' : '\n';
-}
-
-//创建模板函数
-function template(fns) {
-  var configs = {
-    useString: fns.useString,
-    extensions: __WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */].extensions,
-    filters: __WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */].filters,
-    noop: __WEBPACK_IMPORTED_MODULE_1__utils_tools__["n" /* noop */],
-    obj: __WEBPACK_IMPORTED_MODULE_1__utils_tools__["g" /* obj */],
-    throwIf: __WEBPACK_IMPORTED_MODULE_1__utils_tools__["o" /* throwIf */],
-    warn: __WEBPACK_IMPORTED_MODULE_1__utils_tools__["p" /* warn */],
-    newContext: newContext,
-    getComputedData: getComputedData,
-    styleProps: styleProps,
-    exRet: exRet,
-    getElement: getElement,
-    getElementRefer: getElementRefer,
-    getElementName: getElementName,
-    addArgs: addArgs,
-    assign: __WEBPACK_IMPORTED_MODULE_1__utils_tools__["a" /* assign */],
-    global: __WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */].global
-  };
-
-  if (!configs.useString) {
-    configs.h = __WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */].createElement;
-    configs.components = __WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */].components;
-  } else {
-    configs.assignStrProps = assignStrProps;
-    configs.escape = __WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */].escape;
-    configs.levelSpace = levelSpace;
-    configs.firstNewline = firstNewline;
-  }
-
-  __WEBPACK_IMPORTED_MODULE_1__utils_tools__["c" /* each */](fns, function (v, k) {
-    if (k.indexOf('main') === 0) {
-      //将每个主函数构建为可运行的模板函数
-      configs[k] = tmplWrap(configs, v);
-      configs[k]._njTmpl = true;
-      if (v._njName != null) {
-        //设置函数名
-        configs[k].tmplName = v._njName;
-      }
-      configs['_' + k] = v;
-    } else if (k.indexOf('fn') === 0) {
-      //扩展标签函数
-      configs[k] = v;
-    }
-  }, false, false);
-
-  return configs;
-}
-
-/***/ }),
 /* 5 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils_tools__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__transforms_transformData__ = __webpack_require__(3);
 /* unused harmony export filters */
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return filterConfig; });
 /* harmony export (immutable) */ __webpack_exports__["a"] = registerFilter;
+
 
 
 
@@ -1193,13 +1195,15 @@ var filters = {
   },
 
   //Get computed properties
-  '#': function _(obj, method) {
-    if (obj != null) {
-      var args = arguments;
-      return obj[method].apply(obj, __WEBPACK_IMPORTED_MODULE_1__utils_tools__["j" /* arraySlice */](args, 2, args.length - 1));
+  '#': function _(obj, prop, options) {
+    if (obj == null) {
+      return obj;
     }
 
-    return obj;
+    return __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_2__transforms_transformData__["c" /* getComputedData */])({
+      val: obj[prop],
+      ctx: obj
+    }, options.context, options.level);
   },
 
   '==': function _(val1, val2) {
@@ -1727,16 +1731,16 @@ function _checkStringElem(xml, tmplRule) {
 }
 
 var SP_FILTER_LOOKUP = {
-  '>(': 'gt(',
-  '<(': 'lt(',
-  '>=(': 'gte(',
-  '<=(': 'lte('
+  '>': 'gt(',
+  '<': 'lt(',
+  '>=': 'gte(',
+  '<=': 'lte('
 };
-var REGEX_SP_FILTER = /(\|)?[\s]+((>|<|>=|<=)\()/g;
+var REGEX_SP_FILTER = /(\|)?[\s]+((>|<|>=|<=)[\s]*\()/g;
 
 function _formatAll(str, tmplRule) {
   var commentRule = tmplRule.commentRule;
-  return str.replace(new RegExp('<!--' + commentRule + '[\\s\\S]*?' + commentRule + '-->', 'g'), '').replace(REGEX_SP_FILTER, function (all, s1, match) {
+  return str.replace(new RegExp('<!--' + commentRule + '[\\s\\S]*?' + commentRule + '-->', 'g'), '').replace(REGEX_SP_FILTER, function (all, g1, g2, match) {
     return ' | ' + SP_FILTER_LOOKUP[match];
   });
 }
@@ -1823,7 +1827,7 @@ function _setText(text, elemArr) {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils_tools__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__transformParam__ = __webpack_require__(9);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__helpers_extension__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__helpers_extension__ = __webpack_require__(4);
 /* harmony export (immutable) */ __webpack_exports__["h"] = getXmlOpenTag;
 /* harmony export (immutable) */ __webpack_exports__["i"] = isXmlSelfCloseTag;
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return OMITTED_CLOSE_TAGS; });
@@ -2063,7 +2067,7 @@ function _compiledProp(prop, innerBrackets) {
 
         var retF = _getFilterParam(filter),
             filterObj = __WEBPACK_IMPORTED_MODULE_1__utils_tools__["g" /* obj */](),
-            filterName = retF[0]; //Get filter name
+            filterName = retF[0].trim(); //Get filter name
 
         if (filterName) {
           var paramsF = retF[1]; //Get filter param
@@ -2150,11 +2154,11 @@ function _getFilterParam(obj) {
 var REGEX_QUOTE = /"[^"]*"|'[^']*'/g;
 var REGEX_CHAR_IN_QUOTE = /(,)|(\()|(\))/g;
 var SP_FILTER_LOOKUP = {
-  '||(': 'or('
+  '||': 'or('
 };
-var REGEX_SP_FILTER = /[\s]+((\|\|)\()/g;
+var REGEX_SP_FILTER = /[\s]+((\|\|)[\s]*\()/g;
 var REGEX_SPACE_FILTER = /[(,]/g;
-var REGEX_FIX_FILTER = /(\|)?(([._#]\()|[\s]+([^\s._#|]+\())/g;
+var REGEX_FIX_FILTER = /(\|)?(([._#]\()|[\s]+([^\s._#|]+[\s]*\())/g;
 
 function _getReplaceParam(obj, tmplRule) {
   var pattern = tmplRule.replaceParam,
@@ -2190,7 +2194,7 @@ function _getReplaceParam(obj, tmplRule) {
 
         return s;
       });
-    }).replace(REGEX_SP_FILTER, function (all, match) {
+    }).replace(REGEX_SP_FILTER, function (all, g1, match) {
       return ' ' + SP_FILTER_LOOKUP[match];
     }).replace(REGEX_SPACE_FILTER, function (all) {
       return all + ' ';
@@ -2270,7 +2274,7 @@ function compiledParam(value, tmplRule) {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils_tools__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__parser_checkElem__ = __webpack_require__(15);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__transforms_transformData__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__transforms_transformData__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__buildRuntime__ = __webpack_require__(14);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__parser_checkStringElem__ = __webpack_require__(7);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__utils_createTmplRule__ = __webpack_require__(2);
@@ -2524,9 +2528,9 @@ __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__utils_tools__["a" /* assign *
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils_tools__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__transforms_transformData__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__transforms_transformData__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__utils_escape__ = __webpack_require__(6);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__helpers_extension__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__helpers_extension__ = __webpack_require__(4);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__helpers_filter__ = __webpack_require__(5);
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
@@ -2626,7 +2630,7 @@ function _buildOptions(config, useStringLocal, node, fns, exPropsStr, subExProps
     }
   }
 
-  return '{ _njOpts: true, _njFnsNo: ' + fns._no + ', global: p1, context: p2, outputH: ' + !fns.useString + hashStr + (valueL ? ', lastValue: ' + valueL : '') + ' }';
+  return '{ _njOpts: true, _njFnsNo: ' + fns._no + ', global: p1, context: p2, outputH: ' + !fns.useString + hashStr + (valueL ? ', lastValue: ' + valueL : '') + (level != null ? ', level: ' + level : '') + ' }';
 }
 
 var CUSTOM_VAR = 'nj_custom';
@@ -2667,7 +2671,7 @@ function _buildPropData(obj, counter, fns, useStringLocal, level) {
         data = 'data';
         special = true;
         break;
-      case '@global':
+      case '@g':
         data = 'p1.global';
         special = CUSTOM_VAR;
         break;
@@ -2776,7 +2780,7 @@ function _buildPropData(obj, counter, fns, useStringLocal, level) {
             filterStrI += propStr.filterStr;
             return p + propStr.valueStr + ', ';
           }
-        }, '') : '') + _buildOptions(configF, useStringLocal, null, fns, null, null, null, null, valueStrL) + ']);\n';
+        }, '') : '') + _buildOptions(configF, useStringLocal, null, fns, null, null, level, null, valueStrL) + ']);\n';
         _filterStr += '  ' + valueStrL + ' = ' + valueStr + ';\n';
         _filterStr += '  ' + valueStr + ' = ' + tmpStr + ';\n';
 
@@ -3578,7 +3582,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__utils_createTmplRule__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__config__ = __webpack_require__(11);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__utils_escape__ = __webpack_require__(6);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__helpers_extension__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__helpers_extension__ = __webpack_require__(4);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "registerExtension", function() { return __WEBPACK_IMPORTED_MODULE_6__helpers_extension__["a"]; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__helpers_filter__ = __webpack_require__(5);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "registerFilter", function() { return __WEBPACK_IMPORTED_MODULE_7__helpers_filter__["a"]; });

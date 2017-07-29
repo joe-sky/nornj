@@ -1,5 +1,6 @@
 ﻿import nj from '../core';
 import * as tools from '../utils/tools';
+import { getComputedData } from '../transforms/transformData';
 
 //Global filter list
 export const filters = {
@@ -23,13 +24,15 @@ export const filters = {
   },
 
   //Get computed properties
-  '#': function(obj, method) {
-    if (obj != null) {
-      let args = arguments;
-      return obj[method].apply(obj, tools.arraySlice(args, 2, args.length - 1));
+  '#': (obj, prop, options) => {
+    if (obj == null) {
+      return obj;
     }
 
-    return obj;
+    return getComputedData({
+      val: obj[prop],
+      ctx: obj
+    }, options.context, options.level);
   },
 
   '==': (val1, val2) => val1 == val2,

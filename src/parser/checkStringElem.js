@@ -224,17 +224,17 @@ function _checkStringElem(xml, tmplRule) {
 }
 
 const SP_FILTER_LOOKUP = {
-  '>(': 'gt(',
-  '<(': 'lt(',
-  '>=(': 'gte(',
-  '<=(': 'lte('
+  '>': 'gt(',
+  '<': 'lt(',
+  '>=': 'gte(',
+  '<=': 'lte('
 };
-const REGEX_SP_FILTER = /(\|)?[\s]+((>|<|>=|<=)\()/g;
+const REGEX_SP_FILTER = /(\|)?[\s]+((>|<|>=|<=)[\s]*\()/g;
 
 function _formatAll(str, tmplRule) {
   const commentRule = tmplRule.commentRule;
   return str.replace(new RegExp('<!--' + commentRule + '[\\s\\S]*?' + commentRule + '-->', 'g'), '')
-    .replace(REGEX_SP_FILTER, (all, s1, match) => ' | ' + SP_FILTER_LOOKUP[match]);
+    .replace(REGEX_SP_FILTER, (all, g1, g2, match) => ' | ' + SP_FILTER_LOOKUP[match]);
 }
 
 function _transformToEx(isStr, elemName, elemParams, tmplRule) {

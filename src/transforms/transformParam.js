@@ -24,7 +24,7 @@ function _compiledProp(prop, innerBrackets) {
 
       let retF = _getFilterParam(filter),
         filterObj = tools.obj(),
-        filterName = retF[0]; //Get filter name
+        filterName = retF[0].trim(); //Get filter name
 
       if (filterName) {
         const paramsF = retF[1]; //Get filter param
@@ -105,11 +105,11 @@ function _getFilterParam(obj) {
 const REGEX_QUOTE = /"[^"]*"|'[^']*'/g;
 const REGEX_CHAR_IN_QUOTE = /(,)|(\()|(\))/g;
 const SP_FILTER_LOOKUP = {
-  '||(': 'or('
+  '||': 'or('
 };
-const REGEX_SP_FILTER = /[\s]+((\|\|)\()/g;
+const REGEX_SP_FILTER = /[\s]+((\|\|)[\s]*\()/g;
 const REGEX_SPACE_FILTER = /[(,]/g;
-const REGEX_FIX_FILTER = /(\|)?(([._#]\()|[\s]+([^\s._#|]+\())/g;
+const REGEX_FIX_FILTER = /(\|)?(([._#]\()|[\s]+([^\s._#|]+[\s]*\())/g;
 
 function _getReplaceParam(obj, tmplRule) {
   let pattern = tmplRule.replaceParam,
@@ -142,7 +142,7 @@ function _getReplaceParam(obj, tmplRule) {
 
         return s;
       }))
-      .replace(REGEX_SP_FILTER, (all, match) => ' ' + SP_FILTER_LOOKUP[match])
+      .replace(REGEX_SP_FILTER, (all, g1, match) => ' ' + SP_FILTER_LOOKUP[match])
       .replace(REGEX_SPACE_FILTER, all => all + ' ')
       .replace(REGEX_FIX_FILTER, (all, g1, g2, g3, g4) => {
         return (g1 ? all : ' | ' + (g3 ? g3 : g4));
