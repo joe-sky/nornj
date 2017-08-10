@@ -38,7 +38,7 @@ export function styleProps(obj) {
 //Get value from multiple datas
 export function getData(prop, data, hasCtx) {
   let ret, obj;
-  if (data == null) {
+  if (!data) {
     data = this.data;
   }
 
@@ -82,7 +82,7 @@ export function getComputedData(fn, p2, level) {
 }
 
 export function getElement(name, p1) {
-  const element = p1.components[name];
+  const element = p1.cp[name];
   return element ? element : name;
 }
 
@@ -122,7 +122,8 @@ export function newContext(p2, p3) {
     parent: p3.fallback ? p2 : p2.parent,
     index: 'index' in p3 ? p3.index : p2.index,
     level: p2.level,
-    getData
+    getData,
+    d: getData
   };
 }
 
@@ -170,7 +171,8 @@ export function tmplWrap(configs, main) {
       parent: initCtx ? initCtx._njParent : null,
       index: initCtx ? initCtx._njIndex : null,
       level: initCtx ? initCtx._njLevel : null,
-      getData
+      getData,
+      d: getData
     });
   };
 }
@@ -191,36 +193,40 @@ function firstNewline(p2) {
   return p2.index == null ? '' : (p2.index == 0 ? '' : '\n');
 }
 
+function createElementApply(p) {
+  return nj.createElement.apply(null, p);
+}
+
 //创建模板函数
 export function template(fns) {
   const configs = {
-    useString: fns.useString,
-    extensions: nj.extensions,
-    filters: nj.filters,
-    noop: tools.noop,
-    obj: tools.obj,
-    throwIf: tools.throwIf,
-    warn: tools.warn,
-    newContext,
-    getComputedData,
-    styleProps,
-    exRet,
-    getElement,
-    getElementRefer,
-    getElementName,
-    addArgs,
-    assign: tools.assign,
-    global: nj.global
+    us: fns.useString,
+    x: nj.extensions,
+    f: nj.filters,
+    np: tools.noop,
+    tf: tools.throwIf,
+    wn: tools.warn,
+    n: newContext,
+    c: getComputedData,
+    sp: styleProps,
+    r: exRet,
+    e: getElement,
+    er: getElementRefer,
+    en: getElementName,
+    aa: addArgs,
+    an: tools.assign,
+    g: nj.global
   };
 
-  if (!configs.useString) {
+  if (!configs.us) {
     configs.h = nj.createElement;
-    configs.components = nj.components;
+    configs.H = createElementApply;
+    configs.cp = nj.components;
   } else {
-    configs.assignStrProps = assignStrProps;
-    configs.escape = nj.escape;
-    configs.levelSpace = levelSpace;
-    configs.firstNewline = firstNewline;
+    configs.ans = assignStrProps;
+    configs.es = nj.escape;
+    configs.ls = levelSpace;
+    configs.fl = firstNewline;
   }
 
   tools.each(fns, (v, k) => {
