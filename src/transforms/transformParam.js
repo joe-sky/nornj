@@ -1,11 +1,12 @@
 ﻿import nj from '../core';
 import * as tools from '../utils/tools';
+import '../helpers/filter';
 
 //Get compiled property
-const REGEX_JS_PROP = /(('[^']*')|("[^"]*")|(-?([0-9][0-9]*)(\.\d+)?)|true|false|null|undefined|Object|Array|Math|Date|JSON|([#]*)([^.[\]()]+))([^\s()]*)/;
-const REGEX_REPLACE_CHAR = /(_njCo_)|(_njLp_)|(_njRp_)/g;
+const REGEX_JS_PROP = new RegExp('(' + nj.regexJsBase + '([^\\s()]*)');
+const REGEX_REPLACE_CHAR = /_njQs(\d)_/g;
 
-function _compiledProp(prop, innerBrackets) {
+function _compiledProp(prop, innerBrackets, innerQuotes) {
   let ret = tools.obj();
 
   //If there are vertical lines in the property,then use filter
@@ -34,7 +35,7 @@ function _compiledProp(prop, innerBrackets) {
           let params = [];
           tools.each(innerBrackets[paramsF].split(','), p => {
             if (p !== '') {
-              params[params.length] = _compiledProp(p.trim(), innerBrackets);
+              params[params.length] = _compiledProp(p.trim(), innerBrackets, innerQuotes);
             }
           }, false, true);
 
@@ -49,21 +50,8 @@ function _compiledProp(prop, innerBrackets) {
     ret.filters = filters;
   }
 
-  //替换特殊字符
-  prop = prop.replace(REGEX_REPLACE_CHAR, (all, g1, g2, g3) => {
-    let s = all;
-    if (g1) {
-      s = ',';
-    }
-    if (g2) {
-      s = '(';
-    }
-    if (g3) {
-      s = ')';
-    }
-
-    return s;
-  });
+  //替换字符串值
+  prop = prop.replace(REGEX_REPLACE_CHAR, (all, g1) => innerQuotes[g1]);
 
   //Extract the parent data path
   if (prop.indexOf('../') === 0) {
@@ -102,16 +90,24 @@ function _getFilterParam(obj) {
 }
 
 //Extract replace parameters
-const REGEX_QUOTE = /"[^"]*"|'[^']*'/g;
-const REGEX_CHAR_IN_QUOTE = /(,)|(\()|(\))/g;
-const SP_FILTER_LOOKUP = {
-  '||': 'or('
+const REGEX_LT_GT = /_nj(L|G)t_/g;
+const LT_GT_LOOKUP = {
+  '_njLt_': '<',
+  '_njGt_': '>'
 };
-const REGEX_SP_FILTER = /[\s]+((\|\|)[\s]*\()/g;
+const REGEX_QUOTE = /"[^"]*"|'[^']*'/g;
+const SP_FILTER_LOOKUP = {
+  '||': 'or'
+};
+const REGEX_SP_FILTER = /[\s]+((\|\|)[\s]*)/g;
+const FN_FILTER_LOOKUP = {
+  ')': ')_('
+};
+const REGEX_FN_FILTER = /(\)|\.([^\s'"._#()]+))[\s]*\(/g;
 const REGEX_SPACE_FILTER = /[(,]/g;
 const REGEX_FIX_FILTER = /(\|)?(([._#]\()|[\s]+([^\s._#|]+[\s]*\())/g;
 
-function _getReplaceParam(obj, tmplRule) {
+function _getReplaceParam(obj, tmplRule, innerQuotes) {
   let pattern = tmplRule.replaceParam,
     matchArr, ret, i = 0;
 
@@ -128,26 +124,19 @@ function _getReplaceParam(obj, tmplRule) {
     }
 
     //替换特殊过滤器名称并且为简化过滤器补全"|"符
-    prop = prop.replace(REGEX_QUOTE, match => match.replace(REGEX_CHAR_IN_QUOTE, (all, g1, g2, g3) => {
-        let s = all;
-        if (g1) {
-          s = '_njCo_';
-        }
-        if (g2) {
-          s = '_njLp_';
-        }
-        if (g3) {
-          s = '_njRp_';
-        }
-
-        return s;
-      }))
-      .replace(REGEX_SP_FILTER, (all, g1, match) => ' ' + SP_FILTER_LOOKUP[match])
+    prop = prop.replace(REGEX_LT_GT, match => LT_GT_LOOKUP[match])
+      .replace(REGEX_QUOTE, match => {
+        innerQuotes.push(match);
+        return '_njQs' + (innerQuotes.length - 1) + '_';
+      })
+      .replace(REGEX_SP_FILTER, (all, g1, match) => ' ' + SP_FILTER_LOOKUP[match] + ' ')
+      .replace(nj.regexTransOpts, (all, g1, g2) => ' ' + g1 + '(' + g2 + ')')
+      .replace(REGEX_FN_FILTER, (all, match, g1) => !g1 ? (' ' + FN_FILTER_LOOKUP[match]) : '.(\'' + g1 + '\')_(')
       .replace(REGEX_SPACE_FILTER, all => all + ' ')
       .replace(REGEX_FIX_FILTER, (all, g1, g2, g3, g4) => {
         return (g1 ? all : ' | ' + (g3 ? g3 : g4));
       });
-
+console.log(prop);
     item[2] = prop.trim();
     ret.push(item);
     i++;
@@ -185,7 +174,8 @@ export function compiledParam(value, tmplRule) {
 
   //If have placehorder
   if (strs.length > 1) {
-    const params = _getReplaceParam(value, tmplRule);
+    const innerQuotes = [];
+    const params = _getReplaceParam(value, tmplRule, innerQuotes);
     props = [];
 
     tools.each(params, param => {
@@ -194,7 +184,7 @@ export function compiledParam(value, tmplRule) {
 
       isAll = param[3] ? param[0] === value : false; //If there are several curly braces in one property value, "isAll" must be false.
       const prop = _replaceInnerBrackets(param[2], 0, innerBrackets);
-      retP.prop = _compiledProp(prop, innerBrackets);
+      retP.prop = _compiledProp(prop, innerBrackets, innerQuotes);
 
       //To determine whether it is necessary to escape
       retP.escape = param[1] !== tmplRule.firstChar + tmplRule.startRule;

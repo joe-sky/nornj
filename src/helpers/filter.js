@@ -44,14 +44,14 @@ export const filters = {
   '!==': (val1, val2) => val1 !== val2,
 
   //Less than
-  lt: (val1, val2) => val1 < val2,
+  '<': (val1, val2) => val1 < val2,
 
-  lte: (val1, val2) => val1 <= val2,
+  '<=': (val1, val2) => val1 <= val2,
 
   //Greater than
-  gt: (val1, val2) => val1 > val2,
+  '>': (val1, val2) => val1 > val2,
 
-  gte: (val1, val2) => val1 >= val2,
+  '>=': (val1, val2) => val1 >= val2,
 
   '+': (val1, val2) => val1 + val2,
 
@@ -125,7 +125,8 @@ export const filters = {
 
 function _config(params) {
   let ret = {
-    onlyGlobal: false
+    onlyGlobal: false,
+    transOperator: false
   };
 
   if (params) {
@@ -134,34 +135,36 @@ function _config(params) {
   return ret;
 }
 
-const _defaultCfg = { onlyGlobal: true };
+const _defaultCfg = { onlyGlobal: true },
+  _defaultCfgO = { onlyGlobal: true, transOperator: true };
 
 //Filter default config
 export const filterConfig = {
   '.': _config(_defaultCfg),
+  '_': _config(_defaultCfg),
   '#': _config(_defaultCfg),
-  '==': _config(_defaultCfg),
-  '===': _config(_defaultCfg),
-  '!=': _config(_defaultCfg),
-  '!==': _config(_defaultCfg),
-  lt: _config(_defaultCfg),
-  lte: _config(_defaultCfg),
-  gt: _config(_defaultCfg),
-  gte: _config(_defaultCfg),
-  '+': _config(_defaultCfg),
-  '-': _config(_defaultCfg),
-  '*': _config(_defaultCfg),
-  '/': _config(_defaultCfg),
-  '%': _config(_defaultCfg),
+  '==': _config(_defaultCfgO),
+  '===': _config(_defaultCfgO),
+  '!=': _config(_defaultCfgO),
+  '!==': _config(_defaultCfgO),
+  '<': _config(_defaultCfgO),
+  '<=': _config(_defaultCfgO),
+  '>': _config(_defaultCfgO),
+  '>=': _config(_defaultCfgO),
+  '+': _config(_defaultCfgO),
+  '-': _config(_defaultCfgO),
+  '*': _config(_defaultCfgO),
+  '/': _config(_defaultCfgO),
+  '%': _config(_defaultCfgO),
   '?': _config(_defaultCfg),
   '!': _config(_defaultCfg),
-  '&&': _config(_defaultCfg),
-  or: _config(_defaultCfg),
+  '&&': _config(_defaultCfgO),
+  or: _config(_defaultCfgO),
   int: _config(_defaultCfg),
   float: _config(_defaultCfg),
   bool: _config(_defaultCfg),
   obj: _config(_defaultCfg),
-  ':': _config(_defaultCfg),
+  ':': _config(_defaultCfgO),
   list: _config(_defaultCfg),
   reg: _config(_defaultCfg)
 };
@@ -191,12 +194,28 @@ export function registerFilter(name, filter, options) {
         filters[name] = v;
       }
       filterConfig[name] = _config(options);
+
+      if(options && options.transOperator) {
+        nj.regexTransOpts = _getRegexTransopts(nj.regexTransOpts + '|' + name);
+      }
     }
   }, false, false);
 }
 
+function _getRegexTransopts(opts) {
+  return new RegExp('[\\s]+(' + opts.replace(/\+|\*/g, match => '\\' + match) + ')[\\s]+(' + nj.regexJsBase + '([^\\s,()]*)', 'g');
+}
+
+let _REGEX_TRANSOPTS = '';
+tools.each(filterConfig, (v, k) => {
+  if(v.transOperator) {
+    _REGEX_TRANSOPTS += '|' + k;
+  }
+});
+
 tools.assign(nj, {
   filters,
   filterConfig,
-  registerFilter
+  registerFilter,
+  regexTransOpts: _getRegexTransopts(_REGEX_TRANSOPTS.substr(1))
 });

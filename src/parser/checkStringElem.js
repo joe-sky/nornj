@@ -223,18 +223,16 @@ function _checkStringElem(xml, tmplRule) {
   return root;
 }
 
-const SP_FILTER_LOOKUP = {
-  '>': 'gt(',
-  '<': 'lt(',
-  '>=': 'gte(',
-  '<=': 'lte('
+const LT_GT_LOOKUP = {
+  '<': '_njLt_',
+  '>': '_njGt_'
 };
-const REGEX_SP_FILTER = /(\|)?[\s]+((>|<|>=|<=)[\s]*\()/g;
+const REGEX_LT_GT = />|</g;
 
 function _formatAll(str, tmplRule) {
   const commentRule = tmplRule.commentRule;
   return str.replace(new RegExp('<!--' + commentRule + '[\\s\\S]*?' + commentRule + '-->', 'g'), '')
-    .replace(REGEX_SP_FILTER, (all, g1, g2, match) => ' | ' + SP_FILTER_LOOKUP[match]);
+    .replace(new RegExp(tmplRule.startRule + '[^' + tmplRule.endRule + ']*' + tmplRule.endRule, 'g'), all => all.replace(REGEX_LT_GT, match => LT_GT_LOOKUP[match]));
 }
 
 function _transformToEx(isStr, elemName, elemParams, tmplRule) {

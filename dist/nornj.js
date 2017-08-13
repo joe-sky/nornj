@@ -95,6 +95,7 @@ nj.errorTitle = '[NornJ]';
 nj.tmplRule = {};
 nj.outputH = false;
 nj.global = typeof self !== 'undefined' ? self : global;
+nj.regexJsBase = '(\'[^\']*\')|("[^"]*")|(-?([0-9][0-9]*)(\\.\\d+)?)|true|false|null|undefined|Object|Array|Math|Date|JSON|([#]*)([^\\s.[\\]()]+))';
 /* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(16)))
 
 /***/ }),
@@ -1229,20 +1230,20 @@ var filters = {
   },
 
   //Less than
-  lt: function lt(val1, val2) {
+  '<': function _(val1, val2) {
     return val1 < val2;
   },
 
-  lte: function lte(val1, val2) {
+  '<=': function _(val1, val2) {
     return val1 <= val2;
   },
 
   //Greater than
-  gt: function gt(val1, val2) {
+  '>': function _(val1, val2) {
     return val1 > val2;
   },
 
-  gte: function gte(val1, val2) {
+  '>=': function _(val1, val2) {
     return val1 >= val2;
   },
 
@@ -1340,7 +1341,8 @@ var filters = {
 
 function _config(params) {
   var ret = {
-    onlyGlobal: false
+    onlyGlobal: false,
+    transOperator: false
   };
 
   if (params) {
@@ -1349,34 +1351,36 @@ function _config(params) {
   return ret;
 }
 
-var _defaultCfg = { onlyGlobal: true };
+var _defaultCfg = { onlyGlobal: true },
+    _defaultCfgO = { onlyGlobal: true, transOperator: true };
 
 //Filter default config
 var filterConfig = {
   '.': _config(_defaultCfg),
+  '_': _config(_defaultCfg),
   '#': _config(_defaultCfg),
-  '==': _config(_defaultCfg),
-  '===': _config(_defaultCfg),
-  '!=': _config(_defaultCfg),
-  '!==': _config(_defaultCfg),
-  lt: _config(_defaultCfg),
-  lte: _config(_defaultCfg),
-  gt: _config(_defaultCfg),
-  gte: _config(_defaultCfg),
-  '+': _config(_defaultCfg),
-  '-': _config(_defaultCfg),
-  '*': _config(_defaultCfg),
-  '/': _config(_defaultCfg),
-  '%': _config(_defaultCfg),
+  '==': _config(_defaultCfgO),
+  '===': _config(_defaultCfgO),
+  '!=': _config(_defaultCfgO),
+  '!==': _config(_defaultCfgO),
+  '<': _config(_defaultCfgO),
+  '<=': _config(_defaultCfgO),
+  '>': _config(_defaultCfgO),
+  '>=': _config(_defaultCfgO),
+  '+': _config(_defaultCfgO),
+  '-': _config(_defaultCfgO),
+  '*': _config(_defaultCfgO),
+  '/': _config(_defaultCfgO),
+  '%': _config(_defaultCfgO),
   '?': _config(_defaultCfg),
   '!': _config(_defaultCfg),
-  '&&': _config(_defaultCfg),
-  or: _config(_defaultCfg),
+  '&&': _config(_defaultCfgO),
+  or: _config(_defaultCfgO),
   int: _config(_defaultCfg),
   float: _config(_defaultCfg),
   bool: _config(_defaultCfg),
   obj: _config(_defaultCfg),
-  ':': _config(_defaultCfg),
+  ':': _config(_defaultCfgO),
   list: _config(_defaultCfg),
   reg: _config(_defaultCfg)
 };
@@ -1408,14 +1412,32 @@ function registerFilter(name, filter, options) {
         filters[name] = v;
       }
       filterConfig[name] = _config(_options);
+
+      if (_options && _options.transOperator) {
+        __WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */].regexTransOpts = _getRegexTransopts(__WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */].regexTransOpts + '|' + name);
+      }
     }
   }, false, false);
 }
 
+function _getRegexTransopts(opts) {
+  return new RegExp('[\\s]+(' + opts.replace(/\+|\*/g, function (match) {
+    return '\\' + match;
+  }) + ')[\\s]+(' + __WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */].regexJsBase + '([^\\s,()]*)', 'g');
+}
+
+var _REGEX_TRANSOPTS = '';
+__WEBPACK_IMPORTED_MODULE_1__utils_tools__["c" /* each */](filterConfig, function (v, k) {
+  if (v.transOperator) {
+    _REGEX_TRANSOPTS += '|' + k;
+  }
+});
+
 __WEBPACK_IMPORTED_MODULE_1__utils_tools__["a" /* assign */](__WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */], {
   filters: filters,
   filterConfig: filterConfig,
-  registerFilter: registerFilter
+  registerFilter: registerFilter,
+  regexTransOpts: _getRegexTransopts(_REGEX_TRANSOPTS.substr(1))
 });
 
 /***/ }),
@@ -1736,18 +1758,18 @@ function _checkStringElem(xml, tmplRule) {
   return root;
 }
 
-var SP_FILTER_LOOKUP = {
-  '>': 'gt(',
-  '<': 'lt(',
-  '>=': 'gte(',
-  '<=': 'lte('
+var LT_GT_LOOKUP = {
+  '<': '_njLt_',
+  '>': '_njGt_'
 };
-var REGEX_SP_FILTER = /(\|)?[\s]+((>|<|>=|<=)[\s]*\()/g;
+var REGEX_LT_GT = />|</g;
 
 function _formatAll(str, tmplRule) {
   var commentRule = tmplRule.commentRule;
-  return str.replace(new RegExp('<!--' + commentRule + '[\\s\\S]*?' + commentRule + '-->', 'g'), '').replace(REGEX_SP_FILTER, function (all, g1, g2, match) {
-    return ' | ' + SP_FILTER_LOOKUP[match];
+  return str.replace(new RegExp('<!--' + commentRule + '[\\s\\S]*?' + commentRule + '-->', 'g'), '').replace(new RegExp(tmplRule.startRule + '[^' + tmplRule.endRule + ']*' + tmplRule.endRule, 'g'), function (all) {
+    return all.replace(REGEX_LT_GT, function (match) {
+      return LT_GT_LOOKUP[match];
+    });
   });
 }
 
@@ -2045,15 +2067,17 @@ function isStrPropS(elemName, tmplRule) {
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils_tools__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__helpers_filter__ = __webpack_require__(5);
 /* harmony export (immutable) */ __webpack_exports__["a"] = compiledParam;
 
 
 
-//Get compiled property
-var REGEX_JS_PROP = /(('[^']*')|("[^"]*")|(-?([0-9][0-9]*)(\.\d+)?)|true|false|null|undefined|Object|Array|Math|Date|JSON|([#]*)([^.[\]()]+))([^\s()]*)/;
-var REGEX_REPLACE_CHAR = /(_njCo_)|(_njLp_)|(_njRp_)/g;
 
-function _compiledProp(prop, innerBrackets) {
+//Get compiled property
+var REGEX_JS_PROP = new RegExp('(' + __WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */].regexJsBase + '([^\\s()]*)');
+var REGEX_REPLACE_CHAR = /_njQs(\d)_/g;
+
+function _compiledProp(prop, innerBrackets, innerQuotes) {
   var ret = __WEBPACK_IMPORTED_MODULE_1__utils_tools__["g" /* obj */]();
 
   //If there are vertical lines in the property,then use filter
@@ -2084,7 +2108,7 @@ function _compiledProp(prop, innerBrackets) {
               var params = [];
               __WEBPACK_IMPORTED_MODULE_1__utils_tools__["c" /* each */](innerBrackets[paramsF].split(','), function (p) {
                 if (p !== '') {
-                  params[params.length] = _compiledProp(p.trim(), innerBrackets);
+                  params[params.length] = _compiledProp(p.trim(), innerBrackets, innerQuotes);
                 }
               }, false, true);
 
@@ -2101,20 +2125,9 @@ function _compiledProp(prop, innerBrackets) {
     })();
   }
 
-  //替换特殊字符
-  prop = prop.replace(REGEX_REPLACE_CHAR, function (all, g1, g2, g3) {
-    var s = all;
-    if (g1) {
-      s = ',';
-    }
-    if (g2) {
-      s = '(';
-    }
-    if (g3) {
-      s = ')';
-    }
-
-    return s;
+  //替换字符串值
+  prop = prop.replace(REGEX_REPLACE_CHAR, function (all, g1) {
+    return innerQuotes[g1];
   });
 
   //Extract the parent data path
@@ -2157,16 +2170,24 @@ function _getFilterParam(obj) {
 }
 
 //Extract replace parameters
-var REGEX_QUOTE = /"[^"]*"|'[^']*'/g;
-var REGEX_CHAR_IN_QUOTE = /(,)|(\()|(\))/g;
-var SP_FILTER_LOOKUP = {
-  '||': 'or('
+var REGEX_LT_GT = /_nj(L|G)t_/g;
+var LT_GT_LOOKUP = {
+  '_njLt_': '<',
+  '_njGt_': '>'
 };
-var REGEX_SP_FILTER = /[\s]+((\|\|)[\s]*\()/g;
+var REGEX_QUOTE = /"[^"]*"|'[^']*'/g;
+var SP_FILTER_LOOKUP = {
+  '||': 'or'
+};
+var REGEX_SP_FILTER = /[\s]+((\|\|)[\s]*)/g;
+var FN_FILTER_LOOKUP = {
+  ')': ')_('
+};
+var REGEX_FN_FILTER = /(\)|\.([^\s'"._#()]+))[\s]*\(/g;
 var REGEX_SPACE_FILTER = /[(,]/g;
 var REGEX_FIX_FILTER = /(\|)?(([._#]\()|[\s]+([^\s._#|]+[\s]*\())/g;
 
-function _getReplaceParam(obj, tmplRule) {
+function _getReplaceParam(obj, tmplRule, innerQuotes) {
   var pattern = tmplRule.replaceParam,
       matchArr = void 0,
       ret = void 0,
@@ -2185,29 +2206,23 @@ function _getReplaceParam(obj, tmplRule) {
     }
 
     //替换特殊过滤器名称并且为简化过滤器补全"|"符
-    prop = prop.replace(REGEX_QUOTE, function (match) {
-      return match.replace(REGEX_CHAR_IN_QUOTE, function (all, g1, g2, g3) {
-        var s = all;
-        if (g1) {
-          s = '_njCo_';
-        }
-        if (g2) {
-          s = '_njLp_';
-        }
-        if (g3) {
-          s = '_njRp_';
-        }
-
-        return s;
-      });
+    prop = prop.replace(REGEX_LT_GT, function (match) {
+      return LT_GT_LOOKUP[match];
+    }).replace(REGEX_QUOTE, function (match) {
+      innerQuotes.push(match);
+      return '_njQs' + (innerQuotes.length - 1) + '_';
     }).replace(REGEX_SP_FILTER, function (all, g1, match) {
-      return ' ' + SP_FILTER_LOOKUP[match];
+      return ' ' + SP_FILTER_LOOKUP[match] + ' ';
+    }).replace(__WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */].regexTransOpts, function (all, g1, g2) {
+      return ' ' + g1 + '(' + g2 + ')';
+    }).replace(REGEX_FN_FILTER, function (all, match, g1) {
+      return !g1 ? ' ' + FN_FILTER_LOOKUP[match] : '.(\'' + g1 + '\')_(';
     }).replace(REGEX_SPACE_FILTER, function (all) {
       return all + ' ';
     }).replace(REGEX_FIX_FILTER, function (all, g1, g2, g3, g4) {
       return g1 ? all : ' | ' + (g3 ? g3 : g4);
     });
-
+    console.log(prop);
     item[2] = prop.trim();
     ret.push(item);
     i++;
@@ -2248,21 +2263,24 @@ function compiledParam(value, tmplRule) {
 
   //If have placehorder
   if (strs.length > 1) {
-    var params = _getReplaceParam(value, tmplRule);
-    props = [];
+    (function () {
+      var innerQuotes = [];
+      var params = _getReplaceParam(value, tmplRule, innerQuotes);
+      props = [];
 
-    __WEBPACK_IMPORTED_MODULE_1__utils_tools__["c" /* each */](params, function (param) {
-      var retP = __WEBPACK_IMPORTED_MODULE_1__utils_tools__["g" /* obj */](),
-          innerBrackets = [];
+      __WEBPACK_IMPORTED_MODULE_1__utils_tools__["c" /* each */](params, function (param) {
+        var retP = __WEBPACK_IMPORTED_MODULE_1__utils_tools__["g" /* obj */](),
+            innerBrackets = [];
 
-      isAll = param[3] ? param[0] === value : false; //If there are several curly braces in one property value, "isAll" must be false.
-      var prop = _replaceInnerBrackets(param[2], 0, innerBrackets);
-      retP.prop = _compiledProp(prop, innerBrackets);
+        isAll = param[3] ? param[0] === value : false; //If there are several curly braces in one property value, "isAll" must be false.
+        var prop = _replaceInnerBrackets(param[2], 0, innerBrackets);
+        retP.prop = _compiledProp(prop, innerBrackets, innerQuotes);
 
-      //To determine whether it is necessary to escape
-      retP.escape = param[1] !== tmplRule.firstChar + tmplRule.startRule;
-      props.push(retP);
-    }, false, true);
+        //To determine whether it is necessary to escape
+        retP.escape = param[1] !== tmplRule.firstChar + tmplRule.startRule;
+        props.push(retP);
+      }, false, true);
+    })();
   }
 
   ret.props = props;

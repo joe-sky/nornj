@@ -321,19 +321,19 @@ describe('test compile string', function() {
                   111
                   #${nj`<span>1</span>`}
                 </div>`}
-          #${nj`<div>{{../name3.('substring')_(0, 3)}}</div>`}
+          #${nj`<div>{{../name3.substring(0, 3)}}</div>`}
           <{{../sliderItem.('a')|tagName(1,2)}} no0="/" no1={{no}} no2="{{-0.05 | filter2}}" checked no='{{ ../sliderItem.b }}' />
         </slider>
       </#each>
       <$if {a .('length')}>1</$if>
-      {{{a.c.('d').('substr')_(1) + ("a,(b)" + (@sq)) + ('a,b')}}}
-      {{list(list(JSON.stringify_(obj('a' : (1))), 2))}}
-      {{reg('^[abc]$', 'i').('test')_('A')}}
+      {{{a.c.d.substr(1) + ("a,(b)" + (@sq)) + 'a,b'}}}
+      {{list(list(JSON.stringify(obj('a' : 1)), 2))}}
+      {{reg('^[abc]$', 'i').('test')('A')}}
       {{#f1}}
       <div>{{f2#('f3')}}</div>
       <#e1>111</#e1>
-      {{Date.now_()}} + {{Math.('max')_(Math.('max')_(10, 1), 2, 3)}}
-      <img src="test1.png">
+      {{Date.now()}} + {{Math.max(Math.max(10 + 1, 1), 2 + 20, 3)}}
+      <img src="test1.png" a="{{1 + (5 * 5) + 'abc'}}" b="{{{'1 + 5'}}}" c="{{ 'a' || 'b' ? (1, 2) }}">
       `;
 
       //console.log(tmplTest._njTmpl);
