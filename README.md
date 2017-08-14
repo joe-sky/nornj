@@ -44,7 +44,7 @@
 
 ```html
 <template name="partial">
-  <#if {{i > (0) || (i <= (-10))}}>
+  <#if {{i > 0 || (i <= -10)}}>
     <input id=test onclick={{click}} />
   </#if>
 </template>

@@ -23,6 +23,9 @@ describe('test compile string', function() {
         nj.registerFilter('emptyFilter', function(n) {
           return 'emptyFilter' + n;
         });
+        nj.registerFilter('**', function(v, m) {
+          return Math.pow(v, m);
+        }, { transOperator: true });
 
         nj.registerExtension('textExpr', function(arg1, arg2, opts) {
           //return opts.props.tmpls[0]();
@@ -333,7 +336,7 @@ describe('test compile string', function() {
       <div>{{f2#('f3')}}</div>
       <#e1>111</#e1>
       {{Date.now()}} + {{Math.max(Math.max(10 + 1, 1), 2 + 20, 3)}}
-      <img src="test1.png" a="{{1 + (5 * 5) + 'abc'}}" b="{{{'1 + 5'}}}" c="{{ 'a' || 'b' ? (1, 2) }}">
+      <img src="test1.png" a="{{1 + (5 ** 2) + 'abc ' + a.c.d}}" b="{{{'1 + 5'}}}" c="{{ 'a' || 'b' ? (1, 2) }}">
       `;
 
       //console.log(tmplTest._njTmpl);

@@ -130,13 +130,16 @@ function _getReplaceParam(obj, tmplRule, innerQuotes) {
         return '_njQs' + (innerQuotes.length - 1) + '_';
       })
       .replace(REGEX_SP_FILTER, (all, g1, match) => ' ' + SP_FILTER_LOOKUP[match] + ' ')
-      .replace(nj.regexTransOpts, (all, g1, g2) => ' ' + g1 + '(' + g2 + ')')
+      .replace(nj.regexTransOpts, function() {
+        const args = arguments;
+        return ' ' + args[1] + '(' + args[2] + (args[10] != null ? args[10] : '') + ')'
+      })
       .replace(REGEX_FN_FILTER, (all, match, g1) => !g1 ? (' ' + FN_FILTER_LOOKUP[match]) : '.(\'' + g1 + '\')_(')
       .replace(REGEX_SPACE_FILTER, all => all + ' ')
       .replace(REGEX_FIX_FILTER, (all, g1, g2, g3, g4) => {
         return (g1 ? all : ' | ' + (g3 ? g3 : g4));
       });
-console.log(prop);
+
     item[2] = prop.trim();
     ret.push(item);
     i++;

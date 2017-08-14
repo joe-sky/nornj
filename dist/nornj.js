@@ -1414,7 +1414,8 @@ function registerFilter(name, filter, options) {
       filterConfig[name] = _config(_options);
 
       if (_options && _options.transOperator) {
-        __WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */].regexTransOpts = _getRegexTransopts(__WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */].regexTransOpts + '|' + name);
+        _REGEX_TRANSOPTS += '|' + name;
+        __WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */].regexTransOpts = _getRegexTransopts(_REGEX_TRANSOPTS);
       }
     }
   }, false, false);
@@ -1432,12 +1433,13 @@ __WEBPACK_IMPORTED_MODULE_1__utils_tools__["c" /* each */](filterConfig, functio
     _REGEX_TRANSOPTS += '|' + k;
   }
 });
+_REGEX_TRANSOPTS = _REGEX_TRANSOPTS.substr(1);
 
 __WEBPACK_IMPORTED_MODULE_1__utils_tools__["a" /* assign */](__WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */], {
   filters: filters,
   filterConfig: filterConfig,
   registerFilter: registerFilter,
-  regexTransOpts: _getRegexTransopts(_REGEX_TRANSOPTS.substr(1))
+  regexTransOpts: _getRegexTransopts(_REGEX_TRANSOPTS)
 });
 
 /***/ }),
@@ -2213,8 +2215,9 @@ function _getReplaceParam(obj, tmplRule, innerQuotes) {
       return '_njQs' + (innerQuotes.length - 1) + '_';
     }).replace(REGEX_SP_FILTER, function (all, g1, match) {
       return ' ' + SP_FILTER_LOOKUP[match] + ' ';
-    }).replace(__WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */].regexTransOpts, function (all, g1, g2) {
-      return ' ' + g1 + '(' + g2 + ')';
+    }).replace(__WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */].regexTransOpts, function () {
+      var args = arguments;
+      return ' ' + args[1] + '(' + args[2] + (args[10] != null ? args[10] : '') + ')';
     }).replace(REGEX_FN_FILTER, function (all, match, g1) {
       return !g1 ? ' ' + FN_FILTER_LOOKUP[match] : '.(\'' + g1 + '\')_(';
     }).replace(REGEX_SPACE_FILTER, function (all) {
@@ -2222,7 +2225,7 @@ function _getReplaceParam(obj, tmplRule, innerQuotes) {
     }).replace(REGEX_FIX_FILTER, function (all, g1, g2, g3, g4) {
       return g1 ? all : ' | ' + (g3 ? g3 : g4);
     });
-    console.log(prop);
+
     item[2] = prop.trim();
     ret.push(item);
     i++;

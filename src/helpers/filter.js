@@ -196,7 +196,8 @@ export function registerFilter(name, filter, options) {
       filterConfig[name] = _config(options);
 
       if(options && options.transOperator) {
-        nj.regexTransOpts = _getRegexTransopts(nj.regexTransOpts + '|' + name);
+        _REGEX_TRANSOPTS += '|' + name;
+        nj.regexTransOpts = _getRegexTransopts(_REGEX_TRANSOPTS);
       }
     }
   }, false, false);
@@ -212,10 +213,11 @@ tools.each(filterConfig, (v, k) => {
     _REGEX_TRANSOPTS += '|' + k;
   }
 });
+_REGEX_TRANSOPTS = _REGEX_TRANSOPTS.substr(1);
 
 tools.assign(nj, {
   filters,
   filterConfig,
   registerFilter,
-  regexTransOpts: _getRegexTransopts(_REGEX_TRANSOPTS.substr(1))
+  regexTransOpts: _getRegexTransopts(_REGEX_TRANSOPTS)
 });
