@@ -576,7 +576,7 @@ function getComputedData(fn, p2, level) {
 }
 
 function getElement(name, p1) {
-  var element = p1.cp[name];
+  var element = !p1.icp ? p1.cp[name] : p1.icp[name] ? p1.icp[name] : p1.cp[name];
   return element ? element : name;
 }
 
@@ -693,7 +693,7 @@ function createElementApply(p) {
 }
 
 //创建模板函数
-function template(fns) {
+function template(fns, components) {
   var configs = {
     us: fns.useString,
     x: __WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */].extensions,
@@ -717,6 +717,7 @@ function template(fns) {
     configs.h = __WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */].createElement;
     configs.H = createElementApply;
     configs.cp = __WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */].components;
+    configs.icp = components;
   } else {
     configs.ans = assignStrProps;
     configs.es = __WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */].escape;
@@ -2320,7 +2321,7 @@ function compiledParam(value, tmplRule) {
 
 //编译模板并返回转换函数
 function _createCompile(outputH) {
-  return function (tmpl, tmplKey, fileName, delimiters, tmplRule) {
+  return function (tmpl, tmplKey, fileName, delimiters, tmplRule, components) {
     if (!tmpl) {
       return;
     }
@@ -2330,6 +2331,7 @@ function _createCompile(outputH) {
       fileName = options.fileName;
       delimiters = options.delimiters;
       tmplRule = options.tmplRule;
+      components = options.components;
     }
 
     //编译模板函数
@@ -2383,7 +2385,7 @@ function _createCompile(outputH) {
         fns = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4__buildRuntime__["a" /* default */])(root.content, root, !outputH);
       }
 
-      tmplFns = __WEBPACK_IMPORTED_MODULE_3__transforms_transformData__["b" /* template */](fns);
+      tmplFns = __WEBPACK_IMPORTED_MODULE_3__transforms_transformData__["b" /* template */](fns, components);
 
       //保存模板函数编译结果到全局集合中
       if (tmplKey) {

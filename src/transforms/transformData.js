@@ -82,7 +82,7 @@ export function getComputedData(fn, p2, level) {
 }
 
 export function getElement(name, p1) {
-  const element = p1.cp[name];
+  const element = !p1.icp ? p1.cp[name] : (p1.icp[name] ? p1.icp[name] : p1.cp[name]);
   return element ? element : name;
 }
 
@@ -198,7 +198,7 @@ function createElementApply(p) {
 }
 
 //创建模板函数
-export function template(fns) {
+export function template(fns, components) {
   const configs = {
     us: fns.useString,
     x: nj.extensions,
@@ -222,6 +222,7 @@ export function template(fns) {
     configs.h = nj.createElement;
     configs.H = createElementApply;
     configs.cp = nj.components;
+    configs.icp = components;
   } else {
     configs.ans = assignStrProps;
     configs.es = nj.escape;
