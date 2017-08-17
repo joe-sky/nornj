@@ -97,20 +97,28 @@ export const extensions = {
         ret = [];
       }
 
-      const props = options.props;
-      tools.each(list, (item, index, len) => {
+      const props = options.props,
+        isArrayLike = tools.isArrayLike(list);
+      tools.each(list, (item, index, len, lenObj) => {
         let param = {
           data: item,
-          index: index,
+          index: isArrayLike ? index : len,
           fallback: true
         };
 
         if (props && props.moreValues) {
+          const _len = isArrayLike ? len : lenObj;
           param.extra = {
-            '@first': index === 0,
-            '@last': index === len - 1,
-            '@length': len
+            '@first': param.index === 0,
+            '@last': param.index === _len - 1,
+            '@length': _len
           };
+        }
+        if (!isArrayLike) {
+          if (!param.extra) {
+            param.extra = {};
+          }
+          param.extra['@key'] = index;
         }
 
         let retI = options.result(param);
@@ -119,7 +127,7 @@ export const extensions = {
         } else {
           ret.push(retI);
         }
-      }, false, tools.isArrayLike(list));
+      }, false, isArrayLike);
 
       //Return null when not use string and result is empty.
       if (!useString && !ret.length) {

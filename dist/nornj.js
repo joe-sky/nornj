@@ -864,20 +864,28 @@ var extensions = {
           ret = [];
         }
 
-        var props = options.props;
-        __WEBPACK_IMPORTED_MODULE_1__utils_tools__["c" /* each */](list, function (item, index, len) {
+        var props = options.props,
+            isArrayLike = __WEBPACK_IMPORTED_MODULE_1__utils_tools__["i" /* isArrayLike */](list);
+        __WEBPACK_IMPORTED_MODULE_1__utils_tools__["c" /* each */](list, function (item, index, len, lenObj) {
           var param = {
             data: item,
-            index: index,
+            index: isArrayLike ? index : len,
             fallback: true
           };
 
           if (props && props.moreValues) {
+            var _len = isArrayLike ? len : lenObj;
             param.extra = {
-              '@first': index === 0,
-              '@last': index === len - 1,
-              '@length': len
+              '@first': param.index === 0,
+              '@last': param.index === _len - 1,
+              '@length': _len
             };
+          }
+          if (!isArrayLike) {
+            if (!param.extra) {
+              param.extra = {};
+            }
+            param.extra['@key'] = index;
           }
 
           var retI = options.result(param);
@@ -886,7 +894,7 @@ var extensions = {
           } else {
             ret.push(retI);
           }
-        }, false, __WEBPACK_IMPORTED_MODULE_1__utils_tools__["i" /* isArrayLike */](list));
+        }, false, isArrayLike);
 
         //Return null when not use string and result is empty.
         if (!useString && !ret.length) {
