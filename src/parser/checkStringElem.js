@@ -72,6 +72,9 @@ export default function compileStringTmpl(tmpl) {
     paramCount = ret._njParamCount;
   if (paramCount > 0) {
     params = {};
+    tools.defineProp(params, '_njParam', {
+      value: true
+    });
 
     for (let i = 0; i < paramCount; i++) {
       params[SPLIT_FLAG + i] = args[i + 1];

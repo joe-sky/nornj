@@ -685,7 +685,7 @@ function _getLocalComponents(localConfigs, initCtx) {
 
 //构建可运行的模板函数
 function tmplWrap(configs, main) {
-  return function (localConfigs) {
+  return function (lc, lc2) {
     var initCtx = this,
         data = __WEBPACK_IMPORTED_MODULE_1__utils_tools__["j" /* arraySlice */](arguments);
 
@@ -696,7 +696,7 @@ function tmplWrap(configs, main) {
       level: initCtx ? initCtx._njLevel : null,
       getData: getData,
       d: getData,
-      icp: _getLocalComponents(localConfigs, initCtx)
+      icp: _getLocalComponents(lc && lc._njParam ? lc2 : lc, initCtx)
     });
   };
 }
@@ -1631,6 +1631,9 @@ function compileStringTmpl(tmpl) {
       paramCount = ret._njParamCount;
   if (paramCount > 0) {
     params = {};
+    __WEBPACK_IMPORTED_MODULE_1__utils_tools__["d" /* defineProp */](params, '_njParam', {
+      value: true
+    });
 
     for (var i = 0; i < paramCount; i++) {
       params[SPLIT_FLAG + i] = args[i + 1];

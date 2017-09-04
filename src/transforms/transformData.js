@@ -190,7 +190,7 @@ function _getLocalComponents(localConfigs, initCtx) {
 
 //构建可运行的模板函数
 export function tmplWrap(configs, main) {
-  return function(localConfigs) {
+  return function(lc, lc2) {
     const initCtx = this,
       data = tools.arraySlice(arguments);
 
@@ -201,7 +201,7 @@ export function tmplWrap(configs, main) {
       level: initCtx ? initCtx._njLevel : null,
       getData,
       d: getData,
-      icp: _getLocalComponents(localConfigs, initCtx)
+      icp: _getLocalComponents(lc && lc._njParam ? lc2 : lc, initCtx)
     });
   };
 }
