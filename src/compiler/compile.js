@@ -8,7 +8,7 @@ import createTmplRule from '../utils/createTmplRule';
 
 //编译模板并返回转换函数
 function _createCompile(outputH) {
-  return (tmpl, tmplKey, fileName, delimiters, tmplRule, components) => {
+  return (tmpl, tmplKey, fileName, delimiters, tmplRule) => {
     if (!tmpl) {
       return;
     }
@@ -18,7 +18,6 @@ function _createCompile(outputH) {
       fileName = options.fileName;
       delimiters = options.delimiters;
       tmplRule = options.tmplRule;
-      components = options.components;
     }
 
     //编译模板函数
@@ -70,7 +69,7 @@ function _createCompile(outputH) {
         fns = buildRuntime(root.content, root, !outputH);
       }
 
-      tmplFns = tranData.template(fns, components);
+      tmplFns = tranData.template(fns);
 
       //保存模板函数编译结果到全局集合中
       if (tmplKey) {

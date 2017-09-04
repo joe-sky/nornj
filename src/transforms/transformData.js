@@ -81,13 +81,22 @@ export function getComputedData(fn, p2, level) {
   }
 }
 
-export function getElement(name, p1) {
-  const element = !p1.icp ? p1.cp[name] : (p1.icp[name] ? p1.icp[name] : p1.cp[name]);
+export function getElement(name, p1, p2) {
+  const element;
+  if (!p2.icp) {
+    element = p1.cp[name];
+  } else {
+    element = getData(name, p2.icp);
+    if (!element) {
+      element = p1.cp[name];
+    }
+  }
+
   return element ? element : name;
 }
 
-export function getElementRefer(refer, name, p1) {
-  return refer != null ? (tools.isString(refer) ? getElement(refer.toLowerCase(), p1) : refer) : getElement(name, p1);
+export function getElementRefer(refer, name, p1, p2) {
+  return refer != null ? (tools.isString(refer) ? getElement(refer.toLowerCase(), p1, p2) : refer) : getElement(name, p1, p2);
 }
 
 export function getElementName(refer, name) {
@@ -123,7 +132,8 @@ export function newContext(p2, p3) {
     index: 'index' in p3 ? p3.index : p2.index,
     level: p2.level,
     getData,
-    d: getData
+    d: getData,
+    icp: p2.icp
   };
 }
 
@@ -162,9 +172,10 @@ export function exRet(p1, p2, fn, p4, p5) {
 
 //构建可运行的模板函数
 export function tmplWrap(configs, main) {
-  return function() {
+  return function(localConfigs) {
     const initCtx = this,
-      data = tools.arraySlice(arguments);
+      data = tools.arraySlice(arguments),
+      components = localConfigs && localConfigs.components;
 
     return main(configs, {
       data: initCtx && initCtx._njData ? tools.arrayPush(data, initCtx._njData) : data,
@@ -172,7 +183,8 @@ export function tmplWrap(configs, main) {
       index: initCtx ? initCtx._njIndex : null,
       level: initCtx ? initCtx._njLevel : null,
       getData,
-      d: getData
+      d: getData,
+      icp: components ? (tools.isArray(components) ? components : [components]) : null
     });
   };
 }
@@ -198,7 +210,7 @@ function createElementApply(p) {
 }
 
 //创建模板函数
-export function template(fns, components) {
+export function template(fns) {
   const configs = {
     us: fns.useString,
     x: nj.extensions,
@@ -222,7 +234,6 @@ export function template(fns, components) {
     configs.h = nj.createElement;
     configs.H = createElementApply;
     configs.cp = nj.components;
-    configs.icp = components;
   } else {
     configs.ans = assignStrProps;
     configs.es = nj.escape;

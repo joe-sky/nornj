@@ -591,7 +591,7 @@ function _buildNode(node, parent, fns, counter, retType, level, useStringLocal, 
     let typeStr;
     if (!useStringF) {
       const _typeL = _type.toLowerCase();
-      typeStr = _typeRefer ? ('p1.er(' + _typeRefer + ', \'' + _typeL + '\', p1)') : ('p1.e(\'' + _typeL + '\', p1)');
+      typeStr = _typeRefer ? ('p1.er(' + _typeRefer + ', \'' + _typeL + '\', p1, p2)') : ('p1.e(\'' + _typeL + '\', p1, p2)');
     } else {
       typeStr = _typeRefer ? ('p1.en(' + _typeRefer + ', \'' + _type + '\')') : ('\'' + _type + '\'');
     }
