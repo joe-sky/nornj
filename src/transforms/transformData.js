@@ -60,33 +60,37 @@ export function getData(prop, data, hasCtx) {
   }
 }
 
+function _getLevel(level, p2) {
+  if (level != null && p2.level != null) {
+    level += p2.level;
+  }
+  return level;
+}
+
 export function getComputedData(fn, p2, level) {
   if (fn == null) {
     return fn;
   }
 
   if (fn.val._njTmpl) { //模板函数
-    if (level != null && p2.level != null) {
-      level += p2.level;
-    }
-
     return fn.val.call({
       _njData: p2.data,
       _njParent: p2.parent,
       _njIndex: p2.index,
-      _njLevel: level
+      _njLevel: _getLevel(level, p2),
+      _njIcp: p2.icp
     });
   } else { //普通函数
     return fn.val.call(fn.ctx, p2);
   }
 }
 
-export function getElement(name, p1, p2) {
-  const element;
+export function getElement(name, p1, nameO, p2) {
+  let element;
   if (!p2.icp) {
     element = p1.cp[name];
   } else {
-    element = getData(name, p2.icp);
+    element = getData(nameO, p2.icp);
     if (!element) {
       element = p1.cp[name];
     }
@@ -95,8 +99,8 @@ export function getElement(name, p1, p2) {
   return element ? element : name;
 }
 
-export function getElementRefer(refer, name, p1, p2) {
-  return refer != null ? (tools.isString(refer) ? getElement(refer.toLowerCase(), p1, p2) : refer) : getElement(name, p1, p2);
+export function getElementRefer(refer, name, p1, nameO, p2) {
+  return refer != null ? (tools.isString(refer) ? getElement(refer.toLowerCase(), p1, nameO, p2) : refer) : getElement(name, p1, nameO, p2);
 }
 
 export function getElementName(refer, name) {
@@ -170,12 +174,25 @@ export function exRet(p1, p2, fn, p4, p5) {
   };
 }
 
+function _getLocalComponents(localConfigs, initCtx) {
+  let icp;
+  if (localConfigs && localConfigs.components) {
+    icp = localConfigs.components;
+    if (!tools.isArray(icp)) {
+      icp = [icp];
+    }
+  }
+  if (initCtx && initCtx._njIcp) {
+    icp = icp ? tools.arrayPush(icp, initCtx._njIcp) : initCtx._njIcp;
+  }
+  return icp;
+}
+
 //构建可运行的模板函数
 export function tmplWrap(configs, main) {
   return function(localConfigs) {
     const initCtx = this,
-      data = tools.arraySlice(arguments),
-      components = localConfigs && localConfigs.components;
+      data = tools.arraySlice(arguments);
 
     return main(configs, {
       data: initCtx && initCtx._njData ? tools.arrayPush(data, initCtx._njData) : data,
@@ -184,7 +201,7 @@ export function tmplWrap(configs, main) {
       level: initCtx ? initCtx._njLevel : null,
       getData,
       d: getData,
-      icp: components ? (tools.isArray(components) ? components : [components]) : null
+      icp: _getLocalComponents(localConfigs, initCtx)
     });
   };
 }
@@ -227,7 +244,8 @@ export function template(fns) {
     en: getElementName,
     aa: addArgs,
     an: tools.assign,
-    g: nj.global
+    g: nj.global,
+    l: _getLevel
   };
 
   if (!configs.us) {

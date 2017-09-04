@@ -108,16 +108,16 @@ nj.regexJsBase = '(\'[^\']*\')|("[^"]*")|(-?([0-9][0-9]*)(\\.\\d+)?)|true|false|
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "e", function() { return defineProps; });
 /* harmony export (immutable) */ __webpack_exports__["h"] = arrayPush;
 /* harmony export (immutable) */ __webpack_exports__["j"] = arraySlice;
-/* harmony export (immutable) */ __webpack_exports__["q"] = isArray;
+/* harmony export (immutable) */ __webpack_exports__["n"] = isArray;
 /* harmony export (immutable) */ __webpack_exports__["k"] = isObject;
 /* harmony export (immutable) */ __webpack_exports__["l"] = isNumber;
 /* harmony export (immutable) */ __webpack_exports__["b"] = isString;
 /* harmony export (immutable) */ __webpack_exports__["i"] = isArrayLike;
 /* harmony export (immutable) */ __webpack_exports__["c"] = each;
 /* harmony export (immutable) */ __webpack_exports__["r"] = trimRight;
-/* harmony export (immutable) */ __webpack_exports__["n"] = noop;
-/* harmony export (immutable) */ __webpack_exports__["o"] = throwIf;
-/* harmony export (immutable) */ __webpack_exports__["p"] = warn;
+/* harmony export (immutable) */ __webpack_exports__["o"] = noop;
+/* harmony export (immutable) */ __webpack_exports__["p"] = throwIf;
+/* harmony export (immutable) */ __webpack_exports__["q"] = warn;
 /* harmony export (immutable) */ __webpack_exports__["g"] = obj;
 /* harmony export (immutable) */ __webpack_exports__["f"] = clearQuot;
 /* harmony export (immutable) */ __webpack_exports__["m"] = toCamelCase;
@@ -552,6 +552,13 @@ function getData(prop, data, hasCtx) {
   }
 }
 
+function _getLevel(level, p2) {
+  if (level != null && p2.level != null) {
+    level += p2.level;
+  }
+  return level;
+}
+
 function getComputedData(fn, p2, level) {
   if (fn == null) {
     return fn;
@@ -559,15 +566,12 @@ function getComputedData(fn, p2, level) {
 
   if (fn.val._njTmpl) {
     //模板函数
-    if (level != null && p2.level != null) {
-      level += p2.level;
-    }
-
     return fn.val.call({
       _njData: p2.data,
       _njParent: p2.parent,
       _njIndex: p2.index,
-      _njLevel: level
+      _njLevel: _getLevel(level, p2),
+      _njIcp: p2.icp
     });
   } else {
     //普通函数
@@ -575,13 +579,22 @@ function getComputedData(fn, p2, level) {
   }
 }
 
-function getElement(name, p1) {
-  var element = !p1.icp ? p1.cp[name] : p1.icp[name] ? p1.icp[name] : p1.cp[name];
+function getElement(name, p1, nameO, p2) {
+  var element = void 0;
+  if (!p2.icp) {
+    element = p1.cp[name];
+  } else {
+    element = getData(nameO, p2.icp);
+    if (!element) {
+      element = p1.cp[name];
+    }
+  }
+
   return element ? element : name;
 }
 
-function getElementRefer(refer, name, p1) {
-  return refer != null ? __WEBPACK_IMPORTED_MODULE_1__utils_tools__["b" /* isString */](refer) ? getElement(refer.toLowerCase(), p1) : refer : getElement(name, p1);
+function getElementRefer(refer, name, p1, nameO, p2) {
+  return refer != null ? __WEBPACK_IMPORTED_MODULE_1__utils_tools__["b" /* isString */](refer) ? getElement(refer.toLowerCase(), p1, nameO, p2) : refer : getElement(name, p1, nameO, p2);
 }
 
 function getElementName(refer, name) {
@@ -618,7 +631,8 @@ function newContext(p2, p3) {
     index: 'index' in p3 ? p3.index : p2.index,
     level: p2.level,
     getData: getData,
-    d: getData
+    d: getData,
+    icp: p2.icp
   };
 }
 
@@ -655,9 +669,23 @@ function exRet(p1, p2, fn, p4, p5) {
   };
 }
 
+function _getLocalComponents(localConfigs, initCtx) {
+  var icp = void 0;
+  if (localConfigs && localConfigs.components) {
+    icp = localConfigs.components;
+    if (!__WEBPACK_IMPORTED_MODULE_1__utils_tools__["n" /* isArray */](icp)) {
+      icp = [icp];
+    }
+  }
+  if (initCtx && initCtx._njIcp) {
+    icp = icp ? __WEBPACK_IMPORTED_MODULE_1__utils_tools__["h" /* arrayPush */](icp, initCtx._njIcp) : initCtx._njIcp;
+  }
+  return icp;
+}
+
 //构建可运行的模板函数
 function tmplWrap(configs, main) {
-  return function () {
+  return function (localConfigs) {
     var initCtx = this,
         data = __WEBPACK_IMPORTED_MODULE_1__utils_tools__["j" /* arraySlice */](arguments);
 
@@ -667,7 +695,8 @@ function tmplWrap(configs, main) {
       index: initCtx ? initCtx._njIndex : null,
       level: initCtx ? initCtx._njLevel : null,
       getData: getData,
-      d: getData
+      d: getData,
+      icp: _getLocalComponents(localConfigs, initCtx)
     });
   };
 }
@@ -693,14 +722,14 @@ function createElementApply(p) {
 }
 
 //创建模板函数
-function template(fns, components) {
+function template(fns) {
   var configs = {
     us: fns.useString,
     x: __WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */].extensions,
     f: __WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */].filters,
-    np: __WEBPACK_IMPORTED_MODULE_1__utils_tools__["n" /* noop */],
-    tf: __WEBPACK_IMPORTED_MODULE_1__utils_tools__["o" /* throwIf */],
-    wn: __WEBPACK_IMPORTED_MODULE_1__utils_tools__["p" /* warn */],
+    np: __WEBPACK_IMPORTED_MODULE_1__utils_tools__["o" /* noop */],
+    tf: __WEBPACK_IMPORTED_MODULE_1__utils_tools__["p" /* throwIf */],
+    wn: __WEBPACK_IMPORTED_MODULE_1__utils_tools__["q" /* warn */],
     n: newContext,
     c: getComputedData,
     sp: styleProps,
@@ -710,14 +739,14 @@ function template(fns, components) {
     en: getElementName,
     aa: addArgs,
     an: __WEBPACK_IMPORTED_MODULE_1__utils_tools__["a" /* assign */],
-    g: __WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */].global
+    g: __WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */].global,
+    l: _getLevel
   };
 
   if (!configs.us) {
     configs.h = __WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */].createElement;
     configs.H = createElementApply;
     configs.cp = __WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */].components;
-    configs.icp = components;
   } else {
     configs.ans = assignStrProps;
     configs.es = __WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */].escape;
@@ -2329,7 +2358,7 @@ function compiledParam(value, tmplRule) {
 
 //编译模板并返回转换函数
 function _createCompile(outputH) {
-  return function (tmpl, tmplKey, fileName, delimiters, tmplRule, components) {
+  return function (tmpl, tmplKey, fileName, delimiters, tmplRule) {
     if (!tmpl) {
       return;
     }
@@ -2339,7 +2368,6 @@ function _createCompile(outputH) {
       fileName = options.fileName;
       delimiters = options.delimiters;
       tmplRule = options.tmplRule;
-      components = options.components;
     }
 
     //编译模板函数
@@ -2393,7 +2421,7 @@ function _createCompile(outputH) {
         fns = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_4__buildRuntime__["a" /* default */])(root.content, root, !outputH);
       }
 
-      tmplFns = __WEBPACK_IMPORTED_MODULE_3__transforms_transformData__["b" /* template */](fns, components);
+      tmplFns = __WEBPACK_IMPORTED_MODULE_3__transforms_transformData__["b" /* template */](fns);
 
       //保存模板函数编译结果到全局集合中
       if (tmplKey) {
@@ -2919,7 +2947,11 @@ function _buildProps(obj, counter, fns, useStringLocal, level) {
       valueStr += ',\n';
       if (i === l - 1) {
         //传递上下文参数
-        valueStr += '  _njData: p2.data,\n  _njParent: p2.parent,\n  _njIndex: p2.index\n';
+        valueStr += '  _njData: p2.data,\n  \
+                       _njParent: p2.parent,\n  \
+                       _njIndex: p2.index,\n  \
+                       _njLevel: p1.l(' + level + ', p2),\n  \
+                       _njIcp: p2.icp\n';
       }
     }, false, false);
     valueStr += '}';
@@ -3201,7 +3233,7 @@ function _buildNode(node, parent, fns, counter, retType, level, useStringLocal, 
     var typeStr = void 0;
     if (!useStringF) {
       var _typeL = _type.toLowerCase();
-      typeStr = _typeRefer ? 'p1.er(' + _typeRefer + ', \'' + _typeL + '\', p1)' : 'p1.e(\'' + _typeL + '\', p1)';
+      typeStr = _typeRefer ? 'p1.er(' + _typeRefer + ', \'' + _typeL + '\', p1, \'' + _type + '\', p2)' : 'p1.e(\'' + _typeL + '\', p1, \'' + _type + '\', p2)';
     } else {
       typeStr = _typeRefer ? 'p1.en(' + _typeRefer + ', \'' + _type + '\')' : '\'' + _type + '\'';
     }
@@ -3382,7 +3414,7 @@ function _plainTextNode(obj, parent, parentContent, noSplitNewline, tmplRule) {
 function checkElem(obj, parent, tmplRule, hasExProps, noSplitNewline, isLast) {
   var parentContent = 'content';
 
-  if (!__WEBPACK_IMPORTED_MODULE_1__utils_tools__["q" /* isArray */](obj)) {
+  if (!__WEBPACK_IMPORTED_MODULE_1__utils_tools__["n" /* isArray */](obj)) {
     //判断是否为文本节点
     if (__WEBPACK_IMPORTED_MODULE_1__utils_tools__["b" /* isString */](obj)) {
       if (!noSplitNewline) {
@@ -3563,7 +3595,7 @@ function checkElem(obj, parent, tmplRule, hasExProps, noSplitNewline, isLast) {
       //如果不是元素节点,则为节点集合
       _checkContentElem(obj, parent, tmplRule, hasExProps, noSplitNewline);
     }
-  } else if (__WEBPACK_IMPORTED_MODULE_1__utils_tools__["q" /* isArray */](first)) {
+  } else if (__WEBPACK_IMPORTED_MODULE_1__utils_tools__["n" /* isArray */](first)) {
     //如果第一个子节点为数组,则该节点一定为节点集合(可以是多层数组嵌套的集合)
     _checkContentElem(obj, parent, tmplRule, hasExProps, noSplitNewline);
   }

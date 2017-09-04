@@ -185,9 +185,9 @@ function _buildPropData(obj, counter, fns, useStringLocal, level) {
     let valueStr = '_value' + counterValue,
       valueStrL = '_valueL' + counterValue,
       filterStr = 'var ' + valueStr + ' = ' + (!isEmpty ? dataValueStr : 'null') + ', ' + valueStrL + ';\n';
-      
+
     const tmpStr = '_tmp';
-    if(!counter._tmp) {  //在同一函数作用域内_tmp变量只创建一次
+    if (!counter._tmp) { //在同一函数作用域内_tmp变量只创建一次
       filterStr += 'var ' + tmpStr + ';\n';
       counter._tmp++;
     }
@@ -327,7 +327,11 @@ function _buildProps(obj, counter, fns, useStringLocal, level) {
 
       valueStr += ',\n';
       if (i === l - 1) { //传递上下文参数
-        valueStr += '  _njData: p2.data,\n  _njParent: p2.parent,\n  _njIndex: p2.index\n';
+        valueStr += '  _njData: p2.data,\n  \
+                       _njParent: p2.parent,\n  \
+                       _njIndex: p2.index,\n  \
+                       _njLevel: p1.l(' + level + ', p2),\n  \
+                       _njIcp: p2.icp\n';
       }
     }, false, false);
     valueStr += '}';
@@ -591,7 +595,7 @@ function _buildNode(node, parent, fns, counter, retType, level, useStringLocal, 
     let typeStr;
     if (!useStringF) {
       const _typeL = _type.toLowerCase();
-      typeStr = _typeRefer ? ('p1.er(' + _typeRefer + ', \'' + _typeL + '\', p1, p2)') : ('p1.e(\'' + _typeL + '\', p1, p2)');
+      typeStr = _typeRefer ? ('p1.er(' + _typeRefer + ', \'' + _typeL + '\', p1, \'' + _type + '\', p2)') : ('p1.e(\'' + _typeL + '\', p1, \'' + _type + '\', p2)');
     } else {
       typeStr = _typeRefer ? ('p1.en(' + _typeRefer + ', \'' + _type + '\')') : ('\'' + _type + '\'');
     }
