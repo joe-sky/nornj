@@ -11,12 +11,12 @@ export default {
   devtool: 'source-map',
 
   module: {
-    loaders: [
-      { test: /\.js$/, loaders: ['babel-loader'], exclude: /node_modules/ },
+    rules: [
+      { test: /\.js$/, loader: 'babel-loader', exclude: /node_modules/ },
       {
         test: /\.nj.html(\?[\s\S]+)*$/,
-        loader: 'nornj',
-        query: {
+        loader: 'nornj-loader',
+        options: {
           outputH: true,
           delimiters: 'react'
         }
@@ -25,12 +25,11 @@ export default {
   },
 
   resolve: {
-    extensions: ['', '.js', '.jsx'],
-    modulesDirectories: ['node_modules']
+    extensions: ['.js', '.jsx'],
+    modules: ['node_modules']
   },
 
   plugins: [
-    new webpack.optimize.OccurenceOrderPlugin(),
     new webpack.DefinePlugin({
       'process.env.NODE_ENV': '"production"'
     }),
@@ -41,7 +40,8 @@ export default {
         unsafe_comps: true,
         screw_ie8: false,
         warnings: false
-      }
+      },
+      sourceMap: true
     })
   ]
 };

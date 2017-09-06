@@ -23,6 +23,6 @@
     "react-router": "^2.0.1",
     "react-router-redux": "^3.0.0",
     "redux": "^3.3.1",
-    "webpack": "^1.12.14"
+    "webpack": "^2.2.1"
   }
 }
