@@ -19,7 +19,7 @@
   <p>
     {'Show: '}
     <#each {filters}>
-      <#if {filter ==(currentFilter)}>
+      <#if {filter == currentFilter}>
         {name}
         <#else>
           <router-Link to="/{filter | todoState}">
@@ -27,7 +27,7 @@
           </router-Link>
         </#else>
       </#if>
-      <#if {name ==('Active')}>
+      <#if {name == 'Active'}>
         .
         <#else>
           {', '}

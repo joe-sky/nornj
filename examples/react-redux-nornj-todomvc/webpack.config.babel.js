@@ -1,6 +1,5 @@
 import path from 'path';
 import webpack from 'webpack';
-import 'nornj-react';
 
 export default {
   entry: __dirname + '/index.js',
@@ -18,7 +17,8 @@ export default {
         test: /\.nj.html(\?[\s\S]+)*$/,
         loader: 'nornj',
         query: {
-          outputH: true
+          outputH: true,
+          delimiters: 'react'
         }
       }
     ]
