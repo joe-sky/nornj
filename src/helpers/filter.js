@@ -204,7 +204,7 @@ export function registerFilter(name, filter, options) {
 }
 
 function _getRegexTransopts(opts) {
-  return new RegExp('[\\s]+(' + opts.replace(/\+|\*/g, match => '\\' + match) + ')[\\s]+(' + nj.regexJsBase + '([^\\s,()]*)', 'g');
+  return new RegExp('[\\s]+(' + opts.replace(/\+|\*/g, match => '\\' + match) + ')[\\s]+' + nj.regexJsBase + '([^\\s,()]*)', 'g');
 }
 
 let _REGEX_TRANSOPTS = '';

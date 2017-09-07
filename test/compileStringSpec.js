@@ -330,7 +330,7 @@ describe('test compile string', function() {
       </#each>
       <$if {a .('length')}>1</$if>
       {{{a.c.d.substr(1) + ("a,(b)" + (@sq)) + 'a,b'}}}
-      {{list(list(JSON.stringify(obj('a' : 1)), 2))}}
+      {{list(list(JSON.stringify(obj('a' : '1', 'b' : 2)), 2))}}
       {{reg('^[abc]$', 'i').('test')('A')}}
       {{#f1}}
       <div>{{f2#('f3')}}</div>

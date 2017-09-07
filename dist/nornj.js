@@ -95,7 +95,7 @@ nj.errorTitle = '[NornJ]';
 nj.tmplRule = {};
 nj.outputH = false;
 nj.global = typeof self !== 'undefined' ? self : global;
-nj.regexJsBase = '(\'[^\']*\')|("[^"]*")|(-?([0-9][0-9]*)(\\.\\d+)?)|true|false|null|undefined|Object|Array|Math|Date|JSON|([#]*)([^\\s.[\\]()]+))';
+nj.regexJsBase = '((\'[^\']*\')|("[^"]*")|(-?([0-9][0-9]*)(\\.\\d+)?)|true|false|null|undefined|Object|Array|Math|Date|JSON|([#]*)([^\\s.,[\\]()]+))';
 /* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(16)))
 
 /***/ }),
@@ -1462,7 +1462,7 @@ function registerFilter(name, filter, options) {
 function _getRegexTransopts(opts) {
   return new RegExp('[\\s]+(' + opts.replace(/\+|\*/g, function (match) {
     return '\\' + match;
-  }) + ')[\\s]+(' + __WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */].regexJsBase + '([^\\s,()]*)', 'g');
+  }) + ')[\\s]+' + __WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */].regexJsBase + '([^\\s,()]*)', 'g');
 }
 
 var _REGEX_TRANSOPTS = '';
@@ -2117,7 +2117,7 @@ function isStrPropS(elemName, tmplRule) {
 
 
 //Get compiled property
-var REGEX_JS_PROP = new RegExp('(' + __WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */].regexJsBase + '([^\\s()]*)');
+var REGEX_JS_PROP = new RegExp(__WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */].regexJsBase + '([^\\s()]*)');
 var REGEX_REPLACE_CHAR = /_njQs(\d)_/g;
 
 function _compiledProp(prop, innerBrackets, innerQuotes) {

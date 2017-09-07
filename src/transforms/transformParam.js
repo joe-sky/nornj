@@ -3,7 +3,7 @@ import * as tools from '../utils/tools';
 import '../helpers/filter';
 
 //Get compiled property
-const REGEX_JS_PROP = new RegExp('(' + nj.regexJsBase + '([^\\s()]*)');
+const REGEX_JS_PROP = new RegExp(nj.regexJsBase + '([^\\s()]*)');
 const REGEX_REPLACE_CHAR = /_njQs(\d)_/g;
 
 function _compiledProp(prop, innerBrackets, innerQuotes) {
