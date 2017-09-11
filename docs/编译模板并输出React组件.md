@@ -163,15 +163,15 @@ class TestComponent extends Component {
 ```
 
 ## registerTmpl
-`registerTmpl`采用es7装饰器的形式，可以使NornJ用更简洁的语法配合React使用：
+`registerTmpl`采用es7装饰器的形式，可以使NornJ用更简洁的语法配合React使用，[更多详情请见这里](https://github.com/joe-sky/nornj-react/blob/master/README.md)。
 
 ```js
 import { Component } from 'react';
 import { registerTmpl } from 'nornj-react';
 
 @registerTmpl({
-  name: 'TestComponent',  //传入组件名，相当于调用了nj.registerComponent注册组件，可以省略不传
-  template: `             <!--传入模板，普通字符串和es6模板字符串都可以，可以省略不传-->
+  name: 'TestComponent',  //可传入组件名，相当于调用了nj.registerComponent注册组件，可选参数
+  template: `             <!--可传入模板，普通字符串和es6模板字符串都可以，可选参数-->
     <div id=test1>
       this the test demo{no}.
       <i>test{no}</i>
@@ -183,12 +183,4 @@ class TestComponent extends Component {
     return this.template({ no: 1 });  //使用this.template方法渲染，该方法和nj.compileH编译的模板函数是一样的
   }
 }
-```
-
-另外，`registerTmpl`装饰器也可以这样更简化地传参数：
-
-```js
-@registerTmpl(/*参数依次为：组件名、模板*/
-  'TestComponent', '<div id=test1>...</div>'
-})
 ```
