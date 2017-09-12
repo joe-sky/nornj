@@ -758,11 +758,14 @@ function template(fns) {
     if (k.indexOf('main') === 0) {
       //将每个主函数构建为可运行的模板函数
       configs[k] = tmplWrap(configs, v);
-      configs[k]._njTmpl = true;
-      if (v._njName != null) {
-        //设置函数名
-        configs[k].tmplName = v._njName;
-      }
+      __WEBPACK_IMPORTED_MODULE_1__utils_tools__["e" /* defineProps */](configs[k], {
+        _njTmpl: {
+          value: true
+        },
+        tmplName: { //设置函数名
+          value: v._njName
+        }
+      });
       configs['_' + k] = v;
     } else if (k.indexOf('fn') === 0) {
       //扩展标签函数
@@ -1641,7 +1644,7 @@ function compileStringTmpl(tmpl) {
   }
 
   var tmplFn = function tmplFn() {
-    return __WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */]['compile' + (outputH ? 'H' : '')](tmplFn, { tmplKey: tmplKey, tmplRule: tmplRule }).apply(this, arguments);
+    return __WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */]['compile' + (outputH ? 'H' : '')](tmplFn, tmplKey, null, null, tmplRule).apply(this, arguments);
   };
   __WEBPACK_IMPORTED_MODULE_1__utils_tools__["e" /* defineProps */](tmplFn, {
     _njTmpl: {
