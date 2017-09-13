@@ -53,7 +53,7 @@ function _createCompile(outputH) {
                 tmpl = includeParser(tmpl, fileName, tmplRule);
               }
 
-              tmpl = compileStringTmpl.call({ tmplRule, outputH }, tmpl);
+              tmpl = compileStringTmpl.call({ tmplRule, outputH, onlyParse: true }, tmpl);
             }
 
             //分析传入参数并转换为节点树对象
@@ -77,18 +77,7 @@ function _createCompile(outputH) {
       }
     }
 
-    if (tmpl._njParams) {
-      const tmplFn = function() {
-        return tmplFns.main.apply(this, tools.arrayPush([tmpl._njParams], arguments));
-      };
-      tools.defineProp(tmplFn, '_njTmpl', {
-        value: true
-      });
-
-      return tmplFn;
-    } else {
-      return tmplFns.main;
-    }
+    return tmplFns.main;
   };
 }
 
@@ -109,7 +98,7 @@ export function precompile(tmpl, outputH, tmplRule) {
   const root = _createAstRoot();
 
   if (tools.isString(tmpl)) {
-    tmpl = compileStringTmpl.call({ tmplRule, outputH }, tmpl);
+    tmpl = compileStringTmpl.call({ tmplRule, outputH, onlyParse: true }, tmpl);
   }
   checkElem(tmpl._njTmpl, root, tmplRule);
 

@@ -15,7 +15,7 @@ const { OMITTED_CLOSE_TAGS } = tranElem;
 export default function compileStringTmpl(tmpl) {
   let tmplKey = tmpl.toString(), //Get unique key
     ret = preAsts[tmplKey];
-  const { outputH, tmplRule } = this;
+  const { outputH, tmplRule, onlyParse } = this;
 
   if (!ret) { //If the cache already has template data, direct return the template.
     let isStr = tools.isString(tmpl),
@@ -81,20 +81,29 @@ export default function compileStringTmpl(tmpl) {
     }
   }
 
-  const tmplFn = function() {
-    return nj['compile' + (outputH ? 'H' : '')](tmplFn, tmplKey, null, null, tmplRule).apply(this, arguments);
-  };
-  tools.defineProps(tmplFn, {
-    _njTmpl: {
-      value: ret
-    },
-    _njTmplKey: {
-      value: tmplKey
-    },
-    _njParams: {
-      value: params
-    }
-  });
+  let tmplFn;
+  if (!onlyParse) {
+    tmplFn = params ? function() {
+      return tmplMainFn.apply(this, tools.arrayPush([params], arguments));
+    } : function() {
+      return tmplMainFn.apply(this, arguments);
+    };
+    tools.defineProps(tmplFn, {
+      _njTmpl: {
+        value: ret
+      },
+      _njTmplKey: {
+        value: tmplKey
+      }
+    });
+
+    const tmplMainFn = nj['compile' + (outputH ? 'H' : '')](tmplFn, tmplKey, null, null, tmplRule);
+  } else {
+    tmplFn = {
+      _njTmpl: ret,
+      _njTmplKey: tmplKey
+    };
+  }
 
   return tmplFn;
 }
