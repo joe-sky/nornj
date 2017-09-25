@@ -263,14 +263,8 @@ export const extensions = {
 
   once: options => {
     const { props } = options;
-    let cacheObj;
-    if (props && props.cacheTo != null) {
-      cacheObj = props.cacheTo;
-    } else {
-      cacheObj = options.global;
-    }
-
-    let cacheKey = '_njOnceCache_' + options._njFnsNo,
+    let cacheObj = options.global,
+      cacheKey = '_njOnceCache_' + (props && props.cacheKey != null ? props.cacheKey : options._njFnsNo),
       cache = cacheObj[cacheKey],
       useCache;
 

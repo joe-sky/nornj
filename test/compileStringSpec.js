@@ -196,8 +196,8 @@ describe('test compile string', function() {
       `;
 
       var tmplTest = nj`
-      <#once>
-        <@resetList>{{ list(id, c1) }}</@resetList>
+      <#once cacheKey="doctype">
+        <@resetList>{{list(id, c1)}}</@resetList>
         <!DOCTYPE html>
         <#with {{name3}} as=name5>{{{
           JSON.stringify_( 

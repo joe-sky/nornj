@@ -1080,14 +1080,8 @@ var extensions = {
   once: function once(options) {
     var props = options.props;
 
-    var cacheObj = void 0;
-    if (props && props.cacheTo != null) {
-      cacheObj = props.cacheTo;
-    } else {
-      cacheObj = options.global;
-    }
-
-    var cacheKey = '_njOnceCache_' + options._njFnsNo,
+    var cacheObj = options.global,
+        cacheKey = '_njOnceCache_' + (props && props.cacheKey != null ? props.cacheKey : options._njFnsNo),
         cache = cacheObj[cacheKey],
         useCache = void 0;
 
