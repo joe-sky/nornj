@@ -30,7 +30,9 @@ gulp.task('build', () => {
     libName = 'nornj.min.js';
   }
 
-  let plugins = [];
+  let plugins = [new webpack.DefinePlugin({
+    'process.env.NODE_ENV': JSON.stringify('development')
+  })];
   if (argv.p) {
     plugins.push(new webpack.optimize.UglifyJsPlugin({
       compressor: {

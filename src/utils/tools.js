@@ -110,17 +110,13 @@ export function throwIf(val, msg, type) {
 }
 
 //Print warn
-export function warn(msg, type) {
-  let ret = errorTitle;
-  switch (type) {
-    case 'filter':
-      ret += 'A filter called "' + msg + '" is undefined.';
-      break;
-    default:
-      ret += msg;
-  }
+export function warn(msg) {
+  console.warn(errorTitle + msg);
+}
 
-  console.warn(ret);
+//Print error
+export function error(msg) {
+  console.error(errorTitle + msg);
 }
 
 //create light weight object

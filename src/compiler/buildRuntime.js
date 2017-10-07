@@ -55,16 +55,20 @@ function _buildFn(content, node, fns, no, newContext, level, useStringLocal, nam
     fnStr += 'return ret;';
   }
 
-  /* 构建扩展标签函数
-   p1: 模板全局数据
-   p2: 节点上下文数据
-   p3: 扩展标签内调用result方法传递的参数
-   p4: #props变量
-   p5：子扩展标签#props变量
-  */
-  const fn = fns[main ? 'main' + (isTmplEx ? no : '') : 'fn' + no] = new Function('p1', 'p2', 'p3', 'p4', 'p5', fnStr);
-  if (isTmplEx && name != null) { //设置函数名
-    fn._njName = name;
+  try {
+    /* 构建扩展标签函数
+     p1: 模板全局数据
+     p2: 节点上下文数据
+     p3: 扩展标签内调用result方法传递的参数
+     p4: #props变量
+     p5：子扩展标签#props变量
+    */
+    const fn = fns[main ? 'main' + (isTmplEx ? no : '') : 'fn' + no] = new Function('p1', 'p2', 'p3', 'p4', 'p5', fnStr);
+    if (isTmplEx && name != null) { //设置函数名
+      fn._njName = name;
+    }
+  } catch (err) {
+    tools.error(`Failed to generate template function:\n\n` + err.toString() + ' in\n\n' + fnStr + '\n');
   }
   return no;
 }
@@ -213,9 +217,11 @@ function _buildPropData(obj, counter, fns, useStringLocal, level) {
         filterStr += '  ' + filterVarStr + ' = ' + globalFilterStr + ';\n';
         filterStr += '}\n';
       }
-      filterStr += 'if (!' + filterVarStr + ') {\n';
-      filterStr += '  p1.wn(\'' + o.name + '\', \'filter\');\n';
-      filterStr += '} else {\n';
+      if (process.env.NODE_ENV !== 'production') {
+        filterStr += 'if (!' + filterVarStr + ') {\n';
+        filterStr += '  p1.wn(\'A filter called "' + o.name + '" is undefined.\');\n';
+        filterStr += '} else {\n';
+      }
 
       let _filterStr = '  ' + tmpStr + ' = ' + filterVarStr + '.apply(' + (fnHVarStr ? fnHVarStr + ' ? ' + fnHVarStr + '.ctx : p2' : 'p2') + ', [' + ((!isEmpty || i > 0) ? valueStr + ', ' : '') +
         ((o.params && o.params.length) ? o.params.reduce((p, c) => {
@@ -240,7 +246,11 @@ function _buildPropData(obj, counter, fns, useStringLocal, level) {
         filterStr += filterStrI;
       }
       filterStr += _filterStr;
-      filterStr += '}\n';
+
+      if (process.env.NODE_ENV !== 'production') {
+        filterStr += '}';
+      }
+      filterStr += '\n';
     }, false, true);
 
     return {
@@ -565,8 +575,9 @@ function _buildNode(node, parent, fns, counter, retType, level, useStringLocal, 
 
     fnStr += paramsStr + dataReferStr;
 
-    //如果扩展标签不存在则打印警告信息
-    fnStr += 'p1.tf(_ex' + _exC + ', \'' + node.ex + '\', \'ex\');\n';
+    if (process.env.NODE_ENV !== 'production') {  //如果扩展标签不存在则打印警告信息
+      fnStr += 'p1.tf(_ex' + _exC + ', \'' + node.ex + '\', \'ex\');\n';
+    }
 
     //渲染
     fnStr += _buildRender(node, parent, 2, retType, {
