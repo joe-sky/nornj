@@ -1329,11 +1329,9 @@ var filters = {
     var args = arguments,
         ret = {};
 
-    if (args.length > 1) {
-      __WEBPACK_IMPORTED_MODULE_1__utils_tools__["c" /* each */](args, function (v, i) {
-        ret[v.key] = v.val;
-      }, false, true);
-    }
+    __WEBPACK_IMPORTED_MODULE_1__utils_tools__["c" /* each */](args, function (v, i) {
+      ret[v.key] = v.val;
+    }, false, true);
     return ret;
   },
 

@@ -91,11 +91,9 @@ export const filters = {
     let args = arguments,
       ret = {};
 
-    if (args.length > 1) {
-      tools.each(args, (v, i) => {
-        ret[v.key] = v.val;
-      }, false, true);
-    }
+    tools.each(args, (v, i) => {
+      ret[v.key] = v.val;
+    }, false, true);
     return ret;
   },
 
