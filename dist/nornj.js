@@ -1330,10 +1330,8 @@ var filters = {
         ret = {};
 
     if (args.length > 1) {
-      __WEBPACK_IMPORTED_MODULE_1__utils_tools__["c" /* each */](args, function (v, i, l) {
-        if (i < l - 1) {
-          ret[v.key] = v.val;
-        }
+      __WEBPACK_IMPORTED_MODULE_1__utils_tools__["c" /* each */](args, function (v, i) {
+        ret[v.key] = v.val;
       }, false, true);
     }
     return ret;
@@ -1345,18 +1343,14 @@ var filters = {
 
   list: function list() {
     var args = arguments;
-    if (args.length === 1) {
+    if (args.length === 0) {
       return [];
     } else {
-      return __WEBPACK_IMPORTED_MODULE_1__utils_tools__["j" /* arraySlice */](args, 0, args.length - 1);
+      return __WEBPACK_IMPORTED_MODULE_1__utils_tools__["j" /* arraySlice */](args, 0, args.length);
     }
   },
 
   reg: function reg(pattern, flags) {
-    if (flags._njOpts) {
-      flags = '';
-    }
-
     return new RegExp(pattern, flags);
   }
 };
@@ -1364,7 +1358,8 @@ var filters = {
 function _config(params) {
   var ret = {
     onlyGlobal: false,
-    transOperator: false
+    transOperator: false,
+    hasOptions: true
   };
 
   if (params) {
@@ -1373,14 +1368,14 @@ function _config(params) {
   return ret;
 }
 
-var _defaultCfg = { onlyGlobal: true },
-    _defaultCfgO = { onlyGlobal: true, transOperator: true };
+var _defaultCfg = { onlyGlobal: true, hasOptions: false },
+    _defaultCfgO = { onlyGlobal: true, transOperator: true, hasOptions: false };
 
 //Filter default config
 var filterConfig = {
   '.': _config(_defaultCfg),
-  '_': _config(_defaultCfg),
-  '#': _config(_defaultCfg),
+  '_': _config({ onlyGlobal: true }),
+  '#': _config({ onlyGlobal: true }),
   '==': _config(_defaultCfgO),
   '===': _config(_defaultCfgO),
   '!=': _config(_defaultCfgO),
@@ -1394,7 +1389,7 @@ var filterConfig = {
   '*': _config(_defaultCfgO),
   '/': _config(_defaultCfgO),
   '%': _config(_defaultCfgO),
-  '?': _config(_defaultCfg),
+  '?': _config(_defaultCfgO),
   '!': _config(_defaultCfg),
   '&&': _config(_defaultCfgO),
   or: _config(_defaultCfgO),
@@ -1444,7 +1439,7 @@ function registerFilter(name, filter, options) {
 }
 
 function _getRegexTransopts(opts) {
-  return new RegExp('[\\s]+(' + opts.replace(/\+|\*/g, function (match) {
+  return new RegExp('[\\s]+(' + opts.replace(/\+|\*|\?/g, function (match) {
     return '\\' + match;
   }) + ')[\\s]+' + __WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */].regexJsBase + '([^\\s,()]*)', 'g');
 }
@@ -2835,6 +2830,7 @@ function _buildPropData(obj, counter, fns, useStringLocal, level) {
     __WEBPACK_IMPORTED_MODULE_1__utils_tools__["c" /* each */](filters, function (o, i) {
       var _filterC = counter._filter++,
           configF = __WEBPACK_IMPORTED_MODULE_5__helpers_filter__["b" /* filterConfig */][o.name],
+          hasOptions = !configF || configF.hasOptions,
           filterVarStr = '_filter' + _filterC,
           globalFilterStr = 'p1.f[\'' + o.name + '\']',
           filterStrI = '',
@@ -2861,19 +2857,20 @@ function _buildPropData(obj, counter, fns, useStringLocal, level) {
         filterStr += '} else {\n';
       }
 
-      var _filterStr = '  ' + tmpStr + ' = ' + filterVarStr + '.apply(' + (fnHVarStr ? fnHVarStr + ' ? ' + fnHVarStr + '.ctx : p2' : 'p2') + ', [' + (!isEmpty || i > 0 ? valueStr + ', ' : '') + (o.params && o.params.length ? o.params.reduce(function (p, c) {
+      var _filterStr = '  ' + tmpStr + ' = ' + filterVarStr + '.apply(' + (fnHVarStr ? fnHVarStr + ' ? ' + fnHVarStr + '.ctx : p2' : 'p2') + ', [' + (!isEmpty || i > 0 ? valueStr + ', ' : '') + (o.params && o.params.length ? o.params.reduce(function (p, c, i, arr) {
         var propStr = _buildPropData({
           prop: c,
           escape: escape
-        }, counter, fns, useStringLocal, level);
+        }, counter, fns, useStringLocal, level),
+            hasComma = hasOptions || i < arr.length - 1;
 
         if (__WEBPACK_IMPORTED_MODULE_1__utils_tools__["b" /* isString */](propStr)) {
-          return p + propStr + ', ';
+          return p + propStr + (hasComma ? ', ' : '');
         } else {
           filterStrI += propStr.filterStr;
-          return p + propStr.valueStr + ', ';
+          return p + propStr.valueStr + (hasComma ? ', ' : '');
         }
-      }, '') : '') + _buildOptions(configF, useStringLocal, null, fns, null, null, level, null, valueStrL) + ']);\n';
+      }, '') : '') + (hasOptions ? _buildOptions(configF, useStringLocal, null, fns, null, null, level, null, valueStrL) : '') + ']);\n';
       _filterStr += '  ' + valueStrL + ' = ' + valueStr + ';\n';
       _filterStr += '  ' + valueStr + ' = ' + tmpStr + ';\n';
 

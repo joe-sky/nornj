@@ -1,5 +1,6 @@
 import nj from '../../base';
 
 nj.registerFilter('//', val => Math.sqrt(val), {
-  onlyGlobal: true
+  onlyGlobal: true,
+  hasOptions: false
 });

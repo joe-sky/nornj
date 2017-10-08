@@ -199,6 +199,7 @@ function _buildPropData(obj, counter, fns, useStringLocal, level) {
     tools.each(filters, (o, i) => {
       let _filterC = counter._filter++,
         configF = filterConfig[o.name],
+        hasOptions = !configF || configF.hasOptions,
         filterVarStr = '_filter' + _filterC,
         globalFilterStr = 'p1.f[\'' + o.name + '\']',
         filterStrI = '',
@@ -224,20 +225,21 @@ function _buildPropData(obj, counter, fns, useStringLocal, level) {
       }
 
       let _filterStr = '  ' + tmpStr + ' = ' + filterVarStr + '.apply(' + (fnHVarStr ? fnHVarStr + ' ? ' + fnHVarStr + '.ctx : p2' : 'p2') + ', [' + ((!isEmpty || i > 0) ? valueStr + ', ' : '') +
-        ((o.params && o.params.length) ? o.params.reduce((p, c) => {
+        ((o.params && o.params.length) ? o.params.reduce((p, c, i, arr) => {
           const propStr = _buildPropData({
-            prop: c,
-            escape
-          }, counter, fns, useStringLocal, level);
+              prop: c,
+              escape
+            }, counter, fns, useStringLocal, level),
+            hasComma = hasOptions || i < arr.length - 1;
 
           if (tools.isString(propStr)) {
-            return p + propStr + ', ';
+            return p + propStr + (hasComma ? ', ' : '');
           } else {
             filterStrI += propStr.filterStr;
-            return p + propStr.valueStr + ', ';
+            return p + propStr.valueStr + (hasComma ? ', ' : '');
           }
         }, '') : '') +
-        _buildOptions(configF, useStringLocal, null, fns, null, null, level, null, valueStrL) +
+        (hasOptions ? _buildOptions(configF, useStringLocal, null, fns, null, null, level, null, valueStrL) : '') +
         ']);\n';
       _filterStr += '  ' + valueStrL + ' = ' + valueStr + ';\n';
       _filterStr += '  ' + valueStr + ' = ' + tmpStr + ';\n';

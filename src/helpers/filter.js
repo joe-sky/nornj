@@ -92,10 +92,8 @@ export const filters = {
       ret = {};
 
     if (args.length > 1) {
-      tools.each(args, (v, i, l) => {
-        if (i < l - 1) {
-          ret[v.key] = v.val;
-        }
+      tools.each(args, (v, i) => {
+        ret[v.key] = v.val;
       }, false, true);
     }
     return ret;
@@ -107,26 +105,21 @@ export const filters = {
 
   list: function() {
     let args = arguments;
-    if (args.length === 1) {
+    if (args.length === 0) {
       return [];
     } else {
-      return tools.arraySlice(args, 0, args.length - 1);
+      return tools.arraySlice(args, 0, args.length);
     }
   },
 
-  reg: (pattern, flags) => {
-    if (flags._njOpts) {
-      flags = '';
-    }
-
-    return new RegExp(pattern, flags);
-  }
+  reg: (pattern, flags) => new RegExp(pattern, flags)
 };
 
 function _config(params) {
   let ret = {
     onlyGlobal: false,
-    transOperator: false
+    transOperator: false,
+    hasOptions: true
   };
 
   if (params) {
@@ -135,14 +128,14 @@ function _config(params) {
   return ret;
 }
 
-const _defaultCfg = { onlyGlobal: true },
-  _defaultCfgO = { onlyGlobal: true, transOperator: true };
+const _defaultCfg = { onlyGlobal: true, hasOptions: false },
+  _defaultCfgO = { onlyGlobal: true, transOperator: true, hasOptions: false };
 
 //Filter default config
 export const filterConfig = {
   '.': _config(_defaultCfg),
-  '_': _config(_defaultCfg),
-  '#': _config(_defaultCfg),
+  '_': _config({ onlyGlobal: true }),
+  '#': _config({ onlyGlobal: true }),
   '==': _config(_defaultCfgO),
   '===': _config(_defaultCfgO),
   '!=': _config(_defaultCfgO),
@@ -156,7 +149,7 @@ export const filterConfig = {
   '*': _config(_defaultCfgO),
   '/': _config(_defaultCfgO),
   '%': _config(_defaultCfgO),
-  '?': _config(_defaultCfg),
+  '?': _config(_defaultCfgO),
   '!': _config(_defaultCfg),
   '&&': _config(_defaultCfgO),
   or: _config(_defaultCfgO),
@@ -204,7 +197,7 @@ export function registerFilter(name, filter, options) {
 }
 
 function _getRegexTransopts(opts) {
-  return new RegExp('[\\s]+(' + opts.replace(/\+|\*/g, match => '\\' + match) + ')[\\s]+' + nj.regexJsBase + '([^\\s,()]*)', 'g');
+  return new RegExp('[\\s]+(' + opts.replace(/\+|\*|\?/g, match => '\\' + match) + ')[\\s]+' + nj.regexJsBase + '([^\\s,()]*)', 'g');
 }
 
 let _REGEX_TRANSOPTS = '';
