@@ -63,6 +63,10 @@ export const filters = {
 
   '%': (val1, val2) => val1 % val2,
 
+  '**': (val1, val2) => Math.pow(val1, val2),
+
+  '//': val => Math.sqrt(val),
+
   //Ternary operator
   '?': (val, val1, val2) => val ? val1 : val2,
 
@@ -147,6 +151,8 @@ export const filterConfig = {
   '*': _config(_defaultCfgO),
   '/': _config(_defaultCfgO),
   '%': _config(_defaultCfgO),
+  '**': _config(_defaultCfgO),
+  '//': _config(_defaultCfg),
   '?': _config(_defaultCfgO),
   '!': _config(_defaultCfg),
   '&&': _config(_defaultCfgO),

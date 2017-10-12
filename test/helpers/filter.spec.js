@@ -1,6 +1,5 @@
 ﻿import { render } from '../../src/compiler/compile';
 import '../../src/utils/createTmplRule';
-import '../../src/tools/filters';
 
 describe('filter', () => {
   it('.', () => {
