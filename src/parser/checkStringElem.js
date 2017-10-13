@@ -182,7 +182,8 @@ function _checkStringElem(xml, tmplRule) {
             }
 
             if (isEx || !inTextContent) {
-              if (elemName === '/' + current.elemName) {
+              const cName = current.elemName;
+              if (cName.indexOf(SPLIT_FLAG) < 0 ? (elemName === '/' + cName) : (elemName.indexOf(SPLIT_FLAG) > -1)) {  //如果开始标签包含SPLIT_FLAG，则只要结束标签包含SPLIT_FLAG就认为该标签已关闭
                 current = current.parent;
               }
             } else {

@@ -246,7 +246,7 @@ describe('test compile string', function() {
           <img src="test1.png">
         </textarea>
       </#once>
-      <img src="test1.png">
+      <${'img'} src="test1.png">
       <img src="test1.png">
         <#prop {{'id'}}>img</#prop>
         <@id1>img1</@id1>
@@ -333,7 +333,13 @@ describe('test compile string', function() {
       {{list(list(JSON.stringify(obj('a' : '1', 'b' : 2)), 2))}}
       {{reg('^[abc]$', 'i').('test')('A')}}
       {{#f1}}
-      <div>{{f2#('f3')}}</div>
+      <${'div'}>
+        {{f2#('f3')}}
+        <${'div'}>
+          <${'img'} />
+          <${'span'}>aaa</${'span'}>
+        </${'div'}>
+      </${'div'}>
       <#e1>111</#e1>
       {{Date.now()}} + {{Math.max(Math.max(10 + 1, 1), 2 + 20, 3)}}
       <img src="test1.png" a="{{1 + (5 ** 2) + 'abc ' + a.c.d}}" b="{{{'1 + 5'}}}" c="{{ false ? 1 }}">
