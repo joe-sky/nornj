@@ -213,6 +213,9 @@ describe('test compile string', function() {
         <#each {{list}}>
           <div>{{this}}</div>
           {{this}}
+          <#empty>
+            no data
+          </#empty>
         </#each>
         <style>
           .class1 {

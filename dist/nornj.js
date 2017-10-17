@@ -883,6 +883,7 @@ var extensions = {
 
   each: function each(list, options) {
     var useString = options.useString,
+        props = options.props,
         ret = void 0;
 
     if (list) {
@@ -893,8 +894,7 @@ var extensions = {
           ret = [];
         }
 
-        var props = options.props,
-            isArrayLike = __WEBPACK_IMPORTED_MODULE_1__utils_tools__["i" /* isArrayLike */](list);
+        var isArrayLike = __WEBPACK_IMPORTED_MODULE_1__utils_tools__["i" /* isArrayLike */](list);
         __WEBPACK_IMPORTED_MODULE_1__utils_tools__["c" /* each */](list, function (item, index, len, lenObj) {
           var param = {
             data: item,
@@ -929,9 +929,12 @@ var extensions = {
         if (!useString && !ret.length) {
           ret = null;
         }
+
+        if ((!ret || !ret.length) && props && props['else']) {
+          ret = props['else']();
+        }
       })();
     } else {
-      var props = options.props;
       if (props && props['else']) {
         ret = props['else']();
       }
@@ -1157,8 +1160,8 @@ extensionConfig.once = _config(extensionConfig.obj);
 //Extension alias
 extensions['case'] = extensions.elseif;
 extensionConfig['case'] = extensionConfig.elseif;
-extensions['default'] = extensions['else'];
-extensionConfig['default'] = extensionConfig['else'];
+extensions['empty'] = extensions['default'] = extensions['else'];
+extensionConfig['empty'] = extensionConfig['default'] = extensionConfig['else'];
 extensions.strProp = extensions.prop;
 extensionConfig.strProp = __WEBPACK_IMPORTED_MODULE_1__utils_tools__["a" /* assign */](_config(extensionConfig.prop), { useString: true });
 extensions.strArg = extensions.arg;

@@ -88,6 +88,7 @@ export const extensions = {
 
   each: (list, options) => {
     let useString = options.useString,
+      props = options.props,
       ret;
 
     if (list) {
@@ -97,8 +98,7 @@ export const extensions = {
         ret = [];
       }
 
-      const props = options.props,
-        isArrayLike = tools.isArrayLike(list);
+      const isArrayLike = tools.isArrayLike(list);
       tools.each(list, (item, index, len, lenObj) => {
         let param = {
           data: item,
@@ -133,8 +133,11 @@ export const extensions = {
       if (!useString && !ret.length) {
         ret = null;
       }
+
+      if ((!ret || !ret.length) && props && props['else']) {
+        ret = props['else']();
+      }
     } else {
-      let props = options.props;
       if (props && props['else']) {
         ret = props['else']();
       }
@@ -339,8 +342,8 @@ extensionConfig.once = _config(extensionConfig.obj);
 //Extension alias
 extensions['case'] = extensions.elseif;
 extensionConfig['case'] = extensionConfig.elseif;
-extensions['default'] = extensions['else'];
-extensionConfig['default'] = extensionConfig['else'];
+extensions['empty'] = extensions['default'] = extensions['else'];
+extensionConfig['empty'] = extensionConfig['default'] = extensionConfig['else'];
 extensions.strProp = extensions.prop;
 extensionConfig.strProp = tools.assign(_config(extensionConfig.prop), { useString: true });
 extensions.strArg = extensions.arg;
