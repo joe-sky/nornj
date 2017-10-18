@@ -1,11 +1,12 @@
 ﻿import nj from '../core';
 import * as tools from '../utils/tools';
 const { errorTitle } = nj;
+const REGEX_NUM = /^(-?([0-9]+[\.]?[0-9]+)|[0-9])$/;
 
 //提取style内参数
 export function styleProps(obj) {
   //If the parameter is a style object,then direct return.
-  if (tools.isObject(obj) || tools.isNumber(obj)) {
+  if (tools.isObject(obj) || tools.isArray(obj) || tools.isNumber(obj)) {
     return obj;
   }
 
@@ -29,7 +30,7 @@ export function styleProps(obj) {
     //将连字符转为驼峰命名
     key = tools.toCamelCase(key);
 
-    ret[key] = value;
+    ret[key] = REGEX_NUM.test(value) ? Number(value) : value;
   }
 
   return ret;

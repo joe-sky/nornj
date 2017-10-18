@@ -108,9 +108,9 @@ nj.regexJsBase = '((\'[^\']*\')|("[^"]*")|(-?([0-9][0-9]*)(\\.\\d+)?)|true|false
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "f", function() { return defineProps; });
 /* harmony export (immutable) */ __webpack_exports__["e"] = arrayPush;
 /* harmony export (immutable) */ __webpack_exports__["j"] = arraySlice;
-/* harmony export (immutable) */ __webpack_exports__["n"] = isArray;
+/* harmony export (immutable) */ __webpack_exports__["l"] = isArray;
 /* harmony export (immutable) */ __webpack_exports__["k"] = isObject;
-/* harmony export (immutable) */ __webpack_exports__["l"] = isNumber;
+/* harmony export (immutable) */ __webpack_exports__["m"] = isNumber;
 /* harmony export (immutable) */ __webpack_exports__["b"] = isString;
 /* harmony export (immutable) */ __webpack_exports__["i"] = isArrayLike;
 /* harmony export (immutable) */ __webpack_exports__["c"] = each;
@@ -121,7 +121,7 @@ nj.regexJsBase = '((\'[^\']*\')|("[^"]*")|(-?([0-9][0-9]*)(\\.\\d+)?)|true|false
 /* harmony export (immutable) */ __webpack_exports__["r"] = error;
 /* harmony export (immutable) */ __webpack_exports__["h"] = obj;
 /* harmony export (immutable) */ __webpack_exports__["g"] = clearQuot;
-/* harmony export (immutable) */ __webpack_exports__["m"] = toCamelCase;
+/* harmony export (immutable) */ __webpack_exports__["n"] = toCamelCase;
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return assign; });
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
@@ -471,7 +471,7 @@ createTmplRule({}, true);
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils_tools__ = __webpack_require__(1);
-/* unused harmony export styleProps */
+/* harmony export (immutable) */ __webpack_exports__["d"] = styleProps;
 /* unused harmony export getData */
 /* harmony export (immutable) */ __webpack_exports__["c"] = getComputedData;
 /* unused harmony export getElement */
@@ -488,11 +488,12 @@ createTmplRule({}, true);
 
 var errorTitle = __WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */].errorTitle;
 
-//提取style内参数
+var REGEX_NUM = /^(-?([0-9]+[\.]?[0-9]+)|[0-9])$/;
 
+//提取style内参数
 function styleProps(obj) {
   //If the parameter is a style object,then direct return.
-  if (__WEBPACK_IMPORTED_MODULE_1__utils_tools__["k" /* isObject */](obj) || __WEBPACK_IMPORTED_MODULE_1__utils_tools__["l" /* isNumber */](obj)) {
+  if (__WEBPACK_IMPORTED_MODULE_1__utils_tools__["k" /* isObject */](obj) || __WEBPACK_IMPORTED_MODULE_1__utils_tools__["l" /* isArray */](obj) || __WEBPACK_IMPORTED_MODULE_1__utils_tools__["m" /* isNumber */](obj)) {
     return obj;
   }
 
@@ -515,9 +516,9 @@ function styleProps(obj) {
     }
 
     //将连字符转为驼峰命名
-    key = __WEBPACK_IMPORTED_MODULE_1__utils_tools__["m" /* toCamelCase */](key);
+    key = __WEBPACK_IMPORTED_MODULE_1__utils_tools__["n" /* toCamelCase */](key);
 
-    ret[key] = value;
+    ret[key] = REGEX_NUM.test(value) ? Number(value) : value;
   }
 
   return ret;
@@ -670,7 +671,7 @@ function _getLocalComponents(localConfigs, initCtx) {
   var icp = void 0;
   if (localConfigs && localConfigs.components) {
     icp = localConfigs.components;
-    if (!__WEBPACK_IMPORTED_MODULE_1__utils_tools__["n" /* isArray */](icp)) {
+    if (!__WEBPACK_IMPORTED_MODULE_1__utils_tools__["l" /* isArray */](icp)) {
       icp = [icp];
     }
   }
@@ -1371,6 +1372,11 @@ var filters = {
 
   reg: function reg(pattern, flags) {
     return new RegExp(pattern, flags);
+  },
+
+  //Transform css string to object
+  css: function css(cssText) {
+    return __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_2__transforms_transformData__["d" /* styleProps */])(cssText);
   }
 };
 
@@ -1420,7 +1426,8 @@ var filterConfig = {
   obj: _config(_defaultCfg),
   ':': _config(_defaultCfgO),
   list: _config(_defaultCfg),
-  reg: _config(_defaultCfg)
+  reg: _config(_defaultCfg),
+  css: _config(_defaultCfg)
 };
 
 //Filter alias
@@ -3438,7 +3445,7 @@ function _plainTextNode(obj, parent, parentContent, noSplitNewline, tmplRule) {
 function checkElem(obj, parent, tmplRule, hasExProps, noSplitNewline, isLast) {
   var parentContent = 'content';
 
-  if (!__WEBPACK_IMPORTED_MODULE_1__utils_tools__["n" /* isArray */](obj)) {
+  if (!__WEBPACK_IMPORTED_MODULE_1__utils_tools__["l" /* isArray */](obj)) {
     //判断是否为文本节点
     if (__WEBPACK_IMPORTED_MODULE_1__utils_tools__["b" /* isString */](obj)) {
       if (!noSplitNewline) {
@@ -3619,7 +3626,7 @@ function checkElem(obj, parent, tmplRule, hasExProps, noSplitNewline, isLast) {
       //如果不是元素节点,则为节点集合
       _checkContentElem(obj, parent, tmplRule, hasExProps, noSplitNewline);
     }
-  } else if (__WEBPACK_IMPORTED_MODULE_1__utils_tools__["n" /* isArray */](first)) {
+  } else if (__WEBPACK_IMPORTED_MODULE_1__utils_tools__["l" /* isArray */](first)) {
     //如果第一个子节点为数组,则该节点一定为节点集合(可以是多层数组嵌套的集合)
     _checkContentElem(obj, parent, tmplRule, hasExProps, noSplitNewline);
   }

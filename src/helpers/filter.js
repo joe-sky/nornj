@@ -1,6 +1,6 @@
 ﻿import nj from '../core';
 import * as tools from '../utils/tools';
-import { getComputedData } from '../transforms/transformData';
+import { getComputedData, styleProps } from '../transforms/transformData';
 
 //Global filter list
 export const filters = {
@@ -114,7 +114,10 @@ export const filters = {
     }
   },
 
-  reg: (pattern, flags) => new RegExp(pattern, flags)
+  reg: (pattern, flags) => new RegExp(pattern, flags),
+
+  //Transform css string to object
+  css: cssText => styleProps(cssText)
 };
 
 function _config(params) {
@@ -163,7 +166,8 @@ export const filterConfig = {
   obj: _config(_defaultCfg),
   ':': _config(_defaultCfgO),
   list: _config(_defaultCfg),
-  reg: _config(_defaultCfg)
+  reg: _config(_defaultCfg),
+  css: _config(_defaultCfg)
 };
 
 //Filter alias
