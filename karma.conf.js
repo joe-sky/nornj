@@ -1,16 +1,17 @@
-export default function(config) {
+const path = require('path');
+
+module.exports = function(config) {
   config.set({
     // base path that will be used to resolve all patterns (eg. files, exclude)
     basePath: '',
 
     // frameworks to use
     // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
-    frameworks: ['jasmine', 'commonjs'],
+    frameworks: ['jasmine'],
 
     // list of files / patterns to load in the browser
     files: [
-      'src/**/*.js',
-      'test/**/*.spec.js'
+      'test/index.js'
     ],
 
     // list of files to exclude
@@ -19,26 +20,30 @@ export default function(config) {
     // preprocess matching files before serving them to the browser
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
     preprocessors: {
-      'src/**/*.js': ['babel', 'commonjs', 'coverage'],
-      'test/**/*.spec.js': ['babel', 'commonjs']
+      'test/index.js': ['webpack', 'sourcemap']
     },
 
     // test results reporter to use
     // possible values: 'dots', 'progress'
     // available reporters: https://npmjs.org/browse/keyword/karma-reporter
-    reporters: ['spec', 'coverage'],
+    reporters: ['spec', 'coverage-istanbul'],
 
-    coverageReporter: {
-      reporters: [{
-        type: 'text-summary'
-      }, {
-        type: 'html',
-        dir: 'test/coverage'
-      }, {
-        type: 'cobertura',
-        subdir: '.',
-        dir: 'test/coverage'
-      }]
+    // coverage-istanbul 输出配置，报告文件输出于根目录下的 coverage 文件夹内
+    coverageIstanbulReporter: {
+      // reports can be any that are listed here: https://github.com/istanbuljs/istanbul-reports/tree/590e6b0089f67b723a1fdf57bc7ccc080ff189d7/lib
+      reports: ['html', 'cobertura', 'text-summary'],
+      // base output directory
+      dir: 'test/coverage',
+      // if using webpack and pre-loaders, work around webpack breaking the source path
+      fixWebpackSourcePaths: true,
+      // Most reporters accept additional config options. You can pass these through the `report-config` option
+      'report-config': {
+        // all options available at: https://github.com/istanbuljs/istanbul-reports/blob/590e6b0089f67b723a1fdf57bc7ccc080ff189d7/lib/html/index.js#L135-L137
+        html: {
+          // outputs the report in ./coverage/html
+          subdir: 'html'
+        }
+      }
     },
 
     // web server port
@@ -58,12 +63,42 @@ export default function(config) {
     // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
     browsers: ['PhantomJS'],
 
+    // 设定终端上不输出 webpack 的打包信息
+    webpackMiddleware: {
+      noInfo: true
+    },
+
+    // 用来预编译源代码的 webpack 配置，基本就是项目的 webpack 配置，但要去掉 entry 属性
+    webpack: {
+      output: {
+        path: path.join(__dirname, 'test'),
+        filename: 'testBundle.js',
+        libraryTarget: 'umd'
+      },
+      module: {
+        rules: [{
+          test: /\.js$/,
+          use: [{
+            loader: 'babel-loader'
+          }],
+          exclude: /node_modules/
+        }, {
+          test: /\.js$/,
+          use: [{
+            loader: 'istanbul-instrumenter-loader'
+          }],
+          include: path.resolve('src/'),
+          enforce: 'post'
+        }]
+      }
+    },
+
     plugins: [
       'karma-jasmine',
-      'karma-coverage',
+      'karma-coverage-istanbul-reporter',
+      'karma-webpack',
+      'karma-sourcemap-loader',
       'karma-spec-reporter',
-      'karma-commonjs',
-      'karma-babel-preprocessor',
       'karma-phantomjs-launcher'
     ],
 

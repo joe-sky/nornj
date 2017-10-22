@@ -132,7 +132,7 @@ function _getReplaceParam(obj, tmplRule, innerQuotes) {
       .replace(REGEX_SP_FILTER, (all, g1, match) => ' ' + SP_FILTER_LOOKUP[match] + ' ')
       .replace(nj.regexTransOpts, function() {
         const args = arguments;
-        return ' ' + args[1] + '(' + args[2] + (args[10] != null ? args[10] : '') + ')'
+        return ' ' + args[1] + '(' + args[2] + (args[10] != null ? args[10] : '') + ')';
       })
       .replace(REGEX_FN_FILTER, (all, match, g1) => !g1 ? (' ' + FN_FILTER_LOOKUP[match]) : '.(\'' + g1 + '\')_(')
       .replace(REGEX_SPACE_FILTER, all => all + ' ')

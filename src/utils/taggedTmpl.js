@@ -9,7 +9,7 @@ export function createTaggedTmpl(opts = {}) {
 
   return function() {
     return compileStringTmpl.apply({ tmplRule, outputH }, arguments);
-  }
+  };
 }
 
 export const taggedTmpl = createTaggedTmpl({ outputH: false });

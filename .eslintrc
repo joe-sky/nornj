@@ -3,7 +3,7 @@
     "camelcase": [2, { "properties": "always" }],
     "comma-dangle": [2, "never"],
     "semi": [2, "always"],
-    "quotes": [2, "single"],
+    "quotes": [1, "single"],
     "strict": [2, "global"]
   },
   "parser": "babel-eslint",
