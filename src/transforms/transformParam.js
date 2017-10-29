@@ -101,9 +101,10 @@ const SP_FILTER_LOOKUP = {
 };
 const REGEX_SP_FILTER = /[\s]+((\|\|)[\s]*)/g;
 const FN_FILTER_LOOKUP = {
-  ')': ')_('
+  ')': ')_(',
+  ']': ']_('
 };
-const REGEX_FN_FILTER = /(\)|\.([^\s'"._#()]+))[\s]*\(/g;
+const REGEX_FN_FILTER = /(\)|\]|\.([^\s'"._#()]+))[\s]*\(/g;
 const REGEX_SPACE_FILTER = /[(,]/g;
 const REGEX_FIX_FILTER = /(\|)?(([._#]\()|[\s]+([^\s._#|]+[\s]*\())/g;
 
@@ -134,12 +135,12 @@ function _getReplaceParam(obj, tmplRule, innerQuotes) {
         const args = arguments;
         return ' ' + args[1] + '(' + args[2] + (args[10] != null ? args[10] : '') + ')';
       })
-      .replace(REGEX_FN_FILTER, (all, match, g1) => !g1 ? (' ' + FN_FILTER_LOOKUP[match]) : '.(\'' + g1 + '\')_(')
+      .replace(REGEX_FN_FILTER, (all, match, g1) => !g1 ? FN_FILTER_LOOKUP[match] : '.(\'' + g1 + '\')_(')
       .replace(REGEX_SPACE_FILTER, all => all + ' ')
       .replace(REGEX_FIX_FILTER, (all, g1, g2, g3, g4) => {
         return (g1 ? all : ' | ' + (g3 ? g3 : g4));
       });
-
+      
     item[2] = prop.trim();
     ret.push(item);
     i++;

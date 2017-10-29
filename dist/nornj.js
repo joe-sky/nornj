@@ -1652,9 +1652,10 @@ var SP_FILTER_LOOKUP = {
 };
 var REGEX_SP_FILTER = /[\s]+((\|\|)[\s]*)/g;
 var FN_FILTER_LOOKUP = {
-  ')': ')_('
+  ')': ')_(',
+  ']': ']_('
 };
-var REGEX_FN_FILTER = /(\)|\.([^\s'"._#()]+))[\s]*\(/g;
+var REGEX_FN_FILTER = /(\)|\]|\.([^\s'"._#()]+))[\s]*\(/g;
 var REGEX_SPACE_FILTER = /[(,]/g;
 var REGEX_FIX_FILTER = /(\|)?(([._#]\()|[\s]+([^\s._#|]+[\s]*\())/g;
 
@@ -1688,7 +1689,7 @@ function _getReplaceParam(obj, tmplRule, innerQuotes) {
       var args = arguments;
       return ' ' + args[1] + '(' + args[2] + (args[10] != null ? args[10] : '') + ')';
     }).replace(REGEX_FN_FILTER, function (all, match, g1) {
-      return !g1 ? ' ' + FN_FILTER_LOOKUP[match] : '.(\'' + g1 + '\')_(';
+      return !g1 ? FN_FILTER_LOOKUP[match] : '.(\'' + g1 + '\')_(';
     }).replace(REGEX_SPACE_FILTER, function (all) {
       return all + ' ';
     }).replace(REGEX_FIX_FILTER, function (all, g1, g2, g3, g4) {

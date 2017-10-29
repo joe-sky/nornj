@@ -118,7 +118,8 @@ describe('test compile string', function() {
                       }
                     },
                     {
-                      name1: 'joe_sky1'
+                      name1: 'joe_sky1',
+                      fns: [p => 'fn1' + p]
                     }
                   ];
 
@@ -331,7 +332,7 @@ describe('test compile string', function() {
           <{{../sliderItem.('a')|tagName(1,2)}} no0="/" no1={{no}} no2="{{-0.05 | filter2}}" checked no='{{ ../sliderItem.b }}' />
         </slider>
       </#each>
-      <$if {a .('length')}>1</$if>
+      <$if {a.('length')}>1</$if>
       {{{a.c.d.substr(1) + ("a,(b)" + (@sq)) + 'a,b'}}}
       {{list(list(JSON.stringify(obj('a' : '1', 'b' : 2)), 2))}}
       {{reg('^[abc]$', 'i').('test')('A')}}
@@ -346,6 +347,7 @@ describe('test compile string', function() {
       <#e1>111</#e1>
       {{Date.now()}} + {{Math.max(Math.max(10 + 1, 1), 2 + 20, 3)}}
       <img src="test1.png" a="{{1 + (5 ** 2) + 'abc ' + a.c.d}}" b="{{{'1 + 5'}}}" c="{{ false ? 1 }}">
+      {{fns[0]('fns[0]()')}}
       `;
 
       //console.log(tmplTest._njTmpl);
@@ -411,7 +413,33 @@ describe('test compile string', function() {
       // console.log('\n4:\n', fns.fn4.toString());
       //console.log(JSON.stringify(nj.asts['tmplString']));
 
-      var html = tmplTest.apply(null, data);
+      const tmplTest3 = nj`
+      <nj-text>
+      <script>
+        function test() {
+          console.log(1);
+
+          <#if {{true}}>var reg = /\\n+/;</#if>
+          var a = '{{@lt + 'test' + @gt}}';
+
+          if(i < 10) {
+            return;
+          }
+
+          var num = <#each><#arg>{{list(1, 2, 3)}}</#arg>{{this}}</#each>;
+
+          function test2() {
+            console.log('    <div  >a<img    />  b  </div>  <div>  '
+              + ' <img /> </div>  ');
+          }
+
+          var scriptUrl = '<script src="'+prefix+'/resources/app/pages/'+path+'index.js">' + '<' + '/script>';
+        }
+      </script>
+      </nj-text>
+      `;
+
+      var html = tmplTest3.apply(null, data);
       // var html2 = tmplTest.call(null, { id: 200, c1: 100 }, data[0]);
       console.log(html);
       expect(html).toBeTruthy();
