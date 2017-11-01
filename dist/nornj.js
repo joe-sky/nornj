@@ -93,6 +93,8 @@ nj.tmplRule = {};
 nj.outputH = false;
 nj.global = typeof self !== 'undefined' ? self : global;
 nj.regexJsBase = '((\'[^\']*\')|("[^"]*")|(-?([0-9][0-9]*)(\\.\\d+)?)|true|false|null|undefined|Object|Array|Math|Date|JSON|([#]*)([^\\s.,[\\]()]+))';
+nj.textTag = 'nj-text';
+nj.textMode = false;
 /* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(11)))
 
 /***/ }),
@@ -1991,7 +1993,7 @@ var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = [
 var preAsts = __WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */].preAsts;
 
 var SPLIT_FLAG = '_nj_split';
-var TEXT_CONTENT = ['style', 'script', 'textarea', 'xmp'];
+var TEXT_CONTENT = ['style', 'script', 'textarea', 'xmp', __WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */].textTag];
 var OMITTED_CLOSE_TAGS = __WEBPACK_IMPORTED_MODULE_2__transforms_transformElement__["a" /* OMITTED_CLOSE_TAGS */];
 
 //Compile string template
@@ -2045,6 +2047,9 @@ function compileStringTmpl(tmpl) {
     }, false, true);
 
     fullXml = _formatAll(fullXml, tmplRule);
+    if (__WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */].textMode && !outputH) {
+      fullXml = '<' + __WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */].textTag + '>' + fullXml + '</' + __WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */].textTag + '>';
+    }
 
     //Resolve string to element
     ret = _checkStringElem(fullXml, tmplRule);
@@ -2123,7 +2128,7 @@ function _checkStringElem(xml, tmplRule) {
       parent = null,
       pattern = tmplRule.checkElem,
       matchArr = void 0,
-      inTextContent = false,
+      inTextContent = void 0,
       omittedCloseElem = null;
 
   while (matchArr = pattern.exec(xml)) {
@@ -2171,9 +2176,9 @@ function _checkStringElem(xml, tmplRule) {
           var _isEx = __WEBPACK_IMPORTED_MODULE_2__transforms_transformElement__["i" /* isExAll */](elemName, tmplRule);
           if (elemName[0] === '/') {
             //Close tag
-            if (TEXT_CONTENT.indexOf(elemName.substr(1).toLowerCase()) > -1) {
+            if (elemName.substr(1).toLowerCase() === inTextContent) {
               //取消纯文本子节点标记
-              inTextContent = false;
+              inTextContent = null;
             }
 
             if (_isEx || !inTextContent) {
@@ -2199,9 +2204,10 @@ function _checkStringElem(xml, tmplRule) {
                 //img等可不闭合标签
                 omittedCloseElem = [elem, elemName, elemParams, textAfter];
               } else {
-                if (TEXT_CONTENT.indexOf(elemName.toLowerCase()) > -1) {
+                var elemNameL = elemName.toLowerCase();
+                if (TEXT_CONTENT.indexOf(elemNameL) > -1) {
                   //标记该标签为纯文本子节点
-                  inTextContent = true;
+                  inTextContent = elemNameL;
                 }
 
                 parent = current;
@@ -2451,7 +2457,8 @@ function registerComponent(name, component) {
   var delimiters = configs.delimiters,
       includeParser = configs.includeParser,
       createElement = configs.createElement,
-      outputH = configs.outputH;
+      outputH = configs.outputH,
+      textMode = configs.textMode;
 
   if (delimiters) {
     Object(__WEBPACK_IMPORTED_MODULE_1__utils_createTmplRule__["a" /* default */])(delimiters, true);
@@ -2467,6 +2474,10 @@ function registerComponent(name, component) {
 
   if (outputH != null) {
     __WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */].outputH = outputH;
+  }
+
+  if (textMode != null) {
+    __WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */].textMode = textMode;
   }
 });;
 
@@ -2631,7 +2642,7 @@ __WEBPACK_IMPORTED_MODULE_1__utils_tools__["c" /* assign */](__WEBPACK_IMPORTED_
 
 
 
-var NO_SPLIT_NEWLINE = ['style', 'script', 'textarea', 'pre', 'xmp', 'template', 'noscript'];
+var NO_SPLIT_NEWLINE = ['style', 'script', 'textarea', 'pre', 'xmp', 'template', 'noscript', __WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */].textTag];
 
 function _plainTextNode(obj, parent, parentContent, noSplitNewline, tmplRule) {
   var node = {};
@@ -3579,14 +3590,18 @@ function _buildRender(node, parent, nodeType, retType, params, fns, level, useSt
           retStr = '\'\\n\' + ';
         }
 
-        retStr += levelSpace + _buildLevelSpaceRt(useStringF, isFirst || noLevel) + '\'<\' + _type' + params._type + ' + ' + (params._params != null ? '_params' + params._params + ' + ' : '');
-        if (!params._selfClose) {
-          retStr += '\'>\'';
-          retStr += ' + _children' + params._children + ' + ';
-          retStr += (!content || allowNewline || noLevel ? '' : '\'\\n\' + ') + (content ? levelSpace : '') + //如果子节点为空则不输出缩进空格和换行符
-          _buildLevelSpaceRt(useStringF, noLevel) + '\'</\' + _type' + params._type + ' + \'>\'';
+        if (node.type !== __WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */].textTag) {
+          retStr += levelSpace + _buildLevelSpaceRt(useStringF, isFirst || noLevel) + '\'<\' + _type' + params._type + ' + ' + (params._params != null ? '_params' + params._params + ' + ' : '');
+          if (!params._selfClose) {
+            retStr += '\'>\'';
+            retStr += ' + _children' + params._children + ' + ';
+            retStr += (!content || allowNewline || noLevel ? '' : '\'\\n\' + ') + (content ? levelSpace : '') + //如果子节点为空则不输出缩进空格和换行符
+            _buildLevelSpaceRt(useStringF, noLevel) + '\'</\' + _type' + params._type + ' + \'>\'';
+          } else {
+            retStr += '\' />\'';
+          }
         } else {
-          retStr += '\' />\'';
+          retStr += '_children' + params._children;
         }
       }
       break;

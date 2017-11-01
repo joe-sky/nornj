@@ -413,9 +413,19 @@ describe('test compile string', function() {
       // console.log('\n4:\n', fns.fn4.toString());
       //console.log(JSON.stringify(nj.asts['tmplString']));
 
-      const tmplTest3 = nj`
-      <nj-text>
-      <script>
+      nj.config({ textMode: true });
+      const tmplTest3 = 
+nj`<template>
+  <div>1</div>
+</template>
+
+<style>
+  .a {
+    margin-left: 100px;
+  }
+</style>
+
+<script>
         function test() {
           console.log(1);
 
@@ -435,11 +445,10 @@ describe('test compile string', function() {
 
           var scriptUrl = '<script src="'+prefix+'/resources/app/pages/'+path+'index.js">' + '<' + '/script>';
         }
-      </script>
-      </nj-text>
-      `;
+</script>`;
 
-      var html = tmplTest3.apply(null, data);
+      //var html = tmplTest3.apply(null, data);
+      var html = nj.compile(tmplTest3)(data);
       // var html2 = tmplTest.call(null, { id: 200, c1: 100 }, data[0]);
       console.log(html);
       expect(html).toBeTruthy();

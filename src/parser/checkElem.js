@@ -9,7 +9,8 @@ const NO_SPLIT_NEWLINE = [
   'pre',
   'xmp',
   'template',
-  'noscript'
+  'noscript',
+  nj.textTag
 ];
 
 function _plainTextNode(obj, parent, parentContent, noSplitNewline, tmplRule) {

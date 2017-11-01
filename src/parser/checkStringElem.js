@@ -7,7 +7,8 @@ const TEXT_CONTENT = [
   'style',
   'script',
   'textarea',
-  'xmp'
+  'xmp',
+  nj.textTag
 ];
 const { OMITTED_CLOSE_TAGS } = tranElem;
 
@@ -56,6 +57,9 @@ export default function compileStringTmpl(tmpl) {
     }, false, true);
 
     fullXml = _formatAll(fullXml, tmplRule);
+    if (nj.textMode && !outputH) {
+      fullXml = '<' + nj.textTag + '>' + fullXml + '</' + nj.textTag + '>';
+    }
 
     //Resolve string to element
     ret = _checkStringElem(fullXml, tmplRule);
@@ -134,7 +138,7 @@ function _checkStringElem(xml, tmplRule) {
     parent = null,
     pattern = tmplRule.checkElem,
     matchArr,
-    inTextContent = false,
+    inTextContent,
     omittedCloseElem = null;
 
   while (matchArr = pattern.exec(xml)) {
@@ -177,13 +181,13 @@ function _checkStringElem(xml, tmplRule) {
         } else {
           const isEx = tranElem.isExAll(elemName, tmplRule);
           if (elemName[0] === '/') { //Close tag
-            if (TEXT_CONTENT.indexOf(elemName.substr(1).toLowerCase()) > -1) { //取消纯文本子节点标记
-              inTextContent = false;
+            if (elemName.substr(1).toLowerCase() === inTextContent) { //取消纯文本子节点标记
+              inTextContent = null;
             }
 
             if (isEx || !inTextContent) {
               const cName = current.elemName;
-              if (cName.indexOf(SPLIT_FLAG) < 0 ? (elemName === '/' + cName) : (elemName.indexOf(SPLIT_FLAG) > -1)) {  //如果开始标签包含SPLIT_FLAG，则只要结束标签包含SPLIT_FLAG就认为该标签已关闭
+              if (cName.indexOf(SPLIT_FLAG) < 0 ? (elemName === '/' + cName) : (elemName.indexOf(SPLIT_FLAG) > -1)) { //如果开始标签包含SPLIT_FLAG，则只要结束标签包含SPLIT_FLAG就认为该标签已关闭
                 current = current.parent;
               }
             } else {
@@ -200,8 +204,9 @@ function _checkStringElem(xml, tmplRule) {
               if (!inTextContent && OMITTED_CLOSE_TAGS[elemName.toLowerCase()]) { //img等可不闭合标签
                 omittedCloseElem = [elem, elemName, elemParams, textAfter];
               } else {
-                if (TEXT_CONTENT.indexOf(elemName.toLowerCase()) > -1) { //标记该标签为纯文本子节点
-                  inTextContent = true;
+                const elemNameL = elemName.toLowerCase();
+                if (TEXT_CONTENT.indexOf(elemNameL) > -1) { //标记该标签为纯文本子节点
+                  inTextContent = elemNameL;
                 }
 
                 parent = current;

@@ -5,7 +5,8 @@ export default function (configs) {
   const delimiters = configs.delimiters,
     includeParser = configs.includeParser,
     createElement = configs.createElement,
-    outputH = configs.outputH;
+    outputH = configs.outputH,
+    textMode = configs.textMode;
 
   if(delimiters) {
     createTmplRule(delimiters, true);
@@ -21,5 +22,9 @@ export default function (configs) {
 
   if(outputH != null) {
     nj.outputH = outputH;
+  }
+
+  if(textMode != null) {
+    nj.textMode = textMode;
   }
 };

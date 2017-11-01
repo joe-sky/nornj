@@ -577,7 +577,7 @@ function _buildNode(node, parent, fns, counter, retType, level, useStringLocal, 
 
     fnStr += paramsStr + dataReferStr;
 
-    if (process.env.NODE_ENV !== 'production') {  //如果扩展标签不存在则打印警告信息
+    if (process.env.NODE_ENV !== 'production') { //如果扩展标签不存在则打印警告信息
       fnStr += 'p1.tf(_ex' + _exC + ', \'' + node.ex + '\', \'ex\');\n';
     }
 
@@ -685,14 +685,18 @@ function _buildRender(node, parent, nodeType, retType, params, fns, level, useSt
           retStr = '\'\\n\' + ';
         }
 
-        retStr += levelSpace + _buildLevelSpaceRt(useStringF, isFirst || noLevel) + '\'<\' + _type' + params._type + ' + ' + (params._params != null ? '_params' + params._params + ' + ' : '');
-        if (!params._selfClose) {
-          retStr += '\'>\'';
-          retStr += ' + _children' + params._children + ' + ';
-          retStr += (!content || allowNewline || noLevel ? '' : '\'\\n\' + ') + (content ? levelSpace : '') + //如果子节点为空则不输出缩进空格和换行符
-            _buildLevelSpaceRt(useStringF, noLevel) + '\'</\' + _type' + params._type + ' + \'>\'';
+        if (node.type !== nj.textTag) {
+          retStr += levelSpace + _buildLevelSpaceRt(useStringF, isFirst || noLevel) + '\'<\' + _type' + params._type + ' + ' + (params._params != null ? '_params' + params._params + ' + ' : '');
+          if (!params._selfClose) {
+            retStr += '\'>\'';
+            retStr += ' + _children' + params._children + ' + ';
+            retStr += (!content || allowNewline || noLevel ? '' : '\'\\n\' + ') + (content ? levelSpace : '') + //如果子节点为空则不输出缩进空格和换行符
+              _buildLevelSpaceRt(useStringF, noLevel) + '\'</\' + _type' + params._type + ' + \'>\'';
+          } else {
+            retStr += '\' />\'';
+          }
         } else {
-          retStr += '\' />\'';
+          retStr += '_children' + params._children;
         }
       }
       break;
