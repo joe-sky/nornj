@@ -430,7 +430,7 @@ nj`<template>
           console.log(1);
 
           <#if {{true}}>var reg = /\\n+/;</#if>
-          var a = '{{@lt + 'test' + @gt}}';
+          var a = '{{@lt + ('test'.length|int()) + @gt}}';
 
           if(i < 10) {
             return;

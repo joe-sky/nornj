@@ -1657,7 +1657,7 @@ var FN_FILTER_LOOKUP = {
   ')': ')_(',
   ']': ']_('
 };
-var REGEX_FN_FILTER = /(\)|\]|\.([^\s'"._#()]+))[\s]*\(/g;
+var REGEX_FN_FILTER = /(\)|\]|\.([^\s'"._#()|]+))[\s]*\(/g;
 var REGEX_SPACE_FILTER = /[(,]/g;
 var REGEX_FIX_FILTER = /(\|)?(([._#]\()|[\s]+([^\s._#|]+[\s]*\())/g;
 

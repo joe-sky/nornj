@@ -162,7 +162,7 @@ console.log(html);
 使用npm安装:
 
 ```sh
-npm install nornj
+npm install nornj@latest
 ```
 
 ## 示例项目

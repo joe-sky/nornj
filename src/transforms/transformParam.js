@@ -104,7 +104,7 @@ const FN_FILTER_LOOKUP = {
   ')': ')_(',
   ']': ']_('
 };
-const REGEX_FN_FILTER = /(\)|\]|\.([^\s'"._#()]+))[\s]*\(/g;
+const REGEX_FN_FILTER = /(\)|\]|\.([^\s'"._#()|]+))[\s]*\(/g;
 const REGEX_SPACE_FILTER = /[(,]/g;
 const REGEX_FIX_FILTER = /(\|)?(([._#]\()|[\s]+([^\s._#|]+[\s]*\())/g;
 
