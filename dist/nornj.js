@@ -363,6 +363,10 @@ function _replace$(str) {
   return str.replace(/\$/g, '\\$');
 }
 
+function _replaceMinus(str) {
+  return str.replace(/\-/g, '\\-');
+}
+
 function createTmplRule() {
   var rules = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
   var isGlobal = arguments[1];
@@ -418,10 +422,10 @@ function createTmplRule() {
     commentRule = comment;
   }
 
-  var allRules = _clearRepeat(startRule + endRule),
-      firstChar = startRule[0],
+  var firstChar = startRule[0],
       lastChar = endRule[endRule.length - 1],
-      extensionRules = _clearRepeat(extensionRule + propRule + strPropRule + tagSpRule),
+      allRules = firstChar + lastChar,
+      extensionRules = _replaceMinus(_clearRepeat(extensionRule + propRule + strPropRule + tagSpRule)),
       escapeExtensionRule = _replace$(extensionRule),
       escapePropRule = _replace$(propRule),
       escapeStrPropRule = _replace$(strPropRule);
@@ -447,7 +451,7 @@ function createTmplRule() {
     extension: _createRegExp('^' + escapeExtensionRule + '([^\\s]+)', 'i'),
     exAll: _createRegExp('^([/]?)(' + escapeExtensionRule + '|' + escapeStrPropRule + escapePropRule + '|' + escapePropRule + ')([^\\s]+)', 'i'),
     include: _createRegExp('<' + escapeExtensionRule + 'include([^>]*)>', 'ig'),
-    newlineSplit: _createRegExp('\\n(?![^' + firstChar + lastChar + ']*' + lastChar + ')', 'g'),
+    newlineSplit: _createRegExp('\\n(?![^' + allRules + ']*' + lastChar + ')', 'g'),
     incompleteStart: _createRegExp('[' + firstChar + ']?' + startRule + '[^' + allRules + ']*$'),
     incompleteEnd: _createRegExp('^[^' + allRules + ']*' + endRule + '[' + lastChar + ']?')
   };
@@ -1885,15 +1889,17 @@ function getInsideBraceParam(obj, tmplRule) {
 }
 
 //判断扩展标签并返回参数
-function isEx(obj, tmplRule, isAll) {
+function isEx(obj, tmplRule, noParams) {
   var ret = void 0,
       ret1 = tmplRule.extension.exec(obj);
   if (ret1) {
     ret = [ret1[1]];
 
-    var params = getOpenTagParams(obj, tmplRule); //提取各参数
-    if (params) {
-      ret.push(params);
+    if (!noParams) {
+      var params = getOpenTagParams(obj, tmplRule); //提取各参数
+      if (params) {
+        ret.push(params);
+      }
     }
   }
 
@@ -2271,7 +2277,7 @@ function _transformToEx(isStr, elemName, elemParams, tmplRule) {
 function _setElem(elem, elemName, elemParams, elemArr, bySelfClose, tmplRule) {
   var ret = void 0,
       paramsEx = void 0;
-  if (elemName[0] === tmplRule.extensionRule) {
+  if (__WEBPACK_IMPORTED_MODULE_2__transforms_transformElement__["h" /* isEx */](elemName, tmplRule, true)) {
     ret = elem.substring(1, elem.length - 1);
   } else if (__WEBPACK_IMPORTED_MODULE_2__transforms_transformElement__["l" /* isStrPropS */](elemName, tmplRule)) {
     ret = _transformToEx(true, elemName, elemParams, tmplRule);

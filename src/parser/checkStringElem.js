@@ -260,7 +260,7 @@ function _transformToEx(isStr, elemName, elemParams, tmplRule) {
 //Set element node
 function _setElem(elem, elemName, elemParams, elemArr, bySelfClose, tmplRule) {
   let ret, paramsEx;
-  if (elemName[0] === tmplRule.extensionRule) {
+  if (tranElem.isEx(elemName, tmplRule, true)) {
     ret = elem.substring(1, elem.length - 1);
   } else if (tranElem.isStrPropS(elemName, tmplRule)) {
     ret = _transformToEx(true, elemName, elemParams, tmplRule);

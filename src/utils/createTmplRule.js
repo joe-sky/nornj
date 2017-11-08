@@ -26,6 +26,10 @@ function _replace$(str) {
   return str.replace(/\$/g, '\\$');
 }
 
+function _replaceMinus(str) {
+  return str.replace(/\-/g, '\\-');
+}
+
 export default function createTmplRule(rules = {}, isGlobal) {
   let {
     startRule = '{{',
@@ -74,10 +78,10 @@ export default function createTmplRule(rules = {}, isGlobal) {
     commentRule = comment;
   }
 
-  const allRules = _clearRepeat(startRule + endRule),
-    firstChar = startRule[0],
+  const firstChar = startRule[0],
     lastChar = endRule[endRule.length - 1],
-    extensionRules = _clearRepeat(extensionRule + propRule + strPropRule + tagSpRule),
+    allRules = firstChar + lastChar,
+    extensionRules = _replaceMinus(_clearRepeat(extensionRule + propRule + strPropRule + tagSpRule)),
     escapeExtensionRule = _replace$(extensionRule),
     escapePropRule = _replace$(propRule),
     escapeStrPropRule = _replace$(strPropRule);
@@ -103,7 +107,7 @@ export default function createTmplRule(rules = {}, isGlobal) {
     extension: _createRegExp('^' + escapeExtensionRule + '([^\\s]+)', 'i'),
     exAll: _createRegExp('^([/]?)(' + escapeExtensionRule + '|' + escapeStrPropRule + escapePropRule + '|' + escapePropRule + ')([^\\s]+)', 'i'),
     include: _createRegExp('<' + escapeExtensionRule + 'include([^>]*)>', 'ig'),
-    newlineSplit: _createRegExp('\\n(?![^' + firstChar + lastChar + ']*' + lastChar + ')', 'g'),
+    newlineSplit: _createRegExp('\\n(?![^' + allRules + ']*' + lastChar + ')', 'g'),
     incompleteStart: _createRegExp('[' + firstChar + ']?' + startRule + '[^' + allRules + ']*$'),
     incompleteEnd: _createRegExp('^[^' + allRules + ']*' + endRule + '[' + lastChar + ']?')
   };

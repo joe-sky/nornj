@@ -413,7 +413,15 @@ describe('test compile string', function() {
       // console.log('\n4:\n', fns.fn4.toString());
       //console.log(JSON.stringify(nj.asts['tmplString']));
 
-      nj.config({ textMode: true });
+      nj.config({
+        textMode: true,
+        delimiters: {
+          start: '{%',
+          end: '%}',
+          extension: '$$',
+          prop: '##'
+        }
+      });
       const tmplTest3 = 
 nj`<template>
   <div>1</div>
@@ -429,14 +437,14 @@ nj`<template>
         function test() {
           console.log(1);
 
-          <#if {{true}}>var reg = /\\n+/;</#if>
-          var a = '{{@lt + ('test'.length|int()) + @gt}}';
+          <$$if {%true%}>var reg = /\\n+/;</$$if>
+          var a = '{%@lt + ('test%'.length|int()) + @gt%}';
 
           if(i < 10) {
             return;
           }
 
-          var num = <#each><#arg>{{list(1, 2, 3)}}</#arg>{{this}}</#each>;
+          var num = <$$each><$$arg>{%list(1, 2, 3)%}</$$arg><##moreValues /><$$if {%@last|!%}>{%this%}</$$if></$$each>;
 
           function test2() {
             console.log('    <div  >a<img    />  b  </div>  <div>  '
@@ -447,7 +455,7 @@ nj`<template>
         }
 </script>`;
 
-      //var html = tmplTest3.apply(null, data);
+      //var html = tmplTest.apply(null, data);
       var html = nj.compile(tmplTest3)(data);
       // var html2 = tmplTest.call(null, { id: 200, c1: 100 }, data[0]);
       console.log(html);

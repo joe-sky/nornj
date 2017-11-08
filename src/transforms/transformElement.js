@@ -91,14 +91,16 @@ export function getInsideBraceParam(obj, tmplRule) {
 }
 
 //判断扩展标签并返回参数
-export function isEx(obj, tmplRule, isAll) {
+export function isEx(obj, tmplRule, noParams) {
   let ret, ret1 = tmplRule.extension.exec(obj);
   if (ret1) {
     ret = [ret1[1]];
 
-    const params = getOpenTagParams(obj, tmplRule); //提取各参数
-    if (params) {
-      ret.push(params);
+    if (!noParams) {
+      const params = getOpenTagParams(obj, tmplRule); //提取各参数
+      if (params) {
+        ret.push(params);
+      }
     }
   }
 
