@@ -435,7 +435,7 @@ nj`<template>
 
 <script>
         function test() {
-          console.log({%props .. 'n2'%});
+          console.log({%props.('n2')%});
 
           <$$if {%true%}>var reg = /\\n+/;</$$if>
           var a = '{%@lt + ('test%'.length|int()) + @gt%}';
