@@ -4,7 +4,7 @@ import '../helpers/filter';
 
 //Get compiled property
 const REGEX_JS_PROP = new RegExp(nj.regexJsBase + '([^\\s()]*)');
-const REGEX_REPLACE_CHAR = /_njQs(\d)_/g;
+const REGEX_REPLACE_CHAR = /_njQs(\d)\$/g;
 
 function _compiledProp(prop, innerBrackets, innerQuotes) {
   let ret = tools.obj();
@@ -90,10 +90,10 @@ function _getFilterParam(obj) {
 }
 
 //Extract replace parameters
-const REGEX_LT_GT = /_nj(L|G)t_/g;
+const REGEX_LT_GT = /_nj(L|G)t\$/g;
 const LT_GT_LOOKUP = {
-  '_njLt_': '<',
-  '_njGt_': '>'
+  '_njLt$': '<',
+  '_njGt$': '>'
 };
 const REGEX_QUOTE = /"[^"]*"|'[^']*'/g;
 const SP_FILTER_LOOKUP = {
@@ -128,7 +128,7 @@ function _getReplaceParam(obj, tmplRule, innerQuotes) {
     prop = prop.replace(REGEX_LT_GT, match => LT_GT_LOOKUP[match])
       .replace(REGEX_QUOTE, match => {
         innerQuotes.push(match);
-        return '_njQs' + (innerQuotes.length - 1) + '_';
+        return '_njQs' + (innerQuotes.length - 1) + '$';
       })
       .replace(REGEX_SP_FILTER, (all, g1, match) => ' ' + SP_FILTER_LOOKUP[match] + ' ')
       .replace(nj.regexTransOpts, function() {
@@ -173,7 +173,7 @@ export function compiledParam(value, tmplRule) {
     isAll = false; //此处指替换符是否占满整个属性值;若无替换符时为false
 
   if (isStr) { //替换插值变量以外的文本中的换行符
-    strs = strs.map(str => str.replace(/\n/g, '_njNl_').replace(/\r/g, ''));
+    strs = strs.map(str => str.replace(/\n/g, '_njNl$').replace(/\r/g, ''));
   }
 
   //If have placehorder

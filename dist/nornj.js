@@ -1460,7 +1460,7 @@ function registerFilter(name, filter, options) {
 }
 
 function _getRegexTransopts(opts) {
-  return new RegExp('[\\s]+(' + opts.replace(/\+|\*|\?/g, function (match) {
+  return new RegExp('[\\s]+(' + opts.replace(/\+|\*|\?|\./g, function (match) {
     return '\\' + match;
   }) + ')[\\s]+' + __WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */].regexJsBase + '([^\\s,()]*)', 'g');
 }
@@ -1558,7 +1558,7 @@ Object(__WEBPACK_IMPORTED_MODULE_1__tools__["c" /* assign */])(__WEBPACK_IMPORTE
 
 //Get compiled property
 var REGEX_JS_PROP = new RegExp(__WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */].regexJsBase + '([^\\s()]*)');
-var REGEX_REPLACE_CHAR = /_njQs(\d)_/g;
+var REGEX_REPLACE_CHAR = /_njQs(\d)\$/g;
 
 function _compiledProp(prop, innerBrackets, innerQuotes) {
   var ret = __WEBPACK_IMPORTED_MODULE_1__utils_tools__["o" /* obj */]();
@@ -1647,10 +1647,10 @@ function _getFilterParam(obj) {
 }
 
 //Extract replace parameters
-var REGEX_LT_GT = /_nj(L|G)t_/g;
+var REGEX_LT_GT = /_nj(L|G)t\$/g;
 var LT_GT_LOOKUP = {
-  '_njLt_': '<',
-  '_njGt_': '>'
+  '_njLt$': '<',
+  '_njGt$': '>'
 };
 var REGEX_QUOTE = /"[^"]*"|'[^']*'/g;
 var SP_FILTER_LOOKUP = {
@@ -1663,7 +1663,7 @@ var FN_FILTER_LOOKUP = {
 };
 var REGEX_FN_FILTER = /(\)|\]|\.([^\s'"._#()|]+))[\s]*\(/g;
 var REGEX_SPACE_FILTER = /[(,]/g;
-var REGEX_FIX_FILTER = /(\|)?(([._#]\()|[\s]+([^\s._#|]+[\s]*\())/g;
+var REGEX_FIX_FILTER = /(\|)?(([._#]+\()|[\s]+([^\s._#|]+[\s]*\())/g;
 
 function _getReplaceParam(obj, tmplRule, innerQuotes) {
   var pattern = tmplRule.replaceParam,
@@ -1688,7 +1688,7 @@ function _getReplaceParam(obj, tmplRule, innerQuotes) {
       return LT_GT_LOOKUP[match];
     }).replace(REGEX_QUOTE, function (match) {
       innerQuotes.push(match);
-      return '_njQs' + (innerQuotes.length - 1) + '_';
+      return '_njQs' + (innerQuotes.length - 1) + '$';
     }).replace(REGEX_SP_FILTER, function (all, g1, match) {
       return ' ' + SP_FILTER_LOOKUP[match] + ' ';
     }).replace(__WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */].regexTransOpts, function () {
@@ -1736,7 +1736,7 @@ function compiledParam(value, tmplRule) {
   if (isStr) {
     //替换插值变量以外的文本中的换行符
     strs = strs.map(function (str) {
-      return str.replace(/\n/g, '_njNl_').replace(/\r/g, '');
+      return str.replace(/\n/g, '_njNl$').replace(/\r/g, '');
     });
   }
 
@@ -2255,8 +2255,8 @@ function _checkStringElem(xml, tmplRule) {
 }
 
 var LT_GT_LOOKUP = {
-  '<': '_njLt_',
-  '>': '_njGt_'
+  '<': '_njLt$',
+  '>': '_njGt$'
 };
 var REGEX_LT_GT = />|</g;
 
@@ -3162,7 +3162,7 @@ function _buildEscape(valueStr, fns, escape, special) {
 }
 
 function _replaceStrs(str) {
-  return _replaceBackslash(str).replace(/_njNl_/g, '\\n').replace(/'/g, "\\'");
+  return _replaceBackslash(str).replace(/_njNl\$/g, '\\n').replace(/'/g, "\\'");
 }
 
 function _replaceBackslash(str) {

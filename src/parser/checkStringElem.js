@@ -242,8 +242,8 @@ function _checkStringElem(xml, tmplRule) {
 }
 
 const LT_GT_LOOKUP = {
-  '<': '_njLt_',
-  '>': '_njGt_'
+  '<': '_njLt$',
+  '>': '_njGt$'
 };
 const REGEX_LT_GT = />|</g;
 
