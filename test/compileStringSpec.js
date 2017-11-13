@@ -435,7 +435,7 @@ nj`<template>
 
 <script>
         function test() {
-          console.log(1);
+          console.log({%props .. 'n2'%});
 
           <$$if {%true%}>var reg = /\\n+/;</$$if>
           var a = '{%@lt + ('test%'.length|int()) + @gt%}';
@@ -456,7 +456,7 @@ nj`<template>
 </script>`;
 
       //var html = tmplTest.apply(null, data);
-      var html = nj.compile(tmplTest3)(data);
+      var html = nj.compile(tmplTest3).apply(null, data);
       // var html2 = tmplTest.call(null, { id: 200, c1: 100 }, data[0]);
       console.log(html);
       expect(html).toBeTruthy();
