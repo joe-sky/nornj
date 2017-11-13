@@ -106,7 +106,7 @@ const FN_FILTER_LOOKUP = {
 };
 const REGEX_FN_FILTER = /(\)|\]|\.([^\s'"._#()|]+))[\s]*\(/g;
 const REGEX_SPACE_FILTER = /[(,]/g;
-const REGEX_FIX_FILTER = /(\|)?(([._#]\()|[\s]+([^\s._#|]+[\s]*\())/g;
+const REGEX_FIX_FILTER = /(\|)?(([._#]+\()|[\s]+([^\s._#|]+[\s]*\())/g;
 
 function _getReplaceParam(obj, tmplRule, innerQuotes) {
   let pattern = tmplRule.replaceParam,
