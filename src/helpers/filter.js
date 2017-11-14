@@ -120,14 +120,13 @@ export const filters = {
   css: cssText => styleProps(cssText),
 
   //Generate array by two positive integers,closed interval 
-  '..':(val1, val2) =>  _getArrayByNum(val1,val2),
+  '..': _getArrayByNum(1),
 
   //Generate array by two positive integers,right open interval
-  rLt:(val1, val2) =>  _getArrayByNum(val1,val2,false),
+  rLt: _getArrayByNum(0),
 
   //Compare two number or letter 
   '<=>':(val1, val2) => {
-
         if(val1 > val2 ){
           return 1;
         } else if(val1 == val2){
@@ -138,12 +137,10 @@ export const filters = {
   }
 };
 
-function _getArrayByNum(start,end,isContainEnd  = true){
-  let length  = end - start;
-  if(isContainEnd){
-    length += 1;
-  }
-  return Object.keys(Array.apply(null, {length:length })).map( (item) => +item);
+function _getArrayByNum(isContainEnd){
+  return function(val1, val2){
+    return Object.keys(Array.apply(null, {length:val2- val1 + isContainEnd })).map( (item) => +item);
+  };
 }
 
 function _config(params) {
