@@ -97,9 +97,10 @@ const LT_GT_LOOKUP = {
 };
 const REGEX_QUOTE = /"[^"]*"|'[^']*'/g;
 const SP_FILTER_LOOKUP = {
-  '||': 'or'
+  '||': 'or',
+  '..<': 'rLt'
 };
-const REGEX_SP_FILTER = /[\s]+((\|\|)[\s]*)/g;
+const REGEX_SP_FILTER = /[\s]+((\|\||\.\.<)[\s]*)/g;
 const FN_FILTER_LOOKUP = {
   ')': ')_(',
   ']': ']_('

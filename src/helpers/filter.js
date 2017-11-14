@@ -117,8 +117,34 @@ export const filters = {
   reg: (pattern, flags) => new RegExp(pattern, flags),
 
   //Transform css string to object
-  css: cssText => styleProps(cssText)
+  css: cssText => styleProps(cssText),
+
+  //Generate array by two positive integers,closed interval 
+  '..':(val1, val2) =>  _getArrayByNum(val1,val2),
+
+  //Generate array by two positive integers,right open interval
+  rLt:(val1, val2) =>  _getArrayByNum(val1,val2,false),
+
+  //Compare two number or letter 
+  '<=>':(val1, val2) => {
+
+        if(val1 > val2 ){
+          return 1;
+        } else if(val1 == val2){
+          return 0;
+        } else {
+          return -1;
+        }
+  }
 };
+
+function _getArrayByNum(start,end,isContainEnd  = true){
+  let length  = end - start;
+  if(isContainEnd){
+    length += 1;
+  }
+  return Object.keys(Array.apply(null, {length:length })).map( (item) => +item);
+}
 
 function _config(params) {
   let ret = {
@@ -167,7 +193,10 @@ export const filterConfig = {
   ':': _config(_defaultCfgO),
   list: _config(_defaultCfg),
   reg: _config(_defaultCfg),
-  css: _config(_defaultCfg)
+  css: _config(_defaultCfg),
+  '..': _config(_defaultCfgO),
+  rLt: _config(_defaultCfgO),
+  '<=>': _config(_defaultCfgO)
 };
 
 //Filter alias
