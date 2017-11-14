@@ -126,20 +126,20 @@ export const filters = {
   rLt: _getArrayByNum(0),
 
   //Compare two number or letter 
-  '<=>':(val1, val2) => {
-        if(val1 > val2 ){
-          return 1;
-        } else if(val1 == val2){
-          return 0;
-        } else {
-          return -1;
-        }
+  '<=>': (val1, val2) => {
+    if (val1 > val2) {
+      return 1;
+    } else if (val1 == val2) {
+      return 0;
+    } else {
+      return -1;
+    }
   }
 };
 
-function _getArrayByNum(isContainEnd){
-  return function(val1, val2){
-    return Object.keys(Array.apply(null, {length:val2- val1 + isContainEnd })).map( (item) => +item);
+function _getArrayByNum(isContainEnd) {
+  return function(val1, val2) {
+    return Object.keys(Array.apply(null, { length: val2 - val1 + isContainEnd })).map(item => +item + val1);
   };
 }
 
@@ -222,7 +222,7 @@ export function registerFilter(name, filter, options) {
       }
       filterConfig[name] = _config(options);
 
-      if(options && options.transOperator) {
+      if (options && options.transOperator) {
         _REGEX_TRANSOPTS += '|' + name;
         nj.regexTransOpts = _getRegexTransopts(_REGEX_TRANSOPTS);
       }
@@ -236,7 +236,7 @@ function _getRegexTransopts(opts) {
 
 let _REGEX_TRANSOPTS = '';
 tools.each(filterConfig, (v, k) => {
-  if(v.transOperator) {
+  if (v.transOperator) {
     _REGEX_TRANSOPTS += '|' + k;
   }
 });
