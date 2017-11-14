@@ -91,4 +91,16 @@ describe('filter', () => {
   it('_(method)', () => {
     expect(render("{{ 'abc'.substr(1) }}")).toBe('bc');
   });
+
+  it('..', () => {
+    expect(render("{{  0 .. 5 .('length') }}")).toBe(6);
+  });
+  it('..>', () => {
+    expect(render("{{  0 ..< 5 .('length') }}")).toBe(5);
+  });
+
+  it('<=>', () => {
+    expect(render("{{  2 <=> 1  }}")).toBe(1);
+  });
+
 });
