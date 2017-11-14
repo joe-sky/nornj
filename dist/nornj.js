@@ -1370,8 +1370,33 @@ var filters = {
   //Transform css string to object
   css: function css(cssText) {
     return Object(__WEBPACK_IMPORTED_MODULE_2__transforms_transformData__["c" /* styleProps */])(cssText);
+  },
+
+  //Generate array by two positive integers,closed interval 
+  '..': _getArrayByNum(1),
+
+  //Generate array by two positive integers,right open interval
+  rLt: _getArrayByNum(0),
+
+  //Compare two number or letter 
+  '<=>': function _(val1, val2) {
+    if (val1 > val2) {
+      return 1;
+    } else if (val1 == val2) {
+      return 0;
+    } else {
+      return -1;
+    }
   }
 };
+
+function _getArrayByNum(isContainEnd) {
+  return function (val1, val2) {
+    return Object.keys(Array.apply(null, { length: val2 - val1 + isContainEnd })).map(function (item) {
+      return +item + val1;
+    });
+  };
+}
 
 function _config(params) {
   var ret = {
@@ -1420,7 +1445,10 @@ var filterConfig = {
   ':': _config(_defaultCfgO),
   list: _config(_defaultCfg),
   reg: _config(_defaultCfg),
-  css: _config(_defaultCfg)
+  css: _config(_defaultCfg),
+  '..': _config(_defaultCfgO),
+  rLt: _config(_defaultCfgO),
+  '<=>': _config(_defaultCfgO)
 };
 
 //Filter alias
@@ -1654,9 +1682,10 @@ var LT_GT_LOOKUP = {
 };
 var REGEX_QUOTE = /"[^"]*"|'[^']*'/g;
 var SP_FILTER_LOOKUP = {
-  '||': 'or'
+  '||': 'or',
+  '..<': 'rLt'
 };
-var REGEX_SP_FILTER = /[\s]+((\|\|)[\s]*)/g;
+var REGEX_SP_FILTER = /[\s]+((\|\||\.\.<)[\s]*)/g;
 var FN_FILTER_LOOKUP = {
   ')': ')_(',
   ']': ']_('

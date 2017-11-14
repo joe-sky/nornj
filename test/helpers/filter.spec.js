@@ -95,6 +95,7 @@ describe('filter', () => {
   it('..', () => {
     expect(render("{{  0 .. 5 .('length') }}")).toBe(6);
   });
+
   it('..>', () => {
     expect(render("{{  0 ..< 5 .('length') }}")).toBe(5);
   });
@@ -102,5 +103,4 @@ describe('filter', () => {
   it('<=>', () => {
     expect(render("{{  2 <=> 1  }}")).toBe(1);
   });
-
 });
