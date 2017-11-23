@@ -165,6 +165,12 @@ console.log(html);
 npm install nornj@latest
 ```
 
+## 相关项目
+
+* [nornj-react(React适配库)](https://github.com/joe-sky/nornj-react)
+* [nornj-loader(Webpack loader)](https://github.com/joe-sky/nornj-loader)
+* [nornj-cli(脚手架工具)](https://github.com/joe-sky/nornj-cli)
+
 ## 示例项目
 
 * [react-redux-nornj-todomvc](https://github.com/joe-sky/nornj/blob/master/examples/react-redux-nornj-todomvc)
