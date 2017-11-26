@@ -115,7 +115,8 @@ describe('test compile string', function() {
                             g: 'efg'
                           }
                         }
-                      }
+                      },
+                      _test_: 'test'
                     },
                     {
                       name1: 'joe_sky1',
@@ -250,7 +251,7 @@ describe('test compile string', function() {
           <img src="test1.png">
         </textarea>
       </#once>
-      <${'img'} src="test1.png">
+      <${'img'} src="test1.png" />
       <img src="test1.png">
         <#prop {{'id'}}>img</#prop>
         <@id1>img1</@id1>
@@ -348,6 +349,8 @@ describe('test compile string', function() {
       {{Date.now()}} + {{Math.max(Math.max(10 + 1, 1), 2 + 20, 3)}}
       <img src="test1.png" a="{{1 + (5 ** 2) + 'abc ' + a.c.d}}" b="{{{'1 + 5'}}}" c="{{ false ? 1 }}">
       {{fns[0]('fns[0]()')}}
+      {{ -10 ..< 10 }}
+      <#each {{list}}>{{ ../_test_.slice(1) }}</#each>
       `;
 
       //console.log(tmplTest._njTmpl);
@@ -455,8 +458,8 @@ nj`<template>
         }
 </script>`;
 
-      //var html = tmplTest.apply(null, data);
-      var html = nj.compile(tmplTest3).apply(null, data);
+      var html = tmplTest.apply(null, data);
+      //var html = nj.compile(tmplTest3).apply(null, data);
       // var html2 = tmplTest.call(null, { id: 200, c1: 100 }, data[0]);
       console.log(html);
       expect(html).toBeTruthy();

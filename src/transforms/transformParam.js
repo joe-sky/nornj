@@ -4,7 +4,7 @@ import '../helpers/filter';
 
 //Get compiled property
 const REGEX_JS_PROP = new RegExp(nj.regexJsBase + '([^\\s()]*)');
-const REGEX_REPLACE_CHAR = /_njQs(\d)\$/g;
+const REGEX_REPLACE_CHAR = /_njQs(\d)_/g;
 
 function _compiledProp(prop, innerBrackets, innerQuotes) {
   let ret = tools.obj();
@@ -90,10 +90,10 @@ function _getFilterParam(obj) {
 }
 
 //Extract replace parameters
-const REGEX_LT_GT = /_nj(L|G)t\$/g;
+const REGEX_LT_GT = /_nj(L|G)t_/g;
 const LT_GT_LOOKUP = {
-  '_njLt$': '<',
-  '_njGt$': '>'
+  '_njLt_': '<',
+  '_njGt_': '>'
 };
 const REGEX_QUOTE = /"[^"]*"|'[^']*'/g;
 const SP_FILTER_LOOKUP = {
@@ -107,7 +107,7 @@ const FN_FILTER_LOOKUP = {
 };
 const REGEX_FN_FILTER = /(\)|\]|\.([^\s'"._#()|]+))[\s]*\(/g;
 const REGEX_SPACE_FILTER = /[(,]/g;
-const REGEX_FIX_FILTER = /(\|)?(([._#]+\()|[\s]+([^\s._#|]+[\s]*\())/g;
+const REGEX_FIX_FILTER = /(\|)?(((\.+|_|#+)\()|[\s]+([^\s._#|]+[\s]*\())/g;
 
 function _getReplaceParam(obj, tmplRule, innerQuotes) {
   let pattern = tmplRule.replaceParam,
@@ -129,7 +129,7 @@ function _getReplaceParam(obj, tmplRule, innerQuotes) {
     prop = prop.replace(REGEX_LT_GT, match => LT_GT_LOOKUP[match])
       .replace(REGEX_QUOTE, match => {
         innerQuotes.push(match);
-        return '_njQs' + (innerQuotes.length - 1) + '$';
+        return '_njQs' + (innerQuotes.length - 1) + '_';
       })
       .replace(REGEX_SP_FILTER, (all, g1, match) => ' ' + SP_FILTER_LOOKUP[match] + ' ')
       .replace(nj.regexTransOpts, function() {
@@ -138,9 +138,7 @@ function _getReplaceParam(obj, tmplRule, innerQuotes) {
       })
       .replace(REGEX_FN_FILTER, (all, match, g1) => !g1 ? FN_FILTER_LOOKUP[match] : '.(\'' + g1 + '\')_(')
       .replace(REGEX_SPACE_FILTER, all => all + ' ')
-      .replace(REGEX_FIX_FILTER, (all, g1, g2, g3, g4) => {
-        return (g1 ? all : ' | ' + (g3 ? g3 : g4));
-      });
+      .replace(REGEX_FIX_FILTER, (all, g1, g2, g3, g4, g5) => g1 ? all : ' | ' + (g3 ? g3 : g5));
       
     item[2] = prop.trim();
     ret.push(item);
@@ -174,7 +172,7 @@ export function compiledParam(value, tmplRule) {
     isAll = false; //此处指替换符是否占满整个属性值;若无替换符时为false
 
   if (isStr) { //替换插值变量以外的文本中的换行符
-    strs = strs.map(str => str.replace(/\n/g, '_njNl$').replace(/\r/g, ''));
+    strs = strs.map(str => str.replace(/\n/g, '_njNl_').replace(/\r/g, ''));
   }
 
   //If have placehorder
