@@ -61,6 +61,10 @@
 
 如上例，`NornJ`的语法在可以展现一定逻辑性的同时结构与html几乎一致，而且`if`、`each`、`>`、`<=`等都是支持自定义扩展的模板语法！^_^
 
+## 在线演示地址
+
+* [在线Playground(jsfiddle)](https://jsfiddle.net/joe_sky/n5n9tutj/)
+
 ## 特色
 
 传统js模板引擎如`Handlebars`、`EJS`等通常只支持渲染html字符串，`NornJ`与它们相比，相同点和不同点都有：
