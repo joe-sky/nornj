@@ -3336,7 +3336,7 @@ function _buildParams(node, fns, counter, useString, level, exPropsStr, subExPro
           if (i == 0) {
             keys += '{ ';
           }
-          keys += k + ': 1';
+          keys += '\'' + k + '\': 1';
 
           if (i < l - 1) {
             keys += ', ';

@@ -351,6 +351,7 @@ describe('test compile string', function() {
       {{fns[0]('fns[0]()')}}
       {{ -10 ..< 10 }}
       <#each {{list}}>{{ ../_test_.slice(1) }}</#each>
+      <div data-auto name="1"><@id>1</@id></div>
       `;
 
       //console.log(tmplTest._njTmpl);
