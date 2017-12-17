@@ -335,7 +335,7 @@ describe('test compile string', function() {
       </#each>
       <$if {a.('length')}>1</$if>
       {{{a.c.d.substr(1) + ("a,(b)" + (@sq)) + 'a,b'}}}
-      {{list(list(JSON.stringify(obj('a' : '1', 'b' : 2)), 2))}}
+      {{[[JSON.stringify(obj('a' : '1', 'b' : 2)), 2]]}}
       {{reg('^[abc]$', 'i').('test')('A')}}
       {{#f1}}
       <${'div'}>
@@ -351,7 +351,8 @@ describe('test compile string', function() {
       {{fns[0]('fns[0]()')}}
       {{ -10 ..< 10 }}
       <#each {{list}}>{{ ../_test_.slice(1) }}</#each>
-      <div data-auto name="1"><@id>1</@id></div>
+      <div data-auto :name="1 + props.n2 + ({ a: 20, b: ({ c: 50 }) }.('b').('c'))" :name2="1 > 2"><@id>1</@id></div>
+      {{'123'[1]['length'] + ([[[-1, 0], 1], 2, 3])}}
       `;
 
       //console.log(tmplTest._njTmpl);

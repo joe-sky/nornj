@@ -44,7 +44,7 @@ export function getOpenTagParams(tag, tmplRule) {
     matchArr, ret;
 
   while ((matchArr = pattern.exec(tag))) {
-    const key = matchArr[1];
+    let key = matchArr[1];
     if (key === '/') { //If match to the last of "/", then continue the loop.
       continue;
     }
@@ -70,10 +70,18 @@ export function getOpenTagParams(tag, tmplRule) {
       }
     }
 
+    //Transform special key
+    let hasColon;
+    if(key[0] === ':') {
+      key = key.substr(1);
+      hasColon = true;
+    }
+
     ret.push({
       key,
       value,
-      onlyBrace
+      onlyBrace,
+      hasColon
     });
   }
 

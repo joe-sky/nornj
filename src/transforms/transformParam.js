@@ -108,41 +108,68 @@ const FN_FILTER_LOOKUP = {
 const REGEX_FN_FILTER = /(\)|\]|\.([^\s'"._#()|]+))[\s]*\(/g;
 const REGEX_SPACE_FILTER = /[(,]/g;
 const REGEX_FIX_FILTER = /(\|)?(((\.+|_|#+)\()|[\s]+([^\s._#|]+[\s]*\())/g;
+const REGEX_ARRPROP_FILTER = /([^\s([,])((\[[^[\]]+\])+)/g;
+const REGEX_REPLACE_ARRPROP = /_njAp(\d)_/g;
+const ARR_OBJ_FILTER_LOOKUP = {
+  '[': 'list(',
+  ']': ')',
+  '{': 'obj(',
+  '}': ')'
+};
+const REGEX_ARR_OBJ_FILTER = /\[|\]|\{|\}/g;
+const REGEX_OBJKEY_FILTER = /[\s]+([^\s:,'"]+):/g;
 
-function _getReplaceParam(obj, tmplRule, innerQuotes) {
+function _getProp(matchArr, innerQuotes, i) {
+  let prop = ' ' + matchArr[2],
+    item = [matchArr[0], matchArr[1], null, true],
+    innerArrProp = [];
+
+  if (i > 0) {
+    item[3] = false; //Sign not contain all of placehorder
+  }
+
+  //替换特殊过滤器名称并且为简化过滤器补全"|"符
+  prop = prop.replace(REGEX_LT_GT, match => LT_GT_LOOKUP[match])
+    .replace(REGEX_QUOTE, match => {
+      innerQuotes.push(match);
+      return '_njQs' + (innerQuotes.length - 1) + '_';
+    })
+    .replace(REGEX_ARRPROP_FILTER, (all, g1, g2) => {
+      innerArrProp.push(g2);
+      return g1 + '_njAp' + (innerArrProp.length - 1) + '_';
+    })
+    .replace(REGEX_ARR_OBJ_FILTER, match => ARR_OBJ_FILTER_LOOKUP[match])
+    .replace(REGEX_OBJKEY_FILTER, (all, g1) => ' \'' + g1 + '\' : ')
+    .replace(REGEX_REPLACE_ARRPROP, (all, g1) => innerArrProp[g1])
+    .replace(REGEX_SP_FILTER, (all, g1, match) => ' ' + SP_FILTER_LOOKUP[match] + ' ')
+    .replace(nj.regexTransOpts, function() {
+      const args = arguments;
+      return ' ' + args[1] + '(' + args[2] + (args[10] != null ? args[10] : '') + ')';
+    })
+    .replace(REGEX_FN_FILTER, (all, match, g1) => !g1 ? FN_FILTER_LOOKUP[match] : '.(\'' + g1 + '\')_(')
+    .replace(REGEX_SPACE_FILTER, all => all + ' ')
+    .replace(REGEX_FIX_FILTER, (all, g1, g2, g3, g4, g5) => g1 ? all : ' | ' + (g3 ? g3 : g5));
+
+  item[2] = prop.trim();
+  return item;
+}
+
+function _getReplaceParam(obj, tmplRule, innerQuotes, hasColon) {
   let pattern = tmplRule.replaceParam,
     matchArr, ret, i = 0;
 
-  while ((matchArr = pattern.exec(obj))) {
-    if (!ret) {
-      ret = [];
+  if (!hasColon) {
+    while ((matchArr = pattern.exec(obj))) {
+      if (!ret) {
+        ret = [];
+      }
+
+      ret.push(_getProp(matchArr, innerQuotes, i));
+      i++;
     }
-
-    let prop = ' ' + matchArr[2],
-      item = [matchArr[0], matchArr[1], null, true];
-
-    if (i > 0) {
-      item[3] = false; //Sign not contain all of placehorder
-    }
-
-    //替换特殊过滤器名称并且为简化过滤器补全"|"符
-    prop = prop.replace(REGEX_LT_GT, match => LT_GT_LOOKUP[match])
-      .replace(REGEX_QUOTE, match => {
-        innerQuotes.push(match);
-        return '_njQs' + (innerQuotes.length - 1) + '_';
-      })
-      .replace(REGEX_SP_FILTER, (all, g1, match) => ' ' + SP_FILTER_LOOKUP[match] + ' ')
-      .replace(nj.regexTransOpts, function() {
-        const args = arguments;
-        return ' ' + args[1] + '(' + args[2] + (args[10] != null ? args[10] : '') + ')';
-      })
-      .replace(REGEX_FN_FILTER, (all, match, g1) => !g1 ? FN_FILTER_LOOKUP[match] : '.(\'' + g1 + '\')_(')
-      .replace(REGEX_SPACE_FILTER, all => all + ' ')
-      .replace(REGEX_FIX_FILTER, (all, g1, g2, g3, g4, g5) => g1 ? all : ' | ' + (g3 ? g3 : g5));
-      
-    item[2] = prop.trim();
-    ret.push(item);
-    i++;
+  } else {
+    matchArr = [obj, tmplRule.startRule, obj];
+    ret = [_getProp(matchArr, innerQuotes, i)];
   }
 
   return ret;
@@ -164,10 +191,10 @@ function _replaceInnerBrackets(prop, counter, innerBrackets) {
 }
 
 //Get compiled parameter
-export function compiledParam(value, tmplRule) {
+export function compiledParam(value, tmplRule, hasColon) {
   let ret = tools.obj(),
     isStr = tools.isString(value),
-    strs = isStr ? value.split(tmplRule.replaceSplit) : [value],
+    strs = isStr ? (!hasColon ? value.split(tmplRule.replaceSplit) : ['', '']) : [value],
     props = null,
     isAll = false; //此处指替换符是否占满整个属性值;若无替换符时为false
 
@@ -178,7 +205,7 @@ export function compiledParam(value, tmplRule) {
   //If have placehorder
   if (strs.length > 1) {
     const innerQuotes = [];
-    const params = _getReplaceParam(value, tmplRule, innerQuotes);
+    const params = _getReplaceParam(value, tmplRule, innerQuotes, hasColon);
     props = [];
 
     tools.each(params, param => {

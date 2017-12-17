@@ -1693,47 +1693,76 @@ var FN_FILTER_LOOKUP = {
 var REGEX_FN_FILTER = /(\)|\]|\.([^\s'"._#()|]+))[\s]*\(/g;
 var REGEX_SPACE_FILTER = /[(,]/g;
 var REGEX_FIX_FILTER = /(\|)?(((\.+|_|#+)\()|[\s]+([^\s._#|]+[\s]*\())/g;
+var REGEX_ARRPROP_FILTER = /([^\s([,])((\[[^[\]]+\])+)/g;
+var REGEX_REPLACE_ARRPROP = /_njAp(\d)_/g;
+var ARR_OBJ_FILTER_LOOKUP = {
+  '[': 'list(',
+  ']': ')',
+  '{': 'obj(',
+  '}': ')'
+};
+var REGEX_ARR_OBJ_FILTER = /\[|\]|\{|\}/g;
+var REGEX_OBJKEY_FILTER = /[\s]+([^\s:,'"]+):/g;
 
-function _getReplaceParam(obj, tmplRule, innerQuotes) {
+function _getProp(matchArr, innerQuotes, i) {
+  var prop = ' ' + matchArr[2],
+      item = [matchArr[0], matchArr[1], null, true],
+      innerArrProp = [];
+
+  if (i > 0) {
+    item[3] = false; //Sign not contain all of placehorder
+  }
+
+  //替换特殊过滤器名称并且为简化过滤器补全"|"符
+  prop = prop.replace(REGEX_LT_GT, function (match) {
+    return LT_GT_LOOKUP[match];
+  }).replace(REGEX_QUOTE, function (match) {
+    innerQuotes.push(match);
+    return '_njQs' + (innerQuotes.length - 1) + '_';
+  }).replace(REGEX_ARRPROP_FILTER, function (all, g1, g2) {
+    innerArrProp.push(g2);
+    return g1 + '_njAp' + (innerArrProp.length - 1) + '_';
+  }).replace(REGEX_ARR_OBJ_FILTER, function (match) {
+    return ARR_OBJ_FILTER_LOOKUP[match];
+  }).replace(REGEX_OBJKEY_FILTER, function (all, g1) {
+    return ' \'' + g1 + '\' : ';
+  }).replace(REGEX_REPLACE_ARRPROP, function (all, g1) {
+    return innerArrProp[g1];
+  }).replace(REGEX_SP_FILTER, function (all, g1, match) {
+    return ' ' + SP_FILTER_LOOKUP[match] + ' ';
+  }).replace(__WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */].regexTransOpts, function () {
+    var args = arguments;
+    return ' ' + args[1] + '(' + args[2] + (args[10] != null ? args[10] : '') + ')';
+  }).replace(REGEX_FN_FILTER, function (all, match, g1) {
+    return !g1 ? FN_FILTER_LOOKUP[match] : '.(\'' + g1 + '\')_(';
+  }).replace(REGEX_SPACE_FILTER, function (all) {
+    return all + ' ';
+  }).replace(REGEX_FIX_FILTER, function (all, g1, g2, g3, g4, g5) {
+    return g1 ? all : ' | ' + (g3 ? g3 : g5);
+  });
+
+  item[2] = prop.trim();
+  return item;
+}
+
+function _getReplaceParam(obj, tmplRule, innerQuotes, hasColon) {
   var pattern = tmplRule.replaceParam,
       matchArr = void 0,
       ret = void 0,
       i = 0;
 
-  while (matchArr = pattern.exec(obj)) {
-    if (!ret) {
-      ret = [];
+  if (!hasColon) {
+    while (matchArr = pattern.exec(obj)) {
+      if (!ret) {
+        ret = [];
+      }
+
+      ret.push(_getProp(matchArr, innerQuotes, i));
+      i++;
     }
-
-    var prop = ' ' + matchArr[2],
-        item = [matchArr[0], matchArr[1], null, true];
-
-    if (i > 0) {
-      item[3] = false; //Sign not contain all of placehorder
-    }
-
-    //替换特殊过滤器名称并且为简化过滤器补全"|"符
-    prop = prop.replace(REGEX_LT_GT, function (match) {
-      return LT_GT_LOOKUP[match];
-    }).replace(REGEX_QUOTE, function (match) {
-      innerQuotes.push(match);
-      return '_njQs' + (innerQuotes.length - 1) + '_';
-    }).replace(REGEX_SP_FILTER, function (all, g1, match) {
-      return ' ' + SP_FILTER_LOOKUP[match] + ' ';
-    }).replace(__WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */].regexTransOpts, function () {
-      var args = arguments;
-      return ' ' + args[1] + '(' + args[2] + (args[10] != null ? args[10] : '') + ')';
-    }).replace(REGEX_FN_FILTER, function (all, match, g1) {
-      return !g1 ? FN_FILTER_LOOKUP[match] : '.(\'' + g1 + '\')_(';
-    }).replace(REGEX_SPACE_FILTER, function (all) {
-      return all + ' ';
-    }).replace(REGEX_FIX_FILTER, function (all, g1, g2, g3, g4, g5) {
-      return g1 ? all : ' | ' + (g3 ? g3 : g5);
-    });
-
-    item[2] = prop.trim();
-    ret.push(item);
-    i++;
+  } else {
+    matchArr = [obj, tmplRule.startRule, obj];
+    ret = [_getProp(matchArr, innerQuotes, i)];
   }
 
   return ret;
@@ -1755,10 +1784,10 @@ function _replaceInnerBrackets(prop, counter, innerBrackets) {
 }
 
 //Get compiled parameter
-function compiledParam(value, tmplRule) {
+function compiledParam(value, tmplRule, hasColon) {
   var ret = __WEBPACK_IMPORTED_MODULE_1__utils_tools__["o" /* obj */](),
       isStr = __WEBPACK_IMPORTED_MODULE_1__utils_tools__["m" /* isString */](value),
-      strs = isStr ? value.split(tmplRule.replaceSplit) : [value],
+      strs = isStr ? !hasColon ? value.split(tmplRule.replaceSplit) : ['', ''] : [value],
       props = null,
       isAll = false; //此处指替换符是否占满整个属性值;若无替换符时为false
 
@@ -1772,7 +1801,7 @@ function compiledParam(value, tmplRule) {
   //If have placehorder
   if (strs.length > 1) {
     var innerQuotes = [];
-    var params = _getReplaceParam(value, tmplRule, innerQuotes);
+    var params = _getReplaceParam(value, tmplRule, innerQuotes, hasColon);
     props = [];
 
     __WEBPACK_IMPORTED_MODULE_1__utils_tools__["g" /* each */](params, function (param) {
@@ -1897,10 +1926,18 @@ function getOpenTagParams(tag, tmplRule) {
       }
     }
 
+    //Transform special key
+    var hasColon = void 0;
+    if (key[0] === ':') {
+      key = key.substr(1);
+      hasColon = true;
+    }
+
     ret.push({
       key: key,
       value: value,
-      onlyBrace: onlyBrace
+      onlyBrace: onlyBrace,
+      hasColon: hasColon
     });
   }
 
@@ -2291,8 +2328,8 @@ var REGEX_LT_GT = />|</g;
 
 function _formatAll(str, tmplRule) {
   var commentRule = tmplRule.commentRule;
-  return str.replace(new RegExp('<!--' + commentRule + '[\\s\\S]*?' + commentRule + '-->', 'g'), '').replace(new RegExp(tmplRule.startRule + '[^' + tmplRule.endRule + ']*' + tmplRule.endRule, 'g'), function (all) {
-    return all.replace(REGEX_LT_GT, function (match) {
+  return str.replace(new RegExp('<!--' + commentRule + '[\\s\\S]*?' + commentRule + '-->', 'g'), '').replace(new RegExp('([\\s]+:[^\\s=>]+=(\'[^\']+\')|("[^"]+"))|(' + tmplRule.startRule + '[^' + tmplRule.endRule + ']*' + tmplRule.endRule + ')', 'g'), function (all, g1, g2, g3, g4) {
+    return (g1 ? g1 : g4).replace(REGEX_LT_GT, function (match) {
       return LT_GT_LOOKUP[match];
     });
   });
@@ -2781,7 +2818,7 @@ function checkElem(obj, parent, tmplRule, hasExProps, noSplitNewline, isLast) {
             return;
           }
 
-          var paramV = __WEBPACK_IMPORTED_MODULE_2__transforms_transformParam__["a" /* compiledParam */](value, tmplRule);
+          var paramV = __WEBPACK_IMPORTED_MODULE_2__transforms_transformParam__["a" /* compiledParam */](value, tmplRule, param.hasColon);
           if (param.onlyBrace) {
             //提取匿名参数
             node.args.push(paramV);
@@ -2822,7 +2859,7 @@ function checkElem(obj, parent, tmplRule, hasExProps, noSplitNewline, isLast) {
 
           __WEBPACK_IMPORTED_MODULE_1__utils_tools__["g" /* each */](tagParams, function (param) {
             //The parameter like "{prop}" needs to be replaced.
-            node.params[param.onlyBrace ? param.onlyBrace.replace(/\.\.\//g, '') : param.key] = __WEBPACK_IMPORTED_MODULE_2__transforms_transformParam__["a" /* compiledParam */](param.value, tmplRule);
+            node.params[param.onlyBrace ? param.onlyBrace.replace(/\.\.\//g, '') : param.key] = __WEBPACK_IMPORTED_MODULE_2__transforms_transformParam__["a" /* compiledParam */](param.value, tmplRule, param.hasColon);
           }, false, true);
         }
 
