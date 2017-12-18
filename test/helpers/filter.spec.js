@@ -103,4 +103,12 @@ describe('filter', () => {
   it('<=>', () => {
     expect(render("{{  2 <=> 1  }}")).toBe(1);
   });
+
+  it('array', () => {
+    expect(render("{{['1'[0]['length'], '123'[1], '345'[0], ['4567'['length'], 5].join('-')].join('-')}}")).toBe('1-2-3-4-5');
+  });
+
+  it('object', () => {
+    expect(render(`<img :src="{ src: 'http://test.com/img.png' }.('src')">`)).toBe('<img src="http://test.com/img.png" />');
+  });
 });

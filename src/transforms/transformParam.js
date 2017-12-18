@@ -117,7 +117,7 @@ const ARR_OBJ_FILTER_LOOKUP = {
   '}': ')'
 };
 const REGEX_ARR_OBJ_FILTER = /\[|\]|\{|\}/g;
-const REGEX_OBJKEY_FILTER = /[\s]+([^\s:,'"]+):/g;
+const REGEX_OBJKEY_FILTER = /[\s]+([^\s:,'"()]+):/g;
 
 function _getProp(matchArr, innerQuotes, i) {
   let prop = ' ' + matchArr[2],

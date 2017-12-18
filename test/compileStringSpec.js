@@ -347,7 +347,7 @@ describe('test compile string', function() {
       </${'div'}>
       <#e1>111</#e1>
       {{Date.now()}} + {{Math.max(Math.max(10 + 1, 1), 2 + 20, 3)}}
-      <img src="test1.png" a="{{1 + (5 ** 2) + 'abc ' + a.c.d}}" b="{{{'1 + 5'}}}" c="{{ false ? 1 }}">
+      <img src="test1.png" a="{{1 + (5 ** 2) + 'abc ' + a.c.d}}" b="{{{'1 + 5'}}}" c="{{ false ? 1 }}" alt="">
       {{fns[0]('fns[0]()')}}
       {{ -10 ..< 10 }}
       <#each {{list}}>{{ ../_test_.slice(1) }}</#each>

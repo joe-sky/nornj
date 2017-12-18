@@ -1702,7 +1702,7 @@ var ARR_OBJ_FILTER_LOOKUP = {
   '}': ')'
 };
 var REGEX_ARR_OBJ_FILTER = /\[|\]|\{|\}/g;
-var REGEX_OBJKEY_FILTER = /[\s]+([^\s:,'"]+):/g;
+var REGEX_OBJKEY_FILTER = /[\s]+([^\s:,'"()]+):/g;
 
 function _getProp(matchArr, innerQuotes, i) {
   var prop = ' ' + matchArr[2],
@@ -2328,8 +2328,8 @@ var REGEX_LT_GT = />|</g;
 
 function _formatAll(str, tmplRule) {
   var commentRule = tmplRule.commentRule;
-  return str.replace(new RegExp('<!--' + commentRule + '[\\s\\S]*?' + commentRule + '-->', 'g'), '').replace(new RegExp('([\\s]+:[^\\s=>]+=(\'[^\']+\')|("[^"]+"))|(' + tmplRule.startRule + '[^' + tmplRule.endRule + ']*' + tmplRule.endRule + ')', 'g'), function (all, g1, g2, g3, g4) {
-    return (g1 ? g1 : g4).replace(REGEX_LT_GT, function (match) {
+  return str.replace(new RegExp('<!--' + commentRule + '[\\s\\S]*?' + commentRule + '-->', 'g'), '').replace(new RegExp('([\\s]+:[^\\s=>]+=((\'[^\']+\')|("[^"]+")))|(' + tmplRule.startRule + '[^' + tmplRule.endRule + ']*' + tmplRule.endRule + ')', 'g'), function (all, g1, g2, g3, g4, g5) {
+    return (g1 ? g1 : g5).replace(REGEX_LT_GT, function (match) {
       return LT_GT_LOOKUP[match];
     });
   });
