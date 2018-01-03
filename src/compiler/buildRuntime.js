@@ -205,7 +205,7 @@ function _buildPropData(obj, counter, fns, useStringLocal, level) {
         filterStrI = '',
         fnHVarStr;
 
-      if (isEmpty && i == 0) {
+      if (isEmpty && i == 0 && (!configF || !configF.hasOptions)) {
         hasOptions = false;
       }
 

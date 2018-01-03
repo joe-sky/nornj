@@ -334,7 +334,7 @@ describe('test compile string', function() {
                   #${nj`<span>1</span>`}
                 </div>`}
           #${nj`<div>{{../name3.substring(0, 3)}}</div>`}
-          <{{../sliderItem.('a')|tagName(1,2)}} no0="/" no1={{no}} no2="{{-0.05 | filter2}}" checked no='{{ ../sliderItem.b }}' />
+          <{{tagName(../sliderItem.('a'),1,2)}} no0="/" no1={{no}} no2="{{-0.05 | filter2}}" checked no='{{ ../sliderItem.b }}' />
         </slider>
       </#each>
       <$if {a.('length')}>1</$if>
