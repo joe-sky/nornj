@@ -205,6 +205,10 @@ function _buildPropData(obj, counter, fns, useStringLocal, level) {
         filterStrI = '',
         fnHVarStr;
 
+      if (isEmpty && i == 0) {
+        hasOptions = false;
+      }
+
       if (configF && configF.onlyGlobal) { //只能从全局获取
         filterStr += '\nvar ' + filterVarStr + ' = ' + globalFilterStr + ';\n';
       } else { //优先从p2.data中获取

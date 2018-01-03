@@ -1,7 +1,10 @@
-﻿var nj = require('../src/base').default,
+﻿'use strict';
+
+const nj = require('../src/base').default,
   _ = require('lodash'),
   compile = require('../src/compiler/compile').compile,
-  includeParser = require('../tools/includeParser');
+  includeParser = require('../tools/includeParser'),
+  moment = require('moment');
 
 describe('test compile string', function() {
       beforeAll(function() {
@@ -120,7 +123,8 @@ describe('test compile string', function() {
                     },
                     {
                       name1: 'joe_sky1',
-                      fns: [p => 'fn1' + p]
+                      fns: [p => 'fn1' + p],
+                      moment
                     }
                   ];
 
@@ -353,6 +357,7 @@ describe('test compile string', function() {
       <#each {{list}}>{{ ../_test_.slice(1) }}</#each>
       <div data-auto :name="1 + props.n2 + ({ a: 20, b: ({ c: 50 }) }.('b').('c'))" :name2="1 > 2"><@id>1</@id></div>
       {{'123'[1]['length'] + ([[[-1, 0], 1], 2, 3])}}
+      {{moment('2011-10-10', 'hh:mm:ss').format('hh:mm:ss')}}
       `;
 
       //console.log(tmplTest._njTmpl);

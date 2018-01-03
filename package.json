@@ -1,6 +1,6 @@
 {
   "name": "nornj",
-  "version": "0.4.2-rc.17",
+  "version": "0.4.2-rc.18",
   "description": "A multipurpose javascript template engine",
   "main": "lib/base.js",
   "files": [
@@ -53,6 +53,7 @@
     "karma-spec-reporter": "0.0.30",
     "karma-webpack": "^2.0.5",
     "lodash": "^4.13.1",
+    "moment": "^2.20.1",
     "react": "^15.6.2",
     "react-dom": "^15.6.2",
     "webpack": "^3.8.1",
