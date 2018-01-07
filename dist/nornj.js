@@ -1479,9 +1479,8 @@ function registerFilter(name, filter, options) {
       }
       filterConfig[name] = _config(_options);
 
-      if (_options && _options.transOperator) {
-        _REGEX_TRANSOPTS += '|' + name;
-        __WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */].regexTransOpts = _getRegexTransopts(_REGEX_TRANSOPTS);
+      if (_options && _options.transOperator && _REGEX_TRANSOPTS.indexOf(name) < 0) {
+        __WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */].regexTransOpts = _getRegexTransopts(_REGEX_TRANSOPTS.join('|'));
       }
     }
   }, false, false);
@@ -1493,19 +1492,18 @@ function _getRegexTransopts(opts) {
   }) + ')[\\s]+' + __WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */].regexJsBase + '([^\\s,()]*)', 'g');
 }
 
-var _REGEX_TRANSOPTS = '';
+var _REGEX_TRANSOPTS = [];
 __WEBPACK_IMPORTED_MODULE_1__utils_tools__["g" /* each */](filterConfig, function (v, k) {
   if (v.transOperator) {
-    _REGEX_TRANSOPTS += '|' + k;
+    _REGEX_TRANSOPTS.push(k);
   }
 });
-_REGEX_TRANSOPTS = _REGEX_TRANSOPTS.substr(1);
 
 __WEBPACK_IMPORTED_MODULE_1__utils_tools__["c" /* assign */](__WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */], {
   filters: filters,
   filterConfig: filterConfig,
   registerFilter: registerFilter,
-  regexTransOpts: _getRegexTransopts(_REGEX_TRANSOPTS)
+  regexTransOpts: _getRegexTransopts(_REGEX_TRANSOPTS.join('|'))
 });
 
 /***/ }),

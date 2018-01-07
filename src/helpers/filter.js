@@ -222,9 +222,8 @@ export function registerFilter(name, filter, options) {
       }
       filterConfig[name] = _config(options);
 
-      if (options && options.transOperator) {
-        _REGEX_TRANSOPTS += '|' + name;
-        nj.regexTransOpts = _getRegexTransopts(_REGEX_TRANSOPTS);
+      if (options && options.transOperator && _REGEX_TRANSOPTS.indexOf(name) < 0) {
+        nj.regexTransOpts = _getRegexTransopts(_REGEX_TRANSOPTS.join('|'));
       }
     }
   }, false, false);
@@ -234,17 +233,16 @@ function _getRegexTransopts(opts) {
   return new RegExp('[\\s]+(' + opts.replace(/\+|\*|\?|\./g, match => '\\' + match) + ')[\\s]+' + nj.regexJsBase + '([^\\s,()]*)', 'g');
 }
 
-let _REGEX_TRANSOPTS = '';
+const _REGEX_TRANSOPTS = [];
 tools.each(filterConfig, (v, k) => {
   if (v.transOperator) {
-    _REGEX_TRANSOPTS += '|' + k;
+    _REGEX_TRANSOPTS.push(k);
   }
 });
-_REGEX_TRANSOPTS = _REGEX_TRANSOPTS.substr(1);
 
 tools.assign(nj, {
   filters,
   filterConfig,
   registerFilter,
-  regexTransOpts: _getRegexTransopts(_REGEX_TRANSOPTS)
+  regexTransOpts: _getRegexTransopts(_REGEX_TRANSOPTS.join('|'))
 });
