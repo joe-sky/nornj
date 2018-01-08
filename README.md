@@ -166,7 +166,7 @@ console.log(html);
 使用npm安装:
 
 ```sh
-npm install nornj@latest
+npm install nornj
 ```
 
 ## 相关项目

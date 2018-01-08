@@ -1401,7 +1401,6 @@ function _getArrayByNum(isContainEnd) {
 function _config(params) {
   var ret = {
     onlyGlobal: false,
-    transOperator: false,
     hasOptions: true
   };
 
@@ -1411,44 +1410,43 @@ function _config(params) {
   return ret;
 }
 
-var _defaultCfg = { onlyGlobal: true, hasOptions: false },
-    _defaultCfgO = { onlyGlobal: true, transOperator: true, hasOptions: false };
+var _defaultCfg = { onlyGlobal: true, hasOptions: false };
 
 //Filter default config
 var filterConfig = {
   '.': _config(_defaultCfg),
   '_': _config({ onlyGlobal: true }),
   '#': _config({ onlyGlobal: true }),
-  '==': _config(_defaultCfgO),
-  '===': _config(_defaultCfgO),
-  '!=': _config(_defaultCfgO),
-  '!==': _config(_defaultCfgO),
-  '<': _config(_defaultCfgO),
-  '<=': _config(_defaultCfgO),
-  '>': _config(_defaultCfgO),
-  '>=': _config(_defaultCfgO),
-  '+': _config(_defaultCfgO),
-  '-': _config(_defaultCfgO),
-  '*': _config(_defaultCfgO),
-  '/': _config(_defaultCfgO),
-  '%': _config(_defaultCfgO),
-  '**': _config(_defaultCfgO),
+  '==': _config(_defaultCfg),
+  '===': _config(_defaultCfg),
+  '!=': _config(_defaultCfg),
+  '!==': _config(_defaultCfg),
+  '<': _config(_defaultCfg),
+  '<=': _config(_defaultCfg),
+  '>': _config(_defaultCfg),
+  '>=': _config(_defaultCfg),
+  '+': _config(_defaultCfg),
+  '-': _config(_defaultCfg),
+  '*': _config(_defaultCfg),
+  '/': _config(_defaultCfg),
+  '%': _config(_defaultCfg),
+  '**': _config(_defaultCfg),
   '//': _config(_defaultCfg),
-  '?': _config(_defaultCfgO),
+  '?': _config(_defaultCfg),
   '!': _config(_defaultCfg),
-  '&&': _config(_defaultCfgO),
-  or: _config(_defaultCfgO),
+  '&&': _config(_defaultCfg),
+  or: _config(_defaultCfg),
   int: _config(_defaultCfg),
   float: _config(_defaultCfg),
   bool: _config(_defaultCfg),
   obj: _config(_defaultCfg),
-  ':': _config(_defaultCfgO),
+  ':': _config(_defaultCfg),
   list: _config(_defaultCfg),
   reg: _config(_defaultCfg),
   css: _config(_defaultCfg),
-  '..': _config(_defaultCfgO),
-  rLt: _config(_defaultCfgO),
-  '<=>': _config(_defaultCfgO)
+  '..': _config(_defaultCfg),
+  rLt: _config(_defaultCfg),
+  '<=>': _config(_defaultCfg)
 };
 
 //Filter alias
@@ -1478,32 +1476,19 @@ function registerFilter(name, filter, options) {
         filters[name] = v;
       }
       filterConfig[name] = _config(_options);
-
-      if (_options && _options.transOperator && _REGEX_TRANSOPTS.indexOf(name) < 0) {
-        __WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */].regexTransOpts = _getRegexTransopts(_REGEX_TRANSOPTS.join('|'));
-      }
     }
   }, false, false);
 }
 
-function _getRegexTransopts(opts) {
-  return new RegExp('[\\s]+(' + opts.replace(/\+|\*|\?|\./g, function (match) {
-    return '\\' + match;
-  }) + ')[\\s]+' + __WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */].regexJsBase + '([^\\s,()]*)', 'g');
+function _getRegexTransopts() {
+  return new RegExp('[\\s]+([^\\s(),|"\']+)[\\s]+' + __WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */].regexJsBase + '([^\\s,()]*)', 'g');
 }
-
-var _REGEX_TRANSOPTS = [];
-__WEBPACK_IMPORTED_MODULE_1__utils_tools__["g" /* each */](filterConfig, function (v, k) {
-  if (v.transOperator) {
-    _REGEX_TRANSOPTS.push(k);
-  }
-});
 
 __WEBPACK_IMPORTED_MODULE_1__utils_tools__["c" /* assign */](__WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */], {
   filters: filters,
   filterConfig: filterConfig,
   registerFilter: registerFilter,
-  regexTransOpts: _getRegexTransopts(_REGEX_TRANSOPTS.join('|'))
+  regexTransOpts: _getRegexTransopts()
 });
 
 /***/ }),
@@ -1690,6 +1675,7 @@ var FN_FILTER_LOOKUP = {
 };
 var REGEX_FN_FILTER = /(\)|\]|\.([^\s'"._#()|]+))[\s]*\(/g;
 var REGEX_SPACE_FILTER = /[(,]/g;
+var REGEX_SPACE_S_FILTER = /([(,|])[\s]+/g;
 var REGEX_FIX_FILTER = /(\|)?(((\.+|_|#+)\()|[\s]+([^\s._#|]+[\s]*\())/g;
 var REGEX_ARRPROP_FILTER = /([^\s([,])((\[[^[\]]+\])+)/g;
 var REGEX_REPLACE_ARRPROP = /_njAp(\d)_/g;
@@ -1703,7 +1689,7 @@ var REGEX_ARR_OBJ_FILTER = /\[|\]|\{|\}/g;
 var REGEX_OBJKEY_FILTER = /[\s]+([^\s:,'"()]+):/g;
 
 function _getProp(matchArr, innerQuotes, i) {
-  var prop = ' ' + matchArr[2],
+  var prop = matchArr[2].trim(),
       item = [matchArr[0], matchArr[1], null, true],
       innerArrProp = [];
 
@@ -1728,10 +1714,14 @@ function _getProp(matchArr, innerQuotes, i) {
     return innerArrProp[g1];
   }).replace(REGEX_SP_FILTER, function (all, g1, match) {
     return ' ' + SP_FILTER_LOOKUP[match] + ' ';
+  }).replace(REGEX_SPACE_S_FILTER, function (all, match) {
+    return match;
   }).replace(__WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */].regexTransOpts, function () {
     var args = arguments;
     return ' ' + args[1] + '(' + args[2] + (args[10] != null ? args[10] : '') + ')';
-  }).replace(REGEX_FN_FILTER, function (all, match, g1) {
+  });
+  prop = ' ' + prop;
+  prop = prop.replace(REGEX_FN_FILTER, function (all, match, g1) {
     return !g1 ? FN_FILTER_LOOKUP[match] : '.(\'' + g1 + '\')_(';
   }).replace(REGEX_SPACE_FILTER, function (all) {
     return all + ' ';

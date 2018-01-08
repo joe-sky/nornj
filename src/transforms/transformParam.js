@@ -107,6 +107,7 @@ const FN_FILTER_LOOKUP = {
 };
 const REGEX_FN_FILTER = /(\)|\]|\.([^\s'"._#()|]+))[\s]*\(/g;
 const REGEX_SPACE_FILTER = /[(,]/g;
+const REGEX_SPACE_S_FILTER = /([(,|])[\s]+/g;
 const REGEX_FIX_FILTER = /(\|)?(((\.+|_|#+)\()|[\s]+([^\s._#|]+[\s]*\())/g;
 const REGEX_ARRPROP_FILTER = /([^\s([,])((\[[^[\]]+\])+)/g;
 const REGEX_REPLACE_ARRPROP = /_njAp(\d)_/g;
@@ -120,7 +121,7 @@ const REGEX_ARR_OBJ_FILTER = /\[|\]|\{|\}/g;
 const REGEX_OBJKEY_FILTER = /[\s]+([^\s:,'"()]+):/g;
 
 function _getProp(matchArr, innerQuotes, i) {
-  let prop = ' ' + matchArr[2],
+  let prop = matchArr[2].trim(),
     item = [matchArr[0], matchArr[1], null, true],
     innerArrProp = [];
 
@@ -142,11 +143,13 @@ function _getProp(matchArr, innerQuotes, i) {
     .replace(REGEX_OBJKEY_FILTER, (all, g1) => ' \'' + g1 + '\' : ')
     .replace(REGEX_REPLACE_ARRPROP, (all, g1) => innerArrProp[g1])
     .replace(REGEX_SP_FILTER, (all, g1, match) => ' ' + SP_FILTER_LOOKUP[match] + ' ')
+    .replace(REGEX_SPACE_S_FILTER, (all, match) => match)
     .replace(nj.regexTransOpts, function() {
       const args = arguments;
       return ' ' + args[1] + '(' + args[2] + (args[10] != null ? args[10] : '') + ')';
-    })
-    .replace(REGEX_FN_FILTER, (all, match, g1) => !g1 ? FN_FILTER_LOOKUP[match] : '.(\'' + g1 + '\')_(')
+    });
+  prop = ' ' + prop;
+  prop = prop.replace(REGEX_FN_FILTER, (all, match, g1) => !g1 ? FN_FILTER_LOOKUP[match] : '.(\'' + g1 + '\')_(')
     .replace(REGEX_SPACE_FILTER, all => all + ' ')
     .replace(REGEX_FIX_FILTER, (all, g1, g2, g3, g4, g5) => g1 ? all : ' | ' + (g3 ? g3 : g5));
 

@@ -146,7 +146,6 @@ function _getArrayByNum(isContainEnd) {
 function _config(params) {
   let ret = {
     onlyGlobal: false,
-    transOperator: false,
     hasOptions: true
   };
 
@@ -156,44 +155,43 @@ function _config(params) {
   return ret;
 }
 
-const _defaultCfg = { onlyGlobal: true, hasOptions: false },
-  _defaultCfgO = { onlyGlobal: true, transOperator: true, hasOptions: false };
+const _defaultCfg = { onlyGlobal: true, hasOptions: false };
 
 //Filter default config
 export const filterConfig = {
   '.': _config(_defaultCfg),
   '_': _config({ onlyGlobal: true }),
   '#': _config({ onlyGlobal: true }),
-  '==': _config(_defaultCfgO),
-  '===': _config(_defaultCfgO),
-  '!=': _config(_defaultCfgO),
-  '!==': _config(_defaultCfgO),
-  '<': _config(_defaultCfgO),
-  '<=': _config(_defaultCfgO),
-  '>': _config(_defaultCfgO),
-  '>=': _config(_defaultCfgO),
-  '+': _config(_defaultCfgO),
-  '-': _config(_defaultCfgO),
-  '*': _config(_defaultCfgO),
-  '/': _config(_defaultCfgO),
-  '%': _config(_defaultCfgO),
-  '**': _config(_defaultCfgO),
+  '==': _config(_defaultCfg),
+  '===': _config(_defaultCfg),
+  '!=': _config(_defaultCfg),
+  '!==': _config(_defaultCfg),
+  '<': _config(_defaultCfg),
+  '<=': _config(_defaultCfg),
+  '>': _config(_defaultCfg),
+  '>=': _config(_defaultCfg),
+  '+': _config(_defaultCfg),
+  '-': _config(_defaultCfg),
+  '*': _config(_defaultCfg),
+  '/': _config(_defaultCfg),
+  '%': _config(_defaultCfg),
+  '**': _config(_defaultCfg),
   '//': _config(_defaultCfg),
-  '?': _config(_defaultCfgO),
+  '?': _config(_defaultCfg),
   '!': _config(_defaultCfg),
-  '&&': _config(_defaultCfgO),
-  or: _config(_defaultCfgO),
+  '&&': _config(_defaultCfg),
+  or: _config(_defaultCfg),
   int: _config(_defaultCfg),
   float: _config(_defaultCfg),
   bool: _config(_defaultCfg),
   obj: _config(_defaultCfg),
-  ':': _config(_defaultCfgO),
+  ':': _config(_defaultCfg),
   list: _config(_defaultCfg),
   reg: _config(_defaultCfg),
   css: _config(_defaultCfg),
-  '..': _config(_defaultCfgO),
-  rLt: _config(_defaultCfgO),
-  '<=>': _config(_defaultCfgO)
+  '..': _config(_defaultCfg),
+  rLt: _config(_defaultCfg),
+  '<=>': _config(_defaultCfg)
 };
 
 //Filter alias
@@ -221,28 +219,17 @@ export function registerFilter(name, filter, options) {
         filters[name] = v;
       }
       filterConfig[name] = _config(options);
-
-      if (options && options.transOperator && _REGEX_TRANSOPTS.indexOf(name) < 0) {
-        nj.regexTransOpts = _getRegexTransopts(_REGEX_TRANSOPTS.join('|'));
-      }
     }
   }, false, false);
 }
 
-function _getRegexTransopts(opts) {
-  return new RegExp('[\\s]+(' + opts.replace(/\+|\*|\?|\./g, match => '\\' + match) + ')[\\s]+' + nj.regexJsBase + '([^\\s,()]*)', 'g');
+function _getRegexTransopts() {
+  return new RegExp('[\\s]+([^\\s(),|"\']+)[\\s]+' + nj.regexJsBase + '([^\\s,()]*)', 'g');
 }
-
-const _REGEX_TRANSOPTS = [];
-tools.each(filterConfig, (v, k) => {
-  if (v.transOperator) {
-    _REGEX_TRANSOPTS.push(k);
-  }
-});
 
 tools.assign(nj, {
   filters,
   filterConfig,
   registerFilter,
-  regexTransOpts: _getRegexTransopts(_REGEX_TRANSOPTS.join('|'))
+  regexTransOpts: _getRegexTransopts()
 });
