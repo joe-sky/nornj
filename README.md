@@ -64,6 +64,11 @@
 ## 在线演示地址
 
 * [在线Playground(jsfiddle)](https://jsfiddle.net/joe_sky/n5n9tutj/)
+* [在线Playground(codepen)](https://codepen.io/joe_sky/pen/ooPNbj)
+
+## 在线文档
+
+* [NornJ中文指南](https://joe-sky.gitbooks.io/nornj-guide/)
 
 ## 特色
 
