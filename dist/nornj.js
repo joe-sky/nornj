@@ -580,7 +580,7 @@ function getComputedData(fn, p2, level) {
   }
 }
 
-function getElement(name, p1, nameO, p2) {
+function getElement(name, p1, nameO, p2, subName) {
   var element = void 0;
   if (!p2.icp) {
     element = p1.cp[name];
@@ -589,6 +589,10 @@ function getElement(name, p1, nameO, p2) {
     if (!element) {
       element = p1.cp[name];
     }
+  }
+
+  if (subName != null && element) {
+    element = element[subName];
   }
 
   return element ? element : name;
@@ -3163,7 +3167,7 @@ function _buildPropData(obj, counter, fns, useStringLocal, level) {
         filterStr += '  ' + filterVarStr + ' = ' + globalFilterStr + ';\n';
         filterStr += '}\n';
       }
-      if (true) {
+      if (undefined !== 'production') {
         filterStr += 'if (!' + filterVarStr + ') {\n';
         filterStr += '  p1.wn(\'A filter called "' + o.name + '" is undefined.\');\n';
         filterStr += '} else {\n';
@@ -3191,7 +3195,7 @@ function _buildPropData(obj, counter, fns, useStringLocal, level) {
       }
       filterStr += _filterStr;
 
-      if (true) {
+      if (undefined !== 'production') {
         filterStr += '}';
       }
       filterStr += '\n';
@@ -3535,7 +3539,7 @@ function _buildNode(node, parent, fns, counter, retType, level, useStringLocal, 
 
     fnStr += paramsStr + dataReferStr;
 
-    if (true) {
+    if (undefined !== 'production') {
       //如果扩展标签不存在则打印警告信息
       fnStr += 'p1.tf(_ex' + _exC + ', \'' + node.ex + '\', \'ex\');\n';
     }
@@ -3568,8 +3572,17 @@ function _buildNode(node, parent, fns, counter, retType, level, useStringLocal, 
 
     var typeStr = void 0;
     if (!useStringF) {
-      var _typeL = _type.toLowerCase();
-      typeStr = _typeRefer ? 'p1.er(' + _typeRefer + ', \'' + _typeL + '\', p1, \'' + _type + '\', p2)' : 'p1.e(\'' + _typeL + '\', p1, \'' + _type + '\', p2)';
+      var _typeL = _type.toLowerCase(),
+          subName = '';
+
+      if (!_typeRefer && _typeL.indexOf('.') > -1) {
+        var typeS = _type.split('.');
+        _typeL = _typeL.split('.')[0];
+        _type = typeS[0];
+        subName = ', \'' + typeS[1] + '\'';
+      }
+
+      typeStr = _typeRefer ? 'p1.er(' + _typeRefer + ', \'' + _typeL + '\', p1, \'' + _type + '\', p2)' : 'p1.e(\'' + _typeL + '\', p1, \'' + _type + '\', p2' + subName + ')';
     } else {
       typeStr = _typeRefer ? 'p1.en(' + _typeRefer + ', \'' + _type + '\')' : '\'' + _type + '\'';
     }

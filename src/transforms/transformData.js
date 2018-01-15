@@ -86,7 +86,7 @@ export function getComputedData(fn, p2, level) {
   }
 }
 
-export function getElement(name, p1, nameO, p2) {
+export function getElement(name, p1, nameO, p2, subName) {
   let element;
   if (!p2.icp) {
     element = p1.cp[name];
@@ -95,6 +95,10 @@ export function getElement(name, p1, nameO, p2) {
     if (!element) {
       element = p1.cp[name];
     }
+  }
+
+  if(subName != null && element) {
+    element = element[subName];
   }
 
   return element ? element : name;

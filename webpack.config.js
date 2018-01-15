@@ -8,7 +8,7 @@ if (isProd) {
 }
 
 let plugins = [new webpack.DefinePlugin({
-  'process.env.NODE_ENV': JSON.stringify('development')
+  'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV)
 })];
 if (isProd) {
   plugins.push(new webpack.optimize.UglifyJsPlugin({
