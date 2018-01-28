@@ -170,6 +170,12 @@ export const extensions = {
     }, false, false);
   },
 
+  show: options => {
+    if (!options.result()) {
+      options.exProps.style = options.useString ? 'display:none' : { display: 'none' };
+    }
+  },
+
   'for': (start, end, options) => {
     if (end._njOpts) {
       options = end;
@@ -338,6 +344,7 @@ extensionConfig.block = _config(extensionConfig.obj);
 extensionConfig.pre = _config(extensionConfig.obj);
 extensionConfig.arg = _config(extensionConfig.prop);
 extensionConfig.once = _config(extensionConfig.obj);
+extensionConfig.show = _config(extensionConfig.prop);
 
 //Extension alias
 extensions['case'] = extensions.elseif;

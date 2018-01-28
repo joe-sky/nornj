@@ -971,6 +971,12 @@ var extensions = {
     }, false, false);
   },
 
+  show: function show(options) {
+    if (!options.result()) {
+      options.exProps.style = options.useString ? 'display:none' : { display: 'none' };
+    }
+  },
+
   'for': function _for(start, end, options) {
     if (end._njOpts) {
       options = end;
@@ -1154,6 +1160,7 @@ extensionConfig.block = _config(extensionConfig.obj);
 extensionConfig.pre = _config(extensionConfig.obj);
 extensionConfig.arg = _config(extensionConfig.prop);
 extensionConfig.once = _config(extensionConfig.obj);
+extensionConfig.show = _config(extensionConfig.prop);
 
 //Extension alias
 extensions['case'] = extensions.elseif;
@@ -2366,12 +2373,13 @@ function _setElem(elem, elemName, elemParams, elemArr, bySelfClose, tmplRule) {
 function _getSplitParams(elem, tmplRule) {
   var extensionRule = tmplRule.extensionRule,
       startRule = tmplRule.startRule,
-      endRule = tmplRule.endRule;
+      endRule = tmplRule.endRule,
+      spreadProp = tmplRule.spreadProp;
 
   var paramsEx = void 0;
 
   //Replace the parameter like "{...props}".
-  elem = elem.replace(tmplRule.spreadProp, function (all, begin, prop) {
+  elem = elem.replace(spreadProp, function (all, begin, prop) {
     prop = prop.trim();
 
     if (!paramsEx) {
@@ -2379,6 +2387,15 @@ function _getSplitParams(elem, tmplRule) {
     }
 
     paramsEx.push([extensionRule + 'spread ' + startRule + prop.replace(/\.\.\./g, '') + endRule + '/']);
+    return ' ';
+  });
+
+  elem = elem.replace(new RegExp('[\\s]+' + extensionRule + '([^\\s=>]+)=((\'[^\']+\')|("[^"]+")|([^"\'\\s>]+))'), function (all, name, value) {
+    if (!paramsEx) {
+      paramsEx = [extensionRule + 'props'];
+    }
+
+    paramsEx.push([extensionRule + name, __WEBPACK_IMPORTED_MODULE_1__utils_tools__["d" /* clearQuot */](value)]);
     return ' ';
   });
 

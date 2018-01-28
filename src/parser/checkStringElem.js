@@ -289,11 +289,11 @@ function _setElem(elem, elemName, elemParams, elemArr, bySelfClose, tmplRule) {
 
 //Extract split parameters
 function _getSplitParams(elem, tmplRule) {
-  const { extensionRule, startRule, endRule } = tmplRule;
+  const { extensionRule, startRule, endRule, spreadProp } = tmplRule;
   let paramsEx;
 
   //Replace the parameter like "{...props}".
-  elem = elem.replace(tmplRule.spreadProp, (all, begin, prop) => {
+  elem = elem.replace(spreadProp, (all, begin, prop) => {
     prop = prop.trim();
 
     if (!paramsEx) {
@@ -301,6 +301,16 @@ function _getSplitParams(elem, tmplRule) {
     }
 
     paramsEx.push([extensionRule + 'spread ' + startRule + prop.replace(/\.\.\./g, '') + endRule + '/']);
+    return ' ';
+  });
+
+  //Replace the parameter like "#show={false}".
+  elem = elem.replace(new RegExp('[\\s]+' + extensionRule + '([^\\s=>]+)=((\'[^\']+\')|("[^"]+")|([^"\'\\s>]+))'), (all, name, value) => {
+    if (!paramsEx) {
+      paramsEx = [extensionRule + 'props'];
+    }
+
+    paramsEx.push([extensionRule + name, tools.clearQuot(value)]);
     return ' ';
   });
 
