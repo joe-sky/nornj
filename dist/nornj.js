@@ -2390,6 +2390,7 @@ function _getSplitParams(elem, tmplRule) {
     return ' ';
   });
 
+  //Replace the parameter like "#show={false}".
   elem = elem.replace(new RegExp('[\\s]+' + extensionRule + '([^\\s=>]+)=((\'[^\']+\')|("[^"]+")|([^"\'\\s>]+))'), function (all, name, value) {
     if (!paramsEx) {
       paramsEx = [extensionRule + 'props'];
