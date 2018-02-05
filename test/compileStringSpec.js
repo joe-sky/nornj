@@ -205,17 +205,17 @@ describe('test compile string', function() {
       <#once cacheKey="doctype">
         <@resetList>{{list(id, c1)}}</@resetList>
         <!DOCTYPE html>
-        <#with {{name3}} as=name5>{{{
-          JSON.stringify_( 
-            list(
+        <#with {{name3}} as=name5>{{
+          JSON.stringify( 
+            [
               1,
-              obj(
-                'a' : (1),
-                'b' : (2)
-              )
-            )
+              {
+                a: 1,
+                b: 2
+              }
+            ]
           )
-        }}}</#with>
+        }}</#with>
         <#each {{list}}>
           <div>{{this}}</div>
           {{this}}
@@ -339,7 +339,7 @@ describe('test compile string', function() {
       </#each>
       <$if {a.('length')}>1</$if>
       {{{a.c.d.substr(1) + ("a,(b)" + (@sq)) + 'a,b'}}}
-      {{[[JSON.stringify(obj('a' : '1', 'b' : 2)), 2]]}}
+      {{[[JSON.stringify({ a: '1', b: 2 }), 2]]}}
       {{reg('^[abc]$', 'i').('test')('A')}}
       {{#f1}}
       <${'div'}>
