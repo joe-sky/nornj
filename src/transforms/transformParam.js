@@ -4,7 +4,7 @@ import '../helpers/filter';
 
 //Get compiled property
 const REGEX_JS_PROP = new RegExp(nj.regexJsBase + '([^\\s()]*)');
-const REGEX_REPLACE_CHAR = /_njQs(\d)_/g;
+const REGEX_REPLACE_CHAR = /_njQs(\d+)_/g;
 
 function _compiledProp(prop, innerBrackets, innerQuotes) {
   let ret = tools.obj();
@@ -110,7 +110,7 @@ const REGEX_SPACE_FILTER = /[(,]/g;
 const REGEX_SPACE_S_FILTER = /([(,|])[\s]+/g;
 const REGEX_FIX_FILTER = /(\|)?(((\.+|_|#+)\()|[\s]+([^\s._#|]+[\s]*\())/g;
 const REGEX_ARRPROP_FILTER = /([^\s([,])((\[[^[\]]+\])+)/g;
-const REGEX_REPLACE_ARRPROP = /_njAp(\d)_/g;
+const REGEX_REPLACE_ARRPROP = /_njAp(\d+)_/g;
 const ARR_OBJ_FILTER_LOOKUP = {
   '[': 'list(',
   ']': ')',

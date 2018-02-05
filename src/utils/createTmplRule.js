@@ -99,7 +99,7 @@ export default function createTmplRule(rules = {}, isGlobal) {
     lastChar,
     xmlOpenTag: _createRegExp('^<([a-z' + firstChar + extensionRules + '][^\\s>]*)[^>]*>$', 'i'),
     openTagParams: _createRegExp('[\\s]+((([' + firstChar + ']?' + startRule + ')((?!' + endRule + ')[\\s\\S]+?)(' + endRule + '[' + lastChar + ']?))|[^\\s=>]+)(=((\'[^\']+\')|("[^"]+")|([^"\'\\s]+)))?', 'g'),
-    insideBraceParam: _createRegExp('([' + firstChar + ']?' + startRule + ')((?!' + endRule + ')[\\s\\S]+?)(' + endRule + '[' + lastChar + ']?)', 'i'),
+    insideBraceParam: _createRegExp('([' + firstChar + ']?' + startRule + ')((?!' + endRule + ')[\\s\\S]+?)(' + endRule + '[' + lastChar + ']?)', 'ig'),
     spreadProp: _createRegExp('[\\s]+([' + firstChar + ']?' + startRule + ')[\\s]*(\\.\\.\\.(?!' + endRule + ')[\\s\\S]+?)(' + endRule + '[' + lastChar + ']?)', 'g'),
     replaceSplit: _createRegExp('(?:[' + firstChar + ']?' + startRule + ')(?!' + endRule + ')[\\s\\S]+?(?:' + endRule + '[' + lastChar + ']?)'),
     replaceParam: _createRegExp('([' + firstChar + ']?' + startRule + ')((?!' + endRule + ')[\\s\\S]+?)' + endRule + '[' + lastChar + ']?', 'g'),
@@ -107,7 +107,6 @@ export default function createTmplRule(rules = {}, isGlobal) {
     extension: _createRegExp('^' + escapeExtensionRule + '([^\\s]+)', 'i'),
     exAll: _createRegExp('^([/]?)(' + escapeExtensionRule + '|' + escapeStrPropRule + escapePropRule + '|' + escapePropRule + ')([^\\s]+)', 'i'),
     include: _createRegExp('<' + escapeExtensionRule + 'include([^>]*)>', 'ig'),
-    newlineSplit: _createRegExp('\\n(?![^' + allRules + ']*' + lastChar + ')', 'g'),
     incompleteStart: _createRegExp('[' + firstChar + ']?' + startRule + '((?!' + endRule + ')[\\s\\S])*$'),
     incompleteEnd: _createRegExp('^(?!' + startRule + ')[\\s\\S]*?' + endRule + '[' + lastChar + ']?')
   };

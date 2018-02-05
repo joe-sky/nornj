@@ -442,18 +442,17 @@ function createTmplRule() {
     firstChar: firstChar,
     lastChar: lastChar,
     xmlOpenTag: _createRegExp('^<([a-z' + firstChar + extensionRules + '][^\\s>]*)[^>]*>$', 'i'),
-    openTagParams: _createRegExp('[\\s]+((([' + firstChar + ']?' + startRule + ')([^' + allRules + ']+)(' + endRule + '[' + lastChar + ']?))|[^\\s=>]+)(=((\'[^\']+\')|("[^"]+")|([^"\'\\s]+)))?', 'g'),
-    insideBraceParam: _createRegExp('([' + firstChar + ']?' + startRule + ')([^' + allRules + ']+)(' + endRule + '[' + lastChar + ']?)', 'i'),
-    spreadProp: _createRegExp('[\\s]+([' + firstChar + ']?' + startRule + ')[\\s]*(\\.\\.\\.[^' + allRules + ']+)(' + endRule + '[' + lastChar + ']?)', 'g'),
-    replaceSplit: _createRegExp('(?:[' + firstChar + ']?' + startRule + ')[^' + allRules + ']+(?:' + endRule + '[' + lastChar + ']?)'),
-    replaceParam: _createRegExp('([' + firstChar + ']?' + startRule + ')([^' + allRules + ']+)' + endRule + '[' + lastChar + ']?', 'g'),
+    openTagParams: _createRegExp('[\\s]+((([' + firstChar + ']?' + startRule + ')((?!' + endRule + ')[\\s\\S]+?)(' + endRule + '[' + lastChar + ']?))|[^\\s=>]+)(=((\'[^\']+\')|("[^"]+")|([^"\'\\s]+)))?', 'g'),
+    insideBraceParam: _createRegExp('([' + firstChar + ']?' + startRule + ')((?!' + endRule + ')[\\s\\S]+?)(' + endRule + '[' + lastChar + ']?)', 'ig'),
+    spreadProp: _createRegExp('[\\s]+([' + firstChar + ']?' + startRule + ')[\\s]*(\\.\\.\\.(?!' + endRule + ')[\\s\\S]+?)(' + endRule + '[' + lastChar + ']?)', 'g'),
+    replaceSplit: _createRegExp('(?:[' + firstChar + ']?' + startRule + ')(?!' + endRule + ')[\\s\\S]+?(?:' + endRule + '[' + lastChar + ']?)'),
+    replaceParam: _createRegExp('([' + firstChar + ']?' + startRule + ')((?!' + endRule + ')[\\s\\S]+?)' + endRule + '[' + lastChar + ']?', 'g'),
     checkElem: _createRegExp('([^<>]+)|(<([a-z/!' + firstChar + extensionRules + '][^\\s<>]*)([^<>]*)>|<)([^<]*)', 'ig'),
     extension: _createRegExp('^' + escapeExtensionRule + '([^\\s]+)', 'i'),
     exAll: _createRegExp('^([/]?)(' + escapeExtensionRule + '|' + escapeStrPropRule + escapePropRule + '|' + escapePropRule + ')([^\\s]+)', 'i'),
     include: _createRegExp('<' + escapeExtensionRule + 'include([^>]*)>', 'ig'),
-    newlineSplit: _createRegExp('\\n(?![^' + allRules + ']*' + lastChar + ')', 'g'),
-    incompleteStart: _createRegExp('[' + firstChar + ']?' + startRule + '[^' + allRules + ']*$'),
-    incompleteEnd: _createRegExp('^[^' + allRules + ']*' + endRule + '[' + lastChar + ']?')
+    incompleteStart: _createRegExp('[' + firstChar + ']?' + startRule + '((?!' + endRule + ')[\\s\\S])*$'),
+    incompleteEnd: _createRegExp('^(?!' + startRule + ')[\\s\\S]*?' + endRule + '[' + lastChar + ']?')
   };
 
   if (isGlobal) {
@@ -1580,7 +1579,7 @@ Object(__WEBPACK_IMPORTED_MODULE_1__tools__["c" /* assign */])(__WEBPACK_IMPORTE
 
 //Get compiled property
 var REGEX_JS_PROP = new RegExp(__WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */].regexJsBase + '([^\\s()]*)');
-var REGEX_REPLACE_CHAR = /_njQs(\d)_/g;
+var REGEX_REPLACE_CHAR = /_njQs(\d+)_/g;
 
 function _compiledProp(prop, innerBrackets, innerQuotes) {
   var ret = __WEBPACK_IMPORTED_MODULE_1__utils_tools__["o" /* obj */]();
@@ -1689,7 +1688,7 @@ var REGEX_SPACE_FILTER = /[(,]/g;
 var REGEX_SPACE_S_FILTER = /([(,|])[\s]+/g;
 var REGEX_FIX_FILTER = /(\|)?(((\.+|_|#+)\()|[\s]+([^\s._#|]+[\s]*\())/g;
 var REGEX_ARRPROP_FILTER = /([^\s([,])((\[[^[\]]+\])+)/g;
-var REGEX_REPLACE_ARRPROP = /_njAp(\d)_/g;
+var REGEX_REPLACE_ARRPROP = /_njAp(\d+)_/g;
 var ARR_OBJ_FILTER_LOOKUP = {
   '[': 'list(',
   ']': ')',
@@ -2327,7 +2326,7 @@ var REGEX_LT_GT = />|</g;
 
 function _formatAll(str, tmplRule) {
   var commentRule = tmplRule.commentRule;
-  return str.replace(new RegExp('<!--' + commentRule + '[\\s\\S]*?' + commentRule + '-->', 'g'), '').replace(new RegExp('([\\s]+:[^\\s=>]+=((\'[^\']+\')|("[^"]+")))|(' + tmplRule.startRule + '[^' + tmplRule.endRule + ']*' + tmplRule.endRule + ')', 'g'), function (all, g1, g2, g3, g4, g5) {
+  return str.replace(new RegExp('<!--' + commentRule + '[\\s\\S]*?' + commentRule + '-->', 'g'), '').replace(new RegExp('([\\s]+:[^\\s=>]+=((\'[^\']+\')|("[^"]+")))|(' + tmplRule.startRule + '(?!' + tmplRule.endRule + ')[\\s\\S]*?' + tmplRule.endRule + ')', 'g'), function (all, g1, g2, g3, g4, g5) {
     return (g1 ? g1 : g5).replace(REGEX_LT_GT, function (match) {
       return LT_GT_LOOKUP[match];
     });
@@ -2734,6 +2733,8 @@ function _plainTextNode(obj, parent, parentContent, noSplitNewline, tmplRule) {
   parent[parentContent].push(node);
 }
 
+var REGEX_REPLACE_BP = /_njBp(\d+)_/g;
+
 //检测元素节点
 function checkElem(obj, parent, tmplRule, hasExProps, noSplitNewline, isLast) {
   var parentContent = 'content';
@@ -2742,10 +2743,17 @@ function checkElem(obj, parent, tmplRule, hasExProps, noSplitNewline, isLast) {
     //判断是否为文本节点
     if (__WEBPACK_IMPORTED_MODULE_1__utils_tools__["m" /* isString */](obj)) {
       if (!noSplitNewline) {
-        var strs = obj.split(tmplRule.newlineSplit);
+        var braceParams = [];
+        var strs = obj.replace(tmplRule.insideBraceParam, function (match) {
+          braceParams.push(match);
+          return '_njBp' + (braceParams.length - 1) + '_';
+        }).split(/\n/g);
+
         strs.forEach(function (str, i) {
           str = str.trim();
-          str !== '' && _plainTextNode(str, parent, parentContent, noSplitNewline, tmplRule);
+          str !== '' && _plainTextNode(str.replace(REGEX_REPLACE_BP, function (all, g1) {
+            return braceParams[g1];
+          }), parent, parentContent, noSplitNewline, tmplRule);
         });
       } else {
         _plainTextNode(isLast && parent.allowNewline === 'nlElem' ? __WEBPACK_IMPORTED_MODULE_1__utils_tools__["r" /* trimRight */](obj) : obj, parent, parentContent, noSplitNewline, tmplRule);

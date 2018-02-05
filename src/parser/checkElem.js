@@ -21,6 +21,8 @@ function _plainTextNode(obj, parent, parentContent, noSplitNewline, tmplRule) {
   parent[parentContent].push(node);
 }
 
+const REGEX_REPLACE_BP = /_njBp(\d+)_/g;
+
 //检测元素节点
 export default function checkElem(obj, parent, tmplRule, hasExProps, noSplitNewline, isLast) {
   const parentContent = 'content';
@@ -28,10 +30,15 @@ export default function checkElem(obj, parent, tmplRule, hasExProps, noSplitNewl
   if (!tools.isArray(obj)) { //判断是否为文本节点
     if (tools.isString(obj)) {
       if (!noSplitNewline) {
-        let strs = obj.split(tmplRule.newlineSplit);
+        const braceParams = [];
+        let strs = obj.replace(tmplRule.insideBraceParam, match => {
+          braceParams.push(match);
+          return '_njBp' + (braceParams.length - 1) + '_';
+        }).split(/\n/g);
+
         strs.forEach((str, i) => {
           str = str.trim();
-          str !== '' && _plainTextNode(str, parent, parentContent, noSplitNewline, tmplRule);
+          str !== '' && _plainTextNode(str.replace(REGEX_REPLACE_BP, (all, g1) => braceParams[g1]), parent, parentContent, noSplitNewline, tmplRule);
         });
       } else {
         _plainTextNode(isLast && parent.allowNewline === 'nlElem' ? tools.trimRight(obj) : obj, parent, parentContent, noSplitNewline, tmplRule);

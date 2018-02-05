@@ -16,13 +16,14 @@ describe('test compile string', function() {
 
 
       var tmpl = nj `
-        <div class="{{id}} {{name3}}" {{name3}} {{ ...props}} name={{name1}} autofocus name1={{a.c.d}} name2="{{a.e .('f') .('g')}}" a="/%'aaa'%/">
+        <${'div'} class="{{id}} {{name3}}" {{name3}} {{ ...props}} name={{name1}} autofocus name1={{a.c.d}} name2="{{a.e .('f') .('g')}}" a="/%'aaa'%/">
           <#prop {{'name1' | vm-var}} />
+          {{1 + ${2} + 3 + ${4}}}
           {{111}}
           {{ 
             { a: 1, b: 2 } }}
           {{ { a: 1 } }}
-        </div>
+        </${'div'}>
       `;
 
 

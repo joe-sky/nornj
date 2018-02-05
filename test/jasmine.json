@@ -1,7 +1,7 @@
 {
   "spec_dir": "test/",
   "spec_files": [
-    "simpleSpec.js"
+    "compileStringSpec.js"
   ],
   "helpers": [
     "../node_modules/babel-core/register.js"
