@@ -7,7 +7,7 @@
 		exports["NornJ"] = factory();
 	else
 		root["NornJ"] = factory();
-})(this, function() {
+})(typeof self !== 'undefined' ? self : this, function() {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -1696,7 +1696,7 @@ var ARR_OBJ_FILTER_LOOKUP = {
   '}': ')'
 };
 var REGEX_ARR_OBJ_FILTER = /\[|\]|\{|\}/g;
-var REGEX_OBJKEY_FILTER = /[\s]+([^\s:,'"()]+):/g;
+var REGEX_OBJKEY_FILTER = /([^\s:,'"()|]+):/g;
 
 function _getProp(matchArr, innerQuotes, i) {
   var prop = matchArr[2].trim(),
