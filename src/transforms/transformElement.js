@@ -95,7 +95,7 @@ export function isXmlCloseTag(obj, tagName) {
 
 //get inside brace param
 export function getInsideBraceParam(obj, tmplRule) {
-  return tmplRule.insideBraceParam.exec(obj);
+  return tmplRule.braceParam.exec(obj);
 }
 
 //判断扩展标签并返回参数

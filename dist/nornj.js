@@ -7,7 +7,7 @@
 		exports["NornJ"] = factory();
 	else
 		root["NornJ"] = factory();
-})(typeof self !== 'undefined' ? self : this, function() {
+})(this, function() {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -428,7 +428,8 @@ function createTmplRule() {
       extensionRules = _replaceMinus(_clearRepeat(extensionRule + propRule + strPropRule + tagSpRule)),
       escapeExtensionRule = _replace$(extensionRule),
       escapePropRule = _replace$(propRule),
-      escapeStrPropRule = _replace$(strPropRule);
+      escapeStrPropRule = _replace$(strPropRule),
+      braceParamStr = '([' + firstChar + ']?' + startRule + ')((?!' + endRule + ')[\\s\\S]+?)(' + endRule + '[' + lastChar + ']?)';
 
   var tmplRules = {
     startRule: startRule,
@@ -443,7 +444,8 @@ function createTmplRule() {
     lastChar: lastChar,
     xmlOpenTag: _createRegExp('^<([a-z' + firstChar + extensionRules + '][^\\s>]*)[^>]*>$', 'i'),
     openTagParams: _createRegExp('[\\s]+((([' + firstChar + ']?' + startRule + ')((?!' + endRule + ')[\\s\\S]+?)(' + endRule + '[' + lastChar + ']?))|[^\\s=>]+)(=((\'[^\']+\')|("[^"]+")|([^"\'\\s]+)))?', 'g'),
-    insideBraceParam: _createRegExp('([' + firstChar + ']?' + startRule + ')((?!' + endRule + ')[\\s\\S]+?)(' + endRule + '[' + lastChar + ']?)', 'ig'),
+    braceParam: _createRegExp(braceParamStr, 'i'),
+    braceParamG: _createRegExp(braceParamStr, 'ig'),
     spreadProp: _createRegExp('[\\s]+([' + firstChar + ']?' + startRule + ')[\\s]*(\\.\\.\\.(?!' + endRule + ')[\\s\\S]+?)(' + endRule + '[' + lastChar + ']?)', 'g'),
     replaceSplit: _createRegExp('(?:[' + firstChar + ']?' + startRule + ')(?!' + endRule + ')[\\s\\S]+?(?:' + endRule + '[' + lastChar + ']?)'),
     replaceParam: _createRegExp('([' + firstChar + ']?' + startRule + ')((?!' + endRule + ')[\\s\\S]+?)' + endRule + '[' + lastChar + ']?', 'g'),
@@ -1949,7 +1951,7 @@ function isXmlCloseTag(obj, tagName) {
 
 //get inside brace param
 function getInsideBraceParam(obj, tmplRule) {
-  return tmplRule.insideBraceParam.exec(obj);
+  return tmplRule.braceParam.exec(obj);
 }
 
 //判断扩展标签并返回参数
@@ -2744,7 +2746,7 @@ function checkElem(obj, parent, tmplRule, hasExProps, noSplitNewline, isLast) {
     if (__WEBPACK_IMPORTED_MODULE_1__utils_tools__["m" /* isString */](obj)) {
       if (!noSplitNewline) {
         var braceParams = [];
-        var strs = obj.replace(tmplRule.insideBraceParam, function (match) {
+        var strs = obj.replace(tmplRule.braceParamG, function (match) {
           braceParams.push(match);
           return '_njBp' + (braceParams.length - 1) + '_';
         }).split(/\n/g);

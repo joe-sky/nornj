@@ -31,7 +31,7 @@ export default function checkElem(obj, parent, tmplRule, hasExProps, noSplitNewl
     if (tools.isString(obj)) {
       if (!noSplitNewline) {
         const braceParams = [];
-        let strs = obj.replace(tmplRule.insideBraceParam, match => {
+        let strs = obj.replace(tmplRule.braceParamG, match => {
           braceParams.push(match);
           return '_njBp' + (braceParams.length - 1) + '_';
         }).split(/\n/g);
