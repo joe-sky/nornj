@@ -7,7 +7,7 @@
 		exports["NornJ"] = factory();
 	else
 		root["NornJ"] = factory();
-})(this, function() {
+})(typeof self !== 'undefined' ? self : this, function() {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -1312,8 +1312,8 @@ var filters = {
     return Math.pow(val1, val2);
   },
 
-  '//': function _(val) {
-    return Math.sqrt(val);
+  '//': function _(val1, val2) {
+    return Math.floor(val1 / val2);
   },
 
   //Ternary operator

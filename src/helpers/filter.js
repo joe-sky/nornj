@@ -65,7 +65,7 @@ export const filters = {
 
   '**': (val1, val2) => Math.pow(val1, val2),
 
-  '//': val => Math.sqrt(val),
+  '//': (val1, val2) => Math.floor(val1 / val2),
 
   //Ternary operator
   '?': (val, val1, val2) => val ? val1 : val2,
