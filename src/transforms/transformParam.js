@@ -183,7 +183,7 @@ function _fixFilter(prop, innerBrackets) {
     return ' ' + args[1] + '_njBracket_' + (innerBrackets.length - 1);
     //return ' ' + args[1] + '(' + args[2] + (args[5] != null ? args[5] : '') + ')';
   });
-
+  
   return (' ' + prop).replace(REGEX_SPACE_FILTER, all => all + ' ')
     .replace(REGEX_FIX_FILTER, (all, g1, g2, g3, g4, g5) => g1 ? all : ' | ' + (g3 ? g3 : g5)).trim();
 }

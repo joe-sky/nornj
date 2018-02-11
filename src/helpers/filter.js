@@ -224,7 +224,7 @@ export function registerFilter(name, filter, options) {
 }
 
 function _getRegexTransopts() {
-  return new RegExp('[\\s]+([^\\s(),|"\']+)[\\s]+' + nj.regexJsBase + '([^\\s,()]*)', 'g');
+  return new RegExp('[\\s]+((?!_njBracket_)[^\\s(),|"\']+)[\\s]+' + nj.regexJsBase + '([^\\s,()]*)', 'g');
 }
 
 tools.assign(nj, {
