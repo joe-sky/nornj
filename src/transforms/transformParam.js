@@ -108,7 +108,7 @@ const FN_FILTER_LOOKUP = {
 const REGEX_FN_FILTER = /(\)|\]|\.([^\s'"._#()|]+))[\s]*\(/g;
 const REGEX_SPACE_FILTER = /[(,]/g;
 const REGEX_SPACE_S_FILTER = /([(,|])[\s]+/g;
-const REGEX_FIX_FILTER = /(\|)?(((\.+|_|#+)\()|[\s]+([^\s._#|]+[\s]*\())/g;
+const REGEX_FIX_FILTER = /(\|)?(((\.+|_|#+)_njBracket_)|[\s]+([^\s._#|]+[\s]*_njBracket_))/g;
 const REGEX_ARRPROP_FILTER = /([^\s([,])((\[[^[\]]+\])+)/g;
 const REGEX_REPLACE_ARRPROP = /_njAp(\d+)_/g;
 const ARR_OBJ_FILTER_LOOKUP = {
@@ -119,6 +119,8 @@ const ARR_OBJ_FILTER_LOOKUP = {
 };
 const REGEX_ARR_OBJ_FILTER = /\[|\]|\{|\}/g;
 const REGEX_OBJKEY_FILTER = /([^\s:,'"()|]+):/g;
+
+//const _regexJsBase = new RegExp('[\\s]+([^\\s(),|"\']+)[\\s]+((-?([0-9][0-9]*)(\\.\\d+)?|[^\\s,()|]+)(\\([^()]*\\))*)(([._#]\\([^()]*\\))*)', 'g');
 
 function _getProp(matchArr, innerQuotes, i) {
   let prop = matchArr[2].trim(),
@@ -144,14 +146,7 @@ function _getProp(matchArr, innerQuotes, i) {
     .replace(REGEX_REPLACE_ARRPROP, (all, g1) => innerArrProp[g1])
     .replace(REGEX_SP_FILTER, (all, g1, match) => ' ' + SP_FILTER_LOOKUP[match] + ' ')
     .replace(REGEX_SPACE_S_FILTER, (all, match) => match)
-    .replace(nj.regexTransOpts, function() {
-      const args = arguments;
-      return ' ' + args[1] + '(' + args[2] + (args[10] != null ? args[10] : '') + ')';
-    });
-  prop = ' ' + prop;
-  prop = prop.replace(REGEX_FN_FILTER, (all, match, g1) => !g1 ? FN_FILTER_LOOKUP[match] : '.(\'' + g1 + '\')_(')
-    .replace(REGEX_SPACE_FILTER, all => all + ' ')
-    .replace(REGEX_FIX_FILTER, (all, g1, g2, g3, g4, g5) => g1 ? all : ' | ' + (g3 ? g3 : g5));
+    .replace(REGEX_FN_FILTER, (all, match, g1) => !g1 ? FN_FILTER_LOOKUP[match] : '.(\'' + g1 + '\')_(');
 
   item[2] = prop.trim();
   return item;
@@ -180,16 +175,29 @@ function _getReplaceParam(obj, tmplRule, innerQuotes, hasColon) {
 
 const REGEX_INNER_BRACKET = /\(([^()]*)\)/g;
 
-function _replaceInnerBrackets(prop, counter, innerBrackets) {
+function _fixFilter(prop, innerBrackets) {
+  prop = prop.replace(nj.regexTransOpts, function() {
+    const args = arguments;
+
+    innerBrackets.push(args[2] + (args[10] != null ? args[10] : ''));
+    return ' ' + args[1] + '_njBracket_' + (innerBrackets.length - 1);
+    //return ' ' + args[1] + '(' + args[2] + (args[5] != null ? args[5] : '') + ')';
+  });
+
+  return (' ' + prop).replace(REGEX_SPACE_FILTER, all => all + ' ')
+    .replace(REGEX_FIX_FILTER, (all, g1, g2, g3, g4, g5) => g1 ? all : ' | ' + (g3 ? g3 : g5)).trim();
+}
+
+function _replaceInnerBrackets(prop, innerBrackets) {
   let propR = prop.replace(REGEX_INNER_BRACKET, (all, s1) => {
-    innerBrackets.push(s1);
-    return '_njBracket_' + counter++;
+    innerBrackets.push(_fixFilter(s1, innerBrackets));
+    return '_njBracket_' + (innerBrackets.length - 1);
   });
 
   if (propR !== prop) {
-    return _replaceInnerBrackets(propR, counter, innerBrackets);
+    return _replaceInnerBrackets(propR, innerBrackets);
   } else {
-    return propR;
+    return _fixFilter(propR, innerBrackets);
   }
 }
 
@@ -216,7 +224,8 @@ export function compiledParam(value, tmplRule, hasColon) {
         innerBrackets = [];
 
       isAll = param[3] ? param[0] === value : false; //If there are several curly braces in one property value, "isAll" must be false.
-      const prop = _replaceInnerBrackets(param[2], 0, innerBrackets);
+      const prop = _replaceInnerBrackets(param[2], innerBrackets);
+      //console.log(prop);
       retP.prop = _compiledProp(prop, innerBrackets, innerQuotes);
 
       //To determine whether it is necessary to escape

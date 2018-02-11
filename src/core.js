@@ -11,6 +11,6 @@ nj.errorTitle = '[NornJ]';
 nj.tmplRule = {};
 nj.outputH = false;
 nj.global = typeof self !== 'undefined' ? self : global;
-nj.regexJsBase = '((\'[^\']*\')|("[^"]*")|(-?([0-9][0-9]*)(\\.\\d+)?)|true|false|null|undefined|Object|Array|Math|Date|JSON|([#]*)([^\\s.,[\\]()]+))';
+nj.regexJsBase = '((\'[^\']*\')|("[^"]*")|(-?([0-9][0-9]*)(\\.\\d+)?)|true|false|null|undefined|Object|Array|Math|Date|JSON|([#]*)((?!_njBracket_)[^\\s.,[\\]()]+))';
 nj.textTag = 'nj-text';
 nj.textMode = false;

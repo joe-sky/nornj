@@ -20,9 +20,11 @@ describe('test compile string', function() {
           <#prop {{'name1' | vm-var}} />
           {{1 + ${2} + 3 + ${4}}}
           {{111}}
-          {{ 
-            { a: 1, b: 2 } }}
+          {{{
+            JSON.stringify({ a: 1, b: 2 })
+          }}}
           {{ { a: 1 } }}
+          {{ 20.5 | int * (10.05 | float) + (2 ** 3) + (19 // 2) }}
         </${'div'}>
       `;
 
