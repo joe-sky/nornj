@@ -103,11 +103,11 @@ function _buildPropData(obj, counter, fns, useStringLocal, level) {
     escape = obj.escape,
     isEmpty = false,
     special = false;
-  const { jsProp, isComputed } = obj.prop;
+  const { isComputed } = obj.prop;
 
   //先生成数据值
   if (obj.prop.isBasicType) {
-    dataValueStr = obj.prop.name + jsProp;
+    dataValueStr = obj.prop.name;
   } else if (obj.prop.isEmpty) {
     isEmpty = true;
   } else {
@@ -172,10 +172,10 @@ function _buildPropData(obj, counter, fns, useStringLocal, level) {
     }
 
     if (!special && !specialP) {
-      dataValueStr = (isComputed ? 'p1.c(' : '') + 'p2.d(\'' + name + '\'' + (isComputed ? ', 0, true' : '') + ')' + (isComputed ? ', p2, ' + level + ')' : '') + jsProp;
+      dataValueStr = (isComputed ? 'p1.c(' : '') + 'p2.d(\'' + name + '\'' + (isComputed ? ', 0, true' : '') + ')' + (isComputed ? ', p2, ' + level + ')' : '');
     } else {
       let dataStr = special === CUSTOM_VAR ? data : 'p2.' + data;
-      dataValueStr = (special ? dataStr : (isComputed ? 'p1.c(' : '') + 'p2.d(\'' + name + '\', ' + dataStr + (isComputed ? ', true' : '') + ')' + (isComputed ? ', p2, ' + level + ')' : '')) + jsProp;
+      dataValueStr = (special ? dataStr : (isComputed ? 'p1.c(' : '') + 'p2.d(\'' + name + '\', ' + dataStr + (isComputed ? ', true' : '') + ')' + (isComputed ? ', p2, ' + level + ')' : ''));
     }
   }
   if (dataValueStr) {

@@ -223,13 +223,8 @@ export function registerFilter(name, filter, options) {
   }, false, false);
 }
 
-function _getRegexTransopts() {
-  return new RegExp('[\\s]+((?!_njBracket_)[^\\s(),|"\']+)[\\s]+' + nj.regexJsBase + '([^\\s,()]*)', 'g');
-}
-
 tools.assign(nj, {
   filters,
   filterConfig,
-  registerFilter,
-  regexTransOpts: _getRegexTransopts()
+  registerFilter
 });

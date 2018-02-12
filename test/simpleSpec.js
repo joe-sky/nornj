@@ -16,15 +16,20 @@ describe('test compile string', function() {
 
 
       var tmpl = nj `
-        <${'div'} class="{{id}} {{name3}}" {{name3}} {{ ...props}} name={{name1}} autofocus name1={{a.c.d}} name2="{{a.e .('f') .('g')}}" a="/%'aaa'%/">
+        <${'div'} class="{{id}} {{name3}}" {{name3}} {{ ...props}} name={{name1}} autofocus name1={{a.c.d}} name2="{{ [a[a.e['h']].f.g, 2] }}" a="/%'aaa'%/">
           <#prop {{'name1' | vm-var}} />
           {{1 + ${2} + 3 + ${4}}}
           {{111}}
           {{{
-            JSON.stringify({ a: 1, b: 2 })
+            JSON.stringify([{
+              a: { c: 1 },
+              b: [2, { d: 5 }]
+            }, { e: 10 }])
           }}}
           {{ { a: 1 } }}
           {{ 20.5 | int * (10.05 | float) + (2 ** 3) + (19 // 2) }}
+          {{ [1, 2, 3].length + [1].push(100) }}
+          {{ -10 ..< 10 }}
         </${'div'}>
       `;
 
@@ -39,7 +44,8 @@ describe('test compile string', function() {
           e: {
             f: {
               g: 'efg'
-            }
+            },
+            h: 'e'
           }
         },
       });

@@ -3,7 +3,7 @@ import '../../src/utils/createTmplRule';
 
 describe('filter', () => {
   it('.', () => {
-    expect(render("{{ a.b.('c').('length') }}", {
+    expect(render("{{ a.b['c'].length }}", {
       a: {
         b: {
           c: 'abc'
@@ -93,11 +93,11 @@ describe('filter', () => {
   });
 
   it('..', () => {
-    expect(render("{{ 0 .. 5 .('length') }}")).toBe(6);
+    expect(render("{{ 0 .. 5 .length }}")).toBe(6);
   });
 
   it('..>', () => {
-    expect(render("{{ 0 ..< 5 .('length') }}")).toBe(5);
+    expect(render("{{ 0 ..< 5 .length }}")).toBe(5);
   });
 
   it('<=>', () => {
@@ -109,6 +109,6 @@ describe('filter', () => {
   });
 
   it('object', () => {
-    expect(render(`<img src="{{ { src: 'http://test.com/img.png' }.('src') }}">`)).toBe('<img src="http://test.com/img.png" />');
+    expect(render(`<img src="{{ { src: 'http://test.com/img.png' }.src }}">`)).toBe('<img src="http://test.com/img.png" />');
   });
 });

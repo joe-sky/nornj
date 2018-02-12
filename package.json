@@ -1,7 +1,7 @@
 {
   "name": "nornj",
-  "version": "0.4.2-rc.26",
-  "description": "A multipurpose javascript template engine",
+  "version": "0.4.2-rc.27",
+  "description": "A multipurpose javascript template engine, support both the rendering string and the react component.",
   "main": "lib/base.js",
   "files": [
     "dist/",

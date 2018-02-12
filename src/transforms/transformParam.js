@@ -3,7 +3,7 @@ import * as tools from '../utils/tools';
 import '../helpers/filter';
 
 //Get compiled property
-const REGEX_JS_PROP = new RegExp(nj.regexJsBase + '([^\\s()]*)');
+const REGEX_JS_PROP = /('[^']*')|("[^"]*")|(-?[0-9][0-9]*(\.\d+)?)|true|false|null|undefined|Object|Array|Math|Date|JSON|([#]*)([^\s.,[\]()]+)/;
 const REGEX_REPLACE_CHAR = /_njQs(\d+)_/g;
 
 function _compiledProp(prop, innerBrackets, innerQuotes) {
@@ -67,11 +67,10 @@ function _compiledProp(prop, innerBrackets, innerQuotes) {
   //Extract the js property
   if (prop !== '') {
     prop = REGEX_JS_PROP.exec(prop);
-    const hasComputed = prop[7];
-    ret.name = hasComputed ? prop[8] : prop[1];
-    ret.jsProp = prop[9];
+    const hasComputed = prop[5];
+    ret.name = hasComputed ? prop[6] : prop[0];
 
-    if (!prop[8]) { //Sign the parameter is a basic type value.
+    if (!prop[6]) { //Sign the parameter is a basic type value.
       ret.isBasicType = true;
     }
     if (hasComputed) {
@@ -106,11 +105,9 @@ const FN_FILTER_LOOKUP = {
   ']': ']_('
 };
 const REGEX_FN_FILTER = /(\)|\]|\.([^\s'"._#()|]+))[\s]*\(/g;
-const REGEX_SPACE_FILTER = /[(,]/g;
 const REGEX_SPACE_S_FILTER = /([(,|])[\s]+/g;
-const REGEX_FIX_FILTER = /(\|)?(((\.+|_|#+)_njBracket_)|[\s]+([^\s._#|]+[\s]*_njBracket_))/g;
-const REGEX_ARRPROP_FILTER = /([^\s([,])((\[[^[\]]+\])+)/g;
-const REGEX_REPLACE_ARRPROP = /_njAp(\d+)_/g;
+const REGEX_PROP_FILTER = /\.([a-zA-Z_$][^\s.\/,[\]()'"|]*)/g;
+const REGEX_ARRPROP_FILTER = /([^\s([,])(\[)/g;
 const ARR_OBJ_FILTER_LOOKUP = {
   '[': 'list(',
   ']': ')',
@@ -119,8 +116,6 @@ const ARR_OBJ_FILTER_LOOKUP = {
 };
 const REGEX_ARR_OBJ_FILTER = /\[|\]|\{|\}/g;
 const REGEX_OBJKEY_FILTER = /([^\s:,'"()|]+):/g;
-
-//const _regexJsBase = new RegExp('[\\s]+([^\\s(),|"\']+)[\\s]+((-?([0-9][0-9]*)(\\.\\d+)?|[^\\s,()|]+)(\\([^()]*\\))*)(([._#]\\([^()]*\\))*)', 'g');
 
 function _getProp(matchArr, innerQuotes, i) {
   let prop = matchArr[2].trim(),
@@ -137,13 +132,10 @@ function _getProp(matchArr, innerQuotes, i) {
       innerQuotes.push(match);
       return '_njQs' + (innerQuotes.length - 1) + '_';
     })
-    .replace(REGEX_ARRPROP_FILTER, (all, g1, g2) => {
-      innerArrProp.push(g2);
-      return g1 + '_njAp' + (innerArrProp.length - 1) + '_';
-    })
+    .replace(REGEX_PROP_FILTER, (all, g1) => '.(\'' + g1 + '\')')
+    .replace(REGEX_ARRPROP_FILTER, (all, g1, g2) => g1 + '.(')
     .replace(REGEX_ARR_OBJ_FILTER, match => ARR_OBJ_FILTER_LOOKUP[match])
     .replace(REGEX_OBJKEY_FILTER, (all, g1) => ' \'' + g1 + '\' : ')
-    .replace(REGEX_REPLACE_ARRPROP, (all, g1) => innerArrProp[g1])
     .replace(REGEX_SP_FILTER, (all, g1, match) => ' ' + SP_FILTER_LOOKUP[match] + ' ')
     .replace(REGEX_SPACE_S_FILTER, (all, match) => match)
     .replace(REGEX_FN_FILTER, (all, match, g1) => !g1 ? FN_FILTER_LOOKUP[match] : '.(\'' + g1 + '\')_(');
@@ -174,30 +166,33 @@ function _getReplaceParam(obj, tmplRule, innerQuotes, hasColon) {
 }
 
 const REGEX_INNER_BRACKET = /\(([^()]*)\)/g;
+const REGEX_FIX_OPERATOR = /[\s]+((?!_njBracket_)[^\s(),|"\']+)[\s]+((-?[0-9][0-9]*(\.\d+)?|(?!_njBracket_)[^\s,|]+)(_njBracket_\d+)?([._#]_njBracket_\d+)*)/g;
+const REGEX_SPACE_FILTER = /[(,]/g;
+const REGEX_FIX_FILTER = /(\|)?(((\.+|_|#+)_njBracket_)|[\s]+([^\s._#|]+[\s]*_njBracket_))/g;
 
-function _fixFilter(prop, innerBrackets) {
-  prop = prop.replace(nj.regexTransOpts, function() {
+function _fixOperator(prop, innerBrackets) {
+  return _fixFilter(prop.replace(REGEX_FIX_OPERATOR, function() {
     const args = arguments;
-
-    innerBrackets.push(args[2] + (args[10] != null ? args[10] : ''));
+    innerBrackets.push(_fixFilter(args[2]));
     return ' ' + args[1] + '_njBracket_' + (innerBrackets.length - 1);
-    //return ' ' + args[1] + '(' + args[2] + (args[5] != null ? args[5] : '') + ')';
-  });
-  
+  }));
+}
+
+function _fixFilter(prop) {
   return (' ' + prop).replace(REGEX_SPACE_FILTER, all => all + ' ')
     .replace(REGEX_FIX_FILTER, (all, g1, g2, g3, g4, g5) => g1 ? all : ' | ' + (g3 ? g3 : g5)).trim();
 }
 
 function _replaceInnerBrackets(prop, innerBrackets) {
   let propR = prop.replace(REGEX_INNER_BRACKET, (all, s1) => {
-    innerBrackets.push(_fixFilter(s1, innerBrackets));
+    innerBrackets.push(_fixOperator(s1, innerBrackets));
     return '_njBracket_' + (innerBrackets.length - 1);
   });
 
   if (propR !== prop) {
     return _replaceInnerBrackets(propR, innerBrackets);
   } else {
-    return _fixFilter(propR, innerBrackets);
+    return _fixOperator(propR, innerBrackets);
   }
 }
 
@@ -225,7 +220,6 @@ export function compiledParam(value, tmplRule, hasColon) {
 
       isAll = param[3] ? param[0] === value : false; //If there are several curly braces in one property value, "isAll" must be false.
       const prop = _replaceInnerBrackets(param[2], innerBrackets);
-      //console.log(prop);
       retP.prop = _compiledProp(prop, innerBrackets, innerQuotes);
 
       //To determine whether it is necessary to escape

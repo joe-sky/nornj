@@ -7,7 +7,7 @@
 		exports["NornJ"] = factory();
 	else
 		root["NornJ"] = factory();
-})(typeof self !== 'undefined' ? self : this, function() {
+})(this, function() {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -92,7 +92,6 @@ nj.errorTitle = '[NornJ]';
 nj.tmplRule = {};
 nj.outputH = false;
 nj.global = typeof self !== 'undefined' ? self : global;
-nj.regexJsBase = '((\'[^\']*\')|("[^"]*")|(-?([0-9][0-9]*)(\\.\\d+)?)|true|false|null|undefined|Object|Array|Math|Date|JSON|([#]*)([^\\s.,[\\]()]+))';
 nj.textTag = 'nj-text';
 nj.textMode = false;
 /* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(11)))
@@ -1492,15 +1491,10 @@ function registerFilter(name, filter, options) {
   }, false, false);
 }
 
-function _getRegexTransopts() {
-  return new RegExp('[\\s]+([^\\s(),|"\']+)[\\s]+' + __WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */].regexJsBase + '([^\\s,()]*)', 'g');
-}
-
 __WEBPACK_IMPORTED_MODULE_1__utils_tools__["c" /* assign */](__WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */], {
   filters: filters,
   filterConfig: filterConfig,
-  registerFilter: registerFilter,
-  regexTransOpts: _getRegexTransopts()
+  registerFilter: registerFilter
 });
 
 /***/ }),
@@ -1580,7 +1574,7 @@ Object(__WEBPACK_IMPORTED_MODULE_1__tools__["c" /* assign */])(__WEBPACK_IMPORTE
 
 
 //Get compiled property
-var REGEX_JS_PROP = new RegExp(__WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */].regexJsBase + '([^\\s()]*)');
+var REGEX_JS_PROP = /('[^']*')|("[^"]*")|(-?[0-9][0-9]*(\.\d+)?)|true|false|null|undefined|Object|Array|Math|Date|JSON|([#]*)([^\s.,[\]()]+)/;
 var REGEX_REPLACE_CHAR = /_njQs(\d+)_/g;
 
 function _compiledProp(prop, innerBrackets, innerQuotes) {
@@ -1646,11 +1640,10 @@ function _compiledProp(prop, innerBrackets, innerQuotes) {
   //Extract the js property
   if (prop !== '') {
     prop = REGEX_JS_PROP.exec(prop);
-    var hasComputed = prop[7];
-    ret.name = hasComputed ? prop[8] : prop[1];
-    ret.jsProp = prop[9];
+    var hasComputed = prop[5];
+    ret.name = hasComputed ? prop[6] : prop[0];
 
-    if (!prop[8]) {
+    if (!prop[6]) {
       //Sign the parameter is a basic type value.
       ret.isBasicType = true;
     }
@@ -1686,11 +1679,9 @@ var FN_FILTER_LOOKUP = {
   ']': ']_('
 };
 var REGEX_FN_FILTER = /(\)|\]|\.([^\s'"._#()|]+))[\s]*\(/g;
-var REGEX_SPACE_FILTER = /[(,]/g;
 var REGEX_SPACE_S_FILTER = /([(,|])[\s]+/g;
-var REGEX_FIX_FILTER = /(\|)?(((\.+|_|#+)\()|[\s]+([^\s._#|]+[\s]*\())/g;
-var REGEX_ARRPROP_FILTER = /([^\s([,])((\[[^[\]]+\])+)/g;
-var REGEX_REPLACE_ARRPROP = /_njAp(\d+)_/g;
+var REGEX_PROP_FILTER = /\.([a-zA-Z_$][^\s.\/,[\]()'"|]*)/g;
+var REGEX_ARRPROP_FILTER = /([^\s([,])(\[)/g;
 var ARR_OBJ_FILTER_LOOKUP = {
   '[': 'list(',
   ']': ')',
@@ -1715,30 +1706,20 @@ function _getProp(matchArr, innerQuotes, i) {
   }).replace(REGEX_QUOTE, function (match) {
     innerQuotes.push(match);
     return '_njQs' + (innerQuotes.length - 1) + '_';
+  }).replace(REGEX_PROP_FILTER, function (all, g1) {
+    return '.(\'' + g1 + '\')';
   }).replace(REGEX_ARRPROP_FILTER, function (all, g1, g2) {
-    innerArrProp.push(g2);
-    return g1 + '_njAp' + (innerArrProp.length - 1) + '_';
+    return g1 + '.(';
   }).replace(REGEX_ARR_OBJ_FILTER, function (match) {
     return ARR_OBJ_FILTER_LOOKUP[match];
   }).replace(REGEX_OBJKEY_FILTER, function (all, g1) {
     return ' \'' + g1 + '\' : ';
-  }).replace(REGEX_REPLACE_ARRPROP, function (all, g1) {
-    return innerArrProp[g1];
   }).replace(REGEX_SP_FILTER, function (all, g1, match) {
     return ' ' + SP_FILTER_LOOKUP[match] + ' ';
   }).replace(REGEX_SPACE_S_FILTER, function (all, match) {
     return match;
-  }).replace(__WEBPACK_IMPORTED_MODULE_0__core__["a" /* default */].regexTransOpts, function () {
-    var args = arguments;
-    return ' ' + args[1] + '(' + args[2] + (args[10] != null ? args[10] : '') + ')';
-  });
-  prop = ' ' + prop;
-  prop = prop.replace(REGEX_FN_FILTER, function (all, match, g1) {
+  }).replace(REGEX_FN_FILTER, function (all, match, g1) {
     return !g1 ? FN_FILTER_LOOKUP[match] : '.(\'' + g1 + '\')_(';
-  }).replace(REGEX_SPACE_FILTER, function (all) {
-    return all + ' ';
-  }).replace(REGEX_FIX_FILTER, function (all, g1, g2, g3, g4, g5) {
-    return g1 ? all : ' | ' + (g3 ? g3 : g5);
   });
 
   item[2] = prop.trim();
@@ -1769,17 +1750,36 @@ function _getReplaceParam(obj, tmplRule, innerQuotes, hasColon) {
 }
 
 var REGEX_INNER_BRACKET = /\(([^()]*)\)/g;
+var REGEX_FIX_OPERATOR = /[\s]+((?!_njBracket_)[^\s(),|"\']+)[\s]+((-?[0-9][0-9]*(\.\d+)?|(?!_njBracket_)[^\s,|]+)(_njBracket_\d+)?([._#]_njBracket_\d+)*)/g;
+var REGEX_SPACE_FILTER = /[(,]/g;
+var REGEX_FIX_FILTER = /(\|)?(((\.+|_|#+)_njBracket_)|[\s]+([^\s._#|]+[\s]*_njBracket_))/g;
 
-function _replaceInnerBrackets(prop, counter, innerBrackets) {
+function _fixOperator(prop, innerBrackets) {
+  return _fixFilter(prop.replace(REGEX_FIX_OPERATOR, function () {
+    var args = arguments;
+    innerBrackets.push(_fixFilter(args[2]));
+    return ' ' + args[1] + '_njBracket_' + (innerBrackets.length - 1);
+  }));
+}
+
+function _fixFilter(prop) {
+  return (' ' + prop).replace(REGEX_SPACE_FILTER, function (all) {
+    return all + ' ';
+  }).replace(REGEX_FIX_FILTER, function (all, g1, g2, g3, g4, g5) {
+    return g1 ? all : ' | ' + (g3 ? g3 : g5);
+  }).trim();
+}
+
+function _replaceInnerBrackets(prop, innerBrackets) {
   var propR = prop.replace(REGEX_INNER_BRACKET, function (all, s1) {
-    innerBrackets.push(s1);
-    return '_njBracket_' + counter++;
+    innerBrackets.push(_fixOperator(s1, innerBrackets));
+    return '_njBracket_' + (innerBrackets.length - 1);
   });
 
   if (propR !== prop) {
-    return _replaceInnerBrackets(propR, counter, innerBrackets);
+    return _replaceInnerBrackets(propR, innerBrackets);
   } else {
-    return propR;
+    return _fixOperator(propR, innerBrackets);
   }
 }
 
@@ -1809,7 +1809,7 @@ function compiledParam(value, tmplRule, hasColon) {
           innerBrackets = [];
 
       isAll = param[3] ? param[0] === value : false; //If there are several curly braces in one property value, "isAll" must be false.
-      var prop = _replaceInnerBrackets(param[2], 0, innerBrackets);
+      var prop = _replaceInnerBrackets(param[2], innerBrackets);
       retP.prop = _compiledProp(prop, innerBrackets, innerQuotes);
 
       //To determine whether it is necessary to escape
@@ -3067,20 +3067,18 @@ function _buildPropData(obj, counter, fns, useStringLocal, level) {
       escape = obj.escape,
       isEmpty = false,
       special = false;
-  var _obj$prop = obj.prop,
-      jsProp = _obj$prop.jsProp,
-      isComputed = _obj$prop.isComputed;
+  var isComputed = obj.prop.isComputed;
 
   //先生成数据值
 
   if (obj.prop.isBasicType) {
-    dataValueStr = obj.prop.name + jsProp;
+    dataValueStr = obj.prop.name;
   } else if (obj.prop.isEmpty) {
     isEmpty = true;
   } else {
-    var _obj$prop2 = obj.prop,
-        name = _obj$prop2.name,
-        parentNum = _obj$prop2.parentNum;
+    var _obj$prop = obj.prop,
+        name = _obj$prop.name,
+        parentNum = _obj$prop.parentNum;
 
     var data = '',
         specialP = false;
@@ -3142,10 +3140,10 @@ function _buildPropData(obj, counter, fns, useStringLocal, level) {
     }
 
     if (!special && !specialP) {
-      dataValueStr = (isComputed ? 'p1.c(' : '') + 'p2.d(\'' + name + '\'' + (isComputed ? ', 0, true' : '') + ')' + (isComputed ? ', p2, ' + level + ')' : '') + jsProp;
+      dataValueStr = (isComputed ? 'p1.c(' : '') + 'p2.d(\'' + name + '\'' + (isComputed ? ', 0, true' : '') + ')' + (isComputed ? ', p2, ' + level + ')' : '');
     } else {
       var dataStr = special === CUSTOM_VAR ? data : 'p2.' + data;
-      dataValueStr = (special ? dataStr : (isComputed ? 'p1.c(' : '') + 'p2.d(\'' + name + '\', ' + dataStr + (isComputed ? ', true' : '') + ')' + (isComputed ? ', p2, ' + level + ')' : '')) + jsProp;
+      dataValueStr = special ? dataStr : (isComputed ? 'p1.c(' : '') + 'p2.d(\'' + name + '\', ' + dataStr + (isComputed ? ', true' : '') + ')' + (isComputed ? ', p2, ' + level + ')' : '');
     }
   }
   if (dataValueStr) {
