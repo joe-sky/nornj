@@ -2,7 +2,8 @@
   "name": "nornj",
   "version": "0.4.2-rc.27",
   "description": "A multipurpose javascript template engine, support both the rendering string and the react component.",
-  "main": "lib/base.js",
+  "main": "dist/nornj.common.js",
+  "unpkg": "dist/nornj.js",
   "files": [
     "dist/",
     "lib/",
@@ -12,9 +13,11 @@
     "README.md"
   ],
   "scripts": {
-    "umd": "cross-env BABEL_ENV=webpack webpack && npm run lib",
-    "min": "cross-env BABEL_ENV=webpack NODE_ENV=production webpack && npm run lib",
+    "cjs": "cross-env NODE_ENV=cjs rollup -c -o dist/nornj.common.js",
+    "umd": "cross-env NODE_ENV=development rollup -c -o dist/nornj.js",
+    "min": "cross-env NODE_ENV=production rollup -c -o dist/nornj.min.js",
     "lib": "babel src --out-dir lib",
+    "build": "npm run cjs && npm run umd && npm run min && npm run lib",
     "lint": "eslint src",
     "test": "karma start",
     "bdd": "jasmine JASMINE_CONFIG_PATH=test/jasmine.json"
@@ -36,6 +39,7 @@
     "babel-core": "^6.26.0",
     "babel-eslint": "^8.0.1",
     "babel-loader": "^7.1.2",
+    "babel-plugin-external-helpers": "^6.22.0",
     "babel-preset-env": "^1.6.1",
     "babel-register": "^6.18.0",
     "cross-env": "^5.1.0",
@@ -55,6 +59,12 @@
     "moment": "^2.20.1",
     "react": "^15.6.2",
     "react-dom": "^15.6.2",
+    "rollup": "^0.55.5",
+    "rollup-plugin-babel": "^3.0.3",
+    "rollup-plugin-filesize": "^1.5.0",
+    "rollup-plugin-license": "^0.5.0",
+    "rollup-plugin-replace": "^2.0.0",
+    "rollup-plugin-uglify": "^3.0.0",
     "webpack": "^3.8.1"
   }
 }

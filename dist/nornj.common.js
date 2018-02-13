@@ -3,11 +3,9 @@
 * (c) 2016-2018 Joe_Sky
 * Released under the MIT License.
 */
-(function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
-	typeof define === 'function' && define.amd ? define(['exports'], factory) :
-	(factory((global.NornJ = {})));
-}(this, (function (exports) { 'use strict';
+'use strict';
+
+Object.defineProperty(exports, '__esModule', { value: true });
 
 function nj() {
   return nj['taggedTmpl' + (nj.outputH ? 'H' : '')].apply(null, arguments);
@@ -2416,7 +2414,7 @@ function _buildPropData(obj$$1, counter, fns, useStringLocal, level) {
         filterStr += '  ' + filterVarStr + ' = ' + globalFilterStr + ';\n';
         filterStr += '}\n';
       }
-      {
+      if (process.env.NODE_ENV !== 'production') {
         filterStr += 'if (!' + filterVarStr + ') {\n';
         filterStr += '  p1.wn(\'A filter called "' + o.name + '" is undefined.\');\n';
         filterStr += '} else {\n';
@@ -2444,7 +2442,7 @@ function _buildPropData(obj$$1, counter, fns, useStringLocal, level) {
       }
       filterStr += _filterStr;
 
-      {
+      if (process.env.NODE_ENV !== 'production') {
         filterStr += '}';
       }
       filterStr += '\n';
@@ -2788,7 +2786,7 @@ function _buildNode(node, parent, fns, counter, retType, level, useStringLocal, 
 
     fnStr += paramsStr + dataReferStr;
 
-    {
+    if (process.env.NODE_ENV !== 'production') {
       //如果扩展标签不存在则打印警告信息
       fnStr += 'p1.tf(_ex' + _exC + ', \'' + node.ex + '\', \'ex\');\n';
     }
@@ -3509,7 +3507,3 @@ exports.render = render;
 exports.renderH = renderH;
 exports.taggedTmpl = taggedTmpl;
 exports.taggedTmplH = taggedTmplH;
-
-Object.defineProperty(exports, '__esModule', { value: true });
-
-})));

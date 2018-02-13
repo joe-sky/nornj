@@ -1,12 +1,3 @@
 {
-  "env": {
-    "development": {
-      "presets": ["env"]
-    },
-    "webpack": {
-      "presets": [
-        ["env", { "modules": false }]
-      ]
-    }
-  }
+  "presets": ["env"]
 }
