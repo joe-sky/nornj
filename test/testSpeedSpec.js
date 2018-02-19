@@ -4,6 +4,7 @@
   _ = require('lodash'),
   React = require('react'),
   ReactDOM = require('react-dom'),
+  createReactClass = require('create-react-class'),
   ReactDOMServer = require('react-dom/server'),
   Handlebars = require('handlebars');
 
@@ -108,6 +109,7 @@ describe('test speed', function() {
   var tmpl2 = nj `
   <{div} id="{num}_100">
     <#each {arr}>
+      {item.name['fullName']}
       <span class=test_{@index}
             style={../styles}
             onClick={../onClick}>
@@ -386,11 +388,11 @@ describe('test speed', function() {
     expect(ret).toBeTruthy();
   });
 
-  xit('test render to component by jsx', function() {
+  it('test render to component by jsx', function() {
     var start;
     let sum = 0;
 
-    var TestComponent = React.createClass({
+    var TestComponent = createReactClass({
       getInitialState: function() {
         return {
           num: 100
@@ -403,21 +405,38 @@ describe('test speed', function() {
       },
       render: function() {
         start = Date.now();
-        var ret = React.createElement('div', { id: this.state.num + '_100' }, this.props.arr.map(function(o, i) {
-          return [
-            React.createElement('span', { className: 'test_' + i, style: { color: 'blue' }, onClick: this.onClick },
-              'test_' + this.state.num,
-              list2.map(function(p, j) {
-                return React.createElement('div', i % 5 == 0 ? { name: 'five', key: j } : { key: j },
-                  React.createElement('span', null, 'span' + p.no),
-                  React.createElement('i', null, p.no),
-                  React.createElement('i', null, React.createElement('i', null, '1000'))
-                );
-              })
-            ),
-            i % 5 == 0 ? React.createElement('br') : React.createElement('img')
-          ];
-        }.bind(this)));
+        const ret = (
+          <div id={this.state.num + '_100'}>
+            {this.props.arr.map((o, i) => [
+              o.item.name['fullName'],
+              <span className={'test_' + i} style={{ color: 'blue' }} onClick={this.onClick}>
+                {'test_' + this.state.num}
+                {list2.map((p, j) => <div {... i % 5 == 0 ? { name: 'five', key: j } : { key: j }}>
+                  <span>{'span' + p.no}</span>
+                  <i>{p.no}</i>
+                  <i><i>1000</i></i>
+                </div>)}
+              </span>
+            ])}
+          </div>
+        );
+
+        // var ret = React.createElement('div', { id: this.state.num + '_100' }, this.props.arr.map(function(o, i) {
+        //   return [
+        //     o.item.name['fullName'],
+        //     React.createElement('span', { className: 'test_' + i, style: { color: 'blue' }, onClick: this.onClick },
+        //       'test_' + this.state.num,
+        //       list2.map(function(p, j) {
+        //         return React.createElement('div', i % 5 == 0 ? { name: 'five', key: j } : { key: j },
+        //           React.createElement('span', null, 'span' + p.no),
+        //           React.createElement('i', null, p.no),
+        //           React.createElement('i', null, React.createElement('i', null, '1000'))
+        //         );
+        //       })
+        //     ),
+        //     i % 5 == 0 ? React.createElement('br') : React.createElement('img')
+        //   ];
+        // }.bind(this)));
 
         //var params = ['div', null];
         //this.props.arr.forEach(function (o, i) {
@@ -433,19 +452,26 @@ describe('test speed', function() {
     });
 
     var list2 = _.times(100, function(n) {
-      return { no: n + 1 };
+      return { no: n };
     });
 
-    var html = ReactDOMServer.renderToStaticMarkup(React.createElement('div', null, _.times(10, (i) => React.createElement(TestComponent, {
+    var html = ReactDOMServer.renderToStaticMarkup(React.createElement('div', null, _.times(20, (i) => React.createElement(TestComponent, {
       key: i,
       arr: _.times(100, function(n) {
-        return n;
+        return {
+          no: n,
+          item: {
+            name: {
+              fullName: 'test' + n
+            }
+          }
+        };
       }),
       a: 1,
       list: [{ no: 1, b: 1 }, { no: 2, b: 0 }, { no: 3, b: 1 }]
     }))));
 
-    //console.log('avg:' + (sum / 10));
+    console.log('avg:' + (sum / 20));
 
     //console.log(html);
     expect(html).toBeTruthy();
@@ -454,7 +480,7 @@ describe('test speed', function() {
   it('test render to component by nj', function() {
     var start;
 
-    nj.registerComponent('TestComp', React.createClass({
+    nj.registerComponent('TestComp', createReactClass({
       render: function() {
         return nj `<div><#each {arr}>{../#text}</#each></div>` ({
           text: this.props.tmpls['t2'],
@@ -465,7 +491,7 @@ describe('test speed', function() {
       }
     }));
 
-    nj.registerComponent('TestComp2', React.createClass({
+    nj.registerComponent('TestComp2', createReactClass({
       render: function() {
         return nj `
         <div>
@@ -483,7 +509,7 @@ describe('test speed', function() {
 
     let sum = 0;
 
-    var TestComponent = React.createClass({
+    var TestComponent = createReactClass({
       getInitialState: function() {
         return {
           num: 100
@@ -560,7 +586,7 @@ describe('test speed', function() {
     });
 
     var list2 = _.times(100, function(n) {
-      return { no: n + 1 };
+      return { no: n };
     });
 
     // var html = ReactDOMServer.renderToStaticMarkup(React.createElement('div', null, _.times(1, (i) => React.createElement(TestComponent, {
@@ -572,18 +598,25 @@ describe('test speed', function() {
     //   list: [{ no: 1, b: 1 }, { no: 2, b: 0 }, { no: 3, b: 1 }]
     // }))));
 
-    //console.log('avg:' + (sum / 10));
-
-    var html = ReactDOMServer.renderToStaticMarkup(React.createElement('div', null, _.times(10, (n) => {
+    var html = ReactDOMServer.renderToStaticMarkup(React.createElement('div', null, _.times(20, (n) => {
       return React.createElement(TestComponent, {
         key: n,
         arr: _.times(100, function(n) {
-          return n;
+          return {
+            no: n,
+            item: {
+              name: {
+                fullName: 'test' + n
+              }
+            }
+          };
         }),
         a: 1,
         list: [{ no: 1, b: 1 }, { no: 2, b: 0 }, { no: 3, b: 1 }]
       })
     })));
+
+    console.log('avg:' + (sum / 20));
 
     //console.log(JSON.stringify(nj.asts['tmpl1']));
     //console.log(html);
