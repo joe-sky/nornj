@@ -1,9 +1,9 @@
 ﻿'use strict';
 
-const nj = require('../src/base').default,
+const nj = require('../../src/base').default,
   _ = require('lodash'),
-  compile = require('../src/compiler/compile').compile,
-  includeParser = require('../tools/includeParser'),
+  compile = require('../../src/compiler/compile').compile,
+  //includeParser = require('../../tools/includeParser'),
   moment = require('moment');
 
 describe('test compile string', function() {
@@ -425,17 +425,9 @@ describe('test compile string', function() {
       // console.log('\n4:\n', fns.fn4.toString());
       //console.log(JSON.stringify(nj.asts['tmplString']));
 
-      nj.config({
-        textMode: true,
-        delimiters: {
-          start: '{%',
-          end: '%}',
-          extension: '$$',
-          prop: '##'
-        }
-      });
       const tmplTest3 = 
-nj`<template>
+`<nj-text>
+<template>
   <div>1</div>
 </template>
 
@@ -465,10 +457,15 @@ nj`<template>
 
           var scriptUrl = '<script src="'+prefix+'/resources/app/pages/'+path+'index.js">' + '<' + '/script>';
         }
-</script>`;
+</script></nj-text>`;
 
       var html = tmplTest.apply(null, data);
-      //var html = nj.compile(tmplTest3).apply(null, data);
+      // var html = nj.compile(tmplTest3, { delimiters: {
+      //   start: '{%',
+      //   end: '%}',
+      //   extension: '$$',
+      //   prop: '##'
+      // } }).apply(null, data);
       // var html2 = tmplTest.call(null, { id: 200, c1: 100 }, data[0]);
       console.log(html);
       expect(html).toBeTruthy();

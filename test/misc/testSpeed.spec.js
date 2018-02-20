@@ -1,15 +1,14 @@
-﻿var nj = require('../src/base').default,
-  compiler = require('../src/compiler/compile'),
+﻿var nj = require('../../src/base').default,
+  compiler = require('../../src/compiler/compile'),
   compile = compiler.compile,
   _ = require('lodash'),
   React = require('react'),
   ReactDOM = require('react-dom'),
   createReactClass = require('create-react-class'),
   ReactDOMServer = require('react-dom/server'),
-  Handlebars = require('handlebars');
+  Handlebars = require('handlebars/dist/handlebars');
 
-nj.config({
-  createElement: React.createElement,
+const Nj = nj.createTaggedTmpl({
   outputH: true,
   delimiters: {
     start: '{',
@@ -17,16 +16,20 @@ nj.config({
   }
 });
 
+nj.config({
+  createElement: React.createElement
+});
+
 describe('test speed', function() {
-  var t1 = nj `
+  var t1 = Nj `
   <img src="t1" />
   `;
 
-  var t2 = nj `
+  var t2 = Nj `
   <img src="t2" style="margin:0 auto" />
   `;
 
-  var tmpl = nj `
+  var tmpl = Nj `
   <{div} id="{num}_100'200'">
     <@class useString>
       test
@@ -106,7 +109,7 @@ describe('test speed', function() {
   </{div}>
   `;
 
-  var tmpl2 = nj `
+  var tmpl2 = Nj `
   <{div} id="{num}_100">
     <#each {arr}>
       {item.name['fullName']}
@@ -128,7 +131,7 @@ describe('test speed', function() {
         </#each>
       </span>
       <#if {@index | five(1)}>
-        <#once><br /></#once>
+        <br />
         <#else>
           <#once><img /></#once>
         </#else>
@@ -242,7 +245,7 @@ describe('test speed', function() {
     }
   };
 
-  var _tmpl = nj `
+  var _tmpl = Nj `
   <{div} id="{num}_100">{...props}
     &nbsp;1&gt;2
     <#each {arr}>
@@ -286,10 +289,7 @@ describe('test speed', function() {
       <span class="test_{{@index}}">
         test_{{../num}}
         {{#each ../list2}}
-          <div key="{{@index}}"{{#five @../index}} name="five"{{/five}}>
-            <span>span{{no}}</span>
-            <i>{{no}}</i>
-          </div>
+          {{no}}<img id="{{no}}">{{no}}
         {{/each}}
       </span>
       {{#five @index}}
@@ -301,31 +301,23 @@ describe('test speed', function() {
   </{{div}}>
   `;
 
-  var tmplNj = nj `
-  <{div} id="{num}_100" id2="2">
-    <#each {arr}>
-      <span class="test_{@index}">
-        test_{../num}
-        <#each {../list2}>
-          <div key="{@index}">
-            <#props>
-              <#if {../@index | five}>
-                <@name>five</@name>
-              </#if>
-            </#props>
-            <span>span{no}</span>
-            <i>{no}</i>
-          </div>
+  var tmplNj = `
+  <{{div}} id="{{num}}_100" id2="2">
+    <#each {{arr}}>
+      <span class="test_{{@index}}">
+        test_{{../num}}
+        <#each {{../list2}}>
+          {{no}}<img id="{{no}}">{{no}}
         </#each>
       </span>
-      <#if {@index | five}>
+      <#if {{@index | five}}>
         <br />
         <#else>
           <img />
         </#else>
       </#if>
     </#each>
-  </{div}>
+  </{{div}}>
   `;
 
   beforeAll(function() {
@@ -333,7 +325,7 @@ describe('test speed', function() {
       if (obj % 5 == 0) {
         return true;
       }
-    }, { useString: false });
+    });
 
     nj.registerFilter('test', function (obj, p, p2) {
       return (obj + p) + p2;
@@ -348,14 +340,14 @@ describe('test speed', function() {
     });
   });
 
-  xit('test render to string by hbs', function() {
+  it('test render to string by hbs', function() {
     var data = {
       div: 'div',
       num: 100,
-      arr: _.times(200, function(n) {
+      arr: _.times(100, function(n) {
         return n;
       }),
-      list2: _.times(100, function(n) {
+      list2: _.times(1000, function(n) {
         return { no: n + 1 };
       })
     };
@@ -368,19 +360,20 @@ describe('test speed', function() {
     expect(ret).toBeTruthy();
   });
 
-  xit('test render to string by nj', function() {
+  it('test render to string by nj', function() {
     var data = {
       div: 'div',
       num: 100,
-      arr: _.times(200, function(n) {
+      arr: _.times(100, function(n) {
         return n;
       }),
-      list2: _.times(100, function(n) {
+      list2: _.times(1000, function(n) {
         return { no: n + 1 };
       })
     };
 
-    var tmplFn = nj.compile(tmplNj);
+    var tmplFn = nj.compile(tmplNj, 't1');
+    //console.log(nj.templates['t1'].fn2.toString());
     var start = Date.now();
     var ret = tmplFn(data);
     //console.log(ret);
@@ -404,7 +397,6 @@ describe('test speed', function() {
         });
       },
       render: function() {
-        start = Date.now();
         const ret = (
           <div id={this.state.num + '_100'}>
             {this.props.arr.map((o, i) => [
@@ -444,9 +436,6 @@ describe('test speed', function() {
         //});
         //ret = React.createElement.apply(React, params);
 
-        let time = Date.now() - start;
-        console.log('jsx:' + time);
-        sum += time;
         return ret;
       }
     });
@@ -455,9 +444,11 @@ describe('test speed', function() {
       return { no: n };
     });
 
-    var html = ReactDOMServer.renderToStaticMarkup(React.createElement('div', null, _.times(20, (i) => React.createElement(TestComponent, {
-      key: i,
-      arr: _.times(100, function(n) {
+    let html = '',
+      count = 10;
+    _.times(count, (n) => {
+      start = Date.now();
+      html += ReactDOMServer.renderToStaticMarkup(<TestComponent key={n} arr={_.times(50, function(n) {
         return {
           no: n,
           item: {
@@ -466,12 +457,14 @@ describe('test speed', function() {
             }
           }
         };
-      }),
-      a: 1,
-      list: [{ no: 1, b: 1 }, { no: 2, b: 0 }, { no: 3, b: 1 }]
-    }))));
+      })} a={1} list={[{ no: 1, b: 1 }, { no: 2, b: 0 }, { no: 3, b: 1 }]} />);
 
-    console.log('avg:' + (sum / 20));
+      let time = Date.now() - start;
+      console.log('jsx:' + (time));
+      sum += time;
+    });
+
+    console.log('avg:' + (sum / count));
 
     //console.log(html);
     expect(html).toBeTruthy();
@@ -482,7 +475,7 @@ describe('test speed', function() {
 
     nj.registerComponent('TestComp', createReactClass({
       render: function() {
-        return nj `<div><#each {arr}>{../#text}</#each></div>` ({
+        return Nj `<div><#each {arr}>{../#text}</#each></div>` ({
           text: this.props.tmpls['t2'],
           arr: _.times(2, function(n) {
             return n;
@@ -493,7 +486,7 @@ describe('test speed', function() {
 
     nj.registerComponent('TestComp2', createReactClass({
       render: function() {
-        return nj `
+        return Nj `
         <div>
           {tmpl}
           <br />
@@ -515,14 +508,12 @@ describe('test speed', function() {
           num: 100
         };
       },
-      template: nj.compileH(tmpl2, 'tmpl1'),
       onClick: function() {
         this.setState({ num: Date.now() }, function() {
           console.log('total:' + (Date.now() - start));
         });
       },
       render: function() {
-        start = Date.now();
         var params = {
           arr: this.props.arr,
           num: this.state.num,
@@ -576,11 +567,7 @@ describe('test speed', function() {
         // </{div}>
         // ` (params);
 
-        var ret = this.template(params);
-        let time = Date.now() - start;
-        console.log('nj:' + (time));
-        sum += time;
-
+        var ret = tmpl2(params);
         return ret;
       }
     });
@@ -598,25 +585,27 @@ describe('test speed', function() {
     //   list: [{ no: 1, b: 1 }, { no: 2, b: 0 }, { no: 3, b: 1 }]
     // }))));
 
-    var html = ReactDOMServer.renderToStaticMarkup(React.createElement('div', null, _.times(20, (n) => {
-      return React.createElement(TestComponent, {
-        key: n,
-        arr: _.times(100, function(n) {
-          return {
-            no: n,
-            item: {
-              name: {
-                fullName: 'test' + n
-              }
+    let html = '',
+      count = 10;
+    _.times(count, (n) => {
+      start = Date.now();
+      html += ReactDOMServer.renderToStaticMarkup(Nj`<${TestComponent} key=${n} arr=${_.times(50, function(n) {
+        return {
+          no: n,
+          item: {
+            name: {
+              fullName: 'test' + n
             }
-          };
-        }),
-        a: 1,
-        list: [{ no: 1, b: 1 }, { no: 2, b: 0 }, { no: 3, b: 1 }]
-      })
-    })));
+          }
+        };
+      })} a={1} :list="[{ no: 1, b: 1 }, { no: 2, b: 0 }, { no: 3, b: 1 }]" />`());
 
-    console.log('avg:' + (sum / 20));
+      let time = Date.now() - start;
+      console.log('nj:' + (time));
+      sum += time;
+    });
+
+    console.log('avg:' + (sum / count));
 
     //console.log(JSON.stringify(nj.asts['tmpl1']));
     //console.log(html);
