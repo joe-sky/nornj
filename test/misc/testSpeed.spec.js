@@ -445,7 +445,7 @@ describe('test speed', function() {
     });
 
     let html = '',
-      count = 10;
+      count = 5;
     _.times(count, (n) => {
       start = Date.now();
       html += ReactDOMServer.renderToStaticMarkup(<TestComponent key={n} arr={_.times(10, function(n) {
@@ -586,7 +586,7 @@ describe('test speed', function() {
     // }))));
 
     let html = '',
-      count = 10;
+      count = 5;
     _.times(count, (n) => {
       start = Date.now();
       html += ReactDOMServer.renderToStaticMarkup(Nj`<${TestComponent} key=${n} arr=${_.times(10, function(n) {
