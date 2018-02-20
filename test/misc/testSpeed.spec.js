@@ -347,7 +347,7 @@ describe('test speed', function() {
       arr: _.times(100, function(n) {
         return n;
       }),
-      list2: _.times(1000, function(n) {
+      list2: _.times(100, function(n) {
         return { no: n + 1 };
       })
     };
@@ -367,7 +367,7 @@ describe('test speed', function() {
       arr: _.times(100, function(n) {
         return n;
       }),
-      list2: _.times(1000, function(n) {
+      list2: _.times(100, function(n) {
         return { no: n + 1 };
       })
     };
@@ -448,7 +448,7 @@ describe('test speed', function() {
       count = 10;
     _.times(count, (n) => {
       start = Date.now();
-      html += ReactDOMServer.renderToStaticMarkup(<TestComponent key={n} arr={_.times(50, function(n) {
+      html += ReactDOMServer.renderToStaticMarkup(<TestComponent key={n} arr={_.times(10, function(n) {
         return {
           no: n,
           item: {
@@ -589,7 +589,7 @@ describe('test speed', function() {
       count = 10;
     _.times(count, (n) => {
       start = Date.now();
-      html += ReactDOMServer.renderToStaticMarkup(Nj`<${TestComponent} key=${n} arr=${_.times(50, function(n) {
+      html += ReactDOMServer.renderToStaticMarkup(Nj`<${TestComponent} key=${n} arr=${_.times(10, function(n) {
         return {
           no: n,
           item: {
