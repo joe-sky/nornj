@@ -12,6 +12,12 @@
 `NornJ`是一个渲染效率高，语法可读性好，可扩展性超强，适用场景丰富的javascript模板引擎。
 
 [![NPM Version][npm-image]][npm-url]
+<a href="https://travis-ci.org/joe-sky/nornj">
+<img src="https://travis-ci.org/joe-sky/nornj.svg?branch=master" alt="Travis CI Status"/>
+</a>
+<a href="https://codecov.io/gh/joe-sky/nornj">
+  <img src="https://codecov.io/gh/joe-sky/nornj/branch/master/graph/badge.svg" alt="Codecov" />
+</a>
 [![NPM Downloads][downloads-image]][npm-url]
 
 ## 概述
