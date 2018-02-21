@@ -2857,7 +2857,7 @@ function _buildNode(node, parent, fns, counter, retType, level, useStringLocal, 
     fnStr += _buildContent(node.content, node, fns, counter, !useStringF ? { _compParam: '_compParam' + _compParamC } : { _children: '_children' + _childrenC }, level != null ? level + 1 : level, useStringLocal);
 
     //渲染
-    fnStr += _buildRender(node, parent, 3, retType, !useStringF ? { _compParam: _compParamC } : { _type: _typeC, _params: _paramsStr !== '' ? _paramsC2 : null, _children: _childrenC, _selfClose: node.selfCloseTag }, fns, level, useStringLocal, node.allowNewline, isFirst);
+    fnStr += _buildRender(node, parent, 3, retType, !useStringF ? { _compParam: _compParamC } : { _type: _typeC, _typeS: _type, _typeR: _typeRefer, _params: _paramsStr !== '' ? _paramsC2 : null, _children: _childrenC, _selfClose: node.selfCloseTag }, fns, level, useStringLocal, node.allowNewline, isFirst);
   }
 
   return fnStr;
@@ -2915,14 +2915,17 @@ function _buildRender(node, parent, nodeType, retType, params, fns, level, useSt
         }
 
         if (node.type !== nj.textTag) {
-          retStr += levelSpace + _buildLevelSpaceRt(useStringF, isFirst || noLevel) + '\'<\' + _type' + params._type + ' + ' + (params._params != null ? '_params' + params._params + ' + ' : '');
+          var hasTypeR = params._typeR,
+              hasParams = params._params != null;
+
+          retStr += levelSpace + _buildLevelSpaceRt(useStringF, isFirst || noLevel) + '\'<' + (hasTypeR ? '\' + _type' + params._type : params._typeS) + (hasParams ? (!hasTypeR ? '\'' : '') + ' + _params' + params._params : '') + (hasTypeR || hasParams ? ' + \'' : '');
           if (!params._selfClose) {
-            retStr += '\'>\'';
+            retStr += '>\'';
             retStr += ' + _children' + params._children + ' + ';
             retStr += (!content || allowNewline || noLevel ? '' : '\'\\n\' + ') + (content ? levelSpace : '') + //如果子节点为空则不输出缩进空格和换行符
-            _buildLevelSpaceRt(useStringF, noLevel) + '\'</\' + _type' + params._type + ' + \'>\'';
+            _buildLevelSpaceRt(useStringF, noLevel) + '\'</' + (hasTypeR ? '\' + _type' + params._type + ' + \'' : params._typeS) + '>\'';
           } else {
-            retStr += '\' />\'';
+            retStr += ' />\'';
           }
         } else {
           retStr += '_children' + params._children;

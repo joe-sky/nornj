@@ -289,7 +289,7 @@ describe('test speed', function() {
       <span class="test_{{@index}}">
         test_{{../num}}
         {{#each ../list2}}
-          {{no}}<img id="{{no}}">{{no}}
+          {{no}}{{no}}<div>{{no}}</div>{{no}}{{no}}
         {{/each}}
       </span>
       {{#five @index}}
@@ -307,7 +307,7 @@ describe('test speed', function() {
       <span class="test_{{@index}}">
         test_{{../num}}
         <#each {{../list2}}>
-          {{no}}<img id="{{no}}">{{no}}
+          {{no}}{{no}}<div>{{no}}</div>{{no}}{{no}}
         </#each>
       </span>
       <#if {{@index | five}}>
@@ -347,7 +347,7 @@ describe('test speed', function() {
       arr: _.times(100, function(n) {
         return n;
       }),
-      list2: _.times(100, function(n) {
+      list2: _.times(1000, function(n) {
         return { no: n + 1 };
       })
     };
@@ -367,13 +367,15 @@ describe('test speed', function() {
       arr: _.times(100, function(n) {
         return n;
       }),
-      list2: _.times(100, function(n) {
+      list2: _.times(1000, function(n) {
         return { no: n + 1 };
       })
     };
 
     var tmplFn = nj.compile(tmplNj, 't1');
     //console.log(nj.templates['t1'].fn2.toString());
+    // nj.templates['t1'].fn2 = new Function('p1', 'p2', 'p3', 'p4', 'p5', `
+    // `);
     var start = Date.now();
     var ret = tmplFn(data);
     //console.log(ret);
@@ -448,7 +450,7 @@ describe('test speed', function() {
       count = 10;
     _.times(count, (n) => {
       start = Date.now();
-      html += ReactDOMServer.renderToStaticMarkup(<TestComponent key={n} arr={_.times(100, function(n) {
+      html += ReactDOMServer.renderToStaticMarkup(<TestComponent key={n} arr={_.times(50, function(n) {
         return {
           no: n,
           item: {
@@ -589,7 +591,7 @@ describe('test speed', function() {
       count = 10;
     _.times(count, (n) => {
       start = Date.now();
-      html += ReactDOMServer.renderToStaticMarkup(Nj`<${TestComponent} key=${n} arr=${_.times(100, function(n) {
+      html += ReactDOMServer.renderToStaticMarkup(Nj`<${TestComponent} key=${n} arr=${_.times(50, function(n) {
         return {
           no: n,
           item: {

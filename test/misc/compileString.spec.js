@@ -20,7 +20,7 @@ describe('test compile string', function() {
           return !!!v;
         });
         nj.registerFilter('tagName', function(v1, v2, v3, options) {
-          console.log(options.lastValue);
+          //console.log(options.lastValue);
           return v1 + 'Tmp';
         });
         nj.registerFilter('emptyFilter', function(n) {
@@ -33,7 +33,7 @@ describe('test compile string', function() {
         nj.registerExtension('textExpr', function(arg1, arg2, opts) {
           //return opts.props.tmpls[0]();
           //console.log(opts.props.args);
-          console.log(opts.props.a);
+          //console.log(opts.props.a);
           return arg1;
         });
 
@@ -78,7 +78,7 @@ describe('test compile string', function() {
               //expect(html).toBeTruthy();
             });
 
-            it('test compile 1', function() {
+            it('test compile string', function() {
                   var data = [{
                       f1: function() {
                         return '__f1__' + this.name3;
@@ -467,7 +467,7 @@ describe('test compile string', function() {
       //   prop: '##'
       // } }).apply(null, data);
       // var html2 = tmplTest.call(null, { id: 200, c1: 100 }, data[0]);
-      console.log(html);
+      //console.log(html);
       expect(html).toBeTruthy();
     });
 

@@ -48,7 +48,7 @@ describe('test compile string', function() {
           }
         },
       });
-      console.log(html);
+      //console.log(html);
       expect(html).toBeTruthy();
     });
   });
