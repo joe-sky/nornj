@@ -112,7 +112,7 @@ describe('test speed', function() {
   var tmpl2 = Nj `
   <{div} id="{num}_100">
     <#each {arr}>
-      {item.name['fullName']}
+      <#once>{item.name['fullName']}</#once>
       <span class=test_{@index}
             style={../styles}
             onClick={../onClick}>
@@ -131,7 +131,7 @@ describe('test speed', function() {
         </#each>
       </span>
       <#if {@index | five(1)}>
-        <br />
+        <#once><br /></#once>
         <#else>
           <#once><img /></#once>
         </#else>
@@ -447,10 +447,10 @@ describe('test speed', function() {
     });
 
     let html = '',
-      count = 5;
+      count = 10;
     _.times(count, (n) => {
       start = Date.now();
-      html += ReactDOMServer.renderToStaticMarkup(<TestComponent key={n} arr={_.times(50, function(n) {
+      html += ReactDOMServer.renderToStaticMarkup(<TestComponent key={n} arr={_.times(100, function(n) {
         return {
           no: n,
           item: {
@@ -588,10 +588,10 @@ describe('test speed', function() {
     // }))));
 
     let html = '',
-      count = 5;
+      count = 10;
     _.times(count, (n) => {
       start = Date.now();
-      html += ReactDOMServer.renderToStaticMarkup(Nj`<${TestComponent} key=${n} arr=${_.times(50, function(n) {
+      html += ReactDOMServer.renderToStaticMarkup(Nj`<${TestComponent} key=${n} arr=${_.times(100, function(n) {
         return {
           no: n,
           item: {
