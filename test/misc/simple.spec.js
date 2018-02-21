@@ -11,7 +11,7 @@ describe('test compile string', function() {
   });
 
   describe('compile string template to html', function() {
-    it('test compile 1', function() {
+    it('test compile simple', function() {
 
 
       var tmpl = nj `

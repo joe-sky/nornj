@@ -112,18 +112,13 @@ describe('test speed', function() {
   var tmpl2 = Nj `
   <{div} id="{num}_100">
     <#each {arr}>
-      <#once>{item.name['fullName']}</#once>
+      {item.name['fullName']}
       <span class=test_{@index}
             style={../styles}
             onClick={../onClick}>
-        <#once>test_{../num}</#once>
+        test_{../num}
         <#each {../list2}>
           <div key={@index}>
-            <#props>
-              <#if {../@index | five}>
-                <@name>five</@name>
-              </#if>
-            </#props>
             <span>span{no}</span>
             <i>{no}</i>
             <#once><i><i>1000</i></i></#once>
@@ -405,7 +400,7 @@ describe('test speed', function() {
               o.item.name['fullName'],
               <span className={'test_' + i} style={{ color: 'blue' }} onClick={this.onClick}>
                 {'test_' + this.state.num}
-                {list2.map((p, j) => <div {... i % 5 == 0 ? { name: 'five', key: j } : { key: j }}>
+                {list2.map((p, j) => <div key={j}>
                   <span>{'span' + p.no}</span>
                   <i>{p.no}</i>
                   <i><i>1000</i></i>
@@ -447,10 +442,10 @@ describe('test speed', function() {
     });
 
     let html = '',
-      count = 10;
+      count = 20;
     _.times(count, (n) => {
       start = Date.now();
-      html += ReactDOMServer.renderToStaticMarkup(<TestComponent key={n} arr={_.times(20, function(n) {
+      html += ReactDOMServer.renderToStaticMarkup(<TestComponent key={n} arr={_.times(10, function(n) {
         return {
           no: n,
           item: {
@@ -588,10 +583,10 @@ describe('test speed', function() {
     // }))));
 
     let html = '',
-      count = 10;
+      count = 20;
     _.times(count, (n) => {
       start = Date.now();
-      html += ReactDOMServer.renderToStaticMarkup(Nj`<${TestComponent} key=${n} arr=${_.times(20, function(n) {
+      html += ReactDOMServer.renderToStaticMarkup(Nj`<${TestComponent} key=${n} arr=${_.times(10, function(n) {
         return {
           no: n,
           item: {
