@@ -116,7 +116,7 @@ describe('test speed', function() {
       <span class=test_{@index}
             style={../styles}
             onClick={../onClick}>
-        test_{../num}
+        <#once>test_{../num}</#once>
         <#each {../list2}>
           <div key={@index}>
             <#props>
@@ -447,7 +447,7 @@ describe('test speed', function() {
     });
 
     let html = '',
-      count = 10;
+      count = 5;
     _.times(count, (n) => {
       start = Date.now();
       html += ReactDOMServer.renderToStaticMarkup(<TestComponent key={n} arr={_.times(50, function(n) {
@@ -588,7 +588,7 @@ describe('test speed', function() {
     // }))));
 
     let html = '',
-      count = 10;
+      count = 5;
     _.times(count, (n) => {
       start = Date.now();
       html += ReactDOMServer.renderToStaticMarkup(Nj`<${TestComponent} key=${n} arr=${_.times(50, function(n) {
