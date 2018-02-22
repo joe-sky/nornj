@@ -29,7 +29,9 @@ const UNESCAPE_LOOKUP = {
   zwj: '\u200D',
   lt: '<',
   gt: '>',
-  amp: '&'
+  amp: '&',
+  quot: '"',
+  '#x27': '\''
 };
 
 const REGEX_UNESCAPE = new RegExp('&(' + Object.keys(UNESCAPE_LOOKUP).join('|') + ');', 'g');

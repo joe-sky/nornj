@@ -531,7 +531,9 @@ var UNESCAPE_LOOKUP = {
   zwj: '\u200D',
   lt: '<',
   gt: '>',
-  amp: '&'
+  amp: '&',
+  quot: '"',
+  '#x27': '\''
 };
 
 var REGEX_UNESCAPE = new RegExp('&(' + Object.keys(UNESCAPE_LOOKUP).join('|') + ');', 'g');
