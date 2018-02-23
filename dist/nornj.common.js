@@ -1129,10 +1129,8 @@ var extensions = {
   },
 
   once: function once(options) {
-    var props = options.props;
-
     var cacheObj = options.context.root || options.context,
-        cacheKey = '_njOnceCache_' + (props && props.cacheKey != null ? props.cacheKey : options._njFnsNo),
+        cacheKey = '_njOnceCache_' + options._njFnsNo,
         cache = cacheObj[cacheKey];
 
     if (cache === undefined) {

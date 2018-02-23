@@ -271,9 +271,8 @@ export const extensions = {
   },
 
   once: options => {
-    const { props } = options;
     let cacheObj = options.context.root || options.context,
-      cacheKey = '_njOnceCache_' + (props && props.cacheKey != null ? props.cacheKey : options._njFnsNo),
+      cacheKey = '_njOnceCache_' + options._njFnsNo,
       cache = cacheObj[cacheKey];
 
     if (cache === undefined) {
