@@ -126,9 +126,9 @@ describe('test speed', function() {
         </#each>
       </span>
       <#if {@index | five(1)}>
-        <#once><br /></#once>
+        <br />
         <#else>
-          <#once><img /></#once>
+          <img />
         </#else>
       </#if>
     </#each>
