@@ -85,7 +85,7 @@ function _compiledProp(prop, innerBrackets, innerQuotes) {
 
 //Get filter param
 function _getFilterParam(obj) {
-  return obj.split('_njBracket_');
+  return obj.split('\'bracket_');
 }
 
 //Extract replace parameters
@@ -106,7 +106,7 @@ const FN_FILTER_LOOKUP = {
 };
 const REGEX_FN_FILTER = /(\)|\]|\.([^\s'"._#()|]+))[\s]*\(/g;
 const REGEX_SPACE_S_FILTER = /([(,|])[\s]+/g;
-const REGEX_PROP_FILTER = /\.([a-zA-Z_$][^\s.\/,[\]()'"|]*)/g;
+const REGEX_PROP_FILTER = /\.([a-zA-Z_$][^\s.\/,[\]()'"|#]*)/g;
 const REGEX_ARRPROP_FILTER = /([^\s([,])(\[)/g;
 const ARR_OBJ_FILTER_LOOKUP = {
   '[': 'list(',
@@ -132,7 +132,11 @@ function _getProp(matchArr, innerQuotes, i) {
       innerQuotes.push(match);
       return '_njQs' + (innerQuotes.length - 1) + '_';
     })
-    .replace(REGEX_PROP_FILTER, (all, g1) => '.(\'' + g1 + '\')')
+    .replace(REGEX_PROP_FILTER, (all, g1) => {
+      const lastCharIndex = g1.length - 1,
+        endWithUnderline = g1[lastCharIndex] === '_';
+      return '.(\'' + (endWithUnderline ? g1.substr(0, lastCharIndex) : g1) + '\')' + (endWithUnderline ? '_' : '');
+    })
     .replace(REGEX_ARRPROP_FILTER, (all, g1, g2) => g1 + '.(')
     .replace(REGEX_ARR_OBJ_FILTER, match => ARR_OBJ_FILTER_LOOKUP[match])
     .replace(REGEX_OBJKEY_FILTER, (all, g1) => ' \'' + g1 + '\' : ')
@@ -166,15 +170,15 @@ function _getReplaceParam(obj, tmplRule, innerQuotes, hasColon) {
 }
 
 const REGEX_INNER_BRACKET = /\(([^()]*)\)/g;
-const REGEX_FIX_OPERATOR = /[\s]+((?!_njBracket_)[^\s(),|"\']+)[\s]+((-?[0-9][0-9]*(\.\d+)?|(?!_njBracket_)[^\s,|]+)(_njBracket_\d+)?([._#]_njBracket_\d+)*)/g;
+const REGEX_FIX_OPERATOR = /[\s]+([^\s(),|"']+)[\s]+((-?[0-9][0-9]*(\.\d+)?|[^\s,|']+)('bracket_\d+)?([._#]'bracket_\d+)*)/g;
 const REGEX_SPACE_FILTER = /[(,]/g;
-const REGEX_FIX_FILTER = /(\|)?(((\.+|_|#+)_njBracket_)|[\s]+([^\s._#|]+[\s]*_njBracket_))/g;
+const REGEX_FIX_FILTER = /(\|)?(((\.+|_|#+)'bracket_)|[\s]+([^\s._#|]+[\s]*'bracket_))/g;
 
 function _fixOperator(prop, innerBrackets) {
   return _fixFilter(prop.replace(REGEX_FIX_OPERATOR, function() {
     const args = arguments;
     innerBrackets.push(_fixFilter(args[2]));
-    return ' ' + args[1] + '_njBracket_' + (innerBrackets.length - 1);
+    return ' ' + args[1] + '\'bracket_' + (innerBrackets.length - 1);
   }));
 }
 
@@ -186,7 +190,7 @@ function _fixFilter(prop) {
 function _replaceInnerBrackets(prop, innerBrackets) {
   let propR = prop.replace(REGEX_INNER_BRACKET, (all, s1) => {
     innerBrackets.push(_fixOperator(s1, innerBrackets));
-    return '_njBracket_' + (innerBrackets.length - 1);
+    return '\'bracket_' + (innerBrackets.length - 1);
   });
 
   if (propR !== prop) {

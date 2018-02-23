@@ -29,6 +29,7 @@ describe('test compile string', function() {
           {{ 20.5 | int * (10.05 | float) + (2 ** 3) + (19 // 2) }}
           {{ [1, 2, 3].length + [1].push(100) }}
           {{ -10 ..< 10 }}
+          {{1 >(0) ?('+','')}}
         </${'div'}>
       `;
 

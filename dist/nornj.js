@@ -1,5 +1,5 @@
 /*!
-* NornJ template engine v0.4.2-rc.27
+* NornJ template engine v0.4.2-rc.30
 * (c) 2016-2018 Joe_Sky
 * Released under the MIT License.
 */
@@ -434,7 +434,7 @@ function createTmplRule() {
       escapeExtensionRule = _replace$(extensionRule),
       escapePropRule = _replace$(propRule),
       escapeStrPropRule = _replace$(strPropRule),
-      braceParamStr = '([' + firstChar + ']?' + startRule + ')((?!' + endRule + ')[\\s\\S]+?)(' + endRule + '[' + lastChar + ']?)';
+      braceParamStr = '([' + firstChar + ']?' + startRule + ')([\\s\\S]+?)(' + endRule + '[' + lastChar + ']?)';
 
   var tmplRules = {
     startRule: startRule,
@@ -448,18 +448,18 @@ function createTmplRule() {
     firstChar: firstChar,
     lastChar: lastChar,
     xmlOpenTag: _createRegExp('^<([a-z' + firstChar + extensionRules + '][^\\s>]*)[^>]*>$', 'i'),
-    openTagParams: _createRegExp('[\\s]+((([' + firstChar + ']?' + startRule + ')((?!' + endRule + ')[\\s\\S]+?)(' + endRule + '[' + lastChar + ']?))|[^\\s=>]+)(=((\'[^\']+\')|("[^"]+")|([^"\'\\s]+)))?', 'g'),
+    openTagParams: _createRegExp('[\\s]+((([' + firstChar + ']?' + startRule + ')([\\s\\S]+?)(' + endRule + '[' + lastChar + ']?))|[^\\s=>]+)(=((\'[^\']+\')|("[^"]+")|([^"\'\\s]+)))?', 'g'),
     braceParam: _createRegExp(braceParamStr, 'i'),
     braceParamG: _createRegExp(braceParamStr, 'ig'),
-    spreadProp: _createRegExp('[\\s]+([' + firstChar + ']?' + startRule + ')[\\s]*(\\.\\.\\.(?!' + endRule + ')[\\s\\S]+?)(' + endRule + '[' + lastChar + ']?)', 'g'),
-    replaceSplit: _createRegExp('(?:[' + firstChar + ']?' + startRule + ')(?!' + endRule + ')[\\s\\S]+?(?:' + endRule + '[' + lastChar + ']?)'),
-    replaceParam: _createRegExp('([' + firstChar + ']?' + startRule + ')((?!' + endRule + ')[\\s\\S]+?)' + endRule + '[' + lastChar + ']?', 'g'),
+    spreadProp: _createRegExp('[\\s]+([' + firstChar + ']?' + startRule + ')[\\s]*(\\.\\.\\.[\\s\\S]+?)(' + endRule + '[' + lastChar + ']?)', 'g'),
+    replaceSplit: _createRegExp('(?:[' + firstChar + ']?' + startRule + ')[\\s\\S]+?(?:' + endRule + '[' + lastChar + ']?)'),
+    replaceParam: _createRegExp('([' + firstChar + ']?' + startRule + ')([\\s\\S]+?)' + endRule + '[' + lastChar + ']?', 'g'),
     checkElem: _createRegExp('([^<>]+)|(<([a-z/!' + firstChar + extensionRules + '][^\\s<>]*)([^<>]*)>|<)([^<]*)', 'ig'),
     extension: _createRegExp('^' + escapeExtensionRule + '([^\\s]+)', 'i'),
     exAll: _createRegExp('^([/]?)(' + escapeExtensionRule + '|' + escapeStrPropRule + escapePropRule + '|' + escapePropRule + ')([^\\s]+)', 'i'),
     include: _createRegExp('<' + escapeExtensionRule + 'include([^>]*)>', 'ig'),
     incompleteStart: _createRegExp('[' + firstChar + ']?' + startRule + '((?!' + endRule + ')[\\s\\S])*$'),
-    incompleteEnd: _createRegExp('^(?!' + startRule + ')[\\s\\S]*?' + endRule + '[' + lastChar + ']?')
+    incompleteEnd: _createRegExp('^[\\s\\S]*?' + endRule + '[' + lastChar + ']?')
   };
 
   if (isGlobal) {
@@ -1589,7 +1589,7 @@ function _compiledProp(prop, innerBrackets, innerQuotes) {
 
 //Get filter param
 function _getFilterParam(obj$$1) {
-  return obj$$1.split('_njBracket_');
+  return obj$$1.split('\'bracket_');
 }
 
 //Extract replace parameters
@@ -1610,7 +1610,7 @@ var FN_FILTER_LOOKUP = {
 };
 var REGEX_FN_FILTER = /(\)|\]|\.([^\s'"._#()|]+))[\s]*\(/g;
 var REGEX_SPACE_S_FILTER = /([(,|])[\s]+/g;
-var REGEX_PROP_FILTER = /\.([a-zA-Z_$][^\s.\/,[\]()'"|]*)/g;
+var REGEX_PROP_FILTER = /\.([a-zA-Z_$][^\s.\/,[\]()'"|#]*)/g;
 var REGEX_ARRPROP_FILTER = /([^\s([,])(\[)/g;
 var ARR_OBJ_FILTER_LOOKUP = {
   '[': 'list(',
@@ -1636,7 +1636,9 @@ function _getProp(matchArr, innerQuotes, i) {
     innerQuotes.push(match);
     return '_njQs' + (innerQuotes.length - 1) + '_';
   }).replace(REGEX_PROP_FILTER, function (all, g1) {
-    return '.(\'' + g1 + '\')';
+    var lastCharIndex = g1.length - 1,
+        endWithUnderline = g1[lastCharIndex] === '_';
+    return '.(\'' + (endWithUnderline ? g1.substr(0, lastCharIndex) : g1) + '\')' + (endWithUnderline ? '_' : '');
   }).replace(REGEX_ARRPROP_FILTER, function (all, g1, g2) {
     return g1 + '.(';
   }).replace(REGEX_ARR_OBJ_FILTER, function (match) {
@@ -1679,15 +1681,15 @@ function _getReplaceParam(obj$$1, tmplRule, innerQuotes, hasColon) {
 }
 
 var REGEX_INNER_BRACKET = /\(([^()]*)\)/g;
-var REGEX_FIX_OPERATOR = /[\s]+((?!_njBracket_)[^\s(),|"\']+)[\s]+((-?[0-9][0-9]*(\.\d+)?|(?!_njBracket_)[^\s,|]+)(_njBracket_\d+)?([._#]_njBracket_\d+)*)/g;
+var REGEX_FIX_OPERATOR = /[\s]+([^\s(),|"']+)[\s]+((-?[0-9][0-9]*(\.\d+)?|[^\s,|']+)('bracket_\d+)?([._#]'bracket_\d+)*)/g;
 var REGEX_SPACE_FILTER = /[(,]/g;
-var REGEX_FIX_FILTER = /(\|)?(((\.+|_|#+)_njBracket_)|[\s]+([^\s._#|]+[\s]*_njBracket_))/g;
+var REGEX_FIX_FILTER = /(\|)?(((\.+|_|#+)'bracket_)|[\s]+([^\s._#|]+[\s]*'bracket_))/g;
 
 function _fixOperator(prop, innerBrackets) {
   return _fixFilter(prop.replace(REGEX_FIX_OPERATOR, function () {
     var args = arguments;
     innerBrackets.push(_fixFilter(args[2]));
-    return ' ' + args[1] + '_njBracket_' + (innerBrackets.length - 1);
+    return ' ' + args[1] + '\'bracket_' + (innerBrackets.length - 1);
   }));
 }
 
@@ -1702,7 +1704,7 @@ function _fixFilter(prop) {
 function _replaceInnerBrackets(prop, innerBrackets) {
   var propR = prop.replace(REGEX_INNER_BRACKET, function (all, s1) {
     innerBrackets.push(_fixOperator(s1, innerBrackets));
-    return '_njBracket_' + (innerBrackets.length - 1);
+    return '\'bracket_' + (innerBrackets.length - 1);
   });
 
   if (propR !== prop) {
@@ -3234,7 +3236,7 @@ var REGEX_LT_GT$1 = />|</g;
 
 function _formatAll(str, tmplRule) {
   var commentRule = tmplRule.commentRule;
-  return str.replace(new RegExp('<!--' + commentRule + '[\\s\\S]*?' + commentRule + '-->', 'g'), '').replace(new RegExp('([\\s]+:[^\\s=>]+=((\'[^\']+\')|("[^"]+")))|(' + tmplRule.startRule + '(?!' + tmplRule.endRule + ')[\\s\\S]*?' + tmplRule.endRule + ')', 'g'), function (all, g1, g2, g3, g4, g5) {
+  return str.replace(new RegExp('<!--' + commentRule + '[\\s\\S]*?' + commentRule + '-->', 'g'), '').replace(new RegExp('([\\s]+:[^\\s=>]+=((\'[^\']+\')|("[^"]+")))|(' + tmplRule.startRule + '[\\s\\S]*?' + tmplRule.endRule + ')', 'g'), function (all, g1, g2, g3, g4, g5) {
     return (g1 ? g1 : g5).replace(REGEX_LT_GT$1, function (match) {
       return LT_GT_LOOKUP$1[match];
     });

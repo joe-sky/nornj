@@ -250,7 +250,7 @@ const REGEX_LT_GT = />|</g;
 function _formatAll(str, tmplRule) {
   const commentRule = tmplRule.commentRule;
   return str.replace(new RegExp('<!--' + commentRule + '[\\s\\S]*?' + commentRule + '-->', 'g'), '')
-    .replace(new RegExp('([\\s]+:[^\\s=>]+=((\'[^\']+\')|("[^"]+")))|(' + tmplRule.startRule + '(?!' + tmplRule.endRule + ')[\\s\\S]*?' + tmplRule.endRule + ')', 'g'), (all, g1, g2, g3, g4, g5) => (g1 ? g1 : g5).replace(REGEX_LT_GT, match => LT_GT_LOOKUP[match]));
+    .replace(new RegExp('([\\s]+:[^\\s=>]+=((\'[^\']+\')|("[^"]+")))|(' + tmplRule.startRule + '[\\s\\S]*?' + tmplRule.endRule + ')', 'g'), (all, g1, g2, g3, g4, g5) => (g1 ? g1 : g5).replace(REGEX_LT_GT, match => LT_GT_LOOKUP[match]));
 }
 
 function _transformToEx(isStr, elemName, elemParams, tmplRule) {
