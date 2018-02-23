@@ -272,33 +272,11 @@ export const extensions = {
 
   once: options => {
     const { props } = options;
-    let cacheObj = options.global,
+    let cacheObj = options.context.root || options.context,
       cacheKey = '_njOnceCache_' + (props && props.cacheKey != null ? props.cacheKey : options._njFnsNo),
-      cache = cacheObj[cacheKey],
-      useCache;
+      cache = cacheObj[cacheKey];
 
-    if (props && (props.reset !== undefined || props.resetList !== undefined)) {
-      let { reset, resetList } = props;
-      let cacheValKey = cacheKey + 'V';
-      useCache = true;
-
-      if (reset !== undefined) {
-        resetList = [reset];
-      }
-      resetList.forEach((r, i) => {
-        let key = cacheValKey + i,
-          cacheVal = cacheObj[key];
-
-        if (cacheVal !== r) {
-          useCache = false;
-          cacheObj[key] = r;
-        }
-      });
-    } else {
-      useCache = cache !== undefined;
-    }
-
-    if (!useCache) {
+    if (cache === undefined) {
       cache = cacheObj[cacheKey] = options.result();
     }
     return cache;

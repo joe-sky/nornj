@@ -97,7 +97,7 @@ export function getElement(name, p1, nameO, p2, subName) {
     }
   }
 
-  if(subName != null && element) {
+  if (subName != null && element) {
     element = element[subName];
   }
 
@@ -138,6 +138,7 @@ export function newContext(p2, p3) {
   return {
     data: newData.length ? tools.arrayPush(newData, p2.data) : p2.data,
     parent: p3.fallback ? p2 : p2.parent,
+    root: p2.root || p2,
     index: 'index' in p3 ? p3.index : p2.index,
     level: p2.level,
     getData,

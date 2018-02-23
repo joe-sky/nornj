@@ -121,7 +121,7 @@ describe('test speed', function() {
           <div key={@index}>
             <span>span{no}</span>
             <i>{no}</i>
-            <#once><i><i>1000</i></i></#once>
+            <#once><div><i><i>1000</i></i><i><i>1000</i></i><i><i>1000</i></i><i><i>1000</i></i><i><i>1000</i></i></div></#once>
           </div>
         </#each>
       </span>
@@ -403,7 +403,7 @@ describe('test speed', function() {
                 {list2.map((p, j) => <div key={j}>
                   <span>{'span' + p.no}</span>
                   <i>{p.no}</i>
-                  <i><i>1000</i></i>
+                  <div><i><i>1000</i></i><i><i>1000</i></i><i><i>1000</i></i><i><i>1000</i></i><i><i>1000</i></i></div>
                 </div>)}
               </span>
             ])}

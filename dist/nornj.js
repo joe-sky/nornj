@@ -696,6 +696,7 @@ function newContext(p2, p3) {
   return {
     data: newData.length ? arrayPush(newData, p2.data) : p2.data,
     parent: p3.fallback ? p2 : p2.parent,
+    root: p2.root || p2,
     index: 'index' in p3 ? p3.index : p2.index,
     level: p2.level,
     getData: getData,
@@ -1132,35 +1133,11 @@ var extensions = {
   once: function once(options) {
     var props = options.props;
 
-    var cacheObj = options.global,
+    var cacheObj = options.context.root || options.context,
         cacheKey = '_njOnceCache_' + (props && props.cacheKey != null ? props.cacheKey : options._njFnsNo),
-        cache = cacheObj[cacheKey],
-        useCache = void 0;
+        cache = cacheObj[cacheKey];
 
-    if (props && (props.reset !== undefined || props.resetList !== undefined)) {
-      var reset = props.reset,
-          resetList = props.resetList;
-
-      var cacheValKey = cacheKey + 'V';
-      useCache = true;
-
-      if (reset !== undefined) {
-        resetList = [reset];
-      }
-      resetList.forEach(function (r, i) {
-        var key = cacheValKey + i,
-            cacheVal = cacheObj[key];
-
-        if (cacheVal !== r) {
-          useCache = false;
-          cacheObj[key] = r;
-        }
-      });
-    } else {
-      useCache = cache !== undefined;
-    }
-
-    if (!useCache) {
+    if (cache === undefined) {
       cache = cacheObj[cacheKey] = options.result();
     }
     return cache;
