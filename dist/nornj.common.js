@@ -1,5 +1,5 @@
 /*!
-* NornJ template engine v0.4.2-rc.30
+* NornJ template engine v0.4.2-rc.31
 * (c) 2016-2018 Joe_Sky
 * Released under the MIT License.
 */
@@ -1608,7 +1608,7 @@ var FN_FILTER_LOOKUP = {
 };
 var REGEX_FN_FILTER = /(\)|\]|\.([^\s'"._#()|]+))[\s]*\(/g;
 var REGEX_SPACE_S_FILTER = /([(,|])[\s]+/g;
-var REGEX_PROP_FILTER = /\.([a-zA-Z_$][^\s.\/,[\]()'"|#]*)/g;
+var REGEX_PROP_FILTER = /\.([a-zA-Z_$#][^\s.\/,[\]()'"|#]*)/g;
 var REGEX_ARRPROP_FILTER = /([^\s([,])(\[)/g;
 var ARR_OBJ_FILTER_LOOKUP = {
   '[': 'list(',
@@ -1634,9 +1634,14 @@ function _getProp(matchArr, innerQuotes, i) {
     innerQuotes.push(match);
     return '_njQs' + (innerQuotes.length - 1) + '_';
   }).replace(REGEX_PROP_FILTER, function (all, g1) {
+    var startWithHash = g1[0] === '#';
+    if (startWithHash) {
+      g1 = g1.substr(1);
+    }
+
     var lastCharIndex = g1.length - 1,
-        endWithUnderline = g1[lastCharIndex] === '_';
-    return '.(\'' + (endWithUnderline ? g1.substr(0, lastCharIndex) : g1) + '\')' + (endWithUnderline ? '_' : '');
+        endWithUnderline = lastCharIndex > 0 && g1[lastCharIndex] === '_';
+    return (startWithHash ? '#' : '.') + '(\'' + (endWithUnderline ? g1.substr(0, lastCharIndex) : g1) + '\')' + (endWithUnderline ? '_' : '');
   }).replace(REGEX_ARRPROP_FILTER, function (all, g1, g2) {
     return g1 + '.(';
   }).replace(REGEX_ARR_OBJ_FILTER, function (match) {

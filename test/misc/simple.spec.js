@@ -30,6 +30,8 @@ describe('test compile string', function() {
           {{ [1, 2, 3].length + [1].push(100) }}
           {{ -10 ..< 10 }}
           {{1 >(0) ?('+','')}}
+          {{ a._ }}
+          {{ a.#prop }}
         </${'div'}>
       `;
 
@@ -46,7 +48,9 @@ describe('test compile string', function() {
               g: 'efg'
             },
             h: 'e'
-          }
+          },
+          _: 123,
+          prop: ctx => 456
         },
       });
       //console.log(html);

@@ -106,7 +106,7 @@ const FN_FILTER_LOOKUP = {
 };
 const REGEX_FN_FILTER = /(\)|\]|\.([^\s'"._#()|]+))[\s]*\(/g;
 const REGEX_SPACE_S_FILTER = /([(,|])[\s]+/g;
-const REGEX_PROP_FILTER = /\.([a-zA-Z_$][^\s.\/,[\]()'"|#]*)/g;
+const REGEX_PROP_FILTER = /\.([a-zA-Z_$#][^\s.\/,[\]()'"|#]*)/g;
 const REGEX_ARRPROP_FILTER = /([^\s([,])(\[)/g;
 const ARR_OBJ_FILTER_LOOKUP = {
   '[': 'list(',
@@ -133,9 +133,14 @@ function _getProp(matchArr, innerQuotes, i) {
       return '_njQs' + (innerQuotes.length - 1) + '_';
     })
     .replace(REGEX_PROP_FILTER, (all, g1) => {
+      const startWithHash = g1[0] === '#';
+      if (startWithHash) {
+        g1 = g1.substr(1);
+      }
+
       const lastCharIndex = g1.length - 1,
-        endWithUnderline = g1[lastCharIndex] === '_';
-      return '.(\'' + (endWithUnderline ? g1.substr(0, lastCharIndex) : g1) + '\')' + (endWithUnderline ? '_' : '');
+        endWithUnderline = lastCharIndex > 0 && g1[lastCharIndex] === '_';
+      return (startWithHash ? '#' : '.') + '(\'' + (endWithUnderline ? g1.substr(0, lastCharIndex) : g1) + '\')' + (endWithUnderline ? '_' : '');
     })
     .replace(REGEX_ARRPROP_FILTER, (all, g1, g2) => g1 + '.(')
     .replace(REGEX_ARR_OBJ_FILTER, match => ARR_OBJ_FILTER_LOOKUP[match])
