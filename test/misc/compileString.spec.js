@@ -458,15 +458,16 @@ describe('test compile string', function() {
         }
 </script></nj-text>`;
 
-      var html = tmplTest.apply(null, data);
-      // var html = nj.compile(tmplTest3, { delimiters: {
-      //   start: '{%',
-      //   end: '%}',
-      //   extension: '$$',
-      //   prop: '##'
-      // } }).apply(null, data);
+      const html = tmplTest.apply(null, data);
+      const html2 = tmplTest2();
+      const html3 = nj.compile(tmplTest3, { delimiters: {
+        start: '{%',
+        end: '%}',
+        extension: '$$',
+        prop: '##'
+      } }).apply(null, data);
       // var html2 = tmplTest.call(null, { id: 200, c1: 100 }, data[0]);
-      //console.log(html);
+      //console.log(html2);
       expect(html).toBeTruthy();
     });
 
