@@ -74,7 +74,7 @@
 
 ## 在线文档
 
-* [NornJ中文指南](http://joe-sky.github.io/nornj-guide)
+* [NornJ中文指南](https://joe-sky.github.io/nornj-guide)
 * [NornJ中文指南(gitbook)](https://joe-sky.gitbooks.io/nornj-guide)
 
 ## 特色
