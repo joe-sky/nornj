@@ -74,8 +74,8 @@
 
 ## 在线文档
 
-* [NornJ中文指南](https://joe-sky.github.io/nornj-guide)
 * [NornJ中文指南(gitbook)](https://joe-sky.gitbooks.io/nornj-guide)
+* [NornJ中文指南(github pages)](https://joe-sky.github.io/nornj-guide)
 
 ## 特色
 
@@ -186,6 +186,10 @@ npm install nornj
 * [nornj-react(React适配库)](https://github.com/joe-sky/nornj-react)
 * [nornj-loader(Webpack loader)](https://github.com/joe-sky/nornj-loader)
 * [nornj-cli(脚手架工具)](https://github.com/joe-sky/nornj-cli)
+
+## 语法高亮插件
+
+* [nornj-highlight(vscode语法高亮插件)](https://github.com/joe-sky/nornj-highlight)
 
 ## 示例项目
 
