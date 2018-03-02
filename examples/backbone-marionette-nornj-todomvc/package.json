@@ -7,8 +7,8 @@
     "backbone.localstorage": "^1.1.6",
     "backbone.marionette": "^2.4.1",
     "backbone.radio": "^1.0.1",
-    "jquery": "^1.11.2",
-    "nornj": "^0.4.1-rc.25",
+    "jquery": "^3.0.0",
+    "nornj": "^0.4.2-rc.31",
     "todomvc-app-css": "^1.0.1",
     "todomvc-common": "^1.0.1",
     "underscore": "^1.6.0"
