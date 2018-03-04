@@ -36,10 +36,14 @@ export default function compileStringTmpl(tmpl) {
           isSpread = lastChar3 === '...';
 
         if (isInBrace) {
-          isInBrace = !tmplRule.incompleteEnd.test(xml);
+          isInBrace = !(tmplRule['incompleteEnd' + (isInBrace === 'isR' ? 'R' : '')]).test(xml);
         }
-        if (!isInBrace && tmplRule.incompleteStart.test(xml)) {
-          isInBrace = true;
+        if (!isInBrace) {
+          if (tmplRule.incompleteStartR.test(xml)) {
+            isInBrace = 'isR';
+          } else {
+            isInBrace = tmplRule.incompleteStart.test(xml);
+          }
         }
         if (isComputed) {
           xml = xml.substr(0, last);
@@ -250,7 +254,7 @@ const REGEX_LT_GT = />|</g;
 function _formatAll(str, tmplRule) {
   const commentRule = tmplRule.commentRule;
   return str.replace(new RegExp('<!--' + commentRule + '[\\s\\S]*?' + commentRule + '-->', 'g'), '')
-    .replace(new RegExp('([\\s]+:[^\\s=>]+=((\'[^\']+\')|("[^"]+")))|(' + tmplRule.startRule + '[\\s\\S]*?' + tmplRule.endRule + ')', 'g'), (all, g1, g2, g3, g4, g5) => (g1 ? g1 : g5).replace(REGEX_LT_GT, match => LT_GT_LOOKUP[match]));
+    .replace(new RegExp('([\\s]+:[^\\s=>]+=((\'[^\']+\')|("[^"]+")))|(' + tmplRule.braceParamStr + ')', 'g'), (all, g1, g2, g3, g4, g5) => (g1 ? g1 : g5).replace(REGEX_LT_GT, match => LT_GT_LOOKUP[match]));
 }
 
 function _transformToEx(isStr, elemName, elemParams, tmplRule) {
@@ -289,18 +293,20 @@ function _setElem(elem, elemName, elemParams, elemArr, bySelfClose, tmplRule) {
 
 //Extract split parameters
 function _getSplitParams(elem, tmplRule) {
-  const { extensionRule, startRule, endRule, spreadProp } = tmplRule;
+  const { extensionRule, startRule, endRule, firstChar, lastChar, spreadProp } = tmplRule;
   let paramsEx;
 
   //Replace the parameter like "{...props}".
-  elem = elem.replace(spreadProp, (all, begin, prop) => {
-    prop = prop.trim();
+  elem = elem.replace(spreadProp, (all, g1, propR, g3, prop) => {
+    if (propR) {
+      prop = propR;
+    }
 
     if (!paramsEx) {
       paramsEx = [extensionRule + 'props'];
     }
 
-    paramsEx.push([extensionRule + 'spread ' + startRule + prop.replace(/\.\.\./g, '') + endRule + '/']);
+    paramsEx.push([extensionRule + 'spread ' + (propR ? firstChar : '') + startRule + prop.replace(/\.\.\./, '') + endRule + (propR ? lastChar : '') + '/']);
     return ' ';
   });
 

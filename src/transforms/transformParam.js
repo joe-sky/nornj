@@ -3,7 +3,7 @@ import * as tools from '../utils/tools';
 import '../helpers/filter';
 
 //Get compiled property
-const REGEX_JS_PROP = /('[^']*')|("[^"]*")|(-?[0-9][0-9]*(\.\d+)?)|true|false|null|undefined|Object|Array|Math|Date|JSON|([#]*)([^\s.,[\]()]+)/;
+const REGEX_JS_PROP = /('[^']*')|("[^"]*")|(-?[0-9][0-9]*(\.\d+)?)|true|false|null|undefined|Object|Array|Math|Date|JSON|(([a-zA-Z_$#@])([a-zA-Z_$\d]*))/;
 const REGEX_REPLACE_CHAR = /_njQs(\d+)_/g;
 
 function _compiledProp(prop, innerBrackets, innerQuotes) {
@@ -67,10 +67,10 @@ function _compiledProp(prop, innerBrackets, innerQuotes) {
   //Extract the js property
   if (prop !== '') {
     prop = REGEX_JS_PROP.exec(prop);
-    const hasComputed = prop[5];
-    ret.name = hasComputed ? prop[6] : prop[0];
+    const hasComputed = prop[6] === '#';
+    ret.name = hasComputed ? prop[7] : prop[0];
 
-    if (!prop[6]) { //Sign the parameter is a basic type value.
+    if (!prop[5]) { //Sign the parameter is a basic type value.
       ret.isBasicType = true;
     }
     if (hasComputed) {
@@ -106,7 +106,7 @@ const FN_FILTER_LOOKUP = {
 };
 const REGEX_FN_FILTER = /(\)|\]|\.([^\s'"._#()|]+))[\s]*\(/g;
 const REGEX_SPACE_S_FILTER = /([(,|])[\s]+/g;
-const REGEX_PROP_FILTER = /\.([a-zA-Z_$#][^\s.\/,[\]()'"|#]*)/g;
+const REGEX_PROP_FILTER = /\.([a-zA-Z_$#][a-zA-Z_$\d]*)/g;
 const REGEX_ARRPROP_FILTER = /([^\s([,])(\[)/g;
 const ARR_OBJ_FILTER_LOOKUP = {
   '[': 'list(',
@@ -163,7 +163,8 @@ function _getReplaceParam(obj, tmplRule, innerQuotes, hasColon) {
         ret = [];
       }
 
-      ret.push(_getProp(matchArr, innerQuotes, i));
+      const startRuleR = matchArr[2];
+      ret.push(_getProp([matchArr[0], startRuleR ? startRuleR : matchArr[5], startRuleR ? matchArr[3] : matchArr[6]], innerQuotes, i));
       i++;
     }
   } else {

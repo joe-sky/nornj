@@ -53,8 +53,8 @@ export function getOpenTagParams(tag, tmplRule) {
       ret = [];
     }
 
-    let value = matchArr[7],
-      onlyBrace = matchArr[4];
+    let value = matchArr[8],
+      onlyBrace = matchArr[4] != null ? matchArr[4] : matchArr[6];
     if (value != null) {
       value = tools.clearQuot(value); //Remove quotation marks
     } else {
@@ -62,7 +62,7 @@ export function getOpenTagParams(tag, tmplRule) {
     }
 
     //Removed at the end of "/>", ">" or "/".
-    if (!matchArr[8] && !matchArr[9]) {
+    if (!matchArr[9] && !matchArr[10]) {
       if (/\/>$/.test(value)) {
         value = value.substr(0, value.length - 2);
       } else if (/>$/.test(value) || /\/$/.test(value)) {

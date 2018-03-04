@@ -85,7 +85,11 @@ export default function createTmplRule(rules = {}, isGlobal) {
     escapeExtensionRule = _replace$(extensionRule),
     escapePropRule = _replace$(propRule),
     escapeStrPropRule = _replace$(strPropRule),
-    braceParamStr = '([' + firstChar + ']?' + startRule + ')([\\s\\S]+?)(' + endRule + '[' + lastChar + ']?)';
+    startRuleR = firstChar + startRule,
+    endRuleR = endRule + lastChar,
+    varContent = '[\\s\\S]+?',
+    varContentS = '\\.\\.\\.' + varContent,
+    braceParamStr = startRuleR + varContent + endRuleR + '|' + startRule + varContent + endRule;
 
   const tmplRules = {
     startRule,
@@ -98,19 +102,22 @@ export default function createTmplRule(rules = {}, isGlobal) {
     commentRule,
     firstChar,
     lastChar,
+    braceParamStr,
     xmlOpenTag: _createRegExp('^<([a-z' + firstChar + extensionRules + '][^\\s>]*)[^>]*>$', 'i'),
-    openTagParams: _createRegExp('[\\s]+((([' + firstChar + ']?' + startRule + ')([\\s\\S]+?)(' + endRule + '[' + lastChar + ']?))|[^\\s=>]+)(=((\'[^\']+\')|("[^"]+")|([^"\'\\s]+)))?', 'g'),
+    openTagParams: _createRegExp('[\\s]+(((' + startRuleR + '(' + varContent + ')' + endRuleR + ')|(' + startRule + '(' + varContent + ')' + endRule + '))|[^\\s=>]+)(=((\'[^\']+\')|("[^"]+")|([^"\'\\s]+)))?', 'g'),
     braceParam: _createRegExp(braceParamStr, 'i'),
     braceParamG: _createRegExp(braceParamStr, 'ig'),
-    spreadProp: _createRegExp('[\\s]+([' + firstChar + ']?' + startRule + ')[\\s]*(\\.\\.\\.[\\s\\S]+?)(' + endRule + '[' + lastChar + ']?)', 'g'),
-    replaceSplit: _createRegExp('(?:[' + firstChar + ']?' + startRule + ')[\\s\\S]+?(?:' + endRule + '[' + lastChar + ']?)'),
-    replaceParam: _createRegExp('([' + firstChar + ']?' + startRule + ')([\\s\\S]+?)' + endRule + '[' + lastChar + ']?', 'g'),
+    spreadProp: _createRegExp('[\\s]+(' + startRuleR + '[\\s]*(' + varContentS + ')' + endRuleR + ')|(' + startRule + '[\\s]*(' + varContentS + ')' + endRule + ')', 'g'),
+    replaceSplit: _createRegExp(braceParamStr),
+    replaceParam: _createRegExp('((' + startRuleR + ')(' + varContent + ')' + endRuleR + ')|((' + startRule + ')(' + varContent + ')' + endRule + ')', 'g'),
     checkElem: _createRegExp('([^<>]+)|(<([a-z/!' + firstChar + extensionRules + '][^\\s<>]*)([^<>]*)>|<)([^<]*)', 'ig'),
     extension: _createRegExp('^' + escapeExtensionRule + '([^\\s]+)', 'i'),
     exAll: _createRegExp('^([/]?)(' + escapeExtensionRule + '|' + escapeStrPropRule + escapePropRule + '|' + escapePropRule + ')([^\\s]+)', 'i'),
     include: _createRegExp('<' + escapeExtensionRule + 'include([^>]*)>', 'ig'),
-    incompleteStart: _createRegExp('[' + firstChar + ']?' + startRule + '((?!' + endRule + ')[\\s\\S])*$'),
-    incompleteEnd: _createRegExp('^[\\s\\S]*?' + endRule + '[' + lastChar + ']?')
+    incompleteStart: _createRegExp(startRule + '((?!' + endRule + ')[\\s\\S])*$'),
+    incompleteStartR: _createRegExp(startRuleR + '((?!' + endRuleR + ')[\\s\\S])*$'),
+    incompleteEnd: _createRegExp('^[\\s\\S]*?' + endRule),
+    incompleteEndR: _createRegExp('^[\\s\\S]*?' + endRuleR)
   };
 
   if (isGlobal) { //Reset the regexs to global list
