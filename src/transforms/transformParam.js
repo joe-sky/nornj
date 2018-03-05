@@ -3,11 +3,21 @@ import * as tools from '../utils/tools';
 import '../helpers/filter';
 
 //Get compiled property
-const REGEX_JS_PROP = /('[^']*')|("[^"]*")|(-?[0-9][0-9]*(\.\d+)?)|true|false|null|undefined|Object|Array|Math|Date|JSON|(([a-zA-Z_$#@])([a-zA-Z_$\d]*))/;
+const REGEX_JS_PROP = /('[^']*')|("[^"]*")|(-?[0-9][0-9]*(\.\d+)?)|true|false|null|undefined|Object|Array|Math|Date|JSON|(([a-zA-Z_$#@])([a-zA-Z_$@\d]*))/;
 const REGEX_REPLACE_CHAR = /_njQs(\d+)_/g;
+const REGEX_HAS_BRACKET = /bracket_\d+/;
 
-function _compiledProp(prop, innerBrackets, innerQuotes) {
+function _replaceStr(prop, innerQuotes) {
+  return prop.replace(REGEX_REPLACE_CHAR, (all, g1) => innerQuotes[g1]);
+}
+
+function _syntaxError(errorStr, expression, source) {
+  return 'Filter or expression syntax error: ' + errorStr + ' in\n\nexpression: ' + expression + '\n\nsource: ' + source + '\n\nNornJ expression syntax specification please see the document: https://joe-sky.github.io/nornj-guide/templateSyntax/filter.html\n';
+}
+
+function _compiledProp(prop, innerBrackets, innerQuotes, source) {
   let ret = tools.obj();
+  const propO = prop;
 
   //If there are vertical lines in the property,then use filter
   if (prop.indexOf('|') >= 0) {
@@ -32,6 +42,8 @@ function _compiledProp(prop, innerBrackets, innerQuotes) {
 
         //Multiple params are separated by commas.
         if (paramsF != null) {
+          tools.throwIf(innerBrackets[paramsF] != null, _syntaxError(_replaceStr(paramsF, innerQuotes), _replaceStr(propO, innerQuotes), source));
+
           let params = [];
           tools.each(innerBrackets[paramsF].split(','), p => {
             if (p !== '') {
@@ -51,7 +63,7 @@ function _compiledProp(prop, innerBrackets, innerQuotes) {
   }
 
   //替换字符串值
-  prop = prop.replace(REGEX_REPLACE_CHAR, (all, g1) => innerQuotes[g1]);
+  prop = _replaceStr(prop, innerQuotes);
 
   //Extract the parent data path
   if (prop.indexOf('../') === 0) {
@@ -66,11 +78,18 @@ function _compiledProp(prop, innerBrackets, innerQuotes) {
 
   //Extract the js property
   if (prop !== '') {
-    prop = REGEX_JS_PROP.exec(prop);
-    const hasComputed = prop[6] === '#';
-    ret.name = hasComputed ? prop[7] : prop[0];
+    const matchProp = REGEX_JS_PROP.exec(prop);
+    const hasComputed = matchProp[6] === '#';
+    ret.name = hasComputed ? matchProp[7] : matchProp[0];
 
-    if (!prop[5]) { //Sign the parameter is a basic type value.
+    if (matchProp[0] !== prop) {
+      if (REGEX_HAS_BRACKET.test(ret.name)) {
+        tools.throwIf(0, _syntaxError('There is an extra bracket', _replaceStr(propO, innerQuotes), source));
+      } else {
+        tools.error(_syntaxError('The operator must have at least one space before and after', _replaceStr(propO, innerQuotes), source));
+      }
+    }
+    if (!matchProp[5]) { //Sign the parameter is a basic type value.
       ret.isBasicType = true;
     }
     if (hasComputed) {
@@ -106,7 +125,7 @@ const FN_FILTER_LOOKUP = {
 };
 const REGEX_FN_FILTER = /(\)|\]|\.([^\s'"._#()|]+))[\s]*\(/g;
 const REGEX_SPACE_S_FILTER = /([(,|])[\s]+/g;
-const REGEX_PROP_FILTER = /\.([a-zA-Z_$#][a-zA-Z_$\d]*)/g;
+const REGEX_PROP_FILTER = /\.([a-zA-Z_$#@][a-zA-Z_$@\d]*)/g;
 const REGEX_ARRPROP_FILTER = /([^\s([,])(\[)/g;
 const ARR_OBJ_FILTER_LOOKUP = {
   '[': 'list(',
@@ -230,7 +249,7 @@ export function compiledParam(value, tmplRule, hasColon) {
 
       isAll = param[3] ? param[0] === value : false; //If there are several curly braces in one property value, "isAll" must be false.
       const prop = _replaceInnerBrackets(param[2], innerBrackets);
-      retP.prop = _compiledProp(prop, innerBrackets, innerQuotes);
+      retP.prop = _compiledProp(prop, innerBrackets, innerQuotes, value);
 
       //To determine whether it is necessary to escape
       retP.escape = param[1] !== tmplRule.firstChar + tmplRule.startRule;

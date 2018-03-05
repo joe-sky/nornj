@@ -68,7 +68,7 @@ function _buildFn(content, node, fns, no, newContext, level, useStringLocal, nam
       fn._njName = name;
     }
   } catch (err) {
-    tools.error(`Failed to generate template function:\n\n` + err.toString() + ' in\n\n' + fnStr + '\n');
+    tools.error('Failed to generate template function:\n\n' + err.toString() + ' in\n\n' + fnStr + '\n');
   }
   return no;
 }
