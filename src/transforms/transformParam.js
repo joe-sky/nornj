@@ -47,7 +47,7 @@ function _compiledProp(prop, innerBrackets, innerQuotes, source) {
           let params = [];
           tools.each(innerBrackets[paramsF].split(','), p => {
             if (p !== '') {
-              params[params.length] = _compiledProp(p.trim(), innerBrackets, innerQuotes);
+              params[params.length] = _compiledProp(p.trim(), innerBrackets, innerQuotes, source);
             }
           }, false, true);
 

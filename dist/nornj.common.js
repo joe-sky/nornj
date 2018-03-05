@@ -1,5 +1,5 @@
 /*!
-* NornJ template engine v0.4.2-rc.32
+* NornJ template engine v0.4.2-rc.33
 * (c) 2016-2018 Joe_Sky
 * Released under the MIT License.
 */
@@ -1555,7 +1555,7 @@ function _compiledProp(prop, innerBrackets, innerQuotes, source) {
           var params = [];
           each(innerBrackets[paramsF].split(','), function (p) {
             if (p !== '') {
-              params[params.length] = _compiledProp(p.trim(), innerBrackets, innerQuotes);
+              params[params.length] = _compiledProp(p.trim(), innerBrackets, innerQuotes, source);
             }
           }, false, true);
 

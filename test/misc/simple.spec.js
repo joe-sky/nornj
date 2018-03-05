@@ -32,6 +32,7 @@ describe('test compile string', function() {
           {{1 >(0) ?('+','')}}
           {{ a._ }}
           {{ a.#prop }}
+          {{ { a: 1 }.a }}
         </${'div'}>
       `;
 
