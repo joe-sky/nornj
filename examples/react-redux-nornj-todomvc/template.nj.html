@@ -1,3 +1,16 @@
+<template name="index">
+  <Provider {store}>
+    <Router history={hashHistory}>
+      <Route path="/" component={App}>
+        <Route path="/all" />
+        <Route path="/active" />
+        <Route path="/completed" />
+        <Redirect from="/" to="/all" />
+      </Route>
+    </Router>
+  </Provider>
+</template>
+
 <template name="app">
   <div>
     <AddTodo onAddClick={addClick} />

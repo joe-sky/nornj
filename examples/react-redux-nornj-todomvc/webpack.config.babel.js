@@ -26,7 +26,10 @@ export default {
 
   resolve: {
     extensions: ['.js', '.jsx'],
-    modules: ['node_modules']
+    modules: ['node_modules'],
+    alias: {
+      'nornj': 'nornj/dist/nornj.runtime.common'
+    }
   },
 
   plugins: [

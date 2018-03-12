@@ -2,11 +2,12 @@
 import replace from 'rollup-plugin-replace';
 import uglify from 'rollup-plugin-uglify';
 import filesize from 'rollup-plugin-filesize';
-import license  from 'rollup-plugin-license';
+import license from 'rollup-plugin-license';
 
 const env = process.env.NODE_ENV;
+const type = process.env.TYPE;
 const config = {
-  input: './src/base.js',
+  input: './src/base' + (type == 'runtime' ? '.runtime' : '') + '.js',
   output: { name: 'NornJ' },
   plugins: [
     babel({
