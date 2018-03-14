@@ -33,6 +33,12 @@ describe('test compile string', function() {
           {{ a._ }}
           {{ a.#prop }}
           {{ { a: 1 }.a }}
+          <#once name="test">
+            <i>test</i>
+          </#once>
+          <#each {{1 .. 10}}>
+            {{@root.test}}
+          </#each>
         </${'div'}>
       `;
 

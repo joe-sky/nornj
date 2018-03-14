@@ -132,6 +132,14 @@ function _buildPropData(obj, counter, fns, useStringLocal, level) {
         data = 'p1.g';
         special = CUSTOM_VAR;
         break;
+      case '@root':
+        data = '(p2.root || p2)';
+        special = CUSTOM_VAR;
+        break;
+      case '@context':
+        data = 'p2';
+        special = CUSTOM_VAR;
+        break;
       case '@lt':
         data = '\'<\'';
         special = CUSTOM_VAR;

@@ -127,16 +127,8 @@ export function newContext(p2, p3) {
     return p2;
   }
 
-  const newData = [];
-  if ('data' in p3) {
-    newData.push(p3.data);
-  }
-  if ('extra' in p3) {
-    newData.push(p3.extra);
-  }
-
   return {
-    data: newData.length ? tools.arrayPush(newData, p2.data) : p2.data,
+    data: p3.data ? tools.arrayPush(p3.data, p2.data) : p2.data,
     parent: p3.fallback ? p2 : p2.parent,
     root: p2.root || p2,
     index: 'index' in p3 ? p3.index : p2.index,

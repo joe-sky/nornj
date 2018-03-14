@@ -101,24 +101,28 @@ export const extensions = {
       const isArrayLike = tools.isArrayLike(list);
       tools.each(list, (item, index, len, lenObj) => {
         let param = {
-          data: item,
+          data: [item],
           index: isArrayLike ? index : len,
           fallback: true
         };
 
+        let extra;
         if (props && props.moreValues) {
           const _len = isArrayLike ? len : lenObj;
-          param.extra = {
+          extra = {
             '@first': param.index === 0,
             '@last': param.index === _len - 1,
             '@length': _len
           };
         }
         if (!isArrayLike) {
-          if (!param.extra) {
-            param.extra = {};
+          if (!extra) {
+            extra = {};
           }
-          param.extra['@key'] = index;
+          extra['@key'] = index;
+        }
+        if (extra) {
+          param.data.push(extra);
         }
 
         let retI = options.result(param);
@@ -243,7 +247,7 @@ export const extensions = {
         paramNames.forEach((v, i) => params[paramNames[i]] = arguments[i]);
       }
 
-      return options.result({ data: params });
+      return options.result({ data: [params] });
     };
   },
 
@@ -255,9 +259,9 @@ export const extensions = {
     const { props } = options;
 
     return options.result({
-      data: props && props.as ? {
+      data: [props && props.as ? {
         [props.as]: originalData
-      } : originalData
+      } : originalData]
     });
   },
 
@@ -272,7 +276,8 @@ export const extensions = {
 
   once: options => {
     let cacheObj = options.context.root || options.context,
-      cacheKey = '_njOnceCache_' + options._njFnsNo,
+      props = options.props,
+      cacheKey = props && props.name ? props.name : ('_njOnceCache_' + options._njFnsNo),
       cache = cacheObj[cacheKey];
 
     if (cache === undefined) {

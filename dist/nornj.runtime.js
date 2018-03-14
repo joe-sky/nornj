@@ -1,5 +1,5 @@
 /*!
-* NornJ template engine v0.4.2-rc.33
+* NornJ template engine v0.4.2-rc.35
 * (c) 2016-2018 Joe_Sky
 * Released under the MIT License.
 */
@@ -459,16 +459,8 @@ function newContext(p2, p3) {
     return p2;
   }
 
-  var newData = [];
-  if ('data' in p3) {
-    newData.push(p3.data);
-  }
-  if ('extra' in p3) {
-    newData.push(p3.extra);
-  }
-
   return {
-    data: newData.length ? arrayPush(newData, p2.data) : p2.data,
+    data: p3.data ? arrayPush(p3.data, p2.data) : p2.data,
     parent: p3.fallback ? p2 : p2.parent,
     root: p2.root || p2,
     index: 'index' in p3 ? p3.index : p2.index,
@@ -721,24 +713,28 @@ var extensions = {
       var isArrayLike$$1 = isArrayLike(list);
       each(list, function (item, index, len, lenObj) {
         var param = {
-          data: item,
+          data: [item],
           index: isArrayLike$$1 ? index : len,
           fallback: true
         };
 
+        var extra = void 0;
         if (props && props.moreValues) {
           var _len = isArrayLike$$1 ? len : lenObj;
-          param.extra = {
+          extra = {
             '@first': param.index === 0,
             '@last': param.index === _len - 1,
             '@length': _len
           };
         }
         if (!isArrayLike$$1) {
-          if (!param.extra) {
-            param.extra = {};
+          if (!extra) {
+            extra = {};
           }
-          param.extra['@key'] = index;
+          extra['@key'] = index;
+        }
+        if (extra) {
+          param.data.push(extra);
         }
 
         var retI = options.result(param);
@@ -873,7 +869,7 @@ var extensions = {
         });
       }
 
-      return options.result({ data: params });
+      return options.result({ data: [params] });
     };
   },
 
@@ -890,7 +886,7 @@ var extensions = {
 
 
     return options.result({
-      data: props && props.as ? defineProperty({}, props.as, originalData) : originalData
+      data: [props && props.as ? defineProperty({}, props.as, originalData) : originalData]
     });
   },
 
@@ -906,7 +902,8 @@ var extensions = {
 
   once: function once(options) {
     var cacheObj = options.context.root || options.context,
-        cacheKey = '_njOnceCache_' + options._njFnsNo,
+        props = options.props,
+        cacheKey = props && props.name ? props.name : '_njOnceCache_' + options._njFnsNo,
         cache = cacheObj[cacheKey];
 
     if (cache === undefined) {
