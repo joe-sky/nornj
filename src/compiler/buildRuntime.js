@@ -170,8 +170,10 @@ function _buildPropData(obj, counter, fns, useStringLocal, level) {
       if (!data) {
         data = 'data';
       }
+
+      const isCtx = data == 'p2';
       for (let i = 0; i < parentNum; i++) {
-        data = 'parent.' + data;
+        data = !isCtx ? ('parent.' + data) : (data + '.parent');
       }
 
       if (!special) {

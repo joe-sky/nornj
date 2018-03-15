@@ -2369,8 +2369,10 @@ function _buildPropData(obj$$1, counter, fns, useStringLocal, level) {
       if (!data) {
         data = 'data';
       }
+
+      var isCtx = data == 'p2';
       for (var i = 0; i < parentNum; i++) {
-        data = 'parent.' + data;
+        data = !isCtx ? 'parent.' + data : data + '.parent';
       }
 
       if (!special) {

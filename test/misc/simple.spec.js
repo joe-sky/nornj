@@ -38,6 +38,11 @@ describe('test compile string', function() {
           </#once>
           <#each {{1 .. 10}}>
             {{@root.test}}
+            {{@context.data[2].a.b}}
+            {{../@context.data[1].a.b}}
+            <#each {{1 .. 2}}>
+              {{../../@context.data[1].a.b}}
+            </#each>
           </#each>
         </${'div'}>
       `;
