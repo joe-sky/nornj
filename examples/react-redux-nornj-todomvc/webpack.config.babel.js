@@ -2,6 +2,7 @@ import path from 'path';
 import webpack from 'webpack';
 
 export default {
+  mode: "production",
   entry: __dirname + '/index.js',
   output: {
     path: path.join(__dirname, 'assets'),
@@ -30,21 +31,5 @@ export default {
     alias: {
       'nornj': 'nornj/dist/nornj.runtime.common'
     }
-  },
-
-  plugins: [
-    new webpack.DefinePlugin({
-      'process.env.NODE_ENV': '"production"'
-    }),
-    new webpack.optimize.UglifyJsPlugin({
-      compressor: {
-        pure_getters: true,
-        unsafe: true,
-        unsafe_comps: true,
-        screw_ie8: false,
-        warnings: false
-      },
-      sourceMap: true
-    })
-  ]
+  }
 };

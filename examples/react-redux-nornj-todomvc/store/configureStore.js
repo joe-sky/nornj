@@ -1,16 +1,14 @@
 ﻿import { combineReducers, applyMiddleware, createStore } from 'redux';
-import { hashHistory } from 'react-router';
-import { routeReducer, syncHistory } from 'react-router-redux';
+import createHistory from 'history/createHashHistory';
+import { routerMiddleware, routerReducer as routing } from 'react-router-redux';
 import todoApp from '../reducers/reducers';
 
-let reducer = combineReducers(Object.assign({}, todoApp, {
-  routing: routeReducer
-}));
+export const history = createHistory();
+const middleware = routerMiddleware(history);
 
-let reduxRouterMiddleware = syncHistory(hashHistory);
-let createStoreWithMiddleware = applyMiddleware(reduxRouterMiddleware)(createStore);
-
-let store = createStoreWithMiddleware(reducer);
-reduxRouterMiddleware.listenForReplays(store);
-
-export default store;
+export default createStore(
+  combineReducers(Object.assign({}, todoApp, {
+    routing
+  })),
+  applyMiddleware(middleware)
+);

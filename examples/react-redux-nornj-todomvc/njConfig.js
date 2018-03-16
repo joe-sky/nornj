@@ -1,13 +1,10 @@
 ﻿import nj from 'nornj';
-import { Provider } from 'react-redux';
-import { Router, Route, Redirect, Link } from 'react-router';
+import 'nornj-react/redux';
+import 'nornj-react/router';
+import { ConnectedRouter } from 'react-router-redux';
 
 nj.registerComponent({
-  Provider,
-  Router,
-  Route,
-  Redirect,
-  'router-Link': Link
+  ConnectedRouter
 });
 
 nj.registerFilter({

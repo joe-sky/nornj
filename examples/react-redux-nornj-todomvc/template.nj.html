@@ -1,13 +1,13 @@
 <template name="index">
   <Provider {store}>
-    <Router history={hashHistory}>
+    <ConnectedRouter {history}>
       <Route path="/" component={App}>
         <Route path="/all" />
         <Route path="/active" />
         <Route path="/completed" />
         <Redirect from="/" to="/all" />
       </Route>
-    </Router>
+    </ConnectedRouter>
   </Provider>
 </template>
 
