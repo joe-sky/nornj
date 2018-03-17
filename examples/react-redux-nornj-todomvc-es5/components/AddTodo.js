@@ -1,6 +1,6 @@
-﻿njr.registerTmpl('AddTodo', '#template-addTodo')(React.createClass({
+﻿njr.registerTmpl('AddTodo', '#template-addTodo')(createReactClass({
   propTypes: {
-    onAddClick: React.PropTypes.func.isRequired
+    onAddClick: PropTypes.func.isRequired
   },
 
   handleClick: function(e) {

@@ -1,9 +1,9 @@
 ﻿nj.registerComponent({
   Provider: ReactRedux.Provider,
-  Router: ReactRouter.Router,
-  Route: ReactRouter.Route,
-  Redirect: ReactRouter.Redirect,
-  'router-Link': ReactRouter.Link
+  ConnectedRouter: ReactRouterRedux.ConnectedRouter,
+  Route: ReactRouterDOM.Route,
+  Redirect: ReactRouterDOM.Redirect,
+  'router-Link': ReactRouterDOM.Link
 });
 
 nj.registerFilter({

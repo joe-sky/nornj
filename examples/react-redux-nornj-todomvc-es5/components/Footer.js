@@ -1,6 +1,6 @@
-﻿njr.registerTmpl('Footer', '#template-footer')(React.createClass({
+﻿njr.registerTmpl('Footer', '#template-footer')(createReactClass({
   propTypes: {
-    filter: React.PropTypes.oneOf([
+    filter: PropTypes.oneOf([
       VisibilityFilters.SHOW_ALL,
       VisibilityFilters.SHOW_COMPLETED,
       VisibilityFilters.SHOW_ACTIVE

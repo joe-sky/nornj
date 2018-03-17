@@ -4,7 +4,7 @@
   }
 
   switch (action.type) {
-    case ReactRouterRedux.UPDATE_LOCATION:
+    case ReactRouterRedux.LOCATION_CHANGE:
       var filter = action.payload.pathname.substr(1);
       switch (filter) {
         case '':
