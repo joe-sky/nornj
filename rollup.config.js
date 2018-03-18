@@ -25,7 +25,7 @@ const config = {
   ]
 };
 
-if (env === 'cjs') {
+if (env === 'cjs' || env === 'es') {
   config.output.format = env;
 }
 
