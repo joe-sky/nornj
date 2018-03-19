@@ -3,7 +3,7 @@ import * as tools from '../utils/tools';
 import '../helpers/filter';
 
 //Get compiled property
-const REGEX_JS_PROP = /('[^']*')|("[^"]*")|(-?[0-9][0-9]*(\.\d+)?)|true|false|null|undefined|Object|Array|Math|Date|JSON|(([a-zA-Z_$#@])([a-zA-Z_$@\d]*))/;
+const REGEX_JS_PROP = /('[^']*')|("[^"]*")|(-?[0-9][0-9]*(\.\d+)?)|true|false|null|undefined|Object|Array|Math|Date|JSON|(([a-zA-Z_$#@])([a-zA-Z_$\d]*))/;
 const REGEX_REPLACE_CHAR = /_njQs(\d+)_/g;
 const REGEX_HAS_BRACKET = /bracket_\d+/;
 
@@ -125,7 +125,7 @@ const FN_FILTER_LOOKUP = {
 };
 const REGEX_FN_FILTER = /(\)|\]|\.([^\s'"._#()|]+))[\s]*\(/g;
 const REGEX_SPACE_S_FILTER = /([(,|])[\s]+/g;
-const REGEX_PROP_FILTER = /\.([a-zA-Z_$#@][a-zA-Z_$@\d]*)/g;
+const REGEX_PROP_FILTER = /\.([a-zA-Z_$#@][a-zA-Z_$\d]*)/g;
 const REGEX_ARRPROP_FILTER = /([^\s([,])(\[)/g;
 const ARR_OBJ_FILTER_LOOKUP = {
   '[': 'list(',

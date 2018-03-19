@@ -1502,7 +1502,7 @@ assign(nj, {
 });
 
 //Get compiled property
-var REGEX_JS_PROP = /('[^']*')|("[^"]*")|(-?[0-9][0-9]*(\.\d+)?)|true|false|null|undefined|Object|Array|Math|Date|JSON|(([a-zA-Z_$#@])([a-zA-Z_$@\d]*))/;
+var REGEX_JS_PROP = /('[^']*')|("[^"]*")|(-?[0-9][0-9]*(\.\d+)?)|true|false|null|undefined|Object|Array|Math|Date|JSON|(([a-zA-Z_$#@])([a-zA-Z_$\d]*))/;
 var REGEX_REPLACE_CHAR = /_njQs(\d+)_/g;
 var REGEX_HAS_BRACKET = /bracket_\d+/;
 
@@ -1627,7 +1627,7 @@ var FN_FILTER_LOOKUP = {
 };
 var REGEX_FN_FILTER = /(\)|\]|\.([^\s'"._#()|]+))[\s]*\(/g;
 var REGEX_SPACE_S_FILTER = /([(,|])[\s]+/g;
-var REGEX_PROP_FILTER = /\.([a-zA-Z_$#@][a-zA-Z_$@\d]*)/g;
+var REGEX_PROP_FILTER = /\.([a-zA-Z_$#@][a-zA-Z_$\d]*)/g;
 var REGEX_ARRPROP_FILTER = /([^\s([,])(\[)/g;
 var ARR_OBJ_FILTER_LOOKUP = {
   '[': 'list(',
