@@ -3,7 +3,6 @@
 const nj = require('../../src/base').default,
   _ = require('lodash'),
   compile = require('../../src/compiler/compile').compile,
-  //includeParser = require('../../tools/includeParser'),
   moment = require('moment');
 
 describe('test compile string', function() {
@@ -468,32 +467,6 @@ describe('test compile string', function() {
       } }).apply(null, data);
       // var html2 = tmplTest.call(null, { id: 200, c1: 100 }, data[0]);
       //console.log(html);
-      expect(html).toBeTruthy();
-    });
-
-    xit('test include parser', function () {
-      nj.config({ includeParser });
-
-      const tmpl = `
-        <template name="t1">
-          <img />
-        </template>
-        <template name="t2" local>
-          <input />
-        </template>
-        <template>
-          <section>
-            <#include src="./resources/testInclude.html" />
-            <img />
-            <#include src="./resources/testInclude2.html" />
-          </section>
-        </template>
-      `;
-
-      //console.log(includeParser(tmpl, __filename, true));
-
-      var html = nj.compile(tmpl, { fileName: __filename })();
-      console.log(html);
       expect(html).toBeTruthy();
     });
   });

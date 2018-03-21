@@ -16,7 +16,7 @@ const { OMITTED_CLOSE_TAGS } = tranElem;
 export default function compileStringTmpl(tmpl) {
   let tmplKey = tmpl.toString(), //Get unique key
     ret = preAsts[tmplKey];
-  const { outputH, tmplRule, onlyParse } = this;
+  const { outputH, tmplRule, onlyParse, fileName } = this;
 
   if (!ret) { //If the cache already has template data, direct return the template.
     let isStr = tools.isString(tmpl),
@@ -59,6 +59,12 @@ export default function compileStringTmpl(tmpl) {
 
       fullXml += xml + split;
     }, false, true);
+
+    //Merge all include tags
+    const includeParser = nj.includeParser;
+    if (includeParser) {
+      fullXml = includeParser(fullXml, fileName, tmplRule);
+    }
 
     fullXml = _formatAll(fullXml, tmplRule);
     if (nj.textMode && !outputH) {

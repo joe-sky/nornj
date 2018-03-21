@@ -47,13 +47,7 @@ function _createCompile(outputH) {
 
             //Transform string template to preAst
             if (tools.isString(tmpl)) {
-              //Merge all include tags
-              const includeParser = nj.includeParser;
-              if (includeParser) {
-                tmpl = includeParser(tmpl, fileName, tmplRule);
-              }
-
-              tmpl = compileStringTmpl.call({ tmplRule, outputH, onlyParse: true }, tmpl);
+              tmpl = compileStringTmpl.call({ tmplRule, outputH, onlyParse: true, fileName }, tmpl);
             }
 
             //分析传入参数并转换为节点树对象

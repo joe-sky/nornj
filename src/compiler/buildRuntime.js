@@ -73,17 +73,23 @@ function _buildFn(content, node, fns, no, newContext, level, useStringLocal, nam
   return no;
 }
 
-function _buildOptions(config, useStringLocal, node, fns, exPropsStr, subExPropsStr, level, hashProps, valueL) {
+function _buildOptions(config, useStringLocal, node, fns, exPropsStr, subExPropsStr, level, hashProps, valueL, parent) {
   let hashStr = ', useString: ' + (useStringLocal == null ? 'p1.us' : (useStringLocal ? 'true' : 'false')),
     noConfig = !config;
 
   if (node) { //扩展标签
-    let newContext = config ? config.newContext : true;
+    let newContext = config ? config.newContext : true,
+      hasProps;
     if (noConfig || config.exProps) {
       hashStr += ', exProps: ' + exPropsStr;
+      hasProps = true;
     }
     if (noConfig || config.subExProps) {
       hashStr += ', subExProps: ' + subExPropsStr;
+      hasProps = true;
+    }
+    if (hasProps && parent && parent.parentType) {
+      hashStr += ', parentType: \'' + parent.parentType + '\'';
     }
 
     hashStr += ', result: ' + (node.content ? 'p1.r(p1, p2, p1.fn' + _buildFn(node.content, node, fns, ++fns._no, newContext, level, useStringLocal) + ', ' + exPropsStr + ', ' + subExPropsStr + ')' : 'p1.np');
@@ -577,7 +583,7 @@ function _buildNode(node, parent, fns, counter, retType, level, useStringLocal, 
       paramsStr = retP[0],
       _paramsC = retP[1];
 
-    dataReferStr += _buildOptions(configE, useStringLocal, node, fns, exPropsStr, subExPropsStr, level, paramsStr !== '' ? '_params' + _paramsC : null);
+    dataReferStr += _buildOptions(configE, useStringLocal, node, fns, exPropsStr, subExPropsStr, level, paramsStr !== '' ? '_params' + _paramsC : null, null, parent);
     dataReferStr += '\n];\n';
 
     //添加匿名参数

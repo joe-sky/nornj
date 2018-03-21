@@ -8,8 +8,7 @@
   ReactDOMServer = require('react-dom/server'),
   Handlebars = require('handlebars/dist/handlebars');
 
-const Nj = nj.createTaggedTmpl({
-  outputH: true,
+const Nj = nj.createTaggedTmplH({
   delimiters: {
     start: '{',
     end: '}'

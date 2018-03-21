@@ -168,6 +168,7 @@ export function addParamsEx(node, parent, isProp, isSub) {
       exPropsNode = node;
     }
 
+    exPropsNode.parentType = parent.type;
     parent[exPropsName] = exPropsNode;
   } else {
     tools.arrayPush(parent[exPropsName].content, isProp || isSub ? [node] : node.content);

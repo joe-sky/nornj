@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## [v0.4.2-rc.36] 2018.03.21
+
+* 🌟 支持在`nj`标签模板字符串语法中写`<#include>`标签。
+* 🌟 `nj.createTaggedTmpl`方法支持传入`fileName`参数。
+
 ## [v0.4.2-rc.35] 2018.03.19
 
 * 🌟 支持构建`es module`包。

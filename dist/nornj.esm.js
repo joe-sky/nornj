@@ -1,5 +1,5 @@
 /*!
-* NornJ template engine v0.4.2-rc.35
+* NornJ template engine v0.4.2-rc.36
 * (c) 2016-2018 Joe_Sky
 * Released under the MIT License.
 */
@@ -1947,6 +1947,7 @@ function addParamsEx(node, parent, isProp, isSub) {
       exPropsNode = node;
     }
 
+    exPropsNode.parentType = parent.type;
     parent[exPropsName] = exPropsNode;
   } else {
     arrayPush(parent[exPropsName].content, isProp || isSub ? [node] : node.content);
@@ -2261,18 +2262,24 @@ function _buildFn(content, node, fns, no, newContext$$1, level, useStringLocal, 
   return no;
 }
 
-function _buildOptions(config, useStringLocal, node, fns, exPropsStr, subExPropsStr, level, hashProps, valueL) {
+function _buildOptions(config, useStringLocal, node, fns, exPropsStr, subExPropsStr, level, hashProps, valueL, parent) {
   var hashStr = ', useString: ' + (useStringLocal == null ? 'p1.us' : useStringLocal ? 'true' : 'false'),
       noConfig = !config;
 
   if (node) {
     //扩展标签
-    var newContext$$1 = config ? config.newContext : true;
+    var newContext$$1 = config ? config.newContext : true,
+        hasProps = void 0;
     if (noConfig || config.exProps) {
       hashStr += ', exProps: ' + exPropsStr;
+      hasProps = true;
     }
     if (noConfig || config.subExProps) {
       hashStr += ', subExProps: ' + subExPropsStr;
+      hasProps = true;
+    }
+    if (hasProps && parent && parent.parentType) {
+      hashStr += ', parentType: \'' + parent.parentType + '\'';
     }
 
     hashStr += ', result: ' + (node.content ? 'p1.r(p1, p2, p1.fn' + _buildFn(node.content, node, fns, ++fns._no, newContext$$1, level, useStringLocal) + ', ' + exPropsStr + ', ' + subExPropsStr + ')' : 'p1.np');
@@ -2786,7 +2793,7 @@ function _buildNode(node, parent, fns, counter, retType, level, useStringLocal, 
         paramsStr = retP[0],
         _paramsC = retP[1];
 
-    dataReferStr += _buildOptions(configE, useStringLocal, node, fns, exPropsStr, subExPropsStr, level, paramsStr !== '' ? '_params' + _paramsC : null);
+    dataReferStr += _buildOptions(configE, useStringLocal, node, fns, exPropsStr, subExPropsStr, level, paramsStr !== '' ? '_params' + _paramsC : null, null, parent);
     dataReferStr += '\n];\n';
 
     //添加匿名参数
@@ -3017,7 +3024,8 @@ function compileStringTmpl(tmpl) {
   ret = preAsts[tmplKey];
   var outputH = this.outputH,
       tmplRule = this.tmplRule,
-      onlyParse = this.onlyParse;
+      onlyParse = this.onlyParse,
+      fileName = this.fileName;
 
 
   if (!ret) {
@@ -3062,6 +3070,12 @@ function compileStringTmpl(tmpl) {
 
       fullXml += xml + split;
     }, false, true);
+
+    //Merge all include tags
+    var includeParser = nj.includeParser;
+    if (includeParser) {
+      fullXml = includeParser(fullXml, fileName, tmplRule);
+    }
 
     fullXml = _formatAll(fullXml, tmplRule);
     if (nj.textMode && !outputH) {
@@ -3412,13 +3426,7 @@ function _createCompile(outputH) {
 
             //Transform string template to preAst
             if (isString(tmpl)) {
-              //Merge all include tags
-              var includeParser = nj.includeParser;
-              if (includeParser) {
-                tmpl = includeParser(tmpl, fileName, tmplRule);
-              }
-
-              tmpl = compileStringTmpl.call({ tmplRule: tmplRule, outputH: outputH, onlyParse: true }, tmpl);
+              tmpl = compileStringTmpl.call({ tmplRule: tmplRule, outputH: outputH, onlyParse: true, fileName: fileName }, tmpl);
             }
 
             //分析传入参数并转换为节点树对象
@@ -3494,13 +3502,21 @@ assign(nj, {
 function createTaggedTmpl() {
   var opts = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
   var outputH = opts.outputH,
-      delimiters = opts.delimiters;
+      delimiters = opts.delimiters,
+      fileName = opts.fileName;
 
   var tmplRule = delimiters ? createTmplRule(delimiters) : nj.tmplRule;
 
   return function () {
-    return compileStringTmpl.apply({ tmplRule: tmplRule, outputH: outputH }, arguments);
+    return compileStringTmpl.apply({ tmplRule: tmplRule, outputH: outputH, fileName: fileName }, arguments);
   };
+}
+
+function createTaggedTmplH() {
+  var opts = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+  opts.outputH = true;
+  return createTaggedTmpl(opts);
 }
 
 var taggedTmpl = createTaggedTmpl({ outputH: false });
@@ -3508,6 +3524,7 @@ var taggedTmplH = createTaggedTmpl({ outputH: true });
 
 assign(nj, {
   createTaggedTmpl: createTaggedTmpl,
+  createTaggedTmplH: createTaggedTmplH,
   taggedTmpl: taggedTmpl,
   taggedTmplH: taggedTmplH
 });
