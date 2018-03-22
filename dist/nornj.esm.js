@@ -3083,7 +3083,7 @@ function compileStringTmpl(tmpl) {
     }
 
     //Resolve string to element
-    ret = _checkStringElem(fullXml, tmplRule);
+    ret = _checkStringElem(fullXml, tmplRule, outputH);
     defineProp(ret, '_njParamCount', {
       value: l - 1
     });
@@ -3149,7 +3149,7 @@ function _setTextAfter(textAfter, current) {
 }
 
 //Resolve string to element
-function _checkStringElem(xml, tmplRule) {
+function _checkStringElem(xml, tmplRule, outputH) {
   var root = [],
       current = {
     elem: root,
@@ -3183,9 +3183,9 @@ function _checkStringElem(xml, tmplRule) {
       if (isEx$$1 && !isEx$$1[1] && (isPropS(elemName, tmplRule) || isStrPropS(elemName, tmplRule) || isParamsEx(isEx$$1[3]) || exCompileConfig(isEx$$1[3]).isProp)) {
         parent = current;
         current = _createCurrent(_elemName, parent);
-        _setElem(_elem, _elemName, _elemParams, current.elem, null, tmplRule);
+        _setElem(_elem, _elemName, _elemParams, current.elem, null, tmplRule, outputH);
       } else {
-        _setSelfCloseElem(_elem, _elemName, _elemParams, current.elem, tmplRule);
+        _setSelfCloseElem(_elem, _elemName, _elemParams, current.elem, tmplRule, outputH);
       }
 
       _setTextAfter(_textAfter, current);
@@ -3224,7 +3224,7 @@ function _checkStringElem(xml, tmplRule) {
           } else if (elem[elem.length - 2] === '/') {
             //Self close tag
             if (_isEx || !inTextContent) {
-              _setSelfCloseElem(elem, elemName, elemParams, current.elem, tmplRule);
+              _setSelfCloseElem(elem, elemName, elemParams, current.elem, tmplRule, outputH);
             } else {
               _setText(elem, current.elem);
             }
@@ -3243,7 +3243,7 @@ function _checkStringElem(xml, tmplRule) {
 
                 parent = current;
                 current = _createCurrent(elemName, parent);
-                _setElem(elem, elemName, elemParams, current.elem, null, tmplRule);
+                _setElem(elem, elemName, elemParams, current.elem, null, tmplRule, outputH);
               }
             } else {
               _setText(elem, current.elem);
@@ -3272,7 +3272,7 @@ function _checkStringElem(xml, tmplRule) {
         _elemParams2 = _omittedCloseElem4[2],
         _textAfter2 = _omittedCloseElem4[3];
 
-    _setSelfCloseElem(_elem2, _elemName2, _elemParams2, current.elem, tmplRule);
+    _setSelfCloseElem(_elem2, _elemName2, _elemParams2, current.elem, tmplRule, outputH);
     _setTextAfter(_textAfter2, current);
   }
 
@@ -3299,7 +3299,7 @@ function _transformToEx(isStr, elemName, elemParams, tmplRule) {
 }
 
 //Set element node
-function _setElem(elem, elemName, elemParams, elemArr, bySelfClose, tmplRule) {
+function _setElem(elem, elemName, elemParams, elemArr, bySelfClose, tmplRule, outputH) {
   var ret = void 0,
       paramsEx = void 0;
   if (isEx(elemName, tmplRule, true)) {
@@ -3309,7 +3309,7 @@ function _setElem(elem, elemName, elemParams, elemArr, bySelfClose, tmplRule) {
   } else if (isPropS(elemName, tmplRule)) {
     ret = _transformToEx(false, elemName, elemParams, tmplRule);
   } else {
-    var retS = _getSplitParams(elem, tmplRule);
+    var retS = _getSplitParams(elem, tmplRule, outputH);
     ret = retS.elem;
     paramsEx = retS.params;
   }
@@ -3330,7 +3330,7 @@ function _setElem(elem, elemName, elemParams, elemArr, bySelfClose, tmplRule) {
 }
 
 //Extract split parameters
-function _getSplitParams(elem, tmplRule) {
+function _getSplitParams(elem, tmplRule, outputH) {
   var extensionRule = tmplRule.extensionRule,
       startRule = tmplRule.startRule,
       endRule = tmplRule.endRule,
@@ -3355,12 +3355,12 @@ function _getSplitParams(elem, tmplRule) {
   });
 
   //Replace the parameter like "#show={false}".
-  elem = elem.replace(new RegExp('[\\s]+' + extensionRule + '([^\\s=>]+)=((\'[^\']+\')|("[^"]+")|([^"\'\\s>]+))'), function (all, name, value) {
+  elem = elem.replace(new RegExp('[\\s]+(:?)' + extensionRule + '([^\\s=>]+)=((\'[^\']+\')|("[^"]+")|([^"\'\\s>]+))'), function (all, hasColon, name, value) {
     if (!paramsEx) {
       paramsEx = [extensionRule + 'props'];
     }
 
-    paramsEx.push([extensionRule + name, clearQuot(value)]);
+    paramsEx.push([extensionRule + name, (hasColon ? (outputH ? firstChar : '') + startRule + ' ' : '') + clearQuot(value) + (hasColon ? ' ' + endRule + (outputH ? lastChar : '') : '')]);
     return ' ';
   });
 
@@ -3371,11 +3371,11 @@ function _getSplitParams(elem, tmplRule) {
 }
 
 //Set self close element node
-function _setSelfCloseElem(elem, elemName, elemParams, elemArr, tmplRule) {
+function _setSelfCloseElem(elem, elemName, elemParams, elemArr, tmplRule, outputH) {
   if (/\/$/.test(elemName)) {
     elemName = elemName.substr(0, elemName.length - 1);
   }
-  _setElem(elem, elemName, elemParams, elemArr, true, tmplRule);
+  _setElem(elem, elemName, elemParams, elemArr, true, tmplRule, outputH);
 }
 
 //Set text node

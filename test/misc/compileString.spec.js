@@ -356,7 +356,7 @@ describe('test compile string', function() {
       <div data-auto :name="1 + props.n2 + ({ a: 20, b: ({ c: 50 }) }.('b').('c'))" :name2="1 > 2"><@id>1</@id></div>
       {{'123'[1]['length'] + ([[[-1, 0], 1], 2, 3])}}
       {{moment('2011-10-10', 'hh:mm:ss').format('hh:mm:ss')}}
-      <div #show="{{ false }}">
+      <div :#show="'1' !== '1'">
       </div>
       `;
 

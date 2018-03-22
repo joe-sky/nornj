@@ -72,7 +72,7 @@ export default function compileStringTmpl(tmpl) {
     }
 
     //Resolve string to element
-    ret = _checkStringElem(fullXml, tmplRule);
+    ret = _checkStringElem(fullXml, tmplRule, outputH);
     tools.defineProp(ret, '_njParamCount', {
       value: l - 1
     });
@@ -138,7 +138,7 @@ function _setTextAfter(textAfter, current) {
 }
 
 //Resolve string to element
-function _checkStringElem(xml, tmplRule) {
+function _checkStringElem(xml, tmplRule, outputH) {
   let root = [],
     current = {
       elem: root,
@@ -169,9 +169,9 @@ function _checkStringElem(xml, tmplRule) {
           tranElem.exCompileConfig(isEx[3]).isProp)) {
         parent = current;
         current = _createCurrent(_elemName, parent);
-        _setElem(_elem, _elemName, _elemParams, current.elem, null, tmplRule);
+        _setElem(_elem, _elemName, _elemParams, current.elem, null, tmplRule, outputH);
       } else {
-        _setSelfCloseElem(_elem, _elemName, _elemParams, current.elem, tmplRule);
+        _setSelfCloseElem(_elem, _elemName, _elemParams, current.elem, tmplRule, outputH);
       }
 
       _setTextAfter(_textAfter, current);
@@ -205,7 +205,7 @@ function _checkStringElem(xml, tmplRule) {
             }
           } else if (elem[elem.length - 2] === '/') { //Self close tag
             if (isEx || !inTextContent) {
-              _setSelfCloseElem(elem, elemName, elemParams, current.elem, tmplRule);
+              _setSelfCloseElem(elem, elemName, elemParams, current.elem, tmplRule, outputH);
             } else {
               _setText(elem, current.elem);
             }
@@ -221,7 +221,7 @@ function _checkStringElem(xml, tmplRule) {
 
                 parent = current;
                 current = _createCurrent(elemName, parent);
-                _setElem(elem, elemName, elemParams, current.elem, null, tmplRule);
+                _setElem(elem, elemName, elemParams, current.elem, null, tmplRule, outputH);
               }
             } else {
               _setText(elem, current.elem);
@@ -244,7 +244,7 @@ function _checkStringElem(xml, tmplRule) {
   if (omittedCloseElem) {
     const [_elem, _elemName, _elemParams, _textAfter] = omittedCloseElem;
 
-    _setSelfCloseElem(_elem, _elemName, _elemParams, current.elem, tmplRule);
+    _setSelfCloseElem(_elem, _elemName, _elemParams, current.elem, tmplRule, outputH);
     _setTextAfter(_textAfter, current);
   }
 
@@ -268,7 +268,7 @@ function _transformToEx(isStr, elemName, elemParams, tmplRule) {
 }
 
 //Set element node
-function _setElem(elem, elemName, elemParams, elemArr, bySelfClose, tmplRule) {
+function _setElem(elem, elemName, elemParams, elemArr, bySelfClose, tmplRule, outputH) {
   let ret, paramsEx;
   if (tranElem.isEx(elemName, tmplRule, true)) {
     ret = elem.substring(1, elem.length - 1);
@@ -277,7 +277,7 @@ function _setElem(elem, elemName, elemParams, elemArr, bySelfClose, tmplRule) {
   } else if (tranElem.isPropS(elemName, tmplRule)) {
     ret = _transformToEx(false, elemName, elemParams, tmplRule);
   } else {
-    const retS = _getSplitParams(elem, tmplRule);
+    const retS = _getSplitParams(elem, tmplRule, outputH);
     ret = retS.elem;
     paramsEx = retS.params;
   }
@@ -298,7 +298,7 @@ function _setElem(elem, elemName, elemParams, elemArr, bySelfClose, tmplRule) {
 }
 
 //Extract split parameters
-function _getSplitParams(elem, tmplRule) {
+function _getSplitParams(elem, tmplRule, outputH) {
   const { extensionRule, startRule, endRule, firstChar, lastChar, spreadProp } = tmplRule;
   let paramsEx;
 
@@ -317,12 +317,12 @@ function _getSplitParams(elem, tmplRule) {
   });
 
   //Replace the parameter like "#show={false}".
-  elem = elem.replace(new RegExp('[\\s]+' + extensionRule + '([^\\s=>]+)=((\'[^\']+\')|("[^"]+")|([^"\'\\s>]+))'), (all, name, value) => {
+  elem = elem.replace(new RegExp('[\\s]+(:?)' + extensionRule + '([^\\s=>]+)=((\'[^\']+\')|("[^"]+")|([^"\'\\s>]+))'), (all, hasColon, name, value) => {
     if (!paramsEx) {
       paramsEx = [extensionRule + 'props'];
     }
 
-    paramsEx.push([extensionRule + name, tools.clearQuot(value)]);
+    paramsEx.push([extensionRule + name, (hasColon ? ((outputH ? firstChar : '') + startRule + ' ') : '') + tools.clearQuot(value) + (hasColon ? (' ' + endRule + (outputH ? lastChar : '')) : '')]);
     return ' ';
   });
 
@@ -333,11 +333,11 @@ function _getSplitParams(elem, tmplRule) {
 }
 
 //Set self close element node
-function _setSelfCloseElem(elem, elemName, elemParams, elemArr, tmplRule) {
+function _setSelfCloseElem(elem, elemName, elemParams, elemArr, tmplRule, outputH) {
   if (/\/$/.test(elemName)) {
     elemName = elemName.substr(0, elemName.length - 1);
   }
-  _setElem(elem, elemName, elemParams, elemArr, true, tmplRule);
+  _setElem(elem, elemName, elemParams, elemArr, true, tmplRule, outputH);
 }
 
 //Set text node
