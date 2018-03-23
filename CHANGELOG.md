@@ -2,6 +2,7 @@
 
 ## [v0.4.2-rc.36] 2018.03.21
 
+* 🌟 支持`<div :#show="1 < 2">`语法。
 * 🌟 支持在`nj`标签模板字符串语法中写`<#include>`标签。
 * 🌟 `nj.createTaggedTmpl`方法支持传入`fileName`参数。
 
