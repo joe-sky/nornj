@@ -9,6 +9,13 @@ export const filters = {
     if (obj == null) {
       return obj;
     }
+    if (obj._njCtx) {
+      return {
+        _njCtx: obj.val,
+        val: obj.val[prop],
+        prop
+      };
+    }
 
     return obj[prop];
   },
@@ -31,8 +38,16 @@ export const filters = {
 
     return getComputedData({
       val: obj[prop],
-      ctx: obj
+      _njCtx: obj
     }, options.context, options.level);
+  },
+
+  '=': (obj, val) => {
+    if (obj == null) {
+      return obj;
+    }
+
+    obj._njCtx[obj.prop] = val;
   },
 
   '==': (val1, val2) => val1 == val2,

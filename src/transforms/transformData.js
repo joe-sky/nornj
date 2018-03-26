@@ -50,8 +50,9 @@ export function getData(prop, data, hasCtx) {
       if (ret !== undefined) {
         if (hasCtx) {
           return {
-            ctx: obj,
-            val: ret
+            _njCtx: obj,
+            val: ret,
+            prop
           };
         }
 
@@ -82,7 +83,7 @@ export function getComputedData(fn, p2, level) {
       _njIcp: p2.icp
     });
   } else { //普通函数
-    return fn.val.call(fn.ctx, p2);
+    return fn.val.call(fn._njCtx, p2);
   }
 }
 

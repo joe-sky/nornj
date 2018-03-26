@@ -1,5 +1,5 @@
 /*!
-* NornJ template engine v0.4.2-rc.36
+* NornJ template engine v0.4.2-rc.38
 * (c) 2016-2018 Joe_Sky
 * Released under the MIT License.
 */
@@ -606,8 +606,9 @@ function getData(prop, data, hasCtx) {
       if (ret !== undefined) {
         if (hasCtx) {
           return {
-            ctx: obj$$1,
-            val: ret
+            _njCtx: obj$$1,
+            val: ret,
+            prop: prop
           };
         }
 
@@ -640,7 +641,7 @@ function getComputedData(fn, p2, level) {
     });
   } else {
     //普通函数
-    return fn.val.call(fn.ctx, p2);
+    return fn.val.call(fn._njCtx, p2);
   }
 }
 
@@ -1148,7 +1149,8 @@ function _config(params) {
     exProps: false,
     isProp: false,
     subExProps: false,
-    isSub: false
+    isSub: false,
+    addSet: false
   };
 
   if (params) {
@@ -1231,6 +1233,13 @@ var filters = {
     if (obj$$1 == null) {
       return obj$$1;
     }
+    if (obj$$1._njCtx) {
+      return {
+        _njCtx: obj$$1.val,
+        val: obj$$1.val[prop],
+        prop: prop
+      };
+    }
 
     return obj$$1[prop];
   },
@@ -1253,8 +1262,16 @@ var filters = {
 
     return getComputedData({
       val: obj$$1[prop],
-      ctx: obj$$1
+      _njCtx: obj$$1
     }, options.context, options.level);
+  },
+
+  '=': function _(obj$$1, val) {
+    if (obj$$1 == null) {
+      return obj$$1;
+    }
+
+    obj$$1._njCtx[obj$$1.prop] = val;
   },
 
   '==': function _(val1, val2) {
@@ -1505,6 +1522,7 @@ assign(nj, {
 var REGEX_JS_PROP = /('[^']*')|("[^"]*")|(-?[0-9][0-9]*(\.\d+)?)|true|false|null|undefined|Object|Array|Math|Date|JSON|(([a-zA-Z_$#@])([a-zA-Z_$\d]*))/;
 var REGEX_REPLACE_CHAR = /_njQs(\d+)_/g;
 var REGEX_HAS_BRACKET = /bracket_\d+/;
+var REGEX_REPLACE_SET = /_njSet_/;
 
 function _replaceStr(prop, innerQuotes) {
   return prop.replace(REGEX_REPLACE_CHAR, function (all, g1) {
@@ -1597,6 +1615,10 @@ function _compiledProp(prop, innerBrackets, innerQuotes, source) {
     if (hasComputed) {
       ret.isComputed = true;
     }
+    ret.name = ret.name.replace(REGEX_REPLACE_SET, function () {
+      ret.hasSet = true;
+      return '';
+    });
   } else {
     ret.isEmpty = true;
   }
@@ -1636,7 +1658,8 @@ var ARR_OBJ_FILTER_LOOKUP = {
   '}': ')'
 };
 var REGEX_ARR_OBJ_FILTER = /\[|\]|\{|\}/g;
-var REGEX_OBJKEY_FILTER = /([^\s:,'"()|]+):/g;
+var REGEX_OBJKEY_FILTER = /([(,][\s]*)([^\s:,'"()|]+):/g;
+var REGEX_SET_FILTER = /^[\s]*set[\s]+|([(,])[\s]*set[\s]+/g;
 
 function _getProp(matchArr, innerQuotes, i) {
   var prop = matchArr[2].trim(),
@@ -1665,8 +1688,10 @@ function _getProp(matchArr, innerQuotes, i) {
     return g1 + '.(';
   }).replace(REGEX_ARR_OBJ_FILTER, function (match) {
     return ARR_OBJ_FILTER_LOOKUP[match];
-  }).replace(REGEX_OBJKEY_FILTER, function (all, g1) {
-    return ' \'' + g1 + '\' : ';
+  }).replace(REGEX_SET_FILTER, function (all, g1) {
+    return (g1 ? g1 : '') + '_njSet_';
+  }).replace(REGEX_OBJKEY_FILTER, function (all, g1, g2) {
+    return g1 + ' \'' + g2 + '\' : ';
   }).replace(REGEX_SP_FILTER, function (all, g1, match) {
     return ' ' + SP_FILTER_LOOKUP[match] + ' ';
   }).replace(REGEX_SPACE_S_FILTER, function (all, match) {
@@ -1959,7 +1984,8 @@ function exCompileConfig(name) {
   return {
     isSub: config ? config.isSub : false,
     isProp: config ? config.isProp : false,
-    useString: config ? config.useString : false
+    useString: config ? config.useString : false,
+    addSet: config ? config.addSet : false
   };
 }
 
@@ -2299,7 +2325,9 @@ function _buildPropData(obj$$1, counter, fns, useStringLocal, level) {
       escape$$1 = obj$$1.escape,
       isEmpty = false,
       special = false;
-  var isComputed = obj$$1.prop.isComputed;
+  var _obj$prop = obj$$1.prop,
+      isComputed = _obj$prop.isComputed,
+      hasSet = _obj$prop.hasSet;
 
   //先生成数据值
 
@@ -2308,9 +2336,9 @@ function _buildPropData(obj$$1, counter, fns, useStringLocal, level) {
   } else if (obj$$1.prop.isEmpty) {
     isEmpty = true;
   } else {
-    var _obj$prop = obj$$1.prop,
-        name = _obj$prop.name,
-        parentNum = _obj$prop.parentNum;
+    var _obj$prop2 = obj$$1.prop,
+        name = _obj$prop2.name,
+        parentNum = _obj$prop2.parentNum;
 
     var data = '',
         specialP = false;
@@ -2382,10 +2410,10 @@ function _buildPropData(obj$$1, counter, fns, useStringLocal, level) {
     }
 
     if (!special && !specialP) {
-      dataValueStr = (isComputed ? 'p1.c(' : '') + 'p2.d(\'' + name + '\'' + (isComputed ? ', 0, true' : '') + ')' + (isComputed ? ', p2, ' + level + ')' : '');
+      dataValueStr = (isComputed ? 'p1.c(' : '') + 'p2.d(\'' + name + '\'' + (isComputed || hasSet ? ', 0, true' : '') + ')' + (isComputed ? ', p2, ' + level + ')' : '');
     } else {
       var dataStr = special === CUSTOM_VAR ? data : 'p2.' + data;
-      dataValueStr = special ? dataStr : (isComputed ? 'p1.c(' : '') + 'p2.d(\'' + name + '\', ' + dataStr + (isComputed ? ', true' : '') + ')' + (isComputed ? ', p2, ' + level + ')' : '');
+      dataValueStr = special ? dataStr : (isComputed ? 'p1.c(' : '') + 'p2.d(\'' + name + '\', ' + dataStr + (isComputed || hasSet ? ', true' : '') + ')' + (isComputed ? ', p2, ' + level + ')' : '');
     }
   }
   if (dataValueStr) {
@@ -2441,7 +2469,7 @@ function _buildPropData(obj$$1, counter, fns, useStringLocal, level) {
         filterStr += '} else {\n';
       }
 
-      var _filterStr = '  ' + tmpStr + ' = ' + filterVarStr + '.apply(' + (fnHVarStr ? fnHVarStr + ' ? ' + fnHVarStr + '.ctx : p2' : 'p2') + ', [' + (!isEmpty || i > 0 ? valueStr + ', ' : '') + (o.params && o.params.length ? o.params.reduce(function (p, c, i, arr) {
+      var _filterStr = '  ' + tmpStr + ' = ' + filterVarStr + '.apply(' + (fnHVarStr ? fnHVarStr + ' ? ' + fnHVarStr + '._njCtx : p2' : 'p2') + ', [' + (!isEmpty || i > 0 ? valueStr + ', ' : '') + (o.params && o.params.length ? o.params.reduce(function (p, c, i, arr) {
         var propStr = _buildPropData({
           prop: c,
           escape: escape$$1
@@ -2917,7 +2945,7 @@ function _buildRender(node, parent, nodeType, retType, params, fns, level, useSt
       break;
     case 2:
       //扩展标签
-      retStr = '_ex' + params._ex + '.apply(' + (params.fnH ? params.fnH + ' ? ' + params.fnH + '.ctx : p2' : 'p2') + ', _dataRefer' + params._dataRefer + ')';
+      retStr = '_ex' + params._ex + '.apply(' + (params.fnH ? params.fnH + ' ? ' + params.fnH + '._njCtx : p2' : 'p2') + ', _dataRefer' + params._dataRefer + ')';
       break;
     case 3:
       //元素节点
@@ -3329,6 +3357,10 @@ function _setElem(elem, elemName, elemParams, elemArr, bySelfClose, tmplRule, ou
   }
 }
 
+function _inlineExTagValue(name, value) {
+  return (exCompileConfig(name).addSet ? 'set ' : '') + value;
+}
+
 //Extract split parameters
 function _getSplitParams(elem, tmplRule, outputH) {
   var extensionRule = tmplRule.extensionRule,
@@ -3360,7 +3392,7 @@ function _getSplitParams(elem, tmplRule, outputH) {
       paramsEx = [extensionRule + 'props'];
     }
 
-    paramsEx.push([extensionRule + name, (hasColon ? (outputH ? firstChar : '') + startRule + ' ' : '') + clearQuot(value) + (hasColon ? ' ' + endRule + (outputH ? lastChar : '') : '')]);
+    paramsEx.push([extensionRule + name, (hasColon ? (outputH ? firstChar : '') + startRule + ' ' : '') + _inlineExTagValue(name, clearQuot(value)) + (hasColon ? ' ' + endRule + (outputH ? lastChar : '') : '')]);
     return ' ';
   });
 

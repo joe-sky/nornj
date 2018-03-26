@@ -1,5 +1,5 @@
 /*!
-* NornJ template engine v0.4.2-rc.36
+* NornJ template engine v0.4.2-rc.38
 * (c) 2016-2018 Joe_Sky
 * Released under the MIT License.
 */
@@ -379,8 +379,9 @@ function getData(prop, data, hasCtx) {
       if (ret !== undefined) {
         if (hasCtx) {
           return {
-            ctx: obj$$1,
-            val: ret
+            _njCtx: obj$$1,
+            val: ret,
+            prop: prop
           };
         }
 
@@ -413,7 +414,7 @@ function getComputedData(fn, p2, level) {
     });
   } else {
     //普通函数
-    return fn.val.call(fn.ctx, p2);
+    return fn.val.call(fn._njCtx, p2);
   }
 }
 
@@ -921,7 +922,8 @@ function _config(params) {
     exProps: false,
     isProp: false,
     subExProps: false,
-    isSub: false
+    isSub: false,
+    addSet: false
   };
 
   if (params) {
@@ -1004,6 +1006,13 @@ var filters = {
     if (obj$$1 == null) {
       return obj$$1;
     }
+    if (obj$$1._njCtx) {
+      return {
+        _njCtx: obj$$1.val,
+        val: obj$$1.val[prop],
+        prop: prop
+      };
+    }
 
     return obj$$1[prop];
   },
@@ -1026,8 +1035,16 @@ var filters = {
 
     return getComputedData({
       val: obj$$1[prop],
-      ctx: obj$$1
+      _njCtx: obj$$1
     }, options.context, options.level);
+  },
+
+  '=': function _(obj$$1, val) {
+    if (obj$$1 == null) {
+      return obj$$1;
+    }
+
+    obj$$1._njCtx[obj$$1.prop] = val;
   },
 
   '==': function _(val1, val2) {

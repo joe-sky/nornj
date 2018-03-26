@@ -180,7 +180,8 @@ export function exCompileConfig(name) {
   return {
     isSub: config ? config.isSub : false,
     isProp: config ? config.isProp : false,
-    useString: config ? config.useString : false
+    useString: config ? config.useString : false,
+    addSet: config ? config.addSet : false
   };
 }
 

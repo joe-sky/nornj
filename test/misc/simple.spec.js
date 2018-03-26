@@ -44,6 +44,8 @@ describe('test compile string', function() {
               {{../../@context.data[1].a.b}}
             </#each>
           </#each>
+          {{ set a.b = '__cde' }}{{ a.b }}
+          <#if {{ a._ > 100 }}>{{ set x = '__yzx' }}</#if>{{ x }}
         </${'div'}>
       `;
 
@@ -64,6 +66,7 @@ describe('test compile string', function() {
           _: 123,
           prop: ctx => 456
         },
+        x: '__xyz'
       });
       //console.log(html);
       expect(html).toBeTruthy();

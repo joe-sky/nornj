@@ -295,7 +295,8 @@ function _config(params) {
     exProps: false,
     isProp: false,
     subExProps: false,
-    isSub: false
+    isSub: false,
+    addSet: false
   };
 
   if (params) {

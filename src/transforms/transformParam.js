@@ -6,6 +6,7 @@ import '../helpers/filter';
 const REGEX_JS_PROP = /('[^']*')|("[^"]*")|(-?[0-9][0-9]*(\.\d+)?)|true|false|null|undefined|Object|Array|Math|Date|JSON|(([a-zA-Z_$#@])([a-zA-Z_$\d]*))/;
 const REGEX_REPLACE_CHAR = /_njQs(\d+)_/g;
 const REGEX_HAS_BRACKET = /bracket_\d+/;
+const REGEX_REPLACE_SET = /_njSet_/;
 
 function _replaceStr(prop, innerQuotes) {
   return prop.replace(REGEX_REPLACE_CHAR, (all, g1) => innerQuotes[g1]);
@@ -95,6 +96,10 @@ function _compiledProp(prop, innerBrackets, innerQuotes, source) {
     if (hasComputed) {
       ret.isComputed = true;
     }
+    ret.name = ret.name.replace(REGEX_REPLACE_SET, () => {
+      ret.hasSet = true;
+      return '';
+    });
   } else {
     ret.isEmpty = true;
   }
@@ -134,7 +139,8 @@ const ARR_OBJ_FILTER_LOOKUP = {
   '}': ')'
 };
 const REGEX_ARR_OBJ_FILTER = /\[|\]|\{|\}/g;
-const REGEX_OBJKEY_FILTER = /([^\s:,'"()|]+):/g;
+const REGEX_OBJKEY_FILTER = /([(,][\s]*)([^\s:,'"()|]+):/g;
+const REGEX_SET_FILTER = /^[\s]*set[\s]+|([(,])[\s]*set[\s]+/g;
 
 function _getProp(matchArr, innerQuotes, i) {
   let prop = matchArr[2].trim(),
@@ -163,7 +169,8 @@ function _getProp(matchArr, innerQuotes, i) {
     })
     .replace(REGEX_ARRPROP_FILTER, (all, g1, g2) => g1 + '.(')
     .replace(REGEX_ARR_OBJ_FILTER, match => ARR_OBJ_FILTER_LOOKUP[match])
-    .replace(REGEX_OBJKEY_FILTER, (all, g1) => ' \'' + g1 + '\' : ')
+    .replace(REGEX_SET_FILTER, (all, g1) => (g1 ? g1 : '') + '_njSet_')
+    .replace(REGEX_OBJKEY_FILTER, (all, g1, g2) => g1 + ' \'' + g2 + '\' : ')
     .replace(REGEX_SP_FILTER, (all, g1, match) => ' ' + SP_FILTER_LOOKUP[match] + ' ')
     .replace(REGEX_SPACE_S_FILTER, (all, match) => match)
     .replace(REGEX_FN_FILTER, (all, match, g1) => !g1 ? FN_FILTER_LOOKUP[match] : '.(\'' + g1 + '\')_(');

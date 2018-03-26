@@ -297,6 +297,10 @@ function _setElem(elem, elemName, elemParams, elemArr, bySelfClose, tmplRule, ou
   }
 }
 
+function _inlineExTagValue(name, value) {
+  return (tranElem.exCompileConfig(name).addSet ? 'set ' : '') + value;
+}
+
 //Extract split parameters
 function _getSplitParams(elem, tmplRule, outputH) {
   const { extensionRule, startRule, endRule, firstChar, lastChar, spreadProp } = tmplRule;
@@ -322,7 +326,7 @@ function _getSplitParams(elem, tmplRule, outputH) {
       paramsEx = [extensionRule + 'props'];
     }
 
-    paramsEx.push([extensionRule + name, (hasColon ? ((outputH ? firstChar : '') + startRule + ' ') : '') + tools.clearQuot(value) + (hasColon ? (' ' + endRule + (outputH ? lastChar : '')) : '')]);
+    paramsEx.push([extensionRule + name, (hasColon ? ((outputH ? firstChar : '') + startRule + ' ') : '') + _inlineExTagValue(name, tools.clearQuot(value)) + (hasColon ? (' ' + endRule + (outputH ? lastChar : '')) : '')]);
     return ' ';
   });
 
