@@ -470,7 +470,7 @@ function _buildParams(node, fns, counter, useString, level, exPropsStr, subExPro
         }
 
         let key = _replaceStrs(k),
-          onlyKey = ('\'' + key + '\'') === valueStr;
+          onlyKey = params[k].onlyKey;
         if (!useStringF) {
           key = tranData.fixPropName(key);
         }

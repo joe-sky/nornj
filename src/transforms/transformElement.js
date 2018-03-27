@@ -54,11 +54,15 @@ export function getOpenTagParams(tag, tmplRule) {
     }
 
     let value = matchArr[8],
-      onlyBrace = matchArr[4] != null ? matchArr[4] : matchArr[6];
+      onlyBrace = matchArr[4] != null ? matchArr[4] : matchArr[6],
+      onlyKey = false;
     if (value != null) {
       value = tools.clearQuot(value); //Remove quotation marks
     } else {
       value = key; //Match to Similar to "checked" or "disabled" attribute.
+      if (!onlyBrace) {
+        onlyKey = true;
+      }
     }
 
     //Removed at the end of "/>", ">" or "/".
@@ -72,7 +76,7 @@ export function getOpenTagParams(tag, tmplRule) {
 
     //Transform special key
     let hasColon;
-    if(key[0] === ':') {
+    if (key[0] === ':') {
       key = key.substr(1);
       hasColon = true;
     }
@@ -81,7 +85,8 @@ export function getOpenTagParams(tag, tmplRule) {
       key,
       value,
       onlyBrace,
-      hasColon
+      hasColon,
+      onlyKey
     });
   }
 

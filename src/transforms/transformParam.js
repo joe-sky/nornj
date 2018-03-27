@@ -233,7 +233,7 @@ function _replaceInnerBrackets(prop, innerBrackets) {
 }
 
 //Get compiled parameter
-export function compiledParam(value, tmplRule, hasColon) {
+export function compiledParam(value, tmplRule, hasColon, onlyKey) {
   let ret = tools.obj(),
     isStr = tools.isString(value),
     strs = isStr ? (!hasColon ? value.split(tmplRule.replaceSplit) : ['', '']) : [value],
@@ -267,6 +267,7 @@ export function compiledParam(value, tmplRule, hasColon) {
   ret.props = props;
   ret.strs = strs;
   ret.isAll = isAll;
+  ret.onlyKey = onlyKey;
 
   return ret;
 }

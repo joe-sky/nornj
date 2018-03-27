@@ -1769,7 +1769,7 @@ function _replaceInnerBrackets(prop, innerBrackets) {
 }
 
 //Get compiled parameter
-function compiledParam(value, tmplRule, hasColon) {
+function compiledParam(value, tmplRule, hasColon, onlyKey) {
   var ret = obj(),
       isStr = isString(value),
       strs = isStr ? !hasColon ? value.split(tmplRule.replaceSplit) : ['', ''] : [value],
@@ -1806,6 +1806,7 @@ function compiledParam(value, tmplRule, hasColon) {
   ret.props = props;
   ret.strs = strs;
   ret.isAll = isAll;
+  ret.onlyKey = onlyKey;
 
   return ret;
 }
@@ -1863,11 +1864,15 @@ function getOpenTagParams(tag, tmplRule) {
     }
 
     var value = matchArr[8],
-        onlyBrace = matchArr[4] != null ? matchArr[4] : matchArr[6];
+        onlyBrace = matchArr[4] != null ? matchArr[4] : matchArr[6],
+        onlyKey = false;
     if (value != null) {
       value = clearQuot(value); //Remove quotation marks
     } else {
       value = key; //Match to Similar to "checked" or "disabled" attribute.
+      if (!onlyBrace) {
+        onlyKey = true;
+      }
     }
 
     //Removed at the end of "/>", ">" or "/".
@@ -1890,7 +1895,8 @@ function getOpenTagParams(tag, tmplRule) {
       key: key,
       value: value,
       onlyBrace: onlyBrace,
-      hasColon: hasColon
+      hasColon: hasColon,
+      onlyKey: onlyKey
     });
   }
 
@@ -2116,7 +2122,7 @@ function checkElem(obj$$1, parent, tmplRule, hasExProps, noSplitNewline, isLast)
             return;
           }
 
-          var paramV = compiledParam(value, tmplRule, param.hasColon);
+          var paramV = compiledParam(value, tmplRule, param.hasColon, param.onlyKey);
           if (param.onlyBrace) {
             //提取匿名参数
             node.args.push(paramV);
@@ -2157,7 +2163,7 @@ function checkElem(obj$$1, parent, tmplRule, hasExProps, noSplitNewline, isLast)
 
           each(tagParams, function (param) {
             //The parameter like "{prop}" needs to be replaced.
-            node.params[param.onlyBrace ? param.onlyBrace.replace(/\.\.\//g, '') : param.key] = compiledParam(param.value, tmplRule, param.hasColon);
+            node.params[param.onlyBrace ? param.onlyBrace.replace(/\.\.\//g, '') : param.key] = compiledParam(param.value, tmplRule, param.hasColon, param.onlyKey);
           }, false, true);
         }
 
@@ -2706,7 +2712,7 @@ function _buildParams(node, fns, counter, useString, level, exPropsStr, subExPro
         }
 
         var key = _replaceStrs(k),
-            onlyKey = '\'' + key + '\'' === valueStr;
+            onlyKey = params[k].onlyKey;
         if (!useStringF) {
           key = fixPropName(key);
         }

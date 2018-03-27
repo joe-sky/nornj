@@ -114,7 +114,7 @@ export default function checkElem(obj, parent, tmplRule, hasExProps, noSplitNewl
             return;
           }
 
-          let paramV = tranParam.compiledParam(value, tmplRule, param.hasColon);
+          let paramV = tranParam.compiledParam(value, tmplRule, param.hasColon, param.onlyKey);
           if (param.onlyBrace) { //提取匿名参数
             node.args.push(paramV);
           } else {
@@ -152,7 +152,7 @@ export default function checkElem(obj, parent, tmplRule, hasExProps, noSplitNewl
           }
 
           tools.each(tagParams, param => { //The parameter like "{prop}" needs to be replaced.
-            node.params[param.onlyBrace ? param.onlyBrace.replace(/\.\.\//g, '') : param.key] = tranParam.compiledParam(param.value, tmplRule, param.hasColon);
+            node.params[param.onlyBrace ? param.onlyBrace.replace(/\.\.\//g, '') : param.key] = tranParam.compiledParam(param.value, tmplRule, param.hasColon, param.onlyKey);
           }, false, true);
         }
 
