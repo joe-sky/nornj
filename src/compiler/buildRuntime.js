@@ -78,19 +78,18 @@ function _buildOptions(config, useStringLocal, node, fns, exPropsStr, subExProps
     noConfig = !config;
 
   if (node) { //扩展标签
-    let newContext = config ? config.newContext : true,
-      hasProps;
+    let newContext = config ? config.newContext : true;
     if (noConfig || config.exProps) {
       hashStr += ', exProps: ' + exPropsStr;
-      hasProps = true;
     }
     if (noConfig || config.subExProps) {
       hashStr += ', subExProps: ' + subExPropsStr;
-      hasProps = true;
     }
-    if (hasProps && parent && parent.parentType) {
-      hashStr += ', parentType: \'' + parent.parentType + '\'';
+    if (parent) {
+      const _parentType = parent.parentType != null ? parent.parentType : (parent.ex ? parent.ex : parent.type);
+      hashStr += ', parentName: ' + (_parentType != null ? ('\'' + _parentType + '\'') : _parentType);
     }
+    hashStr += ', name: \'' + node.ex + '\'';
 
     hashStr += ', result: ' + (node.content ? 'p1.r(p1, p2, p1.fn' + _buildFn(node.content, node, fns, ++fns._no, newContext, level, useStringLocal) + ', ' + exPropsStr + ', ' + subExPropsStr + ')' : 'p1.np');
 
