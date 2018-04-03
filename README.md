@@ -59,22 +59,24 @@
 
 <template>
   <div>
-    <#each {{1 .. 20}}>                               <!-- ".."是范围运算符 -->
-      this the test demo Hello {{@index ** 2 | int}}  <!-- "**"是乘方运算符 -->
+    <#each {{1 .. 20}}>
+      this the test demo Hello {{@index ** 2 | int}}
     </#each>
-    <#include name="partial" />                       <!-- 导入其他模板 -->
+    <#include name="partial" />
   </div>
 </template>
 ```
 
-可见，`NornJ`的语法结构在尽量与html保持一致的同时，更有丰富的扩展语法去实现各种逻辑；且拥有`..`、`**`等js不支持的运算符，而且它们还是可以自由扩展的^_^!
+如上，`NornJ`的语法结构在尽量与html保持一致的同时，更有丰富的扩展语法去实现各种逻辑；且拥有`..`、`**`等js原生不支持的运算符，而且还可以自由扩展处更多的新语句与运算符!
 
 * 在js文件中像JSX那样编写
 
 ```js
+const props = { id: 'test', name: 'test' };
+
 const partial = nj`
-  <#if ${i > 0 || (i <= -10)}>                        <!-- 可直接嵌入js表达式 -->
-    <input id=test onclick={{click}}>
+  <#if ${i > 0 || (i <= -10)}>
+    <input onclick={{click}} ...${props}>
   </#if>
 `;
 
@@ -83,17 +85,37 @@ const template = nj`
     <#each {{1 .. 20}}>
       this the test demo Hello {{@index ** 2 | int}}
     </#each>
-    #${partial}                                       <!-- 导入其他模板 -->
+    #${partial}
   </div>
 `;
 ```
 
-`NornJ`也同时支持像`JSX`那样在js文件中自由地编写，它使用`ES2015+`提供的`tagged template string`语法；并且几乎所有JSX支持的特性，它也都是支持的^_^!
+`NornJ`也同时支持像`JSX`那样在js文件中自由地编写，它使用`ES2015+`提供的`tagged template string`语法；并且几乎所有JSX支持的特性，它也都是支持的!
+
+## 安装
+
+```sh
+npm install nornj
+```
 
 ## 在线演示地址
 
 * [在线Playground(jsfiddle)](https://jsfiddle.net/joe_sky/n5n9tutj/)
 * [在线Playground(codepen)](https://codepen.io/joe_sky/pen/ooPNbj)
+
+## 项目脚手架
+
+* [nornj-cli](https://github.com/joe-sky/nornj-cli)
+
+该脚手架的使用方法类似于`vue-cli`，目前可创建完整的基于`react + mobx`的项目模板，并有[快速上手文档](https://github.com/joe-sky/nornj-cli/blob/master/docs/guides/overview.md)。
+
+## 示例项目
+
+* [todomvc[react + redux + react-router + nornj + webpack4]](https://github.com/joe-sky/nornj/blob/master/examples/react-redux-nornj-todomvc)
+* [todomvc(无需webpack打包)[react + redux + react-router + nornj]](https://github.com/joe-sky/nornj/blob/master/examples/react-redux-nornj-todomvc-es5)
+* [todomvc[backbone + marionette + nornj]](https://github.com/joe-sky/nornj/blob/master/examples/backbone-marionette-nornj-todomvc)
+* [计数器示例[react-native + styled-components + nornj]](https://github.com/joe-sky/nornj-react-native-counter)
+* [项目脚手架[react + mobx + react-router + nornj]](https://github.com/joe-sky/nornj-cli/tree/master/templates/react-mst)
 
 ## 特色
 
@@ -184,14 +206,6 @@ console.log(html);
 */
 ```
 
-## 安装
-
-使用npm安装:
-
-```sh
-npm install nornj
-```
-
 ## 相关项目及工具
 
 * [nornj-react(React适配库)](https://github.com/joe-sky/nornj-react)
@@ -201,24 +215,10 @@ npm install nornj
 * [express适配器](https://github.com/joe-sky/nornj/blob/master/tools/expressEngine.js)
 * [react-native transformer](https://github.com/joe-sky/nornj/blob/master/tools/metroTransformer.js)
 
-## 项目脚手架
-
-* [nornj-cli](https://github.com/joe-sky/nornj-cli)
-
-该脚手架的使用方法类似于`vue-cli`，目前可创建完整的基于`react + mobx`的项目模板，且有[快速上手文档](https://github.com/joe-sky/nornj-cli/blob/master/docs/guides/overview.md)。
-
 ## 语法高亮插件
 
 * [nornj-highlight(vscode)](https://github.com/joe-sky/nornj-highlight)
 * [language-nornj(atom)](https://github.com/zyj1022/language-nornj)
-
-## 示例项目
-
-* [todomvc项目[react + redux + react-router + nornj + webpack4]](https://github.com/joe-sky/nornj/blob/master/examples/react-redux-nornj-todomvc)
-* [todomvc项目(无需webpack打包)[react + redux + react-router + nornj]](https://github.com/joe-sky/nornj/blob/master/examples/react-redux-nornj-todomvc-es5)
-* [todomvc项目[backbone + marionette + nornj]](https://github.com/joe-sky/nornj/blob/master/examples/backbone-marionette-nornj-todomvc)
-* [计数器示例[react-native + styled-components + nornj]](https://github.com/joe-sky/nornj-react-native-counter)
-* [项目脚手架[react + mobx + react-router + nornj]](https://github.com/joe-sky/nornj-cli/tree/master/templates/react-mst)
 
 ## 浏览器支持
 
