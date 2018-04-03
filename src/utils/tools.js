@@ -110,7 +110,12 @@ export function throwIf(val, msg, type) {
 }
 
 //Print warn
-export function warn(msg) {
+export function warn(msg, type) {
+  switch (type) {
+    case 'f':
+      msg = 'A filter called "' + msg + '" is undefined.';
+      break;
+  }
   console.warn(errorTitle + msg);
 }
 

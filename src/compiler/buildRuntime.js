@@ -239,7 +239,7 @@ function _buildPropData(obj, counter, fns, useStringLocal, level) {
       }
       if (process.env.NODE_ENV !== 'production') {
         filterStr += 'if (!' + filterVarStr + ') {\n';
-        filterStr += '  p1.wn(\'A filter called "' + o.name + '" is undefined.\');\n';
+        filterStr += '  p1.wn(\'' + o.name + '\', \'f\');\n';
         filterStr += '} else {\n';
       }
 

@@ -1,6 +1,6 @@
 {
   "name": "nornj",
-  "version": "0.4.2-rc.38",
+  "version": "0.4.2-rc.39",
   "description": "A multipurpose javascript template engine, support both the rendering string and the react component.",
   "main": "dist/nornj.common.js",
   "module": "dist/nornj.esm.js",

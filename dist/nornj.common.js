@@ -1,5 +1,5 @@
 /*!
-* NornJ template engine v0.4.2-rc.38
+* NornJ template engine v0.4.2-rc.39
 * (c) 2016-2018 Joe_Sky
 * Released under the MIT License.
 */
@@ -234,7 +234,12 @@ function throwIf(val, msg, type) {
 }
 
 //Print warn
-function warn(msg) {
+function warn(msg, type) {
+  switch (type) {
+    case 'f':
+      msg = 'A filter called "' + msg + '" is undefined.';
+      break;
+  }
   console.warn(errorTitle + msg);
 }
 
@@ -2474,7 +2479,7 @@ function _buildPropData(obj$$1, counter, fns, useStringLocal, level) {
       }
       if (process.env.NODE_ENV !== 'production') {
         filterStr += 'if (!' + filterVarStr + ') {\n';
-        filterStr += '  p1.wn(\'A filter called "' + o.name + '" is undefined.\');\n';
+        filterStr += '  p1.wn(\'' + o.name + '\', \'f\');\n';
         filterStr += '} else {\n';
       }
 
