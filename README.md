@@ -67,7 +67,7 @@
 </template>
 ```
 
-如上，`NornJ`的语法结构在尽量与html保持一致的同时，更有丰富的扩展语法去实现各种逻辑；且拥有`..`、`**`等js原生不支持的运算符，而且还可以自由扩展处更多的新语句与运算符!
+如上，`NornJ`的语法结构在尽量与html保持一致的同时，更有丰富的扩展语法去实现各种逻辑；且拥有`..`、`**`等js原生不支持的运算符，而且还可以自由扩展出更多的新语句与运算符!
 
 * 在js文件中像JSX那样编写
 
@@ -102,6 +102,11 @@ npm install nornj
 
 * [在线Playground(jsfiddle)](https://jsfiddle.net/joe_sky/n5n9tutj/)
 * [在线Playground(codepen)](https://codepen.io/joe_sky/pen/ooPNbj)
+
+## 在线文档
+
+* [NornJ中文指南(github pages)](https://joe-sky.github.io/nornj-guide)
+* [NornJ中文指南(gitbook)](https://joe-sky.gitbooks.io/nornj-guide)
 
 ## 项目脚手架
 
