@@ -96,6 +96,8 @@ const template = nj`
 
 ```sh
 npm install nornj
+npm install nornj-react   # React开发请一起安装此包
+npm install nornj-loader  # webpack环境请一起安装此包
 ```
 
 ## 在线演示地址
@@ -126,20 +128,41 @@ npm install nornj
 
 传统js模板引擎如`Handlebars`、`EJS`、`Nunjucks`等通常只支持渲染字符串，`NornJ`与它们相比，相同点和不同点都有：
 
-* 支持渲染`React`的`virtual dom`对象，作为`JSX`的替代模板语言。
-* 支持渲染字符串，故它也可以像传统js模板引擎一样支持`Express`或`Koa`等渲染html；也支持为各类文本文件提供模板渲染。
-* 模板语法简单且丰富，在参考自`Handlebars`、`Nunjucks`、`Vue`等著名项目的模板语法基础上，也有很多自己独特的语法。
-* 语法的可扩展性很强大而且容易，例如模板中的每个`运算符`及`语句`都是可以扩展的。
+* 支持渲染`React`的`virtual dom`对象，可替代或辅助`JSX`运行。
+* 支持渲染字符串，就像传统的js模板引擎一样支持`Express`或`Koa`等渲染html；也支持为`各类文本文件`提供模板渲染。
+* 模板语法简单且丰富，在参考自`Handlebars`、`Nunjucks`、`Vue`等著名项目的基础上，也有很多自己独特的语法。
+* 语法的可扩展性强大且开发扩展容易，模板中的每个`运算符`及`语句`都是可以扩展的。
 * 它有多种使用方式适应不同场景：
   * 可用单独的模板文件定义，并用`Webpack loader`编译；
   * 也可以用`script`标签写在html中；
-  * 还可以支持用`ES6模板字符串`语法直接在js文件中编写。
+  * 还可以支持用`ES2015+的模板字符串`语法直接在js文件中编写。
 * 高效渲染，几乎不逊于`Handlebars`、`JSX`等主流模板。
-* 它不仅可以直接在浏览器中运行，也可以支持`模板预编译`；去除编译器的runtime版仅`4kb(gzip)`大小。
+* 它不仅可以直接在浏览器中运行，也支持`模板预编译`；去除编译器的runtime版仅`不到5kb(gzip)`大小。
 
 ## 与React配合示例
 
-`NornJ`可以替代JSX输出React组件，用它可以将React组件的表现与逻辑更优雅地实现解藕：
+`NornJ`可以替代JSX输出React组件，与JSX相比，它的语法更像html：
+
+JSX：
+
+```js
+class TestComponent extends Component {
+  render() {
+    const { no } = this.props;
+
+    return (
+      <div id=test1 className="test1" style={{ color: 'purple', height: 200 }>
+        this the test demo{no}.<input type="text" />
+        {Object.keys(Array.from({ length: no })).map((value, index) => {
+          return <i>test{index}</i>;
+        })}
+      </div>
+    );
+  }
+}
+```
+
+上例使用`NornJ`实现：
 
 ```js
 import { Component } from 'react';
@@ -147,28 +170,25 @@ import { render } from 'react-dom';
 import nj from 'nornj';
 import { registerTmpl } from 'nornj-react';
 
-@registerTmpl({
-  name: 'TestComponent',
-  template: `
-    <div id=test1>
-      this the test demo{no}.
-      <#for {1} {no}>
-        <i>test{@index}</i>
-      </#for>
-    </div>
-  `
-})
+@registerTmpl('TestComponent')
 class TestComponent extends Component {
   render() {
-    return this.template(this.props);
+    return nj`
+      <div id=test1 class="test1" style="color:purple;height:200px;">
+        this the test demo{no}.<input type="text">
+        <#for {1} {no}>
+          <i>test{@index}</i>
+        </#for>
+      </div>
+    `(this.props);
   }
 }
 
-render(nj`<TestComponent no=100 />`(), document.body);
+render(nj`<TestComponent no={100} />`(), document.body);
 
 /* output:
-<div id="test1">
-  this the test demo100.
+<div id="test1" class="test1" style="color:purple;height:200px;">
+  this the test demo100.<input type="text" />
   <i>test0</i>
   <i>test1</i>
   <i>test2</i>
@@ -178,9 +198,33 @@ render(nj`<TestComponent no=100 />`(), document.body);
 */
 ```
 
-## 在ES5环境下使用
+还支持将模板抽离到单独的文件中编写：
 
-`NornJ`也可以支持在es5环境下使用普通的字符串：
+test.nj.html：
+
+```html
+<div id=test1 class="test1" style="color:purple;height:200px;">
+  this the test demo{no}.<input type="text">
+  <#for {1} {no}>
+    <i>test{@index}</i>
+  </#for>
+</div>
+```
+
+```js
+import template from './test.nj.html';
+
+@registerTmpl('TestComponent')
+class TestComponent extends Component {
+  render() {
+    return template(this.props);
+  }
+}
+```
+
+## 更多使用场景
+
+`NornJ`模板也可以支持放在script标签中等传统的方式编写：
 
 ```html
 <script id="template" type="text/nornj">
@@ -194,7 +238,7 @@ render(nj`<TestComponent no=100 />`(), document.body);
 </script>
 ```
 
-然后可以这样渲染html字符串：
+`NornJ`在支持渲染`React`组件的同时，还支持渲染普通的html字符串：
 
 ```js
 let html = nj.render(tmpl, {
