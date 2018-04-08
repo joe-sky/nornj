@@ -12,6 +12,7 @@ function _replaceStr(prop, innerQuotes) {
   return prop.replace(REGEX_REPLACE_CHAR, (all, g1) => innerQuotes[g1]);
 }
 
+const SPACE_ERROR = 'This may be because the operator must have at least one space before and after';
 function _syntaxError(errorStr, expression, source) {
   return 'Filter or expression syntax error: ' + errorStr + ' in\n\nexpression: ' + expression + '\n\nsource: ' + source + '\n\nNornJ expression syntax specification please see the document: https://joe-sky.github.io/nornj-guide/templateSyntax/filter.html\n';
 }
@@ -43,7 +44,7 @@ function _compiledProp(prop, innerBrackets, innerQuotes, source) {
 
         //Multiple params are separated by commas.
         if (paramsF != null) {
-          tools.throwIf(innerBrackets[paramsF] != null, _syntaxError(_replaceStr(paramsF, innerQuotes), _replaceStr(propO, innerQuotes), source));
+          tools.throwIf(innerBrackets[paramsF] != null, _syntaxError(_replaceStr(paramsF, innerQuotes) + '. ' + SPACE_ERROR, _replaceStr(propO, innerQuotes), source));
 
           let params = [];
           tools.each(innerBrackets[paramsF].split(','), p => {
@@ -87,7 +88,7 @@ function _compiledProp(prop, innerBrackets, innerQuotes, source) {
       if (REGEX_HAS_BRACKET.test(ret.name)) {
         tools.throwIf(0, _syntaxError('There is an extra bracket', _replaceStr(propO, innerQuotes), source));
       } else {
-        tools.error(_syntaxError('The operator must have at least one space before and after', _replaceStr(propO, innerQuotes), source));
+        tools.error(_syntaxError(SPACE_ERROR, _replaceStr(propO, innerQuotes), source));
       }
     }
     if (!matchProp[5]) { //Sign the parameter is a basic type value.

@@ -20,6 +20,11 @@
 </a>
 [![NPM Downloads][downloads-image]][npm-url]
 
+## 在线文档
+
+* [NornJ中文指南(github pages)](https://joe-sky.github.io/nornj-guide)
+* [NornJ中文指南(gitbook)](https://joe-sky.gitbooks.io/nornj-guide)
+
 ## 概述
 
 `NornJ`是一款同时支持渲染`纯字符串(html)`和`HyperScript(React vdom)`的模板引擎。
@@ -92,6 +97,18 @@ const template = nj`
 
 `NornJ`也同时支持像`JSX`那样在js文件中自由地编写，它使用`ES2015+`提供的`tagged template string`语法；并且几乎所有JSX支持的特性，它也都是支持的!
 
+## 在线演示地址
+
+### 渲染html字符串
+
+* [在线Playground(jsfiddle)](https://jsfiddle.net/joe_sky/byjdkaf1/)
+* [在线Playground(codepen)](https://codepen.io/joe_sky/pen/BrGvVG)
+
+### 渲染React组件
+
+* [在线Playground(jsfiddle)](https://jsfiddle.net/joe_sky/n5n9tutj/)
+* [在线Playground(codepen)](https://codepen.io/joe_sky/pen/ooPNbj)
+
 ## 安装
 
 ```sh
@@ -99,16 +116,6 @@ npm install nornj
 npm install nornj-react   # React开发请一起安装此包
 npm install nornj-loader  # webpack环境请一起安装此包
 ```
-
-## 在线演示地址
-
-* [在线Playground(jsfiddle)](https://jsfiddle.net/joe_sky/n5n9tutj/)
-* [在线Playground(codepen)](https://codepen.io/joe_sky/pen/ooPNbj)
-
-## 在线文档
-
-* [NornJ中文指南(github pages)](https://joe-sky.github.io/nornj-guide)
-* [NornJ中文指南(gitbook)](https://joe-sky.gitbooks.io/nornj-guide)
 
 ## 项目脚手架
 
@@ -151,7 +158,7 @@ class TestComponent extends Component {
     const { no } = this.props;
 
     return (
-      <div id=test1 className="test1" style={{ color: 'purple', height: 200 }>
+      <div id=test1 className="test1" style={{ color: 'purple', height: 200 }}>
         this the test demo{no}.<input type="text" />
         {Object.keys(Array.from({ length: no })).map((value, index) => {
           return <i>test{index}</i>;
