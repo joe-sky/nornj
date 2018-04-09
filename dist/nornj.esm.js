@@ -2921,7 +2921,7 @@ function _buildNode(node, parent, fns, counter, retType, level, useStringLocal, 
     }
 
     //子节点
-    fnStr += _buildContent(node.content, node, fns, counter, !useStringF ? { _compParam: '_compParam' + _compParamC } : { _children: '_children' + _childrenC }, node.type !== nj.noWsTag ? level != null ? level + 1 : level : null, useStringLocal);
+    fnStr += _buildContent(node.content, node, fns, counter, !useStringF ? { _compParam: '_compParam' + _compParamC } : { _children: '_children' + _childrenC }, useStringF && node.type === nj.noWsTag ? null : level != null ? level + 1 : level, useStringLocal);
 
     //渲染
     fnStr += _buildRender(node, parent, 3, retType, !useStringF ? { _compParam: _compParamC } : { _type: _typeC, _typeS: _type, _typeR: _typeRefer, _params: _paramsStr !== '' ? _paramsC2 : null, _children: _childrenC, _selfClose: node.selfCloseTag }, fns, level, useStringLocal, node.allowNewline, isFirst);
