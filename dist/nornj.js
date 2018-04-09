@@ -1,5 +1,5 @@
 /*!
-* NornJ template engine v0.4.2-rc.40
+* NornJ template engine v0.4.2-rc.41
 * (c) 2016-2018 Joe_Sky
 * Released under the MIT License.
 */
@@ -24,6 +24,8 @@ nj.outputH = false;
 nj.global = typeof self !== 'undefined' ? self : global;
 nj.textTag = 'nj-text';
 nj.textMode = false;
+nj.noWsTag = 'nj-noWs';
+nj.noWsMode = false;
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
   return typeof obj;
@@ -490,7 +492,8 @@ function config (configs) {
       includeParser = configs.includeParser,
       createElement = configs.createElement,
       outputH = configs.outputH,
-      textMode = configs.textMode;
+      textMode = configs.textMode,
+      noWsMode = configs.noWsMode;
 
   if (delimiters) {
     createTmplRule(delimiters, true);
@@ -510,6 +513,10 @@ function config (configs) {
 
   if (textMode != null) {
     nj.textMode = textMode;
+  }
+
+  if (noWsMode != null) {
+    nj.noWsMode = noWsMode;
   }
 }
 
@@ -2920,7 +2927,7 @@ function _buildNode(node, parent, fns, counter, retType, level, useStringLocal, 
     }
 
     //子节点
-    fnStr += _buildContent(node.content, node, fns, counter, !useStringF ? { _compParam: '_compParam' + _compParamC } : { _children: '_children' + _childrenC }, level != null ? level + 1 : level, useStringLocal);
+    fnStr += _buildContent(node.content, node, fns, counter, !useStringF ? { _compParam: '_compParam' + _compParamC } : { _children: '_children' + _childrenC }, node.type !== nj.noWsTag ? level != null ? level + 1 : level : null, useStringLocal);
 
     //渲染
     fnStr += _buildRender(node, parent, 3, retType, !useStringF ? { _compParam: _compParamC } : { _type: _typeC, _typeS: _type, _typeR: _typeRefer, _params: _paramsStr !== '' ? _paramsC2 : null, _children: _childrenC, _selfClose: node.selfCloseTag }, fns, level, useStringLocal, node.allowNewline, isFirst);
@@ -2969,9 +2976,6 @@ function _buildRender(node, parent, nodeType, retType, params, fns, level, useSt
       if (!useStringF) {
         retStr = 'p1.H(_compParam' + params._compParam + ')';
       } else {
-        var levelSpace = _buildLevelSpace(level, fns, allowNewline);
-        var content = node.content;
-
         if (allowNewline && allowNewline !== 'nlElem' || noLevel) {
           retStr = '';
         } else if (isFirst) {
@@ -2980,8 +2984,10 @@ function _buildRender(node, parent, nodeType, retType, params, fns, level, useSt
           retStr = '\'\\n\' + ';
         }
 
-        if (node.type !== nj.textTag) {
-          var hasTypeR = params._typeR,
+        if (node.type !== nj.textTag && node.type !== nj.noWsTag) {
+          var levelSpace = _buildLevelSpace(level, fns, allowNewline),
+              content = node.content,
+              hasTypeR = params._typeR,
               hasParams = params._params != null;
 
           retStr += levelSpace + _buildLevelSpaceRt(useStringF, isFirst || noLevel) + '\'<' + (hasTypeR ? '\' + _type' + params._type : params._typeS) + (hasParams ? (!hasTypeR ? '\'' : '') + ' + _params' + params._params : '') + (hasTypeR || hasParams ? ' + \'' : '');
@@ -3123,8 +3129,13 @@ function compileStringTmpl(tmpl) {
     }
 
     fullXml = _formatAll(fullXml, tmplRule);
-    if (nj.textMode && !outputH) {
-      fullXml = '<' + nj.textTag + '>' + fullXml + '</' + nj.textTag + '>';
+    if (!outputH) {
+      if (nj.textMode) {
+        fullXml = '<' + nj.textTag + '>' + fullXml + '</' + nj.textTag + '>';
+      }
+      if (nj.noWsMode) {
+        fullXml = '<' + nj.noWsTag + '>' + fullXml + '</' + nj.noWsTag + '>';
+      }
     }
 
     //Resolve string to element

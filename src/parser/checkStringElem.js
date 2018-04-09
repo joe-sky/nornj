@@ -67,8 +67,13 @@ export default function compileStringTmpl(tmpl) {
     }
 
     fullXml = _formatAll(fullXml, tmplRule);
-    if (nj.textMode && !outputH) {
-      fullXml = '<' + nj.textTag + '>' + fullXml + '</' + nj.textTag + '>';
+    if (!outputH) {
+      if (nj.textMode) {
+        fullXml = '<' + nj.textTag + '>' + fullXml + '</' + nj.textTag + '>';
+      }
+      if (nj.noWsMode) {
+        fullXml = '<' + nj.noWsTag + '>' + fullXml + '</' + nj.noWsTag + '>';
+      }
     }
 
     //Resolve string to element

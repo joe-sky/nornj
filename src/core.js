@@ -13,3 +13,5 @@ nj.outputH = false;
 nj.global = typeof self !== 'undefined' ? self : global;
 nj.textTag = 'nj-text';
 nj.textMode = false;
+nj.noWsTag = 'nj-noWs';
+nj.noWsMode = false;

@@ -658,7 +658,7 @@ function _buildNode(node, parent, fns, counter, retType, level, useStringLocal, 
     }
 
     //子节点
-    fnStr += _buildContent(node.content, node, fns, counter, !useStringF ? { _compParam: '_compParam' + _compParamC } : { _children: '_children' + _childrenC }, level != null ? level + 1 : level, useStringLocal);
+    fnStr += _buildContent(node.content, node, fns, counter, !useStringF ? { _compParam: '_compParam' + _compParamC } : { _children: '_children' + _childrenC }, node.type !== nj.noWsTag ? (level != null ? level + 1 : level) : null, useStringLocal);
 
     //渲染
     fnStr += _buildRender(node, parent, 3, retType, !useStringF ? { _compParam: _compParamC } : { _type: _typeC, _typeS: _type, _typeR: _typeRefer, _params: paramsStr !== '' ? _paramsC : null, _children: _childrenC, _selfClose: node.selfCloseTag }, fns, level, useStringLocal, node.allowNewline, isFirst);
@@ -702,9 +702,6 @@ function _buildRender(node, parent, nodeType, retType, params, fns, level, useSt
       if (!useStringF) {
         retStr = 'p1.H(_compParam' + params._compParam + ')';
       } else {
-        let levelSpace = _buildLevelSpace(level, fns, allowNewline);
-        const content = node.content;
-
         if ((allowNewline && allowNewline !== 'nlElem') || noLevel) {
           retStr = '';
         } else if (isFirst) {
@@ -713,8 +710,10 @@ function _buildRender(node, parent, nodeType, retType, params, fns, level, useSt
           retStr = '\'\\n\' + ';
         }
 
-        if (node.type !== nj.textTag) {
-          const hasTypeR = params._typeR,
+        if (node.type !== nj.textTag && node.type !== nj.noWsTag) {
+          const levelSpace = _buildLevelSpace(level, fns, allowNewline),
+            content = node.content,
+            hasTypeR = params._typeR,
             hasParams = params._params != null;
 
           retStr += levelSpace + _buildLevelSpaceRt(useStringF, isFirst || noLevel) + '\'<' + (hasTypeR ? ('\' + _type' + params._type) : params._typeS) + (hasParams ? ((!hasTypeR ? '\'' : '') + ' + _params') + params._params : '') + ((hasTypeR || hasParams) ? ' + \'' : '');

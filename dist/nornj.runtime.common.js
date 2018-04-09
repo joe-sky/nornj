@@ -1,5 +1,5 @@
 /*!
-* NornJ template engine v0.4.2-rc.40
+* NornJ template engine v0.4.2-rc.41
 * (c) 2016-2018 Joe_Sky
 * Released under the MIT License.
 */
@@ -22,6 +22,8 @@ nj.outputH = false;
 nj.global = typeof self !== 'undefined' ? self : global;
 nj.textTag = 'nj-text';
 nj.textMode = false;
+nj.noWsTag = 'nj-noWs';
+nj.noWsMode = false;
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
   return typeof obj;
@@ -255,15 +257,8 @@ function registerComponent(name, component) {
 }
 
 function config (configs) {
-  var delimiters = configs.delimiters,
-      includeParser = configs.includeParser,
-      createElement = configs.createElement,
-      outputH = configs.outputH,
-      textMode = configs.textMode;
-
-  if (includeParser) {
-    nj.includeParser = includeParser;
-  }
+  var createElement = configs.createElement,
+      outputH = configs.outputH;
 
   if (createElement) {
     nj.createElement = createElement;
@@ -271,10 +266,6 @@ function config (configs) {
 
   if (outputH != null) {
     nj.outputH = outputH;
-  }
-
-  if (textMode != null) {
-    nj.textMode = textMode;
   }
 }
 
