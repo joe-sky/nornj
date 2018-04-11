@@ -24,7 +24,7 @@
 
 ## 概述
 
-`NornJ`是一款同时支持渲染`纯字符串(html)`和`HyperScript(React vdom)`的模板引擎。
+`NornJ`(读音[nɔ:n dʒeɪ]，简称`nj`)是一款同时支持渲染`纯字符串(html)`和`HyperScript(React vdom)`的模板引擎。
 
 > 什么是`HyperScript`?
 
