@@ -40,6 +40,9 @@
     "type": "git",
     "url": "https://github.com/joe-sky/nornj.git"
   },
+  "bugs": {
+    "url": "https://github.com/joe-sky/nornj/issues"
+  },
   "author": "Joe_Sky <hitomi_doax@sina.com>",
   "license": "MIT",
   "devDependencies": {

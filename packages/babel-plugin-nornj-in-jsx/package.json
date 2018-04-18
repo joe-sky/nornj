@@ -1,0 +1,58 @@
+{
+  "name": "babel-plugin-nornj-in-jsx",
+  "version": "0.4.2-alpha.2",
+  "description": "Make the NornJ template work gracefully in the JSX environment",
+  "author": {
+    "name": "Joe_Sky",
+    "email": "hitomi_doax@sina.com"
+  },
+  "main": "src/index.js",
+  "files": [
+    "src/",
+    "LICENSE",
+    "README.md"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/joe-sky/nornj.git"
+  },
+  "bugs": {
+    "url": "https://github.com/joe-sky/nornj/issues"
+  },
+  "keywords": [
+    "react",
+    "jsx",
+    "nornj",
+    "if",
+    "else",
+    "for",
+    "each",
+    "loop",
+    "babel"
+  ],
+  "license": "MIT",
+  "scripts": {
+    "lint": "eslint src spec",
+    "test": "mocha spec/*.js",
+    "cover": "istanbul cover -x \"**/spec/**\" node_modules/mocha/bin/_mocha spec/*.js"
+  },
+  "dependencies": {
+    "babel-core": "^6.1.2",
+    "babel-plugin-syntax-jsx": "^6.1.18"
+  },
+  "devDependencies": {
+    "babel-eslint": "^6.0.3",
+    "babel-preset-react": "^6.1.2",
+    "chai": "^3.5.0",
+    "chai-spies": "^0.7.1",
+    "coveralls": "^2.11.6",
+    "eslint": "^3.4.0",
+    "eslint-config-airbnb": "^10.0.1",
+    "eslint-plugin-jsx-control-statements": "^2.1.0",
+    "eslint-plugin-react": "^6.2.0",
+    "istanbul": "^0.4.1",
+    "mocha": "^3.0.2",
+    "react": "^15.3.1",
+    "react-dom": "^15.3.1"
+  }
+}
