@@ -77,7 +77,7 @@
 const props = { id: 'test', name: 'test' };
 
 const partial = nj`
-  <#if ${i > 0 || (i <= -10)}>
+  <#if {{i > 0 || (i <= -10)}}>
     <input onclick={{click}} ...${props}>
   </#if>
 `;
