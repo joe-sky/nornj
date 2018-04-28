@@ -103,6 +103,7 @@ export const extensions = {
         let param = {
           data: [item],
           index: isArrayLike ? index : len,
+          item,
           fallback: true
         };
 

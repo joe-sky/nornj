@@ -7,7 +7,7 @@ export function createTaggedTmpl(opts = {}) {
   const { outputH, delimiters, fileName } = opts;
   const tmplRule = delimiters ? createTmplRule(delimiters) : nj.tmplRule;
 
-  return function() {
+  return function () {
     return compileStringTmpl.apply({ tmplRule, outputH, fileName }, arguments);
   };
 }
@@ -18,11 +18,15 @@ export function createTaggedTmplH(opts = {}) {
 }
 
 export const taggedTmpl = createTaggedTmpl({ outputH: false });
-export const taggedTmplH = createTaggedTmpl({ outputH: true });
+export const taggedTmplH = createTaggedTmplH();
+export function template() {
+  return (nj.outputH ? taggedTmplH : taggedTmpl).apply(null, arguments)();
+}
 
 assign(nj, {
   createTaggedTmpl,
   createTaggedTmplH,
   taggedTmpl,
-  taggedTmplH
+  taggedTmplH,
+  template
 });

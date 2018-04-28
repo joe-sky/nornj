@@ -12,9 +12,7 @@ describe('test compile string', function() {
 
   describe('compile string template to html', function() {
     it('test compile simple', function() {
-
-
-      var tmpl = nj `
+      const tmpl = nj `
         <${'div'} class="{{id}} {{name3}}" {{name3}} {{ ...props}} name={{name1}} autofocus name1={{a.c.d}} name2="{{ [a[a.e['h']].f.g, 2] }}" a="/%'aaa'%/" {{... Object.assign({ e: 0 }, ${{ a: '...123', b: 2 }}, { c: 3 }) }} {{... ${{ g: '...123', b: 20 }} }}>
           <#prop {{'name1' | vm-var}} />
           {{1 + ${2} + 3 + ${4}}}
@@ -37,6 +35,12 @@ describe('test compile string', function() {
             <i>test</i>
           </#once>
           <#each {{1 .. 10}}>
+            {{@item}}
+            #${({ item, index }) => item + 100 * index}
+            <#for {{10}}>
+              |{{@item}}|
+              |#${({ item }) => item}|
+            </#for>
             {{@root.test}}
             {{@context.data[2].a.b}}
             {{../@context.data[1].a.b}}
@@ -46,12 +50,13 @@ describe('test compile string', function() {
           </#each>
           {{ set a.b = '__cde' }}{{ a.b }}
           <#if {{ a._ > 100 }}>{{ set x = '__yzx' }}</#if>{{ x }}
+          {{{${nj.template`
+            <input value="${100}">
+          `}}}}
         </${'div'}>
       `;
 
-
-
-      var html = tmpl({
+      const html = tmpl({
         a: {
           b: '__abc',
           c: {
@@ -68,6 +73,7 @@ describe('test compile string', function() {
         },
         x: '__xyz'
       });
+
       //console.log(html);
       expect(html).toBeTruthy();
     });

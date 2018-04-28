@@ -92,7 +92,7 @@ const template = nj`
 `;
 ```
 
-`NornJ`也同时支持像`JSX`那样在js文件中自由地编写，它使用`ES2015+`提供的`tagged template string`语法；并且几乎所有JSX支持的特性，它也都是支持的!
+`NornJ`也同时支持像`JSX`那样在js文件中自由地编写，它使用`ES2015+`提供的`tagged template literals`语法；并且几乎所有JSX支持的特性，它也都是支持的!
 
 ## 在线演示地址
 
@@ -171,7 +171,7 @@ class TestComponent extends Component {
 ```js
 import { Component } from 'react';
 import { render } from 'react-dom';
-import nj from 'nornj';
+import nj, { template as t } from 'nornj';
 import { registerTmpl } from 'nornj-react';
 
 @registerTmpl('TestComponent')
@@ -188,7 +188,7 @@ class TestComponent extends Component {
   }
 }
 
-render(nj`<TestComponent no={100} />`(), document.body);
+render(t`<TestComponent no={100} />`, document.body);
 
 /* output:
 <div id="test1" class="test1" style="color:purple;height:200px;">

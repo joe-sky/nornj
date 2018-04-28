@@ -1,5 +1,5 @@
 /*!
-* NornJ template engine v0.4.2
+* NornJ template engine v0.4.3
 * (c) 2016-2018 Joe_Sky
 * Released under the MIT License.
 */
@@ -704,6 +704,7 @@ function newContext(p2, p3) {
     parent: p3.fallback ? p2 : p2.parent,
     root: p2.root || p2,
     index: 'index' in p3 ? p3.index : p2.index,
+    item: 'item' in p3 ? p3.item : p2.item,
     level: p2.level,
     getData: getData,
     d: getData,
@@ -768,6 +769,7 @@ function tmplWrap(configs, main) {
       data: initCtx && initCtx._njData ? arrayPush(data, initCtx._njData) : data,
       parent: initCtx ? initCtx._njParent : null,
       index: initCtx ? initCtx._njIndex : null,
+      item: initCtx ? initCtx._njItem : null,
       level: initCtx ? initCtx._njLevel : null,
       getData: getData,
       d: getData,
@@ -955,6 +957,7 @@ var extensions = {
         var param = {
           data: [item],
           index: isArrayLike$$1 ? index : len,
+          item: item,
           fallback: true
         };
 
@@ -2366,6 +2369,10 @@ function _buildPropData(obj$$1, counter, fns, useStringLocal, level) {
         data = 'index';
         special = true;
         break;
+      case '@item':
+        data = 'item';
+        special = true;
+        break;
       case 'this':
         data = 'data[0]';
         special = true;
@@ -2604,6 +2611,7 @@ function _buildProps(obj$$1, counter, fns, useStringLocal, level) {
         valueStr += '  _njData: p2.data,\n  \
                        _njParent: p2.parent,\n  \
                        _njIndex: p2.index,\n  \
+                       _njItem: p2.item,\n  \
                        _njLevel: p1.l(' + level + ', p2),\n  \
                        _njIcp: p2.icp\n';
       }
@@ -3574,13 +3582,17 @@ function createTaggedTmplH() {
 }
 
 var taggedTmpl = createTaggedTmpl({ outputH: false });
-var taggedTmplH = createTaggedTmpl({ outputH: true });
+var taggedTmplH = createTaggedTmplH();
+function template$1() {
+  return (nj.outputH ? taggedTmplH : taggedTmpl).apply(null, arguments)();
+}
 
 assign(nj, {
   createTaggedTmpl: createTaggedTmpl,
   createTaggedTmplH: createTaggedTmplH,
   taggedTmpl: taggedTmpl,
-  taggedTmplH: taggedTmplH
+  taggedTmplH: taggedTmplH,
+  template: template$1
 });
 
 assign(nj, {
@@ -3594,4 +3606,4 @@ var _global = nj.global;
 _global.NornJ = _global.nj = nj;
 
 export default nj;
-export { registerComponent, registerExtension, registerFilter, compile, compileH, render, renderH, taggedTmpl, taggedTmplH };
+export { registerComponent, registerExtension, registerFilter, compile, compileH, render, renderH, taggedTmpl, taggedTmplH, template$1 as template };

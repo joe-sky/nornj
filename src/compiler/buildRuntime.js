@@ -125,6 +125,10 @@ function _buildPropData(obj, counter, fns, useStringLocal, level) {
         data = 'index';
         special = true;
         break;
+      case '@item':
+        data = 'item';
+        special = true;
+        break;
       case 'this':
         data = 'data[0]';
         special = true;
@@ -246,9 +250,9 @@ function _buildPropData(obj, counter, fns, useStringLocal, level) {
       let _filterStr = '  ' + tmpStr + ' = ' + filterVarStr + '.apply(' + (fnHVarStr ? fnHVarStr + ' ? ' + fnHVarStr + '._njCtx : p2' : 'p2') + ', [' + ((!isEmpty || i > 0) ? valueStr + ', ' : '') +
         ((o.params && o.params.length) ? o.params.reduce((p, c, i, arr) => {
           const propStr = _buildPropData({
-              prop: c,
-              escape
-            }, counter, fns, useStringLocal, level),
+            prop: c,
+            escape
+          }, counter, fns, useStringLocal, level),
             hasComma = hasOptions || i < arr.length - 1;
 
           if (tools.isString(propStr)) {
@@ -312,7 +316,7 @@ function _buildProps(obj, counter, fns, useStringLocal, level) {
     valueStr = !obj.isAll && str0 !== '' ? ('\'' + _replaceStrs(str0) + '\'') : '';
     filterStr = '';
 
-    tools.each(obj.props, function(o, i) {
+    tools.each(obj.props, function (o, i) {
       let propData = _buildPropData(o, counter, fns, useStringLocal, level),
         dataValueStr;
       if (tools.isString(propData)) {
@@ -343,7 +347,7 @@ function _buildProps(obj, counter, fns, useStringLocal, level) {
     }, false, true);
   } else if (tools.isObject(str0) && str0._njLen != null) { //tmpl标签
     valueStr += '{\n';
-    tools.each(str0, function(v, k, i, l) {
+    tools.each(str0, function (v, k, i, l) {
       if (k !== '_njLen') {
         const hasName = k.indexOf('_njT') !== 0,
           fnStr = 'p1.main' + _buildFn(v.node.content, v.node, fns, 'T' + ++fns._noT, null, null, null, hasName ? k : null);
@@ -361,6 +365,7 @@ function _buildProps(obj, counter, fns, useStringLocal, level) {
         valueStr += '  _njData: p2.data,\n  \
                        _njParent: p2.parent,\n  \
                        _njIndex: p2.index,\n  \
+                       _njItem: p2.item,\n  \
                        _njLevel: p1.l(' + level + ', p2),\n  \
                        _njIcp: p2.icp\n';
       }
@@ -431,7 +436,7 @@ function _buildParams(node, fns, counter, useString, level, exPropsStr, subExPro
         }
       } else {
         let keys = '';
-        tools.each(params, function(v, k, i, l) {
+        tools.each(params, function (v, k, i, l) {
           if (i == 0) {
             keys += '{ ';
           }
@@ -457,7 +462,7 @@ function _buildParams(node, fns, counter, useString, level, exPropsStr, subExPro
         paramsStr += '{\n';
       }
 
-      tools.each(paramKeys, function(k, i) {
+      tools.each(paramKeys, function (k, i) {
         let valueStr = _buildProps(params[k], counter, fns, useString, level);
         if (tools.isObject(valueStr)) {
           filterStr += valueStr.filterStr;
@@ -553,7 +558,7 @@ function _buildNode(node, parent, fns, counter, retType, level, useStringLocal, 
     dataReferStr += 'var _dataRefer' + _dataReferC + ' = [\n';
 
     if (node.args) { //构建匿名参数
-      tools.each(node.args, function(arg, i) {
+      tools.each(node.args, function (arg, i) {
         let valueStr = _buildProps(arg, counter, fns, useStringLocal, level);
         if (tools.isObject(valueStr)) {
           filterStr += valueStr.filterStr;

@@ -1,5 +1,5 @@
 /*!
-* NornJ template engine v0.4.2
+* NornJ template engine v0.4.3
 * (c) 2016-2018 Joe_Sky
 * Released under the MIT License.
 */
@@ -459,6 +459,7 @@ function newContext(p2, p3) {
     parent: p3.fallback ? p2 : p2.parent,
     root: p2.root || p2,
     index: 'index' in p3 ? p3.index : p2.index,
+    item: 'item' in p3 ? p3.item : p2.item,
     level: p2.level,
     getData: getData,
     d: getData,
@@ -523,6 +524,7 @@ function tmplWrap(configs, main) {
       data: initCtx && initCtx._njData ? arrayPush(data, initCtx._njData) : data,
       parent: initCtx ? initCtx._njParent : null,
       index: initCtx ? initCtx._njIndex : null,
+      item: initCtx ? initCtx._njItem : null,
       level: initCtx ? initCtx._njLevel : null,
       getData: getData,
       d: getData,
@@ -710,6 +712,7 @@ var extensions = {
         var param = {
           data: [item],
           index: isArrayLike$$1 ? index : len,
+          item: item,
           fallback: true
         };
 

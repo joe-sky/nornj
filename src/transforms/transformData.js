@@ -133,6 +133,7 @@ export function newContext(p2, p3) {
     parent: p3.fallback ? p2 : p2.parent,
     root: p2.root || p2,
     index: 'index' in p3 ? p3.index : p2.index,
+    item: 'item' in p3 ? p3.item : p2.item,
     level: p2.level,
     getData,
     d: getData,
@@ -168,7 +169,7 @@ export function assignStrProps(paramsE, keys) {
 
 //创建扩展标签子节点函数
 export function exRet(p1, p2, fn, p4, p5) {
-  return function(param) {
+  return function (param) {
     return fn(p1, p2, param, p4, p5);
   };
 }
@@ -189,7 +190,7 @@ function _getLocalComponents(localConfigs, initCtx) {
 
 //构建可运行的模板函数
 export function tmplWrap(configs, main) {
-  return function(lc, lc2) {
+  return function (lc, lc2) {
     const initCtx = this,
       data = tools.arraySlice(arguments);
 
@@ -197,6 +198,7 @@ export function tmplWrap(configs, main) {
       data: initCtx && initCtx._njData ? tools.arrayPush(data, initCtx._njData) : data,
       parent: initCtx ? initCtx._njParent : null,
       index: initCtx ? initCtx._njIndex : null,
+      item: initCtx ? initCtx._njItem : null,
       level: initCtx ? initCtx._njLevel : null,
       getData,
       d: getData,
