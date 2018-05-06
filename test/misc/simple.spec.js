@@ -53,6 +53,7 @@ describe('test compile string', function() {
           {{{${nj.template`
             <input value="${100}">
           `}}}}
+          {{!a.f != !x}}
         </${'div'}>
       `;
 
@@ -68,6 +69,7 @@ describe('test compile string', function() {
             },
             h: 'e'
           },
+          f: false,
           _: 123,
           prop: ctx => 456
         },

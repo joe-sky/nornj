@@ -70,7 +70,7 @@ function _compiledProp(prop, innerBrackets, innerQuotes, source) {
   //Extract the parent data path
   if (prop.indexOf('../') === 0) {
     let n = 0;
-    prop = prop.replace(/\.\.\//g, function() {
+    prop = prop.replace(/\.\.\//g, function () {
       n++;
       return '';
     });
@@ -203,12 +203,19 @@ function _getReplaceParam(obj, tmplRule, innerQuotes, hasColon) {
 }
 
 const REGEX_INNER_BRACKET = /\(([^()]*)\)/g;
+const REGEX_FIX_OPERATOR_1 = /([!]+)((-?[0-9][0-9]*(\.\d+)?|[^\s,|'=]+)('bracket_\d+)?([._#]'bracket_\d+)*)/g;
 const REGEX_FIX_OPERATOR = /[\s]+([^\s(),|"']+)[\s]+((-?[0-9][0-9]*(\.\d+)?|[^\s,|']+)('bracket_\d+)?([._#]'bracket_\d+)*)/g;
 const REGEX_SPACE_FILTER = /[(,]/g;
 const REGEX_FIX_FILTER = /(\|)?(((\.+|_|#+)'bracket_)|[\s]+([^\s._#|]+[\s]*'bracket_))/g;
 
 function _fixOperator(prop, innerBrackets) {
-  return _fixFilter(prop.replace(REGEX_FIX_OPERATOR, function() {
+  prop = prop.replace(REGEX_FIX_OPERATOR_1, function () {
+    const args = arguments;
+    innerBrackets.push(_fixFilter(args[2]));
+    return args[1] + '\'bracket_' + (innerBrackets.length - 1);
+  });
+
+  return _fixFilter(prop.replace(REGEX_FIX_OPERATOR, function () {
     const args = arguments;
     innerBrackets.push(_fixFilter(args[2]));
     return ' ' + args[1] + '\'bracket_' + (innerBrackets.length - 1);
