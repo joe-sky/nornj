@@ -149,7 +149,9 @@ export const filters = {
     } else {
       return -1;
     }
-  }
+  },
+
+  bracket: val => val
 };
 
 function _getArrayByNum(isContainEnd) {
@@ -206,7 +208,8 @@ export const filterConfig = {
   css: _config(_defaultCfg),
   '..': _config(_defaultCfg),
   rLt: _config(_defaultCfg),
-  '<=>': _config(_defaultCfg)
+  '<=>': _config(_defaultCfg),
+  bracket: _config(_defaultCfg)
 };
 
 //Filter alias

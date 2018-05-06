@@ -54,6 +54,7 @@ describe('test compile string', function() {
             <input value="${100}">
           `}}}}
           {{!a.f != !x}}
+          {{(('abc') + ('def')).substr((2), ((2 - 1)))}}
         </${'div'}>
       `;
 

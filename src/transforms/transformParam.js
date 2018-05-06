@@ -5,7 +5,6 @@ import '../helpers/filter';
 //Get compiled property
 const REGEX_JS_PROP = /('[^']*')|("[^"]*")|(-?[0-9][0-9]*(\.\d+)?)|true|false|null|undefined|Object|Array|Math|Date|JSON|(([a-zA-Z_$#@])([a-zA-Z_$\d]*))/;
 const REGEX_REPLACE_CHAR = /_njQs(\d+)_/g;
-const REGEX_HAS_BRACKET = /bracket_\d+/;
 const REGEX_REPLACE_SET = /_njSet_/;
 
 function _replaceStr(prop, innerQuotes) {
@@ -85,11 +84,7 @@ function _compiledProp(prop, innerBrackets, innerQuotes, source) {
     ret.name = hasComputed ? matchProp[7] : matchProp[0];
 
     if (matchProp[0] !== prop) {
-      if (REGEX_HAS_BRACKET.test(ret.name)) {
-        tools.throwIf(0, _syntaxError('There is an extra bracket', _replaceStr(propO, innerQuotes), source));
-      } else {
-        tools.error(_syntaxError(SPACE_ERROR, _replaceStr(propO, innerQuotes), source));
-      }
+      tools.error(_syntaxError(SPACE_ERROR, _replaceStr(propO, innerQuotes), source));
     }
     if (!matchProp[5]) { //Sign the parameter is a basic type value.
       ret.isBasicType = true;
@@ -142,6 +137,7 @@ const ARR_OBJ_FILTER_LOOKUP = {
 const REGEX_ARR_OBJ_FILTER = /\[|\]|\{|\}/g;
 const REGEX_OBJKEY_FILTER = /([(,][\s]*)([^\s:,'"()|]+):/g;
 const REGEX_SET_FILTER = /^[\s]*set[\s]+|([(,])[\s]*set[\s]+/g;
+const REGEX_BRACKET_FILTER = /^[\s]*([(]+)|([(,])[\s]*([(]+)/g;
 
 function _getProp(matchArr, innerQuotes, i) {
   let prop = matchArr[2].trim(),
@@ -171,6 +167,7 @@ function _getProp(matchArr, innerQuotes, i) {
     .replace(REGEX_ARRPROP_FILTER, (all, g1, g2) => g1 + '.(')
     .replace(REGEX_ARR_OBJ_FILTER, match => ARR_OBJ_FILTER_LOOKUP[match])
     .replace(REGEX_SET_FILTER, (all, g1) => (g1 ? g1 : '') + '_njSet_')
+    .replace(REGEX_BRACKET_FILTER, (all, g1, g2, g3) => (g2 ? g2 : '') + (g2 ? g3 : g1).replace(/[(]/g, 'bracket('))
     .replace(REGEX_OBJKEY_FILTER, (all, g1, g2) => g1 + ' \'' + g2 + '\' : ')
     .replace(REGEX_SP_FILTER, (all, g1, match) => ' ' + SP_FILTER_LOOKUP[match] + ' ')
     .replace(REGEX_SPACE_S_FILTER, (all, match) => match)
