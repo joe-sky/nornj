@@ -80,10 +80,10 @@ export const filters = {
 
   '**': (val1, val2) => Math.pow(val1, val2),
 
-  '//': (val1, val2) => Math.floor(val1 / val2),
+  '%%': (val1, val2) => Math.floor(val1 / val2),
 
   //Ternary operator
-  '?': (val, val1, val2) => val ? val1 : val2,
+  '?:': (val, val1, val2) => val ? val1 : val2,
 
   '!': val => !val,
 
@@ -193,8 +193,8 @@ export const filterConfig = {
   '/': _config(_defaultCfg),
   '%': _config(_defaultCfg),
   '**': _config(_defaultCfg),
-  '//': _config(_defaultCfg),
-  '?': _config(_defaultCfg),
+  '%%': _config(_defaultCfg),
+  '?:': _config(_defaultCfg),
   '!': _config(_defaultCfg),
   '&&': _config(_defaultCfg),
   or: _config(_defaultCfg),
@@ -215,6 +215,10 @@ export const filterConfig = {
 //Filter alias
 filters.prop = filters['.'];
 filterConfig.prop = filterConfig['.'];
+filters['?'] = filters['?:'];
+filterConfig['?'] = filterConfig['?:'];
+filters['//'] = filters['%%'];
+filterConfig['//'] = filterConfig['%%'];
 
 //Register filter and also can batch add
 export function registerFilter(name, filter, options) {

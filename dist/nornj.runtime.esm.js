@@ -1,5 +1,5 @@
 /*!
-* NornJ template engine v0.4.3
+* NornJ template engine v0.4.4
 * (c) 2016-2018 Joe_Sky
 * Released under the MIT License.
 */
@@ -1098,12 +1098,12 @@ var filters = {
     return Math.pow(val1, val2);
   },
 
-  '//': function _(val1, val2) {
+  '%%': function _(val1, val2) {
     return Math.floor(val1 / val2);
   },
 
   //Ternary operator
-  '?': function _(val, val1, val2) {
+  '?:': function _(val, val1, val2) {
     return val ? val1 : val2;
   },
 
@@ -1185,6 +1185,10 @@ var filters = {
     } else {
       return -1;
     }
+  },
+
+  bracket: function bracket(val) {
+    return val;
   }
 };
 
@@ -1229,8 +1233,8 @@ var filterConfig = {
   '/': _config$1(_defaultCfg$1),
   '%': _config$1(_defaultCfg$1),
   '**': _config$1(_defaultCfg$1),
-  '//': _config$1(_defaultCfg$1),
-  '?': _config$1(_defaultCfg$1),
+  '%%': _config$1(_defaultCfg$1),
+  '?:': _config$1(_defaultCfg$1),
   '!': _config$1(_defaultCfg$1),
   '&&': _config$1(_defaultCfg$1),
   or: _config$1(_defaultCfg$1),
@@ -1244,12 +1248,17 @@ var filterConfig = {
   css: _config$1(_defaultCfg$1),
   '..': _config$1(_defaultCfg$1),
   rLt: _config$1(_defaultCfg$1),
-  '<=>': _config$1(_defaultCfg$1)
+  '<=>': _config$1(_defaultCfg$1),
+  bracket: _config$1(_defaultCfg$1)
 };
 
 //Filter alias
 filters.prop = filters['.'];
 filterConfig.prop = filterConfig['.'];
+filters['?'] = filters['?:'];
+filterConfig['?'] = filterConfig['?:'];
+filters['//'] = filters['%%'];
+filterConfig['//'] = filterConfig['%%'];
 
 //Register filter and also can batch add
 function registerFilter(name, filter, options) {

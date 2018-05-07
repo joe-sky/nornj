@@ -1,5 +1,5 @@
 /*!
-* NornJ template engine v0.4.3
+* NornJ template engine v0.4.4
 * (c) 2016-2018 Joe_Sky
 * Released under the MIT License.
 */
@@ -1351,12 +1351,12 @@ var filters = {
     return Math.pow(val1, val2);
   },
 
-  '//': function _(val1, val2) {
+  '%%': function _(val1, val2) {
     return Math.floor(val1 / val2);
   },
 
   //Ternary operator
-  '?': function _(val, val1, val2) {
+  '?:': function _(val, val1, val2) {
     return val ? val1 : val2;
   },
 
@@ -1438,6 +1438,10 @@ var filters = {
     } else {
       return -1;
     }
+  },
+
+  bracket: function bracket(val) {
+    return val;
   }
 };
 
@@ -1482,8 +1486,8 @@ var filterConfig = {
   '/': _config$1(_defaultCfg$1),
   '%': _config$1(_defaultCfg$1),
   '**': _config$1(_defaultCfg$1),
-  '//': _config$1(_defaultCfg$1),
-  '?': _config$1(_defaultCfg$1),
+  '%%': _config$1(_defaultCfg$1),
+  '?:': _config$1(_defaultCfg$1),
   '!': _config$1(_defaultCfg$1),
   '&&': _config$1(_defaultCfg$1),
   or: _config$1(_defaultCfg$1),
@@ -1497,12 +1501,17 @@ var filterConfig = {
   css: _config$1(_defaultCfg$1),
   '..': _config$1(_defaultCfg$1),
   rLt: _config$1(_defaultCfg$1),
-  '<=>': _config$1(_defaultCfg$1)
+  '<=>': _config$1(_defaultCfg$1),
+  bracket: _config$1(_defaultCfg$1)
 };
 
 //Filter alias
 filters.prop = filters['.'];
 filterConfig.prop = filterConfig['.'];
+filters['?'] = filters['?:'];
+filterConfig['?'] = filterConfig['?:'];
+filters['//'] = filters['%%'];
+filterConfig['//'] = filterConfig['%%'];
 
 //Register filter and also can batch add
 function registerFilter(name, filter, options) {
@@ -1540,7 +1549,6 @@ assign(nj, {
 //Get compiled property
 var REGEX_JS_PROP = /('[^']*')|("[^"]*")|(-?[0-9][0-9]*(\.\d+)?)|true|false|null|undefined|Object|Array|Math|Date|JSON|(([a-zA-Z_$#@])([a-zA-Z_$\d]*))/;
 var REGEX_REPLACE_CHAR = /_njQs(\d+)_/g;
-var REGEX_HAS_BRACKET = /bracket_\d+/;
 var REGEX_REPLACE_SET = /_njSet_/;
 
 function _replaceStr(prop, innerQuotes) {
@@ -1622,11 +1630,7 @@ function _compiledProp(prop, innerBrackets, innerQuotes, source) {
     ret.name = hasComputed ? matchProp[7] : matchProp[0];
 
     if (matchProp[0] !== prop) {
-      if (REGEX_HAS_BRACKET.test(ret.name)) {
-        throwIf(0, _syntaxError('There is an extra bracket', _replaceStr(propO, innerQuotes), source));
-      } else {
-        error(_syntaxError(SPACE_ERROR, _replaceStr(propO, innerQuotes), source));
-      }
+      error(_syntaxError(SPACE_ERROR, _replaceStr(propO, innerQuotes), source));
     }
     if (!matchProp[5]) {
       //Sign the parameter is a basic type value.
@@ -1680,6 +1684,7 @@ var ARR_OBJ_FILTER_LOOKUP = {
 var REGEX_ARR_OBJ_FILTER = /\[|\]|\{|\}/g;
 var REGEX_OBJKEY_FILTER = /([(,][\s]*)([^\s:,'"()|]+):/g;
 var REGEX_SET_FILTER = /^[\s]*set[\s]+|([(,])[\s]*set[\s]+/g;
+var REGEX_BRACKET_FILTER = /^[\s]*([(]+)|([(,])[\s]*([(]+)/g;
 
 function _getProp(matchArr, innerQuotes, i) {
   var prop = matchArr[2].trim(),
@@ -1710,6 +1715,8 @@ function _getProp(matchArr, innerQuotes, i) {
     return ARR_OBJ_FILTER_LOOKUP[match];
   }).replace(REGEX_SET_FILTER, function (all, g1) {
     return (g1 ? g1 : '') + '_njSet_';
+  }).replace(REGEX_BRACKET_FILTER, function (all, g1, g2, g3) {
+    return (g2 ? g2 : '') + (g2 ? g3 : g1).replace(/[(]/g, 'bracket(');
   }).replace(REGEX_OBJKEY_FILTER, function (all, g1, g2) {
     return g1 + ' \'' + g2 + '\' : ';
   }).replace(REGEX_SP_FILTER, function (all, g1, match) {
@@ -1749,11 +1756,18 @@ function _getReplaceParam(obj$$1, tmplRule, innerQuotes, hasColon) {
 }
 
 var REGEX_INNER_BRACKET = /\(([^()]*)\)/g;
+var REGEX_FIX_OPERATOR_1 = /([!]+)((-?[0-9][0-9]*(\.\d+)?|[^\s,|'=]+)('bracket_\d+)?([._#]'bracket_\d+)*)/g;
 var REGEX_FIX_OPERATOR = /[\s]+([^\s(),|"']+)[\s]+((-?[0-9][0-9]*(\.\d+)?|[^\s,|']+)('bracket_\d+)?([._#]'bracket_\d+)*)/g;
 var REGEX_SPACE_FILTER = /[(,]/g;
 var REGEX_FIX_FILTER = /(\|)?(((\.+|_|#+)'bracket_)|[\s]+([^\s._#|]+[\s]*'bracket_))/g;
 
 function _fixOperator(prop, innerBrackets) {
+  prop = prop.replace(REGEX_FIX_OPERATOR_1, function () {
+    var args = arguments;
+    innerBrackets.push(_fixFilter(args[2]));
+    return args[1] + '\'bracket_' + (innerBrackets.length - 1);
+  });
+
   return _fixFilter(prop.replace(REGEX_FIX_OPERATOR, function () {
     var args = arguments;
     innerBrackets.push(_fixFilter(args[2]));
@@ -2244,6 +2258,11 @@ function _checkContentElem(obj$$1, parent, tmplRule, hasExProps, noSplitNewline)
   }, false, true);
 }
 
+var DEPRECATE_FILTER = {
+  //'?': '?:',
+  '//': '%%'
+};
+
 function _buildFn(content, node, fns, no, newContext$$1, level, useStringLocal, name) {
   var fnStr = '',
       useString = useStringLocal != null ? useStringLocal : fns.useString,
@@ -2496,6 +2515,11 @@ function _buildPropData(obj$$1, counter, fns, useStringLocal, level) {
         filterStr += 'if (!' + filterVarStr + ') {\n';
         filterStr += '  p1.wn(\'' + o.name + '\', \'f\');\n';
         filterStr += '} else {\n';
+
+        var deprecateFilter = DEPRECATE_FILTER[o.name];
+        if (deprecateFilter) {
+          warn('The filter \"' + o.name + '\" is deprecated, please use \"' + deprecateFilter + '\" instead of it.');
+        }
       }
 
       var _filterStr = '  ' + tmpStr + ' = ' + filterVarStr + '.apply(' + (fnHVarStr ? fnHVarStr + ' ? ' + fnHVarStr + '._njCtx : p2' : 'p2') + ', [' + (!isEmpty || i > 0 ? valueStr + ', ' : '') + (o.params && o.params.length ? o.params.reduce(function (p, c, i, arr) {

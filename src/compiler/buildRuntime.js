@@ -5,6 +5,10 @@ import { unescape } from '../utils/escape';
 import { extensionConfig } from '../helpers/extension';
 import { filterConfig } from '../helpers/filter';
 const { errorTitle } = nj;
+const DEPRECATE_FILTER = {
+  //'?': '?:',
+  '//': '%%'
+};
 
 function _buildFn(content, node, fns, no, newContext, level, useStringLocal, name) {
   let fnStr = '',
@@ -245,6 +249,11 @@ function _buildPropData(obj, counter, fns, useStringLocal, level) {
         filterStr += 'if (!' + filterVarStr + ') {\n';
         filterStr += '  p1.wn(\'' + o.name + '\', \'f\');\n';
         filterStr += '} else {\n';
+
+        const deprecateFilter = DEPRECATE_FILTER[o.name];
+        if (deprecateFilter) {
+          tools.warn('The filter \"' + o.name + '\" is deprecated, please use \"' + deprecateFilter + '\" instead of it.');
+        }
       }
 
       let _filterStr = '  ' + tmpStr + ' = ' + filterVarStr + '.apply(' + (fnHVarStr ? fnHVarStr + ' ? ' + fnHVarStr + '._njCtx : p2' : 'p2') + ', [' + ((!isEmpty || i > 0) ? valueStr + ', ' : '') +
