@@ -2,10 +2,10 @@ var astUtil = require("./util/ast");
 var errorUtil = require("./util/error");
 
 var ELEMENTS = {
-  FOR: "For"
+  EACH: "each"
 };
 var ATTRIBUTES = {
-  EACH: "each",
+  ITEM: "item",
   OF: "of",
   INDEX: "index"
 };
@@ -37,7 +37,7 @@ module.exports = function(babel) {
 
   return function(node, file) {
     var mapParams = [];
-    var errorInfos = { node: node, file: file, element: ELEMENTS.FOR };
+    var errorInfos = { node: node, file: file, element: ELEMENTS.EACH };
     var attributes = astUtil.getAttributeMap(node);
     var children = astUtil.getChildren(types, node);
     var returnExpression = astUtil.getSanitizedExpressionForContent(types, children);
@@ -48,7 +48,7 @@ module.exports = function(babel) {
     }
     // check for correct data types, as far as possible
     checkForExpression(attributes, ATTRIBUTES.OF, errorInfos);
-    checkForString(attributes, ATTRIBUTES.EACH, errorInfos);
+    checkForString(attributes, ATTRIBUTES.ITEM, errorInfos);
     checkForString(attributes, ATTRIBUTES.INDEX, errorInfos);
 
     // simply return without any child nodes
@@ -56,7 +56,7 @@ module.exports = function(babel) {
       return returnExpression;
     }
 
-    addMapParam(types, mapParams, attributes, ATTRIBUTES.EACH);
+    addMapParam(types, mapParams, attributes, ATTRIBUTES.ITEM);
     addMapParam(types, mapParams, attributes, ATTRIBUTES.INDEX);
 
     return types.callExpression(

@@ -139,3 +139,43 @@ const a = { b: 1, c: 'abc' };
 ```
 
 但是使用`NornJ`的表达式则不会报错，而是会顺延流转到下面的`elseif`判断中，这是因为`NornJ`的链式取值语法对`null`值进行了过滤，[具体请见这里](https://joe-sky.github.io/nornj-guide/templateSyntax/variable.html)。
+
+### each标签
+
+```js
+//转换前：
+class TestComponent extends Component {
+  render() {
+    return (
+      <div>
+        <each of={[1, 2, 3]} item="item" index="index">
+          <i>{item}</i>
+          <i>{index}</i>
+        </each>
+      </div>
+    );
+  }
+}
+
+//转换后：
+class TestComponent extends Component {
+  render() {
+    return (
+      <div>
+        {nj`
+          <#each ${[1, 2, 3]}>
+            #${({ item: item, index: index }) => {
+              return [
+                <i key={0}>{item}</i>
+                <i key={1}>{index}</i>
+              ];
+            }}
+          </#each>
+        `()}
+      </div>
+    );
+  }
+}
+```
+
+如上，of参数为要遍历的数组，参数格式和上面if的condition是一样的。item、index参数都可以不写，默认值就是例子中的那几个。
