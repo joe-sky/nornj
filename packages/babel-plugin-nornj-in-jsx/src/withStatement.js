@@ -1,4 +1,4 @@
-var astUtil = require("./util/ast");
+var astUtil = require('./util/ast');
 
 module.exports = function(babel) {
   var types = babel.types;
@@ -20,7 +20,7 @@ module.exports = function(babel) {
       }
     });
 
-    values.unshift(types.identifier("this"));
+    values.unshift(types.identifier('this'));
 
     return types.callExpression(
       types.memberExpression(
@@ -33,7 +33,7 @@ module.exports = function(babel) {
             )
           ])
         ),
-        types.identifier("call")
+        types.identifier('call')
       ),
       values
     );

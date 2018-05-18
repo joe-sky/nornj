@@ -1,7 +1,7 @@
-var transformEach = require("./eachTag");
-var transformIf = require("./ifTag");
-//var transformChoose = require("./chooseStatement");
-//var transformWith = require("./withStatement");
+var transformEach = require('./eachTag');
+var transformIf = require('./ifTag');
+//var transformChoose = require('./chooseStatement');
+//var transformWith = require('./withStatement');
 
 module.exports = function jcsPlugin(babel) {
   var nodeHandlers = {
@@ -23,7 +23,7 @@ module.exports = function jcsPlugin(babel) {
   };
 
   return {
-    inherits: require("babel-plugin-syntax-jsx"),
+    inherits: require('babel-plugin-syntax-jsx'),
     visitor: visitor
   };
 };

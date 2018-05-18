@@ -1,10 +1,10 @@
-var astUtil = require("./util/ast");
-var conditionalUtil = require("./util/conditional");
+var astUtil = require('./util/ast');
+var conditionalUtil = require('./util/conditional');
 
 var ELEMENTS = {
-  IF: "if",
-  ELSE: "else",
-  ELSEIF: "elseif"
+  IF: 'if',
+  ELSE: 'else',
+  ELSEIF: 'elseif'
 };
 
 function getBlocks(nodes, types, errorInfos) {
@@ -111,7 +111,9 @@ module.exports = function ifStatement(babel) {
           })));
 
           if (blocks.elseifBlock.length == 1) {
-            const endTag = (i == subBlocksLength - 1) ? '</#elseif></#if>' : (blocks.elseBlock.length ? '</#elseif><#else>' : '</#elseif>');
+            const endTag = (i == subBlocksLength - 1)
+              ? '</#elseif></#if>'
+              : (blocks.elseBlock.length ? '</#elseif><#else>' : '</#elseif>');
             quasis.push(
               types.TemplateElement({
                 raw: endTag,
@@ -128,7 +130,9 @@ module.exports = function ifStatement(babel) {
           })));
 
           if (i == blocks.elseifBlock.length - 1) {
-            const endTag = (i == subBlocksLength - 1) ? '</#elseif></#if>' : (blocks.elseBlock.length ? '</#elseif><#else>' : '</#elseif>');
+            const endTag = (i == subBlocksLength - 1)
+              ? '</#elseif></#if>'
+              : (blocks.elseBlock.length ? '</#elseif><#else>' : '</#elseif>');
             quasis.push(
               types.TemplateElement({
                 raw: endTag,

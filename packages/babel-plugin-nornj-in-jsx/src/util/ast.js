@@ -1,7 +1,7 @@
 var TYPES = {
-  ELEMENT: "JSXElement",
-  EXPRESSION_CONTAINER: "JSXExpressionContainer",
-  STRING_LITERAL: "StringLiteral"
+  ELEMENT: 'JSXElement',
+  EXPRESSION_CONTAINER: 'JSXExpressionContainer',
+  STRING_LITERAL: 'StringLiteral'
 };
 
 function getTagName(node) {
@@ -96,14 +96,14 @@ var addKeyAttribute = exports.addKeyAttribute = function(babelTypes, node, keyVa
   var keyFound = false;
 
   node.openingElement.attributes.forEach(function(attrib) {
-    if (babelTypes.isJSXAttribute(attrib) && attrib.name.name === "key") {
+    if (babelTypes.isJSXAttribute(attrib) && attrib.name.name === 'key') {
       keyFound = true;
       return false;
     }
   });
 
   if (!keyFound) {
-    var keyAttrib = babelTypes.jSXAttribute(babelTypes.jSXIdentifier("key"), babelTypes.stringLiteral("" + keyValue));
+    var keyAttrib = babelTypes.jSXAttribute(babelTypes.jSXIdentifier('key'), babelTypes.stringLiteral('' + keyValue));
     node.openingElement.attributes.push(keyAttrib);
   }
 };
@@ -134,7 +134,7 @@ exports.getSanitizedExpressionForContent = function(babelTypes, blocks, keyPrefi
   for (var i = 0; i < blocks.length; i++) {
     var thisBlock = blocks[i];
     if (babelTypes.isJSXElement(thisBlock)) {
-      var key = keyPrefix ? keyPrefix + "-" + i : i;
+      var key = keyPrefix ? keyPrefix + '-' + i : i;
       addKeyAttribute(babelTypes, thisBlock, key);
     }
   }

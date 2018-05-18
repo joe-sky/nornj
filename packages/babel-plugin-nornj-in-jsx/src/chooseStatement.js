@@ -1,11 +1,11 @@
-var astUtil = require("./util/ast");
-var conditionalUtil = require("./util/conditional");
-var errorUtil = require("./util/error");
+var astUtil = require('./util/ast');
+var conditionalUtil = require('./util/conditional');
+var errorUtil = require('./util/error');
 
 var ELEMENTS = {
-  CHOOSE: "Choose",
-  WHEN: "When",
-  OTHERWISE: "Otherwise"
+  CHOOSE: 'Choose',
+  WHEN: 'When',
+  OTHERWISE: 'Otherwise'
 };
 
 

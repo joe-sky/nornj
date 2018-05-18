@@ -1,0 +1,31 @@
+{
+  "extends": ["plugin:react/recommended"],
+  "plugins": [
+    "react"
+  ],
+  "parser": "babel-eslint",
+  "parserOptions": {
+    "ecmaFeatures": {
+      "jsx": true
+    }
+  },
+  "rules": {
+    "brace-style": [2, "stroustrup"],
+    "quotes": [2, "single"],
+    "jsx-quotes": [2, "prefer-double"],
+    "new-cap": 0,
+    "func-names": 0,
+    "no-param-reassign": 0,
+    "space-before-function-paren": [0, "never"],
+    "max-len": [1, 120],
+    "consistent-return": 0,
+    "vars-on-top": 0,
+    "object-curly-spacing": 0,
+    "global-require": 0,
+    "react/display-name": 0,
+    "react/prop-types": 0
+  },
+  "env": {
+    "mocha": true
+  }
+}
