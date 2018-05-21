@@ -101,24 +101,29 @@ export const extensions = {
       const isArrayLike = tools.isArrayLike(list);
       tools.each(list, (item, index, len, lenObj) => {
         let param = {
-          data: item,
+          data: [item],
           index: isArrayLike ? index : len,
+          item,
           fallback: true
         };
 
+        let extra;
         if (props && props.moreValues) {
           const _len = isArrayLike ? len : lenObj;
-          param.extra = {
+          extra = {
             '@first': param.index === 0,
             '@last': param.index === _len - 1,
             '@length': _len
           };
         }
         if (!isArrayLike) {
-          if (!param.extra) {
-            param.extra = {};
+          if (!extra) {
+            extra = {};
           }
-          param.extra['@key'] = index;
+          extra['@key'] = index;
+        }
+        if (extra) {
+          param.data.push(extra);
         }
 
         let retI = options.result(param);
@@ -168,6 +173,12 @@ export const extensions = {
     tools.each(props, (v, k) => {
       options.exProps[k] = v;
     }, false, false);
+  },
+
+  show: options => {
+    if (!options.result()) {
+      options.exProps.style = options.useString ? 'display:none' : { display: 'none' };
+    }
   },
 
   'for': (start, end, options) => {
@@ -237,7 +248,7 @@ export const extensions = {
         paramNames.forEach((v, i) => params[paramNames[i]] = arguments[i]);
       }
 
-      return options.result({ data: params });
+      return options.result({ data: [params] });
     };
   },
 
@@ -249,9 +260,9 @@ export const extensions = {
     const { props } = options;
 
     return options.result({
-      data: props && props.as ? {
+      data: [props && props.as ? {
         [props.as]: originalData
-      } : originalData
+      } : originalData]
     });
   },
 
@@ -265,34 +276,12 @@ export const extensions = {
   },
 
   once: options => {
-    const { props } = options;
-    let cacheObj = options.global,
-      cacheKey = '_njOnceCache_' + (props && props.cacheKey != null ? props.cacheKey : options._njFnsNo),
-      cache = cacheObj[cacheKey],
-      useCache;
+    let cacheObj = options.context.root || options.context,
+      props = options.props,
+      cacheKey = props && props.name ? props.name : ('_njOnceCache_' + options._njFnsNo),
+      cache = cacheObj[cacheKey];
 
-    if (props && (props.reset !== undefined || props.resetList !== undefined)) {
-      let { reset, resetList } = props;
-      let cacheValKey = cacheKey + 'V';
-      useCache = true;
-
-      if (reset !== undefined) {
-        resetList = [reset];
-      }
-      resetList.forEach((r, i) => {
-        let key = cacheValKey + i,
-          cacheVal = cacheObj[key];
-
-        if (cacheVal !== r) {
-          useCache = false;
-          cacheObj[key] = r;
-        }
-      });
-    } else {
-      useCache = cache !== undefined;
-    }
-
-    if (!useCache) {
+    if (cache === undefined) {
       cache = cacheObj[cacheKey] = options.result();
     }
     return cache;
@@ -307,7 +296,8 @@ function _config(params) {
     exProps: false,
     isProp: false,
     subExProps: false,
-    isSub: false
+    isSub: false,
+    addSet: false
   };
 
   if (params) {
@@ -338,6 +328,7 @@ extensionConfig.block = _config(extensionConfig.obj);
 extensionConfig.pre = _config(extensionConfig.obj);
 extensionConfig.arg = _config(extensionConfig.prop);
 extensionConfig.once = _config(extensionConfig.obj);
+extensionConfig.show = _config(extensionConfig.prop);
 
 //Extension alias
 extensions['case'] = extensions.elseif;

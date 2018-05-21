@@ -11,6 +11,7 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
+      'node_modules/babel-polyfill/dist/polyfill.js',
       'test/index.js'
     ],
 
@@ -104,6 +105,8 @@ module.exports = function(config) {
 
     // Continuous Integration mode
     // if true, Karma captures browsers, runs the tests and exits
-    singleRun: true
+    singleRun: true,
+
+    browserNoActivityTimeout: 100000
   });
 }

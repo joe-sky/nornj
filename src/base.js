@@ -28,7 +28,8 @@ export {
 } from './compiler/compile';
 export {
   taggedTmpl,
-  taggedTmplH
+  taggedTmplH,
+  template
 } from './utils/taggedTmpl';
 export {
   registerComponent

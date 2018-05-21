@@ -5,6 +5,10 @@ import { unescape } from '../utils/escape';
 import { extensionConfig } from '../helpers/extension';
 import { filterConfig } from '../helpers/filter';
 const { errorTitle } = nj;
+const DEPRECATE_FILTER = {
+  //'?': '?:',
+  '//': '%%'
+};
 
 function _buildFn(content, node, fns, no, newContext, level, useStringLocal, name) {
   let fnStr = '',
@@ -68,12 +72,12 @@ function _buildFn(content, node, fns, no, newContext, level, useStringLocal, nam
       fn._njName = name;
     }
   } catch (err) {
-    tools.error(`Failed to generate template function:\n\n` + err.toString() + ' in\n\n' + fnStr + '\n');
+    tools.error('Failed to generate template function:\n\n' + err.toString() + ' in\n\n' + fnStr + '\n');
   }
   return no;
 }
 
-function _buildOptions(config, useStringLocal, node, fns, exPropsStr, subExPropsStr, level, hashProps, valueL) {
+function _buildOptions(config, useStringLocal, node, fns, exPropsStr, subExPropsStr, level, hashProps, valueL, parent) {
   let hashStr = ', useString: ' + (useStringLocal == null ? 'p1.us' : (useStringLocal ? 'true' : 'false')),
     noConfig = !config;
 
@@ -85,6 +89,11 @@ function _buildOptions(config, useStringLocal, node, fns, exPropsStr, subExProps
     if (noConfig || config.subExProps) {
       hashStr += ', subExProps: ' + subExPropsStr;
     }
+    if (parent) {
+      const _parentType = parent.parentType != null ? parent.parentType : (parent.ex ? parent.ex : parent.type);
+      hashStr += ', parentName: ' + (_parentType != null ? ('\'' + _parentType + '\'') : _parentType);
+    }
+    hashStr += ', name: \'' + node.ex + '\'';
 
     hashStr += ', result: ' + (node.content ? 'p1.r(p1, p2, p1.fn' + _buildFn(node.content, node, fns, ++fns._no, newContext, level, useStringLocal) + ', ' + exPropsStr + ', ' + subExPropsStr + ')' : 'p1.np');
 
@@ -103,11 +112,11 @@ function _buildPropData(obj, counter, fns, useStringLocal, level) {
     escape = obj.escape,
     isEmpty = false,
     special = false;
-  const { jsProp, isComputed } = obj.prop;
+  const { isComputed, hasSet } = obj.prop;
 
   //先生成数据值
   if (obj.prop.isBasicType) {
-    dataValueStr = obj.prop.name + jsProp;
+    dataValueStr = obj.prop.name;
   } else if (obj.prop.isEmpty) {
     isEmpty = true;
   } else {
@@ -120,6 +129,10 @@ function _buildPropData(obj, counter, fns, useStringLocal, level) {
         data = 'index';
         special = true;
         break;
+      case '@item':
+        data = 'item';
+        special = true;
+        break;
       case 'this':
         data = 'data[0]';
         special = true;
@@ -130,6 +143,14 @@ function _buildPropData(obj, counter, fns, useStringLocal, level) {
         break;
       case '@g':
         data = 'p1.g';
+        special = CUSTOM_VAR;
+        break;
+      case '@root':
+        data = '(p2.root || p2)';
+        special = CUSTOM_VAR;
+        break;
+      case '@context':
+        data = 'p2';
         special = CUSTOM_VAR;
         break;
       case '@lt':
@@ -162,8 +183,10 @@ function _buildPropData(obj, counter, fns, useStringLocal, level) {
       if (!data) {
         data = 'data';
       }
+
+      const isCtx = data == 'p2';
       for (let i = 0; i < parentNum; i++) {
-        data = 'parent.' + data;
+        data = !isCtx ? ('parent.' + data) : (data + '.parent');
       }
 
       if (!special) {
@@ -172,10 +195,10 @@ function _buildPropData(obj, counter, fns, useStringLocal, level) {
     }
 
     if (!special && !specialP) {
-      dataValueStr = (isComputed ? 'p1.c(' : '') + 'p2.d(\'' + name + '\'' + (isComputed ? ', 0, true' : '') + ')' + (isComputed ? ', p2, ' + level + ')' : '') + jsProp;
+      dataValueStr = (isComputed ? 'p1.c(' : '') + 'p2.d(\'' + name + '\'' + ((isComputed || hasSet) ? ', 0, true' : '') + ')' + (isComputed ? ', p2, ' + level + ')' : '');
     } else {
       let dataStr = special === CUSTOM_VAR ? data : 'p2.' + data;
-      dataValueStr = (special ? dataStr : (isComputed ? 'p1.c(' : '') + 'p2.d(\'' + name + '\', ' + dataStr + (isComputed ? ', true' : '') + ')' + (isComputed ? ', p2, ' + level + ')' : '')) + jsProp;
+      dataValueStr = (special ? dataStr : (isComputed ? 'p1.c(' : '') + 'p2.d(\'' + name + '\', ' + dataStr + ((isComputed || hasSet) ? ', true' : '') + ')' + (isComputed ? ', p2, ' + level + ')' : ''));
     }
   }
   if (dataValueStr) {
@@ -205,6 +228,10 @@ function _buildPropData(obj, counter, fns, useStringLocal, level) {
         filterStrI = '',
         fnHVarStr;
 
+      if (isEmpty && i == 0 && (!configF || !configF.hasOptions)) {
+        hasOptions = false;
+      }
+
       if (configF && configF.onlyGlobal) { //只能从全局获取
         filterStr += '\nvar ' + filterVarStr + ' = ' + globalFilterStr + ';\n';
       } else { //优先从p2.data中获取
@@ -220,16 +247,21 @@ function _buildPropData(obj, counter, fns, useStringLocal, level) {
       }
       if (process.env.NODE_ENV !== 'production') {
         filterStr += 'if (!' + filterVarStr + ') {\n';
-        filterStr += '  p1.wn(\'A filter called "' + o.name + '" is undefined.\');\n';
+        filterStr += '  p1.wn(\'' + o.name + '\', \'f\');\n';
         filterStr += '} else {\n';
+
+        const deprecateFilter = DEPRECATE_FILTER[o.name];
+        if (deprecateFilter) {
+          tools.warn('The filter \"' + o.name + '\" is deprecated, please use \"' + deprecateFilter + '\" instead of it.');
+        }
       }
 
-      let _filterStr = '  ' + tmpStr + ' = ' + filterVarStr + '.apply(' + (fnHVarStr ? fnHVarStr + ' ? ' + fnHVarStr + '.ctx : p2' : 'p2') + ', [' + ((!isEmpty || i > 0) ? valueStr + ', ' : '') +
+      let _filterStr = '  ' + tmpStr + ' = ' + filterVarStr + '.apply(' + (fnHVarStr ? fnHVarStr + ' ? ' + fnHVarStr + '._njCtx : p2' : 'p2') + ', [' + ((!isEmpty || i > 0) ? valueStr + ', ' : '') +
         ((o.params && o.params.length) ? o.params.reduce((p, c, i, arr) => {
           const propStr = _buildPropData({
-              prop: c,
-              escape
-            }, counter, fns, useStringLocal, level),
+            prop: c,
+            escape
+          }, counter, fns, useStringLocal, level),
             hasComma = hasOptions || i < arr.length - 1;
 
           if (tools.isString(propStr)) {
@@ -277,7 +309,7 @@ function _buildEscape(valueStr, fns, escape, special) {
 }
 
 function _replaceStrs(str) {
-  return _replaceBackslash(str).replace(/_njNl\$/g, '\\n').replace(/'/g, "\\'");
+  return _replaceBackslash(str).replace(/_njNl_/g, '\\n').replace(/'/g, "\\'");
 }
 
 function _replaceBackslash(str) {
@@ -293,7 +325,7 @@ function _buildProps(obj, counter, fns, useStringLocal, level) {
     valueStr = !obj.isAll && str0 !== '' ? ('\'' + _replaceStrs(str0) + '\'') : '';
     filterStr = '';
 
-    tools.each(obj.props, function(o, i) {
+    tools.each(obj.props, function (o, i) {
       let propData = _buildPropData(o, counter, fns, useStringLocal, level),
         dataValueStr;
       if (tools.isString(propData)) {
@@ -324,7 +356,7 @@ function _buildProps(obj, counter, fns, useStringLocal, level) {
     }, false, true);
   } else if (tools.isObject(str0) && str0._njLen != null) { //tmpl标签
     valueStr += '{\n';
-    tools.each(str0, function(v, k, i, l) {
+    tools.each(str0, function (v, k, i, l) {
       if (k !== '_njLen') {
         const hasName = k.indexOf('_njT') !== 0,
           fnStr = 'p1.main' + _buildFn(v.node.content, v.node, fns, 'T' + ++fns._noT, null, null, null, hasName ? k : null);
@@ -342,6 +374,7 @@ function _buildProps(obj, counter, fns, useStringLocal, level) {
         valueStr += '  _njData: p2.data,\n  \
                        _njParent: p2.parent,\n  \
                        _njIndex: p2.index,\n  \
+                       _njItem: p2.item,\n  \
                        _njLevel: p1.l(' + level + ', p2),\n  \
                        _njIcp: p2.icp\n';
       }
@@ -412,11 +445,11 @@ function _buildParams(node, fns, counter, useString, level, exPropsStr, subExPro
         }
       } else {
         let keys = '';
-        tools.each(params, function(v, k, i, l) {
+        tools.each(params, function (v, k, i, l) {
           if (i == 0) {
             keys += '{ ';
           }
-          keys += k + ': 1';
+          keys += '\'' + k + '\': 1';
 
           if (i < l - 1) {
             keys += ', ';
@@ -438,7 +471,7 @@ function _buildParams(node, fns, counter, useString, level, exPropsStr, subExPro
         paramsStr += '{\n';
       }
 
-      tools.each(paramKeys, function(k, i) {
+      tools.each(paramKeys, function (k, i) {
         let valueStr = _buildProps(params[k], counter, fns, useString, level);
         if (tools.isObject(valueStr)) {
           filterStr += valueStr.filterStr;
@@ -450,7 +483,7 @@ function _buildParams(node, fns, counter, useString, level, exPropsStr, subExPro
         }
 
         let key = _replaceStrs(k),
-          onlyKey = ('\'' + key + '\'') === valueStr;
+          onlyKey = params[k].onlyKey;
         if (!useStringF) {
           key = tranData.fixPropName(key);
         }
@@ -534,7 +567,7 @@ function _buildNode(node, parent, fns, counter, retType, level, useStringLocal, 
     dataReferStr += 'var _dataRefer' + _dataReferC + ' = [\n';
 
     if (node.args) { //构建匿名参数
-      tools.each(node.args, function(arg, i) {
+      tools.each(node.args, function (arg, i) {
         let valueStr = _buildProps(arg, counter, fns, useStringLocal, level);
         if (tools.isObject(valueStr)) {
           filterStr += valueStr.filterStr;
@@ -563,7 +596,7 @@ function _buildNode(node, parent, fns, counter, retType, level, useStringLocal, 
       paramsStr = retP[0],
       _paramsC = retP[1];
 
-    dataReferStr += _buildOptions(configE, useStringLocal, node, fns, exPropsStr, subExPropsStr, level, paramsStr !== '' ? '_params' + _paramsC : null);
+    dataReferStr += _buildOptions(configE, useStringLocal, node, fns, exPropsStr, subExPropsStr, level, paramsStr !== '' ? '_params' + _paramsC : null, null, parent);
     dataReferStr += '\n];\n';
 
     //添加匿名参数
@@ -607,8 +640,17 @@ function _buildNode(node, parent, fns, counter, retType, level, useStringLocal, 
 
     let typeStr;
     if (!useStringF) {
-      const _typeL = _type.toLowerCase();
-      typeStr = _typeRefer ? ('p1.er(' + _typeRefer + ', \'' + _typeL + '\', p1, \'' + _type + '\', p2)') : ('p1.e(\'' + _typeL + '\', p1, \'' + _type + '\', p2)');
+      let _typeL = _type.toLowerCase(),
+        subName = '';
+
+      if (!_typeRefer && _typeL.indexOf('.') > -1) {
+        const typeS = _type.split('.');
+        _typeL = _typeL.split('.')[0];
+        _type = typeS[0];
+        subName = ', \'' + typeS[1] + '\'';
+      }
+
+      typeStr = _typeRefer ? ('p1.er(' + _typeRefer + ', \'' + _typeL + '\', p1, \'' + _type + '\', p2)') : ('p1.e(\'' + _typeL + '\', p1, \'' + _type + '\', p2' + subName + ')');
     } else {
       typeStr = _typeRefer ? ('p1.en(' + _typeRefer + ', \'' + _type + '\')') : ('\'' + _type + '\'');
     }
@@ -630,10 +672,10 @@ function _buildNode(node, parent, fns, counter, retType, level, useStringLocal, 
     }
 
     //子节点
-    fnStr += _buildContent(node.content, node, fns, counter, !useStringF ? { _compParam: '_compParam' + _compParamC } : { _children: '_children' + _childrenC }, level != null ? level + 1 : level, useStringLocal);
+    fnStr += _buildContent(node.content, node, fns, counter, !useStringF ? { _compParam: '_compParam' + _compParamC } : { _children: '_children' + _childrenC }, (useStringF && node.type === nj.noWsTag) ? null : (level != null ? level + 1 : level), useStringLocal);
 
     //渲染
-    fnStr += _buildRender(node, parent, 3, retType, !useStringF ? { _compParam: _compParamC } : { _type: _typeC, _params: paramsStr !== '' ? _paramsC : null, _children: _childrenC, _selfClose: node.selfCloseTag }, fns, level, useStringLocal, node.allowNewline, isFirst);
+    fnStr += _buildRender(node, parent, 3, retType, !useStringF ? { _compParam: _compParamC } : { _type: _typeC, _typeS: _type, _typeR: _typeRefer, _params: paramsStr !== '' ? _paramsC : null, _children: _childrenC, _selfClose: node.selfCloseTag }, fns, level, useStringLocal, node.allowNewline, isFirst);
   }
 
   return fnStr;
@@ -668,15 +710,12 @@ function _buildRender(node, parent, nodeType, retType, params, fns, level, useSt
       retStr = (!useStringF || allowNewline || noLevel ? '' : (isFirst ? (parent.type !== 'nj_root' ? 'p1.fl(p2) + ' : '') : '\'\\n\' + ')) + _buildLevelSpace(level, fns, allowNewline) + _buildLevelSpaceRt(useStringF, isFirst || noLevel) + params.text;
       break;
     case 2: //扩展标签
-      retStr = '_ex' + params._ex + '.apply(' + (params.fnH ? params.fnH + ' ? ' + params.fnH + '.ctx : p2' : 'p2') + ', _dataRefer' + params._dataRefer + ')';
+      retStr = '_ex' + params._ex + '.apply(' + (params.fnH ? params.fnH + ' ? ' + params.fnH + '._njCtx : p2' : 'p2') + ', _dataRefer' + params._dataRefer + ')';
       break;
     case 3: //元素节点
       if (!useStringF) {
         retStr = 'p1.H(_compParam' + params._compParam + ')';
       } else {
-        let levelSpace = _buildLevelSpace(level, fns, allowNewline);
-        const content = node.content;
-
         if ((allowNewline && allowNewline !== 'nlElem') || noLevel) {
           retStr = '';
         } else if (isFirst) {
@@ -685,15 +724,20 @@ function _buildRender(node, parent, nodeType, retType, params, fns, level, useSt
           retStr = '\'\\n\' + ';
         }
 
-        if (node.type !== nj.textTag) {
-          retStr += levelSpace + _buildLevelSpaceRt(useStringF, isFirst || noLevel) + '\'<\' + _type' + params._type + ' + ' + (params._params != null ? '_params' + params._params + ' + ' : '');
+        if (node.type !== nj.textTag && node.type !== nj.noWsTag) {
+          const levelSpace = _buildLevelSpace(level, fns, allowNewline),
+            content = node.content,
+            hasTypeR = params._typeR,
+            hasParams = params._params != null;
+
+          retStr += levelSpace + _buildLevelSpaceRt(useStringF, isFirst || noLevel) + '\'<' + (hasTypeR ? ('\' + _type' + params._type) : params._typeS) + (hasParams ? ((!hasTypeR ? '\'' : '') + ' + _params') + params._params : '') + ((hasTypeR || hasParams) ? ' + \'' : '');
           if (!params._selfClose) {
-            retStr += '\'>\'';
+            retStr += '>\'';
             retStr += ' + _children' + params._children + ' + ';
             retStr += (!content || allowNewline || noLevel ? '' : '\'\\n\' + ') + (content ? levelSpace : '') + //如果子节点为空则不输出缩进空格和换行符
-              _buildLevelSpaceRt(useStringF, noLevel) + '\'</\' + _type' + params._type + ' + \'>\'';
+              _buildLevelSpaceRt(useStringF, noLevel) + '\'</' + (hasTypeR ? ('\' + _type' + params._type + ' + \'') : params._typeS) + '>\'';
           } else {
-            retStr += '\' />\'';
+            retStr += ' />\'';
           }
         } else {
           retStr += '_children' + params._children;

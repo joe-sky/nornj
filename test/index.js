@@ -7,5 +7,5 @@ testsContext.keys().forEach(testsContext);
 // you can also change this to match only the subset of files that
 // you want coverage for.
 // require 需要统计覆盖率的源码文件
-const srcContext = require.context('../src', true, /^\.\/[\s\S]*\.js$/);
+const srcContext = require.context('../src', true, /^\.\/([\s\S](?!\.runtime))*\.js$/);
 srcContext.keys().forEach(srcContext);

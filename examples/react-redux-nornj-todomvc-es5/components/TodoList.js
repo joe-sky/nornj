@@ -1,9 +1,9 @@
-﻿njr.registerTmpl('TodoList', '#template-todoList')(React.createClass({
+﻿njr.registerTmpl('TodoList', '#template-todoList')(createReactClass({
   propTypes: {
-    onTodoClick: React.PropTypes.func.isRequired,
-    todos: React.PropTypes.arrayOf(React.PropTypes.shape({
-      text: React.PropTypes.string.isRequired,
-      completed: React.PropTypes.bool.isRequired
+    onTodoClick: PropTypes.func.isRequired,
+    todos: PropTypes.arrayOf(PropTypes.shape({
+      text: PropTypes.string.isRequired,
+      completed: PropTypes.bool.isRequired
     }).isRequired).isRequired
   },
 

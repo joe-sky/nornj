@@ -1,10 +1,10 @@
-﻿var _App = React.createClass({
+﻿var _App = createReactClass({
   propTypes: {
-    visibleTodos: React.PropTypes.arrayOf(React.PropTypes.shape({
-      text: React.PropTypes.string.isRequired,
-      completed: React.PropTypes.bool.isRequired
+    visibleTodos: PropTypes.arrayOf(PropTypes.shape({
+      text: PropTypes.string.isRequired,
+      completed: PropTypes.bool.isRequired
     }).isRequired).isRequired,
-    visibilityFilter: React.PropTypes.oneOf([
+    visibilityFilter: PropTypes.oneOf([
       VisibilityFilters.SHOW_ALL,
       VisibilityFilters.SHOW_COMPLETED,
       VisibilityFilters.SHOW_ACTIVE

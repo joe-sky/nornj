@@ -1,8 +1,8 @@
-﻿njr.registerTmpl('Todo', '#template-todo')(React.createClass({
+﻿njr.registerTmpl('Todo', '#template-todo')(createReactClass({
   propTypes: {
-    onClick: React.PropTypes.func.isRequired,
-    text: React.PropTypes.string.isRequired,
-    completed: React.PropTypes.bool.isRequired
+    onClick: PropTypes.func.isRequired,
+    text: PropTypes.string.isRequired,
+    completed: PropTypes.bool.isRequired
   },
 
   template: nj.compileH(document.getElementById('template-todo').innerHTML),

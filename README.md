@@ -1,4 +1,5 @@
-# NornJ
+![](./docs/logo.png)
+-------
 
 ```
   ____        __   
@@ -9,14 +10,22 @@
 
 ```
 
-`NornJ`是一个渲染效率高，语法可读性好，可扩展性超强，适用场景丰富的javascript模板引擎。
+`NornJ`是一个**渲染高效**，**可读性好**，**扩展容易**，**适用性广**的javascript模板引擎。
 
 [![NPM Version][npm-image]][npm-url]
+<a href="https://www.npmjs.com/package/nornj"><img src="https://img.shields.io/npm/l/nornj.svg" alt="License"></a>
+<a href="https://travis-ci.org/joe-sky/nornj"><img src="https://travis-ci.org/joe-sky/nornj.svg?branch=master" alt="Travis CI Status"/></a>
+<a href="https://codecov.io/gh/joe-sky/nornj"><img src="https://codecov.io/gh/joe-sky/nornj/branch/master/graph/badge.svg" alt="Codecov" /></a>
 [![NPM Downloads][downloads-image]][npm-url]
+
+## 在线文档
+
+* [NornJ中文指南(github pages)](https://joe-sky.github.io/nornj-guide)
+* [NornJ中文指南(gitbook)](https://joe-sky.gitbooks.io/nornj-guide)
 
 ## 概述
 
-`NornJ`是一款同时支持渲染`html(或xml)字符串`和`HyperScript`的模板引擎。
+`NornJ`(读音[nɔ:n dʒeɪ]，简称`nj`)是一款同时支持渲染`纯字符串(html)`和`HyperScript(React vdom)`的模板引擎。
 
 > 什么是`HyperScript`?
 
@@ -25,85 +34,166 @@
 而`NornJ`可将同样语法规范的模板，转换为多种方式渲染：
 
 ```
-                  +-----------------+
-                  ¦ template string ¦
-                  +-----------------+
+                +---------------------+
+                ¦ <Template string /> ¦
+                +---------------------+
                            |
                            |
            +-------------------------------+
+           |           render to           |
            |                               |
-           |                               |
- +------------------+      +--------------------------------+
- ¦ html(xml) string ¦      ¦ HyperScript(React virtual dom) ¦
- +------------------+      +--------------------------------+
+ +-------------------+     +--------------------------------+
+ ¦ pure string(html) ¦     ¦ HyperScript(React virtual dom) ¦
+ +-------------------+     +--------------------------------+
 ```
 
-故`NornJ`不但可以作为`Express`服务器的界面模板引擎，还可以替代`JSX`作为`React`的界面模板引擎。它的语法和`JSX`并不互相排斥，可共存一起运行。
+因此，`NornJ`不但可以作为`Express`及`Koa`服务器的界面模板引擎，还可以作为`React`开发中`JSX`的替代品，解决`JSX`在表现流程控制语句等一些方面的不足。它的语法和`JSX`并不互相排斥，可共存一起运行。
 
 ## 模板基本示例
+
+* 在单独的模板文件中编写
 
 ```html
 <template name="partial">
   <#if {{i > 0 || (i <= -10)}}>
-    <input id=test onclick={{click}} />
+    <input id=test onclick={{click}}>
   </#if>
 </template>
 
 <template>
   <div>
-    <#each {{msgs}}>
-      this the test demo Hello {{msg | format}}
+    <#each {{1 .. 20}}>
+      this the test demo Hello {{@index ** 2 | int}}
     </#each>
     <#include name="partial" />
   </div>
 </template>
 ```
 
-如上例，`NornJ`的语法在可以展现一定逻辑性的同时结构与html几乎一致，而且`if`、`each`、`>`、`<=`等都是支持自定义扩展的模板语法！^_^
+如上，`NornJ`的语法结构在尽量与html保持一致的同时，更有丰富的扩展语法去实现各种逻辑；且拥有`..`、`**`等js原生不支持的运算符，而且还可以自由扩展出更多的新语句与运算符!
+
+* 在js文件中像JSX那样编写
+
+```js
+const props = { id: 'test', name: 'test' };
+
+const partial = nj`
+  <#if {{i > 0 || (i <= -10)}}>
+    <input onclick={{click}} ...${props}>
+  </#if>
+`;
+
+const template = nj`
+  <div>
+    <#each {{1 .. 20}}>
+      this the test demo Hello {{@index ** 2 | int}}
+    </#each>
+    #${partial}
+  </div>
+`;
+```
+
+`NornJ`也同时支持像`JSX`那样在js文件中自由地编写，它使用`ES2015+`提供的`tagged template literals`语法；并且几乎所有JSX支持的特性，它也都是支持的!
+
+## 在线演示地址
+
+### 渲染html字符串
+
+* [在线Playground(jsfiddle)](https://jsfiddle.net/joe_sky/byjdkaf1/)
+* [在线Playground(codepen)](https://codepen.io/joe_sky/pen/BrGvVG)
+
+### 渲染React组件
+
+* [在线Playground(jsfiddle)](https://jsfiddle.net/joe_sky/n5n9tutj/)
+* [在线Playground(codepen)](https://codepen.io/joe_sky/pen/ooPNbj)
+
+## 安装
+
+```sh
+npm install nornj
+npm install nornj-react   # React开发请一起安装此包
+npm install nornj-loader  # webpack环境请一起安装此包
+```
+
+## 项目脚手架
+
+* [nornj-cli](https://github.com/joe-sky/nornj-cli)
+
+该脚手架的使用方法类似于`vue-cli`，目前可创建完整的基于`react + mobx`的项目模板，并有[快速上手文档](https://github.com/joe-sky/nornj-cli/blob/master/docs/guides/overview.md)。
+
+## 示例项目
+
+* [todomvc[react + redux + react-router + nornj + webpack4]](https://github.com/joe-sky/nornj/blob/master/examples/react-redux-nornj-todomvc)
+* [todomvc(无需webpack打包)[react + redux + react-router + nornj]](https://github.com/joe-sky/nornj/blob/master/examples/react-redux-nornj-todomvc-es5)
+* [todomvc[backbone + marionette + nornj]](https://github.com/joe-sky/nornj/blob/master/examples/backbone-marionette-nornj-todomvc)
+* [计数器示例[react-native + styled-components + nornj]](https://github.com/joe-sky/nornj-react-native-counter)
+* [项目脚手架[react + mobx + react-router + nornj]](https://github.com/joe-sky/nornj-cli/tree/master/templates/react-mst)
 
 ## 特色
 
-传统js模板引擎如`Handlebars`、`EJS`等通常只支持渲染html字符串，`NornJ`与它们相比，相同点和不同点都有：
+传统js模板引擎如`Handlebars`、`EJS`、`Nunjucks`等通常只支持渲染字符串，`NornJ`与它们相比，相同点和不同点都有：
 
-* 支持渲染`React`的`virtual dom`对象，作为`JSX`的替代模板语言。
-* 支持渲染html字符串，故它也可以像传统js模板引擎一样支持`Backbone`或`Express`等。
-* 它的语法注重表现与逻辑的隔离性，和`Handlebars`更类似一些，但也有很多独特的地方。
-* 语法拥有非常强大的可扩展性，例如模板中的每个`运算符`及`语句`都是可以扩展的。
-* 它有多种使用方式适应不同场景，可用单独的模板文件定义；可以写在html中；还可以支持直接在js文件中编写。
-* 可支持模板预编译，也可以直接在浏览器中运行。
+* 支持渲染`React`的`virtual dom`对象，可替代或辅助`JSX`运行。
+* 支持渲染字符串，就像传统的js模板引擎一样支持`Express`或`Koa`等渲染html；也支持为`各类文本文件`提供模板渲染。
+* 模板语法简单且丰富，在参考自`Handlebars`、`Nunjucks`、`Vue`等著名项目的基础上，也有很多自己独特的语法。
+* 语法的可扩展性强大且开发扩展容易，模板中的每个`运算符`及`语句`都是可以扩展的。
+* 它有多种使用方式适应不同场景：
+  * 可用单独的模板文件定义，并用`Webpack loader`编译；
+  * 也可以用`script`标签写在html中；
+  * 还可以支持用`ES2015+的模板字符串`语法直接在js文件中编写。
+* 高效渲染，几乎不逊于`Handlebars`、`JSX`等主流模板。
+* 它不仅可以直接在浏览器中运行，也支持`模板预编译`；去除编译器的runtime版仅`不到5kb(gzip)`大小。
 
 ## 与React配合示例
 
-NornJ可以替代JSX输出React组件，用它可以将React组件的表现与逻辑更优雅地实现解藕：
+`NornJ`可以替代JSX输出React组件，与JSX相比，它的语法更像html：
+
+JSX：
+
+```js
+class TestComponent extends Component {
+  render() {
+    const { no } = this.props;
+
+    return (
+      <div id=test1 className="test1" style={{ color: 'purple', height: 200 }}>
+        this the test demo{no}.<input type="text" />
+        {Object.keys(Array.from({ length: no })).map((value, index) => {
+          return <i>test{index}</i>;
+        })}
+      </div>
+    );
+  }
+}
+```
+
+上例使用`NornJ`实现：
 
 ```js
 import { Component } from 'react';
 import { render } from 'react-dom';
-import nj from 'nornj';
+import nj, { template as t } from 'nornj';
 import { registerTmpl } from 'nornj-react';
 
-@registerTmpl({
-  name: 'TestComponent',
-  template: `
-    <div id=test1>
-      this the test demo{no}.
-      <#for {1} {no}>
-        <i>test{@index}</i>
-      </#for>
-    </div>
-  `
-})
+@registerTmpl('TestComponent')
 class TestComponent extends Component {
   render() {
-    return this.template(this.props);
+    return nj`
+      <div id=test1 class="test1" style="color:purple;height:200px;">
+        this the test demo{no}.<input type="text">
+        <#for {1} {no}>
+          <i>test{@index}</i>
+        </#for>
+      </div>
+    `(this.props);
   }
 }
 
-render(nj`<TestComponent no=100 />`(), document.body);
+render(t`<TestComponent no={100} />`, document.body);
 
 /* output:
-<div id="test1">
-  this the test demo100.
+<div id="test1" class="test1" style="color:purple;height:200px;">
+  this the test demo100.<input type="text" />
   <i>test0</i>
   <i>test1</i>
   <i>test2</i>
@@ -113,20 +203,33 @@ render(nj`<TestComponent no=100 />`(), document.body);
 */
 ```
 
-还可以替代ReactDOM.render来在html内渲染React组件：
+还支持将模板抽离到单独的文件中编写：
+
+test.nj.html：
 
 ```html
-...
-<body>
-  <script type="text/nornj" autoRender>
-    <TestComponent no="100" />
-  </script>
-</body>
+<div id=test1 class="test1" style="color:purple;height:200px;">
+  this the test demo{no}.<input type="text">
+  <#for {1} {no}>
+    <i>test{@index}</i>
+  </#for>
+</div>
 ```
 
-## 在ES5环境下使用
+```js
+import template from './test.nj.html';
 
-除了使用ES6模板字符串外，`NornJ`也可以支持在es5环境下使用普通的字符串：
+@registerTmpl('TestComponent')
+class TestComponent extends Component {
+  render() {
+    return template(this.props);
+  }
+}
+```
+
+## 更多使用场景
+
+`NornJ`模板也可以支持放在script标签中等传统的方式编写：
 
 ```html
 <script id="template" type="text/nornj">
@@ -140,7 +243,7 @@ render(nj`<TestComponent no=100 />`(), document.body);
 </script>
 ```
 
-然后可以这样渲染html字符串：
+`NornJ`在支持渲染`React`组件的同时，还支持渲染普通的html字符串：
 
 ```js
 let html = nj.render(tmpl, {
@@ -157,33 +260,27 @@ console.log(html);
 */
 ```
 
-## 安装
+## 相关项目及工具
 
-使用npm安装:
+* [nornj-react(React适配库)](https://github.com/joe-sky/nornj-react)
+* [nornj-loader(Webpack loader)](https://github.com/joe-sky/nornj-loader)
+* [babel-plugin-nornj-loader(babel插件)](https://github.com/yuhongda/babel-plugin-nornj-loader)
+* [koa-nornj(koa适配库)](https://github.com/qingqinxl1/koa-nornj)
+* [express适配器](https://github.com/joe-sky/nornj/blob/master/tools/expressEngine.js)
+* [react-native transformer](https://github.com/joe-sky/nornj/blob/master/tools/metroTransformer.js)
 
-```sh
-npm install nornj@latest
-```
+## 语法高亮插件
 
-## 示例项目
-
-* [react-redux-nornj-todomvc](https://github.com/joe-sky/nornj/blob/master/examples/react-redux-nornj-todomvc)
-* [react-redux-nornj-todomvc-es5](https://github.com/joe-sky/nornj/blob/master/examples/react-redux-nornj-todomvc-es5)
-* [backbone-marionette-nornj-todomvc](https://github.com/joe-sky/nornj/blob/master/examples/backbone-marionette-nornj-todomvc)
-* [nornj-react-native-counter](https://github.com/joe-sky/nornj-react-native-counter)
+* [nornj-highlight(vscode)](https://github.com/joe-sky/nornj-highlight)
+* [language-nornj(atom)](https://github.com/zyj1022/language-nornj)
 
 ## 浏览器支持
 
 * 可支持所有现代浏览器以及Internet Explorer 9+。
 
-## 更多详细文档
+## 谁在使用
 
-* [模板语法](https://github.com/joe-sky/nornj/blob/master/docs/模板语法.md)
-* [编译模板并输出html字符串](https://github.com/joe-sky/nornj/blob/master/docs/编译模板并输出html字符串.md)
-* [编译模板并输出React组件](https://github.com/joe-sky/nornj/blob/master/docs/编译模板并输出React组件.md)
-* [在独立模板文件中分模块构建](https://github.com/joe-sky/nornj/blob/master/docs/在独立模板文件中分模块构建.md)
-* [在html dom中渲染React组件](https://github.com/joe-sky/nornj/blob/master/docs/在html%20dom中渲染React组件.md)
-* [模板全局配置](https://github.com/joe-sky/nornj/blob/master/docs/模板全局配置.md)
+![who use](https://joe-sky.github.io/nornj-guide/images/y-dept.jpg?raw=true)
 
 ## License
 

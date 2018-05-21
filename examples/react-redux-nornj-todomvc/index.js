@@ -1,12 +1,14 @@
-﻿import njr from 'nornj-react';
+﻿import 'core-js/es6/map';
+import 'core-js/es6/set';
+import ReactDOM from 'react-dom';
 import './njConfig';
-import { hashHistory } from 'react-router';
-import store from './store/configureStore';
+import store, { history } from './store/configureStore';
 import App from './containers/App';
+import tmpls from './template.nj.html';
 
 //Set default data for first render NornJ html template.
-njr.setInitialData({
+ReactDOM.render(tmpls.index({
   store,
-  hashHistory,
+  history,
   App
-});
+}), document.getElementById('app'));

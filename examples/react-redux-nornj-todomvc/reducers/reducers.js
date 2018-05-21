@@ -1,10 +1,10 @@
-﻿import { UPDATE_LOCATION } from 'react-router-redux';
+﻿import { LOCATION_CHANGE } from 'react-router-redux';
 import { ADD_TODO, COMPLETE_TODO, VisibilityFilters } from '../actions/actions';
 const { SHOW_ALL } = VisibilityFilters;
 
 function visibilityFilter(state = SHOW_ALL, action) {
   switch (action.type) {
-    case UPDATE_LOCATION:
+    case LOCATION_CHANGE:
       var filter = action.payload.pathname.substr(1);
       switch (filter) {
         case '':

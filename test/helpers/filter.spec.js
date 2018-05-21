@@ -3,7 +3,7 @@ import '../../src/utils/createTmplRule';
 
 describe('filter', () => {
   it('.', () => {
-    expect(render("{{ a.b.('c').('length') }}", {
+    expect(render("{{ a.b['c'].length }}", {
       a: {
         b: {
           c: 'abc'
@@ -65,7 +65,7 @@ describe('filter', () => {
   });
 
   it('/', () => {
-    expect(render('{{ 15 / 3 }}')).toBe(5);
+    expect(render('{{ 15 / 2 }}')).toBe(7.5);
   });
 
   it('%', () => {
@@ -81,7 +81,7 @@ describe('filter', () => {
   });
 
   it('int & float', () => {
-    expect(render("{{ 20.5 | int * (10.05 | float) + (2 ** 3) + (//(81)) }}")).toBe(218);
+    expect(render("{{ 20.5 | int * (10.05 | float) + (2 ** 3) + (19 // 2) }}")).toBe(218);
   });
 
   it('bool', () => {
@@ -93,14 +93,22 @@ describe('filter', () => {
   });
 
   it('..', () => {
-    expect(render("{{  0 .. 5 .('length') }}")).toBe(6);
+    expect(render("{{ 0 .. 5 .length }}")).toBe(6);
   });
 
   it('..>', () => {
-    expect(render("{{  0 ..< 5 .('length') }}")).toBe(5);
+    expect(render("{{ 0 ..< 5 .length }}")).toBe(5);
   });
 
   it('<=>', () => {
-    expect(render("{{  2 <=> 1  }}")).toBe(1);
+    expect(render("{{ 2 <=> 1 }}")).toBe(1);
+  });
+
+  it('array', () => {
+    expect(render("{{['1'[0]['length'], '123'[1], '345'[0], ['4567'['length'], 5].join('-')].join('-')}}")).toBe('1-2-3-4-5');
+  });
+
+  it('object', () => {
+    expect(render(`<img src="{{ { src: 'http://test.com/img.png' }.src }}">`)).toBe('<img src="http://test.com/img.png" />');
   });
 });

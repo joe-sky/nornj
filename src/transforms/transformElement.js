@@ -44,7 +44,7 @@ export function getOpenTagParams(tag, tmplRule) {
     matchArr, ret;
 
   while ((matchArr = pattern.exec(tag))) {
-    const key = matchArr[1];
+    let key = matchArr[1];
     if (key === '/') { //If match to the last of "/", then continue the loop.
       continue;
     }
@@ -53,16 +53,20 @@ export function getOpenTagParams(tag, tmplRule) {
       ret = [];
     }
 
-    let value = matchArr[7],
-      onlyBrace = matchArr[4];
+    let value = matchArr[8],
+      onlyBrace = matchArr[4] != null ? matchArr[4] : matchArr[6],
+      onlyKey = false;
     if (value != null) {
       value = tools.clearQuot(value); //Remove quotation marks
     } else {
       value = key; //Match to Similar to "checked" or "disabled" attribute.
+      if (!onlyBrace) {
+        onlyKey = true;
+      }
     }
 
     //Removed at the end of "/>", ">" or "/".
-    if (!matchArr[8] && !matchArr[9]) {
+    if (!matchArr[9] && !matchArr[10]) {
       if (/\/>$/.test(value)) {
         value = value.substr(0, value.length - 2);
       } else if (/>$/.test(value) || /\/$/.test(value)) {
@@ -70,10 +74,19 @@ export function getOpenTagParams(tag, tmplRule) {
       }
     }
 
+    //Transform special key
+    let hasColon;
+    if (key[0] === ':') {
+      key = key.substr(1);
+      hasColon = true;
+    }
+
     ret.push({
       key,
       value,
-      onlyBrace
+      onlyBrace,
+      hasColon,
+      onlyKey
     });
   }
 
@@ -87,7 +100,7 @@ export function isXmlCloseTag(obj, tagName) {
 
 //get inside brace param
 export function getInsideBraceParam(obj, tmplRule) {
-  return tmplRule.insideBraceParam.exec(obj);
+  return tmplRule.braceParam.exec(obj);
 }
 
 //判断扩展标签并返回参数
@@ -160,6 +173,7 @@ export function addParamsEx(node, parent, isProp, isSub) {
       exPropsNode = node;
     }
 
+    exPropsNode.parentType = parent.type;
     parent[exPropsName] = exPropsNode;
   } else {
     tools.arrayPush(parent[exPropsName].content, isProp || isSub ? [node] : node.content);
@@ -171,7 +185,8 @@ export function exCompileConfig(name) {
   return {
     isSub: config ? config.isSub : false,
     isProp: config ? config.isProp : false,
-    useString: config ? config.useString : false
+    useString: config ? config.useString : false,
+    addSet: config ? config.addSet : false
   };
 }
 

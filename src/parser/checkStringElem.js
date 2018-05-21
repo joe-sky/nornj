@@ -16,7 +16,7 @@ const { OMITTED_CLOSE_TAGS } = tranElem;
 export default function compileStringTmpl(tmpl) {
   let tmplKey = tmpl.toString(), //Get unique key
     ret = preAsts[tmplKey];
-  const { outputH, tmplRule, onlyParse } = this;
+  const { outputH, tmplRule, onlyParse, fileName } = this;
 
   if (!ret) { //If the cache already has template data, direct return the template.
     let isStr = tools.isString(tmpl),
@@ -36,10 +36,14 @@ export default function compileStringTmpl(tmpl) {
           isSpread = lastChar3 === '...';
 
         if (isInBrace) {
-          isInBrace = !tmplRule.incompleteEnd.test(xml);
+          isInBrace = !(tmplRule['incompleteEnd' + (isInBrace === 'isR' ? 'R' : '')]).test(xml);
         }
-        if (!isInBrace && tmplRule.incompleteStart.test(xml)) {
-          isInBrace = true;
+        if (!isInBrace) {
+          if (tmplRule.incompleteStartR.test(xml)) {
+            isInBrace = 'isR';
+          } else {
+            isInBrace = tmplRule.incompleteStart.test(xml);
+          }
         }
         if (isComputed) {
           xml = xml.substr(0, last);
@@ -56,13 +60,24 @@ export default function compileStringTmpl(tmpl) {
       fullXml += xml + split;
     }, false, true);
 
+    //Merge all include tags
+    const includeParser = nj.includeParser;
+    if (includeParser) {
+      fullXml = includeParser(fullXml, fileName, tmplRule);
+    }
+
     fullXml = _formatAll(fullXml, tmplRule);
-    if (nj.textMode && !outputH) {
-      fullXml = '<' + nj.textTag + '>' + fullXml + '</' + nj.textTag + '>';
+    if (!outputH) {
+      if (nj.textMode) {
+        fullXml = '<' + nj.textTag + '>' + fullXml + '</' + nj.textTag + '>';
+      }
+      if (nj.noWsMode) {
+        fullXml = '<' + nj.noWsTag + '>' + fullXml + '</' + nj.noWsTag + '>';
+      }
     }
 
     //Resolve string to element
-    ret = _checkStringElem(fullXml, tmplRule);
+    ret = _checkStringElem(fullXml, tmplRule, outputH);
     tools.defineProp(ret, '_njParamCount', {
       value: l - 1
     });
@@ -128,7 +143,7 @@ function _setTextAfter(textAfter, current) {
 }
 
 //Resolve string to element
-function _checkStringElem(xml, tmplRule) {
+function _checkStringElem(xml, tmplRule, outputH) {
   let root = [],
     current = {
       elem: root,
@@ -159,9 +174,9 @@ function _checkStringElem(xml, tmplRule) {
           tranElem.exCompileConfig(isEx[3]).isProp)) {
         parent = current;
         current = _createCurrent(_elemName, parent);
-        _setElem(_elem, _elemName, _elemParams, current.elem, null, tmplRule);
+        _setElem(_elem, _elemName, _elemParams, current.elem, null, tmplRule, outputH);
       } else {
-        _setSelfCloseElem(_elem, _elemName, _elemParams, current.elem, tmplRule);
+        _setSelfCloseElem(_elem, _elemName, _elemParams, current.elem, tmplRule, outputH);
       }
 
       _setTextAfter(_textAfter, current);
@@ -195,7 +210,7 @@ function _checkStringElem(xml, tmplRule) {
             }
           } else if (elem[elem.length - 2] === '/') { //Self close tag
             if (isEx || !inTextContent) {
-              _setSelfCloseElem(elem, elemName, elemParams, current.elem, tmplRule);
+              _setSelfCloseElem(elem, elemName, elemParams, current.elem, tmplRule, outputH);
             } else {
               _setText(elem, current.elem);
             }
@@ -211,7 +226,7 @@ function _checkStringElem(xml, tmplRule) {
 
                 parent = current;
                 current = _createCurrent(elemName, parent);
-                _setElem(elem, elemName, elemParams, current.elem, null, tmplRule);
+                _setElem(elem, elemName, elemParams, current.elem, null, tmplRule, outputH);
               }
             } else {
               _setText(elem, current.elem);
@@ -234,7 +249,7 @@ function _checkStringElem(xml, tmplRule) {
   if (omittedCloseElem) {
     const [_elem, _elemName, _elemParams, _textAfter] = omittedCloseElem;
 
-    _setSelfCloseElem(_elem, _elemName, _elemParams, current.elem, tmplRule);
+    _setSelfCloseElem(_elem, _elemName, _elemParams, current.elem, tmplRule, outputH);
     _setTextAfter(_textAfter, current);
   }
 
@@ -242,15 +257,15 @@ function _checkStringElem(xml, tmplRule) {
 }
 
 const LT_GT_LOOKUP = {
-  '<': '_njLt$',
-  '>': '_njGt$'
+  '<': '_njLt_',
+  '>': '_njGt_'
 };
 const REGEX_LT_GT = />|</g;
 
 function _formatAll(str, tmplRule) {
   const commentRule = tmplRule.commentRule;
   return str.replace(new RegExp('<!--' + commentRule + '[\\s\\S]*?' + commentRule + '-->', 'g'), '')
-    .replace(new RegExp(tmplRule.startRule + '[^' + tmplRule.endRule + ']*' + tmplRule.endRule, 'g'), all => all.replace(REGEX_LT_GT, match => LT_GT_LOOKUP[match]));
+    .replace(new RegExp('([\\s]+:[^\\s=>]+=((\'[^\']+\')|("[^"]+")))|(' + tmplRule.braceParamStr + ')', 'g'), (all, g1, g2, g3, g4, g5) => (g1 ? g1 : g5).replace(REGEX_LT_GT, match => LT_GT_LOOKUP[match]));
 }
 
 function _transformToEx(isStr, elemName, elemParams, tmplRule) {
@@ -258,7 +273,7 @@ function _transformToEx(isStr, elemName, elemParams, tmplRule) {
 }
 
 //Set element node
-function _setElem(elem, elemName, elemParams, elemArr, bySelfClose, tmplRule) {
+function _setElem(elem, elemName, elemParams, elemArr, bySelfClose, tmplRule, outputH) {
   let ret, paramsEx;
   if (tranElem.isEx(elemName, tmplRule, true)) {
     ret = elem.substring(1, elem.length - 1);
@@ -267,7 +282,7 @@ function _setElem(elem, elemName, elemParams, elemArr, bySelfClose, tmplRule) {
   } else if (tranElem.isPropS(elemName, tmplRule)) {
     ret = _transformToEx(false, elemName, elemParams, tmplRule);
   } else {
-    const retS = _getSplitParams(elem, tmplRule);
+    const retS = _getSplitParams(elem, tmplRule, outputH);
     ret = retS.elem;
     paramsEx = retS.params;
   }
@@ -287,20 +302,36 @@ function _setElem(elem, elemName, elemParams, elemArr, bySelfClose, tmplRule) {
   }
 }
 
+function _inlineExTagValue(name, value) {
+  return (tranElem.exCompileConfig(name).addSet ? 'set ' : '') + value;
+}
+
 //Extract split parameters
-function _getSplitParams(elem, tmplRule) {
-  const { extensionRule, startRule, endRule } = tmplRule;
+function _getSplitParams(elem, tmplRule, outputH) {
+  const { extensionRule, startRule, endRule, firstChar, lastChar, spreadProp } = tmplRule;
   let paramsEx;
 
   //Replace the parameter like "{...props}".
-  elem = elem.replace(tmplRule.spreadProp, (all, begin, prop) => {
-    prop = prop.trim();
+  elem = elem.replace(spreadProp, (all, g1, propR, g3, prop) => {
+    if (propR) {
+      prop = propR;
+    }
 
     if (!paramsEx) {
       paramsEx = [extensionRule + 'props'];
     }
 
-    paramsEx.push([extensionRule + 'spread ' + startRule + prop.replace(/\.\.\./g, '') + endRule + '/']);
+    paramsEx.push([extensionRule + 'spread ' + (propR ? firstChar : '') + startRule + prop.replace(/\.\.\./, '') + endRule + (propR ? lastChar : '') + '/']);
+    return ' ';
+  });
+
+  //Replace the parameter like "#show={false}".
+  elem = elem.replace(new RegExp('[\\s]+(:?)' + extensionRule + '([^\\s=>]+)=((\'[^\']+\')|("[^"]+")|([^"\'\\s>]+))'), (all, hasColon, name, value) => {
+    if (!paramsEx) {
+      paramsEx = [extensionRule + 'props'];
+    }
+
+    paramsEx.push([extensionRule + name, (hasColon ? ((outputH ? firstChar : '') + startRule + ' ') : '') + _inlineExTagValue(name, tools.clearQuot(value)) + (hasColon ? (' ' + endRule + (outputH ? lastChar : '')) : '')]);
     return ' ';
   });
 
@@ -311,11 +342,11 @@ function _getSplitParams(elem, tmplRule) {
 }
 
 //Set self close element node
-function _setSelfCloseElem(elem, elemName, elemParams, elemArr, tmplRule) {
+function _setSelfCloseElem(elem, elemName, elemParams, elemArr, tmplRule, outputH) {
   if (/\/$/.test(elemName)) {
     elemName = elemName.substr(0, elemName.length - 1);
   }
-  _setElem(elem, elemName, elemParams, elemArr, true, tmplRule);
+  _setElem(elem, elemName, elemParams, elemArr, true, tmplRule, outputH);
 }
 
 //Set text node

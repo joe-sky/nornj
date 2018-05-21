@@ -6,7 +6,8 @@ export default function (configs) {
     includeParser = configs.includeParser,
     createElement = configs.createElement,
     outputH = configs.outputH,
-    textMode = configs.textMode;
+    textMode = configs.textMode,
+    noWsMode = configs.noWsMode;
 
   if(delimiters) {
     createTmplRule(delimiters, true);
@@ -26,5 +27,9 @@ export default function (configs) {
 
   if(textMode != null) {
     nj.textMode = textMode;
+  }
+
+  if(noWsMode != null) {
+    nj.noWsMode = noWsMode;
   }
 };

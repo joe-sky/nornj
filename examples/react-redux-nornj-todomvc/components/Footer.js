@@ -1,4 +1,5 @@
-﻿import { Component, PropTypes } from 'react';
+﻿import { Component } from 'react';
+import PropTypes from 'prop-types';
 import { registerTmpl } from 'nornj-react';
 import tmpls from '../template.nj.html';
 import { VisibilityFilters } from '../actions/actions';
