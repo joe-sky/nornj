@@ -32,10 +32,10 @@ function checkForExpression(attributes, name, errorInfos) {
   }
 }
 
-module.exports = function(babel) {
+module.exports = function (babel) {
   var types = babel.types;
 
-  return function(node, file) {
+  return function (node, file) {
     var mapParams = [];
     var errorInfos = { node: node, file: file, element: ELEMENTS.EACH };
     var attributes = astUtil.getAttributeMap(node);
@@ -59,21 +59,27 @@ module.exports = function(babel) {
     addMapParam(types, mapParams, attributes, ATTRIBUTES.ITEM);
     addMapParam(types, mapParams, attributes, ATTRIBUTES.INDEX);
 
-    return types.callExpression(
-      types.memberExpression(
-        attributes[ATTRIBUTES.OF].value.expression,
-        types.identifier('map')
-      ),
-      [
-        types.functionExpression(
-          null,
-          mapParams,
-          types.blockStatement([
-            types.returnStatement(returnExpression)
-          ])
-        ),
-        types.identifier('this')
-      ]
+    const quasis = [];
+    const tags = ['<#each {{ ',' }}> #',' </#each>'];
+    tags.forEach(i => {
+      quasis.push(types.TemplateElement({
+        raw: i,
+        cooked: i
+      }));
+    })
+
+    let propertys = mapParams.map(i => types.objectProperty(i, i));
+    let objectPattern = types.objectPattern(propertys, []);
+    let arrowFunctionExpression = types.ArrowFunctionExpression(
+      [objectPattern],
+      types.blockStatement([types.returnStatement(returnExpression)])
     );
+
+    return types.CallExpression(
+      types.TaggedTemplateExpression(
+        types.Identifier('nj'),
+        types.TemplateLiteral(quasis, [attributes[ATTRIBUTES.OF].value.expression,arrowFunctionExpression])
+      )
+      , []);
   };
 };
