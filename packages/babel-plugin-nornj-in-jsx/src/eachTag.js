@@ -32,6 +32,44 @@ function checkForExpression(attributes, name, errorInfos) {
   }
 }
 
+function buildCondition(types, condition, expressions, tagStart = '<#each {{ ') {
+  let ret = [],
+    tagEnd = '}}> #';
+
+  if (types.isTemplateLiteral(condition)) {
+    let hasExp = false;
+    condition.quasis.forEach((q, i) => {
+      if (i == 0) {
+        tagStart += q.value.cooked;
+      }
+      else if (i == condition.quasis.length - 1) {
+        tagEnd = q.value.cooked + tagEnd;
+      }
+      else {
+        ret.push(q.value.cooked);
+      }
+
+      if (i < condition.quasis.length - 1) {
+        hasExp = true;
+        expressions.push(condition.expressions[i]);
+      }
+    });
+
+    if (hasExp) {
+      ret = [tagStart, ...ret, tagEnd];
+    }
+    else {
+      ret = [tagStart + tagEnd];
+    }
+  }
+  else {
+    ret = [tagStart, tagEnd];
+    expressions.push(condition);
+  }
+
+  return ret;
+}
+
 module.exports = function (babel) {
   var types = babel.types;
 
@@ -59,20 +97,23 @@ module.exports = function (babel) {
     addMapParam(types, mapParams, attributes, ATTRIBUTES.ITEM);
     addMapParam(types, mapParams, attributes, ATTRIBUTES.INDEX);
 
-    const expressions = [
-      attributes[ATTRIBUTES.OF].value.expression,
-      types.ArrowFunctionExpression(
-        [types.objectPattern(mapParams, [])],
-        types.blockStatement([types.returnStatement(returnExpression)])
-      )
-    ];
     const quasis = [];
-    ['<#each {{ ',' }}> #',' </#each>'].forEach(i => {
-      quasis.push(types.TemplateElement({
-        raw: i,
-        cooked: i
-      }));
-    });
+    const expressions = [];
+    const tags = buildCondition(types, attributes[ATTRIBUTES.OF].value.expression, expressions);
+    tags.forEach(tag => quasis.push(types.TemplateElement({
+      raw: tag,
+      cooked: tag
+    })));
+
+    expressions.push(types.ArrowFunctionExpression(
+      [types.objectPattern(mapParams, [])],
+      types.blockStatement([types.returnStatement(returnExpression)])
+    ));
+
+    quasis.push(types.TemplateElement({
+      raw: ' </#each>',
+      cooked: ' </#each>'
+    }));
 
     return types.CallExpression(
       types.TaggedTemplateExpression(

@@ -11,7 +11,7 @@
   },
   "rules": {
     "brace-style": [2, "stroustrup"],
-    "quotes": [2, "single"],
+    "quotes": [2, "single",{"allowTemplateLiterals": true}],
     "jsx-quotes": [2, "prefer-double"],
     "new-cap": 0,
     "func-names": 0,

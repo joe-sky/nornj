@@ -8,10 +8,13 @@ module.exports = createReactClass({
     return (
         <div>
         <each of={[['xxxxx',2,3,4],[1,2,3,4]]} item="itemAliases" index="indexAliases">
-        <section id={indexAliases}>
+        <section key={indexAliases}>
+
           <each of={itemAliases}>
+          <div key={index}>
               <div>{item}</div>
               <p>{index}</p>
+          </div>
           </each>
           {/* <i>{itemAliases}</i> */}
           <i>{indexAliases}</i>

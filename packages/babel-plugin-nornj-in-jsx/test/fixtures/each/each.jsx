@@ -8,8 +8,10 @@ module.exports = createReactClass({
     return (
         <div>
         <each of={this.props.of} item="item" index="index">
-          <i>{item}</i>
-          <i>{index}</i>
+          <div key={index}>
+            <i>{item}</i>
+            <i>{index}</i>
+          </div>
         </each>
       </div>
     );
