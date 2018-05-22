@@ -13,10 +13,9 @@ var ATTRIBUTES = {
 function addMapParam(types, params, attributes, attributeKey) {
   var attribute = attributes[attributeKey];
   if (attribute && attribute.value) {
-    params.push(types.Identifier(attribute.value.value));
-  }
-  else {
-    params.push(types.Identifier(attributeKey));
+    params.push(types.objectProperty(types.Identifier(attributeKey), types.Identifier(attribute.value.value)));
+  } else {
+    params.push(types.objectProperty(types.Identifier(attributeKey),types.Identifier(attributeKey)));
   }
 }
 
@@ -32,10 +31,10 @@ function checkForExpression(attributes, name, errorInfos) {
   }
 }
 
-module.exports = function(babel) {
+module.exports = function (babel) {
   var types = babel.types;
 
-  return function(node, file) {
+  return function (node, file) {
     var mapParams = [];
     var errorInfos = { node: node, file: file, element: ELEMENTS.EACH };
     var attributes = astUtil.getAttributeMap(node);
@@ -59,21 +58,26 @@ module.exports = function(babel) {
     addMapParam(types, mapParams, attributes, ATTRIBUTES.ITEM);
     addMapParam(types, mapParams, attributes, ATTRIBUTES.INDEX);
 
-    return types.callExpression(
-      types.memberExpression(
-        attributes[ATTRIBUTES.OF].value.expression,
-        types.identifier('map')
-      ),
-      [
-        types.functionExpression(
-          null,
-          mapParams,
-          types.blockStatement([
-            types.returnStatement(returnExpression)
-          ])
-        ),
-        types.identifier('this')
-      ]
-    );
+    const expressions = [
+      attributes[ATTRIBUTES.OF].value.expression,
+      types.ArrowFunctionExpression(
+        [types.objectPattern(mapParams, [])],
+        types.blockStatement([types.returnStatement(returnExpression)])
+      )
+    ]
+    const quasis = [];
+    ['<#each {{ ',' }}> #',' </#each>'].forEach(i => {
+      quasis.push(types.TemplateElement({
+        raw: i,
+        cooked: i
+      }));
+    });
+
+    return types.CallExpression(
+      types.TaggedTemplateExpression(
+        types.Identifier('nj'),
+        types.TemplateLiteral(quasis, expressions)
+      )
+      , []);
   };
 };
