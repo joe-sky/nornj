@@ -13,10 +13,10 @@ var ATTRIBUTES = {
 function addMapParam(types, params, attributes, attributeKey) {
   var attribute = attributes[attributeKey];
   if (attribute && attribute.value) {
-    params.push(types.Identifier(attribute.value.value));
+    params.push(types.objectProperty(types.Identifier(attributeKey), types.Identifier(attribute.value.value)));
   }
   else {
-    params.push(types.Identifier(attributeKey));
+    params.push(types.objectProperty(types.Identifier(attributeKey),types.Identifier(attributeKey)));
   }
 }
 
@@ -59,6 +59,13 @@ module.exports = function (babel) {
     addMapParam(types, mapParams, attributes, ATTRIBUTES.ITEM);
     addMapParam(types, mapParams, attributes, ATTRIBUTES.INDEX);
 
+    const expressions = [
+      attributes[ATTRIBUTES.OF].value.expression,
+      types.ArrowFunctionExpression(
+        [types.objectPattern(mapParams, [])],
+        types.blockStatement([types.returnStatement(returnExpression)])
+      )
+    ]
     const quasis = [];
     const tags = ['<#each {{ ',' }}> #',' </#each>'];
     tags.forEach(i => {
@@ -66,19 +73,12 @@ module.exports = function (babel) {
         raw: i,
         cooked: i
       }));
-    })
-
-    let propertys = mapParams.map(i => types.objectProperty(i, i));
-    let objectPattern = types.objectPattern(propertys, []);
-    let arrowFunctionExpression = types.ArrowFunctionExpression(
-      [objectPattern],
-      types.blockStatement([types.returnStatement(returnExpression)])
-    );
+    });
 
     return types.CallExpression(
       types.TaggedTemplateExpression(
         types.Identifier('nj'),
-        types.TemplateLiteral(quasis, [attributes[ATTRIBUTES.OF].value.expression,arrowFunctionExpression])
+        types.TemplateLiteral(quasis, expressions)
       )
       , []);
   };

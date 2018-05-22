@@ -7,9 +7,9 @@ module.exports = createReactClass({
   render: function() {
     return (
         <div>
-        <each of={this.props.of} item="item" index="index">
-          <i>{item}</i>
-          <i>{index}</i>
+        <each of={['xxxx','yyyy','zzzz',4]} item="itemAliases" index="indexAliases">
+          <i>{itemAliases}</i>
+          <i>{indexAliases}</i>
         </each>
       </div>
     );
