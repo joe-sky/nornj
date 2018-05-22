@@ -1,6 +1,6 @@
 {
   "name": "babel-plugin-nornj-in-jsx",
-  "version": "0.4.2-alpha.3",
+  "version": "0.4.2-alpha.4",
   "description": "Make the NornJ template work gracefully in the JSX environment",
   "author": {
     "name": "Joe_Sky",
@@ -32,7 +32,7 @@
   ],
   "license": "MIT",
   "scripts": {
-    "lint": "eslint src spec",
+    "lint": "eslint src test",
     "test": "mocha test/index.js",
     "cover": "istanbul cover -x \"**/test/**\" node_modules/mocha/bin/_mocha test/index.js"
   },

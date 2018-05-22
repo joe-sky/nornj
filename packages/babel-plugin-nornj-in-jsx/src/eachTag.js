@@ -14,7 +14,8 @@ function addMapParam(types, params, attributes, attributeKey) {
   var attribute = attributes[attributeKey];
   if (attribute && attribute.value) {
     params.push(types.objectProperty(types.Identifier(attributeKey), types.Identifier(attribute.value.value)));
-  } else {
+  }
+  else {
     params.push(types.objectProperty(types.Identifier(attributeKey),types.Identifier(attributeKey)));
   }
 }
@@ -64,7 +65,7 @@ module.exports = function (babel) {
         [types.objectPattern(mapParams, [])],
         types.blockStatement([types.returnStatement(returnExpression)])
       )
-    ]
+    ];
     const quasis = [];
     ['<#each {{ ',' }}> #',' </#each>'].forEach(i => {
       quasis.push(types.TemplateElement({
