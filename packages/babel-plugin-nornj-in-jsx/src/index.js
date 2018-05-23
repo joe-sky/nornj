@@ -1,12 +1,14 @@
 var transformEach = require('./eachTag');
 var transformIf = require('./ifTag');
+var transformSwitch = require('./switchTag');
 //var transformChoose = require('./chooseStatement');
 //var transformWith = require('./withStatement');
 
 module.exports = function jcsPlugin(babel) {
   var nodeHandlers = {
     each: transformEach(babel),
-    'if': transformIf(babel)
+    'if': transformIf(babel),
+    'switch': transformSwitch(babel),
     //Choose: transformChoose(babel),
     //With: transformWith(babel)
   };
