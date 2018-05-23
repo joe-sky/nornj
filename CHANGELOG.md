@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [v0.4.5] 2018.05.23
+
+* 🌟 增加新API `nj.mustache`。[查看文档](https://joe-sky.github.io/nornj-guide/templateSyntax/templateString.html#njmustache)
+
 ## [v0.4.4] 2018.05.07
 
 * 🌟 表达式支持`{{!a.b.c}}`。
@@ -9,7 +13,7 @@
 ## [v0.4.3] 2018.04.28
 
 * 🌟 `<#each>`标签增加`@item`参数。
-* 🌟 增加新API `nj.template`。
+* 🌟 增加新API `nj.template`。[查看文档](https://joe-sky.github.io/nornj-guide/templateSyntax/templateString.html#njtemplate)
 
 ## [v0.4.2] 2018.04.11
 

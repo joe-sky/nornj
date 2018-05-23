@@ -1,5 +1,5 @@
 /*!
-* NornJ template engine v0.4.4
+* NornJ template engine v0.4.5
 * (c) 2016-2018 Joe_Sky
 * Released under the MIT License.
 */
@@ -2573,7 +2573,7 @@ function _buildEscape(valueStr, fns, escape$$1, special) {
 }
 
 function _replaceStrs(str) {
-  return _replaceBackslash(str).replace(/_njNl_/g, '\\n').replace(/'/g, "\\'");
+  return _replaceBackslash(str).replace(/_njNl_/g, '\\n').replace(/'/g, '\\\'');
 }
 
 function _replaceBackslash(str) {
@@ -3106,7 +3106,8 @@ function compileStringTmpl(tmpl) {
   var outputH = this.outputH,
       tmplRule = this.tmplRule,
       onlyParse = this.onlyParse,
-      fileName = this.fileName;
+      fileName = this.fileName,
+      isMustache = this.isMustache;
 
 
   if (!ret) {
@@ -3120,6 +3121,10 @@ function compileStringTmpl(tmpl) {
     //Connection xml string
     each(xmls, function (xml, i) {
       var split = '';
+
+      if (i == 0 && isMustache) {
+        xml = (outputH ? tmplRule.firstChar : '') + tmplRule.startRule + ' ' + xml;
+      }
       if (i < l - 1) {
         var last = xml.length - 1,
             lastChar = xml[last],
@@ -3147,6 +3152,9 @@ function compileStringTmpl(tmpl) {
         if (!isInBrace) {
           split = tmplRule.startRule + split + tmplRule.endRule;
         }
+      }
+      if (i == l - 1 && isMustache) {
+        xml += ' ' + tmplRule.endRule + (outputH ? tmplRule.lastChar : '');
       }
 
       fullXml += xml + split;
@@ -3593,12 +3601,13 @@ function createTaggedTmpl() {
   var opts = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
   var outputH = opts.outputH,
       delimiters = opts.delimiters,
-      fileName = opts.fileName;
+      fileName = opts.fileName,
+      isMustache = opts.isMustache;
 
   var tmplRule = delimiters ? createTmplRule(delimiters) : nj.tmplRule;
 
   return function () {
-    return compileStringTmpl.apply({ tmplRule: tmplRule, outputH: outputH, fileName: fileName }, arguments);
+    return compileStringTmpl.apply({ tmplRule: tmplRule, outputH: outputH, fileName: fileName, isMustache: isMustache }, arguments);
   };
 }
 
@@ -3615,12 +3624,21 @@ function template$1() {
   return (nj.outputH ? taggedTmplH : taggedTmpl).apply(null, arguments)();
 }
 
+var taggedMustache = createTaggedTmpl({ outputH: false, isMustache: true });
+var taggedMustacheH = createTaggedTmpl({ isMustache: true });
+function mustache() {
+  return (nj.outputH ? taggedMustacheH : taggedMustache).apply(null, arguments)();
+}
+
 assign(nj, {
   createTaggedTmpl: createTaggedTmpl,
   createTaggedTmplH: createTaggedTmplH,
   taggedTmpl: taggedTmpl,
   taggedTmplH: taggedTmplH,
-  template: template$1
+  template: template$1,
+  taggedMustache: taggedMustache,
+  taggedMustacheH: taggedMustacheH,
+  mustache: mustache
 });
 
 assign(nj, {
@@ -3643,4 +3661,7 @@ exports.render = render;
 exports.renderH = renderH;
 exports.taggedTmpl = taggedTmpl;
 exports.taggedTmplH = taggedTmplH;
+exports.taggedMustache = taggedMustache;
+exports.taggedMustacheH = taggedMustacheH;
 exports.template = template$1;
+exports.mustache = mustache;

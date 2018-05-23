@@ -34,7 +34,7 @@ describe('test compile string', function() {
           <#once name="test">
             <i>test</i>
           </#once>
-          <#each {{1 .. 10}}>
+          <#each {{1 .. 2}}>
             {{@item}}
             #${({ item, index }) => item + 100 * index}
             <#for {{10}}>
@@ -55,6 +55,7 @@ describe('test compile string', function() {
           `}}}}
           {{!a.f != !x}}
           {{(('abc') + ('def')).substr((2), ((2 - 1)))}}
+          {{{${nj.mustache`${10} .. ${20}`}}}}
         </${'div'}>
       `;
 
