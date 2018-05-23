@@ -309,7 +309,7 @@ function _buildEscape(valueStr, fns, escape, special) {
 }
 
 function _replaceStrs(str) {
-  return _replaceBackslash(str).replace(/_njNl_/g, '\\n').replace(/'/g, "\\'");
+  return _replaceBackslash(str).replace(/_njNl_/g, '\\n').replace(/'/g, '\\\'');
 }
 
 function _replaceBackslash(str) {

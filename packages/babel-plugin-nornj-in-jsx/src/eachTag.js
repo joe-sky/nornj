@@ -13,10 +13,10 @@ var ATTRIBUTES = {
 function addMapParam(types, params, attributes, attributeKey) {
   var attribute = attributes[attributeKey];
   if (attribute && attribute.value) {
-    params.push(types.Identifier(attribute.value.value));
+    params.push(types.objectProperty(types.Identifier(attributeKey), types.Identifier(attribute.value.value)));
   }
   else {
-    params.push(types.Identifier(attributeKey));
+    params.push(types.objectProperty(types.Identifier(attributeKey),types.Identifier(attributeKey)));
   }
 }
 
@@ -32,10 +32,48 @@ function checkForExpression(attributes, name, errorInfos) {
   }
 }
 
-module.exports = function(babel) {
+function buildCondition(types, condition, expressions, tagStart = '<#each {{ ') {
+  let ret = [],
+    tagEnd = '}}> #';
+
+  if (types.isTemplateLiteral(condition)) {
+    let hasExp = false;
+    condition.quasis.forEach((q, i) => {
+      if (i == 0) {
+        tagStart += q.value.cooked;
+      }
+      else if (i == condition.quasis.length - 1) {
+        tagEnd = q.value.cooked + tagEnd;
+      }
+      else {
+        ret.push(q.value.cooked);
+      }
+
+      if (i < condition.quasis.length - 1) {
+        hasExp = true;
+        expressions.push(condition.expressions[i]);
+      }
+    });
+
+    if (hasExp) {
+      ret = [tagStart, ...ret, tagEnd];
+    }
+    else {
+      ret = [tagStart + tagEnd];
+    }
+  }
+  else {
+    ret = [tagStart, tagEnd];
+    expressions.push(condition);
+  }
+
+  return ret;
+}
+
+module.exports = function (babel) {
   var types = babel.types;
 
-  return function(node, file) {
+  return function (node, file) {
     var mapParams = [];
     var errorInfos = { node: node, file: file, element: ELEMENTS.EACH };
     var attributes = astUtil.getAttributeMap(node);
@@ -59,21 +97,29 @@ module.exports = function(babel) {
     addMapParam(types, mapParams, attributes, ATTRIBUTES.ITEM);
     addMapParam(types, mapParams, attributes, ATTRIBUTES.INDEX);
 
-    return types.callExpression(
-      types.memberExpression(
-        attributes[ATTRIBUTES.OF].value.expression,
-        types.identifier('map')
-      ),
-      [
-        types.functionExpression(
-          null,
-          mapParams,
-          types.blockStatement([
-            types.returnStatement(returnExpression)
-          ])
-        ),
-        types.identifier('this')
-      ]
-    );
+    const quasis = [];
+    const expressions = [];
+    const tags = buildCondition(types, attributes[ATTRIBUTES.OF].value.expression, expressions);
+    tags.forEach(tag => quasis.push(types.TemplateElement({
+      raw: tag,
+      cooked: tag
+    })));
+
+    expressions.push(types.ArrowFunctionExpression(
+      [types.objectPattern(mapParams, [])],
+      types.blockStatement([types.returnStatement(returnExpression)])
+    ));
+
+    quasis.push(types.TemplateElement({
+      raw: ' </#each>',
+      cooked: ' </#each>'
+    }));
+
+    return types.CallExpression(
+      types.TaggedTemplateExpression(
+        types.Identifier('nj'),
+        types.TemplateLiteral(quasis, expressions)
+      )
+      , []);
   };
 };

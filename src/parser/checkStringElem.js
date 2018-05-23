@@ -16,7 +16,7 @@ const { OMITTED_CLOSE_TAGS } = tranElem;
 export default function compileStringTmpl(tmpl) {
   let tmplKey = tmpl.toString(), //Get unique key
     ret = preAsts[tmplKey];
-  const { outputH, tmplRule, onlyParse, fileName } = this;
+  const { outputH, tmplRule, onlyParse, fileName, isMustache } = this;
 
   if (!ret) { //If the cache already has template data, direct return the template.
     let isStr = tools.isString(tmpl),
@@ -28,6 +28,10 @@ export default function compileStringTmpl(tmpl) {
     //Connection xml string
     tools.each(xmls, (xml, i) => {
       let split = '';
+
+      if (i == 0 && isMustache) {
+        xml = (outputH ? tmplRule.firstChar : '') + tmplRule.startRule + ' ' + xml;
+      }
       if (i < l - 1) {
         const last = xml.length - 1,
           lastChar = xml[last],
@@ -55,6 +59,9 @@ export default function compileStringTmpl(tmpl) {
         if (!isInBrace) {
           split = tmplRule.startRule + split + tmplRule.endRule;
         }
+      }
+      if (i == l - 1 && isMustache) {
+        xml += ' ' + tmplRule.endRule + (outputH ? tmplRule.lastChar : '');
       }
 
       fullXml += xml + split;
@@ -102,9 +109,9 @@ export default function compileStringTmpl(tmpl) {
 
   let tmplFn;
   if (!onlyParse) {
-    tmplFn = params ? function() {
+    tmplFn = params ? function () {
       return tmplMainFn.apply(this, tools.arrayPush([params], arguments));
-    } : function() {
+    } : function () {
       return tmplMainFn.apply(this, arguments);
     };
     tools.defineProps(tmplFn, {
@@ -169,9 +176,9 @@ function _checkStringElem(xml, tmplRule, outputH) {
       let isEx = elem ? tranElem.isExAll(elemName, tmplRule) : false;
 
       if (isEx && !isEx[1] && (tranElem.isPropS(elemName, tmplRule) ||
-          tranElem.isStrPropS(elemName, tmplRule) ||
-          tranElem.isParamsEx(isEx[3]) ||
-          tranElem.exCompileConfig(isEx[3]).isProp)) {
+        tranElem.isStrPropS(elemName, tmplRule) ||
+        tranElem.isParamsEx(isEx[3]) ||
+        tranElem.exCompileConfig(isEx[3]).isProp)) {
         parent = current;
         current = _createCurrent(_elemName, parent);
         _setElem(_elem, _elemName, _elemParams, current.elem, null, tmplRule, outputH);

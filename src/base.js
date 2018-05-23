@@ -29,7 +29,10 @@ export {
 export {
   taggedTmpl,
   taggedTmplH,
-  template
+  taggedMustache,
+  taggedMustacheH,
+  template,
+  mustache
 } from './utils/taggedTmpl';
 export {
   registerComponent
