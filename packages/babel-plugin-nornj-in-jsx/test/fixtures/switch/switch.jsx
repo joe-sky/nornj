@@ -7,9 +7,13 @@ module.exports = createReactClass({
   render: function() {
     return (
       <div>
-      <switch value={1}>
-        <case value={1}><span>Case1Block</span></case>
-        <case value={2}><span>Case2Block</span></case>
+      <switch value={this.props.condition}>
+        <case value={"case1"}>
+          <span>Case1Block</span>
+        </case>
+        <case value={"case2"}>
+          <span>Case2Block</span>
+        </case>
         <default>
           <span>DefaultBlock</span>
         </default>

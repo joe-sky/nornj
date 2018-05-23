@@ -103,15 +103,21 @@ module.exports = function switchStatement(babel) {
     const quasis = [];
     const expressions = [];
     const tags = buildCondition(types, condition, expressions);
-    tags.forEach(tag => quasis.push(types.TemplateElement({
-      raw: tag,
-      cooked: tag
-    })));
+    // tags.forEach(tag => quasis.push(types.TemplateElement({
+    //   raw: tag,
+    //   cooked: tag
+    // })));
+    quasis.push(
+      types.TemplateElement({
+        raw: '<#switch {{',
+        cooked: '<#switch {{'
+      })
+    );
 
     if (blocks.caseBlock.length) {
       blocks.caseBlock.forEach((block, i) => {
         if (i == 0) {
-          const tags = buildCondition(types, block.condition, expressions, '<#case {{');
+          const tags = buildCondition(types, block.condition, expressions, '}}><#case {{');
           tags.forEach(tag => quasis.push(types.TemplateElement({
             raw: tag,
             cooked: tag
@@ -157,8 +163,8 @@ module.exports = function switchStatement(babel) {
       if (blocks.caseBlock.length == 0) {
         quasis.push(
           types.TemplateElement({
-            raw: '<#default>',
-            cooked: '<#default>'
+            raw: '}}><#default>',
+            cooked: '}}><#default>'
           })
         );
       }
