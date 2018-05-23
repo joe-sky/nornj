@@ -8,3 +8,4 @@ require('babel-core/register')({
 
 require('./specs/if.spec');
 require('./specs/each.spec');
+require('./specs/switch.spec');
