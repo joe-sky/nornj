@@ -8,7 +8,7 @@ module.exports = function jcsPlugin(babel) {
   var nodeHandlers = {
     each: transformEach(babel),
     'if': transformIf(babel),
-    'switch': transformSwitch(babel),
+    'switch': transformSwitch(babel)
     //Choose: transformChoose(babel),
     //With: transformWith(babel)
   };

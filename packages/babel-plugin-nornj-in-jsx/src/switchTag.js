@@ -1,5 +1,6 @@
 var astUtil = require('./util/ast');
 var conditionalUtil = require('./util/conditional');
+var errorUtil = require('./util/error');
 
 var ELEMENTS = {
   SWITCH: 'switch',
@@ -103,10 +104,7 @@ module.exports = function switchStatement(babel) {
     const quasis = [];
     const expressions = [];
     const tags = buildCondition(types, condition, expressions);
-    // tags.forEach(tag => quasis.push(types.TemplateElement({
-    //   raw: tag,
-    //   cooked: tag
-    // })));
+
     quasis.push(
       types.TemplateElement({
         raw: '<#switch {{',

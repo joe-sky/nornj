@@ -8,7 +8,7 @@ var ATTRIBUTES = {
 
 exports.getConditionExpression = function(node, errorInfos, attrName) {
   let name = attrName || ATTRIBUTES.CONDITION;
-  var condition = astUtil.getAttributeMap(node)[name];
+  let condition = astUtil.getAttributeMap(node)[name];
 
   if (!condition) {
     errorUtil.throwNoAttribute(name, errorInfos);
