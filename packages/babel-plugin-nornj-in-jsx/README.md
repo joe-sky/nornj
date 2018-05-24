@@ -179,3 +179,100 @@ class TestComponent extends Component {
 ```
 
 如上，of参数为要遍历的数组，参数格式和上面if的condition是一样的。item、index参数都可以不写，默认值就是例子中的那几个。
+
+* of参数支持写模板字符串，并在其中使用`NornJ`的过滤器与表达式：
+
+```js
+class TestComponent extends Component {
+  render() {
+    return (
+      <div>
+        <each of={`1 .. 3`} item="item" index="index">
+          <i>{item}</i>
+          <i>{index}</i>
+        </each>
+      </div>
+    );
+  }
+}
+```
+
+### switch标签
+
+```js
+//转换前：
+class TestComponent extends Component {
+  render() {
+    const a = { b: 1 };
+
+    return (
+      <div>
+        <switch value={a.b}>
+          <case value={1}>
+            <i>1</i>
+          </case>
+          <case value={2}>
+            <i>2</i>
+          </case>
+          <default>
+            <i>3</i>
+          </default>
+        </switch>
+      </div>
+    );
+  }
+}
+
+//转换后：
+class TestComponent extends Component {
+  render() {
+    const a = { b: 1 };
+
+    return (
+      <div>
+        {nj`
+          <#switch {{${a.b}}}>
+            <#case {{${1}}}>
+              ${<i>1</i>}
+            </#case>
+            <#case {{${2}}}>
+              ${<i>2</i>}
+            </#case>
+            <#default>
+              ${<i>3</i>}
+            </#default>
+          </#switch>
+        `()}
+      </div>
+    );
+  }
+}
+```
+
+如上，value参数的格式和上面if的condition是一样的。
+
+* value参数支持写模板字符串，并在其中使用`NornJ`的过滤器与表达式：
+
+```js
+class TestComponent extends Component {
+  render() {
+    const a = { b: 1 };
+
+    return (
+      <div>
+        <switch value={`${a}.b`}>
+          <case value={`${' 1 '}.trim()`}>
+            <i>1</i>
+          </case>
+          <case value={`'02'.substr(1) | int`}>
+            <i>2</i>
+          </case>
+          <default>
+            <i>3</i>
+          </default>
+        </switch>
+      </div>
+    );
+  }
+}
+```

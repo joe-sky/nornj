@@ -73,7 +73,7 @@ function buildCondition(types, condition, expressions, tagStart = '<#if {{') {
   return ret;
 }
 
-module.exports = function ifStatement(babel) {
+module.exports = function (babel) {
   var types = babel.types;
 
   return function (node, file) {

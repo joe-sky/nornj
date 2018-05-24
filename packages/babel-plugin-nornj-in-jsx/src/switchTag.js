@@ -18,10 +18,10 @@ function getBlocks(nodes, types, errorInfos) {
     errorInfos.node = node;
     if (astUtil.isTag(node, ELEMENTS.DEFAULT)) {
       errorInfos.element = ELEMENTS.DEFAULT;
-      if(result.defaultBlock.length){
+      if (result.defaultBlock.length) {
         errorUtil.throwSwitchWithMultipleDefault(errorInfos);
       }
-      if(i < nodes.length-1){
+      if (i < nodes.length - 1) {
         errorUtil.throwSwitchDefaultNotLast(errorInfos);
       }
       result.defaultBlock = astUtil.getChildren(types, node);
@@ -80,7 +80,7 @@ function buildCondition(types, condition, expressions, tagStart = '<#switch {{')
   return ret;
 }
 
-module.exports = function switchStatement(babel) {
+module.exports = function (babel) {
   var types = babel.types;
 
   return function (node, file) {
@@ -93,7 +93,7 @@ module.exports = function switchStatement(babel) {
     var blocks = getBlocks(children, babel.types, errorInfos);
     const subBlocksLength = blocks.caseBlock.length + blocks.defaultBlock.length;
 
-    if(!blocks.caseBlock.length){
+    if (!blocks.caseBlock.length) {
       errorInfos.node = node;
       errorUtil.throwSwitchWithoutCase(errorInfos);
     }
@@ -184,7 +184,7 @@ module.exports = function switchStatement(babel) {
     if (blocks.defaultBlock.length) {
       expressions.push(defaultBlock);
     }
-    
+
     return types.CallExpression(
       types.TaggedTemplateExpression(
         types.Identifier('nj'),

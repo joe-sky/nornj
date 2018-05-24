@@ -19,7 +19,6 @@ exports.isTag = function(node, tagName) {
   return node.type === TYPES.ELEMENT && getTagName(node) === tagName;
 };
 
-
 /**
  * Tests whether this is an JSXExpressionContainer and returns it if true.
  *

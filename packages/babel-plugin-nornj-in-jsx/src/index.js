@@ -1,20 +1,18 @@
 var transformEach = require('./eachTag');
 var transformIf = require('./ifTag');
 var transformSwitch = require('./switchTag');
-//var transformChoose = require('./chooseStatement');
-//var transformWith = require('./withStatement');
+var transformWith = require('./withTag');
 
-module.exports = function jcsPlugin(babel) {
+module.exports = function (babel) {
   var nodeHandlers = {
-    each: transformEach(babel),
     'if': transformIf(babel),
-    'switch': transformSwitch(babel)
-    //Choose: transformChoose(babel),
-    //With: transformWith(babel)
+    each: transformEach(babel),
+    'switch': transformSwitch(babel),
+    'with': transformWith(babel)
   };
 
   var visitor = {
-    JSXElement: function(path) {
+    JSXElement: function (path) {
       var nodeName = path.node.openingElement.name.name;
       var handler = nodeHandlers[nodeName];
 

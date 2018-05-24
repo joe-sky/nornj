@@ -16,7 +16,7 @@ function addMapParam(types, params, attributes, attributeKey) {
     params.push(types.objectProperty(types.Identifier(attributeKey), types.Identifier(attribute.value.value)));
   }
   else {
-    params.push(types.objectProperty(types.Identifier(attributeKey),types.Identifier(attributeKey)));
+    params.push(types.objectProperty(types.Identifier(attributeKey), types.Identifier(attributeKey)));
   }
 }
 

@@ -1,7 +1,6 @@
 var astUtil = require('./ast');
 var errorUtil = require('./error');
 
-
 var ATTRIBUTES = {
   CONDITION: 'condition'
 };
