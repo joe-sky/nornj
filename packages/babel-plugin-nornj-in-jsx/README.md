@@ -29,7 +29,7 @@ import 'nornj-react';
 
 ### if标签
 
-可直接在JSX中使用`NornJ`的`if、elseif、else`等标签。NornJ中的[if标签文档请见这里](https://joe-sky.github.io/nornj-guide/templateSyntax/built-inExtensionTag.html#if)。
+可在JSX中使用`NornJ`的`if、elseif、else`等标签。NornJ中的[if标签文档请见这里](https://joe-sky.github.io/nornj-guide/templateSyntax/built-inExtensionTag.html#if)。
 
 ```js
 //转换前：
@@ -142,6 +142,8 @@ const a = { b: 1, c: 'abc' };
 
 ### each标签
 
+可在JSX中使用`NornJ`的`each`标签。NornJ中的[each标签文档请见这里](https://joe-sky.github.io/nornj-guide/templateSyntax/built-inExtensionTag.html#each)。
+
 ```js
 //转换前：
 class TestComponent extends Component {
@@ -198,6 +200,8 @@ class TestComponent extends Component {
 ```
 
 ### switch标签
+
+可在JSX中使用`NornJ`的`switch`标签。NornJ中的[switch标签文档请见这里](https://joe-sky.github.io/nornj-guide/templateSyntax/built-inExtensionTag.html#switch)。
 
 ```js
 //转换前：
@@ -276,3 +280,27 @@ class TestComponent extends Component {
   }
 }
 ```
+
+### 在JSX中使用NornJ的过滤器和表达式
+
+使用`nj.mustache`可以在JSX中以标签模板字符串的方式使用`NornJ`的过滤器和表达式：
+
+```js
+import nj, { mustache as m } from 'nornj';
+
+class TestComponent extends Component {
+  render() {
+    const a = { b: 1 };
+
+    return (
+      <div>
+        <if condition={a.b == 1}>
+          <i>{m`(${a}.b | float).toFixed(2)`}</i>
+        </if>
+      </div>
+    );
+  }
+}
+```
+
+`nj.mustache`的文档请[查看这里](https://joe-sky.github.io/nornj-guide/templateSyntax/templateString.html#njmustache)。
