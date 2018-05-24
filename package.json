@@ -59,6 +59,7 @@
     "create-react-class": "^15.6.3",
     "cross-env": "^5.1.0",
     "eslint": "^4.9.0",
+    "eslint-plugin-react": "^7.8.2",
     "handlebars": "^4.0.5",
     "istanbul-instrumenter-loader": "^3.0.0",
     "jasmine": "^2.99.0",
