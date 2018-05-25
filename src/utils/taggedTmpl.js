@@ -23,8 +23,8 @@ export function template() {
   return (nj.outputH ? taggedTmplH : taggedTmpl).apply(null, arguments)();
 }
 
-export const taggedMustache = createTaggedTmpl({ outputH: false, isMustache: true });
-export const taggedMustacheH = createTaggedTmpl({ isMustache: true });
+export const taggedMustache = createTaggedTmpl({ isMustache: true });
+export const taggedMustacheH = createTaggedTmpl({ outputH: true, isMustache: true });
 export function mustache() {
   return (nj.outputH ? taggedMustacheH : taggedMustache).apply(null, arguments)();
 }

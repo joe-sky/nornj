@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [v0.4.6] 2018.05.25
+
+* 🐞 修复 `nj.mustache` bug。
+
 ## [v0.4.5] 2018.05.23
 
 * 🌟 增加新API `nj.mustache`。[查看文档](https://joe-sky.github.io/nornj-guide/templateSyntax/templateString.html#njmustache)

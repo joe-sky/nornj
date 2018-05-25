@@ -264,10 +264,11 @@ console.log(html);
 
 * [nornj-react(React适配库)](https://github.com/joe-sky/nornj-react)
 * [nornj-loader(Webpack loader)](https://github.com/joe-sky/nornj-loader)
-* [babel-plugin-nornj-loader(babel插件)](https://github.com/yuhongda/babel-plugin-nornj-loader)
-* [koa-nornj(koa适配库)](https://github.com/qingqinxl1/koa-nornj)
-* [express适配器](https://github.com/joe-sky/nornj/blob/master/tools/expressEngine.js)
-* [react-native transformer](https://github.com/joe-sky/nornj/blob/master/tools/metroTransformer.js)
+* [babel-plugin-nornj-in-jsx(支持在JSX中写NornJ语法的Babel插件)](https://github.com/joe-sky/nornj/tree/master/packages/babel-plugin-nornj-in-jsx)
+* [babel-plugin-nornj-loader(nornj-loader的Babel插件版)](https://github.com/yuhongda/babel-plugin-nornj-loader)
+* [react-native transformer(nornj-loader的RN版)](https://github.com/joe-sky/nornj/blob/master/tools/metroTransformer.js)
+* [koa-nornj(NornJ适配Koa的中间件)](https://github.com/qingqinxl1/koa-nornj)
+* [express-nornj(NornJ适配Express的视图引擎)](https://github.com/joe-sky/nornj/blob/master/tools/expressEngine.js)
 
 ## 语法高亮插件
 

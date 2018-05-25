@@ -1,5 +1,5 @@
 /*!
-* NornJ template engine v0.4.5
+* NornJ template engine v0.4.6
 * (c) 2016-2018 Joe_Sky
 * Released under the MIT License.
 */
@@ -3620,8 +3620,8 @@ function template$1() {
   return (nj.outputH ? taggedTmplH : taggedTmpl).apply(null, arguments)();
 }
 
-var taggedMustache = createTaggedTmpl({ outputH: false, isMustache: true });
-var taggedMustacheH = createTaggedTmpl({ isMustache: true });
+var taggedMustache = createTaggedTmpl({ isMustache: true });
+var taggedMustacheH = createTaggedTmpl({ outputH: true, isMustache: true });
 function mustache() {
   return (nj.outputH ? taggedMustacheH : taggedMustache).apply(null, arguments)();
 }
