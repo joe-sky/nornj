@@ -1,5 +1,5 @@
 /*!
-* NornJ template engine v0.4.6
+* NornJ template engine v0.4.7
 * (c) 2016-2018 Joe_Sky
 * Released under the MIT License.
 */
@@ -910,6 +910,10 @@ var extensions = {
       cache = cacheObj[cacheKey] = options.result();
     }
     return cache;
+  },
+
+  css: function css(options) {
+    return options.props.style;
   }
 };
 
@@ -954,6 +958,7 @@ extensionConfig.pre = _config(extensionConfig.obj);
 extensionConfig.arg = _config(extensionConfig.prop);
 extensionConfig.once = _config(extensionConfig.obj);
 extensionConfig.show = _config(extensionConfig.prop);
+extensionConfig.css = _config(extensionConfig.obj);
 
 //Extension alias
 extensions['case'] = extensions.elseif;

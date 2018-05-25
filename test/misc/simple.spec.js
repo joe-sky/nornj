@@ -56,6 +56,12 @@ describe('test compile string', function() {
           {{!a.f != !x}}
           {{(('abc') + ('def')).substr((2), ((2 - 1)))}}
           {{{${nj.mustache`${10} .. ${20}`}}}}
+          <br><#css style="color:${'blue'};margin:${0};" />
+          {{{${JSON.stringify(nj.css`
+            color:${'yel'}low;
+            margin:${0};
+            background-image:url('../a.png');
+          `)}}}}
         </${'div'}>
       `;
 

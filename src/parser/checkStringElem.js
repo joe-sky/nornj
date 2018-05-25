@@ -16,7 +16,7 @@ const { OMITTED_CLOSE_TAGS } = tranElem;
 export default function compileStringTmpl(tmpl) {
   let tmplKey = tmpl.toString(), //Get unique key
     ret = preAsts[tmplKey];
-  const { outputH, tmplRule, onlyParse, fileName, isMustache } = this;
+  const { outputH, tmplRule, onlyParse, fileName, isMustache, isCss } = this;
 
   if (!ret) { //If the cache already has template data, direct return the template.
     let isStr = tools.isString(tmpl),
@@ -29,8 +29,13 @@ export default function compileStringTmpl(tmpl) {
     tools.each(xmls, (xml, i) => {
       let split = '';
 
-      if (i == 0 && isMustache) {
-        xml = (outputH ? tmplRule.firstChar : '') + tmplRule.startRule + ' ' + xml;
+      if (i == 0) {
+        if (isMustache) {
+          xml = (outputH ? tmplRule.firstChar : '') + tmplRule.startRule + ' ' + xml;
+        }
+        else if (isCss) {
+          xml = '<' + tmplRule.extensionRule + 'css style="' + xml;
+        }
       }
       if (i < l - 1) {
         const last = xml.length - 1,
@@ -60,8 +65,13 @@ export default function compileStringTmpl(tmpl) {
           split = tmplRule.startRule + split + tmplRule.endRule;
         }
       }
-      if (i == l - 1 && isMustache) {
-        xml += ' ' + tmplRule.endRule + (outputH ? tmplRule.lastChar : '');
+      if (i == l - 1) {
+        if (isMustache) {
+          xml += ' ' + tmplRule.endRule + (outputH ? tmplRule.lastChar : '');
+        }
+        else if (isCss) {
+          xml += '" />';
+        }
       }
 
       fullXml += xml + split;

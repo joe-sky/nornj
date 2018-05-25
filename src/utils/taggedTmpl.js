@@ -4,11 +4,11 @@ import compileStringTmpl from '../parser/checkStringElem';
 import createTmplRule from '../utils/createTmplRule';
 
 export function createTaggedTmpl(opts = {}) {
-  const { outputH, delimiters, fileName, isMustache } = opts;
+  const { outputH, delimiters, fileName, isMustache, isCss } = opts;
   const tmplRule = delimiters ? createTmplRule(delimiters) : nj.tmplRule;
 
   return function () {
-    return compileStringTmpl.apply({ tmplRule, outputH, fileName, isMustache }, arguments);
+    return compileStringTmpl.apply({ tmplRule, outputH, fileName, isMustache, isCss }, arguments);
   };
 }
 
@@ -29,6 +29,11 @@ export function mustache() {
   return (nj.outputH ? taggedMustacheH : taggedMustache).apply(null, arguments)();
 }
 
+const _taggedCssH = createTaggedTmplH({ isCss: true });
+export function css() {
+  return _taggedCssH.apply(null, arguments)();
+}
+
 assign(nj, {
   createTaggedTmpl,
   createTaggedTmplH,
@@ -37,5 +42,6 @@ assign(nj, {
   template,
   taggedMustache,
   taggedMustacheH,
-  mustache
+  mustache,
+  css
 });

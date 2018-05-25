@@ -1,5 +1,5 @@
 /*!
-* NornJ template engine v0.4.6
+* NornJ template engine v0.4.7
 * (c) 2016-2018 Joe_Sky
 * Released under the MIT License.
 */
@@ -1153,6 +1153,10 @@ var extensions = {
       cache = cacheObj[cacheKey] = options.result();
     }
     return cache;
+  },
+
+  css: function css(options) {
+    return options.props.style;
   }
 };
 
@@ -1197,6 +1201,7 @@ extensionConfig.pre = _config(extensionConfig.obj);
 extensionConfig.arg = _config(extensionConfig.prop);
 extensionConfig.once = _config(extensionConfig.obj);
 extensionConfig.show = _config(extensionConfig.prop);
+extensionConfig.css = _config(extensionConfig.obj);
 
 //Extension alias
 extensions['case'] = extensions.elseif;
@@ -3103,7 +3108,8 @@ function compileStringTmpl(tmpl) {
       tmplRule = this.tmplRule,
       onlyParse = this.onlyParse,
       fileName = this.fileName,
-      isMustache = this.isMustache;
+      isMustache = this.isMustache,
+      isCss = this.isCss;
 
 
   if (!ret) {
@@ -3118,8 +3124,12 @@ function compileStringTmpl(tmpl) {
     each(xmls, function (xml, i) {
       var split = '';
 
-      if (i == 0 && isMustache) {
-        xml = (outputH ? tmplRule.firstChar : '') + tmplRule.startRule + ' ' + xml;
+      if (i == 0) {
+        if (isMustache) {
+          xml = (outputH ? tmplRule.firstChar : '') + tmplRule.startRule + ' ' + xml;
+        } else if (isCss) {
+          xml = '<' + tmplRule.extensionRule + 'css style="' + xml;
+        }
       }
       if (i < l - 1) {
         var last = xml.length - 1,
@@ -3149,8 +3159,12 @@ function compileStringTmpl(tmpl) {
           split = tmplRule.startRule + split + tmplRule.endRule;
         }
       }
-      if (i == l - 1 && isMustache) {
-        xml += ' ' + tmplRule.endRule + (outputH ? tmplRule.lastChar : '');
+      if (i == l - 1) {
+        if (isMustache) {
+          xml += ' ' + tmplRule.endRule + (outputH ? tmplRule.lastChar : '');
+        } else if (isCss) {
+          xml += '" />';
+        }
       }
 
       fullXml += xml + split;
@@ -3598,12 +3612,13 @@ function createTaggedTmpl() {
   var outputH = opts.outputH,
       delimiters = opts.delimiters,
       fileName = opts.fileName,
-      isMustache = opts.isMustache;
+      isMustache = opts.isMustache,
+      isCss = opts.isCss;
 
   var tmplRule = delimiters ? createTmplRule(delimiters) : nj.tmplRule;
 
   return function () {
-    return compileStringTmpl.apply({ tmplRule: tmplRule, outputH: outputH, fileName: fileName, isMustache: isMustache }, arguments);
+    return compileStringTmpl.apply({ tmplRule: tmplRule, outputH: outputH, fileName: fileName, isMustache: isMustache, isCss: isCss }, arguments);
   };
 }
 
@@ -3626,6 +3641,11 @@ function mustache() {
   return (nj.outputH ? taggedMustacheH : taggedMustache).apply(null, arguments)();
 }
 
+var _taggedCssH = createTaggedTmplH({ isCss: true });
+function css() {
+  return _taggedCssH.apply(null, arguments)();
+}
+
 assign(nj, {
   createTaggedTmpl: createTaggedTmpl,
   createTaggedTmplH: createTaggedTmplH,
@@ -3634,7 +3654,8 @@ assign(nj, {
   template: template$1,
   taggedMustache: taggedMustache,
   taggedMustacheH: taggedMustacheH,
-  mustache: mustache
+  mustache: mustache,
+  css: css
 });
 
 assign(nj, {
@@ -3648,4 +3669,4 @@ var _global = nj.global;
 _global.NornJ = _global.nj = nj;
 
 export default nj;
-export { registerComponent, registerExtension, registerFilter, compile, compileH, render, renderH, taggedTmpl, taggedTmplH, taggedMustache, taggedMustacheH, template$1 as template, mustache };
+export { registerComponent, registerExtension, registerFilter, compile, compileH, render, renderH, taggedTmpl, taggedTmplH, taggedMustache, taggedMustacheH, template$1 as template, mustache, css };

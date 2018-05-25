@@ -32,7 +32,8 @@ export {
   taggedMustache,
   taggedMustacheH,
   template,
-  mustache
+  mustache,
+  css
 } from './utils/taggedTmpl';
 export {
   registerComponent
