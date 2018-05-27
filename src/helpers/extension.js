@@ -219,7 +219,7 @@ export const extensions = {
 
   obj: options => options.props,
 
-  list: function() {
+  list: function () {
     let args = arguments,
       last = args.length - 1,
       options = args[last];
@@ -239,7 +239,7 @@ export const extensions = {
   fn: options => {
     const { props } = options;
 
-    return function() {
+    return function () {
       let params;
       if (props) {
         params = {};
@@ -256,14 +256,23 @@ export const extensions = {
 
   pre: options => extensions.block(options),
 
-  'with': function(originalData, options) {
-    const { props } = options;
+  'with': function (originalData, options) {
+    if (originalData && originalData._njOpts) {
+      options = originalData;
 
-    return options.result({
-      data: [props && props.as ? {
-        [props.as]: originalData
-      } : originalData]
-    });
+      return options.result({
+        data: [options.props]
+      });
+    }
+    else {
+      const { props } = options;
+
+      return options.result({
+        data: [props && props.as ? {
+          [props.as]: originalData
+        } : originalData]
+      });
+    }
   },
 
   arg: options => {
@@ -354,7 +363,7 @@ export function registerExtension(name, extension, options) {
     };
   }
 
-  tools.each(params, function(v, name) {
+  tools.each(params, function (v, name) {
     if (v) {
       const { extension, options } = v;
 

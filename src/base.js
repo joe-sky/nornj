@@ -29,8 +29,6 @@ export {
 export {
   taggedTmpl,
   taggedTmplH,
-  taggedMustache,
-  taggedMustacheH,
   template,
   mustache,
   css

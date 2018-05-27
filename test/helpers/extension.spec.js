@@ -150,6 +150,20 @@ describe('extension tag', () => {
 
   it('with', () => {
     expect(render(`
+      <#with {{a.b}}>
+        {{c}}
+      </#with>
+    `, {
+      a: {
+        b: {
+          c: 'abc'
+        }
+      }
+    })).toBe('abc');
+  });
+
+  it('with as', () => {
+    expect(render(`
       <#with {{a.b}} as="val">
         {{val.c}}
       </#with>
@@ -160,5 +174,20 @@ describe('extension tag', () => {
         }
       }
     })).toBe('abc');
+  });
+
+  it('with multi parameters', () => {
+    expect(render(`
+      <#with p1={{a}} p2={{a.b}}>
+        {{p2.c}}-{{p1.d}}
+      </#with>
+    `, {
+      a: {
+        b: {
+          c: 'abc'
+        },
+        d: 'def'
+      }
+    })).toBe('abc-def');
   });
 });

@@ -1131,12 +1131,21 @@ var extensions = {
   },
 
   'with': function _with(originalData, options) {
-    var props = options.props;
+    if (originalData && originalData._njOpts) {
+      options = originalData;
+
+      return options.result({
+        data: [options.props]
+      });
+    } else {
+      var _options = options,
+          props = _options.props;
 
 
-    return options.result({
-      data: [props && props.as ? defineProperty({}, props.as, originalData) : originalData]
-    });
+      return options.result({
+        data: [props && props.as ? defineProperty({}, props.as, originalData) : originalData]
+      });
+    }
   },
 
   arg: function arg(options) {
@@ -1233,7 +1242,7 @@ function registerExtension(name, extension, options) {
   each(params, function (v, name) {
     if (v) {
       var _extension = v.extension,
-          _options = v.options;
+          _options2 = v.options;
 
 
       if (_extension) {
@@ -1241,7 +1250,7 @@ function registerExtension(name, extension, options) {
       } else {
         extensions[name] = v;
       }
-      extensionConfig[name] = _config(_options);
+      extensionConfig[name] = _config(_options2);
     }
   }, false, false);
 }
@@ -3635,16 +3644,16 @@ function createTaggedTmplH() {
   return createTaggedTmpl(opts);
 }
 
-var taggedTmpl = createTaggedTmpl({ outputH: false });
+var taggedTmpl = createTaggedTmpl();
 var taggedTmplH = createTaggedTmplH();
 function template$1() {
   return (nj.outputH ? taggedTmplH : taggedTmpl).apply(null, arguments)();
 }
 
-var taggedMustache = createTaggedTmpl({ isMustache: true });
-var taggedMustacheH = createTaggedTmpl({ outputH: true, isMustache: true });
+var _taggedMustache = createTaggedTmpl({ isMustache: true });
+var _taggedMustacheH = createTaggedTmplH({ isMustache: true });
 function mustache() {
-  return (nj.outputH ? taggedMustacheH : taggedMustache).apply(null, arguments)();
+  return (nj.outputH ? _taggedMustacheH : _taggedMustache).apply(null, arguments)();
 }
 
 var _taggedCssH = createTaggedTmplH({ isCss: true });
@@ -3658,8 +3667,6 @@ assign(nj, {
   taggedTmpl: taggedTmpl,
   taggedTmplH: taggedTmplH,
   template: template$1,
-  taggedMustache: taggedMustache,
-  taggedMustacheH: taggedMustacheH,
   mustache: mustache,
   css: css
 });
@@ -3684,8 +3691,6 @@ exports.render = render;
 exports.renderH = renderH;
 exports.taggedTmpl = taggedTmpl;
 exports.taggedTmplH = taggedTmplH;
-exports.taggedMustache = taggedMustache;
-exports.taggedMustacheH = taggedMustacheH;
 exports.template = template$1;
 exports.mustache = mustache;
 exports.css = css;

@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## [v0.4.7] 2018.05.27
+
+* 🌟 增加新API `nj.css`。[查看文档](https://joe-sky.github.io/nornj-guide/templateSyntax/templateString.html#njcss)
+* 🌟 `<#with>`标签新增创建变量语法。[查看文档](https://joe-sky.github.io/nornj-guide/templateSyntax/built-inExtensionTag.html#with)
+
 ## [v0.4.6] 2018.05.25
 
 * 🐞 修复 `nj.mustache` bug。

@@ -17,16 +17,16 @@ export function createTaggedTmplH(opts = {}) {
   return createTaggedTmpl(opts);
 }
 
-export const taggedTmpl = createTaggedTmpl({ outputH: false });
+export const taggedTmpl = createTaggedTmpl();
 export const taggedTmplH = createTaggedTmplH();
 export function template() {
   return (nj.outputH ? taggedTmplH : taggedTmpl).apply(null, arguments)();
 }
 
-export const taggedMustache = createTaggedTmpl({ isMustache: true });
-export const taggedMustacheH = createTaggedTmpl({ outputH: true, isMustache: true });
+const _taggedMustache = createTaggedTmpl({ isMustache: true });
+const _taggedMustacheH = createTaggedTmplH({ isMustache: true });
 export function mustache() {
-  return (nj.outputH ? taggedMustacheH : taggedMustache).apply(null, arguments)();
+  return (nj.outputH ? _taggedMustacheH : _taggedMustache).apply(null, arguments)();
 }
 
 const _taggedCssH = createTaggedTmplH({ isCss: true });
@@ -40,8 +40,6 @@ assign(nj, {
   taggedTmpl,
   taggedTmplH,
   template,
-  taggedMustache,
-  taggedMustacheH,
   mustache,
   css
 });

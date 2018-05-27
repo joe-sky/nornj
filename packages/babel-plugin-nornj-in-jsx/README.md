@@ -287,6 +287,7 @@ class TestComponent extends Component {
 
 ```js
 import nj, { mustache as m } from 'nornj';
+import 'nornj-react';
 
 class TestComponent extends Component {
   render() {
@@ -304,3 +305,32 @@ class TestComponent extends Component {
 ```
 
 `nj.mustache`的文档请[查看这里](https://joe-sky.github.io/nornj-guide/templateSyntax/templateString.html#njmustache)。
+
+### 在JSX中使用NornJ的style语法
+
+使用`nj.css`可以在JSX中以标签模板字符串的方式使用`NornJ`的style语法：
+
+```js
+import nj, {
+  mustache as m,
+  css as s
+} from 'nornj';
+import 'nornj-react';
+
+class TestComponent extends Component {
+  render() {
+    const a = { b: 1 };
+    const paddingValue = 20;
+
+    return (
+      <div style={s`color:blue;margin-left:10;padding:${paddingValue};`}>
+        <if condition={a.b == 1}>
+          <i>{m`(${a}.b | float).toFixed(2)`}</i>
+        </if>
+      </div>
+    );
+  }
+}
+```
+
+`nj.css`的文档请[查看这里](https://joe-sky.github.io/nornj-guide/templateSyntax/templateString.html#njcss)。

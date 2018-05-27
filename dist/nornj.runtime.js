@@ -882,12 +882,21 @@ var extensions = {
   },
 
   'with': function _with(originalData, options) {
-    var props = options.props;
+    if (originalData && originalData._njOpts) {
+      options = originalData;
+
+      return options.result({
+        data: [options.props]
+      });
+    } else {
+      var _options = options,
+          props = _options.props;
 
 
-    return options.result({
-      data: [props && props.as ? defineProperty({}, props.as, originalData) : originalData]
-    });
+      return options.result({
+        data: [props && props.as ? defineProperty({}, props.as, originalData) : originalData]
+      });
+    }
   },
 
   arg: function arg(options) {
@@ -984,7 +993,7 @@ function registerExtension(name, extension, options) {
   each(params, function (v, name) {
     if (v) {
       var _extension = v.extension,
-          _options = v.options;
+          _options2 = v.options;
 
 
       if (_extension) {
@@ -992,7 +1001,7 @@ function registerExtension(name, extension, options) {
       } else {
         extensions[name] = v;
       }
-      extensionConfig[name] = _config(_options);
+      extensionConfig[name] = _config(_options2);
     }
   }, false, false);
 }
