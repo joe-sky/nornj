@@ -1,4 +1,4 @@
-![](./docs/logo.png)
+<a href="https://joe-sky.github.io/nornj-guide/" target="_blank" rel="noopener noreferrer"><img width="187" src="./docs/logo.png" alt="NornJ logo"></a>
 -------
 
 ```
@@ -20,8 +20,8 @@
 
 ## 在线文档
 
-* [NornJ中文指南(github pages)](https://joe-sky.github.io/nornj-guide)
-* [NornJ中文指南(gitbook)](https://joe-sky.gitbooks.io/nornj-guide)
+* [NornJ指南(github pages)](https://joe-sky.github.io/nornj-guide)
+* [NornJ指南(gitbook)](https://joe-sky.gitbooks.io/nornj-guide)
 
 ## 概述
 
