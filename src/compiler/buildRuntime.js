@@ -208,6 +208,11 @@ function _buildPropData(obj, counter, fns, useStringLocal, level) {
   //有过滤器时需要生成"_value"值
   let filters = obj.prop.filters;
   if (filters) {
+    const _firstFilter = filters[0];
+    if (_firstFilter && _firstFilter.name == 'require') {
+      return 'require(' + _firstFilter.params[0].name + ')';
+    }
+
     const counterValue = counter._value++;
     let valueStr = '_value' + counterValue,
       valueStrL = '_valueL' + counterValue,

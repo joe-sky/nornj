@@ -1,5 +1,5 @@
 /*!
-* NornJ template engine v0.4.7
+* NornJ template engine v0.4.8
 * (c) 2016-2018 Joe_Sky
 * Released under the MIT License.
 */
@@ -2485,6 +2485,11 @@ function _buildPropData(obj$$1, counter, fns, useStringLocal, level) {
   //有过滤器时需要生成"_value"值
   var filters$$1 = obj$$1.prop.filters;
   if (filters$$1) {
+    var _firstFilter = filters$$1[0];
+    if (_firstFilter && _firstFilter.name == 'require') {
+      return 'require(' + _firstFilter.params[0].name + ')';
+    }
+
     var counterValue = counter._value++;
     var valueStr = '_value' + counterValue,
         valueStrL = '_valueL' + counterValue,
