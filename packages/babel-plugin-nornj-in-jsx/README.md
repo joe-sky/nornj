@@ -1,6 +1,19 @@
-# babel-plugin-nornj-in-jsx
+<div align="center">
+  <a href="https://joe-sky.github.io/nornj-guide/">
+    <img width="100" src="https://raw.githubusercontent.com/joe-sky/nornj-highlight/master/images/logo.png">
+  </a>
+  <a href="https://babeljs.io/">
+    <img width="245" src="https://raw.githubusercontent.com/babel/logo/master/babel.png">
+  </a>
+  <div>
+    <img width="100" height="100" title="Babel Plugin" src="https://michael-ciniawsky.github.io/postcss-load-plugins/logo.svg">
+  </div>
+  <h1>Babel-Plugin-NornJ-in-jsx</h1>
+  <p>Make the NornJ template work gracefully in the JSX environment</p>
+</div>
 
-Make the NornJ template work gracefully in the JSX environment.
+[![NPM Version][npm-image]][npm-url]
+[![NPM Downloads][downloads-image]][npm-url]
 
 ## 安装
 
@@ -334,3 +347,11 @@ class TestComponent extends Component {
 ```
 
 `nj.css`的文档请[查看这里](https://joe-sky.github.io/nornj-guide/templateSyntax/templateString.html#njcss)。
+
+## License
+
+MIT
+
+[npm-image]: http://img.shields.io/npm/v/babel-plugin-nornj-in-jsx.svg
+[downloads-image]: http://img.shields.io/npm/dm/babel-plugin-nornj-in-jsx.svg
+[npm-url]: https://www.npmjs.org/package/babel-plugin-nornj-in-jsx
