@@ -29,13 +29,15 @@
     "for",
     "each",
     "loop",
+    "switch",
     "babel"
   ],
   "license": "MIT",
   "scripts": {
     "lint": "eslint src test",
     "test": "mocha test/index.js",
-    "cover": "istanbul cover -x \"**/test/**\" node_modules/mocha/bin/_mocha test/index.js"
+    "cover": "istanbul cover -x \"**/test/**\" node_modules/mocha/bin/_mocha test/index.js",
+    "ci": "npm run cover && cat coverage/lcov.info | node_modules/coveralls/bin/coveralls.js"
   },
   "dependencies": {
     "babel-core": "^6.1.2",

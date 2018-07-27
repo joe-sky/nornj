@@ -70,7 +70,7 @@ class TestComponent extends Component {
 
     return (
       <div>
-        ${nj`
+        {nj`
           <#if ${a.b == 1}>
             ${<i>ifBlock</i>}
             <#else>
