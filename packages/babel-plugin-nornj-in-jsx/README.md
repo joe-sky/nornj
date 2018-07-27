@@ -13,6 +13,7 @@
 </div>
 
 [![NPM Version][npm-image]][npm-url]
+[![Coverage Status](https://coveralls.io/repos/github/joe-sky/nornj/badge.svg?branch=master)](https://coveralls.io/github/joe-sky/nornj?branch=master)
 [![NPM Downloads][downloads-image]][npm-url]
 
 ## 安装

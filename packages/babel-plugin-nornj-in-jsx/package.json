@@ -41,7 +41,8 @@
   },
   "dependencies": {
     "babel-core": "^6.1.2",
-    "babel-plugin-syntax-jsx": "^6.1.18"
+    "babel-plugin-syntax-jsx": "^6.1.18",
+    "nornj": "^0.4.4"
   },
   "devDependencies": {
     "babel-eslint": "^6.0.3",
@@ -54,7 +55,6 @@
     "eslint-plugin-react": "^6.2.0",
     "istanbul": "^0.4.1",
     "mocha": "^3.0.2",
-    "nornj": "^0.4.4",
     "nornj-react": "^0.4.2",
     "react": "^16.3.0",
     "react-dom": "^16.3.0"

@@ -1,7 +1,10 @@
-var astUtil = require('./util/ast');
-var conditionalUtil = require('./util/conditional');
+const nj = require('nornj').default;
+const njUtils = require('nornj/tools/utils');
+const precompile = require('./util/precompile');
+const astUtil = require('./util/ast');
+const conditionalUtil = require('./util/conditional');
 
-var ELEMENTS = {
+const ELEMENTS = {
   IF: 'if',
   ELSE: 'else',
   ELSEIF: 'elseif'
@@ -35,9 +38,9 @@ function getBlocks(nodes, types, errorInfos) {
   return result;
 }
 
-function buildCondition(types, condition, expressions, tagStart = '<#if {{') {
+function buildCondition(types, condition, expressions, tagStart = '<#if ') {
   let ret = [],
-    tagEnd = '}}>';
+    tagEnd = '>';
 
   if (types.isTemplateLiteral(condition)) {
     let hasExp = false;
@@ -104,7 +107,7 @@ module.exports = function (babel) {
     if (blocks.elseifBlock.length) {
       blocks.elseifBlock.forEach((block, i) => {
         if (i == 0) {
-          const tags = buildCondition(types, block.condition, expressions, '<#elseif {{');
+          const tags = buildCondition(types, block.condition, expressions, '<#elseif ');
           tags.forEach(tag => quasis.push(types.TemplateElement({
             raw: tag,
             cooked: tag
@@ -123,7 +126,7 @@ module.exports = function (babel) {
           }
         }
         else {
-          const tags = buildCondition(types, block.condition, expressions, '</#elseif><#elseif {{');
+          const tags = buildCondition(types, block.condition, expressions, '</#elseif><#elseif ');
           tags.forEach(tag => quasis.push(types.TemplateElement({
             raw: tag,
             cooked: tag
@@ -174,11 +177,29 @@ module.exports = function (babel) {
       expressions.push(elseBlock);
     }
 
+    let tmplStr = '',
+      paramCount = 0;
+    quasis.forEach((q, i) => {
+      tmplStr += q.value.cooked;
+      if (i < quasis.length - 1) {
+        tmplStr += '{{_nj_param' + paramCount + '}}';
+        paramCount++;
+      }
+    });
+
+    const tmplKey = njUtils.uniqueKey(tmplStr);
+    const tmplObj = precompile.buildTmplFns(nj.precompile(tmplStr, true, nj.createTmplRule({
+      start: '{',
+      end: '}',
+      comment: ''
+    })), tmplKey);
+    const tmplParams = expressions.map((e, i) => types.objectProperty(types.identifier('_nj_param' + i), e));
+
     return types.CallExpression(
-      types.TaggedTemplateExpression(
-        types.Identifier('nj'),
-        types.TemplateLiteral(quasis, expressions)
-      )
-      , []);
+      types.memberExpression(types.identifier('nj'), types.identifier('renderH'))
+      , [
+        types.identifier(tmplObj),
+        types.objectExpression(tmplParams)
+      ]);
   };
 };
