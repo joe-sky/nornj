@@ -1,8 +1,6 @@
-const nj = require('nornj').default;
-const njUtils = require('nornj/tools/utils');
-const precompile = require('./util/precompile');
 const astUtil = require('./util/ast');
 const conditionalUtil = require('./util/conditional');
+const generate = require('./util/generate');
 
 const ELEMENTS = {
   IF: 'if',
@@ -38,48 +36,10 @@ function getBlocks(nodes, types, errorInfos) {
   return result;
 }
 
-function buildCondition(types, condition, expressions, tagStart = '<#if ') {
-  let ret = [],
-    tagEnd = '>';
-
-  if (types.isTemplateLiteral(condition)) {
-    let hasExp = false;
-    condition.quasis.forEach((q, i) => {
-      if (i == 0) {
-        tagStart += q.value.cooked;
-      }
-      else if (i == condition.quasis.length - 1) {
-        tagEnd = q.value.cooked + tagEnd;
-      }
-      else {
-        ret.push(q.value.cooked);
-      }
-
-      if (i < condition.quasis.length - 1) {
-        hasExp = true;
-        expressions.push(condition.expressions[i]);
-      }
-    });
-
-    if (hasExp) {
-      ret = [tagStart, ...ret, tagEnd];
-    }
-    else {
-      ret = [tagStart + tagEnd];
-    }
-  }
-  else {
-    ret = [tagStart, tagEnd];
-    expressions.push(condition);
-  }
-
-  return ret;
-}
-
 module.exports = function (babel) {
   var types = babel.types;
 
-  return function (node, file) {
+  return function (node, file, state, globalNj) {
     var ifBlock;
     var elseBlock;
     var elseifBlock;
@@ -96,7 +56,7 @@ module.exports = function (babel) {
 
     const quasis = [];
     const expressions = [];
-    const tags = buildCondition(types, condition, expressions);
+    const tags = generate.buildCondition(types, condition, expressions);
     tags.forEach(tag => quasis.push(types.TemplateElement({
       raw: tag,
       cooked: tag
@@ -107,7 +67,7 @@ module.exports = function (babel) {
     if (blocks.elseifBlock.length) {
       blocks.elseifBlock.forEach((block, i) => {
         if (i == 0) {
-          const tags = buildCondition(types, block.condition, expressions, '<#elseif ');
+          const tags = generate.buildCondition(types, block.condition, expressions, '<#elseif {{');
           tags.forEach(tag => quasis.push(types.TemplateElement({
             raw: tag,
             cooked: tag
@@ -126,7 +86,7 @@ module.exports = function (babel) {
           }
         }
         else {
-          const tags = buildCondition(types, block.condition, expressions, '</#elseif><#elseif ');
+          const tags = generate.buildCondition(types, block.condition, expressions, '</#elseif><#elseif {{');
           tags.forEach(tag => quasis.push(types.TemplateElement({
             raw: tag,
             cooked: tag
@@ -177,29 +137,6 @@ module.exports = function (babel) {
       expressions.push(elseBlock);
     }
 
-    let tmplStr = '',
-      paramCount = 0;
-    quasis.forEach((q, i) => {
-      tmplStr += q.value.cooked;
-      if (i < quasis.length - 1) {
-        tmplStr += '{{_nj_param' + paramCount + '}}';
-        paramCount++;
-      }
-    });
-
-    const tmplKey = njUtils.uniqueKey(tmplStr);
-    const tmplObj = precompile.buildTmplFns(nj.precompile(tmplStr, true, nj.createTmplRule({
-      start: '{',
-      end: '}',
-      comment: ''
-    })), tmplKey);
-    const tmplParams = expressions.map((e, i) => types.objectProperty(types.identifier('_nj_param' + i), e));
-
-    return types.CallExpression(
-      types.memberExpression(types.identifier('nj'), types.identifier('renderH'))
-      , [
-        types.identifier(tmplObj),
-        types.objectExpression(tmplParams)
-      ]);
+    return generate.createRenderTmpl(babel, quasis, expressions, state.opts, globalNj);
   };
 };

@@ -1,15 +1,20 @@
 const React = require('react');
 const createReactClass = require('create-react-class');
-const nj = require('nornj').default;
-require('nornj-react');
 
 module.exports = createReactClass({
-  render: function() {
+  render: function () {
     return (
       <div>
-        <if condition={this.props.condition === 'testIf'}>
-          <span>IfBlock</span>
-        </if>
+        <style jsx>{`
+          div {
+            margin: 0;
+          }
+        `}</style>
+        <div id="test" className="bbb" n-show={this.props.show}>
+          <if condition={this.props.condition === 'testIf'}>
+            <span>IfBlock</span>
+          </if>
+        </div>
       </div>
     );
   }

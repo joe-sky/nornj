@@ -1,10 +1,11 @@
-var astUtil = require('./util/ast');
-var errorUtil = require('./util/error');
+const astUtil = require('./util/ast');
+const errorUtil = require('./util/error');
+const generate = require('./util/generate');
 
-var ELEMENTS = {
+const ELEMENTS = {
   EACH: 'each'
 };
-var ATTRIBUTES = {
+const ATTRIBUTES = {
   ITEM: 'item',
   OF: 'of',
   INDEX: 'index'
@@ -32,48 +33,10 @@ function checkForExpression(attributes, name, errorInfos) {
   }
 }
 
-function buildCondition(types, condition, expressions, tagStart = '<#each {{ ') {
-  let ret = [],
-    tagEnd = '}}> #';
-
-  if (types.isTemplateLiteral(condition)) {
-    let hasExp = false;
-    condition.quasis.forEach((q, i) => {
-      if (i == 0) {
-        tagStart += q.value.cooked;
-      }
-      else if (i == condition.quasis.length - 1) {
-        tagEnd = q.value.cooked + tagEnd;
-      }
-      else {
-        ret.push(q.value.cooked);
-      }
-
-      if (i < condition.quasis.length - 1) {
-        hasExp = true;
-        expressions.push(condition.expressions[i]);
-      }
-    });
-
-    if (hasExp) {
-      ret = [tagStart, ...ret, tagEnd];
-    }
-    else {
-      ret = [tagStart + tagEnd];
-    }
-  }
-  else {
-    ret = [tagStart, tagEnd];
-    expressions.push(condition);
-  }
-
-  return ret;
-}
-
 module.exports = function (babel) {
   var types = babel.types;
 
-  return function (node, file) {
+  return function (node, file, state, globalNj) {
     var mapParams = [];
     var errorInfos = { node: node, file: file, element: ELEMENTS.EACH };
     var attributes = astUtil.getAttributeMap(node);
@@ -99,27 +62,24 @@ module.exports = function (babel) {
 
     const quasis = [];
     const expressions = [];
-    const tags = buildCondition(types, attributes[ATTRIBUTES.OF].value.expression, expressions);
+    const tags = generate.buildCondition(types, attributes[ATTRIBUTES.OF].value.expression, expressions, '<#each {{');
     tags.forEach(tag => quasis.push(types.TemplateElement({
       raw: tag,
       cooked: tag
     })));
 
-    expressions.push(types.ArrowFunctionExpression(
+    const expr = types.ArrowFunctionExpression(
       [types.objectPattern(mapParams, [])],
       types.blockStatement([types.returnStatement(returnExpression)])
-    ));
+    );
+    expr.isAccessor = true;
+    expressions.push(expr);
 
     quasis.push(types.TemplateElement({
       raw: ' </#each>',
       cooked: ' </#each>'
     }));
 
-    return types.CallExpression(
-      types.TaggedTemplateExpression(
-        types.Identifier('nj'),
-        types.TemplateLiteral(quasis, expressions)
-      )
-      , []);
+    return generate.createRenderTmpl(babel, quasis, expressions, state.opts, globalNj);
   };
 };

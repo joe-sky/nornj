@@ -1,8 +1,18 @@
-var plugin = require('../src/index');
+const njInJsx = require('../src/index');
+const styledJsx = require('styled-jsx/babel').default;
 
 require('babel-core/register')({
   presets: ['babel-preset-react'],
-  plugins: [plugin],
+  plugins: [
+    styledJsx,
+    [njInJsx, {
+      delimiters: {
+        start: '{',
+        end: '}',
+        comment: ''
+      }
+    }]
+  ],
   cache: false
 });
 

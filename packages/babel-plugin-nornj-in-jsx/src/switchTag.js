@@ -1,8 +1,9 @@
-var astUtil = require('./util/ast');
-var conditionalUtil = require('./util/conditional');
-var errorUtil = require('./util/error');
+const astUtil = require('./util/ast');
+const conditionalUtil = require('./util/conditional');
+const errorUtil = require('./util/error');
+const generate = require('./util/generate');
 
-var ELEMENTS = {
+const ELEMENTS = {
   SWITCH: 'switch',
   CASE: 'case',
   DEFAULT: 'default'
@@ -42,48 +43,10 @@ function getBlocks(nodes, types, errorInfos) {
   return result;
 }
 
-function buildCondition(types, condition, expressions, tagStart = '<#switch {{') {
-  let ret = [],
-    tagEnd = '}}>';
-
-  if (types.isTemplateLiteral(condition)) {
-    let hasExp = false;
-    condition.quasis.forEach((q, i) => {
-      if (i == 0) {
-        tagStart += q.value.cooked;
-      }
-      else if (i == condition.quasis.length - 1) {
-        tagEnd = q.value.cooked + tagEnd;
-      }
-      else {
-        ret.push(q.value.cooked);
-      }
-
-      if (i < condition.quasis.length - 1) {
-        hasExp = true;
-        expressions.push(condition.expressions[i]);
-      }
-    });
-
-    if (hasExp) {
-      ret = [tagStart, ...ret, tagEnd];
-    }
-    else {
-      ret = [tagStart + tagEnd];
-    }
-  }
-  else {
-    ret = [tagStart, tagEnd];
-    expressions.push(condition);
-  }
-
-  return ret;
-}
-
 module.exports = function (babel) {
   var types = babel.types;
 
-  return function (node, file) {
+  return function (node, file, state, globalNj) {
     var caseBlock;
     var defaultBlock;
     var errorInfos = { node: node, file: file, element: ELEMENTS.SWITCH };
@@ -103,19 +66,19 @@ module.exports = function (babel) {
 
     const quasis = [];
     const expressions = [];
-    const tags = buildCondition(types, condition, expressions);
+    const tags = generate.buildCondition(types, condition, expressions, '<#switch {{', true);
 
     quasis.push(
       types.TemplateElement({
-        raw: '<#switch {{',
-        cooked: '<#switch {{'
+        raw: '<#switch ',
+        cooked: '<#switch '
       })
     );
 
     if (blocks.caseBlock.length) {
       blocks.caseBlock.forEach((block, i) => {
         if (i == 0) {
-          const tags = buildCondition(types, block.condition, expressions, '}}><#case {{');
+          const tags = generate.buildCondition(types, block.condition, expressions, '><#case {{');
           tags.forEach(tag => quasis.push(types.TemplateElement({
             raw: tag,
             cooked: tag
@@ -134,7 +97,7 @@ module.exports = function (babel) {
           }
         }
         else {
-          const tags = buildCondition(types, block.condition, expressions, '</#case><#case {{');
+          const tags = generate.buildCondition(types, block.condition, expressions, '</#case><#case {{');
           tags.forEach(tag => quasis.push(types.TemplateElement({
             raw: tag,
             cooked: tag
@@ -161,8 +124,8 @@ module.exports = function (babel) {
       if (blocks.caseBlock.length == 0) {
         quasis.push(
           types.TemplateElement({
-            raw: '}}><#default>',
-            cooked: '}}><#default>'
+            raw: '><#default>',
+            cooked: '><#default>'
           })
         );
       }
@@ -185,11 +148,6 @@ module.exports = function (babel) {
       expressions.push(defaultBlock);
     }
 
-    return types.CallExpression(
-      types.TaggedTemplateExpression(
-        types.Identifier('nj'),
-        types.TemplateLiteral(quasis, expressions)
-      )
-      , []);
+    return generate.createRenderTmpl(babel, quasis, expressions, state.opts, globalNj);
   };
 };

@@ -140,3 +140,30 @@ exports.getSanitizedExpressionForContent = function(babelTypes, blocks, keyPrefi
 
   return babelTypes.arrayExpression(blocks);
 };
+
+exports.hasExAttr = function(node) {
+  return node.openingElement.attributes.reduce(function(result, attr) {
+    if(isExAttr(attr.name.name)) {
+      return true;
+    }
+    return result;
+  }, false);
+};
+
+function isExAttr(name) {
+  return name.indexOf('n-') === 0;
+}
+exports.isExAttr = isExAttr;
+
+exports.transformExAttr = function(attrName) {
+  return '#' + attrName.substr(2);
+};
+
+exports.REGEX_CAPITALIZE = /^[A-Z][\s\S]*$/;
+
+exports.addImportNj = function(state) {
+  const globalNj = state.addImport('nornj', 'default', 'nj');
+  state.addImport('nornj-react');
+
+  return globalNj;
+};

@@ -1,23 +1,33 @@
-var transformEach = require('./eachTag');
-var transformIf = require('./ifTag');
-var transformSwitch = require('./switchTag');
-var transformWith = require('./withTag');
+const transformEach = require('./eachTag');
+const transformIf = require('./ifTag');
+const transformSwitch = require('./switchTag');
+const transformWith = require('./withTag');
+const transformExAttr = require('./exAttr');
+const astUtil = require('./util/ast');
 
 module.exports = function (babel) {
-  var nodeHandlers = {
+  const nodeHandlers = {
     'if': transformIf(babel),
     each: transformEach(babel),
     'switch': transformSwitch(babel),
     'with': transformWith(babel)
   };
+  const exAttrHandler = transformExAttr(babel);
 
   var visitor = {
-    JSXElement: function (path) {
-      var nodeName = path.node.openingElement.name.name;
-      var handler = nodeHandlers[nodeName];
+    JSXElement: {
+      enter(path, state) {
+        var nodeName = path.node.openingElement.name.name;
+        var handler = nodeHandlers[nodeName];
 
-      if (handler) {
-        path.replaceWith(handler(path.node, path.hub.file));
+        if (handler) {
+          path.replaceWith(handler(path.node, path.hub.file, state, astUtil.addImportNj(state)));
+        }
+      },
+      exit(path, state) {
+        if(astUtil.hasExAttr(path.node)) {
+          path.replaceWith(exAttrHandler(path.node, path.hub.file, state, astUtil.addImportNj(state)));
+        }
       }
     }
   };
