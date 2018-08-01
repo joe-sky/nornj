@@ -1,5 +1,4 @@
 const astUtil = require('./util/ast');
-const conditionalUtil = require('./util/conditional');
 const generate = require('./util/generate');
 
 module.exports = function (babel) {
@@ -11,35 +10,70 @@ module.exports = function (babel) {
     const elName = node.openingElement.name.name;
     const attrs = astUtil.getAttributeMap(node);
     const children = astUtil.getChildren(types, node);
-    const childrenExpression = astUtil.getSanitizedExpressionForContent(types, children);
+    const isSelfClosing = node.openingElement.selfClosing;
+    const childrenExpression = !isSelfClosing && astUtil.getSanitizedExpressionForContent(types, children);
+    const isComponent = astUtil.REGEX_CAPITALIZE.test(elName);
     let tagName = '<';
 
-    if (!astUtil.REGEX_CAPITALIZE.test(elName)) {
+    if (!isComponent) {
       tagName += elName;
+    }
+    else {
+      quasis.push(types.TemplateElement({
+        cooked: tagName
+      }));
+      expressions.push(types.identifier(elName));
     }
 
     Object.keys(attrs).forEach((attrName, i) => {
       const attr = attrs[attrName];
-      quasis.push(types.TemplateElement({
-        cooked: (i == 0 ? tagName : '') + ' ' + (astUtil.isExAttr(attrName)
-          ? astUtil.transformExAttr(attrName)
-          : attrName) + '='
-      }));
 
-      expressions.push(attr.value.type == 'JSXExpressionContainer'
-        ? attr.value.expression
-        : attr.value);
+      if (attr.type != 'JSXSpreadAttribute') {
+        quasis.push(types.TemplateElement({
+          cooked: (i == 0 ? (!isComponent ? tagName : '') : '') + ' ' + (astUtil.isExAttr(attrName)
+            ? astUtil.transformExAttr(attrName)
+            : attrName) + '='
+        }));
+        expressions.push(attr.value.type == 'JSXExpressionContainer'
+          ? attr.value.expression
+          : attr.value);
+      }
+      else {
+        quasis.push(types.TemplateElement({
+          cooked: ' '
+        }));
+        attr.argument.isSpread = true;
+        expressions.push(attr.argument);
+      }
     });
 
-    quasis.push(types.TemplateElement({
-      cooked: '>'
-    }));
+    if (!isSelfClosing) {
+      quasis.push(types.TemplateElement({
+        cooked: '>'
+      }));
 
-    expressions.push(childrenExpression);
+      expressions.push(childrenExpression);
 
-    quasis.push(types.TemplateElement({
-      cooked: '</' + elName + '>'
-    }));
+      if (!isComponent) {
+        quasis.push(types.TemplateElement({
+          cooked: '</' + elName + '>'
+        }));
+      }
+      else {
+        quasis.push(types.TemplateElement({
+          cooked: '</'
+        }));
+        expressions.push(types.identifier(elName));
+        quasis.push(types.TemplateElement({
+          cooked: '>'
+        }));
+      }
+    }
+    else {
+      quasis.push(types.TemplateElement({
+        cooked: '/>'
+      }));
+    }
 
     return generate.createRenderTmpl(babel, quasis, expressions, state.opts, globalNj);
   };

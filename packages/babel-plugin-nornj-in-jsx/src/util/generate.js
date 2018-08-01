@@ -41,6 +41,18 @@ function buildCondition(types, condition, expressions, tagStart = '<#if {{', has
   return ret;
 }
 
+function _mustachePrefix(expr) {
+  if (expr.isAccessor) {
+    return '#';
+  }
+  else if (expr.isSpread) {
+    return '...';
+  }
+  else {
+    return '';
+  }
+}
+
 function createRenderTmpl(babel, quasis, expressions, opts, globalNj) {
   const types = babel.types;
   _setTmplConfig(opts);
@@ -52,7 +64,7 @@ function createRenderTmpl(babel, quasis, expressions, opts, globalNj) {
     if (i < quasis.length - 1) {
       const expr = expressions[i];
       tmplStr += (expr.noMustache ? '' : '{{')
-        + (expr.isAccessor ? '#' : '') + '_nj_param' + paramCount
+        + _mustachePrefix(expr) + '_nj_param' + paramCount
         + (expr.noMustache ? '' : '}}');
       paramCount++;
     }

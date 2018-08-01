@@ -56,8 +56,14 @@ exports.isStringLiteral = function(attribute) {
  * @returns {object} Map of all attributes with their name as key
  */
 exports.getAttributeMap = function(node) {
+  let spreadCount = 1;
   return node.openingElement.attributes.reduce(function(result, attr) {
-    result[attr.name.name] = attr;
+    if(attr.argument) {
+      result['_nj_spread' + spreadCount++] = attr;
+    }
+    else {
+      result[attr.name.name] = attr;
+    }
     return result;
   }, {});
 };
@@ -142,8 +148,8 @@ exports.getSanitizedExpressionForContent = function(babelTypes, blocks, keyPrefi
 };
 
 exports.hasExAttr = function(node) {
-  return node.openingElement.attributes.reduce(function(result, attr) {
-    if(isExAttr(attr.name.name)) {
+  return node.openingElement && node.openingElement.attributes.reduce(function(result, attr) {
+    if(attr.name && isExAttr(attr.name.name)) {
       return true;
     }
     return result;
@@ -156,7 +162,8 @@ function isExAttr(name) {
 exports.isExAttr = isExAttr;
 
 exports.transformExAttr = function(attrName) {
-  return '#' + attrName.substr(2);
+  const ret = attrName.substr(2);
+  return (ret === 'style' ? '' : '#') + ret;
 };
 
 exports.REGEX_CAPITALIZE = /^[A-Z][\s\S]*$/;

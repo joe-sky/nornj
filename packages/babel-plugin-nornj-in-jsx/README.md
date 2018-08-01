@@ -32,16 +32,9 @@ npm i babel-plugin-nornj-in-jsx
 }
 ```
 
-## 使用方法
+## 扩展标签
 
-在JSX中使用各种本babel插件提供的标签时，都需要在js中引入：
-
-```js
-import nj from 'nornj';
-import 'nornj-react';
-```
-
-### if标签
+### if
 
 可在JSX中使用`NornJ`的`if、elseif、else`等标签。NornJ中的[if标签文档请见这里](https://joe-sky.github.io/nornj-guide/templateSyntax/built-inExtensionTag.html#if)。
 
@@ -154,7 +147,7 @@ const a = { b: 1, c: 'abc' };
 
 但是使用`NornJ`的表达式则不会报错，而是会顺延流转到下面的`elseif`判断中，这是因为`NornJ`的链式取值语法对`null`值进行了过滤，[具体请见这里](https://joe-sky.github.io/nornj-guide/templateSyntax/variable.html)。
 
-### each标签
+### each
 
 可在JSX中使用`NornJ`的`each`标签。NornJ中的[each标签文档请见这里](https://joe-sky.github.io/nornj-guide/templateSyntax/built-inExtensionTag.html#each)。
 
@@ -213,7 +206,7 @@ class TestComponent extends Component {
 }
 ```
 
-### switch标签
+### switch
 
 可在JSX中使用`NornJ`的`switch`标签。NornJ中的[switch标签文档请见这里](https://joe-sky.github.io/nornj-guide/templateSyntax/built-inExtensionTag.html#switch)。
 
@@ -295,13 +288,58 @@ class TestComponent extends Component {
 }
 ```
 
+## 扩展属性
+
+### n-show
+
+使用`n-show`可以在JSX中很方便地切换标签的`style.display`属性，当值为`false`时不显示，效果和`Vue`的`v-show`类似：
+
+```js
+class TestComponent extends Component {
+  render() {
+    return <input n-show={this.props.show} />;
+  }
+}
+
+ReactDOM.render(<TestComponent show={false} />);
+/*
+ 渲染结果：<input style="display:none" />
+*/
+```
+
+### n-style
+
+使用`n-style`可以在JSX中使用与html语法一致的css写法：
+
+```js
+class TestComponent extends Component {
+  render() {
+    //以下与<input style={{ marginLeft: '10px', padding: 0 }} />效果相同
+    return <input n-style="margin-left:10px;padding:0" />;
+  }
+}
+```
+
+在`n-style`中也可以动态嵌入变量：
+
+```js
+const cssProp = 'padding';
+
+class TestComponent extends Component {
+  render() {
+    return <input n-style={`margin-left:${10};${cssProp}:0`} />;
+  }
+}
+```
+
+## 可在JSX中使用的NornJ模板字符串API
+
 ### 在JSX中使用NornJ的过滤器和表达式
 
 使用`nj.mustache`可以在JSX中以标签模板字符串的方式使用`NornJ`的过滤器和表达式：
 
 ```js
 import nj, { mustache as m } from 'nornj';
-import 'nornj-react';
 
 class TestComponent extends Component {
   render() {
@@ -329,7 +367,6 @@ import nj, {
   mustache as m,
   css as s
 } from 'nornj';
-import 'nornj-react';
 
 class TestComponent extends Component {
   render() {

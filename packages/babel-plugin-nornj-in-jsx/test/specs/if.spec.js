@@ -9,7 +9,7 @@ describe('requiring in component with if', function () {
   var IfWithoutElse = require('../fixtures/if/if.jsx');
 
   it('should render if block when condition true', function () {
-    var rendered = util.render(IfWithoutElse, { condition: 'testIf', show: false });
+    var rendered = util.render(IfWithoutElse, { condition: 'testIf' });
     expect(rendered).to.contain('<span');
     expect(rendered).to.contain('IfBlock');
     expect(rendered).not.to.contain('ElseBlock');
