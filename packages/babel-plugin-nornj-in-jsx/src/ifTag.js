@@ -39,7 +39,7 @@ function getBlocks(nodes, types, errorInfos) {
 module.exports = function (babel) {
   var types = babel.types;
 
-  return function (node, file, state, globalNj) {
+  return function (node, file, state) {
     var ifBlock;
     var elseBlock;
     var elseifBlock;
@@ -137,6 +137,6 @@ module.exports = function (babel) {
       expressions.push(elseBlock);
     }
 
-    return generate.createRenderTmpl(babel, quasis, expressions, state.opts, globalNj);
+    return generate.createRenderTmpl(babel, quasis, expressions, state.opts);
   };
 };

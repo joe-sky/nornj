@@ -4,7 +4,7 @@ const generate = require('./util/generate');
 module.exports = function (babel) {
   const types = babel.types;
 
-  return function (node, file, state, globalNj) {
+  return function (node, file, state) {
     const quasis = [];
     const expressions = [];
     const elName = node.openingElement.name.name;
@@ -75,6 +75,6 @@ module.exports = function (babel) {
       }));
     }
 
-    return generate.createRenderTmpl(babel, quasis, expressions, state.opts, globalNj);
+    return generate.createRenderTmpl(babel, quasis, expressions, state.opts);
   };
 };

@@ -36,7 +36,7 @@ function checkForExpression(attributes, name, errorInfos) {
 module.exports = function (babel) {
   var types = babel.types;
 
-  return function (node, file, state, globalNj) {
+  return function (node, file, state) {
     var mapParams = [];
     var errorInfos = { node: node, file: file, element: ELEMENTS.EACH };
     var attributes = astUtil.getAttributeMap(node);
@@ -80,6 +80,6 @@ module.exports = function (babel) {
       cooked: ' </#each>'
     }));
 
-    return generate.createRenderTmpl(babel, quasis, expressions, state.opts, globalNj);
+    return generate.createRenderTmpl(babel, quasis, expressions, state.opts);
   };
 };

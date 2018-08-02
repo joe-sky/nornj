@@ -53,7 +53,7 @@ function _mustachePrefix(expr) {
   }
 }
 
-function createRenderTmpl(babel, quasis, expressions, opts, globalNj) {
+function createRenderTmpl(babel, quasis, expressions, opts) {
   const types = babel.types;
   _setTmplConfig(opts);
 
@@ -82,7 +82,7 @@ function createRenderTmpl(babel, quasis, expressions, opts, globalNj) {
   const tmplParams = expressions.map((e, i) => types.objectProperty(types.identifier('_nj_param' + i), e));
 
   return types.CallExpression(
-    types.memberExpression(globalNj, types.identifier('renderH'))
+    types.memberExpression(types.identifier('nj'), types.identifier('renderH'))
     , [
       types.identifier(tmplObj),
       types.objectExpression(tmplParams)

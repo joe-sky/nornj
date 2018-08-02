@@ -46,7 +46,7 @@ function getBlocks(nodes, types, errorInfos) {
 module.exports = function (babel) {
   var types = babel.types;
 
-  return function (node, file, state, globalNj) {
+  return function (node, file, state) {
     var caseBlock;
     var defaultBlock;
     var errorInfos = { node: node, file: file, element: ELEMENTS.SWITCH };
@@ -148,6 +148,6 @@ module.exports = function (babel) {
       expressions.push(defaultBlock);
     }
 
-    return generate.createRenderTmpl(babel, quasis, expressions, state.opts, globalNj);
+    return generate.createRenderTmpl(babel, quasis, expressions, state.opts);
   };
 };
