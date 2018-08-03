@@ -83,10 +83,10 @@ function _buildOptions(config, useStringLocal, node, fns, exPropsStr, subExProps
 
   if (node) { //扩展标签
     let newContext = config ? config.newContext : true;
-    if (noConfig || config.exProps) {
+    if (noConfig || config.exProps || node.isProp) {
       hashStr += ', exProps: ' + exPropsStr;
     }
-    if (noConfig || config.subExProps) {
+    if (noConfig || config.subExProps || node.isProp) {
       hashStr += ', subExProps: ' + subExPropsStr;
     }
     if (parent) {

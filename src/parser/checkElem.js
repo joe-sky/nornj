@@ -113,6 +113,11 @@ export default function checkElem(obj, parent, tmplRule, hasExProps, noSplitNewl
             node.useString = !(value === 'false');
             return;
           }
+          else if (key === '_njIsProp') {
+            node.isProp = isProp = true;
+            needAddToProps = !hasExProps;
+            return;
+          }
 
           let paramV = tranParam.compiledParam(value, tmplRule, param.hasColon, param.onlyKey);
           if (param.onlyBrace) { //提取匿名参数

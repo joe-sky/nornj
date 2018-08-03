@@ -343,12 +343,14 @@ function _getSplitParams(elem, tmplRule, outputH) {
   });
 
   //Replace the parameter like "#show={false}".
-  elem = elem.replace(new RegExp('[\\s]+(:?)' + extensionRule + '([^\\s=>]+)=((\'[^\']+\')|("[^"]+")|([^"\'\\s>]+))'), (all, hasColon, name, value) => {
+  elem = elem.replace(new RegExp('[\\s]+(:?)' + extensionRule + '([^\\s=>]+)(=((\'[^\']+\')|("[^"]+")|([^"\'\\s>]+)))?', 'g'), (all, hasColon, name, hasEqual, value) => {
     if (!paramsEx) {
       paramsEx = [extensionRule + 'props'];
     }
 
-    paramsEx.push([extensionRule + name, (hasColon ? ((outputH ? firstChar : '') + startRule + ' ') : '') + _inlineExTagValue(name, tools.clearQuot(value)) + (hasColon ? (' ' + endRule + (outputH ? lastChar : '')) : '')]);
+    const exPreAst = [extensionRule + name + ' _njIsProp' + (hasEqual ? '' : ' /')];
+    hasEqual && exPreAst.push((hasColon ? ((outputH ? firstChar : '') + startRule + ' ') : '') + _inlineExTagValue(name, tools.clearQuot(value)) + (hasColon ? (' ' + endRule + (outputH ? lastChar : '')) : ''));
+    paramsEx.push(exPreAst);
     return ' ';
   });
 

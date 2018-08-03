@@ -1,6 +1,6 @@
 {
   "name": "nornj",
-  "version": "0.4.8",
+  "version": "0.4.9",
   "description": "A multipurpose javascript template engine, support both the rendering string and the react component.",
   "main": "dist/nornj.common.js",
   "module": "dist/nornj.esm.js",
@@ -27,7 +27,7 @@
     "build": "npm run cjs && npm run esm && npm run umd && npm run min && npm run runtime-cjs && npm run runtime-esm && npm run runtime-umd && npm run runtime-min && npm run lib",
     "lint": "eslint src",
     "test": "karma start",
-    "bdd": "jasmine JASMINE_CONFIG_PATH=test/jasmine.json",
+    "bdd": "node test/bdd.js",
     "ci": "npm run test && codecov test/coverage/cobertura-coverage.xml"
   },
   "keywords": [
