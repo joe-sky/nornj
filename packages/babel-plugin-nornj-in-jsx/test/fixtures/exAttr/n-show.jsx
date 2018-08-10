@@ -6,6 +6,14 @@ const Wrap = ({ children, ...props }) => {
     {children}
   </p>;
 };
+const Show = {
+  Wrap
+};
+const Test = {
+  Show
+};
+
+const Noop = () => <i>noop</i>;
 
 module.exports = createReactClass({
   render: function () {
@@ -16,16 +24,21 @@ module.exports = createReactClass({
             margin: 0;
           }
         `}</style>
-        <Wrap id="wrap" n-show={this.props.show} {...{ name: 'wrap' }} {...{ className: 'wrap' }}>
+        <Test.Show.Wrap id="wrap" n-show={this.props.show} {...{ name: 'wrap' }} {...{ className: 'wrap' }}>
           <div className="test" n-show={!this.props.show}>
             <if condition={this.props.condition}>
               <span>IfBlock</span>
               <else>
-                <input n-show={this.props.show} />
+                <input n-show={`${this}.props.show`} />
+                <div n-show={true} disabled>
+                  <Noop>1</Noop>
+                  <Noop id="1">2</Noop>
+                  <Noop>3</Noop>
+                </div>
               </else>
             </if>
           </div>
-        </Wrap>
+        </Test.Show.Wrap>
       </div>
     );
   }

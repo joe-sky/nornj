@@ -1,3 +1,4 @@
+const nj = require('nornj').default;
 const transformEach = require('./eachTag');
 const transformIf = require('./ifTag');
 const transformSwitch = require('./switchTag');
@@ -23,12 +24,23 @@ module.exports = function (babel) {
 
         if (handler) {
           state.file.hasNjInJSX = true;
+
           path.replaceWith(handler(path.node, path.hub.file, state));
         }
       },
       exit(path, state) {
-        if (astUtil.hasExAttr(path.node)) {
+        const exAttrs = astUtil.hasExAttr(path.node);
+        if (exAttrs.length) {
           state.file.hasNjInJSX = true;
+
+          const hasMobx = exAttrs.indexOf('n-mobx-model') > -1;
+          hasMobx
+            && !nj.extensionConfig['mobx-model']
+            && Object.assign(nj.extensionConfig, require('nornj-react/mobx/extensionConfig'));
+          if (hasMobx) {
+            state.file.hasMobx = true;
+          }
+
           path.replaceWith(exAttrHandler(path.node, path.hub.file, state));
         }
       }
@@ -36,12 +48,19 @@ module.exports = function (babel) {
     Program: {
       enter(path, state) {
         state.file.hasNjInJSX = false;
+        state.file.hasMobx = false;
       },
       exit(path, state) {
         if (!state.file.hasNjInJSX) {
           return;
         }
 
+        if (state.file.hasMobx) {
+          path.node.body.unshift(types.importDeclaration(
+            [],
+            types.stringLiteral('nornj-react/mobx')
+          ));
+        }
         path.node.body.unshift(types.importDeclaration(
           [],
           types.stringLiteral('nornj-react')

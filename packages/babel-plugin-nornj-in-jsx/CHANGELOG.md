@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [v0.4.5] 2018.08.10
+
+* 🌟 增加`n-mobx-model`、`n-mst-model`扩展属性。
+
 ## [v0.4.4] 2018.08.02
 
 * 🐞 修复与`styled-jsx`共存时的bug。

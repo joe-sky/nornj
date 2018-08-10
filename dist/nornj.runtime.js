@@ -1,5 +1,5 @@
 /*!
-* NornJ template engine v0.4.8
+* NornJ template engine v0.4.9
 * (c) 2016-2018 Joe_Sky
 * Released under the MIT License.
 */
@@ -15,6 +15,7 @@ function nj() {
 
 nj.createElement = null;
 nj.components = {};
+nj.componentConfig = {};
 nj.preAsts = {};
 nj.asts = {};
 nj.templates = {};
@@ -239,19 +240,40 @@ assign(nj, {
   assign: assign
 });
 
-//注册组件
-function registerComponent(name, component) {
+function registerComponent(name, component, options) {
   var params = name,
       ret = void 0;
   if (!isObject(name)) {
     params = {};
-    params[name] = component;
+    params[name] = {
+      component: component,
+      options: options
+    };
   }
 
   each(params, function (v, k, i) {
-    nj.components[k.toLowerCase()] = v;
+    if (v != null) {
+      var _component = v.component,
+          _options = v.options;
+
+      var _name = k.toLowerCase();
+
+      var comp = _component ? _component : v;
+      nj.components[_name] = comp;
+      nj.componentConfig[_name] = _options;
+
+      defineProp(comp, '_njComponentName', {
+        value: _name
+      });
+    }
+
     if (i == 0) {
       ret = v;
+    } else {
+      if (i == 1) {
+        ret = [ret];
+      }
+      ret.push(v);
     }
   }, false, false);
 
@@ -935,7 +957,8 @@ function _config(params) {
     isProp: false,
     subExProps: false,
     isSub: false,
-    addSet: false
+    addSet: false,
+    useExpressionInJsx: 'onlyTemplateLiteral'
   };
 
   if (params) {
@@ -958,7 +981,8 @@ var extensionConfig = {
   obj: _config({ onlyGlobal: true, newContext: false }),
   list: _config(_defaultCfg),
   fn: _config({ onlyGlobal: true }),
-  'with': _config({ onlyGlobal: true })
+  'with': _config({ onlyGlobal: true }),
+  style: { useExpressionInJsx: false }
 };
 extensionConfig.elseif = _config(extensionConfig['else']);
 extensionConfig['for'] = _config(extensionConfig.each);

@@ -1,12 +1,13 @@
 ﻿import nj from './core';
 import { assign } from './utils/tools';
-import registerComponent from './utils/registerComponent';
+import registerComponent, { getComponentConfig } from './utils/registerComponent';
 import createTmplRule from './utils/createTmplRule';
 import config from './config';
 import './utils/escape';
 
 assign(nj, {
   registerComponent,
+  getComponentConfig,
   createTmplRule,
   config
 });
@@ -31,6 +32,7 @@ export {
   taggedTmplH,
   template,
   mustache,
+  mustache as expression,
   css
 } from './utils/taggedTmpl';
 export {

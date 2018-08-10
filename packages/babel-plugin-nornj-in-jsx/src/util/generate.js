@@ -53,6 +53,24 @@ function _mustachePrefix(expr) {
   }
 }
 
+function getElName(types, expr) {
+  if (types.isJSXMemberExpression(expr)) {
+    return types.memberExpression(getElName(types, expr.object), getElName(types, expr.property));
+  }
+  else {
+    return types.identifier(expr.name);
+  }
+}
+
+function getExAttrExpression(types, expr) {
+  if (types.isBinaryExpression(expr)) {
+    return [...getExAttrExpression(types, expr.left), ...getExAttrExpression(types, expr.right)];
+  }
+  else {
+    return [expr.loc ? expr : expr.value];
+  }
+}
+
 function createRenderTmpl(babel, quasis, expressions, opts) {
   const types = babel.types;
   _setTmplConfig(opts);
@@ -64,7 +82,7 @@ function createRenderTmpl(babel, quasis, expressions, opts) {
     if (i < quasis.length - 1) {
       const expr = expressions[i];
       tmplStr += (expr.noMustache ? '' : '{{')
-        + _mustachePrefix(expr) + '_nj_param' + paramCount
+        + _mustachePrefix(expr) + '_njParam' + paramCount
         + (expr.noMustache ? '' : '}}');
       paramCount++;
     }
@@ -79,14 +97,24 @@ function createRenderTmpl(babel, quasis, expressions, opts) {
       comment: ''
     })),
     njUtils.uniqueKey(tmplStr));
-  const tmplParams = expressions.map((e, i) => types.objectProperty(types.identifier('_nj_param' + i), e));
+
+  const tmplParams = expressions.map((e, i) => types.objectProperty(types.identifier('_njParam' + i), e));
+  if (tmplParams.length) {
+    tmplParams.push(types.objectProperty(types.identifier('_njParam'), types.booleanLiteral(true)));
+  }
+
+  const renderFnParams = [types.identifier(tmplObj)];
+  if (tmplParams.length) {
+    renderFnParams.push(types.objectExpression(tmplParams));
+  }
+  renderFnParams.push(types.thisExpression());
 
   return types.CallExpression(
-    types.memberExpression(types.identifier('nj'), types.identifier('renderH'))
-    , [
-      types.identifier(tmplObj),
-      types.objectExpression(tmplParams)
-    ]);
+    types.memberExpression(
+      types.identifier('nj'),
+      types.identifier('renderH')
+    ), renderFnParams
+  );
 }
 
 function _buildTmplFns(fns, tmplKey) {
@@ -139,5 +167,7 @@ function _setTmplConfig(opts) {
 
 module.exports = {
   buildCondition,
+  getElName,
+  getExAttrExpression,
   createRenderTmpl
 };

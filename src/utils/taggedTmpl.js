@@ -41,5 +41,6 @@ assign(nj, {
   taggedTmplH,
   template,
   mustache,
+  expression: mustache,
   css
 });

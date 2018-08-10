@@ -1,7 +1,10 @@
 # CHANGELOG
 
-## [v0.4.9] 2018.08.06
+## [v0.4.9] 2018.08.10
 
+* 🌟 扩展标签函数的`options`参数中增加`tagName`参数。
+* 🌟 `nj.registerComponent`支持传入组件配置属性。
+* 🌟 新增API`nj.getComponentConfig`和`nj.expression`。
 * 🐞 修复 `<input #mobx-model={value}>` bug。
 * 🐞 修复扩展属性不能添加多个的bug。
 

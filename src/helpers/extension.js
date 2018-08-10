@@ -308,7 +308,8 @@ function _config(params) {
     isProp: false,
     subExProps: false,
     isSub: false,
-    addSet: false
+    addSet: false,
+    useExpressionInJsx: 'onlyTemplateLiteral'
   };
 
   if (params) {
@@ -331,7 +332,8 @@ export const extensionConfig = {
   obj: _config({ onlyGlobal: true, newContext: false }),
   list: _config(_defaultCfg),
   fn: _config({ onlyGlobal: true }),
-  'with': _config({ onlyGlobal: true })
+  'with': _config({ onlyGlobal: true }),
+  style: { useExpressionInJsx: false }
 };
 extensionConfig.elseif = _config(extensionConfig['else']);
 extensionConfig['for'] = _config(extensionConfig.each);

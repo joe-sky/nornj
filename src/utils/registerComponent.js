@@ -1,20 +1,44 @@
 ﻿import nj from '../core';
 import * as tools from './tools';
 
-//注册组件
-export default function registerComponent(name, component) {
+export default function registerComponent(name, component, options) {
   let params = name, ret;
   if (!tools.isObject(name)) {
     params = {};
-    params[name] = component;
+    params[name] = {
+      component,
+      options
+    };
   }
 
   tools.each(params, (v, k, i) => {
-    nj.components[k.toLowerCase()] = v;
-    if(i == 0) {
+    if (v != null) {
+      const { component, options } = v;
+      const name = k.toLowerCase();
+
+      const comp = component ? component : v;
+      nj.components[name] = comp;
+      nj.componentConfig[name] = options;
+
+      tools.defineProp(comp, '_njComponentName', {
+        value: name
+      });
+    }
+
+    if (i == 0) {
       ret = v;
+    }
+    else {
+      if (i == 1) {
+        ret = [ret];
+      }
+      ret.push(v);
     }
   }, false, false);
 
   return ret;
+}
+
+export function getComponentConfig(name) {
+  return nj.componentConfig[tools.isString(name) ? name : name._njComponentName];
 }

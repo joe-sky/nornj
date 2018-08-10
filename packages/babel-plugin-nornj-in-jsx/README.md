@@ -332,14 +332,68 @@ class TestComponent extends Component {
 }
 ```
 
+### n-mobx-model
+
+使用`n-mobx-model`可以在JSX中实现基于`Mobx`的双向数据绑定功能：
+
+```js
+import { Component } from 'react';
+import { observable } from 'mobx';
+import nj from 'nornj';
+
+class TestComponent extends Component {
+  @observable inputValue = '';
+
+  render() {
+    return <input n-mobx-model="inputValue" />;
+  }
+}
+```
+
+`n-mobx-model`的详细文档请[查看这里](https://joe-sky.github.io/nornj-guide/templateSyntax/inlineExtensionTag.html#mobx-model)。
+
+### n-mst-model
+
+`n-mst-model`即为`n-mobx-model`的`mobx-state-tree`版本：
+
+store：
+
+```js
+import { types } from "mobx-state-tree";
+
+const TestStore = types.model("TestStore",
+  {  
+    inputValue: '1'
+  })
+  .actions(self => ({
+    setInputValue(v) {
+      self.inputValue = v;
+    }
+  }));
+```
+
+component：
+
+```js
+@inject('rootStore')
+@observer
+class TestComponent extends Component {
+  render() {
+    return <input n-mst-model={`${this}.props.rootStore.testStore.inputValue`} />;
+  }
+}
+```
+
+`n-mst-model`的详细文档请[查看这里](https://joe-sky.github.io/nornj-guide/templateSyntax/inlineExtensionTag.html#mst-model)。
+
 ## 可在JSX中使用的NornJ模板字符串API
 
 ### 在JSX中使用NornJ的过滤器和表达式
 
-使用`nj.mustache`可以在JSX中以标签模板字符串的方式使用`NornJ`的过滤器和表达式：
+使用`nj.expression`可以在JSX中以标签模板字符串的方式使用`NornJ`的过滤器和表达式：
 
 ```js
-import nj, { mustache as m } from 'nornj';
+import nj, { expression as n } from 'nornj';
 
 class TestComponent extends Component {
   render() {
@@ -348,7 +402,7 @@ class TestComponent extends Component {
     return (
       <div>
         <if condition={a.b == 1}>
-          <i>{m`(${a}.b | float).toFixed(2)`}</i>
+          <i>{n`(${a}.b | float).toFixed(2)`}</i>
         </if>
       </div>
     );
@@ -356,7 +410,7 @@ class TestComponent extends Component {
 }
 ```
 
-`nj.mustache`的文档请[查看这里](https://joe-sky.github.io/nornj-guide/templateSyntax/templateString.html#njmustache)。
+`nj.expression`的文档请[查看这里](https://joe-sky.github.io/nornj-guide/templateSyntax/templateString.html#njexpression)。
 
 ### 在JSX中使用NornJ的style语法
 
