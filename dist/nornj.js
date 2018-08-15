@@ -1,5 +1,5 @@
 /*!
-* NornJ template engine v0.4.9
+* NornJ template engine v0.4.10
 * (c) 2016-2018 Joe_Sky
 * Released under the MIT License.
 */
@@ -332,6 +332,8 @@ assign(nj, {
   assign: assign
 });
 
+var COMP_NAME = '_njComponentName';
+
 function registerComponent(name, component, options) {
   var params = name,
       ret = void 0;
@@ -354,9 +356,14 @@ function registerComponent(name, component, options) {
       nj.components[_name] = comp;
       nj.componentConfig[_name] = _options;
 
-      defineProp(comp, '_njComponentName', {
-        value: _name
-      });
+      if (comp[COMP_NAME] == null) {
+        defineProp(comp, COMP_NAME, {
+          value: _name,
+          writable: true
+        });
+      } else if (_options && _options.replaceComponentName) {
+        comp[COMP_NAME] = _name;
+      }
     }
 
     if (i == 0) {

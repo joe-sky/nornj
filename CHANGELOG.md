@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [v0.4.10] 2018.08.15
+
+* 🐞 改进`nj.registerComponent`将同一组件注册多次时的策略。
+
 ## [v0.4.9] 2018.08.10
 
 * 🌟 扩展标签函数的`options`参数中增加`tagName`参数。
