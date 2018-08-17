@@ -1,5 +1,5 @@
 /*!
-* NornJ template engine v0.4.10
+* NornJ template engine v0.4.11
 * (c) 2016-2018 Joe_Sky
 * Released under the MIT License.
 */
@@ -488,6 +488,7 @@ function createTmplRule() {
     braceParamStr: braceParamStr,
     xmlOpenTag: _createRegExp('^<([a-z' + firstChar + extensionRules + '][^\\s>]*)[^>]*>$', 'i'),
     openTagParams: _createRegExp('[\\s]+(((' + startRuleR + '(' + varContent + ')' + endRuleR + ')|(' + startRule + '(' + varContent + ')' + endRule + '))|[^\\s=>]+)(=((\'[^\']+\')|("[^"]+")|([^"\'\\s]+)))?', 'g'),
+    exAttrs: _createRegExp('[\\s]+(((' + startRuleR + '(' + varContent + ')' + endRuleR + ')|(' + startRule + '(' + varContent + ')' + endRule + '))|((:?)(' + escapeExtensionRule + ')?([^\\s=>]+)))(=((\'[^\']+\')|("[^"]+")|([^"\'\\s>]+)))?', 'g'),
     braceParam: _createRegExp(braceParamStr, 'i'),
     braceParamG: _createRegExp(braceParamStr, 'ig'),
     spreadProp: _createRegExp('[\\s]+(' + startRuleR + '[\\s]*(' + varContentS + ')' + endRuleR + ')|(' + startRule + '[\\s]*(' + varContentS + ')' + endRule + ')', 'g'),
@@ -3501,7 +3502,8 @@ function _getSplitParams(elem, tmplRule, outputH) {
       endRule = tmplRule.endRule,
       firstChar = tmplRule.firstChar,
       lastChar = tmplRule.lastChar,
-      spreadProp = tmplRule.spreadProp;
+      spreadProp = tmplRule.spreadProp,
+      exAttrs = tmplRule.exAttrs;
 
   var paramsEx = void 0;
 
@@ -3520,7 +3522,11 @@ function _getSplitParams(elem, tmplRule, outputH) {
   });
 
   //Replace the parameter like "#show={false}".
-  elem = elem.replace(new RegExp('[\\s]+(:?)' + extensionRule + '([^\\s=>]+)(=((\'[^\']+\')|("[^"]+")|([^"\'\\s>]+)))?', 'g'), function (all, hasColon, name, hasEqual, value) {
+  elem = elem.replace(exAttrs, function (all, g1, g2, g3, g4, g5, g6, key, hasColon, hasEx, name, hasEqual, value) {
+    if (hasEx == null) {
+      return all;
+    }
+
     if (!paramsEx) {
       paramsEx = [extensionRule + 'props'];
     }

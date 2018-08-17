@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [v0.4.11] 2018.08.17
+
+* 🐞 修复渲染`<br style="color: #fff">`时的bug。[#17](https://github.com/joe-sky/nornj/issues/17)
+
 ## [v0.4.10] 2018.08.15
 
 * 🐞 改进`nj.registerComponent`将同一组件注册多次时的策略。

@@ -321,7 +321,7 @@ function _setElem(elem, elemName, elemParams, elemArr, bySelfClose, tmplRule, ou
 
 //Extract split parameters
 function _getSplitParams(elem, tmplRule, outputH) {
-  const { extensionRule, startRule, endRule, firstChar, lastChar, spreadProp } = tmplRule;
+  const { extensionRule, startRule, endRule, firstChar, lastChar, spreadProp, exAttrs } = tmplRule;
   let paramsEx;
 
   //Replace the parameter like "{...props}".
@@ -339,7 +339,11 @@ function _getSplitParams(elem, tmplRule, outputH) {
   });
 
   //Replace the parameter like "#show={false}".
-  elem = elem.replace(new RegExp('[\\s]+(:?)' + extensionRule + '([^\\s=>]+)(=((\'[^\']+\')|("[^"]+")|([^"\'\\s>]+)))?', 'g'), (all, hasColon, name, hasEqual, value) => {
+  elem = elem.replace(exAttrs, (all, g1, g2, g3, g4, g5, g6, key, hasColon, hasEx, name, hasEqual, value) => {
+    if (hasEx == null) {
+      return all;
+    }
+
     if (!paramsEx) {
       paramsEx = [extensionRule + 'props'];
     }
