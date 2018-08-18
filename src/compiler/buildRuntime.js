@@ -77,16 +77,16 @@ function _buildFn(content, node, fns, no, newContext, level, useStringLocal, nam
   return no;
 }
 
-function _buildOptions(config, useStringLocal, node, fns, exPropsStr, subExPropsStr, level, hashProps, valueL, parent) {
+function _buildOptions(config, useStringLocal, node, fns, exPropsStr, subExPropsStr, level, hashProps, valueL, parent, tagName) {
   let hashStr = ', useString: ' + (useStringLocal == null ? 'p1.us' : (useStringLocal ? 'true' : 'false')),
     noConfig = !config;
 
   if (node) { //扩展标签
     let newContext = config ? config.newContext : true;
-    if (noConfig || config.exProps) {
+    if (noConfig || config.exProps || node.isProp) {
       hashStr += ', exProps: ' + exPropsStr;
     }
-    if (noConfig || config.subExProps) {
+    if (noConfig || config.subExProps || node.isProp) {
       hashStr += ', subExProps: ' + subExPropsStr;
     }
     if (parent) {
@@ -94,6 +94,9 @@ function _buildOptions(config, useStringLocal, node, fns, exPropsStr, subExProps
       hashStr += ', parentName: ' + (_parentType != null ? ('\'' + _parentType + '\'') : _parentType);
     }
     hashStr += ', name: \'' + node.ex + '\'';
+    if (tagName) {
+      hashStr += ', tagName: ' + tagName;
+    }
 
     hashStr += ', result: ' + (node.content ? 'p1.r(p1, p2, p1.fn' + _buildFn(node.content, node, fns, ++fns._no, newContext, level, useStringLocal) + ', ' + exPropsStr + ', ' + subExPropsStr + ')' : 'p1.np');
 
@@ -208,6 +211,11 @@ function _buildPropData(obj, counter, fns, useStringLocal, level) {
   //有过滤器时需要生成"_value"值
   let filters = obj.prop.filters;
   if (filters) {
+    const _firstFilter = filters[0];
+    if (_firstFilter && _firstFilter.name == 'require') {
+      return 'require(' + _firstFilter.params[0].name + ')';
+    }
+
     const counterValue = counter._value++;
     let valueStr = '_value' + counterValue,
       valueStrL = '_valueL' + counterValue,
@@ -309,7 +317,7 @@ function _buildEscape(valueStr, fns, escape, special) {
 }
 
 function _replaceStrs(str) {
-  return _replaceBackslash(str).replace(/_njNl_/g, '\\n').replace(/'/g, "\\'");
+  return _replaceBackslash(str).replace(/_njNl_/g, '\\n').replace(/'/g, '\\\'');
 }
 
 function _replaceBackslash(str) {
@@ -392,7 +400,7 @@ function _buildProps(obj, counter, fns, useStringLocal, level) {
   }
 }
 
-function _buildPropsEx(isSub, paramsEC, propsEx, fns, counter, useString, exPropsStr, subExPropsStr) {
+function _buildPropsEx(isSub, paramsEC, propsEx, fns, counter, useString, exPropsStr, subExPropsStr, tagName) {
   let paramsStr = 'var _paramsE' + paramsEC + ' = {};\n';
 
   const ret = {};
@@ -405,11 +413,11 @@ function _buildPropsEx(isSub, paramsEC, propsEx, fns, counter, useString, exProp
   }
 
   //props标签的子节点
-  paramsStr += _buildContent(propsEx.content, propsEx, fns, counter, ret, null, useString);
+  paramsStr += _buildContent(propsEx.content, propsEx, fns, counter, ret, null, useString, tagName);
   return paramsStr;
 }
 
-function _buildParams(node, fns, counter, useString, level, exPropsStr, subExPropsStr) {
+function _buildParams(node, fns, counter, useString, level, exPropsStr, subExPropsStr, tagName) {
   //节点参数
   const { params, paramsEx, propsExS } = node;
   const useStringF = fns.useString,
@@ -429,11 +437,11 @@ function _buildParams(node, fns, counter, useString, level, exPropsStr, subExPro
 
       if (paramsEx) {
         _paramsEC = counter._paramsE++;
-        paramsStr += _buildPropsEx(false, _paramsEC, paramsEx, fns, counter, useString, exPropsStr, subExPropsStr);
+        paramsStr += _buildPropsEx(false, _paramsEC, paramsEx, fns, counter, useString, exPropsStr, subExPropsStr, tagName);
       }
       if (propsExS) {
         _paramsSEC = counter._paramsE++;
-        paramsStr += _buildPropsEx(true, _paramsSEC, propsExS, fns, counter, useString, exPropsStr, subExPropsStr);
+        paramsStr += _buildPropsEx(true, _paramsSEC, propsExS, fns, counter, useString, exPropsStr, subExPropsStr, tagName);
       }
 
       //合并params块的值
@@ -515,7 +523,7 @@ function _buildParams(node, fns, counter, useString, level, exPropsStr, subExPro
   return [paramsStr, _paramsC];
 }
 
-function _buildNode(node, parent, fns, counter, retType, level, useStringLocal, isFirst) {
+function _buildNode(node, parent, fns, counter, retType, level, useStringLocal, isFirst, tagName) {
   let fnStr = '',
     useStringF = fns.useString;
 
@@ -592,11 +600,11 @@ function _buildNode(node, parent, fns, counter, retType, level, useStringLocal, 
     }
 
     //hash参数
-    let retP = _buildParams(node, fns, counter, false, level, exPropsStr, subExPropsStr),
+    let retP = _buildParams(node, fns, counter, false, level, exPropsStr, subExPropsStr, tagName),
       paramsStr = retP[0],
       _paramsC = retP[1];
 
-    dataReferStr += _buildOptions(configE, useStringLocal, node, fns, exPropsStr, subExPropsStr, level, paramsStr !== '' ? '_params' + _paramsC : null, null, parent);
+    dataReferStr += _buildOptions(configE, useStringLocal, node, fns, exPropsStr, subExPropsStr, level, paramsStr !== '' ? '_params' + _paramsC : null, null, parent, tagName);
     dataReferStr += '\n];\n';
 
     //添加匿名参数
@@ -623,7 +631,8 @@ function _buildNode(node, parent, fns, counter, retType, level, useStringLocal, 
   } else { //元素节点
     //节点类型和typeRefer
     let _typeC = counter._type++,
-      _type, _typeRefer;
+      _type, _typeRefer,
+      _tagName = '_type' + _typeC;
 
     if (node.typeRefer) {
       let valueStrT = _buildProps(node.typeRefer, counter, fns, level);
@@ -657,7 +666,7 @@ function _buildNode(node, parent, fns, counter, retType, level, useStringLocal, 
     fnStr += '\nvar _type' + _typeC + ' = ' + typeStr + ';\n';
 
     //节点参数
-    let retP = _buildParams(node, fns, counter, useStringF, level),
+    let retP = _buildParams(node, fns, counter, useStringF, level, null, null, _tagName),
       paramsStr = retP[0],
       _paramsC = retP[1];
     fnStr += paramsStr;
@@ -672,7 +681,7 @@ function _buildNode(node, parent, fns, counter, retType, level, useStringLocal, 
     }
 
     //子节点
-    fnStr += _buildContent(node.content, node, fns, counter, !useStringF ? { _compParam: '_compParam' + _compParamC } : { _children: '_children' + _childrenC }, (useStringF && node.type === nj.noWsTag) ? null : (level != null ? level + 1 : level), useStringLocal);
+    fnStr += _buildContent(node.content, node, fns, counter, !useStringF ? { _compParam: '_compParam' + _compParamC } : { _children: '_children' + _childrenC }, (useStringF && node.type === nj.noWsTag) ? null : (level != null ? level + 1 : level), useStringLocal, _tagName);
 
     //渲染
     fnStr += _buildRender(node, parent, 3, retType, !useStringF ? { _compParam: _compParamC } : { _type: _typeC, _typeS: _type, _typeR: _typeRefer, _params: paramsStr !== '' ? _paramsC : null, _children: _childrenC, _selfClose: node.selfCloseTag }, fns, level, useStringLocal, node.allowNewline, isFirst);
@@ -681,7 +690,7 @@ function _buildNode(node, parent, fns, counter, retType, level, useStringLocal, 
   return fnStr;
 }
 
-function _buildContent(content, parent, fns, counter, retType, level, useStringLocal) {
+function _buildContent(content, parent, fns, counter, retType, level, useStringLocal, tagName) {
   let fnStr = '';
   if (!content) {
     return fnStr;
@@ -689,7 +698,7 @@ function _buildContent(content, parent, fns, counter, retType, level, useStringL
 
   tools.each(content, node => {
     const { useString } = node;
-    fnStr += _buildNode(node, parent, fns, counter, retType, level, useString != null ? useString : useStringLocal, fns._firstNode && level == 0);
+    fnStr += _buildNode(node, parent, fns, counter, retType, level, useString != null ? useString : useStringLocal, fns._firstNode && level == 0, tagName);
 
     if (fns._firstNode) { //输出字符串时模板第一个节点前面不加换行符
       fns._firstNode = false;

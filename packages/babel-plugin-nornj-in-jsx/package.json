@@ -1,6 +1,6 @@
 {
   "name": "babel-plugin-nornj-in-jsx",
-  "version": "0.4.2-alpha.4",
+  "version": "0.4.5",
   "description": "Make the NornJ template work gracefully in the JSX environment",
   "author": {
     "name": "Joe_Sky",
@@ -10,6 +10,7 @@
   "files": [
     "src/",
     "LICENSE",
+    "CHANGELOG.md",
     "README.md"
   ],
   "repository": {
@@ -28,33 +29,36 @@
     "for",
     "each",
     "loop",
+    "switch",
     "babel"
   ],
   "license": "MIT",
   "scripts": {
     "lint": "eslint src test",
     "test": "mocha test/index.js",
-    "cover": "istanbul cover -x \"**/test/**\" node_modules/mocha/bin/_mocha test/index.js"
+    "cover": "istanbul cover -x \"**/test/**\" node_modules/mocha/bin/_mocha test/index.js",
+    "ci": "npm run cover && cat coverage/lcov.info | node_modules/coveralls/bin/coveralls.js"
   },
   "dependencies": {
     "babel-core": "^6.1.2",
-    "babel-plugin-syntax-jsx": "^6.1.18"
+    "babel-plugin-syntax-jsx": "^6.1.18",
+    "nornj": "^0.4.9",
+    "nornj-react": "^0.4.3"
   },
   "devDependencies": {
     "babel-eslint": "^6.0.3",
+    "babel-plugin-transform-object-rest-spread": "^6.26.0",
     "babel-preset-react": "^6.1.2",
     "chai": "^3.5.0",
     "chai-spies": "^0.7.1",
     "coveralls": "^2.11.6",
     "create-react-class": "^15.6.3",
     "eslint": "^3.4.0",
-    "eslint-config-airbnb": "^10.0.1",
     "eslint-plugin-react": "^6.2.0",
     "istanbul": "^0.4.1",
     "mocha": "^3.0.2",
-    "nornj": "^0.4.4",
-    "nornj-react": "^0.4.2",
     "react": "^16.3.0",
-    "react-dom": "^16.3.0"
+    "react-dom": "^16.3.0",
+    "styled-jsx": "^2.2.7"
   }
 }

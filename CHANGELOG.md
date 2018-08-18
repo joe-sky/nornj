@@ -1,5 +1,38 @@
 # CHANGELOG
 
+## [v0.4.11] 2018.08.17
+
+* 🐞 修复渲染`<br style="color: #fff">`时的bug。[#17](https://github.com/joe-sky/nornj/issues/17)
+
+## [v0.4.10] 2018.08.15
+
+* 🐞 改进`nj.registerComponent`将同一组件注册多次时的策略。
+
+## [v0.4.9] 2018.08.10
+
+* 🌟 扩展标签函数的`options`参数中增加`tagName`参数。
+* 🌟 `nj.registerComponent`支持传入组件配置属性。
+* 🌟 新增API`nj.getComponentConfig`和`nj.expression`。
+* 🐞 修复 `<input #mobx-model={value}>` bug。
+* 🐞 修复扩展属性不能添加多个的bug。
+
+## [v0.4.8] 2018.07.22
+
+* 🌟 支持配合`webpack`使用时，直接在模板中使用`require`方法引入图片等资源。[查看文档](https://joe-sky.github.io/nornj-guide/api/webpack.html#%E5%9C%A8%E5%8D%95%E6%96%87%E4%BB%B6%E6%A8%A1%E6%9D%BF%E4%B8%AD%E5%BC%95%E5%85%A5%E5%9B%BE%E7%89%87%E7%AD%89%E8%B5%84%E6%BA%90)
+
+## [v0.4.7] 2018.05.27
+
+* 🌟 增加新API `nj.css`。[查看文档](https://joe-sky.github.io/nornj-guide/templateSyntax/templateString.html#njcss)
+* 🌟 `<#with>`标签新增创建变量语法。[查看文档](https://joe-sky.github.io/nornj-guide/templateSyntax/built-inExtensionTag.html#with)
+
+## [v0.4.6] 2018.05.25
+
+* 🐞 修复 `nj.mustache` bug。
+
+## [v0.4.5] 2018.05.23
+
+* 🌟 增加新API `nj.mustache`。[查看文档](https://joe-sky.github.io/nornj-guide/templateSyntax/templateString.html#njmustache)
+
 ## [v0.4.4] 2018.05.07
 
 * 🌟 表达式支持`{{!a.b.c}}`。
@@ -9,7 +42,7 @@
 ## [v0.4.3] 2018.04.28
 
 * 🌟 `<#each>`标签增加`@item`参数。
-* 🌟 增加新API `nj.template`。
+* 🌟 增加新API `nj.template`。[查看文档](https://joe-sky.github.io/nornj-guide/templateSyntax/templateString.html#njtemplate)
 
 ## [v0.4.2] 2018.04.11
 

@@ -139,13 +139,16 @@ const REGEX_OBJKEY_FILTER = /([(,][\s]*)([^\s:,'"()|]+):/g;
 const REGEX_SET_FILTER = /^[\s]*set[\s]+|([(,])[\s]*set[\s]+/g;
 const REGEX_BRACKET_FILTER = /^[\s]*([(]+)|([(,])[\s]*([(]+)/g;
 
-function _getProp(matchArr, innerQuotes, i) {
+function _getProp(matchArr, innerQuotes, i, addSet) {
   let prop = matchArr[2].trim(),
-    item = [matchArr[0], matchArr[1], null, true],
-    innerArrProp = [];
+    item = [matchArr[0], matchArr[1], null, true];
 
   if (i > 0) {
     item[3] = false; //Sign not contain all of placehorder
+  }
+
+  if (addSet) {
+    prop = 'set ' + prop;
   }
 
   //替换特殊过滤器名称并且为简化过滤器补全"|"符
@@ -177,7 +180,7 @@ function _getProp(matchArr, innerQuotes, i) {
   return item;
 }
 
-function _getReplaceParam(obj, tmplRule, innerQuotes, hasColon) {
+function _getReplaceParam(obj, tmplRule, innerQuotes, hasColon, addSet) {
   let pattern = tmplRule.replaceParam,
     matchArr, ret, i = 0;
 
@@ -188,12 +191,12 @@ function _getReplaceParam(obj, tmplRule, innerQuotes, hasColon) {
       }
 
       const startRuleR = matchArr[2];
-      ret.push(_getProp([matchArr[0], startRuleR ? startRuleR : matchArr[5], startRuleR ? matchArr[3] : matchArr[6]], innerQuotes, i));
+      ret.push(_getProp([matchArr[0], startRuleR ? startRuleR : matchArr[5], startRuleR ? matchArr[3] : matchArr[6]], innerQuotes, i, addSet));
       i++;
     }
   } else {
     matchArr = [obj, tmplRule.startRule, obj];
-    ret = [_getProp(matchArr, innerQuotes, i)];
+    ret = [_getProp(matchArr, innerQuotes, i, addSet)];
   }
 
   return ret;
@@ -238,7 +241,7 @@ function _replaceInnerBrackets(prop, innerBrackets) {
 }
 
 //Get compiled parameter
-export function compiledParam(value, tmplRule, hasColon, onlyKey) {
+export function compiledParam(value, tmplRule, hasColon, onlyKey, addSet) {
   let ret = tools.obj(),
     isStr = tools.isString(value),
     strs = isStr ? (!hasColon ? value.split(tmplRule.replaceSplit) : ['', '']) : [value],
@@ -252,7 +255,7 @@ export function compiledParam(value, tmplRule, hasColon, onlyKey) {
   //If have placehorder
   if (strs.length > 1) {
     const innerQuotes = [];
-    const params = _getReplaceParam(value, tmplRule, innerQuotes, hasColon);
+    const params = _getReplaceParam(value, tmplRule, innerQuotes, hasColon, addSet);
     props = [];
 
     tools.each(params, param => {

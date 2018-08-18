@@ -1,5 +1,5 @@
 /*!
-* NornJ template engine v0.4.4
+* NornJ template engine v0.4.11
 * (c) 2016-2018 Joe_Sky
 * Released under the MIT License.
 */
@@ -9,6 +9,7 @@ function nj() {
 
 nj.createElement = null;
 nj.components = {};
+nj.componentConfig = {};
 nj.preAsts = {};
 nj.asts = {};
 nj.templates = {};
@@ -325,23 +326,55 @@ assign(nj, {
   assign: assign
 });
 
-//注册组件
-function registerComponent(name, component) {
+var COMP_NAME = '_njComponentName';
+
+function registerComponent(name, component, options) {
   var params = name,
       ret = void 0;
   if (!isObject(name)) {
     params = {};
-    params[name] = component;
+    params[name] = {
+      component: component,
+      options: options
+    };
   }
 
   each(params, function (v, k, i) {
-    nj.components[k.toLowerCase()] = v;
+    if (v != null) {
+      var _component = v.component,
+          _options = v.options;
+
+      var _name = k.toLowerCase();
+
+      var comp = _component ? _component : v;
+      nj.components[_name] = comp;
+      nj.componentConfig[_name] = _options;
+
+      if (comp[COMP_NAME] == null) {
+        defineProp(comp, COMP_NAME, {
+          value: _name,
+          writable: true
+        });
+      } else if (_options && _options.replaceComponentName) {
+        comp[COMP_NAME] = _name;
+      }
+    }
+
     if (i == 0) {
       ret = v;
+    } else {
+      if (i == 1) {
+        ret = [ret];
+      }
+      ret.push(v);
     }
   }, false, false);
 
   return ret;
+}
+
+function getComponentConfig(name) {
+  return nj.componentConfig[isString(name) ? name : name._njComponentName];
 }
 
 function _createRegExp(reg, mode) {
@@ -455,6 +488,7 @@ function createTmplRule() {
     braceParamStr: braceParamStr,
     xmlOpenTag: _createRegExp('^<([a-z' + firstChar + extensionRules + '][^\\s>]*)[^>]*>$', 'i'),
     openTagParams: _createRegExp('[\\s]+(((' + startRuleR + '(' + varContent + ')' + endRuleR + ')|(' + startRule + '(' + varContent + ')' + endRule + '))|[^\\s=>]+)(=((\'[^\']+\')|("[^"]+")|([^"\'\\s]+)))?', 'g'),
+    exAttrs: _createRegExp('[\\s]+(((' + startRuleR + '(' + varContent + ')' + endRuleR + ')|(' + startRule + '(' + varContent + ')' + endRule + '))|((:?)(' + escapeExtensionRule + ')?([^\\s=>]+)))(=((\'[^\']+\')|("[^"]+")|([^"\'\\s>]+)))?', 'g'),
     braceParam: _createRegExp(braceParamStr, 'i'),
     braceParamG: _createRegExp(braceParamStr, 'ig'),
     spreadProp: _createRegExp('[\\s]+(' + startRuleR + '[\\s]*(' + varContentS + ')' + endRuleR + ')|(' + startRule + '[\\s]*(' + varContentS + ')' + endRule + ')', 'g'),
@@ -1125,12 +1159,21 @@ var extensions = {
   },
 
   'with': function _with(originalData, options) {
-    var props = options.props;
+    if (originalData && originalData._njOpts) {
+      options = originalData;
+
+      return options.result({
+        data: [options.props]
+      });
+    } else {
+      var _options = options,
+          props = _options.props;
 
 
-    return options.result({
-      data: [props && props.as ? defineProperty({}, props.as, originalData) : originalData]
-    });
+      return options.result({
+        data: [props && props.as ? defineProperty({}, props.as, originalData) : originalData]
+      });
+    }
   },
 
   arg: function arg(options) {
@@ -1153,6 +1196,10 @@ var extensions = {
       cache = cacheObj[cacheKey] = options.result();
     }
     return cache;
+  },
+
+  css: function css(options) {
+    return options.props.style;
   }
 };
 
@@ -1165,7 +1212,8 @@ function _config(params) {
     isProp: false,
     subExProps: false,
     isSub: false,
-    addSet: false
+    addSet: false,
+    useExpressionInJsx: 'onlyTemplateLiteral'
   };
 
   if (params) {
@@ -1188,7 +1236,8 @@ var extensionConfig = {
   obj: _config({ onlyGlobal: true, newContext: false }),
   list: _config(_defaultCfg),
   fn: _config({ onlyGlobal: true }),
-  'with': _config({ onlyGlobal: true })
+  'with': _config({ onlyGlobal: true }),
+  style: { useExpressionInJsx: false }
 };
 extensionConfig.elseif = _config(extensionConfig['else']);
 extensionConfig['for'] = _config(extensionConfig.each);
@@ -1197,6 +1246,7 @@ extensionConfig.pre = _config(extensionConfig.obj);
 extensionConfig.arg = _config(extensionConfig.prop);
 extensionConfig.once = _config(extensionConfig.obj);
 extensionConfig.show = _config(extensionConfig.prop);
+extensionConfig.css = _config(extensionConfig.obj);
 
 //Extension alias
 extensions['case'] = extensions.elseif;
@@ -1222,7 +1272,7 @@ function registerExtension(name, extension, options) {
   each(params, function (v, name) {
     if (v) {
       var _extension = v.extension,
-          _options = v.options;
+          _options2 = v.options;
 
 
       if (_extension) {
@@ -1230,7 +1280,7 @@ function registerExtension(name, extension, options) {
       } else {
         extensions[name] = v;
       }
-      extensionConfig[name] = _config(_options);
+      extensionConfig[name] = _config(_options2);
     }
   }, false, false);
 }
@@ -1682,12 +1732,16 @@ var REGEX_OBJKEY_FILTER = /([(,][\s]*)([^\s:,'"()|]+):/g;
 var REGEX_SET_FILTER = /^[\s]*set[\s]+|([(,])[\s]*set[\s]+/g;
 var REGEX_BRACKET_FILTER = /^[\s]*([(]+)|([(,])[\s]*([(]+)/g;
 
-function _getProp(matchArr, innerQuotes, i) {
+function _getProp(matchArr, innerQuotes, i, addSet) {
   var prop = matchArr[2].trim(),
       item = [matchArr[0], matchArr[1], null, true];
 
   if (i > 0) {
     item[3] = false; //Sign not contain all of placehorder
+  }
+
+  if (addSet) {
+    prop = 'set ' + prop;
   }
 
   //替换特殊过滤器名称并且为简化过滤器补全"|"符
@@ -1727,7 +1781,7 @@ function _getProp(matchArr, innerQuotes, i) {
   return item;
 }
 
-function _getReplaceParam(obj$$1, tmplRule, innerQuotes, hasColon) {
+function _getReplaceParam(obj$$1, tmplRule, innerQuotes, hasColon, addSet) {
   var pattern = tmplRule.replaceParam,
       matchArr = void 0,
       ret = void 0,
@@ -1740,12 +1794,12 @@ function _getReplaceParam(obj$$1, tmplRule, innerQuotes, hasColon) {
       }
 
       var startRuleR = matchArr[2];
-      ret.push(_getProp([matchArr[0], startRuleR ? startRuleR : matchArr[5], startRuleR ? matchArr[3] : matchArr[6]], innerQuotes, i));
+      ret.push(_getProp([matchArr[0], startRuleR ? startRuleR : matchArr[5], startRuleR ? matchArr[3] : matchArr[6]], innerQuotes, i, addSet));
       i++;
     }
   } else {
     matchArr = [obj$$1, tmplRule.startRule, obj$$1];
-    ret = [_getProp(matchArr, innerQuotes, i)];
+    ret = [_getProp(matchArr, innerQuotes, i, addSet)];
   }
 
   return ret;
@@ -1793,7 +1847,7 @@ function _replaceInnerBrackets(prop, innerBrackets) {
 }
 
 //Get compiled parameter
-function compiledParam(value, tmplRule, hasColon, onlyKey) {
+function compiledParam(value, tmplRule, hasColon, onlyKey, addSet) {
   var ret = obj(),
       isStr = isString(value),
       strs = isStr ? !hasColon ? value.split(tmplRule.replaceSplit) : ['', ''] : [value],
@@ -1810,7 +1864,7 @@ function compiledParam(value, tmplRule, hasColon, onlyKey) {
   //If have placehorder
   if (strs.length > 1) {
     var innerQuotes = [];
-    var params = _getReplaceParam(value, tmplRule, innerQuotes, hasColon);
+    var params = _getReplaceParam(value, tmplRule, innerQuotes, hasColon, addSet);
     props = [];
 
     each(params, function (param) {
@@ -2038,7 +2092,7 @@ var NO_SPLIT_NEWLINE = ['style', 'script', 'textarea', 'pre', 'xmp', 'template',
 function _plainTextNode(obj$$1, parent, parentContent, noSplitNewline, tmplRule) {
   var node = {};
   node.type = 'nj_plaintext';
-  node.content = [compiledParam(obj$$1, tmplRule)];
+  node.content = [compiledParam(obj$$1, tmplRule, null, null, parent.ex != null ? exCompileConfig(parent.ex).addSet : null)];
   node.allowNewline = noSplitNewline;
   parent[parentContent].push(node);
 }
@@ -2143,6 +2197,10 @@ function checkElem(obj$$1, parent, tmplRule, hasExProps, noSplitNewline, isLast)
 
           if (key === 'useString') {
             node.useString = !(value === 'false');
+            return;
+          } else if (key === '_njIsProp') {
+            node.isProp = isProp = true;
+            needAddToProps = !hasExProps;
             return;
           }
 
@@ -2329,17 +2387,17 @@ function _buildFn(content, node, fns, no, newContext$$1, level, useStringLocal, 
   return no;
 }
 
-function _buildOptions(config, useStringLocal, node, fns, exPropsStr, subExPropsStr, level, hashProps, valueL, parent) {
+function _buildOptions(config, useStringLocal, node, fns, exPropsStr, subExPropsStr, level, hashProps, valueL, parent, tagName) {
   var hashStr = ', useString: ' + (useStringLocal == null ? 'p1.us' : useStringLocal ? 'true' : 'false'),
       noConfig = !config;
 
   if (node) {
     //扩展标签
     var newContext$$1 = config ? config.newContext : true;
-    if (noConfig || config.exProps) {
+    if (noConfig || config.exProps || node.isProp) {
       hashStr += ', exProps: ' + exPropsStr;
     }
-    if (noConfig || config.subExProps) {
+    if (noConfig || config.subExProps || node.isProp) {
       hashStr += ', subExProps: ' + subExPropsStr;
     }
     if (parent) {
@@ -2347,6 +2405,9 @@ function _buildOptions(config, useStringLocal, node, fns, exPropsStr, subExProps
       hashStr += ', parentName: ' + (_parentType != null ? '\'' + _parentType + '\'' : _parentType);
     }
     hashStr += ', name: \'' + node.ex + '\'';
+    if (tagName) {
+      hashStr += ', tagName: ' + tagName;
+    }
 
     hashStr += ', result: ' + (node.content ? 'p1.r(p1, p2, p1.fn' + _buildFn(node.content, node, fns, ++fns._no, newContext$$1, level, useStringLocal) + ', ' + exPropsStr + ', ' + subExPropsStr + ')' : 'p1.np');
 
@@ -2467,6 +2528,11 @@ function _buildPropData(obj$$1, counter, fns, useStringLocal, level) {
   //有过滤器时需要生成"_value"值
   var filters$$1 = obj$$1.prop.filters;
   if (filters$$1) {
+    var _firstFilter = filters$$1[0];
+    if (_firstFilter && _firstFilter.name == 'require') {
+      return 'require(' + _firstFilter.params[0].name + ')';
+    }
+
     var counterValue = counter._value++;
     var valueStr = '_value' + counterValue,
         valueStrL = '_valueL' + counterValue,
@@ -2569,7 +2635,7 @@ function _buildEscape(valueStr, fns, escape$$1, special) {
 }
 
 function _replaceStrs(str) {
-  return _replaceBackslash(str).replace(/_njNl_/g, '\\n').replace(/'/g, "\\'");
+  return _replaceBackslash(str).replace(/_njNl_/g, '\\n').replace(/'/g, '\\\'');
 }
 
 function _replaceBackslash(str) {
@@ -2654,7 +2720,7 @@ function _buildProps(obj$$1, counter, fns, useStringLocal, level) {
   }
 }
 
-function _buildPropsEx(isSub, paramsEC, propsEx, fns, counter, useString, exPropsStr, subExPropsStr) {
+function _buildPropsEx(isSub, paramsEC, propsEx, fns, counter, useString, exPropsStr, subExPropsStr, tagName) {
   var paramsStr = 'var _paramsE' + paramsEC + ' = {};\n';
 
   var ret = {};
@@ -2667,11 +2733,11 @@ function _buildPropsEx(isSub, paramsEC, propsEx, fns, counter, useString, exProp
   }
 
   //props标签的子节点
-  paramsStr += _buildContent(propsEx.content, propsEx, fns, counter, ret, null, useString);
+  paramsStr += _buildContent(propsEx.content, propsEx, fns, counter, ret, null, useString, tagName);
   return paramsStr;
 }
 
-function _buildParams(node, fns, counter, useString, level, exPropsStr, subExPropsStr) {
+function _buildParams(node, fns, counter, useString, level, exPropsStr, subExPropsStr, tagName) {
   //节点参数
   var params = node.params,
       paramsEx = node.paramsEx,
@@ -2695,11 +2761,11 @@ function _buildParams(node, fns, counter, useString, level, exPropsStr, subExPro
 
       if (paramsEx) {
         _paramsEC = counter._paramsE++;
-        paramsStr += _buildPropsEx(false, _paramsEC, paramsEx, fns, counter, useString, exPropsStr, subExPropsStr);
+        paramsStr += _buildPropsEx(false, _paramsEC, paramsEx, fns, counter, useString, exPropsStr, subExPropsStr, tagName);
       }
       if (propsExS) {
         _paramsSEC = counter._paramsE++;
-        paramsStr += _buildPropsEx(true, _paramsSEC, propsExS, fns, counter, useString, exPropsStr, subExPropsStr);
+        paramsStr += _buildPropsEx(true, _paramsSEC, propsExS, fns, counter, useString, exPropsStr, subExPropsStr, tagName);
       }
 
       //合并params块的值
@@ -2782,7 +2848,7 @@ function _buildParams(node, fns, counter, useString, level, exPropsStr, subExPro
   return [paramsStr, _paramsC];
 }
 
-function _buildNode(node, parent, fns, counter, retType, level, useStringLocal, isFirst) {
+function _buildNode(node, parent, fns, counter, retType, level, useStringLocal, isFirst, tagName) {
   var fnStr = '',
       useStringF = fns.useString;
 
@@ -2867,11 +2933,11 @@ function _buildNode(node, parent, fns, counter, retType, level, useStringLocal, 
     }
 
     //hash参数
-    var retP = _buildParams(node, fns, counter, false, level, exPropsStr, subExPropsStr),
+    var retP = _buildParams(node, fns, counter, false, level, exPropsStr, subExPropsStr, tagName),
         paramsStr = retP[0],
         _paramsC = retP[1];
 
-    dataReferStr += _buildOptions(configE, useStringLocal, node, fns, exPropsStr, subExPropsStr, level, paramsStr !== '' ? '_params' + _paramsC : null, null, parent);
+    dataReferStr += _buildOptions(configE, useStringLocal, node, fns, exPropsStr, subExPropsStr, level, paramsStr !== '' ? '_params' + _paramsC : null, null, parent, tagName);
     dataReferStr += '\n];\n';
 
     //添加匿名参数
@@ -2901,7 +2967,8 @@ function _buildNode(node, parent, fns, counter, retType, level, useStringLocal, 
     //节点类型和typeRefer
     var _typeC = counter._type++,
         _type = void 0,
-        _typeRefer = void 0;
+        _typeRefer = void 0,
+        _tagName = '_type' + _typeC;
 
     if (node.typeRefer) {
       var valueStrT = _buildProps(node.typeRefer, counter, fns, level);
@@ -2935,7 +3002,7 @@ function _buildNode(node, parent, fns, counter, retType, level, useStringLocal, 
     fnStr += '\nvar _type' + _typeC + ' = ' + typeStr + ';\n';
 
     //节点参数
-    var _retP = _buildParams(node, fns, counter, useStringF, level),
+    var _retP = _buildParams(node, fns, counter, useStringF, level, null, null, _tagName),
         _paramsStr = _retP[0],
         _paramsC2 = _retP[1];
     fnStr += _paramsStr;
@@ -2953,7 +3020,7 @@ function _buildNode(node, parent, fns, counter, retType, level, useStringLocal, 
     }
 
     //子节点
-    fnStr += _buildContent(node.content, node, fns, counter, !useStringF ? { _compParam: '_compParam' + _compParamC } : { _children: '_children' + _childrenC }, useStringF && node.type === nj.noWsTag ? null : level != null ? level + 1 : level, useStringLocal);
+    fnStr += _buildContent(node.content, node, fns, counter, !useStringF ? { _compParam: '_compParam' + _compParamC } : { _children: '_children' + _childrenC }, useStringF && node.type === nj.noWsTag ? null : level != null ? level + 1 : level, useStringLocal, _tagName);
 
     //渲染
     fnStr += _buildRender(node, parent, 3, retType, !useStringF ? { _compParam: _compParamC } : { _type: _typeC, _typeS: _type, _typeR: _typeRefer, _params: _paramsStr !== '' ? _paramsC2 : null, _children: _childrenC, _selfClose: node.selfCloseTag }, fns, level, useStringLocal, node.allowNewline, isFirst);
@@ -2962,7 +3029,7 @@ function _buildNode(node, parent, fns, counter, retType, level, useStringLocal, 
   return fnStr;
 }
 
-function _buildContent(content, parent, fns, counter, retType, level, useStringLocal) {
+function _buildContent(content, parent, fns, counter, retType, level, useStringLocal, tagName) {
   var fnStr = '';
   if (!content) {
     return fnStr;
@@ -2971,7 +3038,7 @@ function _buildContent(content, parent, fns, counter, retType, level, useStringL
   each(content, function (node) {
     var useString = node.useString;
 
-    fnStr += _buildNode(node, parent, fns, counter, retType, level, useString != null ? useString : useStringLocal, fns._firstNode && level == 0);
+    fnStr += _buildNode(node, parent, fns, counter, retType, level, useString != null ? useString : useStringLocal, fns._firstNode && level == 0, tagName);
 
     if (fns._firstNode) {
       //输出字符串时模板第一个节点前面不加换行符
@@ -3102,7 +3169,9 @@ function compileStringTmpl(tmpl) {
   var outputH = this.outputH,
       tmplRule = this.tmplRule,
       onlyParse = this.onlyParse,
-      fileName = this.fileName;
+      fileName = this.fileName,
+      isMustache = this.isMustache,
+      isCss = this.isCss;
 
 
   if (!ret) {
@@ -3116,6 +3185,14 @@ function compileStringTmpl(tmpl) {
     //Connection xml string
     each(xmls, function (xml, i) {
       var split = '';
+
+      if (i == 0) {
+        if (isMustache) {
+          xml = (outputH ? tmplRule.firstChar : '') + tmplRule.startRule + ' ' + xml;
+        } else if (isCss) {
+          xml = '<' + tmplRule.extensionRule + 'css style="' + xml;
+        }
+      }
       if (i < l - 1) {
         var last = xml.length - 1,
             lastChar = xml[last],
@@ -3142,6 +3219,13 @@ function compileStringTmpl(tmpl) {
         split = (isComputed ? '#' : isSpread ? '...' : '') + SPLIT_FLAG + i;
         if (!isInBrace) {
           split = tmplRule.startRule + split + tmplRule.endRule;
+        }
+      }
+      if (i == l - 1) {
+        if (isMustache) {
+          xml += ' ' + tmplRule.endRule + (outputH ? tmplRule.lastChar : '');
+        } else if (isCss) {
+          xml += '" />';
         }
       }
 
@@ -3411,10 +3495,6 @@ function _setElem(elem, elemName, elemParams, elemArr, bySelfClose, tmplRule, ou
   }
 }
 
-function _inlineExTagValue(name, value) {
-  return (exCompileConfig(name).addSet ? 'set ' : '') + value;
-}
-
 //Extract split parameters
 function _getSplitParams(elem, tmplRule, outputH) {
   var extensionRule = tmplRule.extensionRule,
@@ -3422,7 +3502,8 @@ function _getSplitParams(elem, tmplRule, outputH) {
       endRule = tmplRule.endRule,
       firstChar = tmplRule.firstChar,
       lastChar = tmplRule.lastChar,
-      spreadProp = tmplRule.spreadProp;
+      spreadProp = tmplRule.spreadProp,
+      exAttrs = tmplRule.exAttrs;
 
   var paramsEx = void 0;
 
@@ -3441,12 +3522,18 @@ function _getSplitParams(elem, tmplRule, outputH) {
   });
 
   //Replace the parameter like "#show={false}".
-  elem = elem.replace(new RegExp('[\\s]+(:?)' + extensionRule + '([^\\s=>]+)=((\'[^\']+\')|("[^"]+")|([^"\'\\s>]+))'), function (all, hasColon, name, value) {
+  elem = elem.replace(exAttrs, function (all, g1, g2, g3, g4, g5, g6, key, hasColon, hasEx, name, hasEqual, value) {
+    if (hasEx == null) {
+      return all;
+    }
+
     if (!paramsEx) {
       paramsEx = [extensionRule + 'props'];
     }
 
-    paramsEx.push([extensionRule + name, (hasColon ? (outputH ? firstChar : '') + startRule + ' ' : '') + _inlineExTagValue(name, clearQuot(value)) + (hasColon ? ' ' + endRule + (outputH ? lastChar : '') : '')]);
+    var exPreAst = [extensionRule + name + ' _njIsProp' + (hasEqual ? '' : ' /')];
+    hasEqual && exPreAst.push((hasColon ? (outputH ? firstChar : '') + startRule + ' ' : '') + clearQuot(value) + (hasColon ? ' ' + endRule + (outputH ? lastChar : '') : ''));
+    paramsEx.push(exPreAst);
     return ' ';
   });
 
@@ -3589,12 +3676,14 @@ function createTaggedTmpl() {
   var opts = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
   var outputH = opts.outputH,
       delimiters = opts.delimiters,
-      fileName = opts.fileName;
+      fileName = opts.fileName,
+      isMustache = opts.isMustache,
+      isCss = opts.isCss;
 
   var tmplRule = delimiters ? createTmplRule(delimiters) : nj.tmplRule;
 
   return function () {
-    return compileStringTmpl.apply({ tmplRule: tmplRule, outputH: outputH, fileName: fileName }, arguments);
+    return compileStringTmpl.apply({ tmplRule: tmplRule, outputH: outputH, fileName: fileName, isMustache: isMustache, isCss: isCss }, arguments);
   };
 }
 
@@ -3605,10 +3694,21 @@ function createTaggedTmplH() {
   return createTaggedTmpl(opts);
 }
 
-var taggedTmpl = createTaggedTmpl({ outputH: false });
+var taggedTmpl = createTaggedTmpl();
 var taggedTmplH = createTaggedTmplH();
 function template$1() {
   return (nj.outputH ? taggedTmplH : taggedTmpl).apply(null, arguments)();
+}
+
+var _taggedMustache = createTaggedTmpl({ isMustache: true });
+var _taggedMustacheH = createTaggedTmplH({ isMustache: true });
+function mustache() {
+  return (nj.outputH ? _taggedMustacheH : _taggedMustache).apply(null, arguments)();
+}
+
+var _taggedCssH = createTaggedTmplH({ isCss: true });
+function css() {
+  return _taggedCssH.apply(null, arguments)();
 }
 
 assign(nj, {
@@ -3616,11 +3716,15 @@ assign(nj, {
   createTaggedTmplH: createTaggedTmplH,
   taggedTmpl: taggedTmpl,
   taggedTmplH: taggedTmplH,
-  template: template$1
+  template: template$1,
+  mustache: mustache,
+  expression: mustache,
+  css: css
 });
 
 assign(nj, {
   registerComponent: registerComponent,
+  getComponentConfig: getComponentConfig,
   createTmplRule: createTmplRule,
   config: config
 });
@@ -3630,4 +3734,4 @@ var _global = nj.global;
 _global.NornJ = _global.nj = nj;
 
 export default nj;
-export { registerComponent, registerExtension, registerFilter, compile, compileH, render, renderH, taggedTmpl, taggedTmplH, template$1 as template };
+export { registerComponent, registerExtension, registerFilter, compile, compileH, render, renderH, taggedTmpl, taggedTmplH, template$1 as template, mustache, mustache as expression, css };

@@ -16,7 +16,7 @@ const { OMITTED_CLOSE_TAGS } = tranElem;
 export default function compileStringTmpl(tmpl) {
   let tmplKey = tmpl.toString(), //Get unique key
     ret = preAsts[tmplKey];
-  const { outputH, tmplRule, onlyParse, fileName } = this;
+  const { outputH, tmplRule, onlyParse, fileName, isMustache, isCss } = this;
 
   if (!ret) { //If the cache already has template data, direct return the template.
     let isStr = tools.isString(tmpl),
@@ -28,6 +28,15 @@ export default function compileStringTmpl(tmpl) {
     //Connection xml string
     tools.each(xmls, (xml, i) => {
       let split = '';
+
+      if (i == 0) {
+        if (isMustache) {
+          xml = (outputH ? tmplRule.firstChar : '') + tmplRule.startRule + ' ' + xml;
+        }
+        else if (isCss) {
+          xml = '<' + tmplRule.extensionRule + 'css style="' + xml;
+        }
+      }
       if (i < l - 1) {
         const last = xml.length - 1,
           lastChar = xml[last],
@@ -54,6 +63,14 @@ export default function compileStringTmpl(tmpl) {
         split = (isComputed ? '#' : (isSpread ? '...' : '')) + SPLIT_FLAG + i;
         if (!isInBrace) {
           split = tmplRule.startRule + split + tmplRule.endRule;
+        }
+      }
+      if (i == l - 1) {
+        if (isMustache) {
+          xml += ' ' + tmplRule.endRule + (outputH ? tmplRule.lastChar : '');
+        }
+        else if (isCss) {
+          xml += '" />';
         }
       }
 
@@ -102,9 +119,9 @@ export default function compileStringTmpl(tmpl) {
 
   let tmplFn;
   if (!onlyParse) {
-    tmplFn = params ? function() {
+    tmplFn = params ? function () {
       return tmplMainFn.apply(this, tools.arrayPush([params], arguments));
-    } : function() {
+    } : function () {
       return tmplMainFn.apply(this, arguments);
     };
     tools.defineProps(tmplFn, {
@@ -169,9 +186,9 @@ function _checkStringElem(xml, tmplRule, outputH) {
       let isEx = elem ? tranElem.isExAll(elemName, tmplRule) : false;
 
       if (isEx && !isEx[1] && (tranElem.isPropS(elemName, tmplRule) ||
-          tranElem.isStrPropS(elemName, tmplRule) ||
-          tranElem.isParamsEx(isEx[3]) ||
-          tranElem.exCompileConfig(isEx[3]).isProp)) {
+        tranElem.isStrPropS(elemName, tmplRule) ||
+        tranElem.isParamsEx(isEx[3]) ||
+        tranElem.exCompileConfig(isEx[3]).isProp)) {
         parent = current;
         current = _createCurrent(_elemName, parent);
         _setElem(_elem, _elemName, _elemParams, current.elem, null, tmplRule, outputH);
@@ -302,13 +319,9 @@ function _setElem(elem, elemName, elemParams, elemArr, bySelfClose, tmplRule, ou
   }
 }
 
-function _inlineExTagValue(name, value) {
-  return (tranElem.exCompileConfig(name).addSet ? 'set ' : '') + value;
-}
-
 //Extract split parameters
 function _getSplitParams(elem, tmplRule, outputH) {
-  const { extensionRule, startRule, endRule, firstChar, lastChar, spreadProp } = tmplRule;
+  const { extensionRule, startRule, endRule, firstChar, lastChar, spreadProp, exAttrs } = tmplRule;
   let paramsEx;
 
   //Replace the parameter like "{...props}".
@@ -326,12 +339,18 @@ function _getSplitParams(elem, tmplRule, outputH) {
   });
 
   //Replace the parameter like "#show={false}".
-  elem = elem.replace(new RegExp('[\\s]+(:?)' + extensionRule + '([^\\s=>]+)=((\'[^\']+\')|("[^"]+")|([^"\'\\s>]+))'), (all, hasColon, name, value) => {
+  elem = elem.replace(exAttrs, (all, g1, g2, g3, g4, g5, g6, key, hasColon, hasEx, name, hasEqual, value) => {
+    if (hasEx == null) {
+      return all;
+    }
+
     if (!paramsEx) {
       paramsEx = [extensionRule + 'props'];
     }
 
-    paramsEx.push([extensionRule + name, (hasColon ? ((outputH ? firstChar : '') + startRule + ' ') : '') + _inlineExTagValue(name, tools.clearQuot(value)) + (hasColon ? (' ' + endRule + (outputH ? lastChar : '')) : '')]);
+    const exPreAst = [extensionRule + name + ' _njIsProp' + (hasEqual ? '' : ' /')];
+    hasEqual && exPreAst.push((hasColon ? ((outputH ? firstChar : '') + startRule + ' ') : '') + tools.clearQuot(value) + (hasColon ? (' ' + endRule + (outputH ? lastChar : '')) : ''));
+    paramsEx.push(exPreAst);
     return ' ';
   });
 

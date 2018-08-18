@@ -44,8 +44,8 @@ describe('filter', () => {
     expect(render('{{ undefined !== null }}')).toBe(true);
   });
 
-  it('?', () => {
-    expect(render('{{ 1 > 2 ? (true, false) }}')).toBe(false);
+  it('?:', () => {
+    expect(render('{{ 1 > 2 ?: (true, false) }}')).toBe(false);
   });
 
   it('!', () => {
@@ -81,7 +81,7 @@ describe('filter', () => {
   });
 
   it('int & float', () => {
-    expect(render("{{ 20.5 | int * (10.05 | float) + (2 ** 3) + (19 // 2) }}")).toBe(218);
+    expect(render("{{ 20.5 | int * (10.05 | float) + (2 ** 3) + (19 %% 2) }}")).toBe(218);
   });
 
   it('bool', () => {
@@ -93,11 +93,11 @@ describe('filter', () => {
   });
 
   it('..', () => {
-    expect(render("{{ 0 .. 5 .length }}")).toBe(6);
+    expect(render("{{ (0 .. 5).length }}")).toBe(6);
   });
 
   it('..>', () => {
-    expect(render("{{ 0 ..< 5 .length }}")).toBe(5);
+    expect(render("{{ (0 ..< 5).length }}")).toBe(5);
   });
 
   it('<=>', () => {

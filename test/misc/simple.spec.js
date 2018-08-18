@@ -5,14 +5,14 @@ const nj = require('../../src/base').default,
   compile = require('../../src/compiler/compile').compile,
   moment = require('moment');
 
-describe('test compile string', function() {
-  beforeAll(function() {
+describe('test compile string', function () {
+  beforeAll(function () {
 
   });
 
-  describe('compile string template to html', function() {
-    it('test compile simple', function() {
-      const tmpl = nj `
+  describe('compile string template to html', function () {
+    it('test compile simple', function () {
+      const tmpl = nj`
         <${'div'} class="{{id}} {{name3}}" {{name3}} {{ ...props}} name={{name1}} autofocus name1={{a.c.d}} name2="{{ [a[a.e['h']].f.g, 2] }}" a="/%'aaa'%/" {{... Object.assign({ e: 0 }, ${{ a: '...123', b: 2 }}, { c: 3 }) }} {{... ${{ g: '...123', b: 20 }} }}>
           <#prop {{'name1' | vm-var}} />
           {{1 + ${2} + 3 + ${4}}}
@@ -34,7 +34,7 @@ describe('test compile string', function() {
           <#once name="test">
             <i>test</i>
           </#once>
-          <#each {{1 .. 10}}>
+          <#each {{1 .. 2}}>
             {{@item}}
             #${({ item, index }) => item + 100 * index}
             <#for {{10}}>
@@ -55,6 +55,13 @@ describe('test compile string', function() {
           `}}}}
           {{!a.f != !x}}
           {{(('abc') + ('def')).substr((2), ((2 - 1)))}}
+          {{{${nj.mustache`${10} .. ${20}`}}}}
+          <br><#css style="color:${'blue'};margin:${0};" />
+          {{{${JSON.stringify(nj.css`
+            color:${'yel'}low;
+            margin:${0};
+            background-image:url('../a.png');
+          `)}}}}
         </${'div'}>
       `;
 
@@ -79,6 +86,19 @@ describe('test compile string', function() {
 
       //console.log(html);
       expect(html).toBeTruthy();
+    });
+
+    it('test require', function () {
+      global.require = function (url) {
+        return url;
+      };
+
+      const tmpl = nj`
+        {{require('../../a.png')}}
+      `;
+
+      const html = tmpl();
+      expect(html).toBe('../../a.png');
     });
   });
 });

@@ -1,6 +1,20 @@
-# babel-plugin-nornj-in-jsx
+<div align="center">
+  <a href="https://joe-sky.github.io/nornj-guide/">
+    <img width="100" src="https://raw.githubusercontent.com/joe-sky/nornj-highlight/master/images/logo.png">
+  </a>
+  <a href="https://babeljs.io/">
+    <img width="245" src="https://raw.githubusercontent.com/babel/logo/master/babel.png">
+  </a>
+  <div>
+    <img width="100" height="100" title="Babel Plugin" src="https://michael-ciniawsky.github.io/postcss-load-plugins/logo.svg">
+  </div>
+  <h1>Babel-Plugin-NornJ-in-jsx</h1>
+  <p>Make the NornJ template work gracefully in the JSX environment</p>
+</div>
 
-Make the NornJ template work gracefully in the JSX environment.
+[![NPM Version][npm-image]][npm-url]
+[![Coverage Status](https://coveralls.io/repos/github/joe-sky/nornj/badge.svg?branch=master)](https://coveralls.io/github/joe-sky/nornj?branch=master)
+[![NPM Downloads][downloads-image]][npm-url]
 
 ## 安装
 
@@ -18,18 +32,11 @@ npm i babel-plugin-nornj-in-jsx
 }
 ```
 
-## 使用方法
+## 扩展标签
 
-在JSX中使用各种本babel插件提供的标签时，都需要在js中引入：
+### if
 
-```js
-import nj from 'nornj';
-import 'nornj-react';
-```
-
-### if标签
-
-可直接在JSX中使用`NornJ`的`if、elseif、else`等标签。NornJ中的[if标签文档请见这里](https://joe-sky.github.io/nornj-guide/templateSyntax/built-inExtensionTag.html#if)。
+可在JSX中使用`NornJ`的`if、elseif、else`等标签。NornJ中的[if标签文档请见这里](https://joe-sky.github.io/nornj-guide/templateSyntax/built-inExtensionTag.html#if)。
 
 ```js
 //转换前：
@@ -57,7 +64,7 @@ class TestComponent extends Component {
 
     return (
       <div>
-        ${nj`
+        {nj`
           <#if ${a.b == 1}>
             ${<i>ifBlock</i>}
             <#else>
@@ -140,7 +147,9 @@ const a = { b: 1, c: 'abc' };
 
 但是使用`NornJ`的表达式则不会报错，而是会顺延流转到下面的`elseif`判断中，这是因为`NornJ`的链式取值语法对`null`值进行了过滤，[具体请见这里](https://joe-sky.github.io/nornj-guide/templateSyntax/variable.html)。
 
-### each标签
+### each
+
+可在JSX中使用`NornJ`的`each`标签。NornJ中的[each标签文档请见这里](https://joe-sky.github.io/nornj-guide/templateSyntax/built-inExtensionTag.html#each)。
 
 ```js
 //转换前：
@@ -179,3 +188,262 @@ class TestComponent extends Component {
 ```
 
 如上，of参数为要遍历的数组，参数格式和上面if的condition是一样的。item、index参数都可以不写，默认值就是例子中的那几个。
+
+* of参数支持写模板字符串，并在其中使用`NornJ`的过滤器与表达式：
+
+```js
+class TestComponent extends Component {
+  render() {
+    return (
+      <div>
+        <each of={`1 .. 3`} item="item" index="index">
+          <i>{item}</i>
+          <i>{index}</i>
+        </each>
+      </div>
+    );
+  }
+}
+```
+
+### switch
+
+可在JSX中使用`NornJ`的`switch`标签。NornJ中的[switch标签文档请见这里](https://joe-sky.github.io/nornj-guide/templateSyntax/built-inExtensionTag.html#switch)。
+
+```js
+//转换前：
+class TestComponent extends Component {
+  render() {
+    const a = { b: 1 };
+
+    return (
+      <div>
+        <switch value={a.b}>
+          <case value={1}>
+            <i>1</i>
+          </case>
+          <case value={2}>
+            <i>2</i>
+          </case>
+          <default>
+            <i>3</i>
+          </default>
+        </switch>
+      </div>
+    );
+  }
+}
+
+//转换后：
+class TestComponent extends Component {
+  render() {
+    const a = { b: 1 };
+
+    return (
+      <div>
+        {nj`
+          <#switch {{${a.b}}}>
+            <#case {{${1}}}>
+              ${<i>1</i>}
+            </#case>
+            <#case {{${2}}}>
+              ${<i>2</i>}
+            </#case>
+            <#default>
+              ${<i>3</i>}
+            </#default>
+          </#switch>
+        `()}
+      </div>
+    );
+  }
+}
+```
+
+如上，value参数的格式和上面if的condition是一样的。
+
+* value参数支持写模板字符串，并在其中使用`NornJ`的过滤器与表达式：
+
+```js
+class TestComponent extends Component {
+  render() {
+    const a = { b: 1 };
+
+    return (
+      <div>
+        <switch value={`${a}.b`}>
+          <case value={`${' 1 '}.trim()`}>
+            <i>1</i>
+          </case>
+          <case value={`'02'.substr(1) | int`}>
+            <i>2</i>
+          </case>
+          <default>
+            <i>3</i>
+          </default>
+        </switch>
+      </div>
+    );
+  }
+}
+```
+
+## 扩展属性
+
+### n-show
+
+使用`n-show`可以在JSX中很方便地切换标签的`style.display`属性，当值为`false`时不显示，效果和`Vue`的`v-show`类似：
+
+```js
+class TestComponent extends Component {
+  render() {
+    return <input n-show={this.props.show} />;
+  }
+}
+
+ReactDOM.render(<TestComponent show={false} />);
+/*
+ 渲染结果：<input style="display:none" />
+*/
+```
+
+### n-style
+
+使用`n-style`可以在JSX中使用与html语法一致的css写法：
+
+```js
+class TestComponent extends Component {
+  render() {
+    //以下与<input style={{ marginLeft: '10px', padding: 0 }} />效果相同
+    return <input n-style="margin-left:10px;padding:0" />;
+  }
+}
+```
+
+在`n-style`中也可以动态嵌入变量：
+
+```js
+const cssProp = 'padding';
+
+class TestComponent extends Component {
+  render() {
+    return <input n-style={`margin-left:${10};${cssProp}:0`} />;
+  }
+}
+```
+
+### n-mobx-model
+
+使用`n-mobx-model`可以在JSX中实现基于`Mobx`的双向数据绑定功能：
+
+```js
+import { Component } from 'react';
+import { observable } from 'mobx';
+import nj from 'nornj';
+
+class TestComponent extends Component {
+  @observable inputValue = '';
+
+  render() {
+    return <input n-mobx-model="inputValue" />;
+  }
+}
+```
+
+`n-mobx-model`的详细文档请[查看这里](https://joe-sky.github.io/nornj-guide/templateSyntax/inlineExtensionTag.html#mobx-model)。
+
+### n-mst-model
+
+`n-mst-model`即为`n-mobx-model`的`mobx-state-tree`版本：
+
+store：
+
+```js
+import { types } from "mobx-state-tree";
+
+const TestStore = types.model("TestStore",
+  {  
+    inputValue: '1'
+  })
+  .actions(self => ({
+    setInputValue(v) {
+      self.inputValue = v;
+    }
+  }));
+```
+
+component：
+
+```js
+@inject('rootStore')
+@observer
+class TestComponent extends Component {
+  render() {
+    return <input n-mst-model={`${this}.props.rootStore.testStore.inputValue`} />;
+  }
+}
+```
+
+`n-mst-model`的详细文档请[查看这里](https://joe-sky.github.io/nornj-guide/templateSyntax/inlineExtensionTag.html#mst-model)。
+
+## 可在JSX中使用的NornJ模板字符串API
+
+### 在JSX中使用NornJ的过滤器和表达式
+
+使用`nj.expression`可以在JSX中以标签模板字符串的方式使用`NornJ`的过滤器和表达式：
+
+```js
+import nj, { expression as n } from 'nornj';
+
+class TestComponent extends Component {
+  render() {
+    const a = { b: 1 };
+
+    return (
+      <div>
+        <if condition={a.b == 1}>
+          <i>{n`(${a}.b | float).toFixed(2)`}</i>
+        </if>
+      </div>
+    );
+  }
+}
+```
+
+`nj.expression`的文档请[查看这里](https://joe-sky.github.io/nornj-guide/templateSyntax/templateString.html#njexpression)。
+
+### 在JSX中使用NornJ的style语法
+
+使用`nj.css`可以在JSX中以标签模板字符串的方式使用`NornJ`的style语法：
+
+```js
+import nj, {
+  mustache as m,
+  css as s
+} from 'nornj';
+
+class TestComponent extends Component {
+  render() {
+    const a = { b: 1 };
+    const paddingValue = 20;
+
+    return (
+      <div style={s`color:blue;margin-left:10;padding:${paddingValue};`}>
+        <if condition={a.b == 1}>
+          <i>{m`(${a}.b | float).toFixed(2)`}</i>
+        </if>
+      </div>
+    );
+  }
+}
+```
+
+`nj.css`的文档请[查看这里](https://joe-sky.github.io/nornj-guide/templateSyntax/templateString.html#njcss)。
+
+## License
+
+MIT
+
+[npm-image]: http://img.shields.io/npm/v/babel-plugin-nornj-in-jsx.svg
+[downloads-image]: http://img.shields.io/npm/dm/babel-plugin-nornj-in-jsx.svg
+[npm-url]: https://www.npmjs.org/package/babel-plugin-nornj-in-jsx

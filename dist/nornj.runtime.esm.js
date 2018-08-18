@@ -1,5 +1,5 @@
 /*!
-* NornJ template engine v0.4.4
+* NornJ template engine v0.4.11
 * (c) 2016-2018 Joe_Sky
 * Released under the MIT License.
 */
@@ -9,6 +9,7 @@ function nj() {
 
 nj.createElement = null;
 nj.components = {};
+nj.componentConfig = {};
 nj.preAsts = {};
 nj.asts = {};
 nj.templates = {};
@@ -233,19 +234,47 @@ assign(nj, {
   assign: assign
 });
 
-//注册组件
-function registerComponent(name, component) {
+var COMP_NAME = '_njComponentName';
+
+function registerComponent(name, component, options) {
   var params = name,
       ret = void 0;
   if (!isObject(name)) {
     params = {};
-    params[name] = component;
+    params[name] = {
+      component: component,
+      options: options
+    };
   }
 
   each(params, function (v, k, i) {
-    nj.components[k.toLowerCase()] = v;
+    if (v != null) {
+      var _component = v.component,
+          _options = v.options;
+
+      var _name = k.toLowerCase();
+
+      var comp = _component ? _component : v;
+      nj.components[_name] = comp;
+      nj.componentConfig[_name] = _options;
+
+      if (comp[COMP_NAME] == null) {
+        defineProp(comp, COMP_NAME, {
+          value: _name,
+          writable: true
+        });
+      } else if (_options && _options.replaceComponentName) {
+        comp[COMP_NAME] = _name;
+      }
+    }
+
     if (i == 0) {
       ret = v;
+    } else {
+      if (i == 1) {
+        ret = [ret];
+      }
+      ret.push(v);
     }
   }, false, false);
 
@@ -876,12 +905,21 @@ var extensions = {
   },
 
   'with': function _with(originalData, options) {
-    var props = options.props;
+    if (originalData && originalData._njOpts) {
+      options = originalData;
+
+      return options.result({
+        data: [options.props]
+      });
+    } else {
+      var _options = options,
+          props = _options.props;
 
 
-    return options.result({
-      data: [props && props.as ? defineProperty({}, props.as, originalData) : originalData]
-    });
+      return options.result({
+        data: [props && props.as ? defineProperty({}, props.as, originalData) : originalData]
+      });
+    }
   },
 
   arg: function arg(options) {
@@ -904,6 +942,10 @@ var extensions = {
       cache = cacheObj[cacheKey] = options.result();
     }
     return cache;
+  },
+
+  css: function css(options) {
+    return options.props.style;
   }
 };
 
@@ -916,7 +958,8 @@ function _config(params) {
     isProp: false,
     subExProps: false,
     isSub: false,
-    addSet: false
+    addSet: false,
+    useExpressionInJsx: 'onlyTemplateLiteral'
   };
 
   if (params) {
@@ -939,7 +982,8 @@ var extensionConfig = {
   obj: _config({ onlyGlobal: true, newContext: false }),
   list: _config(_defaultCfg),
   fn: _config({ onlyGlobal: true }),
-  'with': _config({ onlyGlobal: true })
+  'with': _config({ onlyGlobal: true }),
+  style: { useExpressionInJsx: false }
 };
 extensionConfig.elseif = _config(extensionConfig['else']);
 extensionConfig['for'] = _config(extensionConfig.each);
@@ -948,6 +992,7 @@ extensionConfig.pre = _config(extensionConfig.obj);
 extensionConfig.arg = _config(extensionConfig.prop);
 extensionConfig.once = _config(extensionConfig.obj);
 extensionConfig.show = _config(extensionConfig.prop);
+extensionConfig.css = _config(extensionConfig.obj);
 
 //Extension alias
 extensions['case'] = extensions.elseif;
@@ -973,7 +1018,7 @@ function registerExtension(name, extension, options) {
   each(params, function (v, name) {
     if (v) {
       var _extension = v.extension,
-          _options = v.options;
+          _options2 = v.options;
 
 
       if (_extension) {
@@ -981,7 +1026,7 @@ function registerExtension(name, extension, options) {
       } else {
         extensions[name] = v;
       }
-      extensionConfig[name] = _config(_options);
+      extensionConfig[name] = _config(_options2);
     }
   }, false, false);
 }

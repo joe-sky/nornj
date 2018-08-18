@@ -4,6 +4,7 @@
 
 nj.createElement = null;
 nj.components = {};
+nj.componentConfig = {};
 nj.preAsts = {};
 nj.asts = {};
 nj.templates = {};

@@ -219,7 +219,7 @@ export const extensions = {
 
   obj: options => options.props,
 
-  list: function() {
+  list: function () {
     let args = arguments,
       last = args.length - 1,
       options = args[last];
@@ -239,7 +239,7 @@ export const extensions = {
   fn: options => {
     const { props } = options;
 
-    return function() {
+    return function () {
       let params;
       if (props) {
         params = {};
@@ -256,14 +256,23 @@ export const extensions = {
 
   pre: options => extensions.block(options),
 
-  'with': function(originalData, options) {
-    const { props } = options;
+  'with': function (originalData, options) {
+    if (originalData && originalData._njOpts) {
+      options = originalData;
 
-    return options.result({
-      data: [props && props.as ? {
-        [props.as]: originalData
-      } : originalData]
-    });
+      return options.result({
+        data: [options.props]
+      });
+    }
+    else {
+      const { props } = options;
+
+      return options.result({
+        data: [props && props.as ? {
+          [props.as]: originalData
+        } : originalData]
+      });
+    }
   },
 
   arg: options => {
@@ -285,7 +294,9 @@ export const extensions = {
       cache = cacheObj[cacheKey] = options.result();
     }
     return cache;
-  }
+  },
+
+  css: options => options.props.style
 };
 
 function _config(params) {
@@ -297,7 +308,8 @@ function _config(params) {
     isProp: false,
     subExProps: false,
     isSub: false,
-    addSet: false
+    addSet: false,
+    useExpressionInJsx: 'onlyTemplateLiteral'
   };
 
   if (params) {
@@ -320,7 +332,8 @@ export const extensionConfig = {
   obj: _config({ onlyGlobal: true, newContext: false }),
   list: _config(_defaultCfg),
   fn: _config({ onlyGlobal: true }),
-  'with': _config({ onlyGlobal: true })
+  'with': _config({ onlyGlobal: true }),
+  style: { useExpressionInJsx: false }
 };
 extensionConfig.elseif = _config(extensionConfig['else']);
 extensionConfig['for'] = _config(extensionConfig.each);
@@ -329,6 +342,7 @@ extensionConfig.pre = _config(extensionConfig.obj);
 extensionConfig.arg = _config(extensionConfig.prop);
 extensionConfig.once = _config(extensionConfig.obj);
 extensionConfig.show = _config(extensionConfig.prop);
+extensionConfig.css = _config(extensionConfig.obj);
 
 //Extension alias
 extensions['case'] = extensions.elseif;
@@ -351,7 +365,7 @@ export function registerExtension(name, extension, options) {
     };
   }
 
-  tools.each(params, function(v, name) {
+  tools.each(params, function (v, name) {
     if (v) {
       const { extension, options } = v;
 

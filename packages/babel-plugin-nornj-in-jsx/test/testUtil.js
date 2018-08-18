@@ -1,7 +1,6 @@
 var React = require('react');
 var ReactDOMServer = require('react-dom/server');
 
-
 exports.render = function(Fixture, args) {
   var fixture = React.createElement(Fixture, args);
   return ReactDOMServer.renderToString(fixture);
@@ -42,7 +41,6 @@ exports.matchTextWithinSpansWithinDiv = function(text1, text2) {
 exports.matchEmptyDiv = function() {
   return buildRegExp(getDiv(''));
 };
-
 
 var Builder = function(type) {
   var items = [];
