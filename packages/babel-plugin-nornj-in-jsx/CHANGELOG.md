@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [v0.4.6] 2018.08.22
+
+* 🐞 修复`webpack 4`中构建时`nj`变量重复定义的bug。
+
 ## [v0.4.5] 2018.08.10
 
 * 🌟 增加`n-mobx-model`、`n-mst-model`扩展属性。

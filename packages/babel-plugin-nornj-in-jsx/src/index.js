@@ -45,36 +45,56 @@ module.exports = function (babel) {
         }
       }
     },
+    ImportDeclaration(path, state) {
+      switch (path.node.source.value) {
+        case 'nornj':
+          state.file.hasImportNj = true;
+          break;
+        case 'nornj-react':
+          state.file.hasImportNjr = true;
+          break;
+        case 'nornj-react/mobx':
+          state.file.hasImportNjrMobx = true;
+          break;
+      }
+    },
     Program: {
       enter(path, state) {
         state.file.hasNjInJSX = false;
         state.file.hasMobx = false;
+        state.file.hasImportNj = false;
+        state.file.hasImportNjr = false;
+        state.file.hasImportNjrMobx = false;
       },
       exit(path, state) {
         if (!state.file.hasNjInJSX) {
           return;
         }
 
-        if (state.file.hasMobx) {
+        if (state.file.hasMobx && !state.file.hasImportNjrMobx) {
           path.node.body.unshift(types.importDeclaration(
             [],
             types.stringLiteral('nornj-react/mobx')
           ));
         }
-        path.node.body.unshift(types.importDeclaration(
-          [],
-          types.stringLiteral('nornj-react')
-        ));
-        path.node.body.unshift(types.importDeclaration(
-          [types.importDefaultSpecifier(types.identifier('nj'))],
-          types.stringLiteral('nornj')
-        ));
+        if (!state.file.hasImportNjr) {
+          path.node.body.unshift(types.importDeclaration(
+            [],
+            types.stringLiteral('nornj-react')
+          ));
+        }
+        if (!state.file.hasImportNj) {
+          path.node.body.unshift(types.importDeclaration(
+            [types.importDefaultSpecifier(types.identifier('nj'))],
+            types.stringLiteral('nornj')
+          ));
+        }
       }
     }
   };
 
   return {
     inherits: require('babel-plugin-syntax-jsx'),
-    visitor: visitor
+    visitor
   };
 };
