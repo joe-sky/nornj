@@ -32,6 +32,16 @@ npm i babel-plugin-nornj-in-jsx
 }
 ```
 
+## 为什么开发这个插件
+
+在`React`项目开发中，原生的`JSX`语法并没有提供类似`Vue`的`v-if`、`v-for`、`v-show`等模板语法糖。当然，社区为`JSX`贡献了不少相关的插件，比如[jsx-control-statements](https://github.com/AlexGilleran/jsx-control-statements)。
+
+而`nornj-in-jsx`也是类似于`jsx-control-statements`的插件，它也能为`JSX`提供更加优雅的`分支条件`、`循环`等等语法，并且还可以自由扩展出更多的功能。这些功能大致分为几类：
+
+* [扩展标签](#扩展标签)
+* [扩展属性](#扩展属性)
+* [扩展表达式](#扩展表达式)
+
 ## 扩展标签
 
 ### if
@@ -386,9 +396,7 @@ class TestComponent extends Component {
 
 `n-mst-model`的详细文档请[查看这里](https://joe-sky.github.io/nornj-guide/templateSyntax/inlineExtensionTag.html#mst-model)。
 
-## 可在JSX中使用的NornJ模板字符串API
-
-### 在JSX中使用NornJ的过滤器和表达式
+## 扩展表达式
 
 使用`nj.expression`可以在JSX中以标签模板字符串的方式使用`NornJ`的过滤器和表达式：
 
@@ -411,34 +419,6 @@ class TestComponent extends Component {
 ```
 
 `nj.expression`的文档请[查看这里](https://joe-sky.github.io/nornj-guide/templateSyntax/templateString.html#njexpression)。
-
-### 在JSX中使用NornJ的style语法
-
-使用`nj.css`可以在JSX中以标签模板字符串的方式使用`NornJ`的style语法：
-
-```js
-import nj, {
-  mustache as m,
-  css as s
-} from 'nornj';
-
-class TestComponent extends Component {
-  render() {
-    const a = { b: 1 };
-    const paddingValue = 20;
-
-    return (
-      <div style={s`color:blue;margin-left:10;padding:${paddingValue};`}>
-        <if condition={a.b == 1}>
-          <i>{m`(${a}.b | float).toFixed(2)`}</i>
-        </if>
-      </div>
-    );
-  }
-}
-```
-
-`nj.css`的文档请[查看这里](https://joe-sky.github.io/nornj-guide/templateSyntax/templateString.html#njcss)。
 
 ## License
 

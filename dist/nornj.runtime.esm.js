@@ -1,5 +1,5 @@
 /*!
-* NornJ template engine v0.4.11
+* NornJ template engine v0.4.12
 * (c) 2016-2018 Joe_Sky
 * Released under the MIT License.
 */
@@ -152,7 +152,12 @@ function each(obj, func, context, isArr) {
   }
 }
 
-
+var REGEX_TRIM_RIGHT = /(\n|\r)?[\s\xA0]+$/;
+function trimRight(str) {
+  return str.replace(REGEX_TRIM_RIGHT, function (all, s1) {
+    return s1 ? '\n' : '';
+  });
+}
 
 //Noop function
 function noop() {}
@@ -180,14 +185,43 @@ function warn(msg, type) {
 }
 
 //Print error
-
+function error(msg) {
+  console.error(errorTitle + msg);
+}
 
 //create light weight object
 function obj() {
   return Object.create(null);
 }
 
+//Clear quotation marks
+var REGEX_QUOT_D = /["]+/g;
+var REGEX_QUOT_S = /[']+/g;
 
+function clearQuot(value, clearDouble) {
+  if (value == null) {
+    return;
+  }
+
+  var regex = void 0;
+  if (clearDouble == null) {
+    var charF = value[0];
+    if (charF === '\'') {
+      regex = REGEX_QUOT_S;
+    } else if (charF === '"') {
+      regex = REGEX_QUOT_D;
+    }
+  } else if (clearDouble) {
+    regex = REGEX_QUOT_D;
+  } else {
+    regex = REGEX_QUOT_S;
+  }
+
+  if (regex) {
+    value = value.replace(regex, '');
+  }
+  return value;
+}
 
 //Transform to camel-case
 function toCamelCase(str) {
@@ -232,6 +266,30 @@ assign(nj, {
   obj: obj,
   toCamelCase: toCamelCase,
   assign: assign
+});
+
+
+
+var tools = Object.freeze({
+	defineProp: defineProp,
+	defineProps: defineProps,
+	arrayPush: arrayPush,
+	arraySlice: arraySlice,
+	isArray: isArray,
+	isObject: isObject,
+	isNumber: isNumber,
+	isString: isString,
+	isArrayLike: isArrayLike,
+	each: each,
+	trimRight: trimRight,
+	noop: noop,
+	throwIf: throwIf,
+	warn: warn,
+	error: error,
+	obj: obj,
+	clearQuot: clearQuot,
+	toCamelCase: toCamelCase,
+	assign: assign
 });
 
 var COMP_NAME = '_njComponentName';
@@ -507,13 +565,13 @@ function fixPropName(name) {
 }
 
 //合并字符串属性
-function assignStrProps(paramsE, keys) {
-  var ret = '';
-  for (var k in paramsE) {
-    if (!keys || !keys[k]) {
-      var v = paramsE[k];
-      ret += ' ' + k + (k !== v ? '="' + v + '"' : ' ');
-    }
+function assignStrProps() {
+  var ret = '',
+      retObj = assign.apply(tools, arguments);
+
+  for (var k in retObj) {
+    var v = retObj[k];
+    ret += ' ' + k + (k !== v ? '="' + v + '"' : ' ');
   }
   return ret;
 }
@@ -813,7 +871,18 @@ var extensions = {
 
   show: function show(options) {
     if (!options.result()) {
-      options.exProps.style = options.useString ? 'display:none' : { display: 'none' };
+      var attrs = options.attrs,
+          useString = options.useString;
+
+
+      if (!attrs.style) {
+        attrs.style = useString ? '' : {};
+      }
+      if (useString) {
+        attrs.style += (attrs.style ? ';' : '') + 'display:none';
+      } else {
+        attrs.style.display = 'none';
+      }
     }
   },
 

@@ -156,13 +156,13 @@ export function fixPropName(name) {
 }
 
 //合并字符串属性
-export function assignStrProps(paramsE, keys) {
-  let ret = '';
-  for (let k in paramsE) {
-    if (!keys || !keys[k]) {
-      const v = paramsE[k];
-      ret += ' ' + k + (k !== v ? '="' + v + '"' : ' ');
-    }
+export function assignStrProps(...params) {
+  let ret = '',
+    retObj = tools.assign(...params);
+
+  for (let k in retObj) {
+    const v = retObj[k];
+    ret += ' ' + k + (k !== v ? '="' + v + '"' : ' ');
   }
   return ret;
 }

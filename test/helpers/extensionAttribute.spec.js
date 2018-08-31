@@ -7,8 +7,8 @@ describe('extension attribute', () => {
       visible: false
     })).toBe('<br style="display:none" />');
 
-    expect(render(`<br style="color: #fff;margin:0" #show={{true}}>`))
-      .toBe('<br style="color: #fff;margin:0" />');
+    expect(render(`<br style="color: #fff;margin:0" #show={{false}}>`))
+      .toBe('<br style="color: #fff;margin:0;display:none" />');
 
     expect(render(`<#if {{ ' #fff' }}>test</#if>`))
       .toBe('test');

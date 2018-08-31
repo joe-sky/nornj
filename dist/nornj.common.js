@@ -1,5 +1,5 @@
 /*!
-* NornJ template engine v0.4.11
+* NornJ template engine v0.4.12
 * (c) 2016-2018 Joe_Sky
 * Released under the MIT License.
 */
@@ -328,6 +328,30 @@ assign(nj, {
   obj: obj,
   toCamelCase: toCamelCase,
   assign: assign
+});
+
+
+
+var tools = Object.freeze({
+	defineProp: defineProp,
+	defineProps: defineProps,
+	arrayPush: arrayPush,
+	arraySlice: arraySlice,
+	isArray: isArray,
+	isObject: isObject,
+	isNumber: isNumber,
+	isString: isString,
+	isArrayLike: isArrayLike,
+	each: each,
+	trimRight: trimRight,
+	noop: noop,
+	throwIf: throwIf,
+	warn: warn,
+	error: error,
+	obj: obj,
+	clearQuot: clearQuot,
+	toCamelCase: toCamelCase,
+	assign: assign
 });
 
 var COMP_NAME = '_njComponentName';
@@ -765,13 +789,13 @@ function fixPropName(name) {
 }
 
 //合并字符串属性
-function assignStrProps(paramsE, keys) {
-  var ret = '';
-  for (var k in paramsE) {
-    if (!keys || !keys[k]) {
-      var v = paramsE[k];
-      ret += ' ' + k + (k !== v ? '="' + v + '"' : ' ');
-    }
+function assignStrProps() {
+  var ret = '',
+      retObj = assign.apply(tools, arguments);
+
+  for (var k in retObj) {
+    var v = retObj[k];
+    ret += ' ' + k + (k !== v ? '="' + v + '"' : ' ');
   }
   return ret;
 }
@@ -1071,7 +1095,18 @@ var extensions = {
 
   show: function show(options) {
     if (!options.result()) {
-      options.exProps.style = options.useString ? 'display:none' : { display: 'none' };
+      var attrs = options.attrs,
+          useString = options.useString;
+
+
+      if (!attrs.style) {
+        attrs.style = useString ? '' : {};
+      }
+      if (useString) {
+        attrs.style += (attrs.style ? ';' : '') + 'display:none';
+      } else {
+        attrs.style.display = 'none';
+      }
     }
   },
 
@@ -2391,7 +2426,7 @@ function _buildFn(content, node, fns, no, newContext$$1, level, useStringLocal, 
   return no;
 }
 
-function _buildOptions(config, useStringLocal, node, fns, exPropsStr, subExPropsStr, level, hashProps, valueL, parent, tagName) {
+function _buildOptions(config, useStringLocal, node, fns, exPropsStr, subExPropsStr, level, hashProps, valueL, parent, tagName, attrs) {
   var hashStr = ', useString: ' + (useStringLocal == null ? 'p1.us' : useStringLocal ? 'true' : 'false'),
       noConfig = !config;
 
@@ -2411,6 +2446,9 @@ function _buildOptions(config, useStringLocal, node, fns, exPropsStr, subExProps
     hashStr += ', name: \'' + node.ex + '\'';
     if (tagName) {
       hashStr += ', tagName: ' + tagName;
+    }
+    if (attrs) {
+      hashStr += ', attrs: ' + attrs;
     }
 
     hashStr += ', result: ' + (node.content ? 'p1.r(p1, p2, p1.fn' + _buildFn(node.content, node, fns, ++fns._no, newContext$$1, level, useStringLocal) + ', ' + exPropsStr + ', ' + subExPropsStr + ')' : 'p1.np');
@@ -2724,7 +2762,7 @@ function _buildProps(obj$$1, counter, fns, useStringLocal, level) {
   }
 }
 
-function _buildPropsEx(isSub, paramsEC, propsEx, fns, counter, useString, exPropsStr, subExPropsStr, tagName) {
+function _buildPropsEx(isSub, paramsEC, propsEx, fns, counter, useString, exPropsStr, subExPropsStr, tagName, attrs) {
   var paramsStr = 'var _paramsE' + paramsEC + ' = {};\n';
 
   var ret = {};
@@ -2737,7 +2775,7 @@ function _buildPropsEx(isSub, paramsEC, propsEx, fns, counter, useString, exProp
   }
 
   //props标签的子节点
-  paramsStr += _buildContent(propsEx.content, propsEx, fns, counter, ret, null, useString, tagName);
+  paramsStr += _buildContent(propsEx.content, propsEx, fns, counter, ret, null, useString, tagName, attrs);
   return paramsStr;
 }
 
@@ -2750,63 +2788,20 @@ function _buildParams(node, fns, counter, useString, level, exPropsStr, subExPro
   var useStringF = fns.useString,
       hasPropsEx = paramsEx || propsExS;
   var paramsStr = '',
-      _paramsC = void 0;
+      _paramsC = void 0,
+      _attrs = void 0;
 
   if (params || hasPropsEx) {
     _paramsC = counter._params++;
-    paramsStr = 'var _params' + _paramsC + ' = ';
-
-    //props tag
-    if (hasPropsEx) {
-      var bothPropsEx = paramsEx && propsExS,
-          _paramsEC = void 0,
-          _paramsSEC = void 0;
-      paramsStr += (useString ? '\'\'' : bothPropsEx ? '{}' : 'null') + ';\n';
-
-      if (paramsEx) {
-        _paramsEC = counter._paramsE++;
-        paramsStr += _buildPropsEx(false, _paramsEC, paramsEx, fns, counter, useString, exPropsStr, subExPropsStr, tagName);
-      }
-      if (propsExS) {
-        _paramsSEC = counter._paramsE++;
-        paramsStr += _buildPropsEx(true, _paramsSEC, propsExS, fns, counter, useString, exPropsStr, subExPropsStr, tagName);
-      }
-
-      //合并params块的值
-      if (!useString) {
-        if (bothPropsEx) {
-          paramsStr += '\np1.an(_params' + _paramsC + ', _paramsE' + _paramsEC + ', _paramsE' + _paramsSEC + ');\n';
-        } else {
-          paramsStr += '\n_params' + _paramsC + ' = _paramsE' + (_paramsEC != null ? _paramsEC : _paramsSEC) + ';\n';
-        }
-      } else {
-        var keys = '';
-        each(params, function (v, k, i, l) {
-          if (i == 0) {
-            keys += '{ ';
-          }
-          keys += '\'' + k + '\': 1';
-
-          if (i < l - 1) {
-            keys += ', ';
-          } else {
-            keys += ' }';
-          }
-        }, false, false);
-
-        paramsStr += '\n_params' + _paramsC + ' += p1.ans(_paramsE' + _paramsEC + ', ' + (keys === '' ? 'null' : keys) + ');\n';
-      }
-    }
+    _attrs = '_params' + _paramsC;
+    paramsStr = 'var ' + _attrs + ' = ';
 
     if (params) {
       var paramKeys = Object.keys(params),
           len = paramKeys.length,
           filterStr = '';
 
-      if (!useString && !hasPropsEx) {
-        paramsStr += '{\n';
-      }
-
+      paramsStr += '{\n';
       each(paramKeys, function (k, i) {
         var valueStr = _buildProps(params[k], counter, fns, useString, level);
         if (isObject(valueStr)) {
@@ -2824,35 +2819,50 @@ function _buildParams(node, fns, counter, useString, level, exPropsStr, subExPro
         if (!useStringF) {
           key = fixPropName(key);
         }
-        if (!hasPropsEx) {
-          if (!useString) {
-            paramsStr += '  \'' + key + '\': ' + (!onlyKey ? valueStr : 'true') + (i < len - 1 ? ',\n' : '');
-          } else {
-            paramsStr += (i > 0 ? '  + ' : '') + '\' ' + key + (!onlyKey ? '="\' + ' + valueStr + ' + \'"\'' : ' \'') + (i == len - 1 ? ';' : '') + '\n';
-          }
-        } else {
-          if (!useString) {
-            paramsStr += '_params' + _paramsC + '[\'' + key + '\'] = ' + (!onlyKey ? valueStr : 'true') + ';\n';
-          } else {
-            paramsStr += '_params' + _paramsC + ' += \' ' + key + (!onlyKey ? '="\' + ' + valueStr + ' + \'"\'' : ' \'') + ';\n';
-          }
-        }
+        paramsStr += '  \'' + key + '\': ' + (!onlyKey ? valueStr : !useString ? 'true' : '\'' + key + '\'') + (i < len - 1 ? ',\n' : '');
       }, false, false);
-
-      if (!useString && !hasPropsEx) {
-        paramsStr += '\n};\n';
-      }
+      paramsStr += '\n};\n';
 
       if (filterStr !== '') {
         paramsStr = filterStr + paramsStr;
       }
+    }
+
+    if (hasPropsEx) {
+      var bothPropsEx = paramsEx && propsExS,
+          _paramsEC = void 0,
+          _paramsSEC = void 0;
+      if (!params) {
+        paramsStr += '{};\n';
+      }
+
+      if (paramsEx) {
+        _paramsEC = counter._paramsE++;
+        paramsStr += _buildPropsEx(false, _paramsEC, paramsEx, fns, counter, useString, exPropsStr, subExPropsStr, tagName, _attrs);
+      }
+      if (propsExS) {
+        _paramsSEC = counter._paramsE++;
+        paramsStr += _buildPropsEx(true, _paramsSEC, propsExS, fns, counter, useString, exPropsStr, subExPropsStr, tagName, _attrs);
+      }
+
+      if (!useString) {
+        if (bothPropsEx) {
+          paramsStr += '\n' + _attrs + ' = p1.an({}, _paramsE' + _paramsEC + ', _paramsE' + _paramsSEC + ', ' + _attrs + ');\n';
+        } else {
+          paramsStr += '\n' + _attrs + ' = p1.an({}, _paramsE' + (_paramsEC != null ? _paramsEC : _paramsSEC) + ', ' + _attrs + ');\n';
+        }
+      } else {
+        paramsStr += '\n' + _attrs + ' = p1.ans({}, _paramsE' + _paramsEC + ', ' + _attrs + ');\n';
+      }
+    } else if (useString) {
+      paramsStr += '\n' + _attrs + ' = p1.ans({}, ' + _attrs + ');\n';
     }
   }
 
   return [paramsStr, _paramsC];
 }
 
-function _buildNode(node, parent, fns, counter, retType, level, useStringLocal, isFirst, tagName) {
+function _buildNode(node, parent, fns, counter, retType, level, useStringLocal, isFirst, tagName, attrs) {
   var fnStr = '',
       useStringF = fns.useString;
 
@@ -2941,7 +2951,7 @@ function _buildNode(node, parent, fns, counter, retType, level, useStringLocal, 
         paramsStr = retP[0],
         _paramsC = retP[1];
 
-    dataReferStr += _buildOptions(configE, useStringLocal, node, fns, exPropsStr, subExPropsStr, level, paramsStr !== '' ? '_params' + _paramsC : null, null, parent, tagName);
+    dataReferStr += _buildOptions(configE, useStringLocal, node, fns, exPropsStr, subExPropsStr, level, paramsStr !== '' ? '_params' + _paramsC : null, null, parent, tagName, attrs);
     dataReferStr += '\n];\n';
 
     //添加匿名参数
@@ -3033,7 +3043,7 @@ function _buildNode(node, parent, fns, counter, retType, level, useStringLocal, 
   return fnStr;
 }
 
-function _buildContent(content, parent, fns, counter, retType, level, useStringLocal, tagName) {
+function _buildContent(content, parent, fns, counter, retType, level, useStringLocal, tagName, attrs) {
   var fnStr = '';
   if (!content) {
     return fnStr;
@@ -3042,7 +3052,7 @@ function _buildContent(content, parent, fns, counter, retType, level, useStringL
   each(content, function (node) {
     var useString = node.useString;
 
-    fnStr += _buildNode(node, parent, fns, counter, retType, level, useString != null ? useString : useStringLocal, fns._firstNode && level == 0, tagName);
+    fnStr += _buildNode(node, parent, fns, counter, retType, level, useString != null ? useString : useStringLocal, fns._firstNode && level == 0, tagName, attrs);
 
     if (fns._firstNode) {
       //输出字符串时模板第一个节点前面不加换行符

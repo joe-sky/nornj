@@ -77,7 +77,7 @@ function _buildFn(content, node, fns, no, newContext, level, useStringLocal, nam
   return no;
 }
 
-function _buildOptions(config, useStringLocal, node, fns, exPropsStr, subExPropsStr, level, hashProps, valueL, parent, tagName) {
+function _buildOptions(config, useStringLocal, node, fns, exPropsStr, subExPropsStr, level, hashProps, valueL, parent, tagName, attrs) {
   let hashStr = ', useString: ' + (useStringLocal == null ? 'p1.us' : (useStringLocal ? 'true' : 'false')),
     noConfig = !config;
 
@@ -96,6 +96,9 @@ function _buildOptions(config, useStringLocal, node, fns, exPropsStr, subExProps
     hashStr += ', name: \'' + node.ex + '\'';
     if (tagName) {
       hashStr += ', tagName: ' + tagName;
+    }
+    if (attrs) {
+      hashStr += ', attrs: ' + attrs;
     }
 
     hashStr += ', result: ' + (node.content ? 'p1.r(p1, p2, p1.fn' + _buildFn(node.content, node, fns, ++fns._no, newContext, level, useStringLocal) + ', ' + exPropsStr + ', ' + subExPropsStr + ')' : 'p1.np');
@@ -400,7 +403,7 @@ function _buildProps(obj, counter, fns, useStringLocal, level) {
   }
 }
 
-function _buildPropsEx(isSub, paramsEC, propsEx, fns, counter, useString, exPropsStr, subExPropsStr, tagName) {
+function _buildPropsEx(isSub, paramsEC, propsEx, fns, counter, useString, exPropsStr, subExPropsStr, tagName, attrs) {
   let paramsStr = 'var _paramsE' + paramsEC + ' = {};\n';
 
   const ret = {};
@@ -413,7 +416,7 @@ function _buildPropsEx(isSub, paramsEC, propsEx, fns, counter, useString, exProp
   }
 
   //props标签的子节点
-  paramsStr += _buildContent(propsEx.content, propsEx, fns, counter, ret, null, useString, tagName);
+  paramsStr += _buildContent(propsEx.content, propsEx, fns, counter, ret, null, useString, tagName, attrs);
   return paramsStr;
 }
 
@@ -423,62 +426,20 @@ function _buildParams(node, fns, counter, useString, level, exPropsStr, subExPro
   const useStringF = fns.useString,
     hasPropsEx = paramsEx || propsExS;
   let paramsStr = '',
-    _paramsC;
+    _paramsC,
+    _attrs;
 
   if (params || hasPropsEx) {
     _paramsC = counter._params++;
-    paramsStr = 'var _params' + _paramsC + ' = ';
-
-    //props tag
-    if (hasPropsEx) {
-      let bothPropsEx = paramsEx && propsExS,
-        _paramsEC, _paramsSEC;
-      paramsStr += (useString ? '\'\'' : (bothPropsEx ? '{}' : 'null')) + ';\n';
-
-      if (paramsEx) {
-        _paramsEC = counter._paramsE++;
-        paramsStr += _buildPropsEx(false, _paramsEC, paramsEx, fns, counter, useString, exPropsStr, subExPropsStr, tagName);
-      }
-      if (propsExS) {
-        _paramsSEC = counter._paramsE++;
-        paramsStr += _buildPropsEx(true, _paramsSEC, propsExS, fns, counter, useString, exPropsStr, subExPropsStr, tagName);
-      }
-
-      //合并params块的值
-      if (!useString) {
-        if (bothPropsEx) {
-          paramsStr += '\np1.an(_params' + _paramsC + ', _paramsE' + _paramsEC + ', _paramsE' + _paramsSEC + ');\n';
-        } else {
-          paramsStr += '\n_params' + _paramsC + ' = _paramsE' + (_paramsEC != null ? _paramsEC : _paramsSEC) + ';\n';
-        }
-      } else {
-        let keys = '';
-        tools.each(params, function (v, k, i, l) {
-          if (i == 0) {
-            keys += '{ ';
-          }
-          keys += '\'' + k + '\': 1';
-
-          if (i < l - 1) {
-            keys += ', ';
-          } else {
-            keys += ' }';
-          }
-        }, false, false);
-
-        paramsStr += '\n_params' + _paramsC + ' += p1.ans(_paramsE' + _paramsEC + ', ' + (keys === '' ? 'null' : keys) + ');\n';
-      }
-    }
+    _attrs = '_params' + _paramsC;
+    paramsStr = 'var ' + _attrs + ' = ';
 
     if (params) {
       let paramKeys = Object.keys(params),
         len = paramKeys.length,
         filterStr = '';
 
-      if (!useString && !hasPropsEx) {
-        paramsStr += '{\n';
-      }
-
+      paramsStr += '{\n';
       tools.each(paramKeys, function (k, i) {
         let valueStr = _buildProps(params[k], counter, fns, useString, level);
         if (tools.isObject(valueStr)) {
@@ -495,35 +456,50 @@ function _buildParams(node, fns, counter, useString, level, exPropsStr, subExPro
         if (!useStringF) {
           key = tranData.fixPropName(key);
         }
-        if (!hasPropsEx) {
-          if (!useString) {
-            paramsStr += '  \'' + key + '\': ' + (!onlyKey ? valueStr : 'true') + (i < len - 1 ? ',\n' : '');
-          } else {
-            paramsStr += (i > 0 ? '  + ' : '') + '\' ' + key + (!onlyKey ? '="\' + ' + valueStr + ' + \'"\'' : ' \'') + (i == len - 1 ? ';' : '') + '\n';
-          }
-        } else {
-          if (!useString) {
-            paramsStr += '_params' + _paramsC + '[\'' + key + '\'] = ' + (!onlyKey ? valueStr : 'true') + ';\n';
-          } else {
-            paramsStr += '_params' + _paramsC + ' += \' ' + key + (!onlyKey ? '="\' + ' + valueStr + ' + \'"\'' : ' \'') + ';\n';
-          }
-        }
+        paramsStr += '  \'' + key + '\': ' + (!onlyKey ? valueStr : (!useString ? 'true' : '\'' + key + '\'')) + (i < len - 1 ? ',\n' : '');
       }, false, false);
-
-      if (!useString && !hasPropsEx) {
-        paramsStr += '\n};\n';
-      }
+      paramsStr += '\n};\n';
 
       if (filterStr !== '') {
         paramsStr = filterStr + paramsStr;
       }
+    }
+
+    if (hasPropsEx) {
+      let bothPropsEx = paramsEx && propsExS,
+        _paramsEC, _paramsSEC;
+      if (!params) {
+        paramsStr += '{};\n';
+      }
+
+      if (paramsEx) {
+        _paramsEC = counter._paramsE++;
+        paramsStr += _buildPropsEx(false, _paramsEC, paramsEx, fns, counter, useString, exPropsStr, subExPropsStr, tagName, _attrs);
+      }
+      if (propsExS) {
+        _paramsSEC = counter._paramsE++;
+        paramsStr += _buildPropsEx(true, _paramsSEC, propsExS, fns, counter, useString, exPropsStr, subExPropsStr, tagName, _attrs);
+      }
+
+      if (!useString) {
+        if (bothPropsEx) {
+          paramsStr += '\n' + _attrs + ' = p1.an({}, _paramsE' + _paramsEC + ', _paramsE' + _paramsSEC + ', ' + _attrs + ');\n';
+        } else {
+          paramsStr += '\n' + _attrs + ' = p1.an({}, _paramsE' + (_paramsEC != null ? _paramsEC : _paramsSEC) + ', ' + _attrs + ');\n';
+        }
+      } else {
+        paramsStr += '\n' + _attrs + ' = p1.ans({}, _paramsE' + _paramsEC + ', ' + _attrs + ');\n';
+      }
+    }
+    else if (useString) {
+      paramsStr += '\n' + _attrs + ' = p1.ans({}, ' + _attrs + ');\n';
     }
   }
 
   return [paramsStr, _paramsC];
 }
 
-function _buildNode(node, parent, fns, counter, retType, level, useStringLocal, isFirst, tagName) {
+function _buildNode(node, parent, fns, counter, retType, level, useStringLocal, isFirst, tagName, attrs) {
   let fnStr = '',
     useStringF = fns.useString;
 
@@ -604,7 +580,7 @@ function _buildNode(node, parent, fns, counter, retType, level, useStringLocal, 
       paramsStr = retP[0],
       _paramsC = retP[1];
 
-    dataReferStr += _buildOptions(configE, useStringLocal, node, fns, exPropsStr, subExPropsStr, level, paramsStr !== '' ? '_params' + _paramsC : null, null, parent, tagName);
+    dataReferStr += _buildOptions(configE, useStringLocal, node, fns, exPropsStr, subExPropsStr, level, paramsStr !== '' ? '_params' + _paramsC : null, null, parent, tagName, attrs);
     dataReferStr += '\n];\n';
 
     //添加匿名参数
@@ -690,7 +666,7 @@ function _buildNode(node, parent, fns, counter, retType, level, useStringLocal, 
   return fnStr;
 }
 
-function _buildContent(content, parent, fns, counter, retType, level, useStringLocal, tagName) {
+function _buildContent(content, parent, fns, counter, retType, level, useStringLocal, tagName, attrs) {
   let fnStr = '';
   if (!content) {
     return fnStr;
@@ -698,7 +674,7 @@ function _buildContent(content, parent, fns, counter, retType, level, useStringL
 
   tools.each(content, node => {
     const { useString } = node;
-    fnStr += _buildNode(node, parent, fns, counter, retType, level, useString != null ? useString : useStringLocal, fns._firstNode && level == 0, tagName);
+    fnStr += _buildNode(node, parent, fns, counter, retType, level, useString != null ? useString : useStringLocal, fns._firstNode && level == 0, tagName, attrs);
 
     if (fns._firstNode) { //输出字符串时模板第一个节点前面不加换行符
       fns._firstNode = false;

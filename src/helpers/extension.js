@@ -177,7 +177,20 @@ export const extensions = {
 
   show: options => {
     if (!options.result()) {
-      options.exProps.style = options.useString ? 'display:none' : { display: 'none' };
+      const {
+        attrs,
+        useString
+      } = options;
+
+      if (!attrs.style) {
+        attrs.style = useString ? '' : {};
+      }
+      if (useString) {
+        attrs.style += (attrs.style ? ';' : '') + 'display:none';
+      }
+      else {
+        attrs.style.display = 'none';
+      }
     }
   },
 
