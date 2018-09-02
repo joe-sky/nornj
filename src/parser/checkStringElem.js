@@ -319,6 +319,8 @@ function _setElem(elem, elemName, elemParams, elemArr, bySelfClose, tmplRule, ou
   }
 }
 
+const REGEX_EX_ATTR = /([^\s-_.]+)((-[^\s-_.]+)*)(([_.][^\s-_.]+)*)/;
+
 //Extract split parameters
 function _getSplitParams(elem, tmplRule, outputH) {
   const { extensionRule, startRule, endRule, firstChar, lastChar, spreadProp, exAttrs } = tmplRule;
@@ -348,7 +350,21 @@ function _getSplitParams(elem, tmplRule, outputH) {
       paramsEx = [extensionRule + 'props'];
     }
 
-    const exPreAst = [extensionRule + name + ' _njIsProp' + (hasEqual ? '' : ' /')];
+    let args, modifiers;
+    name = name.replace(REGEX_EX_ATTR, (all, name, arg, g3, modifier) => {
+      if (arg) {
+        args = arg.substr(1).split('-').map(item => '\'' + item + '\'');
+      }
+      if (modifier) {
+        modifiers = modifier.substr(1).split(/[_.]/).map(item => '\'' + item + '\'');
+      }
+      return name;
+    });
+
+    const exPreAst = [extensionRule + name + ' _njIsProp'
+      + (args ? ' args="' + startRule + '[' + args.join(',') + ']' + endRule + '"' : '')
+      + (modifiers ? ' modifiers="' + startRule + '[' + modifiers.join(',') + ']' + endRule + '"' : '')
+      + (hasEqual ? '' : ' /')];
     hasEqual && exPreAst.push((hasColon ? ((outputH ? firstChar : '') + startRule + ' ') : '') + tools.clearQuot(value) + (hasColon ? (' ' + endRule + (outputH ? lastChar : '')) : ''));
     paramsEx.push(exPreAst);
     return ' ';

@@ -9,7 +9,7 @@ describe('precompile', () => {
 
   it('Extension attribute', () => {
     const ret = precompile(`
-      <div type="radio" #show={{show}} #noMargin={{show}}>
+      <div type="radio" #show={{show}} #noMargin-arg1-arg2.modifier1.modifier2={{show}}>
         <i><#test /></i>
       </div>
     `, true, nj.tmplRule);
