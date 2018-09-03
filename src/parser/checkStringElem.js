@@ -362,7 +362,7 @@ function _getSplitParams(elem, tmplRule, outputH) {
     });
 
     const exPreAst = [extensionRule + name + ' _njIsProp'
-      + (args ? ' args="' + startRule + '[' + args.join(',') + ']' + endRule + '"' : '')
+      + (args ? ' arguments="' + startRule + '[' + args.join(',') + ']' + endRule + '"' : '')
       + (modifiers ? ' modifiers="' + startRule + '[' + modifiers.join(',') + ']' + endRule + '"' : '')
       + (hasEqual ? '' : ' /')];
     hasEqual && exPreAst.push((hasColon ? ((outputH ? firstChar : '') + startRule + ' ') : '') + tools.clearQuot(value) + (hasColon ? (' ' + endRule + (outputH ? lastChar : '')) : ''));

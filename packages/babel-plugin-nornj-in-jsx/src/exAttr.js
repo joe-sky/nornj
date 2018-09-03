@@ -42,7 +42,9 @@ module.exports = function (babel) {
         const isExAttr = astUtil.isExAttr(attrName);
         const _attrName = isExAttr ? astUtil.transformExAttr(attrName) : attrName;
         const attrStr = lastAttrStr + (i == 0 ? (!isComponent ? tagName : '') : '') + ' ' + _attrName + '=';
-        let exAttrConfig = isExAttr ? nj.extensionConfig[_attrName != 'style' ? _attrName.substr(1) : _attrName] : {};
+        let exAttrConfig = isExAttr ? nj.extensionConfig[_attrName != 'style'
+          ? _attrName.substr(1).replace(astUtil.REGEX_EX_ATTR, (all, name) => name)
+          : _attrName] : {};
         !exAttrConfig && (exAttrConfig = {});
 
         if (!attr.value) {

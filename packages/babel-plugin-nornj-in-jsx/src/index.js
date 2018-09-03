@@ -33,9 +33,10 @@ module.exports = function (babel) {
         if (exAttrs.length) {
           state.file.hasNjInJSX = true;
 
-          const hasMobx = exAttrs.indexOf('n-mobx-model') > -1;
+          const hasMobx = exAttrs.reduce((result, exAttr) =>
+            result || (exAttr.indexOf('n-mobx') > -1 || exAttr.indexOf('n-mst') > -1), false);
           hasMobx
-            && !nj.extensionConfig['mobx-model']
+            && !nj.extensionConfig['mobx']
             && Object.assign(nj.extensionConfig, require('nornj-react/mobx/extensionConfig'));
           if (hasMobx) {
             state.file.hasMobx = true;

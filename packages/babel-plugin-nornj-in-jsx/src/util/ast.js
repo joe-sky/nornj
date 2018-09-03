@@ -202,6 +202,8 @@ exports.transformExAttr = function (attrName) {
 
 exports.REGEX_CAPITALIZE = /^[A-Z][\s\S]*$/;
 
+exports.REGEX_EX_ATTR = /([^\s-_.]+)((-[^\s-_.]+)*)(([_.][^\s-_.]+)*)/;
+
 exports.addImportNj = function (state) {
   const globalNj = state.addImport('nornj', 'default', 'nj');
   state.addImport('nornj-react');
