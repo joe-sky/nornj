@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## [v0.4.12] 2018.09.05
+
+* 🌟 扩展标签函数的`options`参数中增加`attrs`参数。
+* 🌟 改进`precompile`方法，更好地配合`babel-plugin-nornj-in-jsx`做预编译。
+
 ## [v0.4.11] 2018.08.17
 
 * 🐞 修复渲染`<br style="color: #fff">`时的bug。[#17](https://github.com/joe-sky/nornj/issues/17)

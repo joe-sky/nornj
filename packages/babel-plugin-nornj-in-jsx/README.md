@@ -342,29 +342,93 @@ class TestComponent extends Component {
 }
 ```
 
-### n-mobx-model
+### n-mobx-bind
 
-使用`n-mobx-model`可以在JSX中实现基于`Mobx`的双向数据绑定功能：
+类似于`Vue`的`v-model`指令，可以使用`n-mobx-bind`配合`Mobx`在`<input>`及`<textarea>`等表单元素上创建`双向数据绑定`，它会根据控件类型自动选取正确的方法来更新元素。
+
+* 基本使用方法
 
 ```js
 import { Component } from 'react';
 import { observable } from 'mobx';
-import nj from 'nornj';
 
 class TestComponent extends Component {
   @observable inputValue = '';
 
   render() {
-    return <input n-mobx-model="inputValue" />;
+    return <input n-mobx-bind="inputValue" />;
   }
 }
 ```
 
-`n-mobx-model`的详细文档请[查看这里](https://joe-sky.github.io/nornj-guide/templateSyntax/inlineExtensionTag.html#mobx-model)。
+如上所示，无需编写`<input>`标签的`onChange`事件，`inputValue`变量已自动和`<input>`标签建立了`双向数据绑定`的关系。
 
-### n-mst-model
+* 实质上，`n-mobx-bind`的实现原理和`v-model`很类似，上述示例其实就是下面的语法糖形式：
 
-`n-mst-model`即为`n-mobx-model`的`mobx-state-tree`版本：
+```js
+class TestComponent extends Component {
+  @observable inputValue = '';
+  @autobind
+  onChange(e) {
+    this.inputValue = e.target.value;
+  }
+
+  render() {
+    return <input value={this.inputValue} onChange={this.onChange} />;
+  }
+}
+```
+
+* `onChange`事件
+
+由于`n-mobx-bind`默认自动设置了组件的`onChange`事件，但有些情况下我们可能还是需要在`onChange`中做一些其他的操作：
+
+```js
+class TestComponent extends Component {
+  @observable inputValue = '1';
+
+  @autobind
+  onChange(e) {
+    console.log(e.target.value);
+  }
+
+  render() {
+    return <input n-mobx-bind="inputValue" onChange={this.onChange} />;
+  }
+}
+```
+
+如上所示，`onChange`事件的行为和标签原生的`onChange`完全相同，它会在文本框的值变化后执行。
+
+* 使用`action`更新变量
+
+在`mobx`开发中如果启动严格模式或者使用`mobx-state-tree`时，则须要使用`action`来更新变量。可按下面方式配置使用`action`：
+
+```js
+import { observable, action, configure } from 'mobx';
+
+// don't allow state modifications outside actions
+configure({enforceActions: true});
+
+class TestComponent extends Component {
+  @observable inputValue = '1';
+
+  @action.bound
+  setInputValue(v) {
+    this.inputValue = v;
+  }
+
+  render() {
+    return <input n-mobx-bind_action="inputValue" />;
+  }
+}
+```
+
+当有`action`修饰符时，`n-mobx-bind`会默认执行camel命名法(`set + 变量名`)定义的`action`，上例中为`setInputValue`。
+
+### n-mst-bind
+
+`n-mst-bind`即为`n-mobx-bind`的默认使用`action`来更新值的版本，用来配合`mobx-state-tree`的变量使用：
 
 store：
 
@@ -389,12 +453,14 @@ component：
 @observer
 class TestComponent extends Component {
   render() {
-    return <input n-mst-model={`${this}.props.rootStore.testStore.inputValue`} />;
+    return <input n-mst-bind={`${this}.props.rootStore.testStore`} />;
   }
 }
 ```
 
-`n-mst-model`的详细文档请[查看这里](https://joe-sky.github.io/nornj-guide/templateSyntax/inlineExtensionTag.html#mst-model)。
+如上，`n-mst-bind`会默认执行camel命名法(`set + 变量名`)定义的`action`来更新值，上例中为`setInputValue`。除此外`n-mst-bind`的其他特性与上述的`n-mobx-bind`完全相同。
+
+`n-mobx-bind`和`n-mst-bind`的更多详细文档请[查看这里](https://joe-sky.github.io/nornj-guide/templateSyntax/inlineExtensionTag.html#mobx-bind)。
 
 ## 扩展表达式
 

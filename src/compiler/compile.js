@@ -91,7 +91,17 @@ function _createAstRoot() {
 export function precompile(tmpl, outputH, tmplRule) {
   const root = _createAstRoot();
 
-  if (tools.isString(tmpl)) {
+  if (tmpl.quasis) {
+    const { quasis, isExpresson, isCss } = tmpl;
+    tmpl = compileStringTmpl.call({
+      tmplRule,
+      outputH,
+      onlyParse: true,
+      isMustache: isExpresson,
+      isCss
+    }, quasis);
+  }
+  else if (tools.isString(tmpl)) {
     tmpl = compileStringTmpl.call({ tmplRule, outputH, onlyParse: true }, tmpl);
   }
   checkElem(tmpl._njTmpl, root, tmplRule);
@@ -100,7 +110,7 @@ export function precompile(tmpl, outputH, tmplRule) {
 }
 
 function _createRender(outputH) {
-  return function(tmpl, options) {
+  return function (tmpl, options) {
     return (outputH ? compileH : compile)(tmpl, options ? {
       tmplKey: options.tmplKey ? options.tmplKey : tmpl._njTmplKey,
       fileName: options.fileName,

@@ -71,22 +71,27 @@ function getExAttrExpression(types, expr) {
   }
 }
 
-function createRenderTmpl(babel, quasis, expressions, opts) {
+function createRenderTmpl(babel, quasis, expressions, opts, taggedTmplConfig) {
   const types = babel.types;
   _setTmplConfig(opts);
 
-  let tmplStr = '',
-    paramCount = 0;
-  quasis.forEach((q, i) => {
-    tmplStr += q.value.cooked;
-    if (i < quasis.length - 1) {
-      const expr = expressions[i];
-      tmplStr += (expr.noMustache ? '' : '{{')
-        + _mustachePrefix(expr) + '_njParam' + paramCount
-        + (expr.noMustache ? '' : '}}');
-      paramCount++;
-    }
-  });
+  let tmplStr = '';
+  if (!taggedTmplConfig) {
+    let paramCount = 0;
+    quasis.forEach((q, i) => {
+      tmplStr += q.value.cooked;
+      if (i < quasis.length - 1) {
+        const expr = expressions[i];
+        tmplStr += (expr.noMustache ? '' : '{{')
+          + _mustachePrefix(expr) + '_njParam' + paramCount
+          + (expr.noMustache ? '' : '}}');
+        paramCount++;
+      }
+    });
+  }
+  else {
+    tmplStr = Object.assign({ quasis: quasis.map(q => q.value.cooked) }, taggedTmplConfig);
+  }
 
   const tmplObj = _buildTmplFns(nj.precompile(
     tmplStr,

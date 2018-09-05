@@ -279,10 +279,6 @@ console.log(html);
 
 * 可支持所有现代浏览器以及Internet Explorer 9+。
 
-## 谁在使用
-
-![who use](https://joe-sky.github.io/nornj-guide/images/y-dept.jpg?raw=true)
-
 ## License
 
 MIT

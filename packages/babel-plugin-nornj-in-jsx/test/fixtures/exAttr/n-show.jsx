@@ -27,6 +27,7 @@ module.exports = createReactClass({
         <Test.Show.Wrap id="wrap" n-show={this.props.show} {...{ name: 'wrap' }} {...{ className: 'wrap' }}>
           <div className="test" n-show={!this.props.show}>
             <if condition={this.props.condition}>
+              {n`100 * 10 + ${20}`}
               <span>IfBlock</span>
               <else>
                 <input n-show={`${this}.props.show`} />

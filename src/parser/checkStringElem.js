@@ -2,7 +2,7 @@
 import * as tools from '../utils/tools';
 import * as tranElem from '../transforms/transformElement';
 const { preAsts } = nj;
-const SPLIT_FLAG = '_nj_split';
+const SPLIT_FLAG = '_njParam';
 const TEXT_CONTENT = [
   'style',
   'script',
@@ -103,22 +103,22 @@ export default function compileStringTmpl(tmpl) {
     preAsts[tmplKey] = ret;
   }
 
-  let params,
-    args = arguments,
-    paramCount = ret._njParamCount;
-  if (paramCount > 0) {
-    params = {};
-    tools.defineProp(params, '_njParam', {
-      value: true
-    });
-
-    for (let i = 0; i < paramCount; i++) {
-      params[SPLIT_FLAG + i] = args[i + 1];
-    }
-  }
-
   let tmplFn;
   if (!onlyParse) {
+    let params,
+      args = arguments,
+      paramCount = ret._njParamCount;
+    if (paramCount > 0) {
+      params = {};
+      tools.defineProp(params, '_njParam', {
+        value: true
+      });
+
+      for (let i = 0; i < paramCount; i++) {
+        params[SPLIT_FLAG + i] = args[i + 1];
+      }
+    }
+
     tmplFn = params ? function () {
       return tmplMainFn.apply(this, tools.arrayPush([params], arguments));
     } : function () {

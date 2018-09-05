@@ -4,6 +4,7 @@ const transformIf = require('./ifTag');
 const transformSwitch = require('./switchTag');
 const transformWith = require('./withTag');
 const transformExAttr = require('./exAttr');
+const transformExpression = require('./expression');
 const astUtil = require('./util/ast');
 
 module.exports = function (babel) {
@@ -15,6 +16,7 @@ module.exports = function (babel) {
     'with': transformWith(babel)
   };
   const exAttrHandler = transformExAttr(babel);
+  const expressionHandler = transformExpression(babel);
 
   var visitor = {
     JSXElement: {
@@ -44,6 +46,11 @@ module.exports = function (babel) {
 
           path.replaceWith(exAttrHandler(path.node, path.hub.file, state));
         }
+      }
+    },
+    TaggedTemplateExpression(path, state) {
+      if (path.node.tag.name === 'n') {
+        path.replaceWith(expressionHandler(path.node, path.hub.file, state));
       }
     },
     ImportDeclaration(path, state) {
@@ -86,7 +93,10 @@ module.exports = function (babel) {
         }
         if (!state.file.hasImportNj) {
           path.node.body.unshift(types.importDeclaration(
-            [types.importDefaultSpecifier(types.identifier('nj'))],
+            [
+              types.importDefaultSpecifier(types.identifier('nj')),
+              types.importSpecifier(types.identifier('n'), types.identifier('expression'))
+            ],
             types.stringLiteral('nornj')
           ));
         }

@@ -3166,7 +3166,7 @@ var buildRuntime = (function (astContent, ast, useString) {
 
 var preAsts = nj.preAsts;
 
-var SPLIT_FLAG = '_nj_split';
+var SPLIT_FLAG = '_njParam';
 var TEXT_CONTENT = ['style', 'script', 'textarea', 'xmp', nj.textTag];
 var OMITTED_CLOSE_TAGS$1 = OMITTED_CLOSE_TAGS;
 
@@ -3268,22 +3268,22 @@ function compileStringTmpl(tmpl) {
     preAsts[tmplKey] = ret;
   }
 
-  var params = void 0,
-      args = arguments,
-      paramCount = ret._njParamCount;
-  if (paramCount > 0) {
-    params = {};
-    defineProp(params, '_njParam', {
-      value: true
-    });
-
-    for (var i = 0; i < paramCount; i++) {
-      params[SPLIT_FLAG + i] = args[i + 1];
-    }
-  }
-
   var tmplFn = void 0;
   if (!onlyParse) {
+    var params = void 0,
+        args = arguments,
+        paramCount = ret._njParamCount;
+    if (paramCount > 0) {
+      params = {};
+      defineProp(params, '_njParam', {
+        value: true
+      });
+
+      for (var i = 0; i < paramCount; i++) {
+        params[SPLIT_FLAG + i] = args[i + 1];
+      }
+    }
+
     tmplFn = params ? function () {
       return tmplMainFn.apply(this, arrayPush([params], arguments));
     } : function () {
@@ -3671,7 +3671,20 @@ function _createAstRoot() {
 function precompile(tmpl, outputH, tmplRule) {
   var root = _createAstRoot();
 
-  if (isString(tmpl)) {
+  if (tmpl.quasis) {
+    var _tmpl = tmpl,
+        quasis = _tmpl.quasis,
+        isExpresson = _tmpl.isExpresson,
+        isCss = _tmpl.isCss;
+
+    tmpl = compileStringTmpl.call({
+      tmplRule: tmplRule,
+      outputH: outputH,
+      onlyParse: true,
+      isMustache: isExpresson,
+      isCss: isCss
+    }, quasis);
+  } else if (isString(tmpl)) {
     tmpl = compileStringTmpl.call({ tmplRule: tmplRule, outputH: outputH, onlyParse: true }, tmpl);
   }
   checkElem(tmpl._njTmpl, root, tmplRule);
