@@ -1,7 +1,7 @@
 ﻿import { render } from '../../src/compiler/compile';
 import '../../src/utils/createTmplRule';
 
-describe('extension tag', () => {
+describe('Extension tag', () => {
   it('if', () => {
     expect(render(`
       <#if {{a}}>

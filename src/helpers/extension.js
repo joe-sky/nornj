@@ -5,6 +5,10 @@ import * as tranData from '../transforms/transformData';
 //Global extension list
 export const extensions = {
   'if': (value, options) => {
+    if (value && value._njOpts) {
+      options = value;
+      value = options.props.condition;
+    }
     if (value === 'false') {
       value = false;
     }
@@ -52,6 +56,11 @@ export const extensions = {
   'else': options => options.subExProps['else'] = options.result,
 
   'elseif': (value, options) => {
+    if (value && value._njOpts) {
+      options = value;
+      value = options.props.condition;
+    }
+
     const exProps = options.subExProps;
     if (!exProps.elseifs) {
       exProps.elseifs = [];
@@ -63,6 +72,11 @@ export const extensions = {
   },
 
   'switch': (value, options) => {
+    if (value && value._njOpts) {
+      options = value;
+      value = options.props.value;
+    }
+
     let ret,
       props = options.props,
       l = props.elseifs.length;
@@ -87,6 +101,11 @@ export const extensions = {
   },
 
   each: (list, options) => {
+    if (list && list._njOpts) {
+      options = list;
+      list = options.props.of;
+    }
+
     let useString = options.useString,
       props = options.props,
       ret;
@@ -339,7 +358,7 @@ export const extensionConfig = {
   'else': _config({ onlyGlobal: true, newContext: false, subExProps: true, isSub: true }),
   'switch': _config(_defaultCfg),
   unless: _config(_defaultCfg),
-  each: _config({ onlyGlobal: true }),
+  each: _config({ onlyGlobal: true, newContext: { item: 'item', index: 'index' } }),
   prop: _config({ onlyGlobal: true, newContext: false, exProps: true, subExProps: true, isProp: true }),
   spread: _config({ onlyGlobal: true, newContext: false, exProps: true, subExProps: true, isProp: true }),
   obj: _config({ onlyGlobal: true, newContext: false }),
@@ -351,7 +370,7 @@ export const extensionConfig = {
 extensionConfig.elseif = _config(extensionConfig['else']);
 extensionConfig['for'] = _config(extensionConfig.each);
 extensionConfig.block = _config(extensionConfig.obj);
-extensionConfig.pre = _config(extensionConfig.obj);
+extensionConfig.pre = tools.assign(_config(extensionConfig.obj), { needPrefix: true });
 extensionConfig.arg = _config(extensionConfig.prop);
 extensionConfig.once = _config(extensionConfig.obj);
 extensionConfig.show = _config(extensionConfig.prop);
@@ -368,7 +387,7 @@ extensions.strArg = extensions.arg;
 extensionConfig.strArg = _config(extensionConfig.strProp);
 
 //Register extension and also can batch add
-export function registerExtension(name, extension, options) {
+export function registerExtension(name, extension, options, mergeConfig) {
   let params = name;
   if (!tools.isObject(name)) {
     params = {};
@@ -384,10 +403,19 @@ export function registerExtension(name, extension, options) {
 
       if (extension) {
         extensions[name] = extension;
-      } else {
+      } else if (!mergeConfig) {
         extensions[name] = v;
       }
-      extensionConfig[name] = _config(options);
+
+      if (mergeConfig) {
+        if (!extensionConfig[name]) {
+          extensionConfig[name] = {};
+        }
+        tools.assign(extensionConfig[name], options);
+      }
+      else {
+        extensionConfig[name] = _config(options);
+      }
     }
   }, false, false);
 }

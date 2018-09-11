@@ -1,7 +1,7 @@
 ﻿import { render } from '../../src/compiler/compile';
 import '../../src/utils/createTmplRule';
 
-describe('extension attribute', () => {
+describe('Extension attribute', () => {
   it('show', () => {
     expect(render(`<br #show={{visible}}>`, {
       visible: false

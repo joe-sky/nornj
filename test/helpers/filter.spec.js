@@ -1,7 +1,7 @@
 ﻿import { render } from '../../src/compiler/compile';
 import '../../src/utils/createTmplRule';
 
-describe('filter', () => {
+describe('Filter', () => {
   it('.', () => {
     expect(render("{{ a.b['c'].length }}", {
       a: {

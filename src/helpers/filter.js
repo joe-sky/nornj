@@ -21,7 +21,7 @@ export const filters = {
   },
 
   //Call method
-  _: function(method) {
+  _: function (method) {
     if (method == null) {
       return method;
     }
@@ -106,7 +106,7 @@ export const filters = {
     return Boolean(val);
   },
 
-  obj: function() {
+  obj: function () {
     let args = arguments,
       ret = {};
 
@@ -120,7 +120,7 @@ export const filters = {
     return { key, val };
   },
 
-  list: function() {
+  list: function () {
     let args = arguments;
     if (args.length === 0) {
       return [];
@@ -155,7 +155,7 @@ export const filters = {
 };
 
 function _getArrayByNum(isContainEnd) {
-  return function(val1, val2) {
+  return function (val1, val2) {
     return Object.keys(Array.apply(null, { length: val2 - val1 + isContainEnd })).map(item => +item + val1);
   };
 }
@@ -221,7 +221,7 @@ filters['//'] = filters['%%'];
 filterConfig['//'] = filterConfig['%%'];
 
 //Register filter and also can batch add
-export function registerFilter(name, filter, options) {
+export function registerFilter(name, filter, options, mergeConfig) {
   let params = name;
   if (!tools.isObject(name)) {
     params = {};
@@ -237,10 +237,19 @@ export function registerFilter(name, filter, options) {
 
       if (filter) {
         filters[name] = filter;
-      } else {
+      } else if (!mergeConfig) {
         filters[name] = v;
       }
-      filterConfig[name] = _config(options);
+
+      if (mergeConfig) {
+        if (!filterConfig[name]) {
+          filterConfig[name] = {};
+        }
+        tools.assign(filterConfig[name], options);
+      }
+      else {
+        filterConfig[name] = _config(options);
+      }
     }
   }, false, false);
 }

@@ -2,7 +2,7 @@ import nj from '../../src/core';
 import { precompile } from '../../src/compiler/compile';
 import '../../src/utils/createTmplRule';
 
-describe('precompile', () => {
+describe('Precompile', () => {
   nj.registerExtension('noMargin', options => {
     options.exProps.style = 'margin:0';
   }, { addSet: true });
