@@ -69,7 +69,7 @@ module.exports = function (babel) {
     })));
 
     const expr = types.ArrowFunctionExpression(
-      [types.objectPattern(mapParams, [])],
+      [types.objectPattern(mapParams)],
       types.blockStatement([types.returnStatement(returnExpression)])
     );
     expr.isAccessor = true;

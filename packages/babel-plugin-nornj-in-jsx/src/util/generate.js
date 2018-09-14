@@ -73,7 +73,6 @@ function getExAttrExpression(types, expr) {
 
 function createRenderTmpl(babel, quasis, expressions, opts, taggedTmplConfig) {
   const types = babel.types;
-  _setTmplConfig(opts);
 
   let tmplStr = '';
   if (!taggedTmplConfig) {
@@ -133,41 +132,6 @@ function _buildTmplFns(fns, tmplKey) {
   });
 
   return ret + '}';
-}
-
-function _setTmplConfig(opts) {
-  if (opts.extensionConfig) {
-    let extensionConfig = {},
-      extensionConfigs = opts.extensionConfig;
-    if (!Array.isArray(extensionConfigs)) {
-      extensionConfigs = [extensionConfigs];
-    }
-
-    nj.each(extensionConfigs, exConfig => {
-      nj.each(exConfig, (v, k) => {
-        extensionConfig[k] = {
-          options: v
-        };
-      });
-    });
-    nj.registerExtension(extensionConfig);
-  }
-  if (opts.filterConfig) {
-    let filterConfig = {},
-      filterConfigs = opts.filterConfig;
-    if (!Array.isArray(filterConfigs)) {
-      filterConfigs = [filterConfigs];
-    }
-
-    nj.each(filterConfigs, fConfig => {
-      nj.each(fConfig, (v, k) => {
-        filterConfig[k] = {
-          options: v
-        };
-      });
-    });
-    nj.registerFilter(filterConfig);
-  }
 }
 
 module.exports = {

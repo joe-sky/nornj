@@ -3,9 +3,11 @@ const transformEach = require('./eachTag');
 const transformIf = require('./ifTag');
 const transformSwitch = require('./switchTag');
 const transformWith = require('./withTag');
+const transformExTag = require('./exTag');
 const transformExAttr = require('./exAttr');
 const transformExpression = require('./expression');
 const astUtil = require('./util/ast');
+const utils = require('./util/utils');
 
 module.exports = function (babel) {
   const types = babel.types;
@@ -15,20 +17,27 @@ module.exports = function (babel) {
     'switch': transformSwitch(babel),
     'with': transformWith(babel)
   };
+  const exTagHandler = transformExTag(babel);
   const exAttrHandler = transformExAttr(babel);
   const expressionHandler = transformExpression(babel);
 
   var visitor = {
     JSXElement: {
       enter(path, state) {
-        var nodeName = path.node.openingElement.name.name;
-        var handler = nodeHandlers[nodeName];
+        const nodeName = path.node.openingElement.name.name;
+        const handler = nodeHandlers[nodeName];
 
         if (handler) {
           state.file.hasNjInJSX = true;
 
           path.replaceWith(handler(path.node, path.hub.file, state));
         }
+
+        // if (astUtil.isExTag(nodeName)) {
+        //   state.file.hasNjInJSX = true;
+
+        //   path.replaceWith(exTagHandler(path.node, path.hub.file, state));
+        // }
       },
       exit(path, state) {
         const exAttrs = astUtil.hasExAttr(path.node);
@@ -73,6 +82,7 @@ module.exports = function (babel) {
         state.file.hasImportNj = false;
         state.file.hasImportNjr = false;
         state.file.hasImportNjrMobx = false;
+        utils.setTmplConfig(state.opts);
       },
       exit(path, state) {
         if (!state.file.hasNjInJSX) {

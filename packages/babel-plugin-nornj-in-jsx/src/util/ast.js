@@ -1,4 +1,5 @@
-var TYPES = {
+const nj = require('nornj').default;
+const TYPES = {
   ELEMENT: 'JSXElement',
   EXPRESSION_CONTAINER: 'JSXExpressionContainer',
   STRING_LITERAL: 'StringLiteral'
@@ -209,4 +210,33 @@ exports.addImportNj = function (state) {
   state.addImport('nornj-react');
 
   return globalNj;
+};
+
+function hasExPrefix(name) {
+  return name.indexOf('n-') === 0;
+}
+exports.hasExPrefix = hasExPrefix;
+
+exports.isExTag = function (nodeName) {
+  let exPrefix = hasExPrefix(nodeName);
+  let isSub;
+  let needPrefix;
+  if (exPrefix) {
+    nodeName = nodeName.substr(2);
+  }
+  const exConfig = nj.extensionConfig[nodeName];
+  if (exConfig) {
+    isSub = exConfig.isSub;
+    needPrefix = exConfig.needPrefix;
+  }
+
+  let isExTag;
+  if (exPrefix) {
+    isExTag = !isSub;
+  }
+  else {
+    isExTag = exConfig && !isSub && !needPrefix;
+  }
+
+  return isExTag;
 };
