@@ -240,3 +240,20 @@ exports.isExTag = function (nodeName) {
 
   return isExTag;
 };
+
+exports.isSubExTag = function (nodeName) {
+  let exPrefix = hasExPrefix(nodeName);
+  let isSub;
+  let needPrefix;
+  if (exPrefix) {
+    nodeName = nodeName.substr(2);
+  }
+
+  const exConfig = nj.extensionConfig[nodeName];
+  if (exConfig) {
+    isSub = exConfig.isSub;
+    needPrefix = exConfig.needPrefix;
+  }
+
+  return exPrefix ? isSub : (isSub && !needPrefix);
+};
