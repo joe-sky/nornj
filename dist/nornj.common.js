@@ -1,5 +1,5 @@
 /*!
-* NornJ template engine v0.4.12
+* NornJ template engine v0.4.13
 * (c) 2016-2018 Joe_Sky
 * Released under the MIT License.
 */
@@ -918,6 +918,10 @@ function template(fns) {
 //Global extension list
 var extensions = {
   'if': function _if(value, options) {
+    if (value && value._njOpts) {
+      options = value;
+      value = options.props.condition;
+    }
     if (value === 'false') {
       value = false;
     }
@@ -968,6 +972,11 @@ var extensions = {
   },
 
   'elseif': function elseif(value, options) {
+    if (value && value._njOpts) {
+      options = value;
+      value = options.props.condition || options.props.value;
+    }
+
     var exProps = options.subExProps;
     if (!exProps.elseifs) {
       exProps.elseifs = [];
@@ -979,6 +988,11 @@ var extensions = {
   },
 
   'switch': function _switch(value, options) {
+    if (value && value._njOpts) {
+      options = value;
+      value = options.props.value;
+    }
+
     var ret = void 0,
         props = options.props,
         l = props.elseifs.length;
@@ -1003,6 +1017,11 @@ var extensions = {
   },
 
   each: function each$$1(list, options) {
+    if (list && list._njOpts) {
+      options = list;
+      list = options.props.of;
+    }
+
     var useString = options.useString,
         props = options.props,
         ret = void 0;
@@ -1269,19 +1288,19 @@ var extensionConfig = {
   'else': _config({ onlyGlobal: true, newContext: false, subExProps: true, isSub: true }),
   'switch': _config(_defaultCfg),
   unless: _config(_defaultCfg),
-  each: _config({ onlyGlobal: true }),
+  each: _config({ onlyGlobal: true, newContext: { item: 'item', index: 'index' } }),
   prop: _config({ onlyGlobal: true, newContext: false, exProps: true, subExProps: true, isProp: true }),
   spread: _config({ onlyGlobal: true, newContext: false, exProps: true, subExProps: true, isProp: true }),
   obj: _config({ onlyGlobal: true, newContext: false }),
   list: _config(_defaultCfg),
   fn: _config({ onlyGlobal: true }),
   'with': _config({ onlyGlobal: true }),
-  style: { useExpressionInJsx: false }
+  style: { useExpressionInJsx: false, needPrefix: true }
 };
 extensionConfig.elseif = _config(extensionConfig['else']);
 extensionConfig['for'] = _config(extensionConfig.each);
 extensionConfig.block = _config(extensionConfig.obj);
-extensionConfig.pre = _config(extensionConfig.obj);
+extensionConfig.pre = assign(_config(extensionConfig.obj), { needPrefix: true });
 extensionConfig.arg = _config(extensionConfig.prop);
 extensionConfig.once = _config(extensionConfig.obj);
 extensionConfig.show = _config(extensionConfig.prop);
@@ -1298,7 +1317,7 @@ extensions.strArg = extensions.arg;
 extensionConfig.strArg = _config(extensionConfig.strProp);
 
 //Register extension and also can batch add
-function registerExtension(name, extension, options) {
+function registerExtension(name, extension, options, mergeConfig) {
   var params = name;
   if (!isObject(name)) {
     params = {};
@@ -1316,10 +1335,18 @@ function registerExtension(name, extension, options) {
 
       if (_extension) {
         extensions[name] = _extension;
-      } else {
+      } else if (!mergeConfig) {
         extensions[name] = v;
       }
-      extensionConfig[name] = _config(_options2);
+
+      if (mergeConfig) {
+        if (!extensionConfig[name]) {
+          extensionConfig[name] = {};
+        }
+        assign(extensionConfig[name], _options2);
+      } else {
+        extensionConfig[name] = _config(_options2);
+      }
     }
   }, false, false);
 }
@@ -1599,7 +1626,7 @@ filters['//'] = filters['%%'];
 filterConfig['//'] = filterConfig['%%'];
 
 //Register filter and also can batch add
-function registerFilter(name, filter, options) {
+function registerFilter(name, filter, options, mergeConfig) {
   var params = name;
   if (!isObject(name)) {
     params = {};
@@ -1617,10 +1644,18 @@ function registerFilter(name, filter, options) {
 
       if (_filter) {
         filters[name] = _filter;
-      } else {
+      } else if (!mergeConfig) {
         filters[name] = v;
       }
-      filterConfig[name] = _config$1(_options);
+
+      if (mergeConfig) {
+        if (!filterConfig[name]) {
+          filterConfig[name] = {};
+        }
+        assign(filterConfig[name], _options);
+      } else {
+        filterConfig[name] = _config$1(_options);
+      }
     }
   }, false, false);
 }

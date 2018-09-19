@@ -241,7 +241,12 @@ exports.isExTag = function (nodeName) {
   return isExTag;
 };
 
-exports.isSubExTag = function (nodeName) {
+exports.isSubExTag = function (node) {
+  if(node.type !== TYPES.ELEMENT) {
+    return false;
+  }
+
+  const nodeName = getTagName(node);
   let exPrefix = hasExPrefix(nodeName);
   let isSub;
   let needPrefix;

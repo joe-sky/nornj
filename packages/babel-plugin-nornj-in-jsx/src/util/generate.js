@@ -41,6 +41,83 @@ function buildCondition(types, condition, expressions, tagStart = '<#if {{', has
   return ret;
 }
 
+function buildAttrs(types, tagName, attrs, quasis, expressions, lastAttrStr = '') {
+  const attrNames = Object.keys(attrs);
+
+  if (attrNames.length) {
+    attrNames.forEach((attrName, i) => {
+      const attr = attrs[attrName];
+
+      if (attr.type != 'JSXSpreadAttribute') {
+        let attrStr = lastAttrStr + (i == 0 ? tagName : '') + ' ' + attrName + '=';
+
+        if (!attr.value) {
+          lastAttrStr = attrStr.substr(0, attrStr.length - 1);
+        }
+        else if (attr.value.type == 'JSXExpressionContainer') {
+          const expr = attr.value.expression;
+
+          if (types.isTemplateLiteral(expr)) {
+            if (expr.quasis.length === 1) {
+              lastAttrStr = attrStr + '"{{' + expr.quasis[0].value.cooked + '}}"';
+            }
+            else {
+              expr.quasis.forEach((q, i) => {
+                if (i == 0) {
+                  attrStr += '"{{' + q.value.cooked;
+                  quasis.push(types.TemplateElement({
+                    cooked: attrStr
+                  }));
+                }
+                else if (i == expr.quasis.length - 1) {
+                  lastAttrStr = q.value.cooked + '}}"';
+                }
+                else {
+                  quasis.push(types.TemplateElement({
+                    cooked: q.value.cooked
+                  }));
+                }
+
+                if (i < expr.quasis.length - 1) {
+                  expr.expressions[i].noMustache = true;
+                  expressions.push(expr.expressions[i]);
+                }
+              });
+            }
+          }
+          else {
+            quasis.push(types.TemplateElement({
+              cooked: attrStr
+            }));
+            expressions.push(expr);
+            lastAttrStr = '';
+          }
+        }
+        else {
+          quasis.push(types.TemplateElement({
+            cooked: attrStr
+          }));
+          expressions.push(attr.value);
+          lastAttrStr = '';
+        }
+      }
+      else {
+        quasis.push(types.TemplateElement({
+          cooked: ' '
+        }));
+        attr.argument.isSpread = true;
+        expressions.push(attr.argument);
+        lastAttrStr = '';
+      }
+    });
+  }
+  else {
+    lastAttrStr += tagName;
+  }
+
+  return lastAttrStr;
+}
+
 function _mustachePrefix(expr) {
   if (expr.isAccessor) {
     return '#';
@@ -102,7 +179,13 @@ function createRenderTmpl(babel, quasis, expressions, opts, taggedTmplConfig) {
     })),
     njUtils.uniqueKey(tmplStr));
 
-  const tmplParams = expressions.map((e, i) => types.objectProperty(types.identifier('_njParam' + i), e));
+  const tmplParams = expressions.map((e, i) => types.objectProperty(
+    types.identifier('_njParam' + i), e
+    // e.isAccessor ? types.ArrowFunctionExpression(
+    //   [],
+    //   types.blockStatement([types.returnStatement(e)])
+    // ) : e
+  ));
   if (tmplParams.length) {
     tmplParams.push(types.objectProperty(types.identifier('_njParam'), types.booleanLiteral(true)));
   }
@@ -136,6 +219,7 @@ function _buildTmplFns(fns, tmplKey) {
 
 module.exports = {
   buildCondition,
+  buildAttrs,
   getElName,
   getExAttrExpression,
   createRenderTmpl

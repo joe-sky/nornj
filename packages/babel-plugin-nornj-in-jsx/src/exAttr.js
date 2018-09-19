@@ -10,10 +10,11 @@ module.exports = function (babel) {
     const expressions = [];
     const isJSXMemberExpression = types.isJSXMemberExpression(node.openingElement.name);
     let elName = node.openingElement.name.name;
+    const key = astUtil.getKey(node);
     const attrs = astUtil.getAttributeMap(node);
     const children = astUtil.getChildren(types, node);
     const isSelfClosing = node.openingElement.selfClosing;
-    const childrenExpression = !isSelfClosing && astUtil.getSanitizedExpressionForContent(types, children);
+    const childrenExpression = !isSelfClosing && astUtil.getSanitizedExpressionForContent(types, children, key);
     const isComponent = !isJSXMemberExpression ? astUtil.REGEX_CAPITALIZE.test(elName) : true;
     let tagName = '<';
 

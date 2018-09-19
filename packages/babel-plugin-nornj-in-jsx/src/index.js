@@ -33,7 +33,7 @@ module.exports = function (babel) {
           path.replaceWith(handler(path.node, path.hub.file, state));
         }
 
-        // if (astUtil.isExTag(nodeName)) {
+        // if (nodeName != null && astUtil.isExTag(nodeName)) {
         //   state.file.hasNjInJSX = true;
 
         //   path.replaceWith(exTagHandler(path.node, path.hub.file, state));

@@ -58,7 +58,7 @@ export const extensions = {
   'elseif': (value, options) => {
     if (value && value._njOpts) {
       options = value;
-      value = options.props.condition;
+      value = options.props.condition || options.props.value;
     }
 
     const exProps = options.subExProps;
@@ -365,7 +365,7 @@ export const extensionConfig = {
   list: _config(_defaultCfg),
   fn: _config({ onlyGlobal: true }),
   'with': _config({ onlyGlobal: true }),
-  style: { useExpressionInJsx: false }
+  style: { useExpressionInJsx: false, needPrefix: true }
 };
 extensionConfig.elseif = _config(extensionConfig['else']);
 extensionConfig['for'] = _config(extensionConfig.each);
