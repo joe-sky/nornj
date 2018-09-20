@@ -9,7 +9,7 @@ describe('requiring in component with each', function () {
   var eachCompomment = require('../fixtures/each/each.jsx');
 
   it('should render each block when the "of" props is array and it is not empty ', function () {
-    var rendered = util.render(eachCompomment, { 'of': ['xxxx',2,3] });
+    var rendered = util.render(eachCompomment, { 'of': ['xxxx', 2, 3] });
     expect(rendered).to.contain('<div');
     expect(rendered).to.contain('0');
     expect(rendered).to.contain('xxxx');

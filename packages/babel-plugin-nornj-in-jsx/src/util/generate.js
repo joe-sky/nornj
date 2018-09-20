@@ -41,17 +41,29 @@ function buildCondition(types, condition, expressions, tagStart = '<#if {{', has
   return ret;
 }
 
-function buildAttrs(types, tagName, attrs, quasis, expressions, lastAttrStr = '') {
+function buildAttrs(types, tagName, attrs, quasis, expressions, lastAttrStr, newContextData) {
   const attrNames = Object.keys(attrs);
+  const exTagConfig = nj.extensionConfig[tagName];
+  const newContext = exTagConfig && exTagConfig.newContext;
+  const isCtxObject = nj.isObject(newContext);
+  if (isCtxObject) {
+    Object.keys(newContext).forEach(k => {
+      newContextData[k] = newContext[k];
+    });
+  }
 
   if (attrNames.length) {
     attrNames.forEach((attrName, i) => {
       const attr = attrs[attrName];
 
       if (attr.type != 'JSXSpreadAttribute') {
-        let attrStr = lastAttrStr + (i == 0 ? tagName : '') + ' ' + attrName + '=';
+        let attrStr = lastAttrStr + (i == 0 ? '<#' + tagName : '') + ' ' + attrName + '=';
 
-        if (!attr.value) {
+        if (isCtxObject && newContext[attrName] != null) {
+          newContextData[attrName] = attr.value.value;
+          lastAttrStr += (i == 0 ? '<#' + tagName : '');
+        }
+        else if (!attr.value) {
           lastAttrStr = attrStr.substr(0, attrStr.length - 1);
         }
         else if (attr.value.type == 'JSXExpressionContainer') {
@@ -112,7 +124,7 @@ function buildAttrs(types, tagName, attrs, quasis, expressions, lastAttrStr = ''
     });
   }
   else {
-    lastAttrStr += tagName;
+    lastAttrStr += '<#' + tagName;
   }
 
   return lastAttrStr;
@@ -179,12 +191,33 @@ function createRenderTmpl(babel, quasis, expressions, opts, taggedTmplConfig) {
     })),
     njUtils.uniqueKey(tmplStr));
 
+  // const tmplParams = expressions.map((e, i) => {
+  //   let block;
+  //   if (e.isAccessor) {
+  //     const arrowFnParams = [];
+  //     const newCtxDatakeys = Object.keys(e.newContextData);
+  //     if (newCtxDatakeys.length) {
+  //       arrowFnParams.push(types.objectPattern(newCtxDatakeys.map(k =>
+  //         types.objectProperty(types.Identifier(k), types.Identifier(e.newContextData[k]))
+  //       )));
+  //     }
+
+  //     block = types.ArrowFunctionExpression(
+  //       arrowFnParams,
+  //       types.blockStatement([types.returnStatement(e)])
+  //     );
+  //   }
+  //   else {
+  //     block = e;
+  //   }
+
+  //   return types.objectProperty(
+  //     types.identifier('_njParam' + i),
+  //     block
+  //   );
+  // });
   const tmplParams = expressions.map((e, i) => types.objectProperty(
     types.identifier('_njParam' + i), e
-    // e.isAccessor ? types.ArrowFunctionExpression(
-    //   [],
-    //   types.blockStatement([types.returnStatement(e)])
-    // ) : e
   ));
   if (tmplParams.length) {
     tmplParams.push(types.objectProperty(types.identifier('_njParam'), types.booleanLiteral(true)));

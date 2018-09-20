@@ -363,12 +363,12 @@ export const extensionConfig = {
   spread: _config({ onlyGlobal: true, newContext: false, exProps: true, subExProps: true, isProp: true }),
   obj: _config({ onlyGlobal: true, newContext: false }),
   list: _config(_defaultCfg),
-  fn: _config({ onlyGlobal: true }),
-  'with': _config({ onlyGlobal: true }),
+  'with': _config({ onlyGlobal: true, newContext: { getDataFromProps: true } }),
   style: { useExpressionInJsx: false, needPrefix: true }
 };
 extensionConfig.elseif = _config(extensionConfig['else']);
 extensionConfig['for'] = _config(extensionConfig.each);
+extensionConfig.fn = _config(extensionConfig['with']);
 extensionConfig.block = _config(extensionConfig.obj);
 extensionConfig.pre = tools.assign(_config(extensionConfig.obj), { needPrefix: true });
 extensionConfig.arg = _config(extensionConfig.prop);

@@ -14,7 +14,6 @@ module.exports = function (babel) {
     const isSelfClosing = node.openingElement.selfClosing;
     const childrenBlocks = [];
     const subExTags = [];
-    const tagName = '<#' + elName;
 
     children.forEach(function (childNode) {
       if (astUtil.isSubExTag(childNode)) {
@@ -25,10 +24,12 @@ module.exports = function (babel) {
       }
     });
 
-    let lastAttrStr = generate.buildAttrs(types, tagName, attrs, quasis, expressions);
+    const newContextData = {};
+    let lastAttrStr = generate.buildAttrs(types, elName, attrs, quasis, expressions, '', newContextData);
     if (!isSelfClosing) {
       const childrenExpression = astUtil.getSanitizedExpressionForContent(types, childrenBlocks, key);
       childrenExpression.isAccessor = true;
+      childrenExpression.newContextData = newContextData;
 
       if (subExTags.length) {
         if (childrenBlocks.length) {
@@ -45,8 +46,8 @@ module.exports = function (babel) {
         subExTags.forEach((subExTagNode, i) => {
           const subElName = subExTagNode.openingElement.name.name;
           const subAttrs = astUtil.getAttributeMap(subExTagNode);
-          const subTagName = '<#' + subElName;
-          lastAttrStr = generate.buildAttrs(types, subTagName, subAttrs, quasis, expressions, lastAttrStr);
+          const subNewContextData = {};
+          lastAttrStr = generate.buildAttrs(types, subElName, subAttrs, quasis, expressions, lastAttrStr, subNewContextData);
           quasis.push(types.TemplateElement({
             cooked: lastAttrStr + '>'
           }));
@@ -55,6 +56,7 @@ module.exports = function (babel) {
             types, astUtil.getChildren(types, subExTagNode), key
           );
           subChildrenExpression.isAccessor = true;
+          subChildrenExpression.newContextData = subNewContextData;
           expressions.push(subChildrenExpression);
 
           lastAttrStr = '</#' + subElName + '>';
