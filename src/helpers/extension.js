@@ -127,7 +127,7 @@ export const extensions = {
         };
 
         let extra;
-        if (props && props.moreValues) {
+        if (props && (props.moreValues || props.moreVars)) {
           const _len = isArrayLike ? len : lenObj;
           extra = {
             '@first': param.index === 0,
@@ -358,12 +358,22 @@ export const extensionConfig = {
   'else': _config({ onlyGlobal: true, newContext: false, subExProps: true, isSub: true }),
   'switch': _config(_defaultCfg),
   unless: _config(_defaultCfg),
-  each: _config({ onlyGlobal: true, newContext: { item: 'item', index: 'index' } }),
+  each: _config({
+    onlyGlobal: true,
+    newContext: {
+      item: 'item',
+      index: 'index',
+      variables: {
+        first: ['@first', 'moreVars'],
+        last: ['@last', 'moreVars']
+      }
+    }
+  }),
   prop: _config({ onlyGlobal: true, newContext: false, exProps: true, subExProps: true, isProp: true }),
   spread: _config({ onlyGlobal: true, newContext: false, exProps: true, subExProps: true, isProp: true }),
   obj: _config({ onlyGlobal: true, newContext: false }),
   list: _config(_defaultCfg),
-  'with': _config({ onlyGlobal: true, newContext: { getDataFromProps: true } }),
+  'with': _config({ onlyGlobal: true, newContext: { variableFromProps: true } }),
   style: { useExpressionInJsx: false, needPrefix: true }
 };
 extensionConfig.elseif = _config(extensionConfig['else']);

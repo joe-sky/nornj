@@ -1045,7 +1045,7 @@ var extensions = {
         };
 
         var extra = void 0;
-        if (props && props.moreValues) {
+        if (props && (props.moreValues || props.moreVars)) {
           var _len = isArrayLike$$1 ? len : lenObj;
           extra = {
             '@first': param.index === 0,
@@ -1290,17 +1290,27 @@ var extensionConfig = {
   'else': _config({ onlyGlobal: true, newContext: false, subExProps: true, isSub: true }),
   'switch': _config(_defaultCfg),
   unless: _config(_defaultCfg),
-  each: _config({ onlyGlobal: true, newContext: { item: 'item', index: 'index' } }),
+  each: _config({
+    onlyGlobal: true,
+    newContext: {
+      item: 'item',
+      index: 'index',
+      variables: {
+        first: ['@first', 'moreVars'],
+        last: ['@last', 'moreVars']
+      }
+    }
+  }),
   prop: _config({ onlyGlobal: true, newContext: false, exProps: true, subExProps: true, isProp: true }),
   spread: _config({ onlyGlobal: true, newContext: false, exProps: true, subExProps: true, isProp: true }),
   obj: _config({ onlyGlobal: true, newContext: false }),
   list: _config(_defaultCfg),
-  fn: _config({ onlyGlobal: true }),
-  'with': _config({ onlyGlobal: true }),
+  'with': _config({ onlyGlobal: true, newContext: { variableFromProps: true } }),
   style: { useExpressionInJsx: false, needPrefix: true }
 };
 extensionConfig.elseif = _config(extensionConfig['else']);
 extensionConfig['for'] = _config(extensionConfig.each);
+extensionConfig.fn = _config(extensionConfig['with']);
 extensionConfig.block = _config(extensionConfig.obj);
 extensionConfig.pre = assign(_config(extensionConfig.obj), { needPrefix: true });
 extensionConfig.arg = _config(extensionConfig.prop);
