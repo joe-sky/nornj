@@ -14,6 +14,7 @@ describe('requiring in component with each', function () {
     expect(rendered).to.contain('0');
     expect(rendered).to.contain('xxxx');
   });
+
   it('should render each block when the "of" props literal like `3 ...5` ', function () {
     var rendered = util.render(eachCompomment, { 'of': `${1} .. 2` });
     expect(rendered).to.contain('<div');
@@ -25,7 +26,6 @@ describe('requiring in component with each', function () {
     var rendered = util.render(eachCompomment, { 'of': [] });
     expect(rendered).not.to.contain('<i');
   });
-
 });
 
 describe('requiring in component with item or index props', function () {

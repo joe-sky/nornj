@@ -7,6 +7,7 @@ module.exports = createReactClass({
       <div>
         <each of={this.props.of} item="item" index="index">
           <div key={index}>
+            {/* <if condition={last}>last one</if> */}
             <i>{item}</i>
             <i>{index}</i>
           </div>

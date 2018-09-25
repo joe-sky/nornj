@@ -160,6 +160,10 @@ function getExAttrExpression(types, expr) {
   }
 }
 
+const CTX_VARIABLES = 'variables';
+const CTX_DATA = 'data';
+const CTX_GET_DATA = 'getData';
+
 function createRenderTmpl(babel, quasis, expressions, opts, taggedTmplConfig) {
   const types = babel.types;
 
@@ -196,15 +200,41 @@ function createRenderTmpl(babel, quasis, expressions, opts, taggedTmplConfig) {
   //   if (e.isAccessor) {
   //     const arrowFnParams = [];
   //     const newCtxDatakeys = Object.keys(e.newContextData);
+  //     let newVars;
   //     if (newCtxDatakeys.length) {
-  //       arrowFnParams.push(types.objectPattern(newCtxDatakeys.map(k =>
-  //         types.objectProperty(types.Identifier(k), types.Identifier(e.newContextData[k]))
-  //       )));
+  //       const properties = newCtxDatakeys.map(k => {
+  //         if (CTX_VARIABLES.indexOf(k) < 0) {
+  //           return types.objectProperty(types.Identifier(k), types.Identifier(e.newContextData[k]));
+  //         }
+  //         else {
+  //           newVars = e.newContextData[k];
+  //           return types.objectProperty(types.Identifier(CTX_GET_DATA), types.Identifier(CTX_GET_DATA));
+  //         }
+  //       });
+
+  //       if (newVars) {
+  //         properties.push(types.objectProperty(types.Identifier(CTX_DATA), types.Identifier(CTX_DATA)));
+  //       }
+  //       arrowFnParams.push(types.objectPattern(properties));
   //     }
+
+  //     const arrowFnContent = [];
+  //     if (newVars) {
+  //       const declarations = [];
+  //       Object.keys(newVars).forEach(k => {
+  //         declarations.push(types.variableDeclarator(
+  //           types.Identifier(k),
+  //           types.callExpression(types.Identifier(CTX_GET_DATA), [types.stringLiteral(newVars[k]), types.Identifier(CTX_DATA)])
+  //         ));
+  //       });
+
+  //       arrowFnContent.push(types.variableDeclaration('const', declarations));
+  //     }
+  //     arrowFnContent.push(types.returnStatement(e));
 
   //     block = types.ArrowFunctionExpression(
   //       arrowFnParams,
-  //       types.blockStatement([types.returnStatement(e)])
+  //       types.blockStatement(arrowFnContent)
   //     );
   //   }
   //   else {

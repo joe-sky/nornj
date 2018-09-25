@@ -127,14 +127,12 @@ export const extensions = {
         };
 
         let extra;
-        if (props && (props.moreValues || props.moreVars)) {
-          const _len = isArrayLike ? len : lenObj;
-          extra = {
-            '@first': param.index === 0,
-            '@last': param.index === _len - 1,
-            '@length': _len
-          };
-        }
+        const _len = isArrayLike ? len : lenObj;
+        extra = {
+          '@first': param.index === 0,
+          '@last': param.index === _len - 1
+        };
+
         if (!isArrayLike) {
           if (!extra) {
             extra = {};
@@ -364,8 +362,8 @@ export const extensionConfig = {
       item: 'item',
       index: 'index',
       variables: {
-        first: ['@first', 'moreVars'],
-        last: ['@last', 'moreVars']
+        first: '@first',
+        last: '@last'
       }
     }
   }),

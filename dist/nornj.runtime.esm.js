@@ -819,14 +819,12 @@ var extensions = {
         };
 
         var extra = void 0;
-        if (props && (props.moreValues || props.moreVars)) {
-          var _len = isArrayLike$$1 ? len : lenObj;
-          extra = {
-            '@first': param.index === 0,
-            '@last': param.index === _len - 1,
-            '@length': _len
-          };
-        }
+        var _len = isArrayLike$$1 ? len : lenObj;
+        extra = {
+          '@first': param.index === 0,
+          '@last': param.index === _len - 1
+        };
+
         if (!isArrayLike$$1) {
           if (!extra) {
             extra = {};
@@ -1070,8 +1068,8 @@ var extensionConfig = {
       item: 'item',
       index: 'index',
       variables: {
-        first: ['@first', 'moreVars'],
-        last: ['@last', 'moreVars']
+        first: '@first',
+        last: '@last'
       }
     }
   }),
