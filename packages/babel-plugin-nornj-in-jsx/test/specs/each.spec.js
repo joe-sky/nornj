@@ -5,7 +5,7 @@ var util = require('../testUtil');
 chai.use(spies);
 var expect = chai.expect;
 
-describe('requiring in component with each', function () {
+describe('each extension tag', function () {
   var eachCompomment = require('../fixtures/each/each.jsx');
 
   it('should render each block when the "of" props is array and it is not empty ', function () {
@@ -28,7 +28,7 @@ describe('requiring in component with each', function () {
   });
 });
 
-describe('requiring in component with item or index props', function () {
+describe('each extension tag with item or index props', function () {
   var eachCompomment2 = require('../fixtures/each/each-item-index.jsx');
 
   it('should render each block when have item or index props', function () {
@@ -37,3 +37,12 @@ describe('requiring in component with item or index props', function () {
     expect(rendered).to.contain('4');
   });
 });
+
+// describe('for extension tag', function () {
+//   var forCompomment = require('../fixtures/each/for.jsx');
+
+//   it('should render for block', function () {
+//     var rendered = util.render(forCompomment);
+//     expect(rendered).to.contain('<i>55</i>');
+//   });
+// });

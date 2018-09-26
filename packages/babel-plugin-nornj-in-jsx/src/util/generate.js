@@ -46,10 +46,16 @@ function buildAttrs(types, tagName, attrs, quasis, expressions, lastAttrStr, new
   const exTagConfig = nj.extensionConfig[tagName];
   const newContext = exTagConfig && exTagConfig.newContext;
   const isCtxObject = nj.isObject(newContext);
+  const getDatasFromProp = newContext.getDatasFromProp;
   if (isCtxObject) {
-    Object.keys(newContext).forEach(k => {
-      newContextData[k] = newContext[k];
-    });
+    if (!getDatasFromProp) {
+      Object.keys(newContext).forEach(k => {
+        newContextData[k] = newContext[k];
+      });
+    }
+    else if (!newContextData.datas) {
+      newContextData.datas = {};
+    }
   }
 
   if (attrNames.length) {
@@ -59,8 +65,15 @@ function buildAttrs(types, tagName, attrs, quasis, expressions, lastAttrStr, new
       if (attr.type != 'JSXSpreadAttribute') {
         let attrStr = lastAttrStr + (i == 0 ? '<#' + tagName : '') + ' ' + attrName + '=';
 
-        if (isCtxObject && newContext[attrName] != null) {
+        if (isCtxObject && getDatasFromProp) {
+          newContextData.datas[attrName] = [attrName, attrName];
+        }
+        if (isCtxObject && !getDatasFromProp && newContext[attrName] != null) {
           newContextData[attrName] = attr.value.value;
+          lastAttrStr += (i == 0 ? '<#' + tagName : '');
+        }
+        else if (isCtxObject && !getDatasFromProp && newContext.datas && newContext.datas[attrName] != null) {
+          newContextData.datas[attrName] = [newContextData.datas[attrName][0], attr.value.value];
           lastAttrStr += (i == 0 ? '<#' + tagName : '');
         }
         else if (!attr.value) {
@@ -160,7 +173,7 @@ function getExAttrExpression(types, expr) {
   }
 }
 
-const CTX_VARIABLES = 'variables';
+const CTX_DATAS = 'datas';
 const CTX_DATA = 'data';
 const CTX_GET_DATA = 'getData';
 
@@ -200,31 +213,31 @@ function createRenderTmpl(babel, quasis, expressions, opts, taggedTmplConfig) {
   //   if (e.isAccessor) {
   //     const arrowFnParams = [];
   //     const newCtxDatakeys = Object.keys(e.newContextData);
-  //     let newVars;
+  //     let newDatas;
   //     if (newCtxDatakeys.length) {
   //       const properties = newCtxDatakeys.map(k => {
-  //         if (CTX_VARIABLES.indexOf(k) < 0) {
+  //         if (k !== CTX_DATAS) {
   //           return types.objectProperty(types.Identifier(k), types.Identifier(e.newContextData[k]));
   //         }
   //         else {
-  //           newVars = e.newContextData[k];
+  //           newDatas = e.newContextData[k];
   //           return types.objectProperty(types.Identifier(CTX_GET_DATA), types.Identifier(CTX_GET_DATA));
   //         }
   //       });
 
-  //       if (newVars) {
+  //       if (newDatas) {
   //         properties.push(types.objectProperty(types.Identifier(CTX_DATA), types.Identifier(CTX_DATA)));
   //       }
   //       arrowFnParams.push(types.objectPattern(properties));
   //     }
 
   //     const arrowFnContent = [];
-  //     if (newVars) {
+  //     if (newDatas) {
   //       const declarations = [];
-  //       Object.keys(newVars).forEach(k => {
+  //       Object.keys(newDatas).forEach(k => {
   //         declarations.push(types.variableDeclarator(
-  //           types.Identifier(k),
-  //           types.callExpression(types.Identifier(CTX_GET_DATA), [types.stringLiteral(newVars[k]), types.Identifier(CTX_DATA)])
+  //           types.Identifier(newDatas[k][1]),
+  //           types.callExpression(types.Identifier(CTX_GET_DATA), [types.stringLiteral(newDatas[k][0]), types.Identifier(CTX_DATA)])
   //         ));
   //       });
 

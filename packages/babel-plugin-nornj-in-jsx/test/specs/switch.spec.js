@@ -5,7 +5,7 @@ var util = require('../testUtil');
 chai.use(spies);
 var expect = chai.expect;
 
-describe('requiring in component with switch', function () {
+describe('switch extension tag', function () {
   var SwitchComm = require('../fixtures/switch/switch.jsx');
 
   it('should render case1 block when condition is "case1"', function () {
@@ -27,7 +27,7 @@ describe('requiring in component with switch', function () {
   });
 });
 
-describe('requiring in component with switch nested switch', function () {
+describe('switch extension tag nested switch', function () {
   var NestedSwitch = require('../fixtures/switch/switch-in-switch.jsx');
 
   it('should render nested case1 block when condition1 is "case1" and condition2 is 1', function () {

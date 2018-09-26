@@ -1130,16 +1130,19 @@ var extensions = {
   },
 
   'for': function _for(start, end, options) {
-    if (end._njOpts) {
+    if (start && start._njOpts) {
+      options = start;
+      start = options.props.start || 0;
+      end = options.props.end;
+    }
+    if (end && end._njOpts) {
       options = end;
       end = start;
       start = 0;
     }
 
     var ret = void 0,
-        useString = options.useString,
-        props = options.props,
-        loopLast = props && props.loopLast;
+        useString = options.useString;
     if (useString) {
       ret = '';
     } else {
@@ -1147,10 +1150,6 @@ var extensions = {
     }
 
     for (; start <= end; start++) {
-      if (!loopLast && start === end) {
-        break;
-      }
-
       var retI = options.result({
         index: start,
         fallback: true
@@ -1293,21 +1292,26 @@ var extensionConfig = {
     newContext: {
       item: 'item',
       index: 'index',
-      variables: {
-        first: '@first',
-        last: '@last'
+      datas: {
+        first: ['@first', 'first'],
+        last: ['@last', 'last']
       }
+    }
+  }),
+  'for': _config({
+    onlyGlobal: true,
+    newContext: {
+      index: 'index'
     }
   }),
   prop: _config({ onlyGlobal: true, newContext: false, exProps: true, subExProps: true, isProp: true }),
   spread: _config({ onlyGlobal: true, newContext: false, exProps: true, subExProps: true, isProp: true }),
   obj: _config({ onlyGlobal: true, newContext: false }),
   list: _config(_defaultCfg),
-  'with': _config({ onlyGlobal: true, newContext: { variableFromProps: true } }),
+  'with': _config({ onlyGlobal: true, newContext: { getDatasFromProp: true } }),
   style: { useExpressionInJsx: false, needPrefix: true }
 };
 extensionConfig.elseif = _config(extensionConfig['else']);
-extensionConfig['for'] = _config(extensionConfig.each);
 extensionConfig.fn = _config(extensionConfig['with']);
 extensionConfig.block = _config(extensionConfig.obj);
 extensionConfig.pre = assign(_config(extensionConfig.obj), { needPrefix: true });
