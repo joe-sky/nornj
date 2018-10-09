@@ -1,6 +1,6 @@
 // http://stackoverflow.com/questions/610406/javascript-equivalent-to-printf-string-format#answer-4673436
 function formatString(format) {
-  var args = Array.prototype.slice.call(arguments, 1);
+  const args = Array.prototype.slice.call(arguments, 1);
   return format.replace(/{(\d+)}/g, function(match, number) {
     return typeof args[number] !== 'undefined' ? args[number] : match;
   });
@@ -20,7 +20,7 @@ function throwError(errorMsg, infos) {
   );
 }
 
-var ERRORS = exports.ERRORS = {
+const ERRORS = exports.ERRORS = {
   NO_ATTRIBUTE: 'Attribute "{0}" is required for <{1}>, but missing!',
   NOT_EXPRESSION_TYPE: 'Attribute "{0}" of <{1}> tag must be an expression, e.g. "{0}={ ... }"',
   NOT_STRING_TYPE: 'Attribute "{0}" of <{1}> tag must be of type String, e.g. {0}="..."',
@@ -31,7 +31,7 @@ var ERRORS = exports.ERRORS = {
 };
 
 exports.renderErrorMessage = function(errorMsg, infos) {
-  var args = [];
+  const args = [];
   if (infos) {
     args.push(infos.attribute);
     args.push(infos.element);

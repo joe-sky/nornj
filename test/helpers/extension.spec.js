@@ -87,13 +87,19 @@ describe('Extension tag', () => {
   it('for', () => {
     expect(render(`
       <nj-noWs>
-        <#for {{1}} {{5}} loopLast>
+        <#for i={{1}} to={{5}} step={{2}}>
+          <i>{{i}}</i>
+        </#for>
+      </nj-noWs>
+    `)).toBe('<i>1</i><i>3</i><i>5</i>');
+
+    expect(render(`
+      <nj-noWs>
+        <#for {{1}} {{5}}>
           <i>{{@index}}</i>
         </#for>
       </nj-noWs>
-    `, {
-      list: { a: 1, b: 2 }
-    })).toBe('<i>1</i><i>2</i><i>3</i><i>4</i><i>5</i>');
+    `)).toBe('<i>1</i><i>2</i><i>3</i><i>4</i><i>5</i>');
   });
 
   it('prop', () => {

@@ -47,13 +47,15 @@ function buildAttrs(types, tagName, attrs, quasis, expressions, lastAttrStr, new
   const newContext = exTagConfig && exTagConfig.newContext;
   const isCtxObject = nj.isObject(newContext);
   const getDatasFromProp = newContext.getDatasFromProp;
+  let datasFromPropExcept = getDatasFromProp && getDatasFromProp.except;
   if (isCtxObject) {
-    if (!getDatasFromProp) {
-      Object.keys(newContext).forEach(k => {
+    Object.keys(newContext).forEach(k => {
+      if (k !== 'getDatasFromProp') {
         newContextData[k] = newContext[k];
-      });
-    }
-    else if (!newContextData.datas) {
+      }
+    });
+
+    if (getDatasFromProp && !newContextData.datas) {
       newContextData.datas = {};
     }
   }
@@ -64,15 +66,21 @@ function buildAttrs(types, tagName, attrs, quasis, expressions, lastAttrStr, new
 
       if (attr.type != 'JSXSpreadAttribute') {
         let attrStr = lastAttrStr + (i == 0 ? '<#' + tagName : '') + ' ' + attrName + '=';
+        let isGetDatasFromProp = false;
+        if (getDatasFromProp) {
+          isGetDatasFromProp = !datasFromPropExcept
+            ? true
+            : datasFromPropExcept.indexOf(attrName) < 0;
+        }
 
-        if (isCtxObject && getDatasFromProp) {
+        if (isCtxObject && isGetDatasFromProp) {
           newContextData.datas[attrName] = [attrName, attrName];
         }
-        if (isCtxObject && !getDatasFromProp && newContext[attrName] != null) {
+        if (isCtxObject && !isGetDatasFromProp && newContext[attrName] != null) {
           newContextData[attrName] = attr.value.value;
           lastAttrStr += (i == 0 ? '<#' + tagName : '');
         }
-        else if (isCtxObject && !getDatasFromProp && newContext.datas && newContext.datas[attrName] != null) {
+        else if (isCtxObject && !isGetDatasFromProp && newContext.datas && newContext.datas[attrName] != null) {
           newContextData.datas[attrName] = [newContextData.datas[attrName][0], attr.value.value];
           lastAttrStr += (i == 0 ? '<#' + tagName : '');
         }

@@ -211,16 +211,29 @@ export const extensions = {
     }
   },
 
-  'for': (start, end, options) => {
-    if (start && start._njOpts) {
-      options = start;
-      start = options.props.start || 0;
-      end = options.props.end;
+  'for': (i, to, options) => {
+    let step = 1;
+    let indexKey;
+
+    if (i && i._njOpts) {
+      options = i;
+      const { props } = options;
+      Object.keys(props).forEach(prop => {
+        const value = props[prop];
+        if (prop === 'to') {
+          to = value;
+        }
+        else if (prop === 'step') {
+          step = value;
+        }
+        else {
+          i = value;
+          indexKey = prop;
+        }
+      });
     }
-    if (end && end._njOpts) {
-      options = end;
-      end = start;
-      start = 0;
+    else if (options.props) {
+      step = options.props.step;
     }
 
     let ret, useString = options.useString;
@@ -230,9 +243,10 @@ export const extensions = {
       ret = [];
     }
 
-    for (; start <= end; start++) {
+    for (; i <= to; i += step) {
       let retI = options.result({
-        index: start,
+        data: indexKey ? [{ [indexKey]: i }] : null,
+        index: i,
         fallback: true
       });
 
@@ -369,7 +383,8 @@ export const extensionConfig = {
   'for': _config({
     onlyGlobal: true,
     newContext: {
-      index: 'index'
+      index: 'index',
+      getDatasFromProp: { except: ['to', 'step', 'index'] }
     }
   }),
   prop: _config({ onlyGlobal: true, newContext: false, exProps: true, subExProps: true, isProp: true }),

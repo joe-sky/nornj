@@ -1,7 +1,7 @@
-var astUtil = require('./ast');
-var errorUtil = require('./error');
+const astUtil = require('./ast');
+const errorUtil = require('./error');
 
-var ATTRIBUTES = {
+const ATTRIBUTES = {
   CONDITION: 'condition'
 };
 

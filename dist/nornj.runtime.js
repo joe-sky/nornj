@@ -909,16 +909,28 @@ var extensions = {
     }
   },
 
-  'for': function _for(start, end, options) {
-    if (start && start._njOpts) {
-      options = start;
-      start = options.props.start || 0;
-      end = options.props.end;
-    }
-    if (end && end._njOpts) {
-      options = end;
-      end = start;
-      start = 0;
+  'for': function _for(i, to, options) {
+    var step = 1;
+    var indexKey = void 0;
+
+    if (i && i._njOpts) {
+      options = i;
+      var _options = options,
+          props = _options.props;
+
+      Object.keys(props).forEach(function (prop) {
+        var value = props[prop];
+        if (prop === 'to') {
+          to = value;
+        } else if (prop === 'step') {
+          step = value;
+        } else {
+          i = value;
+          indexKey = prop;
+        }
+      });
+    } else if (options.props) {
+      step = options.props.step;
     }
 
     var ret = void 0,
@@ -929,9 +941,10 @@ var extensions = {
       ret = [];
     }
 
-    for (; start <= end; start++) {
+    for (; i <= to; i += step) {
       var retI = options.result({
-        index: start,
+        data: indexKey ? [defineProperty({}, indexKey, i)] : null,
+        index: i,
         fallback: true
       });
 
@@ -1003,8 +1016,8 @@ var extensions = {
         data: [options.props]
       });
     } else {
-      var _options = options,
-          props = _options.props;
+      var _options2 = options,
+          props = _options2.props;
 
 
       return options.result({
@@ -1081,7 +1094,8 @@ var extensionConfig = {
   'for': _config({
     onlyGlobal: true,
     newContext: {
-      index: 'index'
+      index: 'index',
+      getDatasFromProp: { except: ['to', 'step', 'index'] }
     }
   }),
   prop: _config({ onlyGlobal: true, newContext: false, exProps: true, subExProps: true, isProp: true }),
@@ -1124,7 +1138,7 @@ function registerExtension(name, extension, options, mergeConfig) {
   each(params, function (v, name) {
     if (v) {
       var _extension = v.extension,
-          _options2 = v.options;
+          _options3 = v.options;
 
 
       if (_extension) {
@@ -1137,9 +1151,9 @@ function registerExtension(name, extension, options, mergeConfig) {
         if (!extensionConfig[name]) {
           extensionConfig[name] = {};
         }
-        assign(extensionConfig[name], _options2);
+        assign(extensionConfig[name], _options3);
       } else {
-        extensionConfig[name] = _config(_options2);
+        extensionConfig[name] = _config(_options3);
       }
     }
   }, false, false);

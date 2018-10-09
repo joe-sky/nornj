@@ -21,12 +21,11 @@ module.exports = function (babel) {
   const exAttrHandler = transformExAttr(babel);
   const expressionHandler = transformExpression(babel);
 
-  var visitor = {
+  const visitor = {
     JSXElement: {
       enter(path, state) {
         const nodeName = path.node.openingElement.name.name;
         const handler = nodeHandlers[nodeName];
-
         if (handler) {
           state.file.hasNjInJSX = true;
 
