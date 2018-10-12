@@ -7,7 +7,10 @@ module.exports = function (babel) {
   return function (node, file, state) {
     const quasis = [];
     const expressions = [];
-    const elName = node.openingElement.name.name;
+    let elName = node.openingElement.name.name;
+    if (astUtil.hasExPrefix(elName)) {
+      elName = elName.substr(2);
+    }
     const key = astUtil.getKey(node);
     const attrs = astUtil.getAttributeMap(node);
     const children = astUtil.getChildren(types, node);
@@ -44,7 +47,10 @@ module.exports = function (babel) {
         }
 
         subExTags.forEach((subExTagNode, i) => {
-          const subElName = subExTagNode.openingElement.name.name;
+          let subElName = subExTagNode.openingElement.name.name;
+          if (astUtil.hasExPrefix(subElName)) {
+            subElName = subElName.substr(2);
+          }
           const subAttrs = astUtil.getAttributeMap(subExTagNode);
           const subNewContextData = {};
           lastAttrStr = generate.buildAttrs(types, subElName, subAttrs, quasis, expressions, lastAttrStr, subNewContextData);

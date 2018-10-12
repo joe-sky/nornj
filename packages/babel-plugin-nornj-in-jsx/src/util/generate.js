@@ -249,7 +249,7 @@ function createRenderTmpl(babel, quasis, expressions, opts, taggedTmplConfig) {
   //         ));
   //       });
 
-  //       arrowFnContent.push(types.variableDeclaration('const', declarations));
+  //       declarations.length && arrowFnContent.push(types.variableDeclaration('const', declarations));
   //     }
   //     arrowFnContent.push(types.returnStatement(e));
 

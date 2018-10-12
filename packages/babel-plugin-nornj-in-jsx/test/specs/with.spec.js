@@ -2,11 +2,11 @@ var expect = require('chai').expect;
 var util = require('../testUtil');
 
 describe('with extension tag', function () {
-  // it('should render without attributes', function() {
-  //   var Fixture = require('../fixtures/with/with-no-attributes.jsx');
-  //   var rendered = util.render(Fixture);
-  //   expect(rendered).to.match(/^<div[^>]*><span[^>]*>test<\/span><\/div>$/);
-  // });
+  it('should render without attributes', function() {
+    var Fixture = require('../fixtures/with/with-no-attributes.jsx');
+    var rendered = util.render(Fixture);
+    expect(rendered).to.match(/^<div[^>]*><span[^>]*>test<\/span><\/div>$/);
+  });
 
   it('should render with a single attribute', function () {
     var Fixture = require('../fixtures/with/with-single-attribute.jsx');

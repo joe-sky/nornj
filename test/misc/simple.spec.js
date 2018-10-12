@@ -37,7 +37,7 @@ describe('test compile string', function () {
           <#each {{1 .. 2}}>
             {{@item}}
             #${({ item, index }) => item + 100 * index}
-            <#for {{10}}>
+            <#for {{0}} {{10}}>
               |{{@item}}|
               |#${({ item }) => item}|
             </#for>

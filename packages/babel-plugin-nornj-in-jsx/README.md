@@ -9,12 +9,110 @@
     <img width="100" height="100" title="Babel Plugin" src="https://michael-ciniawsky.github.io/postcss-load-plugins/logo.svg">
   </div>
   <h1>Babel-Plugin-NornJ-in-jsx</h1>
-  <p>Make the NornJ template work gracefully in the JSX environment</p>
+  <p>一个可支持自由扩展的JSX语法增强插件 :wink:</p>
 </div>
 
 [![NPM Version][npm-image]][npm-url]
 [![Coverage Status](https://coveralls.io/repos/github/joe-sky/nornj/badge.svg?branch=master)](https://coveralls.io/github/joe-sky/nornj?branch=master)
 [![NPM Downloads][downloads-image]][npm-url]
+
+`Babel-Plugin-NornJ-in-jsx`是一个能为JSX带来更多丰富语法的Babel插件，比如条件及循环语句：
+
+```js
+const Button = () => {
+  return (
+    <div>
+      <for i={0} to={10}>
+        <if condition={i < 5}>
+          <i>less than 5</i>
+          <else>
+            <i>greater than 5</i>
+          </else>
+        </if>
+      </for>
+    </div>
+  )
+}
+```
+
+以及类似Vue、Angular的指令：
+
+```js
+const Button = (props) => {
+  return (
+    <div>
+      <input type="button" n-show={props.showBtn} />
+    </div>
+  )
+}
+```
+
+还有过滤器：
+
+```js
+const Button = (props) => {
+  return (
+    <div>
+      {n`${props.name} | capitalize`}
+    </div>
+  )
+}
+```
+
+更重要的是，除了以上这些预置的语法，还支持像Vue、Angular那样自由扩展新的语法：
+
+```js
+import nj from 'nornj';
+import cn from 'classnames';
+nj.registerExtension('class', opts => cn(opts.result()));
+
+const Button = (props) => {
+  return (
+    <div>
+      <input type="button" n-class={{
+        className1: true,
+        className2: props.hasClassName2
+      }} />
+    </div>
+  )
+}
+```
+
+## 为什么创建这个插件？
+
+在`React`项目开发中，原生的`JSX`语法并没有提供类似`Vue`的`v-if`、`v-for`、`v-show`等模板语法糖。当然，社区为`JSX`贡献了不少相关的插件，比如[jsx-control-statements](https://github.com/AlexGilleran/jsx-control-statements)。
+
+而`Babel-Plugin-NornJ-in-jsx`的设计灵感就来源于上述的`jsx-control-statements`。只不过，它比前者的功能要更加丰富得多；且可以支持扩展 :wink:。
+
+## 目录
+
+* [安装](安装)
+* [它是如何工作的](#它是如何工作的)
+* [标签](#标签)
+  * [if](#if)
+  * [each](#each)
+  * [switch](#switch)
+  * [for](#for)
+  * [with](#with)
+  * [fn](#fn)
+  * [开发新的标签](#开发新的标签)
+* [指令](#指令)
+  * [n-show](#n-show)
+  * [n-style](#n-style)
+  * [n-mobx-bind](#n-mobx-bind)
+  * [n-mst-bind](#n-mst-bind)
+  * [开发新的指令](#开发新的指令)
+* [表达式](#表达式)
+  * [过滤器](#过滤器)
+    * [capitalize](#capitalize)
+    * [int](#int)
+    * [float](#float)
+    * [bool](#bool)
+  * [运算符](#运算符)
+    * [a.b\['c'\] (安全的属性访问器)](#安全的属性访问器)
+    * [a .. b (范围运算符)](#范围运算符)
+    * [a <=> b (飞船运算符)](#飞船运算符)
+  * [开发新的表达式](#开发新的表达式)
 
 ## 安装
 
@@ -32,17 +130,7 @@ npm i babel-plugin-nornj-in-jsx
 }
 ```
 
-## 为什么开发这个插件
-
-在`React`项目开发中，原生的`JSX`语法并没有提供类似`Vue`的`v-if`、`v-for`、`v-show`等模板语法糖。当然，社区为`JSX`贡献了不少相关的插件，比如[jsx-control-statements](https://github.com/AlexGilleran/jsx-control-statements)。
-
-而`nornj-in-jsx`也是类似于`jsx-control-statements`的插件，它也能为`JSX`提供更加优雅的`分支条件`、`循环`等等语法，并且还可以自由扩展出更多的功能。这些功能大致分为几类：
-
-* [扩展标签](#扩展标签)
-* [扩展属性](#扩展属性)
-* [扩展表达式](#扩展表达式)
-
-## 扩展标签
+## 标签
 
 ### if
 
@@ -298,7 +386,7 @@ class TestComponent extends Component {
 }
 ```
 
-## 扩展属性
+## 指令
 
 ### n-show
 
@@ -462,7 +550,7 @@ class TestComponent extends Component {
 
 `n-mobx-bind`和`n-mst-bind`的更多详细文档请[查看这里](https://joe-sky.github.io/nornj-guide/templateSyntax/inlineExtensionTag.html#mobx-bind)。
 
-## 扩展表达式
+## 表达式
 
 使用`nj.expression`可以在JSX中以标签模板字符串的方式使用`NornJ`的过滤器和表达式：
 
