@@ -151,7 +151,9 @@ export const filters = {
     }
   },
 
-  bracket: val => val
+  bracket: val => val,
+
+  capitalize: str => tools.capitalize(str)
 };
 
 function _getArrayByNum(isContainEnd) {
@@ -209,7 +211,8 @@ export const filterConfig = {
   '..': _config(_defaultCfg),
   rLt: _config(_defaultCfg),
   '<=>': _config(_defaultCfg),
-  bracket: _config(_defaultCfg)
+  bracket: _config(_defaultCfg),
+  capitalize: _config(_defaultCfg)
 };
 
 //Filter alias

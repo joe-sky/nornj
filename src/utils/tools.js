@@ -41,7 +41,7 @@ export function isString(obj) {
 
 //获取属性值
 function _getProperty(key) {
-  return function(obj) {
+  return function (obj) {
     return obj == null ? void 0 : obj[key];
   };
 }
@@ -95,7 +95,7 @@ export function trimRight(str) {
 }
 
 //Noop function
-export function noop() {}
+export function noop() { }
 
 //抛出异常
 export function throwIf(val, msg, type) {
@@ -161,7 +161,7 @@ export function clearQuot(value, clearDouble) {
 //Transform to camel-case
 export function toCamelCase(str) {
   if (str.indexOf('-') > -1) {
-    str = str.replace(/-\w/g, function(letter) {
+    str = str.replace(/-\w/g, function (letter) {
       return letter.substr(1).toUpperCase();
     });
   }
@@ -170,7 +170,7 @@ export function toCamelCase(str) {
 }
 
 //Reference by babel-external-helpers
-export const assign = Object.assign || function(target) {
+export const assign = Object.assign || function (target) {
   for (let i = 1, args = arguments; i < args.length; i++) {
     let source = args[i];
 
@@ -183,6 +183,10 @@ export const assign = Object.assign || function(target) {
 
   return target;
 };
+
+export function capitalize(str) {
+  return str[0].toUpperCase() + str.substr(1);
+}
 
 assign(nj, {
   defineProp,
@@ -200,5 +204,6 @@ assign(nj, {
   warn,
   obj,
   toCamelCase,
-  assign
+  assign,
+  capitalize
 });

@@ -43,7 +43,7 @@
     "babel-core": "^6.1.2",
     "babel-plugin-syntax-jsx": "^6.1.18",
     "nornj": "^0.4.13",
-    "nornj-react": "^0.4.4"
+    "nornj-react": "^0.4.5"
   },
   "devDependencies": {
     "babel-eslint": "^6.0.3",

@@ -255,6 +255,10 @@ var assign = Object.assign || function (target) {
   return target;
 };
 
+function capitalize(str) {
+  return str[0].toUpperCase() + str.substr(1);
+}
+
 assign(nj, {
   defineProp: defineProp,
   defineProps: defineProps,
@@ -271,7 +275,8 @@ assign(nj, {
   warn: warn,
   obj: obj,
   toCamelCase: toCamelCase,
-  assign: assign
+  assign: assign,
+  capitalize: capitalize
 });
 
 
@@ -295,7 +300,8 @@ var tools = Object.freeze({
 	obj: obj,
 	clearQuot: clearQuot,
 	toCamelCase: toCamelCase,
-	assign: assign
+	assign: assign,
+	capitalize: capitalize
 });
 
 var COMP_NAME = '_njComponentName';
@@ -497,7 +503,7 @@ function getComputedData(fn, p2, level) {
     });
   } else {
     //普通函数
-    return fn.val.call(fn._njCtx, p2);
+    return fn.val.call(p2.data[p2.data.length - 1], p2);
   }
 }
 
@@ -1362,6 +1368,10 @@ var filters = {
 
   bracket: function bracket(val) {
     return val;
+  },
+
+  capitalize: function capitalize$$1(str) {
+    return capitalize(str);
   }
 };
 
@@ -1422,7 +1432,8 @@ var filterConfig = {
   '..': _config$1(_defaultCfg$1),
   rLt: _config$1(_defaultCfg$1),
   '<=>': _config$1(_defaultCfg$1),
-  bracket: _config$1(_defaultCfg$1)
+  bracket: _config$1(_defaultCfg$1),
+  capitalize: _config$1(_defaultCfg$1)
 };
 
 //Filter alias

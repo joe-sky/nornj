@@ -83,7 +83,7 @@ export function getComputedData(fn, p2, level) {
       _njIcp: p2.icp
     });
   } else { //普通函数
-    return fn.val.call(fn._njCtx, p2);
+    return fn.val.call(p2.data[p2.data.length - 1], p2);
   }
 }
 

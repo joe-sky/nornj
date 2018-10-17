@@ -38,11 +38,11 @@ describe('each extension tag with item or index props', function () {
   });
 });
 
-// describe('for extension tag', function () {
-//   var forCompomment = require('../fixtures/each/for.jsx');
+describe('for extension tag', function () {
+  var forCompomment = require('../fixtures/each/for.jsx');
 
-//   it('should render for block', function () {
-//     var rendered = util.render(forCompomment);
-//     expect(rendered).to.contain('<i>55</i>');
-//   });
-// });
+  it('should render for block', function () {
+    var rendered = util.render(forCompomment);
+    expect(rendered).to.contain('<i>55</i>');
+  });
+});

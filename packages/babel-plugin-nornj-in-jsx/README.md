@@ -507,7 +507,7 @@ class TestComponent extends Component {
   }
 
   render() {
-    return <input n-mobx-bind_action="inputValue" />;
+    return <input n-mobx-bind$action="inputValue" />;
   }
 }
 ```

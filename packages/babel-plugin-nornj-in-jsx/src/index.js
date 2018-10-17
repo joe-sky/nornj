@@ -1,8 +1,8 @@
 const nj = require('nornj').default;
-const transformEach = require('./eachTag');
-const transformIf = require('./ifTag');
-const transformSwitch = require('./switchTag');
-const transformWith = require('./withTag');
+// const transformEach = require('./eachTag');
+// const transformIf = require('./ifTag');
+// const transformSwitch = require('./switchTag');
+// const transformWith = require('./withTag');
 const transformExTag = require('./exTag');
 const transformExAttr = require('./exAttr');
 const transformExpression = require('./expression');
@@ -11,12 +11,12 @@ const utils = require('./util/utils');
 
 module.exports = function (babel) {
   const types = babel.types;
-  const nodeHandlers = {
-    'if': transformIf(babel),
-    each: transformEach(babel),
-    'switch': transformSwitch(babel),
-    'with': transformWith(babel)
-  };
+  // const nodeHandlers = {
+  //   'if': transformIf(babel),
+  //   each: transformEach(babel),
+  //   'switch': transformSwitch(babel),
+  //   'with': transformWith(babel)
+  // };
   const exTagHandler = transformExTag(babel);
   const exAttrHandler = transformExAttr(babel);
   const expressionHandler = transformExpression(babel);
@@ -25,18 +25,18 @@ module.exports = function (babel) {
     JSXElement: {
       enter(path, state) {
         const nodeName = path.node.openingElement.name.name;
-        const handler = nodeHandlers[nodeName];
-        if (handler) {
-          state.file.hasNjInJSX = true;
-
-          path.replaceWith(handler(path.node, path.hub.file, state));
-        }
-
-        // if (nodeName != null && astUtil.isExTag(nodeName)) {
+        // const handler = nodeHandlers[nodeName];
+        // if (handler) {
         //   state.file.hasNjInJSX = true;
 
-        //   path.replaceWith(exTagHandler(path.node, path.hub.file, state));
+        //   path.replaceWith(handler(path.node, path.hub.file, state));
         // }
+
+        if (nodeName != null && astUtil.isExTag(nodeName)) {
+          state.file.hasNjInJSX = true;
+
+          path.replaceWith(exTagHandler(path.node, path.hub.file, state));
+        }
       },
       exit(path, state) {
         const exAttrs = astUtil.hasExAttr(path.node);

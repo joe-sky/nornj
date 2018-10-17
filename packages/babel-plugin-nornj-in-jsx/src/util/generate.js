@@ -216,63 +216,63 @@ function createRenderTmpl(babel, quasis, expressions, opts, taggedTmplConfig) {
     })),
     njUtils.uniqueKey(tmplStr));
 
-  // const tmplParams = expressions.map((e, i) => {
-  //   let block;
-  //   if (e.isAccessor) {
-  //     const arrowFnParams = [];
-  //     const newCtxDatakeys = Object.keys(e.newContextData);
-  //     let newDatas;
-  //     if (newCtxDatakeys.length) {
-  //       const properties = newCtxDatakeys.map(k => {
-  //         if (k !== CTX_DATAS) {
-  //           return types.objectProperty(types.Identifier(k), types.Identifier(e.newContextData[k]));
-  //         }
-  //         else {
-  //           newDatas = e.newContextData[k];
-  //           return types.objectProperty(types.Identifier(CTX_GET_DATA), types.Identifier(CTX_GET_DATA));
-  //         }
-  //       });
+  const tmplParams = expressions.map((e, i) => {
+    let block;
+    if (e.isAccessor) {
+      const arrowFnParams = [];
+      const newCtxDatakeys = Object.keys(e.newContextData);
+      let newDatas;
+      if (newCtxDatakeys.length) {
+        const properties = newCtxDatakeys.map(k => {
+          if (k !== CTX_DATAS) {
+            return types.objectProperty(types.Identifier(k), types.Identifier(e.newContextData[k]));
+          }
+          else {
+            newDatas = e.newContextData[k];
+            return types.objectProperty(types.Identifier(CTX_GET_DATA), types.Identifier(CTX_GET_DATA));
+          }
+        });
 
-  //       if (newDatas) {
-  //         properties.push(types.objectProperty(types.Identifier(CTX_DATA), types.Identifier(CTX_DATA)));
-  //       }
-  //       arrowFnParams.push(types.objectPattern(properties));
-  //     }
+        if (newDatas) {
+          properties.push(types.objectProperty(types.Identifier(CTX_DATA), types.Identifier(CTX_DATA)));
+        }
+        arrowFnParams.push(types.objectPattern(properties));
+      }
 
-  //     const arrowFnContent = [];
-  //     if (newDatas) {
-  //       const declarations = [];
-  //       Object.keys(newDatas).forEach(k => {
-  //         declarations.push(types.variableDeclarator(
-  //           types.Identifier(newDatas[k][1]),
-  //           types.callExpression(types.Identifier(CTX_GET_DATA), [types.stringLiteral(newDatas[k][0]), types.Identifier(CTX_DATA)])
-  //         ));
-  //       });
+      const arrowFnContent = [];
+      if (newDatas) {
+        const declarations = [];
+        Object.keys(newDatas).forEach(k => {
+          declarations.push(types.variableDeclarator(
+            types.Identifier(newDatas[k][1]),
+            types.callExpression(types.Identifier(CTX_GET_DATA), [types.stringLiteral(newDatas[k][0]), types.Identifier(CTX_DATA)])
+          ));
+        });
 
-  //       declarations.length && arrowFnContent.push(types.variableDeclaration('const', declarations));
-  //     }
-  //     arrowFnContent.push(types.returnStatement(e));
+        declarations.length && arrowFnContent.push(types.variableDeclaration('const', declarations));
+      }
+      arrowFnContent.push(types.returnStatement(e));
 
-  //     block = types.ArrowFunctionExpression(
-  //       arrowFnParams,
-  //       types.blockStatement(arrowFnContent)
-  //     );
-  //   }
-  //   else {
-  //     block = e;
-  //   }
+      block = types.ArrowFunctionExpression(
+        arrowFnParams,
+        types.blockStatement(arrowFnContent)
+      );
+    }
+    else {
+      block = e;
+    }
 
-  //   return types.objectProperty(
-  //     types.identifier('_njParam' + i),
-  //     block
-  //   );
-  // });
-  const tmplParams = expressions.map((e, i) => types.objectProperty(
-    types.identifier('_njParam' + i), e
-  ));
-  if (tmplParams.length) {
-    tmplParams.push(types.objectProperty(types.identifier('_njParam'), types.booleanLiteral(true)));
-  }
+    return types.objectProperty(
+      types.identifier('_njParam' + i),
+      block
+    );
+  });
+  // const tmplParams = expressions.map((e, i) => types.objectProperty(
+  //   types.identifier('_njParam' + i), e
+  // ));
+  // if (tmplParams.length) {
+  //   tmplParams.push(types.objectProperty(types.identifier('_njParam'), types.booleanLiteral(true)));
+  // }
 
   const renderFnParams = [types.identifier(tmplObj)];
   if (tmplParams.length) {
