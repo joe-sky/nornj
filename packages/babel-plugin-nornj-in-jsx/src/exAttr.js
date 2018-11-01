@@ -36,6 +36,37 @@ module.exports = function (babel) {
     }
 
     let lastAttrStr = '';
+    function _buildFromNjExp(exAttrExpressions, attrStr) {
+      if (!nj.isString(exAttrExpressions[0])) {
+        exAttrExpressions.unshift('');
+      }
+      if (!nj.isString(exAttrExpressions[exAttrExpressions.length - 1])) {
+        exAttrExpressions.push('');
+      }
+
+      exAttrExpressions.forEach((e, i) => {
+        if (i == 0) {
+          quasis.push(types.TemplateElement({
+            cooked: attrStr + '"{{' + e
+          }));
+        }
+        else if (i == exAttrExpressions.length - 1) {
+          lastAttrStr = e + '}}"';
+        }
+        else {
+          if (nj.isString(e)) {
+            quasis.push(types.TemplateElement({
+              cooked: e
+            }));
+          }
+          else {
+            e.noMustache = true;
+            expressions.push(e);
+          }
+        }
+      });
+    }
+
     Object.keys(attrs).forEach((attrName, i) => {
       const attr = attrs[attrName];
 
@@ -58,36 +89,21 @@ module.exports = function (babel) {
           if (isExAttr && !cannotUseExpression && types.isStringLiteral(expr)) {
             lastAttrStr = attrStr + '"{{' + expr.value + '}}"';
           }
+          //babel 6
           else if (isExAttr && !cannotUseExpression && types.isBinaryExpression(expr) && expr.operator === '+') {
             const exAttrExpressions = generate.getExAttrExpression(types, expr);
-            if (!nj.isString(exAttrExpressions[0])) {
-              exAttrExpressions.unshift('');
-            }
-            if (!nj.isString(exAttrExpressions[exAttrExpressions.length - 1])) {
-              exAttrExpressions.push('');
-            }
-
-            exAttrExpressions.forEach((e, i) => {
-              if (i == 0) {
-                quasis.push(types.TemplateElement({
-                  cooked: attrStr + '"{{' + e
-                }));
+            _buildFromNjExp(exAttrExpressions, attrStr);
+          }
+          //babel 7
+          else if (isExAttr && !cannotUseExpression && types.isCallExpression(expr)
+            && expr.callee.object.value === '' && expr.callee.property.name === 'concat') {
+            const exAttrExpressions = expr.arguments.map(e => {
+              if (types.isStringLiteral(e)) {
+                return e.value;
               }
-              else if (i == exAttrExpressions.length - 1) {
-                lastAttrStr = e + '}}"';
-              }
-              else {
-                if (nj.isString(e)) {
-                  quasis.push(types.TemplateElement({
-                    cooked: e
-                  }));
-                }
-                else {
-                  e.noMustache = true;
-                  expressions.push(e);
-                }
-              }
+              return e;
             });
+            _buildFromNjExp(exAttrExpressions, attrStr);
           }
           else {
             quasis.push(types.TemplateElement({
