@@ -62,7 +62,8 @@ module.exports = function (babel) {
       }
     },
     ImportDeclaration(path, state) {
-      switch (path.node.source.value) {
+      const { value } = path.node.source;
+      switch (value) {
         case 'nornj':
           state.file.hasImportNj = true;
           break;
@@ -72,6 +73,20 @@ module.exports = function (babel) {
         case 'nornj-react/mobx':
           state.file.hasImportNjrMobx = true;
           break;
+      }
+
+      if (state.opts.imports && state.opts.imports.indexOf(value) >= 0) {
+        const args = [];
+        path.node.specifiers.forEach(spec => {
+          if (types.isImportSpecifier(spec)) {
+            args.push(types.identifier(spec.local.name));
+          }
+        });
+
+        args.length && path.insertAfter(types.expressionStatement(types.callExpression(
+          types.functionExpression(null, [], types.blockStatement([])),
+          args
+        )));
       }
     },
     Program: {
