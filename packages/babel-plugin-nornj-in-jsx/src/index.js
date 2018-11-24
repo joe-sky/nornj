@@ -27,13 +27,13 @@ module.exports = function (babel) {
         const nodeName = path.node.openingElement.name.name;
         // const handler = nodeHandlers[nodeName];
         // if (handler) {
-        //   state.file.hasNjInJSX = true;
+        //   state.hasNjInJSX = true;
 
         //   path.replaceWith(handler(path.node, path.hub.file, state));
         // }
 
         if (nodeName != null && astUtil.isExTag(nodeName)) {
-          state.file.hasNjInJSX = true;
+          state.hasNjInJSX = true;
 
           path.replaceWith(exTagHandler(path.node, path.hub.file, state));
         }
@@ -41,7 +41,7 @@ module.exports = function (babel) {
       exit(path, state) {
         const exAttrs = astUtil.hasExAttr(path.node);
         if (exAttrs.length) {
-          state.file.hasNjInJSX = true;
+          state.hasNjInJSX = true;
 
           const hasMobx = exAttrs.reduce((result, exAttr) =>
             result || (exAttr.indexOf('n-mobx') > -1 || exAttr.indexOf('n-mst') > -1), false);
@@ -49,7 +49,7 @@ module.exports = function (babel) {
             && !nj.extensionConfig['mobx']
             && Object.assign(nj.extensionConfig, require('nornj-react/mobx/extensionConfig'));
           if (hasMobx) {
-            state.file.hasMobx = true;
+            state.hasMobxWithNj = true;
           }
 
           path.replaceWith(exAttrHandler(path.node, path.hub.file, state));
@@ -65,13 +65,13 @@ module.exports = function (babel) {
       const { value } = path.node.source;
       switch (value) {
         case 'nornj':
-          state.file.hasImportNj = true;
+          state.hasImportNj = true;
           break;
         case 'nornj-react':
-          state.file.hasImportNjr = true;
+          state.hasImportNjr = true;
           break;
         case 'nornj-react/mobx':
-          state.file.hasImportNjrMobx = true;
+          state.hasImportNjrMobx = true;
           break;
       }
 
@@ -91,35 +91,36 @@ module.exports = function (babel) {
     },
     Program: {
       enter(path, state) {
-        state.file.hasNjInJSX = false;
-        state.file.hasMobx = false;
-        state.file.hasImportNj = false;
-        state.file.hasImportNjr = false;
-        state.file.hasImportNjrMobx = false;
+        state.hasNjInJSX = false;
+        state.hasMobxWithNj = false;
+        state.hasImportNj = false;
+        state.hasImportNjr = false;
+        state.hasImportNjrMobx = false;
         utils.setTmplConfig(state.opts);
       },
       exit(path, state) {
-        if (!state.file.hasNjInJSX) {
+        if (!state.hasNjInJSX) {
           return;
         }
 
-        if (state.file.hasMobx && !state.file.hasImportNjrMobx) {
+        if (state.hasMobxWithNj && !state.hasImportNjrMobx) {
           path.node.body.unshift(types.importDeclaration(
             [],
             types.stringLiteral('nornj-react/mobx')
           ));
         }
-        if (!state.file.hasImportNjr) {
+        if (!state.hasImportNjr) {
           path.node.body.unshift(types.importDeclaration(
             [],
             types.stringLiteral('nornj-react')
           ));
         }
-        if (!state.file.hasImportNj) {
+        if (!state.hasImportNj) {
           path.node.body.unshift(types.importDeclaration(
             [
               types.importDefaultSpecifier(types.identifier('nj')),
-              types.importSpecifier(types.identifier('n'), types.identifier('expression'))
+              types.importSpecifier(types.identifier('n'), types.identifier('expression')),
+              types.importSpecifier(types.identifier('t'), types.identifier('template'))
             ],
             types.stringLiteral('nornj')
           ));
