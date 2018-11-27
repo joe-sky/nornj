@@ -185,11 +185,11 @@ const CTX_DATAS = 'datas';
 const CTX_DATA = 'data';
 const CTX_GET_DATA = 'getData';
 
-function createRenderTmpl(babel, quasis, expressions, opts, taggedTmplConfig) {
+function createRenderTmpl(babel, quasis, expressions, opts, taggedName) {
   const types = babel.types;
 
   let tmplStr = '';
-  if (!taggedTmplConfig) {
+  if (!taggedName) {
     let paramCount = 0;
     quasis.forEach((q, i) => {
       tmplStr += q.value.cooked;
@@ -203,6 +203,16 @@ function createRenderTmpl(babel, quasis, expressions, opts, taggedTmplConfig) {
     });
   }
   else {
+    let taggedTmplConfig = {};
+    switch (taggedName) {
+      case 'n':
+        taggedTmplConfig = { isExpresson: true };
+        break;
+      case 's':
+        taggedTmplConfig = { isCss: true };
+        break;
+    }
+
     tmplStr = Object.assign({ quasis: quasis.map(q => q.value.cooked) }, taggedTmplConfig);
   }
 

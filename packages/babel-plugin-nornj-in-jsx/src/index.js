@@ -5,7 +5,7 @@ const nj = require('nornj').default;
 // const transformWith = require('./withTag');
 const transformExTag = require('./exTag');
 const transformExAttr = require('./exAttr');
-const transformExpression = require('./expression');
+const transformTaggedTemplate = require('./taggedTemplate');
 const astUtil = require('./util/ast');
 const utils = require('./util/utils');
 
@@ -19,7 +19,8 @@ module.exports = function (babel) {
   // };
   const exTagHandler = transformExTag(babel);
   const exAttrHandler = transformExAttr(babel);
-  const expressionHandler = transformExpression(babel);
+  const taggedTemplateHandler = transformTaggedTemplate(babel);
+  let TaggedTemplates = ['nj', 'n', 't', 's'];
 
   const visitor = {
     JSXElement: {
@@ -57,8 +58,9 @@ module.exports = function (babel) {
       }
     },
     TaggedTemplateExpression(path, state) {
-      if (path.node.tag.name === 'n') {
-        path.replaceWith(expressionHandler(path.node, path.hub.file, state));
+      const taggedName = path.node.tag.name;
+      if (TaggedTemplates.indexOf(taggedName) >= 0) {
+        path.replaceWith(taggedTemplateHandler(path.node, path.hub.file, state, taggedName));
       }
     },
     ImportDeclaration(path, state) {
@@ -120,7 +122,8 @@ module.exports = function (babel) {
             [
               types.importDefaultSpecifier(types.identifier('nj')),
               types.importSpecifier(types.identifier('n'), types.identifier('expression')),
-              types.importSpecifier(types.identifier('t'), types.identifier('template'))
+              types.importSpecifier(types.identifier('t'), types.identifier('template')),
+              types.importSpecifier(types.identifier('s'), types.identifier('css'))
             ],
             types.stringLiteral('nornj')
           ));

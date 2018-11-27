@@ -5,8 +5,8 @@ const generate = require('./util/generate');
 module.exports = function (babel) {
   const types = babel.types;
 
-  return function (node, file, state) {
+  return function (node, file, state, taggedName) {
     const { quasis, expressions } = node.quasi;
-    return generate.createRenderTmpl(babel, quasis, expressions, state.opts, { isExpresson: true });
+    return generate.createRenderTmpl(babel, quasis, expressions, state.opts, taggedName);
   };
 };
