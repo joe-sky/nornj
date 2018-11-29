@@ -24,3 +24,4 @@ require('./specs/switch.spec');
 require('./specs/with.spec');
 require('./specs/fn.spec');
 require('./specs/exAttr.spec');
+require('./specs/taggedTemplate.spec');

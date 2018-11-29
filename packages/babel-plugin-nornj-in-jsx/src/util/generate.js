@@ -187,6 +187,7 @@ const CTX_GET_DATA = 'getData';
 
 function createRenderTmpl(babel, quasis, expressions, opts, taggedName) {
   const types = babel.types;
+  const isTmplFn = taggedName === 'nj';
 
   let tmplStr = '';
   if (!taggedName) {
@@ -288,14 +289,35 @@ function createRenderTmpl(babel, quasis, expressions, opts, taggedName) {
   if (tmplParams.length) {
     renderFnParams.push(types.objectExpression(tmplParams));
   }
-  renderFnParams.push(types.thisExpression());
+  !isTmplFn && renderFnParams.push(types.thisExpression());
 
-  return types.CallExpression(
-    types.memberExpression(
-      types.identifier('nj'),
-      types.identifier('renderH')
-    ), renderFnParams
-  );
+  if (!isTmplFn) {
+    return types.CallExpression(
+      types.memberExpression(
+        types.identifier('nj'),
+        types.identifier('renderH')
+      ), renderFnParams
+    );
+  }
+  else {
+    return types.functionExpression(null, [],
+      types.blockStatement([types.returnStatement(
+        types.CallExpression(
+          types.memberExpression(
+            types.memberExpression(
+              types.identifier('nj'),
+              types.identifier('renderH')
+            ), types.identifier('apply')
+          ), [types.thisExpression(), types.CallExpression(
+            types.memberExpression(
+              types.identifier('nj'),
+              types.identifier('arrayPush')
+            ), [types.arrayExpression(renderFnParams), types.identifier('arguments')]
+          )]
+        )
+      )])
+    );
+  }
 }
 
 function _buildTmplFns(fns, tmplKey) {
