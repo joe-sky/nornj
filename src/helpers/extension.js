@@ -233,7 +233,7 @@ export const extensions = {
       });
     }
     else if (options.props) {
-      step = options.props.step;
+      step = options.props.step || 1;
     }
 
     let ret, useString = options.useString;
