@@ -122,10 +122,35 @@ function _createRender(outputH) {
 export const render = _createRender();
 export const renderH = _createRender(true);
 
+function _buildRender(outputH) {
+  return function (tmpl, params) {
+    const tmplMainFn = (outputH ? compileH : compile)(tmpl, tmpl._njTmplKey);
+    if (params) {
+      const tmplFn = function () {
+        return tmplMainFn.apply(this, tools.arrayPush([params], arguments));
+      };
+      tools.defineProps(tmplFn, {
+        _njTmpl: {
+          value: true
+        }
+      });
+
+      return tmplFn;
+    }
+
+    return tmplMainFn;
+  };
+}
+
+export const buildRender = _buildRender();
+export const buildRenderH = _buildRender(true);
+
 tools.assign(nj, {
   compile,
   compileH,
   precompile,
   render,
-  renderH
+  renderH,
+  buildRender,
+  buildRenderH
 });

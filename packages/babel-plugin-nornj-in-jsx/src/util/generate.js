@@ -1,46 +1,6 @@
 const nj = require('nornj').default;
 const njUtils = require('nornj/tools/utils');
 
-function buildCondition(types, condition, expressions, tagStart = '<#if {{', hasMustache) {
-  let ret = [],
-    tagEnd = '}}>';
-
-  if (types.isTemplateLiteral(condition)) {
-    let hasExp = false;
-    condition.quasis.forEach((q, i) => {
-      if (i == 0) {
-        tagStart += q.value.cooked;
-      }
-      else if (i == condition.quasis.length - 1) {
-        tagEnd = q.value.cooked + tagEnd;
-      }
-      else {
-        ret.push(q.value.cooked);
-      }
-
-      if (i < condition.quasis.length - 1) {
-        hasExp = true;
-        !hasMustache && (condition.expressions[i].noMustache = true);
-        expressions.push(condition.expressions[i]);
-      }
-    });
-
-    if (hasExp) {
-      ret = [tagStart, ...ret, tagEnd];
-    }
-    else {
-      ret = [tagStart + tagEnd];
-    }
-  }
-  else {
-    ret = [tagStart, tagEnd];
-    !hasMustache && (condition.noMustache = true);
-    expressions.push(condition);
-  }
-
-  return ret;
-}
-
 function buildAttrs(types, tagName, attrs, quasis, expressions, lastAttrStr, newContextData) {
   const attrNames = Object.keys(attrs);
   const exTagConfig = nj.extensionConfig[tagName];
@@ -187,23 +147,24 @@ const CTX_GET_DATA = 'getData';
 
 function createRenderTmpl(babel, quasis, expressions, opts, taggedName) {
   const types = babel.types;
-  const isTmplFn = taggedName === 'nj';
+  const isTmplFnS = taggedName === 'njs';
+  const isTmplFn = taggedName === 'nj' || isTmplFnS;
 
   let tmplStr = '';
-  if (!taggedName) {
-    let paramCount = 0;
-    quasis.forEach((q, i) => {
-      tmplStr += q.value.cooked;
-      if (i < quasis.length - 1) {
-        const expr = expressions[i];
-        tmplStr += (expr.noMustache ? '' : '{{')
-          + _mustachePrefix(expr) + '_njParam' + paramCount
-          + (expr.noMustache ? '' : '}}');
-        paramCount++;
-      }
-    });
-  }
-  else {
+  let paramCount = 0;
+  quasis.forEach((q, i) => {
+    tmplStr += q.value.cooked;
+    if (i < quasis.length - 1) {
+      const expr = expressions[i];
+      tmplStr += (expr.noMustache ? '' : '{{')
+        + _mustachePrefix(expr) + '_njParam' + paramCount
+        + (expr.noMustache ? '' : '}}');
+      paramCount++;
+    }
+  });
+
+  const tmplKey = njUtils.uniqueKey(tmplStr);
+  if (taggedName) {
     let taggedTmplConfig = {};
     switch (taggedName) {
       case 'n':
@@ -219,13 +180,13 @@ function createRenderTmpl(babel, quasis, expressions, opts, taggedName) {
 
   const tmplObj = _buildTmplFns(nj.precompile(
     tmplStr,
-    opts.outputH != null ? opts.outputH : true,
+    !isTmplFnS ? (opts.outputH != null ? opts.outputH : true) : false,
     nj.createTmplRule(opts.delimiters != null ? opts.delimiters : {
       start: '{',
       end: '}',
       comment: ''
     })),
-    njUtils.uniqueKey(tmplStr));
+    tmplKey);
 
   const tmplParams = expressions.map((e, i) => {
     let block;
@@ -278,12 +239,6 @@ function createRenderTmpl(babel, quasis, expressions, opts, taggedName) {
       block
     );
   });
-  // const tmplParams = expressions.map((e, i) => types.objectProperty(
-  //   types.identifier('_njParam' + i), e
-  // ));
-  // if (tmplParams.length) {
-  //   tmplParams.push(types.objectProperty(types.identifier('_njParam'), types.booleanLiteral(true)));
-  // }
 
   const renderFnParams = [types.identifier(tmplObj)];
   if (tmplParams.length) {
@@ -291,33 +246,12 @@ function createRenderTmpl(babel, quasis, expressions, opts, taggedName) {
   }
   !isTmplFn && renderFnParams.push(types.thisExpression());
 
-  if (!isTmplFn) {
-    return types.CallExpression(
-      types.memberExpression(
-        types.identifier('nj'),
-        types.identifier('renderH')
-      ), renderFnParams
-    );
-  }
-  else {
-    return types.functionExpression(null, [],
-      types.blockStatement([types.returnStatement(
-        types.CallExpression(
-          types.memberExpression(
-            types.memberExpression(
-              types.identifier('nj'),
-              types.identifier('renderH')
-            ), types.identifier('apply')
-          ), [types.thisExpression(), types.CallExpression(
-            types.memberExpression(
-              types.identifier('nj'),
-              types.identifier('arrayPush')
-            ), [types.arrayExpression(renderFnParams), types.identifier('arguments')]
-          )]
-        )
-      )])
-    );
-  }
+  return types.CallExpression(
+    types.memberExpression(
+      types.identifier('nj'),
+      types.identifier(!isTmplFn ? 'renderH' : (taggedName === 'njs' ? 'buildRender' : 'buildRenderH'))
+    ), renderFnParams
+  );
 }
 
 function _buildTmplFns(fns, tmplKey) {
@@ -334,7 +268,6 @@ function _buildTmplFns(fns, tmplKey) {
 }
 
 module.exports = {
-  buildCondition,
   buildAttrs,
   getElName,
   getExAttrExpression,

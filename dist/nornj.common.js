@@ -1,5 +1,5 @@
 /*!
-* NornJ template engine v0.4.14
+* NornJ template engine v0.4.15
 * (c) 2016-2018 Joe_Sky
 * Released under the MIT License.
 */
@@ -3781,12 +3781,37 @@ function _createRender(outputH) {
 var render = _createRender();
 var renderH = _createRender(true);
 
+function _buildRender$1(outputH) {
+  return function (tmpl, params) {
+    var tmplMainFn = (outputH ? compileH : compile)(tmpl, tmpl._njTmplKey);
+    if (params) {
+      var tmplFn = function tmplFn() {
+        return tmplMainFn.apply(this, arrayPush([params], arguments));
+      };
+      defineProps(tmplFn, {
+        _njTmpl: {
+          value: true
+        }
+      });
+
+      return tmplFn;
+    }
+
+    return tmplMainFn;
+  };
+}
+
+var buildRender = _buildRender$1();
+var buildRenderH = _buildRender$1(true);
+
 assign(nj, {
   compile: compile,
   compileH: compileH,
   precompile: precompile,
   render: render,
-  renderH: renderH
+  renderH: renderH,
+  buildRender: buildRender,
+  buildRenderH: buildRenderH
 });
 
 function createTaggedTmpl() {

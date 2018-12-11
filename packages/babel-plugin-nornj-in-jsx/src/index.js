@@ -1,8 +1,4 @@
 const nj = require('nornj').default;
-// const transformEach = require('./eachTag');
-// const transformIf = require('./ifTag');
-// const transformSwitch = require('./switchTag');
-// const transformWith = require('./withTag');
 const transformExTag = require('./exTag');
 const transformExAttr = require('./exAttr');
 const transformTaggedTemplate = require('./taggedTemplate');
@@ -11,28 +7,15 @@ const utils = require('./util/utils');
 
 module.exports = function (babel) {
   const types = babel.types;
-  // const nodeHandlers = {
-  //   'if': transformIf(babel),
-  //   each: transformEach(babel),
-  //   'switch': transformSwitch(babel),
-  //   'with': transformWith(babel)
-  // };
   const exTagHandler = transformExTag(babel);
   const exAttrHandler = transformExAttr(babel);
   const taggedTemplateHandler = transformTaggedTemplate(babel);
-  let TaggedTemplates = ['nj', 'n', 't', 's'];
+  const TAGGED_TEMPLATES = ['nj', 'njs', 'n', 't', 's'];
 
   const visitor = {
     JSXElement: {
       enter(path, state) {
         const nodeName = path.node.openingElement.name.name;
-        // const handler = nodeHandlers[nodeName];
-        // if (handler) {
-        //   state.hasNjInJSX = true;
-
-        //   path.replaceWith(handler(path.node, path.hub.file, state));
-        // }
-
         if (nodeName != null && astUtil.isExTag(nodeName)) {
           state.hasNjInJSX = true;
 
@@ -59,7 +42,7 @@ module.exports = function (babel) {
     },
     TaggedTemplateExpression(path, state) {
       const taggedName = path.node.tag.name;
-      if (TaggedTemplates.indexOf(taggedName) >= 0) {
+      if (TAGGED_TEMPLATES.indexOf(taggedName) >= 0) {
         path.replaceWith(taggedTemplateHandler(path.node, path.hub.file, state, taggedName));
       }
     },
