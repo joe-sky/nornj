@@ -42,7 +42,7 @@
   "dependencies": {
     "babel-core": "^6.1.2",
     "babel-plugin-syntax-jsx": "^6.1.18",
-    "nornj": "^0.4.13",
+    "nornj": "^0.4.15",
     "nornj-react": "^0.4.5"
   },
   "devDependencies": {

@@ -345,6 +345,10 @@ function registerComponent(name, component, options) {
   return ret;
 }
 
+function getComponentConfig(name) {
+  return nj.componentConfig[isString(name) ? name : name._njComponentName];
+}
+
 function config (configs) {
   var createElement = configs.createElement,
       outputH = configs.outputH;
@@ -1568,6 +1572,7 @@ assign(nj, {
 
 assign(nj, {
   registerComponent: registerComponent,
+  getComponentConfig: getComponentConfig,
   config: config
 });
 

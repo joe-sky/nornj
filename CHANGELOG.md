@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## [v0.4.15] 2018.12.12
+
+* 🌟 新增`nj.buildRender`和`nj.buildRenderH`方法，用于预编译各`tagged template literal`功能时使用。
+* 🐞 修复runtime包缺少`nj.getComponentConfig`方法。
+
 ## [v0.4.14] 2018.12.05
 
 * 🐞 修复`for`标签bug。
