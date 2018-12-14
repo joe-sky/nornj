@@ -43,6 +43,8 @@ module.exports = function (babel) {
     TaggedTemplateExpression(path, state) {
       const taggedName = path.node.tag.name;
       if (TAGGED_TEMPLATES.indexOf(taggedName) >= 0) {
+        state.hasNjInJSX = true;
+
         path.replaceWith(taggedTemplateHandler(path.node, path.hub.file, state, taggedName));
       }
     },
@@ -53,6 +55,7 @@ module.exports = function (babel) {
           state.hasImportNj = true;
           break;
         case 'nornj-react':
+        case 'nornj-react/native':
           state.hasImportNjr = true;
           break;
         case 'nornj-react/mobx':
@@ -97,7 +100,7 @@ module.exports = function (babel) {
         if (!state.hasImportNjr) {
           path.node.body.unshift(types.importDeclaration(
             [],
-            types.stringLiteral('nornj-react')
+            types.stringLiteral(`nornj-react${state.opts.rn ? '/native' : ''}`)
           ));
         }
         if (!state.hasImportNj) {

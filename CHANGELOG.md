@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [v0.4.16] 2018.12.14
+
+* 🐞 `tools/metroTransformer`适配`react-native v0.56+`。
+
 ## [v0.4.15] 2018.12.12
 
 * 🌟 新增`nj.buildRender`和`nj.buildRenderH`方法，用于预编译各`tagged template literal`功能时使用。
