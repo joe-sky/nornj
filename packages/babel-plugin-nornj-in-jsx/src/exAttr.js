@@ -149,9 +149,11 @@ module.exports = function (babel) {
         }));
       }
       else {
-        quasis.push(types.TemplateElement({
+        const closeTagPrefix = types.TemplateElement({
           cooked: '</'
-        }));
+        });
+        closeTagPrefix.isCloseTagPrefix = true;
+        quasis.push(closeTagPrefix);
         expressions.push(elName);
         quasis.push(types.TemplateElement({
           cooked: '>'

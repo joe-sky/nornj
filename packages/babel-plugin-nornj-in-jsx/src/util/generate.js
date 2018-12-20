@@ -188,7 +188,12 @@ function createRenderTmpl(babel, quasis, expressions, opts, taggedName) {
     })),
     tmplKey);
 
-  const tmplParams = expressions.map((e, i) => {
+  const tmplParams = [];
+  expressions.forEach((e, i) => {
+    if (quasis[i].isCloseTagPrefix) {
+      return;
+    }
+
     let block;
     if (e.isAccessor) {
       const arrowFnParams = [];
@@ -234,10 +239,10 @@ function createRenderTmpl(babel, quasis, expressions, opts, taggedName) {
       block = e;
     }
 
-    return types.objectProperty(
+    tmplParams.push(types.objectProperty(
       types.identifier('_njParam' + i),
       block
-    );
+    ));
   });
 
   const renderFnParams = [types.identifier(tmplObj)];

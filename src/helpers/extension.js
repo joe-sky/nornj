@@ -205,6 +205,9 @@ export const extensions = {
       if (useString) {
         attrs.style += (attrs.style ? ';' : '') + 'display:none';
       }
+      else if (tools.isArray(attrs.style)) {
+        attrs.style.push({ display: 'none' });
+      }
       else {
         attrs.style.display = 'none';
       }

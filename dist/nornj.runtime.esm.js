@@ -1,5 +1,5 @@
 /*!
-* NornJ template engine v0.4.16
+* NornJ template engine v0.4.17
 * (c) 2016-2018 Joe_Sky
 * Released under the MIT License.
 */
@@ -907,6 +907,8 @@ var extensions = {
       }
       if (useString) {
         attrs.style += (attrs.style ? ';' : '') + 'display:none';
+      } else if (isArray(attrs.style)) {
+        attrs.style.push({ display: 'none' });
       } else {
         attrs.style.display = 'none';
       }
