@@ -59,6 +59,7 @@ module.exports = function (babel) {
           state.hasImportNjr = true;
           break;
         case 'nornj-react/mobx':
+        case 'nornj-react/mobx/native':
           state.hasImportNjrMobx = true;
           break;
       }
@@ -94,7 +95,7 @@ module.exports = function (babel) {
         if (state.hasMobxWithNj && !state.hasImportNjrMobx) {
           path.node.body.unshift(types.importDeclaration(
             [],
-            types.stringLiteral('nornj-react/mobx')
+            types.stringLiteral(`nornj-react/mobx${state.opts.rn ? '/native' : ''}`)
           ));
         }
         if (!state.hasImportNjr) {
