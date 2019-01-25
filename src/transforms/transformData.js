@@ -102,11 +102,11 @@ export function getElement(name, p1, nameO, p2, subName) {
     element = element[subName];
   }
 
-  return element ? element : name;
+  return element ? element : nameO;
 }
 
 export function getElementRefer(refer, name, p1, nameO, p2) {
-  return refer != null ? (tools.isString(refer) ? getElement(refer.toLowerCase(), p1, nameO, p2) : refer) : getElement(name, p1, nameO, p2);
+  return refer != null ? (tools.isString(refer) ? getElement(refer.toLowerCase(), p1, refer, p2) : refer) : getElement(name, p1, nameO, p2);
 }
 
 export function getElementName(refer, name) {

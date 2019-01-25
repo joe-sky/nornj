@@ -42,8 +42,8 @@
   "dependencies": {
     "babel-core": "^6.1.2",
     "babel-plugin-syntax-jsx": "^6.1.18",
-    "nornj": "^0.4.17",
-    "nornj-react": "^0.4.6"
+    "nornj": "^0.4.18",
+    "nornj-react": "^0.4.7"
   },
   "devDependencies": {
     "babel-eslint": "^6.0.3",

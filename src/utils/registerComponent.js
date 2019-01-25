@@ -1,6 +1,5 @@
 ﻿import nj from '../core';
 import * as tools from './tools';
-const COMP_NAME = '_njComponentName';
 
 export default function registerComponent(name, component, options) {
   let params = name, ret;
@@ -19,17 +18,7 @@ export default function registerComponent(name, component, options) {
 
       const comp = component ? component : v;
       nj.components[name] = comp;
-      nj.componentConfig[name] = options;
-
-      if (comp[COMP_NAME] == null) {
-        tools.defineProp(comp, COMP_NAME, {
-          value: name,
-          writable: true
-        });
-      }
-      else if (options && options.replaceComponentName) {
-        comp[COMP_NAME] = name;
-      }
+      nj.componentConfig.set(comp, options);
     }
 
     if (i == 0) {
@@ -47,5 +36,5 @@ export default function registerComponent(name, component, options) {
 }
 
 export function getComponentConfig(name) {
-  return nj.componentConfig[tools.isString(name) ? name : name._njComponentName];
+  return nj.componentConfig.get(tools.isString(name) ? nj.components[name] : name);
 }

@@ -1,5 +1,5 @@
 /*!
-* NornJ template engine v0.4.17
+* NornJ template engine v0.4.18
 * (c) 2016-2018 Joe_Sky
 * Released under the MIT License.
 */
@@ -13,7 +13,7 @@ function nj() {
 
 nj.createElement = null;
 nj.components = {};
-nj.componentConfig = {};
+nj.componentConfig = new Map();
 nj.preAsts = {};
 nj.asts = {};
 nj.templates = {};
@@ -360,8 +360,6 @@ var tools = Object.freeze({
 	capitalize: capitalize
 });
 
-var COMP_NAME = '_njComponentName';
-
 function registerComponent(name, component, options) {
   var params = name,
       ret = void 0;
@@ -382,16 +380,7 @@ function registerComponent(name, component, options) {
 
       var comp = _component ? _component : v;
       nj.components[_name] = comp;
-      nj.componentConfig[_name] = _options;
-
-      if (comp[COMP_NAME] == null) {
-        defineProp(comp, COMP_NAME, {
-          value: _name,
-          writable: true
-        });
-      } else if (_options && _options.replaceComponentName) {
-        comp[COMP_NAME] = _name;
-      }
+      nj.componentConfig.set(comp, _options);
     }
 
     if (i == 0) {
@@ -408,7 +397,7 @@ function registerComponent(name, component, options) {
 }
 
 function getComponentConfig(name) {
-  return nj.componentConfig[isString(name) ? name : name._njComponentName];
+  return nj.componentConfig.get(isString(name) ? nj.components[name] : name);
 }
 
 function _createRegExp(reg, mode) {
@@ -740,11 +729,11 @@ function getElement(name, p1, nameO, p2, subName) {
     element = element[subName];
   }
 
-  return element ? element : name;
+  return element ? element : nameO;
 }
 
 function getElementRefer(refer, name, p1, nameO, p2) {
-  return refer != null ? isString(refer) ? getElement(refer.toLowerCase(), p1, nameO, p2) : refer : getElement(name, p1, nameO, p2);
+  return refer != null ? isString(refer) ? getElement(refer.toLowerCase(), p1, refer, p2) : refer : getElement(name, p1, nameO, p2);
 }
 
 function getElementName(refer, name) {
