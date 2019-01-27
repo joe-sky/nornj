@@ -5,10 +5,10 @@ jasmine.loadConfig({
   spec_dir: 'test/',
   spec_files: [
     //'misc/simple.spec.js',
-    //'compiler/compile.spec.js',
+    'compiler/compile.spec.js',
     //'helpers/extensionAttribute.spec.js',
     //'helpers/registerExtension.spec.js',
-    'helpers/extension.spec.js'
+    //'helpers/extension.spec.js'
   ],
   helpers: [
     '../node_modules/babel-core/register.js'
