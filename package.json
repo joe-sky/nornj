@@ -27,7 +27,7 @@
     "build": "npm run cjs && npm run esm && npm run umd && npm run min && npm run runtime-cjs && npm run runtime-esm && npm run runtime-umd && npm run runtime-min && npm run lib",
     "lint": "eslint src",
     "test": "karma start",
-    "bdd": "node test/bdd.js",
+    "bdd": "cross-env NODE_ENV=production node test/bdd.js",
     "ci": "npm run test && codecov test/coverage/cobertura-coverage.xml"
   },
   "keywords": [

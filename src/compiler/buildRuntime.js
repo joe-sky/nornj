@@ -119,7 +119,7 @@ function _buildPropData(obj, counter, fns, useStringLocal, level) {
     isEmpty = false,
     special = false;
   const { isComputed, hasSet } = obj.prop;
-
+  console.log(JSON.stringify(obj));
   //先生成数据值
   if (obj.prop.isBasicType) {
     dataValueStr = obj.prop.name;
