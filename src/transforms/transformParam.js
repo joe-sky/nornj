@@ -157,6 +157,7 @@ function _getProp(matchArr, innerQuotes, i, addSet) {
       innerQuotes.push(match);
       return '_njQs' + (innerQuotes.length - 1) + '_';
     })
+    .replace(nj.REGEX_OPERATORS, match => ` ${match} `)
     .replace(REGEX_PROP_FILTER, (all, g1) => {
       const startWithHash = g1[0] === '#';
       if (startWithHash) {

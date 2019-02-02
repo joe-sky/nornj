@@ -223,6 +223,43 @@ filterConfig['?'] = filterConfig['?:'];
 filters['//'] = filters['%%'];
 filterConfig['//'] = filterConfig['%%'];
 
+export const operators = [
+  '+',
+  '-',
+  '**',
+  '*',
+  '%%',
+  '%',
+  '===',
+  '!==',
+  '==',
+  '!=',
+  '<=>',
+  '<=',
+  '>=',
+  '=',
+  '..<',
+  '<',
+  '>',
+  '&&',
+  '||',
+  '?:',
+  '?',
+  ':',
+  '../',
+  '..',
+  '/'
+];
+
+const REGEX_OPERATORS_ESCAPE = /\*|\||\/|\.|\?|\+/g;
+function _createRegexOperators() {
+  return new RegExp(operators.map(o => {
+    return o.replace(REGEX_OPERATORS_ESCAPE, match => '\\' + match);
+  }).join('|'), 'g');
+}
+
+nj.REGEX_OPERATORS = _createRegexOperators();
+
 //Register filter and also can batch add
 export function registerFilter(name, filter, options, mergeConfig) {
   let params = name;
