@@ -1,6 +1,7 @@
 import nj from '../../src/core';
 import { render, precompile } from '../../src/compiler/compile';
 import '../../src/utils/createTmplRule';
+import * as tools from '../../src/utils/tools';
 
 describe('Precompile', () => {
   nj.registerExtension('noMargin', options => {
@@ -20,13 +21,118 @@ describe('Precompile', () => {
   });
 
   it('Simple', () => {
+    const CUSTOM_VAR = 'nj_custom';
+
+    function _replaceBackslash(str) {
+      return str = str.replace(/\\/g, '\\\\');
+    }
+
+    function _buildDataValue(ast) {
+      let dataValueStr, special = false;
+      const { isComputed, hasSet } = ast;
+
+      if (ast.isBasicType) {
+        dataValueStr = ast.name;
+      } else {
+        const { name, parentNum } = ast;
+        let data = '',
+          specialP = false;
+
+        switch (name) {
+          case '@index':
+            data = 'index';
+            special = true;
+            break;
+          case '@item':
+            data = 'item';
+            special = true;
+            break;
+          case 'this':
+            data = 'data';
+            special = data => `${data}[${data}.length - 1]`;
+            break;
+          case '@data':
+            data = 'data';
+            special = true;
+            break;
+          case '@g':
+            data = 'p1.g';
+            special = CUSTOM_VAR;
+            break;
+          case '@root':
+            data = '(p2.root || p2)';
+            special = CUSTOM_VAR;
+            break;
+          case '@context':
+            data = 'p2';
+            special = CUSTOM_VAR;
+            break;
+          case '@lt':
+            data = '\'<\'';
+            special = CUSTOM_VAR;
+            break;
+          case '@gt':
+            data = '\'>\'';
+            special = CUSTOM_VAR;
+            break;
+          case '@lb':
+            data = '\'{\'';
+            special = CUSTOM_VAR;
+            break;
+          case '@rb':
+            data = '\'}\'';
+            special = CUSTOM_VAR;
+            break;
+          case '@q':
+            data = '\'"\'';
+            special = CUSTOM_VAR;
+            break;
+          case '@sq':
+            data = '"\'"';
+            special = CUSTOM_VAR;
+            break;
+        }
+
+        if (parentNum) {
+          if (!data) {
+            data = 'data';
+          }
+
+          const isCtx = data == 'p2';
+          for (let i = 0; i < parentNum; i++) {
+            data = !isCtx ? ('parent.' + data) : (data + '.parent');
+          }
+
+          if (!special) {
+            specialP = true;
+          }
+        }
+
+        if (!special && !specialP) {
+          dataValueStr = (isComputed ? 'p1.c(' : '') + 'p2.d(\'' + name + '\'' + ((isComputed || hasSet) ? ', 0, true' : '') + ')' + (isComputed ? ', p2, ' + level + ')' : '');
+        } else {
+          let dataStr = special === CUSTOM_VAR ? data : 'p2.' + data;
+          if (tools.isObject(special)) {
+            dataStr = special(dataStr);
+          }
+          dataValueStr = (special ? dataStr : (isComputed ? 'p1.c(' : '') + 'p2.d(\'' + name + '\', ' + dataStr + ((isComputed || hasSet) ? ', true' : '') + ')' + (isComputed ? ', p2, ' + level + ')' : ''));
+        }
+      }
+      if (dataValueStr) {
+        dataValueStr = _replaceBackslash(dataValueStr);
+      }
+
+      return dataValueStr;
+    }
+
     //console.log(render(`<i>{{(1+2**3) %% 5+'_123'}}</i>`));
 
     //const REGEX_OPERATOR = /\+|-|\*|%|==|<=|>=|<|>|&&/;
-    const OPERATORS = ['+', '-', '*', '%', '==', '<=', '>=', '<', '>', '&&'];
+    const OPERATORS = ['+', '-', '*', '/', '%', '===', '!==', '==', '!=', '<=', '>=', '=', '+=', '<', '>', '&&', '?', ':'];
+    const ASSIGN_OPERATORS = ['=', '+='];
 
     const tmpl = `<div>
-      {{'abcde'.substring(1, num.getLength()).length * 5 | test(100)}}
+      {{ { a: 1, b: { c: { d: 100 } } }[b] * 100 }}
       <!--#
       <#tmpl>{123}</#tmpl>
       {{1 + 2 > 2 && 2 ** (3 + 1) <= 5 && (5 + 6 %% 7) >= 10}}
@@ -34,97 +140,99 @@ describe('Precompile', () => {
       {{'111'.length + 2 * 3}}
       {{' 123 '.trim() + 4 - 5 ** 6}}
       {{' 123 '.trim(1 + 2 %% 5, alt(ctrl(123['length'].toString(123), '5', 6))) + shift() + 4 - 5 ** 6}}
+      {{'abcde'.substring(1, num.getLength()).length * 5 | test(100)}}
       {{('111'.length + 2) * 3}}
       {{('111'.length + 2) * 3 | test}}
       {{('111'.length + 2) * 3 | test(100, 200)}}
-      {{ { a: 1, b: 2 }.b * 100 }}
+      {{a.b.c ? d.e.f : (1 + 2 === 3 ? 1 : 2)}}
       {{[1, 2, 3][0] + 100}}
-      {{ { fn: param => param + 'abc'.substring(param, 10) } }}
       {{set a = '123' + '456'}}
+      {{ { a: 1, b: 2 }.b * 100 }}
+      {{ { fn: param => param + 'abc'.substring(param, 10) } }}
       #-->
     </div>`;
-
-    const ast0 = {
-      "prop": {
-        "filters": [{
-          "params": [{
-            "name": "2",
-            "isBasicType": true
-          }],
-          "name": "ctrl"
-        }],
-        "name": "'5'",
-        "isBasicType": true
-      },
-      "escape": true
-    };
 
     const ast = {
       "prop": {
         "filters": [{
           "params": [{
-            "name": "'substring'",
-            "isBasicType": true
-          }],
-          "name": "."
-        },
-        {
-          "params": [{
-            "name": "1",
-            "isBasicType": true
+            "filters": [{
+              "params": [{
+                "name": "1",
+                "isBasicType": true
+              }],
+              "name": ":"
+            }],
+            "name": "a"
           },
           {
             "filters": [{
               "params": [{
-                "name": "'getLength'",
-                "isBasicType": true
+                "filters": [{
+                  "params": [{
+                    "filters": [{
+                      "params": [{
+                        "filters": [{
+                          "params": [{
+                            "filters": [{
+                              "params": [{
+                                "name": "100",
+                                "isBasicType": true
+                              }],
+                              "name": ":"
+                            }],
+                            "name": "d"
+                          }],
+                          "name": "obj"
+                        }],
+                        "isEmpty": true
+                      }],
+                      "name": ":"
+                    }],
+                    "name": "c"
+                  }],
+                  "name": "obj"
+                }],
+                "isEmpty": true
               }],
-              "name": "."
-            },
-            {
-              "params": [],
-              "name": "_"
+              "name": ":"
             }],
-            "name": "num"
+            "name": "b"
           }],
-          "name": "_"
+          "name": "obj"
         },
         {
           "params": [{
-            "name": "'length'",
-            "isBasicType": true
+            "name": "b"
           }],
           "name": "."
-        },
-        {
-          "params": [{
-            "name": "5",
-            "isBasicType": true
-          }],
-          "name": "*"
         },
         {
           "params": [{
             "name": "100",
             "isBasicType": true
           }],
-          "name": "test"
+          "name": "*"
         }],
-        "name": "'abcde'",
-        "isBasicType": true
+        "isEmpty": true
       },
       "escape": true
     };
 
-    function _buildExpression(ast) {
-      let codeStr = (ast.filters && OPERATORS.indexOf(ast.filters[0].name) < 0) ? '' : ast.name;
+    function _buildExpression(ast, inObj) {
+      let codeStr = (ast.filters && OPERATORS.indexOf(ast.filters[0].name) < 0) ? '' : (!inObj ? _buildDataValue(ast) : ast.name);
       let lastCodeStr = '';
 
       ast.filters && ast.filters.forEach((filter, i) => {
         const hasFilterNext = ast.filters[i + 1] && OPERATORS.indexOf(ast.filters[i + 1].name) < 0;
 
         if (OPERATORS.indexOf(filter.name) >= 0) {  //Native operator
-          codeStr += ` ${filter.name} `;
+          if (ASSIGN_OPERATORS.indexOf(filter.name) >= 0) {
+            codeStr += `._njCtx.${i == 0 ? ast.name : tools.clearQuot(ast.filters[i - 1].params[0].name)} ${filter.name} `;
+          }
+          else {
+            codeStr += ` ${filter.name} `;
+          }
 
           if (!ast.filters[i + 1] || OPERATORS.indexOf(ast.filters[i + 1].name) >= 0) {
             if (filter.params[0].filters) {
@@ -133,7 +241,7 @@ describe('Precompile', () => {
               codeStr += ')';
             }
             else {
-              codeStr += filter.params[0].name;
+              codeStr += _buildDataValue(filter.params[0]);
             }
           }
         }
@@ -157,10 +265,29 @@ describe('Precompile', () => {
           }
         }
         else {  //Custom filter
-          let _codeStr = `p1.f['${filter.name}'](`;
+          let startStr, endStr, isObj;
+          if (filter.name === 'bracket') {
+            startStr = '(';
+            endStr = ')';
+          }
+          else if (filter.name === 'list') {
+            startStr = '[';
+            endStr = ']';
+          }
+          else if (filter.name === 'obj') {
+            startStr = '{ ';
+            endStr = ' }';
+            isObj = true;
+          }
+          else {
+            startStr = `p1.f['${filter.name}'](`;
+            endStr = ')';
+          }
+
+          let _codeStr = startStr;
           if (ast.isEmpty && i == 0) {  //Method
             filter.params.forEach((param, j) => {
-              _codeStr += _buildExpression(param);
+              _codeStr += _buildExpression(param, isObj);
               if (j < filter.params.length - 1) {
                 _codeStr += ', ';
               }
@@ -168,7 +295,7 @@ describe('Precompile', () => {
           }
           else {  //Operator
             if (i == 0) {
-              _codeStr += ast.name;
+              _codeStr += _buildDataValue(ast);
             }
             else if (lastCodeStr !== '') {
               _codeStr += lastCodeStr;
@@ -178,18 +305,21 @@ describe('Precompile', () => {
                 _codeStr += _buildExpression(ast.filters[i - 1].params[0]);
               }
               else {
-                _codeStr += ast.filters[i - 1].params[0].name;
+                _codeStr += _buildDataValue(ast.filters[i - 1].params[0]);
               }
             }
-            _codeStr += ', ';
-            if (filter.params[0].filters) {
-              _codeStr += _buildExpression(filter.params[0]);
-            }
-            else {
-              _codeStr += filter.params[0].name;
-            }
+
+            filter.params && filter.params.forEach((param, j) => {
+              _codeStr += ', ';
+              if (param.filters) {
+                _codeStr += _buildExpression(param);
+              }
+              else {
+                _codeStr += _buildDataValue(param);
+              }
+            });
           }
-          _codeStr += ')';
+          _codeStr += endStr;
 
           if (hasFilterNext) {
             lastCodeStr = _codeStr;

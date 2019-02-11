@@ -224,6 +224,7 @@ filters['//'] = filters['%%'];
 filterConfig['//'] = filterConfig['%%'];
 
 export const operators = [
+  '+=',
   '+',
   '-',
   '**',

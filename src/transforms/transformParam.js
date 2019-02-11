@@ -135,9 +135,10 @@ const ARR_OBJ_FILTER_LOOKUP = {
   '}': ')'
 };
 const REGEX_ARR_OBJ_FILTER = /\[|\]|\{|\}/g;
-const REGEX_OBJKEY_FILTER = /([(,][\s]*)([^\s:,'"()|]+):/g;
+//const REGEX_OBJKEY_FILTER = /([(,][\s]*)([^\s:,'"()|]+):/g;
 const REGEX_SET_FILTER = /^[\s]*set[\s]+|([(,])[\s]*set[\s]+/g;
 const REGEX_BRACKET_FILTER = /^[\s]*([(]+)|([(,])[\s]*([(]+)/g;
+const NOT_OPERATORS = ['../'];
 
 function _getProp(matchArr, innerQuotes, i, addSet) {
   let prop = matchArr[2].trim(),
@@ -157,7 +158,7 @@ function _getProp(matchArr, innerQuotes, i, addSet) {
       innerQuotes.push(match);
       return '_njQs' + (innerQuotes.length - 1) + '_';
     })
-    .replace(nj.REGEX_OPERATORS, match => ` ${match} `)
+    .replace(nj.REGEX_OPERATORS, match => NOT_OPERATORS.indexOf(match) < 0 ? ` ${match} ` : match)
     .replace(REGEX_PROP_FILTER, (all, g1) => {
       const startWithHash = g1[0] === '#';
       if (startWithHash) {
@@ -172,7 +173,7 @@ function _getProp(matchArr, innerQuotes, i, addSet) {
     .replace(REGEX_ARR_OBJ_FILTER, match => ARR_OBJ_FILTER_LOOKUP[match])
     .replace(REGEX_SET_FILTER, (all, g1) => (g1 ? g1 : '') + '_njSet_')
     .replace(REGEX_BRACKET_FILTER, (all, g1, g2, g3) => (g2 ? g2 : '') + (g2 ? g3 : g1).replace(/[(]/g, 'bracket('))
-    .replace(REGEX_OBJKEY_FILTER, (all, g1, g2) => g1 + ' \'' + g2 + '\' : ')
+    //.replace(REGEX_OBJKEY_FILTER, (all, g1, g2) => g1 + ' \'' + g2 + '\' : ')
     .replace(REGEX_SP_FILTER, (all, g1, match) => ' ' + SP_FILTER_LOOKUP[match] + ' ')
     .replace(REGEX_SPACE_S_FILTER, (all, match) => match)
     .replace(REGEX_FN_FILTER, (all, match, g1) => !g1 ? FN_FILTER_LOOKUP[match] : '.(\'' + g1 + '\')_(');
