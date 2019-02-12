@@ -1,5 +1,6 @@
 const astUtil = require('./util/ast');
 const generate = require('./util/generate');
+const utils = require('./util/utils');
 
 module.exports = function (babel) {
   const types = babel.types;
@@ -11,6 +12,7 @@ module.exports = function (babel) {
     if (astUtil.hasExPrefix(elName)) {
       elName = elName.substr(2);
     }
+    elName = utils.lowerFirst(elName);
     const key = astUtil.getKey(node);
     const attrs = astUtil.getAttributeMap(node);
     const children = astUtil.getChildren(types, node);
@@ -51,6 +53,7 @@ module.exports = function (babel) {
           if (astUtil.hasExPrefix(subElName)) {
             subElName = subElName.substr(2);
           }
+          subElName = utils.lowerFirst(subElName);
           const subAttrs = astUtil.getAttributeMap(subExTagNode);
           const subNewContextData = {};
           lastAttrStr = generate.buildAttrs(types, subElName, subAttrs, quasis, expressions, lastAttrStr, subNewContextData);

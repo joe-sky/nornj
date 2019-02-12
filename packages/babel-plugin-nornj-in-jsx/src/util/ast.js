@@ -1,4 +1,6 @@
 const nj = require('nornj').default;
+const utils = require('./utils');
+
 const TYPES = {
   ELEMENT: 'JSXElement',
   EXPRESSION_CONTAINER: 'JSXExpressionContainer',
@@ -213,7 +215,7 @@ exports.addImportNj = function (state) {
 };
 
 function hasExPrefix(name) {
-  return name.indexOf('n-') === 0;
+  return name.indexOf('n-') === 0 || name.indexOf('Nj') === 0;
 }
 exports.hasExPrefix = hasExPrefix;
 
@@ -224,7 +226,7 @@ exports.isExTag = function (nodeName) {
   if (exPrefix) {
     nodeName = nodeName.substr(2);
   }
-  const exConfig = nj.extensionConfig[nodeName];
+  const exConfig = nj.extensionConfig[utils.lowerFirst(nodeName)];
   if (exConfig) {
     isSub = exConfig.isSub;
     needPrefix = exConfig.needPrefix;
@@ -246,7 +248,7 @@ exports.isSubExTag = function (node) {
     return false;
   }
 
-  const nodeName = getTagName(node);
+  let nodeName = getTagName(node);
   if (nodeName == null) {
     return false;
   }
@@ -258,7 +260,7 @@ exports.isSubExTag = function (node) {
     nodeName = nodeName.substr(2);
   }
 
-  const exConfig = nj.extensionConfig[nodeName];
+  const exConfig = nj.extensionConfig[utils.lowerFirst(nodeName)];
   if (exConfig) {
     isSub = exConfig.isSub;
     needPrefix = exConfig.needPrefix;
