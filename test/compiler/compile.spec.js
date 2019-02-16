@@ -132,7 +132,7 @@ describe('Precompile', () => {
     const ASSIGN_OPERATORS = ['=', '+='];
 
     const tmpl = `<div>
-      {{ { a: 1, b: { c: { d: 100 } } }[b] * 100 }}
+      {{ { a: require('../image1.png'), b: { c: { d: 100 } } }[b] * 100 }}
       <!--#
       <#tmpl>{123}</#tmpl>
       {{1 + 2 > 2 && 2 ** (3 + 1) <= 5 && (5 + 6 %% 7) >= 10}}
@@ -158,8 +158,14 @@ describe('Precompile', () => {
           "params": [{
             "filters": [{
               "params": [{
-                "name": "1",
-                "isBasicType": true
+                "filters": [{
+                  "params": [{
+                    "name": "'../image1.png'",
+                    "isBasicType": true
+                  }],
+                  "name": "require"
+                }],
+                "isEmpty": true
               }],
               "name": ":"
             }],
@@ -280,7 +286,8 @@ describe('Precompile', () => {
             isObj = true;
           }
           else {
-            startStr = `p1.f['${filter.name}'](`;
+            startStr = filter.name != 'require' ? `p1.f['${filter.name}']` : 'require';
+            startStr += '(';
             endStr = ')';
           }
 
