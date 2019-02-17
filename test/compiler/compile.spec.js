@@ -2,6 +2,7 @@ import nj from '../../src/core';
 import { render, precompile } from '../../src/compiler/compile';
 import '../../src/utils/createTmplRule';
 import * as tools from '../../src/utils/tools';
+import { filterConfig } from '../../src/helpers/filter';
 
 describe('Precompile', () => {
   nj.registerExtension('noMargin', options => {
@@ -132,7 +133,7 @@ describe('Precompile', () => {
     const ASSIGN_OPERATORS = ['=', '+='];
 
     const tmpl = `<div>
-      {{ { a: require('../image1.png'), b: { c: { d: 100 } } }[b] * 100 }}
+      {{ { a: require('../image1.png'), b: { c: { d: test(100) } } }[b] * 100 }}
       <!--#
       <#tmpl>{123}</#tmpl>
       {{1 + 2 > 2 && 2 ** (3 + 1) <= 5 && (5 + 6 %% 7) >= 10}}
@@ -182,8 +183,14 @@ describe('Precompile', () => {
                           "params": [{
                             "filters": [{
                               "params": [{
-                                "name": "100",
-                                "isBasicType": true
+                                "filters": [{
+                                  "params": [{
+                                    "name": "100",
+                                    "isBasicType": true
+                                  }],
+                                  "name": "test"
+                                }],
+                                "isEmpty": true
                               }],
                               "name": ":"
                             }],
@@ -286,7 +293,18 @@ describe('Precompile', () => {
             isObj = true;
           }
           else {
-            startStr = filter.name != 'require' ? `p1.f['${filter.name}']` : 'require';
+            if (filter.name == 'require') {
+              startStr = 'require';
+            }
+            else {
+              const configF = filterConfig[filter.name];
+              if (configF && configF.onlyGlobal) {
+                startStr = `p1.f['${filter.name}']`;
+              }
+              else {
+                startStr = `(p2.d('${filter.name}') || p1.f['${filter.name}'])`;
+              }
+            }
             startStr += '(';
             endStr = ')';
           }
