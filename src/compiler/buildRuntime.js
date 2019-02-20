@@ -112,6 +112,241 @@ function _buildOptions(config, useStringLocal, node, fns, exPropsStr, subExProps
 }
 
 const CUSTOM_VAR = 'nj_custom';
+const OPERATORS = ['+', '-', '*', '/', '%', '===', '!==', '==', '!=', '<=', '>=', '=', '+=', '<', '>', '&&', '?', ':'];
+const ASSIGN_OPERATORS = ['=', '+='];
+
+function _buildDataValue(ast) {
+  let dataValueStr, special = false;
+  const { isComputed, hasSet } = ast;
+
+  if (ast.isBasicType) {
+    dataValueStr = ast.name;
+  } else {
+    const { name, parentNum } = ast;
+    let data = '',
+      specialP = false;
+
+    switch (name) {
+      case '@index':
+        data = 'index';
+        special = true;
+        break;
+      case '@item':
+        data = 'item';
+        special = true;
+        break;
+      case 'this':
+        data = 'data';
+        special = data => `${data}[${data}.length - 1]`;
+        break;
+      case '@data':
+        data = 'data';
+        special = true;
+        break;
+      case '@g':
+        data = 'p1.g';
+        special = CUSTOM_VAR;
+        break;
+      case '@root':
+        data = '(p2.root || p2)';
+        special = CUSTOM_VAR;
+        break;
+      case '@context':
+        data = 'p2';
+        special = CUSTOM_VAR;
+        break;
+      case '@lt':
+        data = '\'<\'';
+        special = CUSTOM_VAR;
+        break;
+      case '@gt':
+        data = '\'>\'';
+        special = CUSTOM_VAR;
+        break;
+      case '@lb':
+        data = '\'{\'';
+        special = CUSTOM_VAR;
+        break;
+      case '@rb':
+        data = '\'}\'';
+        special = CUSTOM_VAR;
+        break;
+      case '@q':
+        data = '\'"\'';
+        special = CUSTOM_VAR;
+        break;
+      case '@sq':
+        data = '"\'"';
+        special = CUSTOM_VAR;
+        break;
+    }
+
+    if (parentNum) {
+      if (!data) {
+        data = 'data';
+      }
+
+      const isCtx = data == 'p2';
+      for (let i = 0; i < parentNum; i++) {
+        data = !isCtx ? ('parent.' + data) : (data + '.parent');
+      }
+
+      if (!special) {
+        specialP = true;
+      }
+    }
+
+    if (!special && !specialP) {
+      dataValueStr = (isComputed ? 'p1.c(' : '') + 'p2.d(\'' + name + '\'' + ((isComputed || hasSet) ? ', 0, true' : '') + ')' + (isComputed ? ', p2, ' + level + ')' : '');
+    } else {
+      let dataStr = special === CUSTOM_VAR ? data : 'p2.' + data;
+      if (tools.isObject(special)) {
+        dataStr = special(dataStr);
+      }
+      dataValueStr = (special ? dataStr : (isComputed ? 'p1.c(' : '') + 'p2.d(\'' + name + '\', ' + dataStr + ((isComputed || hasSet) ? ', true' : '') + ')' + (isComputed ? ', p2, ' + level + ')' : ''));
+    }
+  }
+  if (dataValueStr) {
+    dataValueStr = _replaceBackslash(dataValueStr);
+  }
+
+  return dataValueStr;
+}
+
+export function buildExpression(ast, inObj) {
+  let codeStr = (ast.filters && OPERATORS.indexOf(ast.filters[0].name) < 0) ? '' : (!inObj ? _buildDataValue(ast) : ast.name);
+  let lastCodeStr = '';
+
+  ast.filters && ast.filters.forEach((filter, i) => {
+    const hasFilterNext = ast.filters[i + 1] && OPERATORS.indexOf(ast.filters[i + 1].name) < 0;
+
+    if (OPERATORS.indexOf(filter.name) >= 0) {  //Native operator
+      if (ASSIGN_OPERATORS.indexOf(filter.name) >= 0) {
+        codeStr += `._njCtx.${i == 0 ? ast.name : tools.clearQuot(ast.filters[i - 1].params[0].name)} ${filter.name} `;
+      }
+      else {
+        codeStr += ` ${filter.name} `;
+      }
+
+      if (!ast.filters[i + 1] || OPERATORS.indexOf(ast.filters[i + 1].name) >= 0) {
+        if (filter.params[0].filters) {
+          codeStr += '(';
+          codeStr += _buildExpression(filter.params[0]);
+          codeStr += ')';
+        }
+        else {
+          codeStr += _buildDataValue(filter.params[0]);
+        }
+      }
+    }
+    else if (filter.name === '_') {  //Call function
+      let _codeStr = lastCodeStr;
+      _codeStr += '(';
+      filter.params.forEach((param, j) => {
+        _codeStr += _buildExpression(param);
+        if (j < filter.params.length - 1) {
+          _codeStr += ', ';
+        }
+      });
+      _codeStr += ')';
+
+      if (hasFilterNext) {
+        lastCodeStr = _codeStr;
+      }
+      else {
+        codeStr += _codeStr;
+        lastCodeStr = '';
+      }
+    }
+    else {  //Custom filter
+      let startStr, endStr, isObj, configF;
+      if (filter.name === 'bracket') {
+        startStr = '(';
+        endStr = ')';
+      }
+      else if (filter.name === 'list') {
+        startStr = '[';
+        endStr = ']';
+      }
+      else if (filter.name === 'obj') {
+        startStr = '{ ';
+        endStr = ' }';
+        isObj = true;
+      }
+      else {
+        if (filter.name == 'require') {
+          startStr = 'require';
+        }
+        else {
+          const filterStr = `p1.f['${filter.name}']`,
+            warnStr = `p1.wn('${filter.name}', 'f')`,
+            isDev = process.env.NODE_ENV !== 'production';
+
+          configF = filterConfig[filter.name];
+          if (configF && configF.onlyGlobal) {
+            startStr = isDev ? `(${filterStr} || ${warnStr})` : filterStr;
+          }
+          else {
+            startStr = `(p2.d('${filter.name}') || ${filterStr}${isDev ? ` || ${warnStr}` : ''})`;
+          }
+        }
+        startStr += '(';
+        endStr = ')';
+      }
+
+      let _codeStr = startStr;
+      if (ast.isEmpty && i == 0) {  //Method
+        filter.params.forEach((param, j) => {
+          _codeStr += _buildExpression(param, isObj);
+          if (j < filter.params.length - 1) {
+            _codeStr += ', ';
+          }
+        });
+      }
+      else {  //Operator
+        if (i == 0) {
+          _codeStr += _buildDataValue(ast);
+        }
+        else if (lastCodeStr !== '') {
+          _codeStr += lastCodeStr;
+        }
+        else {
+          if (ast.filters[i - 1].params[0].filters) {
+            _codeStr += _buildExpression(ast.filters[i - 1].params[0]);
+          }
+          else {
+            _codeStr += _buildDataValue(ast.filters[i - 1].params[0]);
+          }
+        }
+
+        filter.params && filter.params.forEach((param, j) => {
+          _codeStr += ', ';
+          if (param.filters) {
+            _codeStr += _buildExpression(param);
+          }
+          else {
+            _codeStr += _buildDataValue(param);
+          }
+        });
+
+        if (!configF || configF.hasOptions) {
+          _codeStr += `, ${_buildOptions()}`;
+        }
+      }
+      _codeStr += endStr;
+
+      if (hasFilterNext) {
+        lastCodeStr = _codeStr;
+      }
+      else {
+        codeStr += _codeStr;
+        lastCodeStr = '';
+      }
+    }
+  });
+
+  return codeStr;
+}
 
 function _buildPropData(obj, counter, fns, useStringLocal, level) {
   let dataValueStr,

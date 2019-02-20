@@ -28,6 +28,10 @@ describe('Precompile', () => {
       return str = str.replace(/\\/g, '\\\\');
     }
 
+    function _buildOptions() {
+      return '{ _njOpts: true }';
+    }
+
     function _buildDataValue(ast) {
       let dataValueStr, special = false;
       const { isComputed, hasSet } = ast;
@@ -133,7 +137,7 @@ describe('Precompile', () => {
     const ASSIGN_OPERATORS = ['=', '+='];
 
     const tmpl = `<div>
-      {{ { a: require('../image1.png'), b: { c: { d: test(100) } } }[b] * 100 }}
+      {{ d.e ** a.b.c(1, 2, 3) }}
       <!--#
       <#tmpl>{123}</#tmpl>
       {{1 + 2 > 2 && 2 ** (3 + 1) <= 5 && (5 + 6 %% 7) >= 10}}
@@ -149,6 +153,7 @@ describe('Precompile', () => {
       {{[1, 2, 3][0] + 100}}
       {{set a = '123' + '456'}}
       {{ { a: 1, b: 2 }.b * 100 }}
+      {{ { a: require('../image1.png'), b: { c: { d: (1 + 2) | test } } }[b] * 100 }}
       {{ { fn: param => param + 'abc'.substring(param, 10) } }}
       #-->
     </div>`;
@@ -157,77 +162,47 @@ describe('Precompile', () => {
       "prop": {
         "filters": [{
           "params": [{
-            "filters": [{
-              "params": [{
-                "filters": [{
-                  "params": [{
-                    "name": "'../image1.png'",
-                    "isBasicType": true
-                  }],
-                  "name": "require"
-                }],
-                "isEmpty": true
-              }],
-              "name": ":"
-            }],
-            "name": "a"
-          },
-          {
-            "filters": [{
-              "params": [{
-                "filters": [{
-                  "params": [{
-                    "filters": [{
-                      "params": [{
-                        "filters": [{
-                          "params": [{
-                            "filters": [{
-                              "params": [{
-                                "filters": [{
-                                  "params": [{
-                                    "name": "100",
-                                    "isBasicType": true
-                                  }],
-                                  "name": "test"
-                                }],
-                                "isEmpty": true
-                              }],
-                              "name": ":"
-                            }],
-                            "name": "d"
-                          }],
-                          "name": "obj"
-                        }],
-                        "isEmpty": true
-                      }],
-                      "name": ":"
-                    }],
-                    "name": "c"
-                  }],
-                  "name": "obj"
-                }],
-                "isEmpty": true
-              }],
-              "name": ":"
-            }],
-            "name": "b"
-          }],
-          "name": "obj"
-        },
-        {
-          "params": [{
-            "name": "b"
+            "name": "'e'",
+            "isBasicType": true
           }],
           "name": "."
         },
         {
           "params": [{
-            "name": "100",
-            "isBasicType": true
+            "filters": [{
+              "params": [{
+                "name": "'b'",
+                "isBasicType": true
+              }],
+              "name": "."
+            },
+            {
+              "params": [{
+                "name": "'c'",
+                "isBasicType": true
+              }],
+              "name": "."
+            },
+            {
+              "params": [{
+                "name": "1",
+                "isBasicType": true
+              },
+              {
+                "name": "2",
+                "isBasicType": true
+              },
+              {
+                "name": "3",
+                "isBasicType": true
+              }],
+              "name": "_"
+            }],
+            "name": "a"
           }],
-          "name": "*"
+          "name": "**"
         }],
-        "isEmpty": true
+        "name": "d"
       },
       "escape": true
     };
@@ -259,7 +234,7 @@ describe('Precompile', () => {
           }
         }
         else if (filter.name === '_') {  //Call function
-          let _codeStr = lastCodeStr;
+          let _codeStr = `p1.sc(${lastCodeStr})`;
           _codeStr += '(';
           filter.params.forEach((param, j) => {
             _codeStr += _buildExpression(param);
@@ -278,7 +253,7 @@ describe('Precompile', () => {
           }
         }
         else {  //Custom filter
-          let startStr, endStr, isObj;
+          let startStr, endStr, isObj, configF;
           if (filter.name === 'bracket') {
             startStr = '(';
             endStr = ')';
@@ -297,12 +272,16 @@ describe('Precompile', () => {
               startStr = 'require';
             }
             else {
-              const configF = filterConfig[filter.name];
+              const filterStr = `p1.f['${filter.name}']`,
+                warnStr = `p1.wn('${filter.name}', 'f')`,
+                isDev = process.env.NODE_ENV !== 'production';
+
+              configF = filterConfig[filter.name];
               if (configF && configF.onlyGlobal) {
-                startStr = `p1.f['${filter.name}']`;
+                startStr = isDev ? `(${filterStr} || ${warnStr})` : filterStr;
               }
               else {
-                startStr = `(p2.d('${filter.name}') || p1.f['${filter.name}'])`;
+                startStr = `(p2.d('${filter.name}') || ${filterStr}${isDev ? ` || ${warnStr}` : ''})`;
               }
             }
             startStr += '(';
@@ -343,6 +322,10 @@ describe('Precompile', () => {
                 _codeStr += _buildDataValue(param);
               }
             });
+
+            if (!configF || configF.hasOptions) {
+              _codeStr += `, ${_buildOptions()}`;
+            }
           }
           _codeStr += endStr;
 
@@ -372,19 +355,15 @@ describe('Precompile', () => {
 
       p1.f['.']('111', 'length') + 2 * 3
 
-      var _v0 = p1.f['.'](' 123 ', 'trim');
-      (_v0 && _v0()) + 4 - p1.f['**'](5, 6)
+      (p1.sc(p1.f['.'](' 123 ', 'trim'))()) + 4 - p1.f['**'](5, 6)
 
       p1.f['.']({ a: 1, b: 2 }, 'b') * 100
 
       p1.f['.']([1, 2, 3], 0) + 100
 
-      var _v0 = p1.f['.']('abcde', 'substring');
-      var _v1 = p1.f['.'](p2.d('num'), 'getLength');
-      p1.f['.']((_v0 && _v0(1, (_v1 && _v1()))), 'length') * 5
+      p1.f['.']((p1.sc(p1.f['.']('abcde', 'substring'))(1, (p1.sc(p1.f['.'](p2.d('num'), 'getLength'))()))), 'length') * 5
       
-      var _v0 = p1.f['.']('abc', 'substring');
-      { fn: param => param + (_v0 && _v0(param, 10)) }
+      { fn: param => param + (p1.sc(p1.f['.']('abc', 'substring'))(param, 10)) }
 
       p2.d('a', 0, true)._njCtx.a = '123' + '456'
     `;
