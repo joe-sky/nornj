@@ -1,6 +1,6 @@
 /*!
-* NornJ template engine v0.4.18
-* (c) 2016-2018 Joe_Sky
+* NornJ template engine v5.0.0-alpha.1
+* (c) 2016-2019 Joe_Sky
 * Released under the MIT License.
 */
 'use strict';
@@ -1167,7 +1167,7 @@ assign(nj, {
 //Global filter list
 var filters = {
   //Get properties
-  '.': function _(obj$$1, prop) {
+  '.': function _(obj$$1, prop, callFn) {
     if (obj$$1 == null) {
       return obj$$1;
     }
@@ -1177,19 +1177,19 @@ var filters = {
         val: obj$$1.val[prop],
         prop: prop
       };
+    } else if (callFn) {
+      return {
+        obj: obj$$1,
+        prop: prop
+      };
     }
 
     return obj$$1[prop];
   },
 
-  //Call method
-  _: function _(method) {
-    if (method == null) {
-      return method;
-    }
-
-    var args = arguments;
-    return method.apply(args[args.length - 1].lastValue, arraySlice(args, 1, args.length - 1));
+  //Call function
+  _: function _(fn, args) {
+    return fn != null ? fn.obj[fn.prop].call(fn.obj, args) : null;
   },
 
   //Get computed properties
@@ -1436,6 +1436,19 @@ filters['?'] = filters['?:'];
 filterConfig['?'] = filterConfig['?:'];
 filters['//'] = filters['%%'];
 filterConfig['//'] = filterConfig['%%'];
+
+var operators = ['+=', '+', '-', '**', '*', '%%', '%', '===', '!==', '==', '!=', '<=>', '<=', '>=', '=', '..<', '<', '>', '&&', '||', '?:', '?', ':', '../', '..', '/'];
+
+var REGEX_OPERATORS_ESCAPE = /\*|\||\/|\.|\?|\+/g;
+function _createRegexOperators() {
+  return new RegExp(operators.map(function (o) {
+    return o.replace(REGEX_OPERATORS_ESCAPE, function (match) {
+      return '\\' + match;
+    });
+  }).join('|'), 'g');
+}
+
+nj.REGEX_OPERATORS = _createRegexOperators();
 
 //Register filter and also can batch add
 function registerFilter(name, filter, options, mergeConfig) {

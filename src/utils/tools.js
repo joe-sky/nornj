@@ -188,10 +188,6 @@ export function capitalize(str) {
   return str[0].toUpperCase() + str.substr(1);
 }
 
-export function safeCall(fn) {
-  return fn != null ? fn : noop;
-}
-
 assign(nj, {
   defineProp,
   defineProps,
@@ -209,6 +205,5 @@ assign(nj, {
   obj,
   toCamelCase,
   assign,
-  capitalize,
-  safeCall
+  capitalize
 });

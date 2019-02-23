@@ -154,6 +154,7 @@ describe('Precompile', () => {
       {{set a = '123' + '456'}}
       {{ { a: 1, b: 2 }.b * 100 }}
       {{ { a: require('../image1.png'), b: { c: { d: (1 + 2) | test } } }[b] * 100 }}
+      {{ d.e ** a.b.c(1, 2, 3) }}
       {{ { fn: param => param + 'abc'.substring(param, 10) } }}
       #-->
     </div>`;
@@ -342,9 +343,9 @@ describe('Precompile', () => {
       return codeStr;
     }
 
-    console.log(_buildExpression(ast.prop));
+    //console.log(_buildExpression(ast.prop));
 
-    const ret = precompile(tmpl, true, nj.tmplRule);
+    const ret = precompile(tmpl, false, nj.tmplRule);
 
     const gCode = `
       p1.f['**'](p1.f['ctrl']('5', 2), 5)
@@ -368,7 +369,8 @@ describe('Precompile', () => {
       p2.d('a', 0, true)._njCtx.a = '123' + '456'
     `;
 
-    //console.log(ret.main.toString());
+    console.log(ret.main.toString());
+    console.log(render(`{{ 1 == '1' || 1 == '2' }}`));
     // var _v0 = null;
     // console.log('1' + (_v0 && _v0()) + 3);
   });

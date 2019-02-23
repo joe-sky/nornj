@@ -63,7 +63,7 @@ describe('Extension tag', () => {
       <nj-noWs>
         <#each {{list}} moreValues>
           <#if {{!(@last)}}>
-            <i>{{this}}</i>
+            <i>{{@item}}</i>
           </#if>
         </#each>
       </nj-noWs>
@@ -76,7 +76,7 @@ describe('Extension tag', () => {
     expect(render(`
       <nj-noWs>
         <#each {{list}}>
-          <i>key:{{@key}},value:{{this}}</i>
+          <i>key:{{@key}},value:{{@item}}</i>
         </#each>
       </nj-noWs>
     `, {

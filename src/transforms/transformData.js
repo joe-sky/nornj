@@ -246,8 +246,7 @@ export function template(fns) {
     aa: addArgs,
     an: tools.assign,
     g: nj.global,
-    l: _getLevel,
-    sc: tools.safeCall
+    l: _getLevel
   };
 
   if (!configs.us) {
