@@ -5,17 +5,17 @@ module.exports = createReactClass({
   render: function () {
     return (
       <div>
-        <switch value={this.props.condition}>
-          <case value={'case1'}>
+        <NjSwitch value={this.props.condition}>
+          <Case value={'case1'}>
             <span>Case1Block</span>
-          </case>
-          <case value={'case2'}>
+          </Case>
+          <Case value={'case2'}>
             <span>Case2Block</span>
-          </case>
-          <default>
+          </Case>
+          <Default>
             <span>DefaultBlock</span>
-          </default>
-        </switch>
+          </Default>
+        </NjSwitch>
       </div>
     );
   }

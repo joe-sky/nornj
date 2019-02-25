@@ -8,7 +8,7 @@ jasmine.loadConfig({
     //'compiler/compile.spec.js',
     //'helpers/extensionAttribute.spec.js',
     //'helpers/registerExtension.spec.js',
-    'helpers/extension.spec.js'
+    'helpers/filter.spec.js'
   ],
   helpers: [
     '../node_modules/babel-core/register.js'

@@ -1,6 +1,6 @@
 /*!
-* NornJ template engine v0.4.18
-* (c) 2016-2018 Joe_Sky
+* NornJ template engine v5.0.0-alpha.1
+* (c) 2016-2019 Joe_Sky
 * Released under the MIT License.
 */
 (function (global, factory) {
@@ -1385,7 +1385,7 @@ assign(nj, {
 //Global filter list
 var filters = {
   //Get properties
-  '.': function _(obj$$1, prop) {
+  '.': function _(obj$$1, prop, callFn) {
     if (obj$$1 == null) {
       return obj$$1;
     }
@@ -1395,19 +1395,19 @@ var filters = {
         val: obj$$1.val[prop],
         prop: prop
       };
+    } else if (callFn) {
+      return {
+        obj: obj$$1,
+        prop: prop
+      };
     }
 
     return obj$$1[prop];
   },
 
-  //Call method
-  _: function _(method) {
-    if (method == null) {
-      return method;
-    }
-
-    var args = arguments;
-    return method.apply(args[args.length - 1].lastValue, arraySlice(args, 1, args.length - 1));
+  //Call function
+  _: function _(fn, args) {
+    return fn != null ? fn.obj[fn.prop].call(fn.obj, args) : null;
   },
 
   //Get computed properties
@@ -1655,6 +1655,19 @@ filterConfig['?'] = filterConfig['?:'];
 filters['//'] = filters['%%'];
 filterConfig['//'] = filterConfig['%%'];
 
+var operators = ['+=', '+', '-', '**', '*', '%%', '%', '===', '!==', '==', '!=', '<=>', '<=', '>=', '=', '..<', '<', '>', '&&', '||', '?:', '?', ':', '../', '..', '/'];
+
+var REGEX_OPERATORS_ESCAPE = /\*|\||\/|\.|\?|\+/g;
+function _createRegexOperators() {
+  return new RegExp(operators.map(function (o) {
+    return o.replace(REGEX_OPERATORS_ESCAPE, function (match) {
+      return '\\' + match;
+    });
+  }).join('|'), 'g');
+}
+
+nj.REGEX_OPERATORS = _createRegexOperators();
+
 //Register filter and also can batch add
 function registerFilter(name, filter, options, mergeConfig) {
   var params = name;
@@ -1832,9 +1845,10 @@ var ARR_OBJ_FILTER_LOOKUP = {
   '}': ')'
 };
 var REGEX_ARR_OBJ_FILTER = /\[|\]|\{|\}/g;
-var REGEX_OBJKEY_FILTER = /([(,][\s]*)([^\s:,'"()|]+):/g;
+//const REGEX_OBJKEY_FILTER = /([(,][\s]*)([^\s:,'"()|]+):/g;
 var REGEX_SET_FILTER = /^[\s]*set[\s]+|([(,])[\s]*set[\s]+/g;
 var REGEX_BRACKET_FILTER = /^[\s]*([(]+)|([(,])[\s]*([(]+)/g;
+var NOT_OPERATORS = ['../'];
 
 function _getProp(matchArr, innerQuotes, i, addSet) {
   var prop = matchArr[2].trim(),
@@ -1854,6 +1868,8 @@ function _getProp(matchArr, innerQuotes, i, addSet) {
   }).replace(REGEX_QUOTE, function (match) {
     innerQuotes.push(match);
     return '_njQs' + (innerQuotes.length - 1) + '_';
+  }).replace(nj.REGEX_OPERATORS, function (match) {
+    return NOT_OPERATORS.indexOf(match) < 0 ? ' ' + match + ' ' : match;
   }).replace(REGEX_PROP_FILTER, function (all, g1) {
     var startWithHash = g1[0] === '#';
     if (startWithHash) {
@@ -1871,9 +1887,9 @@ function _getProp(matchArr, innerQuotes, i, addSet) {
     return (g1 ? g1 : '') + '_njSet_';
   }).replace(REGEX_BRACKET_FILTER, function (all, g1, g2, g3) {
     return (g2 ? g2 : '') + (g2 ? g3 : g1).replace(/[(]/g, 'bracket(');
-  }).replace(REGEX_OBJKEY_FILTER, function (all, g1, g2) {
-    return g1 + ' \'' + g2 + '\' : ';
-  }).replace(REGEX_SP_FILTER, function (all, g1, match) {
+  })
+  //.replace(REGEX_OBJKEY_FILTER, (all, g1, g2) => g1 + ' \'' + g2 + '\' : ')
+  .replace(REGEX_SP_FILTER, function (all, g1, match) {
     return ' ' + SP_FILTER_LOOKUP[match] + ' ';
   }).replace(REGEX_SPACE_S_FILTER, function (all, match) {
     return match;
@@ -2416,11 +2432,6 @@ function _checkContentElem(obj$$1, parent, tmplRule, hasExProps, noSplitNewline)
   }, false, true);
 }
 
-var DEPRECATE_FILTER = {
-  //'?': '?:',
-  '//': '%%'
-};
-
 function _buildFn(content, node, fns, no, newContext$$1, level, useStringLocal, name) {
   var fnStr = '',
       useString = useStringLocal != null ? useStringLocal : fns.useString,
@@ -2491,7 +2502,7 @@ function _buildFn(content, node, fns, no, newContext$$1, level, useStringLocal, 
   return no;
 }
 
-function _buildOptions(config, useStringLocal, node, fns, exPropsStr, subExPropsStr, level, hashProps, valueL, parent, tagName, attrs) {
+function _buildOptions(config, useStringLocal, node, fns, exPropsStr, subExPropsStr, level, hashProps, parent, tagName, attrs) {
   var hashStr = ', useString: ' + (useStringLocal == null ? 'p1.us' : useStringLocal ? 'true' : 'false'),
       noConfig = !config;
 
@@ -2523,30 +2534,29 @@ function _buildOptions(config, useStringLocal, node, fns, exPropsStr, subExProps
     }
   }
 
-  return '{ _njOpts: true, _njFnsNo: ' + fns._no + ', global: p1, context: p2, outputH: ' + !fns.useString + hashStr + (valueL ? ', lastValue: ' + valueL : '') + (level != null ? ', level: ' + level : '') + ' }';
+  return '{ _njOpts: true, _njFnsNo: ' + fns._no + ', global: p1, context: p2, outputH: ' + !fns.useString + hashStr + (level != null ? ', level: ' + level : '') + ' }';
 }
 
 var CUSTOM_VAR = 'nj_custom';
+var OPERATORS = ['+', '-', '*', '/', '%', '===', '!==', '==', '!=', '<=', '>=', '=', '+=', '<', '>', '&&', '||', '?', ':'];
+var ASSIGN_OPERATORS = ['=', '+='];
+var SP_FILTER_REPLACE = {
+  'or': '||'
+};
 
-function _buildPropData(obj$$1, counter, fns, useStringLocal, level) {
+function _buildDataValue(ast, escape$$1, fns) {
   var dataValueStr = void 0,
-      escape$$1 = obj$$1.escape,
-      isEmpty = false,
       special = false;
-  var _obj$prop = obj$$1.prop,
-      isComputed = _obj$prop.isComputed,
-      hasSet = _obj$prop.hasSet;
+  var isBasicType = ast.isBasicType,
+      isComputed = ast.isComputed,
+      hasSet = ast.hasSet;
 
-  //先生成数据值
 
-  if (obj$$1.prop.isBasicType) {
-    dataValueStr = obj$$1.prop.name;
-  } else if (obj$$1.prop.isEmpty) {
-    isEmpty = true;
+  if (isBasicType) {
+    dataValueStr = ast.name;
   } else {
-    var _obj$prop2 = obj$$1.prop,
-        name = _obj$prop2.name,
-        parentNum = _obj$prop2.parentNum;
+    var name = ast.name,
+        parentNum = ast.parentNum;
 
     var data = '',
         specialP = false;
@@ -2561,8 +2571,10 @@ function _buildPropData(obj$$1, counter, fns, useStringLocal, level) {
         special = true;
         break;
       case 'this':
-        data = 'data[0]';
-        special = true;
+        data = 'data';
+        special = function special(data) {
+          return data + '[' + data + '.length - 1]';
+        };
         break;
       case '@data':
         data = 'data';
@@ -2625,6 +2637,9 @@ function _buildPropData(obj$$1, counter, fns, useStringLocal, level) {
       dataValueStr = (isComputed ? 'p1.c(' : '') + 'p2.d(\'' + name + '\'' + (isComputed || hasSet ? ', 0, true' : '') + ')' + (isComputed ? ', p2, ' + level + ')' : '');
     } else {
       var dataStr = special === CUSTOM_VAR ? data : 'p2.' + data;
+      if (isObject(special)) {
+        dataStr = special(dataStr);
+      }
       dataValueStr = special ? dataStr : (isComputed ? 'p1.c(' : '') + 'p2.d(\'' + name + '\', ' + dataStr + (isComputed || hasSet ? ', true' : '') + ')' + (isComputed ? ', p2, ' + level + ')' : '');
     }
   }
@@ -2632,100 +2647,148 @@ function _buildPropData(obj$$1, counter, fns, useStringLocal, level) {
     dataValueStr = _replaceBackslash(dataValueStr);
   }
 
-  //有过滤器时需要生成"_value"值
-  var filters$$1 = obj$$1.prop.filters;
-  if (filters$$1) {
-    var _firstFilter = filters$$1[0];
-    if (_firstFilter && _firstFilter.name == 'require') {
-      return 'require(' + _firstFilter.params[0].name + ')';
-    }
+  return _buildEscape(dataValueStr, fns, isBasicType || isComputed ? false : escape$$1, special);
+}
 
-    var counterValue = counter._value++;
-    var valueStr = '_value' + counterValue,
-        valueStrL = '_valueL' + counterValue,
-        filterStr = 'var ' + valueStr + ' = ' + (!isEmpty ? dataValueStr : 'null') + ', ' + valueStrL + ';\n';
+function replaceFilterName(name) {
+  var nameR = SP_FILTER_REPLACE[name];
+  return nameR != null ? nameR : name;
+}
 
-    var tmpStr = '_tmp';
-    if (!counter._tmp) {
-      //在同一函数作用域内_tmp变量只创建一次
-      filterStr += 'var ' + tmpStr + ';\n';
-      counter._tmp++;
-    }
+function buildExpression(ast, inObj, escape$$1, fns, useStringLocal, level) {
+  var codeStr = ast.filters && OPERATORS.indexOf(replaceFilterName(ast.filters[0].name)) < 0 ? '' : !inObj ? _buildDataValue(ast, escape$$1, fns) : ast.name;
+  var lastCodeStr = '';
 
-    each(filters$$1, function (o, i) {
-      var _filterC = counter._filter++,
-          configF = filterConfig[o.name],
-          hasOptions = !configF || configF.hasOptions,
-          filterVarStr = '_filter' + _filterC,
-          globalFilterStr = 'p1.f[\'' + o.name + '\']',
-          filterStrI = '',
-          fnHVarStr = void 0;
+  ast.filters && ast.filters.forEach(function (filter, i) {
+    var hasFilterNext = ast.filters[i + 1] && OPERATORS.indexOf(replaceFilterName(ast.filters[i + 1].name)) < 0;
+    var filterName = replaceFilterName(filter.name);
 
-      if (isEmpty && i == 0 && (!configF || !configF.hasOptions)) {
-        hasOptions = false;
-      }
-
-      if (configF && configF.onlyGlobal) {
-        //只能从全局获取
-        filterStr += '\nvar ' + filterVarStr + ' = ' + globalFilterStr + ';\n';
+    if (OPERATORS.indexOf(filterName) >= 0) {
+      //Native operator
+      if (ASSIGN_OPERATORS.indexOf(filterName) >= 0) {
+        codeStr += '._njCtx.' + (i == 0 ? ast.name : clearQuot(ast.filters[i - 1].params[0].name)) + ' ' + filterName + ' ';
       } else {
-        //优先从p2.data中获取
-        fnHVarStr = '_fnH' + counter._fnH++;
-        filterStr += '\nvar ' + filterVarStr + ';\n';
-        filterStr += 'var ' + fnHVarStr + ' = p2.d(\'' + o.name + '\', 0, true);\n';
-
-        filterStr += 'if (' + fnHVarStr + ') {\n';
-        filterStr += '  ' + filterVarStr + ' = ' + fnHVarStr + '.val;\n';
-        filterStr += '} else {\n';
-        filterStr += '  ' + filterVarStr + ' = ' + globalFilterStr + ';\n';
-        filterStr += '}\n';
-      }
-      {
-        filterStr += 'if (!' + filterVarStr + ') {\n';
-        filterStr += '  p1.wn(\'' + o.name + '\', \'f\');\n';
-        filterStr += '} else {\n';
-
-        var deprecateFilter = DEPRECATE_FILTER[o.name];
-        if (deprecateFilter) {
-          warn('The filter \"' + o.name + '\" is deprecated, please use \"' + deprecateFilter + '\" instead of it.');
-        }
+        codeStr += ' ' + filterName + ' ';
       }
 
-      var _filterStr = '  ' + tmpStr + ' = ' + filterVarStr + '.apply(' + (fnHVarStr ? fnHVarStr + ' ? ' + fnHVarStr + '._njCtx : p2' : 'p2') + ', [' + (!isEmpty || i > 0 ? valueStr + ', ' : '') + (o.params && o.params.length ? o.params.reduce(function (p, c, i, arr) {
-        var propStr = _buildPropData({
-          prop: c,
-          escape: escape$$1
-        }, counter, fns, useStringLocal, level),
-            hasComma = hasOptions || i < arr.length - 1;
-
-        if (isString(propStr)) {
-          return p + propStr + (hasComma ? ', ' : '');
+      if (!ast.filters[i + 1] || OPERATORS.indexOf(replaceFilterName(ast.filters[i + 1].name)) >= 0) {
+        if (filter.params[0].filters) {
+          codeStr += '(';
+          codeStr += buildExpression(filter.params[0], null, escape$$1, fns, useStringLocal, level);
+          codeStr += ')';
         } else {
-          filterStrI += propStr.filterStr;
-          return p + propStr.valueStr + (hasComma ? ', ' : '');
+          codeStr += _buildDataValue(filter.params[0], escape$$1, fns);
         }
-      }, '') : '') + (hasOptions ? _buildOptions(configF, useStringLocal, null, fns, null, null, level, null, valueStrL) : '') + ']);\n';
-      _filterStr += '  ' + valueStrL + ' = ' + valueStr + ';\n';
-      _filterStr += '  ' + valueStr + ' = ' + tmpStr + ';\n';
-
-      if (filterStrI !== '') {
-        filterStr += filterStrI;
       }
-      filterStr += _filterStr;
-
-      {
-        filterStr += '}';
+    } else if (filterName === '_') {
+      //Call function
+      var _codeStr = 'p1.f[\'' + filterName + '\'](' + lastCodeStr;
+      if (filter.params.length) {
+        _codeStr += ', [';
+        filter.params.forEach(function (param, j) {
+          _codeStr += buildExpression(param, null, escape$$1, fns, useStringLocal, level);
+          if (j < filter.params.length - 1) {
+            _codeStr += ', ';
+          }
+        });
+        _codeStr += ']';
       }
-      filterStr += '\n';
-    }, false, true);
+      _codeStr += ')';
 
-    return {
-      valueStr: _buildEscape(valueStr, fns, isComputed ? false : escape$$1, special),
-      filterStr: filterStr
-    };
-  } else {
-    return _buildEscape(dataValueStr, fns, isComputed ? false : escape$$1, special);
-  }
+      if (hasFilterNext) {
+        lastCodeStr = _codeStr;
+      } else {
+        codeStr += _codeStr;
+        lastCodeStr = '';
+      }
+    } else {
+      //Custom filter
+      var startStr = void 0,
+          endStr = void 0,
+          isObj = void 0,
+          configF = void 0;
+      if (filterName === 'bracket') {
+        startStr = '(';
+        endStr = ')';
+      } else if (filterName === 'list') {
+        startStr = '[';
+        endStr = ']';
+      } else if (filterName === 'obj') {
+        startStr = '{ ';
+        endStr = ' }';
+        isObj = true;
+      } else {
+        if (filterName == 'require') {
+          startStr = 'require';
+        } else {
+          var filterStr = 'p1.f[\'' + filterName + '\']',
+              warnStr = 'p1.wn(\'' + filterName + '\', \'f\')',
+              isDev = "development" !== 'production';
+
+          configF = filterConfig[filterName];
+          if (configF && configF.onlyGlobal) {
+            startStr = isDev ? '(' + filterStr + ' || ' + warnStr + ')' : filterStr;
+          } else {
+            startStr = '(p2.d(\'' + filterName + '\') || ' + filterStr + (isDev ? ' || ' + warnStr : '') + ')';
+          }
+        }
+        startStr += '(';
+        endStr = ')';
+      }
+
+      var _codeStr2 = startStr;
+      if (ast.isEmpty && i == 0) {
+        //Method
+        filter.params.forEach(function (param, j) {
+          _codeStr2 += buildExpression(param, isObj, escape$$1, fns, useStringLocal, level);
+          if (j < filter.params.length - 1) {
+            _codeStr2 += ', ';
+          }
+        });
+      } else {
+        //Operator
+        if (i == 0) {
+          _codeStr2 += _buildDataValue(ast, escape$$1, fns);
+        } else if (lastCodeStr !== '') {
+          _codeStr2 += lastCodeStr;
+        } else {
+          if (ast.filters[i - 1].params[0].filters) {
+            _codeStr2 += buildExpression(ast.filters[i - 1].params[0], null, escape$$1, fns, useStringLocal, level);
+          } else {
+            _codeStr2 += _buildDataValue(ast.filters[i - 1].params[0], escape$$1, fns);
+          }
+        }
+
+        filter.params && filter.params.forEach(function (param, j) {
+          _codeStr2 += ', ';
+          if (param.filters) {
+            _codeStr2 += buildExpression(param, null, escape$$1, fns, useStringLocal, level);
+          } else {
+            _codeStr2 += _buildDataValue(param, escape$$1, fns);
+          }
+        });
+
+        var nextFilter = ast.filters[i + 1];
+        if (filterName === '.' && nextFilter && replaceFilterName(nextFilter.name) === '_') {
+          _codeStr2 += ', true';
+        }
+
+        if (!configF || configF.hasOptions) {
+          _codeStr2 += ', ' + _buildOptions(configF, useStringLocal, null, fns, null, null, level);
+        }
+      }
+      _codeStr2 += endStr;
+
+      if (hasFilterNext) {
+        lastCodeStr = _codeStr2;
+      } else {
+        codeStr += _codeStr2;
+        lastCodeStr = '';
+      }
+    }
+  });
+
+  return codeStr;
 }
 
 function _buildEscape(valueStr, fns, escape$$1, special) {
@@ -2749,25 +2812,16 @@ function _replaceBackslash(str) {
   return str = str.replace(/\\/g, '\\\\');
 }
 
-function _buildProps(obj$$1, counter, fns, useStringLocal, level) {
+function _buildProps(obj$$1, fns, useStringLocal, level) {
   var str0 = obj$$1.strs[0],
-      valueStr = '',
-      filterStr = '';
+      valueStr = '';
 
   if (isString(str0)) {
     //常规属性
     valueStr = !obj$$1.isAll && str0 !== '' ? '\'' + _replaceStrs(str0) + '\'' : '';
-    filterStr = '';
 
     each(obj$$1.props, function (o, i) {
-      var propData = _buildPropData(o, counter, fns, useStringLocal, level),
-          dataValueStr = void 0;
-      if (isString(propData)) {
-        dataValueStr = propData;
-      } else {
-        dataValueStr = propData.valueStr;
-        filterStr += propData.filterStr;
-      }
+      var dataValueStr = buildExpression(o.prop, null, o.escape, fns, useStringLocal, level);
 
       if (!obj$$1.isAll) {
         var strI = obj$$1.strs[i + 1],
@@ -2779,6 +2833,8 @@ function _buildProps(obj$$1, counter, fns, useStringLocal, level) {
         // }
 
         dataValueStr = prefixStr + '(' + dataValueStr + ')' + (strI !== '' ? ' + \'' + _replaceStrs(strI) + '\'' : '');
+      } else {
+        dataValueStr = '(' + dataValueStr + ')';
       }
 
       valueStr += dataValueStr;
@@ -2816,15 +2872,7 @@ function _buildProps(obj$$1, counter, fns, useStringLocal, level) {
     valueStr += '}';
   }
 
-  if (filterStr === '') {
-    return valueStr;
-  } else {
-    //包含过滤器
-    return {
-      valueStr: valueStr,
-      filterStr: filterStr
-    };
-  }
+  return valueStr;
 }
 
 function _buildPropsEx(isSub, paramsEC, propsEx, fns, counter, useString, exPropsStr, subExPropsStr, tagName, attrs) {
@@ -2863,16 +2911,11 @@ function _buildParams(node, fns, counter, useString, level, exPropsStr, subExPro
 
     if (params) {
       var paramKeys = Object.keys(params),
-          len = paramKeys.length,
-          filterStr = '';
+          len = paramKeys.length;
 
       paramsStr += '{\n';
       each(paramKeys, function (k, i) {
-        var valueStr = _buildProps(params[k], counter, fns, useString, level);
-        if (isObject(valueStr)) {
-          filterStr += valueStr.filterStr;
-          valueStr = valueStr.valueStr;
-        }
+        var valueStr = _buildProps(params[k], fns, useString, level);
 
         if (!useStringF && k === 'style') {
           //将style字符串转换为对象
@@ -2887,10 +2930,6 @@ function _buildParams(node, fns, counter, useString, level, exPropsStr, subExPro
         paramsStr += '  \'' + key + '\': ' + (!onlyKey ? valueStr : !useString ? 'true' : '\'' + key + '\'') + (i < len - 1 ? ',\n' : '');
       }, false, false);
       paramsStr += '\n};\n';
-
-      if (filterStr !== '') {
-        paramsStr = filterStr + paramsStr;
-      }
     }
 
     if (hasPropsEx) {
@@ -2933,20 +2972,12 @@ function _buildNode(node, parent, fns, counter, retType, level, useStringLocal, 
 
   if (node.type === 'nj_plaintext') {
     //文本节点
-    var valueStr = _buildProps(node.content[0], counter, fns, useStringLocal, level),
-        filterStr = void 0;
-    if (isObject(valueStr)) {
-      filterStr = valueStr.filterStr;
-      valueStr = valueStr.valueStr;
-    }
+    var valueStr = _buildProps(node.content[0], fns, useStringLocal, level);
     if (valueStr === '') {
       return fnStr;
     }
 
     var textStr = _buildRender(node, parent, 1, retType, { text: valueStr }, fns, level, useStringLocal, node.allowNewline, isFirst);
-    if (filterStr) {
-      textStr = filterStr + textStr;
-    }
 
     if (useStringF) {
       fnStr += textStr;
@@ -2959,7 +2990,6 @@ function _buildNode(node, parent, fns, counter, retType, level, useStringLocal, 
     var _exC = counter._ex++,
         _dataReferC = counter._dataRefer++,
         dataReferStr = '',
-        _filterStr2 = '',
         configE = extensionConfig[node.ex],
         exVarStr = '_ex' + _exC,
         globalExStr = 'p1.x[\'' + node.ex + '\']',
@@ -2986,12 +3016,7 @@ function _buildNode(node, parent, fns, counter, retType, level, useStringLocal, 
     if (node.args) {
       //构建匿名参数
       each(node.args, function (arg, i) {
-        var valueStr = _buildProps(arg, counter, fns, useStringLocal, level);
-        if (isObject(valueStr)) {
-          _filterStr2 += valueStr.filterStr;
-          valueStr = valueStr.valueStr;
-        }
-
+        var valueStr = _buildProps(arg, fns, useStringLocal, level);
         dataReferStr += '  ' + valueStr + ',';
       }, false, true);
     }
@@ -3016,16 +3041,12 @@ function _buildNode(node, parent, fns, counter, retType, level, useStringLocal, 
         paramsStr = retP[0],
         _paramsC = retP[1];
 
-    dataReferStr += _buildOptions(configE, useStringLocal, node, fns, exPropsStr, subExPropsStr, level, paramsStr !== '' ? '_params' + _paramsC : null, null, parent, tagName, attrs);
+    dataReferStr += _buildOptions(configE, useStringLocal, node, fns, exPropsStr, subExPropsStr, level, paramsStr !== '' ? '_params' + _paramsC : null, parent, tagName, attrs);
     dataReferStr += '\n];\n';
 
     //添加匿名参数
     if (paramsStr !== '') {
       dataReferStr += 'p1.aa(_params' + _paramsC + ', _dataRefer' + _dataReferC + ');\n';
-    }
-
-    if (_filterStr2 !== '') {
-      dataReferStr = _filterStr2 + dataReferStr;
     }
 
     fnStr += paramsStr + dataReferStr;
@@ -3050,11 +3071,7 @@ function _buildNode(node, parent, fns, counter, retType, level, useStringLocal, 
         _tagName = '_type' + _typeC;
 
     if (node.typeRefer) {
-      var valueStrT = _buildProps(node.typeRefer, counter, fns, level);
-      if (isObject(valueStrT)) {
-        fnStr += valueStrT.filterStr;
-        valueStrT = valueStrT.valueStr;
-      }
+      var valueStrT = _buildProps(node.typeRefer, fns, level);
 
       _typeRefer = valueStrT;
       _type = node.typeRefer.props[0].prop.name;

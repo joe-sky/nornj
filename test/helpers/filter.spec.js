@@ -45,11 +45,11 @@ describe('Filter', () => {
   });
 
   it('?:', () => {
-    expect(render('{{ 1 > 2 ?: (true, false) }}')).toBe(false);
+    expect(render('{{ 1 > 2 ? true : false }}')).toBe(false);
   });
 
   it('!', () => {
-    expect(render('{{ true | ! }}')).toBe(false);
+    expect(render('{{ !true }}')).toBe(false);
   });
 
   it('+', () => {
@@ -73,15 +73,15 @@ describe('Filter', () => {
   });
 
   it('&&', () => {
-    expect(render("{{ 1 == '1' && (1 == '2') }}")).toBe(false);
+    expect(render("{{ 1=='1' && 1 == '2' }}")).toBe(false);
   });
 
   it('||', () => {
-    expect(render("{{ 1 == '1' || (1 == '2') }}")).toBe(true);
+    expect(render("{{ 1 == '1' || 1=='2' }}")).toBe(true);
   });
 
   it('int & float', () => {
-    expect(render("{{ 20.5 | int * (10.05 | float) + (2 ** 3) + (19 %% 2) }}")).toBe(218);
+    expect(render("{{ 20.5 | int * (10.05 | float) + 2 ** 3 + 19 %% 2 }}")).toBe(218);
   });
 
   it('bool', () => {

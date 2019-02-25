@@ -5,7 +5,7 @@ import { getComputedData, styleProps } from '../transforms/transformData';
 //Global filter list
 export const filters = {
   //Get properties
-  '.': (obj, prop) => {
+  '.': (obj, prop, callFn) => {
     if (obj == null) {
       return obj;
     }
@@ -16,18 +16,19 @@ export const filters = {
         prop
       };
     }
+    else if (callFn) {
+      return {
+        obj,
+        prop
+      };
+    }
 
     return obj[prop];
   },
 
-  //Call method
-  _: function (method) {
-    if (method == null) {
-      return method;
-    }
-
-    const args = arguments;
-    return method.apply(args[args.length - 1].lastValue, tools.arraySlice(args, 1, args.length - 1));
+  //Call function
+  _: function (fn, args) {
+    return fn != null ? fn.obj[fn.prop].call(fn.obj, args) : null;
   },
 
   //Get computed properties
@@ -222,6 +223,44 @@ filters['?'] = filters['?:'];
 filterConfig['?'] = filterConfig['?:'];
 filters['//'] = filters['%%'];
 filterConfig['//'] = filterConfig['%%'];
+
+export const operators = [
+  '+=',
+  '+',
+  '-',
+  '**',
+  '*',
+  '%%',
+  '%',
+  '===',
+  '!==',
+  '==',
+  '!=',
+  '<=>',
+  '<=',
+  '>=',
+  '=',
+  '..<',
+  '<',
+  '>',
+  '&&',
+  '||',
+  '?:',
+  '?',
+  ':',
+  '../',
+  '..',
+  '/'
+];
+
+const REGEX_OPERATORS_ESCAPE = /\*|\||\/|\.|\?|\+/g;
+function _createRegexOperators() {
+  return new RegExp(operators.map(o => {
+    return o.replace(REGEX_OPERATORS_ESCAPE, match => '\\' + match);
+  }).join('|'), 'g');
+}
+
+nj.REGEX_OPERATORS = _createRegexOperators();
 
 //Register filter and also can batch add
 export function registerFilter(name, filter, options, mergeConfig) {

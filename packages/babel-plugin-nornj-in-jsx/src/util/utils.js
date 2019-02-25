@@ -1,5 +1,5 @@
 function setTmplConfig(opts) {
-  if(nj._alreadySetConfigs) {
+  if (nj._alreadySetConfigs) {
     return;
   }
 
@@ -39,6 +39,11 @@ function setTmplConfig(opts) {
   nj._alreadySetConfigs = true;
 }
 
+function lowerFirst(str) {
+  return str[0].toLowerCase() + str.substr(1);
+}
+
 module.exports = {
-  setTmplConfig
+  setTmplConfig,
+  lowerFirst
 };
