@@ -5,10 +5,10 @@ import { unescape } from '../utils/escape';
 import { extensionConfig } from '../helpers/extension';
 import { filterConfig } from '../helpers/filter';
 const { errorTitle } = nj;
-const DEPRECATE_FILTER = {
-  //'?': '?:',
-  '//': '%%'
-};
+// const DEPRECATE_FILTER = {
+//   //'?': '?:',
+//   '//': '%%'
+// };
 
 function _buildFn(content, node, fns, no, newContext, level, useStringLocal, name) {
   let fnStr = '',
@@ -118,7 +118,7 @@ const SP_FILTER_REPLACE = {
   'or': '||'
 };
 
-function _buildDataValue(ast, escape, fns) {
+function _buildDataValue(ast, escape, fns, level) {
   let dataValueStr, special = false;
   const { isBasicType, isComputed, hasSet } = ast;
 
@@ -222,7 +222,7 @@ function replaceFilterName(name) {
 }
 
 export function buildExpression(ast, inObj, escape, fns, useStringLocal, level) {
-  let codeStr = (ast.filters && OPERATORS.indexOf(replaceFilterName(ast.filters[0].name)) < 0) ? '' : (!inObj ? _buildDataValue(ast, escape, fns) : ast.name);
+  let codeStr = (ast.filters && OPERATORS.indexOf(replaceFilterName(ast.filters[0].name)) < 0) ? '' : (!inObj ? _buildDataValue(ast, escape, fns, level) : ast.name);
   let lastCodeStr = '';
 
   ast.filters && ast.filters.forEach((filter, i) => {
@@ -244,7 +244,7 @@ export function buildExpression(ast, inObj, escape, fns, useStringLocal, level) 
           codeStr += ')';
         }
         else {
-          codeStr += _buildDataValue(filter.params[0], escape, fns);
+          codeStr += _buildDataValue(filter.params[0], escape, fns, level);
         }
       }
     }
@@ -272,6 +272,7 @@ export function buildExpression(ast, inObj, escape, fns, useStringLocal, level) 
     }
     else {  //Custom filter
       let startStr, endStr, isObj, configF;
+      const isMethod = ast.isEmpty && i == 0;
       if (filterName === 'bracket') {
         startStr = '(';
         endStr = ')';
@@ -299,7 +300,7 @@ export function buildExpression(ast, inObj, escape, fns, useStringLocal, level) 
             startStr = isDev ? `(${filterStr} || ${warnStr})` : filterStr;
           }
           else {
-            startStr = `(p2.d('${filterName}') || ${filterStr}${isDev ? ` || ${warnStr}` : ''})`;
+            startStr = `p1.cf(p2.d('${filterName}', 0, true) || ${filterStr}${isDev ? ` || ${warnStr}` : ''})`;
           }
         }
         startStr += '(';
@@ -307,7 +308,7 @@ export function buildExpression(ast, inObj, escape, fns, useStringLocal, level) 
       }
 
       let _codeStr = startStr;
-      if (ast.isEmpty && i == 0) {  //Method
+      if (isMethod) {  //Method
         filter.params.forEach((param, j) => {
           _codeStr += buildExpression(param, isObj, escape, fns, useStringLocal, level);
           if (j < filter.params.length - 1) {
@@ -317,7 +318,7 @@ export function buildExpression(ast, inObj, escape, fns, useStringLocal, level) 
       }
       else {  //Operator
         if (i == 0) {
-          _codeStr += _buildDataValue(ast, escape, fns);
+          _codeStr += _buildDataValue(ast, escape, fns, level);
         }
         else if (lastCodeStr !== '') {
           _codeStr += lastCodeStr;
@@ -327,7 +328,7 @@ export function buildExpression(ast, inObj, escape, fns, useStringLocal, level) 
             _codeStr += buildExpression(ast.filters[i - 1].params[0], null, escape, fns, useStringLocal, level);
           }
           else {
-            _codeStr += _buildDataValue(ast.filters[i - 1].params[0], escape, fns);
+            _codeStr += _buildDataValue(ast.filters[i - 1].params[0], escape, fns, level);
           }
         }
 
@@ -337,7 +338,7 @@ export function buildExpression(ast, inObj, escape, fns, useStringLocal, level) 
             _codeStr += buildExpression(param, null, escape, fns, useStringLocal, level);
           }
           else {
-            _codeStr += _buildDataValue(param, escape, fns);
+            _codeStr += _buildDataValue(param, escape, fns, level);
           }
         });
 

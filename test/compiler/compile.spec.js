@@ -369,8 +369,8 @@ describe('Precompile', () => {
       p2.d('a', 0, true)._njCtx.a = '123' + '456'
     `;
 
-    console.log(ret.main.toString());
-    console.log(render(`{{ 1 == '1' || 1 == '2' }}`));
+    //console.log(ret.main.toString());
+    //console.log(render(`{{ 1 == '1' || 1 == '2' }}`));
     // var _v0 = null;
     // console.log('1' + (_v0 && _v0()) + 3);
   });

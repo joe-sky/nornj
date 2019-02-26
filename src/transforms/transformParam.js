@@ -139,6 +139,8 @@ const REGEX_ARR_OBJ_FILTER = /\[|\]|\{|\}/g;
 const REGEX_SET_FILTER = /^[\s]*set[\s]+|([(,])[\s]*set[\s]+/g;
 const REGEX_BRACKET_FILTER = /^[\s]*([(]+)|([(,])[\s]*([(]+)/g;
 const NOT_OPERATORS = ['../'];
+const REGEX_NEGATIVE = /-[0-9]/;
+const BEGIN_CHARS = ['', '(', '[', ','];
 
 function _getProp(matchArr, innerQuotes, i, addSet) {
   let prop = matchArr[2].trim(),
@@ -157,8 +159,20 @@ function _getProp(matchArr, innerQuotes, i, addSet) {
     .replace(REGEX_QUOTE, match => {
       innerQuotes.push(match);
       return '_njQs' + (innerQuotes.length - 1) + '_';
-    })
-    .replace(nj.REGEX_OPERATORS, match => NOT_OPERATORS.indexOf(match) < 0 ? ` ${match} ` : match)
+    });
+  prop = prop.replace(nj.REGEX_OPERATORS, (match, index) => {
+    if (REGEX_NEGATIVE.test(match)) {
+      if (index > 0 && BEGIN_CHARS.indexOf(prop[index - 1].trim()) < 0) {  //Example: 123-456
+        return match.split('-').join(' - ');
+      }
+      else {  //Example: -123+456
+        return match;
+      }
+    }
+    else {
+      return NOT_OPERATORS.indexOf(match) < 0 ? ` ${match} ` : match;
+    }
+  })
     .replace(REGEX_PROP_FILTER, (all, g1) => {
       const startWithHash = g1[0] === '#';
       if (startWithHash) {

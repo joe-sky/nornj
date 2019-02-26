@@ -80,13 +80,13 @@ describe('test speed', function() {
               </#if>
             </#props>
             <span>span{no}</span>
-            <i>{no | -(1) | ?(10, 20)}</i>
+            <i>{no-1 ? 10 : 20}</i>
           </div>
         </#each>
       </span>
       <#if {@index | five(1)}>
         <br />
-        <#elseif {@index | >=(1)}>
+        <#elseif {@index >= 1}>
           <img name="elseif" />
         </#elseif>
         <#else>
@@ -240,7 +240,7 @@ describe('test speed', function() {
   };
 
   var _tmpl = Nj `
-  <{div} id="{num}_100">{...props}
+  <{div} id="{num}_100" {...props}>
     &nbsp;1&gt;2
     <#each {arr}>
       <TestComp id={'false'}>
@@ -248,7 +248,7 @@ describe('test speed', function() {
           <span>{text}</span>
         </#tmpl>
         <#tmpl {'t2'}>
-          <span key={@index}>{this}test!</span>
+          <span key={@index}>{@item}test!</span>
         </#tmpl>
       </TestComp>
       <span class=test_{@index}

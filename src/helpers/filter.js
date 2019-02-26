@@ -28,7 +28,7 @@ export const filters = {
 
   //Call function
   _: function (fn, args) {
-    return fn != null ? fn.obj[fn.prop].call(fn.obj, args) : null;
+    return fn != null ? fn.obj[fn.prop].apply(fn.obj, args) : null;
   },
 
   //Get computed properties
@@ -43,41 +43,13 @@ export const filters = {
     }, options.context, options.level);
   },
 
-  '=': (obj, val) => {
-    if (obj == null) {
-      return obj;
-    }
+  // '=': (obj, val) => {
+  //   if (obj == null) {
+  //     return obj;
+  //   }
 
-    obj._njCtx[obj.prop] = val;
-  },
-
-  '==': (val1, val2) => val1 == val2,
-
-  '===': (val1, val2) => val1 === val2,
-
-  '!=': (val1, val2) => val1 != val2,
-
-  '!==': (val1, val2) => val1 !== val2,
-
-  //Less than
-  '<': (val1, val2) => val1 < val2,
-
-  '<=': (val1, val2) => val1 <= val2,
-
-  //Greater than
-  '>': (val1, val2) => val1 > val2,
-
-  '>=': (val1, val2) => val1 >= val2,
-
-  '+': (val1, val2) => val1 + val2,
-
-  '-': (val1, val2) => val1 - val2,
-
-  '*': (val1, val2) => val1 * val2,
-
-  '/': (val1, val2) => val1 / val2,
-
-  '%': (val1, val2) => val1 % val2,
+  //   obj._njCtx[obj.prop] = val;
+  // },
 
   '**': (val1, val2) => Math.pow(val1, val2),
 
@@ -87,10 +59,6 @@ export const filters = {
   '?:': (val, val1, val2) => val ? val1 : val2,
 
   '!': val => !val,
-
-  '&&': (val1, val2) => val1 && val2,
-
-  or: (val1, val2) => val1 || val2,
 
   //Convert to int 
   int: val => parseInt(val, 10),
@@ -105,29 +73,6 @@ export const filters = {
     }
 
     return Boolean(val);
-  },
-
-  obj: function () {
-    let args = arguments,
-      ret = {};
-
-    tools.each(args, (v, i) => {
-      ret[v.key] = v.val;
-    }, false, true);
-    return ret;
-  },
-
-  ':': (key, val) => {
-    return { key, val };
-  },
-
-  list: function () {
-    let args = arguments;
-    if (args.length === 0) {
-      return [];
-    } else {
-      return tools.arraySlice(args, 0, args.length);
-    }
   },
 
   reg: (pattern, flags) => new RegExp(pattern, flags),
@@ -151,8 +96,6 @@ export const filters = {
       return -1;
     }
   },
-
-  bracket: val => val,
 
   capitalize: str => tools.capitalize(str)
 };
@@ -182,51 +125,29 @@ export const filterConfig = {
   '.': _config(_defaultCfg),
   '_': _config({ onlyGlobal: true }),
   '#': _config({ onlyGlobal: true }),
-  '==': _config(_defaultCfg),
-  '===': _config(_defaultCfg),
-  '!=': _config(_defaultCfg),
-  '!==': _config(_defaultCfg),
-  '<': _config(_defaultCfg),
-  '<=': _config(_defaultCfg),
-  '>': _config(_defaultCfg),
-  '>=': _config(_defaultCfg),
-  '+': _config(_defaultCfg),
-  '-': _config(_defaultCfg),
-  '*': _config(_defaultCfg),
-  '/': _config(_defaultCfg),
-  '%': _config(_defaultCfg),
   '**': _config(_defaultCfg),
   '%%': _config(_defaultCfg),
   '?:': _config(_defaultCfg),
   '!': _config(_defaultCfg),
-  '&&': _config(_defaultCfg),
-  or: _config(_defaultCfg),
   int: _config(_defaultCfg),
   float: _config(_defaultCfg),
   bool: _config(_defaultCfg),
-  obj: _config(_defaultCfg),
-  ':': _config(_defaultCfg),
-  list: _config(_defaultCfg),
   reg: _config(_defaultCfg),
   css: _config(_defaultCfg),
   '..': _config(_defaultCfg),
   rLt: _config(_defaultCfg),
   '<=>': _config(_defaultCfg),
-  bracket: _config(_defaultCfg),
   capitalize: _config(_defaultCfg)
 };
 
 //Filter alias
 filters.prop = filters['.'];
 filterConfig.prop = filterConfig['.'];
-filters['?'] = filters['?:'];
-filterConfig['?'] = filterConfig['?:'];
-filters['//'] = filters['%%'];
-filterConfig['//'] = filterConfig['%%'];
 
 export const operators = [
   '+=',
   '+',
+  '-[0-9]',
   '-',
   '**',
   '*',

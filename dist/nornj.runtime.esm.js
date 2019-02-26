@@ -635,6 +635,10 @@ function createElementApply(p) {
   return nj.createElement.apply(null, p);
 }
 
+function callFilter(filter) {
+  return filter._njCtx ? filter.val.bind(filter._njCtx) : filter;
+}
+
 //创建模板函数
 function template(fns) {
   var configs = {
@@ -654,7 +658,8 @@ function template(fns) {
     aa: addArgs,
     an: assign,
     g: nj.global,
-    l: _getLevel
+    l: _getLevel,
+    cf: callFilter
   };
 
   if (!configs.us) {
@@ -1185,7 +1190,7 @@ var filters = {
 
   //Call function
   _: function _(fn, args) {
-    return fn != null ? fn.obj[fn.prop].call(fn.obj, args) : null;
+    return fn != null ? fn.obj[fn.prop].apply(fn.obj, args) : null;
   },
 
   //Get computed properties
@@ -1200,67 +1205,13 @@ var filters = {
     }, options.context, options.level);
   },
 
-  '=': function _(obj$$1, val) {
-    if (obj$$1 == null) {
-      return obj$$1;
-    }
+  // '=': (obj, val) => {
+  //   if (obj == null) {
+  //     return obj;
+  //   }
 
-    obj$$1._njCtx[obj$$1.prop] = val;
-  },
-
-  '==': function _(val1, val2) {
-    return val1 == val2;
-  },
-
-  '===': function _(val1, val2) {
-    return val1 === val2;
-  },
-
-  '!=': function _(val1, val2) {
-    return val1 != val2;
-  },
-
-  '!==': function _(val1, val2) {
-    return val1 !== val2;
-  },
-
-  //Less than
-  '<': function _(val1, val2) {
-    return val1 < val2;
-  },
-
-  '<=': function _(val1, val2) {
-    return val1 <= val2;
-  },
-
-  //Greater than
-  '>': function _(val1, val2) {
-    return val1 > val2;
-  },
-
-  '>=': function _(val1, val2) {
-    return val1 >= val2;
-  },
-
-  '+': function _(val1, val2) {
-    return val1 + val2;
-  },
-
-  '-': function _(val1, val2) {
-    return val1 - val2;
-  },
-
-  '*': function _(val1, val2) {
-    return val1 * val2;
-  },
-
-  '/': function _(val1, val2) {
-    return val1 / val2;
-  },
-
-  '%': function _(val1, val2) {
-    return val1 % val2;
-  },
+  //   obj._njCtx[obj.prop] = val;
+  // },
 
   '**': function _(val1, val2) {
     return Math.pow(val1, val2);
@@ -1277,14 +1228,6 @@ var filters = {
 
   '!': function _(val) {
     return !val;
-  },
-
-  '&&': function _(val1, val2) {
-    return val1 && val2;
-  },
-
-  or: function or(val1, val2) {
-    return val1 || val2;
   },
 
   //Convert to int 
@@ -1304,29 +1247,6 @@ var filters = {
     }
 
     return Boolean(val);
-  },
-
-  obj: function obj$$1() {
-    var args = arguments,
-        ret = {};
-
-    each(args, function (v, i) {
-      ret[v.key] = v.val;
-    }, false, true);
-    return ret;
-  },
-
-  ':': function _(key, val) {
-    return { key: key, val: val };
-  },
-
-  list: function list() {
-    var args = arguments;
-    if (args.length === 0) {
-      return [];
-    } else {
-      return arraySlice(args, 0, args.length);
-    }
   },
 
   reg: function reg(pattern, flags) {
@@ -1353,10 +1273,6 @@ var filters = {
     } else {
       return -1;
     }
-  },
-
-  bracket: function bracket(val) {
-    return val;
   },
 
   capitalize: function capitalize$$1(str) {
@@ -1391,49 +1307,26 @@ var filterConfig = {
   '.': _config$1(_defaultCfg$1),
   '_': _config$1({ onlyGlobal: true }),
   '#': _config$1({ onlyGlobal: true }),
-  '==': _config$1(_defaultCfg$1),
-  '===': _config$1(_defaultCfg$1),
-  '!=': _config$1(_defaultCfg$1),
-  '!==': _config$1(_defaultCfg$1),
-  '<': _config$1(_defaultCfg$1),
-  '<=': _config$1(_defaultCfg$1),
-  '>': _config$1(_defaultCfg$1),
-  '>=': _config$1(_defaultCfg$1),
-  '+': _config$1(_defaultCfg$1),
-  '-': _config$1(_defaultCfg$1),
-  '*': _config$1(_defaultCfg$1),
-  '/': _config$1(_defaultCfg$1),
-  '%': _config$1(_defaultCfg$1),
   '**': _config$1(_defaultCfg$1),
   '%%': _config$1(_defaultCfg$1),
   '?:': _config$1(_defaultCfg$1),
   '!': _config$1(_defaultCfg$1),
-  '&&': _config$1(_defaultCfg$1),
-  or: _config$1(_defaultCfg$1),
   int: _config$1(_defaultCfg$1),
   float: _config$1(_defaultCfg$1),
   bool: _config$1(_defaultCfg$1),
-  obj: _config$1(_defaultCfg$1),
-  ':': _config$1(_defaultCfg$1),
-  list: _config$1(_defaultCfg$1),
   reg: _config$1(_defaultCfg$1),
   css: _config$1(_defaultCfg$1),
   '..': _config$1(_defaultCfg$1),
   rLt: _config$1(_defaultCfg$1),
   '<=>': _config$1(_defaultCfg$1),
-  bracket: _config$1(_defaultCfg$1),
   capitalize: _config$1(_defaultCfg$1)
 };
 
 //Filter alias
 filters.prop = filters['.'];
 filterConfig.prop = filterConfig['.'];
-filters['?'] = filters['?:'];
-filterConfig['?'] = filterConfig['?:'];
-filters['//'] = filters['%%'];
-filterConfig['//'] = filterConfig['%%'];
 
-var operators = ['+=', '+', '-', '**', '*', '%%', '%', '===', '!==', '==', '!=', '<=>', '<=', '>=', '=', '..<', '<', '>', '&&', '||', '?:', '?', ':', '../', '..', '/'];
+var operators = ['+=', '+', '-[0-9]', '-', '**', '*', '%%', '%', '===', '!==', '==', '!=', '<=>', '<=', '>=', '=', '..<', '<', '>', '&&', '||', '?:', '?', ':', '../', '..', '/'];
 
 var REGEX_OPERATORS_ESCAPE = /\*|\||\/|\.|\?|\+/g;
 function _createRegexOperators() {

@@ -227,6 +227,10 @@ function createElementApply(p) {
   return nj.createElement.apply(null, p);
 }
 
+function callFilter(filter) {
+  return filter._njCtx ? filter.val.bind(filter._njCtx) : filter;
+}
+
 //创建模板函数
 export function template(fns) {
   const configs = {
@@ -246,7 +250,8 @@ export function template(fns) {
     aa: addArgs,
     an: tools.assign,
     g: nj.global,
-    l: _getLevel
+    l: _getLevel,
+    cf: callFilter
   };
 
   if (!configs.us) {
