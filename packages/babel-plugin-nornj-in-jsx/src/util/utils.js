@@ -1,3 +1,5 @@
+const nj = require('nornj').default;
+
 function setTmplConfig(opts) {
   if (nj._alreadySetConfigs) {
     return;

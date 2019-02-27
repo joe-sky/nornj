@@ -219,6 +219,8 @@ function hasExPrefix(name) {
 }
 exports.hasExPrefix = hasExPrefix;
 
+const REGEX_LOWER_CASE = /^[a-z]/;
+
 exports.isExTag = function (nodeName) {
   let exPrefix = hasExPrefix(nodeName);
   let isSub;
@@ -237,7 +239,7 @@ exports.isExTag = function (nodeName) {
     isExTag = !isSub;
   }
   else {
-    isExTag = exConfig && !isSub && !needPrefix;
+    isExTag = exConfig && !isSub && (!needPrefix || (needPrefix == 'onlyUpperCase' && REGEX_LOWER_CASE.test(nodeName)));
   }
 
   return isExTag;
@@ -266,5 +268,5 @@ exports.isSubExTag = function (node) {
     needPrefix = exConfig.needPrefix;
   }
 
-  return exPrefix ? isSub : (isSub && !needPrefix);
+  return exPrefix ? isSub : (isSub && (!needPrefix || (needPrefix == 'onlyUpperCase' && REGEX_LOWER_CASE.test(nodeName))));
 };

@@ -345,7 +345,7 @@ export const extensions = {
   css: options => options.props.style
 };
 
-function _config(params) {
+function _config(params, extra) {
   let ret = {
     onlyGlobal: false,
     useString: false,
@@ -361,6 +361,9 @@ function _config(params) {
   if (params) {
     ret = tools.assign(ret, params);
   }
+  if (extra) {
+    ret = tools.assign(ret, extra);
+  }
   return ret;
 }
 
@@ -370,7 +373,7 @@ const _defaultCfg = { onlyGlobal: true, newContext: false };
 export const extensionConfig = {
   'if': _config(_defaultCfg),
   'else': _config({ onlyGlobal: true, newContext: false, subExProps: true, isSub: true }),
-  'switch': _config(_defaultCfg),
+  'switch': _config(_defaultCfg, { needPrefix: 'onlyUpperCase' }),
   unless: _config(_defaultCfg),
   each: _config({
     onlyGlobal: true,
@@ -393,14 +396,14 @@ export const extensionConfig = {
   prop: _config({ onlyGlobal: true, newContext: false, exProps: true, subExProps: true, isProp: true }),
   spread: _config({ onlyGlobal: true, newContext: false, exProps: true, subExProps: true, isProp: true }),
   obj: _config({ onlyGlobal: true, newContext: false }),
-  list: _config(_defaultCfg),
+  list: _config(_defaultCfg, { needPrefix: 'onlyUpperCase' }),
   'with': _config({ onlyGlobal: true, newContext: { getDatasFromProp: true } }),
   style: { useExpressionInJsx: false, needPrefix: true }
 };
 extensionConfig.elseif = _config(extensionConfig['else']);
 extensionConfig.fn = _config(extensionConfig['with']);
 extensionConfig.block = _config(extensionConfig.obj);
-extensionConfig.pre = tools.assign(_config(extensionConfig.obj), { needPrefix: true });
+extensionConfig.pre = _config(extensionConfig.obj, { needPrefix: true });
 extensionConfig.arg = _config(extensionConfig.prop);
 extensionConfig.once = _config(extensionConfig.obj);
 extensionConfig.show = _config(extensionConfig.prop);
@@ -412,7 +415,7 @@ extensionConfig['case'] = extensionConfig.elseif;
 extensions['empty'] = extensions['default'] = extensions['else'];
 extensionConfig['empty'] = extensionConfig['default'] = extensionConfig['else'];
 extensions.strProp = extensions.prop;
-extensionConfig.strProp = tools.assign(_config(extensionConfig.prop), { useString: true });
+extensionConfig.strProp = _config(extensionConfig.prop, { useString: true });
 extensions.strArg = extensions.arg;
 extensionConfig.strArg = _config(extensionConfig.strProp);
 
