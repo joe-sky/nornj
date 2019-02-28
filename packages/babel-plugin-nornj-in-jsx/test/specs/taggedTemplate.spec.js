@@ -9,6 +9,22 @@ describe('nj', function () {
   });
 });
 
+describe('nj.string', function () {
+  it('Simple usage', function () {
+    var Fixture = require('../fixtures/taggedTemplate/nj.string.jsx');
+    var rendered = util.render(Fixture);
+    expect(rendered).to.contain('<i>\n  content\n</i>');
+  });
+});
+
+describe('nj.expression', function () {
+  it('Simple usage', function () {
+    var Fixture = require('../fixtures/taggedTemplate/nj.expression.jsx');
+    var rendered = util.render(Fixture);
+    expect(rendered).to.contain('<i>content</i>');
+  });
+});
+
 describe('nj.template', function () {
   it('Simple usage', function () {
     var Fixture = require('../fixtures/taggedTemplate/nj.template.jsx');

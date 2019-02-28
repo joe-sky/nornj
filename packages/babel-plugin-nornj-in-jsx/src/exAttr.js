@@ -5,7 +5,7 @@ const generate = require('./util/generate');
 module.exports = function (babel) {
   const types = babel.types;
 
-  return function (node, file, state) {
+  return function (node, path, state) {
     const quasis = [];
     const expressions = [];
     const isJSXMemberExpression = types.isJSXMemberExpression(node.openingElement.name);
@@ -166,6 +166,6 @@ module.exports = function (babel) {
       }));
     }
 
-    return generate.createRenderTmpl(babel, quasis, expressions, state.opts);
+    return generate.createRenderTmpl(babel, quasis, expressions, state.opts, path);
   };
 };

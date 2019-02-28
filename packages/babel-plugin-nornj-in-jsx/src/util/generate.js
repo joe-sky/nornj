@@ -145,7 +145,7 @@ const CTX_DATAS = 'datas';
 const CTX_DATA = 'data';
 const CTX_GET_DATA = 'getData';
 
-function createRenderTmpl(babel, quasis, expressions, opts, taggedName) {
+function createRenderTmpl(babel, quasis, expressions, opts, path, taggedName) {
   const types = babel.types;
   const isTmplFnS = taggedName === 'njs';
   const isTmplFn = taggedName === 'nj' || isTmplFnS;
@@ -249,7 +249,13 @@ function createRenderTmpl(babel, quasis, expressions, opts, taggedName) {
   if (tmplParams.length) {
     renderFnParams.push(types.objectExpression(tmplParams));
   }
-  !isTmplFn && renderFnParams.push(types.thisExpression());
+  if (!isTmplFn) {
+    renderFnParams.push(path.scope.hasBinding('props') ? types.identifier('props') :
+      types.conditionalExpression(types.thisExpression(), types.memberExpression(
+        types.thisExpression(),
+        types.identifier('props')
+      ), types.nullLiteral()), types.thisExpression());
+  }
 
   return types.CallExpression(
     types.memberExpression(

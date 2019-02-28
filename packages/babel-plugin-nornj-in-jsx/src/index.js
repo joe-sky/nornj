@@ -19,7 +19,7 @@ module.exports = function (babel) {
         if (nodeName != null && astUtil.isExTag(nodeName)) {
           state.hasNjInJSX = true;
 
-          path.replaceWith(exTagHandler(path.node, path.hub.file, state));
+          path.replaceWith(exTagHandler(path.node, path, state));
         }
       },
       exit(path, state) {
@@ -36,7 +36,7 @@ module.exports = function (babel) {
             state.hasMobxWithNj = true;
           }
 
-          path.replaceWith(exAttrHandler(path.node, path.hub.file, state));
+          path.replaceWith(exAttrHandler(path.node, path, state));
         }
       }
     },
@@ -45,7 +45,7 @@ module.exports = function (babel) {
       if (TAGGED_TEMPLATES.indexOf(taggedName) >= 0) {
         state.hasNjInJSX = true;
 
-        path.replaceWith(taggedTemplateHandler(path.node, path.hub.file, state, taggedName));
+        path.replaceWith(taggedTemplateHandler(path.node, path, state, taggedName));
       }
     },
     ImportDeclaration(path, state) {

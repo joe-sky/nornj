@@ -5,7 +5,7 @@ const utils = require('./util/utils');
 module.exports = function (babel) {
   const types = babel.types;
 
-  return function (node, file, state) {
+  return function (node, path, state) {
     const quasis = [];
     const expressions = [];
     let elName = node.openingElement.name.name;
@@ -93,6 +93,6 @@ module.exports = function (babel) {
       }));
     }
 
-    return generate.createRenderTmpl(babel, quasis, expressions, state.opts);
+    return generate.createRenderTmpl(babel, quasis, expressions, state.opts, path);
   };
 };
