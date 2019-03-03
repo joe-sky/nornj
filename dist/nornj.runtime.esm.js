@@ -1,5 +1,5 @@
 /*!
-* NornJ template engine v5.0.0-alpha.2
+* NornJ template engine v5.0.0-alpha.6
 * (c) 2016-2019 Joe_Sky
 * Released under the MIT License.
 */
@@ -1193,7 +1193,7 @@ var filters = {
 
   //Call function
   _: function _(fn, args) {
-    return fn != null ? fn.obj[fn.prop].apply(fn.obj, args) : null;
+    return fn && fn.obj[fn.prop] != null ? fn.obj[fn.prop].apply(fn.obj, args) : null;
   },
 
   //Get computed properties
@@ -1445,6 +1445,9 @@ function _buildRender(outputH) {
       var tmplFn = function tmplFn() {
         return tmplMainFn.apply(this, arrayPush([params], arguments));
       };
+      defineProp(params, '_njParam', {
+        value: true
+      });
       defineProps(tmplFn, {
         _njTmpl: {
           value: true

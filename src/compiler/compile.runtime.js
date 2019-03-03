@@ -63,6 +63,9 @@ function _buildRender(outputH) {
       const tmplFn = function () {
         return tmplMainFn.apply(this, tools.arrayPush([params], arguments));
       };
+      tools.defineProp(params, '_njParam', {
+        value: true
+      });
       tools.defineProps(tmplFn, {
         _njTmpl: {
           value: true

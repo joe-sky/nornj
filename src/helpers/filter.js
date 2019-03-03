@@ -28,7 +28,7 @@ export const filters = {
 
   //Call function
   _: function (fn, args) {
-    return fn != null ? fn.obj[fn.prop].apply(fn.obj, args) : null;
+    return (fn && fn.obj[fn.prop] != null) ? fn.obj[fn.prop].apply(fn.obj, args) : null;
   },
 
   //Get computed properties
