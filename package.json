@@ -1,7 +1,7 @@
 {
   "name": "nornj",
   "version": "5.0.0-alpha.6",
-  "description": "A multipurpose javascript template engine, support both the rendering string and the react component.",
+  "description": "A powerful template engine that can works with React, JSX enhancement or alternative tools.",
   "main": "dist/nornj.common.js",
   "module": "dist/nornj.esm.js",
   "unpkg": "dist/nornj.js",
@@ -34,7 +34,9 @@
     "nornj",
     "nj",
     "template",
-    "react"
+    "react",
+    "jsx",
+    "babel"
   ],
   "repository": {
     "type": "git",

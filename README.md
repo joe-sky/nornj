@@ -10,7 +10,7 @@
 
 ```
 
-`NornJ`是一个**渲染高效**，**可读性好**，**扩展容易**，**适用性广**的javascript模板引擎。
+`NornJ`(读音[nɔ:n dʒeɪ]，简称`nj`)是一个可以同React一起工作的模板引擎，**JSX的增强或替代工具**。
 
 [![NPM Version][npm-image]][npm-url]
 <a href="https://www.npmjs.com/package/nornj"><img src="https://img.shields.io/npm/l/nornj.svg" alt="License"></a>
@@ -18,82 +18,97 @@
 <a href="https://codecov.io/gh/joe-sky/nornj"><img src="https://codecov.io/gh/joe-sky/nornj/branch/master/graph/badge.svg" alt="Codecov" /></a>
 [![NPM Downloads][downloads-image]][npm-url]
 
-## 在线文档
+## 文档
 
-* [NornJ指南(github pages)](https://joe-sky.github.io/nornj-guide)
-* [NornJ指南(gitbook)](https://joe-sky.gitbooks.io/nornj-guide)
+* [NornJ指南(github pages版)](https://joe-sky.github.io/nornj-guide)
+* [NornJ指南(gitbook版)](https://joe-sky.gitbooks.io/nornj-guide)
 
 ## 概述
 
-`NornJ`(读音[nɔ:n dʒeɪ]，简称`nj`)是一款同时支持渲染`纯字符串(html)`和`HyperScript(React vdom)`的模板引擎。
+`React`的`JSX`几乎可以使用`javascript`的全部语法且非常灵活，可配合`babel`适应各种复杂的使用场景。但是，使用`NornJ`配合`React`开发还能做得更好：
 
-> 什么是`HyperScript`?
+* 支持指令语法：```<img n-show={false} />```；
+* 支持流程控制语法：```<each of={[1, 2, 3]}>{item}</each>```；
+* 支持过滤器语法：```<button>{n`${'abc'} | capitalize`}</button>```；
+* 支持自定义运算符：```<input value={n`(1 .. 100).join('-')`} />```；
+* 还有更多...
 
-[`HyperScript`](https://github.com/hyperhype/hyperscript)可以说是一种创建用户界面元素的语法规范，即：`h (tag, attrs, [text?, Elements?,...])`语法。各大前端框架中对于它的应用，最著名的当属`React`。`React`的`createElement`方法即为`HyperScript`的一种实现，`React`使用它来创建`virtual dom`对象。
+上述这些可增强`JSX`的语法，`NornJ`模板引擎中还有很多，并且还可支持自由扩展。`NornJ`还同时提供了`JSX`和`tagged templates`两套几乎相同的语法API，以适应不同用户的口味 :wink:
 
-而`NornJ`可将同样语法规范的模板，转换为多种方式渲染：
+## 基本示例
 
-```
-                +---------------------+
-                ¦ <Template string /> ¦
-                +---------------------+
-                           |
-                           |
-           +-------------------------------+
-           |           render to           |
-           |                               |
- +-------------------+     +--------------------------------+
- ¦ pure string(html) ¦     ¦ HyperScript(React virtual dom) ¦
- +-------------------+     +--------------------------------+
-```
-
-因此，`NornJ`不但可以作为`Express`及`Koa`服务器的界面模板引擎，还可以作为`React`开发中`JSX`的替代品，解决`JSX`在表现流程控制语句等一些方面的不足。它的语法和`JSX`并不互相排斥，可共存一起运行。
-
-## 模板基本示例
-
-* 在单独的模板文件中编写
-
-```html
-<template name="partial">
-  <#if {{i > 0 || (i <= -10)}}>
-    <input id=test onclick={{click}}>
-  </#if>
-</template>
-
-<template>
-  <div>
-    <#each {{1 .. 20}}>
-      this the test demo Hello {{@index ** 2 | int}}
-    </#each>
-    <#include name="partial" />
-  </div>
-</template>
-```
-
-如上，`NornJ`的语法结构在尽量与html保持一致的同时，更有丰富的扩展语法去实现各种逻辑；且拥有`..`、`**`等js原生不支持的运算符，而且还可以自由扩展出更多的新语句与运算符!
-
-* 在js文件中像JSX那样编写
+* 直接在JSX中使用(结合[styled-jsx](https://github.com/zeit/styled-jsx))：
 
 ```js
-const props = { id: 'test', name: 'test' };
-
-const partial = nj`
-  <#if {{i > 0 || (i <= -10)}}>
-    <input onclick={{click}} ...${props}>
-  </#if>
-`;
-
-const template = nj`
-  <div>
-    <#each {{1 .. 20}}>
-      this the test demo Hello {{@index ** 2 | int}}
-    </#each>
-    #${partial}
-  </div>
-`;
+class App extends Component {
+  addTodo() {
+    const { todos = [] } = this.state;
+    this.setState({ todos: todos.concat(`Item ${todos.length}`) });
+  }
+  render({ page }, { todos = [] }) {
+    return (
+      <div className="app">
+        <style jsx>`
+          .app {
+            padding: 20px;
+            font-size: .75rem;
+          }
+        `</style>
+        <ul>
+          <each of={todos} item="todo">
+            <if condition={index > 5}>
+              <li>{todo * 2}</li>
+              <elseif condition={index > 10}>
+                <li>{todo * 3}</li>
+              </elseif>
+            </if>
+          </each>
+        </ul>
+        <button n-show={todos.length > 0} onClick={() => this.addTodo()}>Add Todo</button>
+      </div>
+    );
+  }
+}
 ```
 
-`NornJ`也同时支持像`JSX`那样在js文件中自由地编写，它使用`ES2015+`提供的`tagged template literals`语法；并且几乎所有JSX支持的特性，它也都是支持的!
+如上例，配合`NornJ`提供的[配套babel插件](https://github.com/joe-sky/nornj/tree/master/packages/babel-plugin-nornj-in-jsx)，便可以在`JSX`中编写各种新的增强语法。
+
+* 使用`tagged templates`语法(结合[styled-components](https://github.com/styled-components/styled-components))：
+
+```js
+const template = nj`
+  <Container>
+    <ul>
+      <#each of={todos}>
+        <#if {@index > 5}>
+          <li>{@item * 2}</li>
+          <#elseif {@index > 10}>
+            <li>{@item * 3}</li>
+          </#elseif>
+        </#if>
+      </#each>
+    </ul>
+    <button n-show={todos.length > 0} onClick={() => addTodo()}>Add Todo</button>
+  </Container>
+`;
+
+const Container = styled.div`
+  padding: 20px;
+  font-size: .75rem;
+`;
+
+class App extends Component {
+  addTodo() {
+    const { todos = [] } = this.state;
+    this.setState({ todos: todos.concat(`Item ${todos.length}`) });
+  }
+  render() {
+    return template({ components: { Container } }, this.state, this);
+  }
+}
+```
+
+上例中使用了`NornJ`的`tagged templates API`创建了一个模板函数，它可以做到与`React`组件的逻辑代码分离，并且还能支持比`JSX API`更加简练的写法。
 
 ## 在线演示地址
 
