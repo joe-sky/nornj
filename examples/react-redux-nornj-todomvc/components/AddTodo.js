@@ -1,9 +1,18 @@
 ﻿import { Component } from 'react';
 import PropTypes from 'prop-types';
-import { registerTmpl } from 'nornj-react';
-import tmpls from '../template.nj.html';
+import { bindTemplate } from 'nornj-react';
 
-@registerTmpl('AddTodo')
+@bindTemplate({
+  name: 'AddTodo',
+  template: nj`
+    <div>
+      <input type=text ref=input />
+      <button onClick={handleClick}>
+        Add
+      </button>
+    </div>
+  `
+})
 export default class AddTodo extends Component {
   static propTypes = {
     onAddClick: PropTypes.func.isRequired
@@ -22,6 +31,6 @@ export default class AddTodo extends Component {
   }
 
   render() {
-    return tmpls.addTodo(this);
+    return this.props.template(this);
   }
 }

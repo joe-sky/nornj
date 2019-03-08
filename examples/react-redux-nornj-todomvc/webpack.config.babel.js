@@ -2,7 +2,7 @@ import path from 'path';
 import webpack from 'webpack';
 
 export default {
-  mode: "production",
+  mode: 'production',
   entry: __dirname + '/index.js',
   output: {
     path: path.join(__dirname, 'assets'),
@@ -13,15 +13,7 @@ export default {
 
   module: {
     rules: [
-      { test: /\.js$/, loader: 'babel-loader', exclude: /node_modules/ },
-      {
-        test: /\.nj.html(\?[\s\S]+)*$/,
-        loader: 'nornj-loader',
-        options: {
-          outputH: true,
-          delimiters: 'react'
-        }
-      }
+      { test: /\.js$/, loader: 'babel-loader', exclude: /node_modules/ }
     ]
   },
 

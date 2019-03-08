@@ -1,5 +1,5 @@
 /*!
-* NornJ template engine v5.0.0-alpha.6
+* NornJ template engine v5.0.0-alpha.7
 * (c) 2016-2019 Joe_Sky
 * Released under the MIT License.
 */
@@ -368,24 +368,25 @@ function registerComponent(name, component, options) {
   }
 
   each(params, function (v, k, i) {
+    var comp = void 0;
     if (v != null) {
       var _component = v.component,
           _options = v.options;
 
       var _name = k.toLowerCase();
 
-      var comp = _component ? _component : v;
+      comp = _component ? _component : v;
       nj.components[_name] = comp;
       nj.componentConfig.set(comp, _options);
     }
 
     if (i == 0) {
-      ret = v;
+      ret = comp;
     } else {
       if (i == 1) {
         ret = [ret];
       }
-      ret.push(v);
+      ret.push(comp);
     }
   }, false, false);
 

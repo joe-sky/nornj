@@ -6,20 +6,19 @@
   <meta charset="utf-8" />
 </head>
 <body>
-  <div>
-    <script type="text/nornj" data-auto>
-      <Provider {store}>
-        <ConnectedRouter {history}>
-          <Route path="/" component={App}>
-            <Route path="/all" />
-            <Route path="/active" />
-            <Route path="/completed" />
-            <Redirect from="/" to="/all" />
-          </Route>
-        </ConnectedRouter>
-      </Provider>
-    </script>
-  </div>
+  <div id="app"></div>
+  <script type="text/nornj" id="template-main">
+    <Provider {store}>
+      <ConnectedRouter {history}>
+        <Route path="/" component={App}>
+          <Route path="/all" />
+          <Route path="/active" />
+          <Route path="/completed" />
+          <Redirect from="/" to="/all" />
+        </Route>
+      </ConnectedRouter>
+    </Provider>
+  </script>
   <script type="text/nornj" id="template-app">
     <div>
       <AddTodo onAddClick={addClick} />
@@ -80,11 +79,11 @@
   <script src="https://unpkg.com/react-router-dom@4.2.2/umd/react-router-dom.min.js"></script>
   <script src="https://unpkg.com/react-router-redux@5.0.0-alpha.9/umd/react-router-redux.min.js"></script>
   <script src="https://unpkg.com/react-dom@16.2.0/umd/react-dom.production.min.js"></script>
-  <script src="https://unpkg.com/nornj@0.4.2-rc.38/dist/nornj.min.js"></script>
-  <script src="https://unpkg.com/nornj-react@0.4.2-rc.9/dist/nornj-react.min.js"></script>
-  <script src="https://unpkg.com/nornj-react@0.4.2-rc.9/dist/nornj-react-redux.min.js"></script>
-  <script src="https://unpkg.com/nornj-react@0.4.2-rc.9/dist/nornj-react-router.min.js"></script>
-  <script src="njConfig.js"></script>
+  <script src="https://unpkg.com/nornj@5.0.0-alpha.7/dist/nornj.min.js"></script>
+  <script src="https://unpkg.com/nornj-react@5.0.0-alpha.6/dist/nornj-react.min.js"></script>
+  <script src="https://unpkg.com/nornj-react@5.0.0-alpha.6/dist/nornj-react-redux.min.js"></script>
+  <script src="https://unpkg.com/nornj-react@5.0.0-alpha.6/dist/nornj-react-router.min.js"></script>
+  <script src="nj.config.js"></script>
   <script src="actions/actions.js"></script>
   <script src="reducers/reducers.js"></script>
   <script src="components/AddTodo.js"></script>

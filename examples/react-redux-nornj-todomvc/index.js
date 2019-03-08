@@ -1,14 +1,20 @@
 ﻿import 'core-js/es6/map';
 import 'core-js/es6/set';
 import ReactDOM from 'react-dom';
-import './njConfig';
+import './nj.config';
 import store, { history } from './store/configureStore';
 import App from './containers/App';
-import tmpls from './template.nj.html';
 
 //Set default data for first render NornJ html template.
-ReactDOM.render(tmpls.index({
-  store,
-  history,
-  App
-}), document.getElementById('app'));
+ReactDOM.render(t`
+  <Provider store=${store}>
+    <ConnectedRouter history=${history}>
+      <Route path="/" component=${App}>
+        <Route path="/all" />
+        <Route path="/active" />
+        <Route path="/completed" />
+        <Redirect from="/" to="/all" />
+      </Route>
+    </ConnectedRouter>
+  </Provider>
+`, document.getElementById('app'));

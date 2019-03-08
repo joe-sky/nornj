@@ -12,23 +12,24 @@ export default function registerComponent(name, component, options) {
   }
 
   tools.each(params, (v, k, i) => {
+    let comp;
     if (v != null) {
       const { component, options } = v;
       const name = k.toLowerCase();
 
-      const comp = component ? component : v;
+      comp = component ? component : v;
       nj.components[name] = comp;
       nj.componentConfig.set(comp, options);
     }
 
     if (i == 0) {
-      ret = v;
+      ret = comp;
     }
     else {
       if (i == 1) {
         ret = [ret];
       }
-      ret.push(v);
+      ret.push(comp);
     }
   }, false, false);
 

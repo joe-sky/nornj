@@ -1,8 +1,8 @@
 ﻿import { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { registerComponent } from 'nornj';
-import tmpls from '../template.nj.html';
+import nj, { registerComponent } from 'nornj';
+import { bindTemplate } from 'nornj-react';
 import { VisibilityFilters, addTodo, completeTodo } from '../actions/actions';
 import '../components/AddTodo';
 import '../components/Footer';
@@ -11,6 +11,15 @@ import '../components/TodoList';
 
 const { SHOW_ACTIVE, SHOW_COMPLETED, SHOW_ALL } = VisibilityFilters;
 
+@bindTemplate({
+  template: nj`
+    <div>
+      <AddTodo onAddClick={addClick} />
+      <TodoList todos={visibleTodos} onTodoClick={todoClick} />
+      <Footer filter={visibilityFilter} />
+    </div>
+  `
+})
 class _App extends Component {
   static propTypes = {
     visibleTodos: PropTypes.arrayOf(PropTypes.shape({
@@ -39,14 +48,14 @@ class _App extends Component {
   }
 
   render() {
-    return tmpls.app(this.props, this);
+    return this.props.template(this.props, this);
   }
 }
 
 function selectTodos(todos, filter) {
   switch (filter) {
     case SHOW_ALL:
-      return todos
+      return todos;
     case SHOW_COMPLETED:
       return todos.filter(function (todo) {
         return todo.completed;
@@ -64,7 +73,7 @@ function select(state) {
   return {
     visibleTodos: selectTodos(state.todos, state.visibilityFilter),
     visibilityFilter: state.visibilityFilter
-  }
+  };
 }
 
 //Wrap component,inject dispatch and state into its default connect(select)(App)

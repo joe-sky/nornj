@@ -1,11 +1,33 @@
 ﻿import { Component } from 'react';
 import PropTypes from 'prop-types';
-import { registerTmpl } from 'nornj-react';
-import tmpls from '../template.nj.html';
+import { bindTemplate } from 'nornj-react';
 import { VisibilityFilters } from '../actions/actions';
 const { SHOW_ACTIVE, SHOW_COMPLETED, SHOW_ALL } = VisibilityFilters;
 
-@registerTmpl('Footer')
+@bindTemplate({
+  name: 'Footer',
+  template: nj`
+    <p>
+      {'Show: '}
+      <#each {filters}>
+        <#if {filter == currentFilter}>
+          {name}
+          <#else>
+            <router-Link to="/{filter | todoState}">
+              {name}
+            </router-Link>
+          </#else>
+        </#if>
+        <#if {name == 'Active'}>
+          .
+          <#else>
+            {', '}
+          </#else>
+        </#if>
+      </#each>
+    </p>
+  `
+})
 export default class Footer extends Component {
   static propTypes = {
     filter: PropTypes.oneOf([
@@ -28,7 +50,7 @@ export default class Footer extends Component {
   }
 
   render() {
-    return tmpls.footer({
+    return this.props.template({
       filters: [
         { filter: SHOW_ALL, name: 'All' },
         { filter: SHOW_COMPLETED, name: 'Completed' },

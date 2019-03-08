@@ -1,9 +1,15 @@
 ﻿import { Component } from 'react';
 import PropTypes from 'prop-types';
-import { registerTmpl } from 'nornj-react';
-import tmpls from '../template.nj.html';
+import { bindTemplate } from 'nornj-react';
 
-@registerTmpl('Todo')
+@bindTemplate({
+  name: 'Todo',
+  template: nj`
+    <li onClick={handleClick} style="text-decoration:{completed | textDecoration};cursor:{completed | cursor};">
+      {text}
+    </li>
+  `
+})
 export default class Todo extends Component {
   static propTypes = {
     onClick: PropTypes.func.isRequired,
@@ -21,6 +27,6 @@ export default class Todo extends Component {
   }
 
   render() {
-    return tmpls.todo(this.props, this);
+    return this.props.template(this.props, this);
   }
 }

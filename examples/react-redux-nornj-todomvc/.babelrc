@@ -1,6 +1,7 @@
 {
   "presets": [ "env", "stage-0", "react" ],
   "plugins": [
+    "nornj-in-jsx",
     "transform-decorators-legacy",
     "transform-object-assign"
   ]

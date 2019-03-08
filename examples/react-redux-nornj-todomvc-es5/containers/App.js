@@ -11,32 +11,32 @@
     ]).isRequired
   },
 
-  addClick: function(text) {
+  addClick: function (text) {
     this.props.dispatch(addTodo(text));
   },
 
-  todoClick: function(index) {
+  todoClick: function (index) {
     this.props.dispatch(completeTodo(index));
   },
 
-  render: function() {
-    return this.template(this.props, {
+  render: function () {
+    return this.props.template({
       addClick: this.addClick,
       todoClick: this.todoClick
-    });
+    }, this.props);
   }
 });
 
 function selectTodos(todos, filter) {
   switch (filter) {
     case VisibilityFilters.SHOW_ALL:
-      return todos
+      return todos;
     case VisibilityFilters.SHOW_COMPLETED:
-      return todos.filter(function(todo) {
+      return todos.filter(function (todo) {
         return todo.completed;
       });
     case VisibilityFilters.SHOW_ACTIVE:
-      return todos.filter(function(todo) {
+      return todos.filter(function (todo) {
         return !todo.completed;
       });
   }
@@ -48,10 +48,10 @@ function select(state) {
   return {
     visibleTodos: selectTodos(state.todos, state.visibilityFilter),
     visibilityFilter: state.visibilityFilter
-  }
+  };
 }
 
 //Wrap component,inject dispatch and state into its default connect(select)(App)
 var App = nj.registerComponent('App', ReactRedux.connect(select)(
-  njr.registerTmpl({ template: '#template-app' })(_App)
+  njr.bindTemplate({ template: '#template-app' })(_App)
 ));
