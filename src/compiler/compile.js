@@ -63,7 +63,7 @@ function _createCompile(outputH) {
         fns = buildRuntime(root.content, root, !outputH);
       }
 
-      tmplFns = tranData.template(fns);
+      tmplFns = tranData.template(fns, tmplKey);
 
       //保存模板函数编译结果到全局集合中
       if (tmplKey) {

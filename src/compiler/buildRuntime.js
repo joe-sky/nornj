@@ -108,7 +108,7 @@ function _buildOptions(config, useStringLocal, node, fns, exPropsStr, subExProps
     }
   }
 
-  return '{ _njOpts: true, _njFnsNo: ' + fns._no + ', global: p1, context: p2, outputH: ' + !fns.useString + hashStr + (level != null ? ', level: ' + level : '') + ' }';
+  return '{ _njOpts: true, exNo: ' + fns._no + ', global: p1, context: p2, outputH: ' + !fns.useString + hashStr + (level != null ? ', level: ' + level : '') + ' }';
 }
 
 const CUSTOM_VAR = 'nj_custom';

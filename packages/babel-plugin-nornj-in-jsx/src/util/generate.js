@@ -1,5 +1,6 @@
 const nj = require('nornj').default;
 const njUtils = require('nornj/tools/utils');
+const { locInfo } = require('./utils');
 
 function buildAttrs(types, tagName, attrs, quasis, expressions, lastAttrStr, newContextData) {
   const attrNames = Object.keys(attrs);
@@ -163,7 +164,7 @@ function createRenderTmpl(babel, quasis, expressions, opts, path, taggedName) {
     }
   });
 
-  const tmplKey = njUtils.uniqueKey(tmplStr);
+  const tmplKey = `${njUtils.uniqueKey(tmplStr)}_${locInfo(path)}`;
   if (taggedName) {
     let taggedTmplConfig = {};
     switch (taggedName) {
@@ -267,7 +268,7 @@ function createRenderTmpl(babel, quasis, expressions, opts, path, taggedName) {
 
 function _buildTmplFns(fns, tmplKey) {
   let ret = '{\n';
-  ret += '  _njTmplKey: ' + tmplKey + ',\n';
+  ret += '  _njTmplKey: \'' + tmplKey + '\',\n';
 
   nj.each(fns, (v, k, i, l) => {
     if (k.indexOf('_') != 0) {

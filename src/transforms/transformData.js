@@ -232,8 +232,9 @@ function callFilter(filter) {
 }
 
 //创建模板函数
-export function template(fns) {
+export function template(fns, tmplKey) {
   const configs = {
+    tmplKey,
     us: fns.useString,
     x: nj.extensions,
     f: nj.filters,

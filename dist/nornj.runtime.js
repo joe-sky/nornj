@@ -1,5 +1,5 @@
 /*!
-* NornJ template engine v5.0.0-alpha.7
+* NornJ template engine v5.0.0-alpha.8
 * (c) 2016-2019 Joe_Sky
 * Released under the MIT License.
 */
@@ -647,8 +647,9 @@ function callFilter(filter) {
 }
 
 //创建模板函数
-function template(fns) {
+function template(fns, tmplKey) {
   var configs = {
+    tmplKey: tmplKey,
     us: fns.useString,
     x: nj.extensions,
     f: nj.filters,
@@ -1046,7 +1047,7 @@ var extensions = {
   once: function once(options) {
     var cacheObj = options.context.root || options.context,
         props = options.props,
-        cacheKey = props && props.name ? props.name : '_njOnceCache_' + options._njFnsNo,
+        cacheKey = props && props.name ? props.name : '_njOnceCache_' + options.exNo,
         cache = cacheObj[cacheKey];
 
     if (cache === undefined) {

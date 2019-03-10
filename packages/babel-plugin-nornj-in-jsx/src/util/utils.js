@@ -45,7 +45,18 @@ function lowerFirst(str) {
   return str[0].toLowerCase() + str.substr(1);
 }
 
+function locInfo(path) {
+  let ret = '';
+  if (path && path.node && path.node.loc) {
+    const loc = path.node.loc;
+    ret = `${loc.start.line},${loc.start.column},${loc.end.line},${loc.end.column}`;
+  }
+
+  return ret;
+}
+
 module.exports = {
   setTmplConfig,
-  lowerFirst
+  lowerFirst,
+  locInfo
 };
