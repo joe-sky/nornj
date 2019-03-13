@@ -1,5 +1,5 @@
 /*!
-* NornJ template engine v5.0.0-alpha.8
+* NornJ template engine v5.0.0-beta.3
 * (c) 2016-2019 Joe_Sky
 * Released under the MIT License.
 */
@@ -356,6 +356,10 @@ var tools = Object.freeze({
 	capitalize: capitalize
 });
 
+var components = nj.components;
+var componentConfig = nj.componentConfig;
+
+
 function registerComponent(name, component, options) {
   var params = name,
       ret = void 0;
@@ -376,8 +380,8 @@ function registerComponent(name, component, options) {
       var _name = k.toLowerCase();
 
       comp = _component ? _component : v;
-      nj.components[_name] = comp;
-      nj.componentConfig.set(comp, _options);
+      components[_name] = comp;
+      componentConfig.set(comp, _options);
     }
 
     if (i == 0) {
@@ -394,7 +398,12 @@ function registerComponent(name, component, options) {
 }
 
 function getComponentConfig(name) {
-  return nj.componentConfig.get(isString(name) ? nj.components[name] : name);
+  return componentConfig.get(isString(name) ? components[name] : name);
+}
+
+function copyComponentConfig(component, from) {
+  componentConfig.set(component, componentConfig.get(from));
+  return component;
 }
 
 function _createRegExp(reg, mode) {
@@ -3791,6 +3800,7 @@ assign(nj, {
 assign(nj, {
   registerComponent: registerComponent,
   getComponentConfig: getComponentConfig,
+  copyComponentConfig: copyComponentConfig,
   createTmplRule: createTmplRule,
   config: config
 });

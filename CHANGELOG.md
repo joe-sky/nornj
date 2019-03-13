@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [v5.0.0-beta.3] 2019.03.13
+
+* 🌟 增加`nj.copyComponentConfig`方法。
+
 ## [v0.4.18] 2019.01.25
 
 * 🌟 存储`nj.componentConfig`的类型改为使用`Map`。

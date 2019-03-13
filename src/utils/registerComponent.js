@@ -1,5 +1,6 @@
 ﻿import nj from '../core';
 import * as tools from './tools';
+const { components, componentConfig } = nj;
 
 export default function registerComponent(name, component, options) {
   let params = name, ret;
@@ -18,8 +19,8 @@ export default function registerComponent(name, component, options) {
       const name = k.toLowerCase();
 
       comp = component ? component : v;
-      nj.components[name] = comp;
-      nj.componentConfig.set(comp, options);
+      components[name] = comp;
+      componentConfig.set(comp, options);
     }
 
     if (i == 0) {
@@ -37,5 +38,10 @@ export default function registerComponent(name, component, options) {
 }
 
 export function getComponentConfig(name) {
-  return nj.componentConfig.get(tools.isString(name) ? nj.components[name] : name);
+  return componentConfig.get(tools.isString(name) ? components[name] : name);
+}
+
+export function copyComponentConfig(component, from) {
+  componentConfig.set(component, componentConfig.get(from));
+  return component;
 }

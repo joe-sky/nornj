@@ -1,6 +1,6 @@
 ﻿import nj from './core';
 import { assign } from './utils/tools';
-import registerComponent, { getComponentConfig } from './utils/registerComponent';
+import registerComponent, { getComponentConfig, copyComponentConfig } from './utils/registerComponent';
 import createTmplRule from './utils/createTmplRule';
 import config from './config';
 import './utils/escape';
@@ -8,6 +8,7 @@ import './utils/escape';
 assign(nj, {
   registerComponent,
   getComponentConfig,
+  copyComponentConfig,
   createTmplRule,
   config
 });

@@ -88,7 +88,7 @@ const template = nj`
         </#if>
       </#each>
     </ul>
-    <button n-show={todos.length > 0} onClick={() => addTodo()}>Add Todo</button>
+    <button :#show="todos.length > 0" :onClick="() => addTodo()">Add Todo</button>
   </Container>
 `;
 
