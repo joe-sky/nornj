@@ -27,13 +27,12 @@
 
 `React`的`JSX`几乎可以使用`javascript`的全部语法且非常灵活，可配合`babel`适应各种复杂的使用场景。但是，使用`NornJ`配合`React`开发还能做得更好：
 
-* 支持指令语法：```<img n-show={false} />```；
-* 支持流程控制语法：```<each of={[1, 2, 3]}>{item}</each>```；
-* 支持过滤器语法：```<button>{n`${'abc'} | capitalize`}</button>```；
-* 支持自定义运算符：```<input value={n`(1 .. 100).join('-')`} />```；
-* 还有更多...
+* 支持指令语法：```<img n-show={false} />```
+* 支持流程控制语法：```<each of={[1, 2, 3]}><i>{item}</i></each>```
+* 支持过滤器语法：```<button>{n`${'abc'} | capitalize`}</button>```
+* 支持自定义运算符：```<input value={n`(1 .. 100).join('-')`} />```
 
-上述这些可增强`JSX`的语法，`NornJ`模板引擎中还有很多，并且还可支持自由扩展。`NornJ`还同时提供了`JSX`和`tagged templates`两套几乎相同的语法API，以适应不同用户的口味 :wink:
+`NornJ`不仅有预置的上述几类可增强`JSX`的语法，并且还实现了**支持用户扩展更多的语法**。`NornJ`还同时提供了`JSX`和`tagged templates`两套几乎相同的语法API，以适应不同用户的口味 :wink:
 
 ## 基本示例
 
