@@ -14,7 +14,8 @@
     "index.d.ts",
     "CHANGELOG.md",
     "LICENSE",
-    "README.md"
+    "README.md",
+    "README.zh.md"
   ],
   "scripts": {
     "cjs": "cross-env NODE_ENV=cjs rollup -c -o dist/nornj.common.js",

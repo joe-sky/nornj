@@ -10,7 +10,7 @@
 
 ```
 
-`NornJ`(pronounced [ˈnɔ:ndʒeɪ]，abbreviated as `nj`) is a template engine that can works with React, JSX enhancement or alternative tools.
+`NornJ`(读音[ˈnɔ:ndʒeɪ]，简称`nj`)是一个可以同React一起工作的模板引擎，**JSX的增强或替代工具**。
 
 [![NPM Version][npm-image]][npm-url]
 <a href="https://www.npmjs.com/package/nornj"><img src="https://img.shields.io/npm/l/nornj.svg" alt="License"></a>
@@ -18,46 +18,46 @@
 <a href="https://codecov.io/gh/joe-sky/nornj"><img src="https://codecov.io/gh/joe-sky/nornj/branch/master/graph/badge.svg" alt="Codecov" /></a>
 [![NPM Downloads][downloads-image]][npm-url]
 
-English | [简体中文](https://github.com/joe-sky/nornj/blob/master/README.zh.md)
+[English](https://github.com/joe-sky/nornj/blob/master/README.md) | 简体中文
 
-## Documents
+## 文档
 
-* [NornJ Guide(github pages)](https://joe-sky.github.io/nornj-guide)
-* [NornJ Guide(gitbook)](https://joe-sky.gitbooks.io/nornj-guide)
+* [NornJ指南(github pages版)](https://joe-sky.github.io/nornj-guide)
+* [NornJ指南(gitbook版)](https://joe-sky.gitbooks.io/nornj-guide)
 
-## Introduction
+## 概述
 
-In `React` development, the `JSX` can use almost all the syntax of javascript and it's very flexible. But if we use `NornJ` with `React` and `JSX`, we can do better:
+`React`的`JSX`几乎可以使用`javascript`的全部语法且非常灵活，可配合`babel`适应各种复杂的使用场景。但是，使用`NornJ`配合`React`开发还能做得更好：
 
-* Support directives：
+* 支持指令语法：
 
 ```js
 <img n-show={false} />
 ```
 
-* Support control statements：
+* 支持流程控制语法：
 
 ```js
 <each of={[1, 2, 3]}><i>{item}</i></each>
 ```
 
-* Support filters：
+* 支持过滤器语法：
 
 ```js
 <button>{n`${'abc'} | capitalize`}</button>
 ```
 
-* Support custom operators：
+* 支持自定义运算符：
 
 ```js
 <input value={n`(1 .. 100).join('-')`} />
 ```
 
-`NornJ` presets the above `JSX` enhancement syntaxs, and also **supports custom extensions of more syntaxs**. It provides two kinds of similar API: `JSX` and `Tagged templates`, can adapt to the preferences of different users :wink:.
+`NornJ`不仅有预置的上述几类可增强`JSX`的语法，并且还实现了**支持用户扩展更多的语法**。`NornJ`还同时提供了`JSX`和`tagged templates`两套几乎相同的语法API，以适应不同用户的口味 :wink:
 
-## Basic
+## 基本示例
 
-* Use NornJ syntaxs in JSX(with [styled-jsx](https://github.com/zeit/styled-jsx))：
+* 直接在JSX中使用(结合[styled-jsx](https://github.com/zeit/styled-jsx))：
 
 ```js
 class App extends Component {
@@ -91,9 +91,9 @@ class App extends Component {
 }
 ```
 
-For above example, combining with the [Babel plugin provided by NornJ](https://github.com/joe-sky/nornj/tree/master/packages/babel-plugin-nornj-in-jsx), it is possible to write various new enhancement syntaxs in JSX.
+如上例，配合`NornJ`提供的[配套babel插件](https://github.com/joe-sky/nornj/tree/master/packages/babel-plugin-nornj-in-jsx)，便可以在`JSX`中编写各种新的增强语法。
 
-* Use NornJ tagged templates syntaxs(with [styled-components](https://github.com/styled-components/styled-components))：
+* 使用`tagged templates`语法(结合[styled-components](https://github.com/styled-components/styled-components))：
 
 ```js
 const template = nj`
@@ -128,25 +128,25 @@ class App extends Component {
 }
 ```
 
-In the above example, a template function was created using `tagged templates API of NornJ`. In this way, the template can be separated from the component logic code, and it also supports more concise writing than `NornJ JSX API`.
+上例中使用了`NornJ`的`tagged templates API`创建了一个模板函数，它可以做到与`React`组件的逻辑代码分离，并且还能支持比`JSX API`更加简练的写法。
 
-## Playground
+## 在线演示地址
 
-### Use it in JSX
+### 使用JSX
 
-* [NornJ playground(codesandbox)](https://codesandbox.io/s/z2nj54r3wx)
+* [在线Playground(codesandbox)](https://codesandbox.io/s/z2nj54r3wx)
 
-### Use tagged templates
+### 使用tagged templates
 
-* [NornJ playground(codepen)](https://codepen.io/joe_sky/pen/ooPNbj)
+* [在线Playground(codepen)](https://codepen.io/joe_sky/pen/ooPNbj)
 
-## Install
+## 安装
 
 ```sh
 npm install babel-plugin-nornj-in-jsx  #or yarn add babel-plugin-nornj-in-jsx
 ```
 
-Next, add `nornj-in-jsx` to plugins in your babel configuration:
+然后配置`.babelrc`:
 
 ```js
 {
@@ -156,32 +156,32 @@ Next, add `nornj-in-jsx` to plugins in your babel configuration:
 }
 ```
 
-## Boilerplate projects
+## 示例项目
 
 * NornJ + React + Redux + React-Router + Webpack: [react-redux-nornj-todomvc](https://github.com/joe-sky/nornj/blob/master/examples/react-redux-nornj-todomvc)
-* NornJ + React + Redux + React-Router(no need webpack): [react-redux-nornj-todomvc-es5](https://github.com/joe-sky/nornj/blob/master/examples/react-redux-nornj-todomvc-es5)
-* NornJ + Backbone + Marionette(render html string): [backbone-marionette-nornj-todomvc](https://github.com/joe-sky/nornj/blob/master/examples/backbone-marionette-nornj-todomvc)
+* NornJ + React + Redux + React-Router(无需webpack打包): [react-redux-nornj-todomvc-es5](https://github.com/joe-sky/nornj/blob/master/examples/react-redux-nornj-todomvc-es5)
+* NornJ + Backbone + Marionette(渲染html字符串): [backbone-marionette-nornj-todomvc](https://github.com/joe-sky/nornj/blob/master/examples/backbone-marionette-nornj-todomvc)
 * NornJ + React-Native + Styled-Components: [nornj-react-native-counter](https://github.com/joe-sky/nornj-react-native-counter)
 * NornJ + React + Mobx + React-Router: [nornj-react-mst-boilerplate](https://github.com/joe-sky/nornj-cli/tree/master/templates/react-mst)
 
-## Tools
+## 相关项目及工具
 
-* [nornj-react(React bindings)](https://github.com/joe-sky/nornj-react)
+* [nornj-react(React适配库)](https://github.com/joe-sky/nornj-react)
 * [nornj-loader(Webpack loader)](https://github.com/joe-sky/nornj-loader)
-* [babel-plugin-nornj-in-jsx(Babel plugin provided by NornJ)](https://github.com/joe-sky/nornj/tree/master/packages/babel-plugin-nornj-in-jsx)
-* [babel-plugin-nornj-loader(nornj-loader's Babel plugin ver)](https://github.com/yuhongda/babel-plugin-nornj-loader)
-* [react-native transformer(nornj-loader's RN ver)](https://github.com/joe-sky/nornj/blob/master/tools/metroTransformer.js)
-* [koa-nornj(NornJ's Koa middleware)](https://github.com/qingqinxl1/koa-nornj)
-* [express-nornj(NornJ's Express view engine)](https://github.com/joe-sky/nornj/blob/master/tools/expressEngine.js)
+* [babel-plugin-nornj-in-jsx(支持在JSX中写NornJ语法的Babel插件)](https://github.com/joe-sky/nornj/tree/master/packages/babel-plugin-nornj-in-jsx)
+* [babel-plugin-nornj-loader(nornj-loader的Babel插件版)](https://github.com/yuhongda/babel-plugin-nornj-loader)
+* [react-native transformer(nornj-loader的RN版)](https://github.com/joe-sky/nornj/blob/master/tools/metroTransformer.js)
+* [koa-nornj(NornJ适配Koa的中间件)](https://github.com/qingqinxl1/koa-nornj)
+* [express-nornj(NornJ适配Express的视图引擎)](https://github.com/joe-sky/nornj/blob/master/tools/expressEngine.js)
 
-## Syntax highlight
+## 语法高亮插件
 
 * [nornj-highlight(vscode)](https://github.com/joe-sky/nornj-highlight)
 * [language-nornj(atom)](https://github.com/zyj1022/language-nornj)
 
-## Browser support
+## 浏览器支持
 
-* Supports all modern browsers and Internet Explorer 9+.
+* 可支持所有现代浏览器以及Internet Explorer 9+。
 
 ## License
 
