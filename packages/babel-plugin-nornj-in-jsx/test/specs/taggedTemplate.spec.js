@@ -40,3 +40,11 @@ describe('nj.css', function () {
     expect(rendered).to.contain('<i style="color:blue">content</i>');
   });
 });
+
+describe('nj.filter', function () {
+  it('Simple usage', function () {
+    var Fixture = require('../fixtures/taggedTemplate/nj.filter.jsx');
+    var rendered = util.render(Fixture, { value: 'abc', cut: 123 });
+    expect(rendered).to.contain('c');
+  });
+});

@@ -11,6 +11,12 @@ require('babel-core/register')({
         start: '{',
         end: '}',
         comment: ''
+      },
+      filterConfig: {
+        cut: {
+          onlyGlobal: true,
+          hasOptions: true
+        }
       }
     }],
     objectRestSpread

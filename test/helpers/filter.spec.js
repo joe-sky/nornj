@@ -1,7 +1,21 @@
 ﻿import { render } from '../../src/compiler/compile';
 import '../../src/utils/createTmplRule';
+import { registerFilter } from '../../src/helpers/filter';
+
+registerFilter({
+  cut: (v, len) => {
+    len && len._njOpts && (len = 2);
+    return v.substr(len);
+  }
+});
 
 describe('Filter', () => {
+  it('One filter', () => {
+    expect(render("{{ '12345' | cut | cut(1) }}")).toBe('45');
+  });
+});
+
+describe('Operator', () => {
   it('.', () => {
     expect(render("{{ a.b['c'].length }}", {
       a: {
