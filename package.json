@@ -1,6 +1,6 @@
 {
   "name": "nornj",
-  "version": "5.0.0-beta.6",
+  "version": "5.0.0-beta.7",
   "description": "A powerful template engine that can works with React, JSX enhancement or alternative tools.",
   "main": "dist/nornj.common.js",
   "module": "dist/nornj.esm.js",

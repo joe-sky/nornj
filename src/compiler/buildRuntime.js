@@ -96,6 +96,7 @@ function _buildOptions(config, useStringLocal, node, fns, exPropsStr, subExProps
     hashStr += ', name: \'' + node.ex + '\'';
     if (tagName) {
       hashStr += ', tagName: ' + tagName;
+      hashStr += ', setTagName: function(c) { ' + tagName + ' = c }';
     }
     if (attrs) {
       hashStr += ', attrs: ' + attrs;
@@ -347,6 +348,7 @@ export function buildExpression(ast, inObj, escape, fns, useStringLocal, level) 
           _codeStr += ', true';
         }
 
+        //if (configF && configF.hasOptions) {
         if (!configF || configF.hasOptions) {
           _codeStr += `, ${_buildOptions(configF, useStringLocal, null, fns, null, null, level)}`;
         }

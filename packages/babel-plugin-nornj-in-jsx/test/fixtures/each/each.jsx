@@ -5,9 +5,9 @@ module.exports = createReactClass({
   render: function () {
     return (
       <div>
-        <each of={this.props.of} item="item" index="index">
+        <each of={this.props.of} item="item" index="index" last="l">
           <div key={index}>
-            {/* <if condition={last}>last one</if> */}
+            <if condition={l}>last one</if>
             <i>{item}</i>
             <i>{index}</i>
           </div>

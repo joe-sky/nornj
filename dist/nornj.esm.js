@@ -1,5 +1,5 @@
 /*!
-* NornJ template engine v5.0.0-beta.5
+* NornJ template engine v5.0.0-beta.7
 * (c) 2016-2019 Joe_Sky
 * Released under the MIT License.
 */
@@ -2441,6 +2441,7 @@ function _buildOptions(config, useStringLocal, node, fns, exPropsStr, subExProps
     hashStr += ', name: \'' + node.ex + '\'';
     if (tagName) {
       hashStr += ', tagName: ' + tagName;
+      hashStr += ', setTagName: function(c) { ' + tagName + ' = c }';
     }
     if (attrs) {
       hashStr += ', attrs: ' + attrs;
@@ -2693,6 +2694,7 @@ function buildExpression(ast, inObj, escape$$1, fns, useStringLocal, level) {
           _codeStr2 += ', true';
         }
 
+        //if (configF && configF.hasOptions) {
         if (!configF || configF.hasOptions) {
           _codeStr2 += ', ' + _buildOptions(configF, useStringLocal, null, fns, null, null, level);
         }

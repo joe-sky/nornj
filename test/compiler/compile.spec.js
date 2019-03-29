@@ -9,19 +9,19 @@ describe('Precompile', () => {
     options.exProps.style = 'margin:0';
   }, { addSet: true });
 
-  xit('Extension attribute', () => {
+  it('Extension attribute', () => {
     const ret = precompile(`
       <div type="radio" #show={{show}} #noMargin-arg1-arg2.modifier1.modifier2={{show}}>
         <i><#test /></i>
       </div>
     `, true, nj.tmplRule);
 
-    //console.log(ret.main.toString());
+    console.log(ret.main.toString());
     expect(Object.keys(ret).length).not.toBe(8);
     expect(ret.main.toString()).toContain('p1.x[\'noMargin\']');
   });
 
-  it('Simple', () => {
+  xit('Simple', () => {
     const CUSTOM_VAR = 'nj_custom';
 
     function _replaceBackslash(str) {

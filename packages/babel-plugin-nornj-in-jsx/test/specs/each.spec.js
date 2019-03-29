@@ -13,6 +13,7 @@ describe('each extension tag', function () {
     expect(rendered).to.contain('<div');
     expect(rendered).to.contain('0');
     expect(rendered).to.contain('xxxx');
+    expect(rendered).to.contain('last one');
   });
 
   it('should render each block when the "of" props literal like `3 ...5` ', function () {
