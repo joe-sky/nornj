@@ -1,6 +1,6 @@
 ﻿import babel from 'rollup-plugin-babel';
 import replace from 'rollup-plugin-replace';
-import uglify from 'rollup-plugin-uglify';
+import { uglify } from 'rollup-plugin-uglify';
 import filesize from 'rollup-plugin-filesize';
 import license from 'rollup-plugin-license';
 
@@ -14,13 +14,12 @@ const config = {
       babelrc: false,
       presets: [
         [
-          "env",
+          '@babel/preset-env',
           {
             modules: false
           }
         ]
-      ],
-      plugins: ['external-helpers'],
+      ]
     })
   ]
 };

@@ -13,7 +13,7 @@ module.exports = function (config) {
 
     // list of files / patterns to load in the browser
     files: [
-      'node_modules/babel-polyfill/dist/polyfill.js',
+      'node_modules/@babel/polyfill/dist/polyfill.js',
       'test/index.js'
     ],
 
@@ -94,7 +94,10 @@ module.exports = function (config) {
         }, {
           test: /\.js$/,
           use: [{
-            loader: 'istanbul-instrumenter-loader'
+            loader: 'istanbul-instrumenter-loader',
+            options: {
+              esModules: true
+            }
           }],
           include: path.resolve('src/'),
           enforce: 'post'

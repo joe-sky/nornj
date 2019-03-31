@@ -1,9 +1,12 @@
 const njInJsx = require('../src/index');
 const styledJsx = require('styled-jsx/babel').default;
-const objectRestSpread = require('babel-plugin-transform-object-rest-spread');
+const objectRestSpread = require('@babel/plugin-proposal-object-rest-spread').default;
 
-require('babel-core/register')({
-  presets: ['babel-preset-react'],
+require('@babel/register')({
+  presets: [
+    '@babel/preset-env',
+    '@babel/preset-react'
+  ],
   plugins: [
     styledJsx,
     [njInJsx, {
