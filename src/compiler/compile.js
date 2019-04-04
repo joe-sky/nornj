@@ -63,7 +63,7 @@ function _createCompile(outputH) {
         fns = buildRuntime(root.content, root, !outputH);
       }
 
-      tmplFns = tranData.template(fns);
+      tmplFns = tranData.template(fns, tmplKey);
 
       //保存模板函数编译结果到全局集合中
       if (tmplKey) {
@@ -91,7 +91,17 @@ function _createAstRoot() {
 export function precompile(tmpl, outputH, tmplRule) {
   const root = _createAstRoot();
 
-  if (tools.isString(tmpl)) {
+  if (tmpl.quasis) {
+    const { quasis, isExpresson, isCss } = tmpl;
+    tmpl = compileStringTmpl.call({
+      tmplRule,
+      outputH,
+      onlyParse: true,
+      isMustache: isExpresson,
+      isCss
+    }, quasis);
+  }
+  else if (tools.isString(tmpl)) {
     tmpl = compileStringTmpl.call({ tmplRule, outputH, onlyParse: true }, tmpl);
   }
   checkElem(tmpl._njTmpl, root, tmplRule);
@@ -100,7 +110,7 @@ export function precompile(tmpl, outputH, tmplRule) {
 }
 
 function _createRender(outputH) {
-  return function(tmpl, options) {
+  return function (tmpl, options) {
     return (outputH ? compileH : compile)(tmpl, options ? {
       tmplKey: options.tmplKey ? options.tmplKey : tmpl._njTmplKey,
       fileName: options.fileName,
@@ -112,10 +122,38 @@ function _createRender(outputH) {
 export const render = _createRender();
 export const renderH = _createRender(true);
 
+function _buildRender(outputH) {
+  return function (tmpl, params) {
+    const tmplMainFn = (outputH ? compileH : compile)(tmpl, tmpl._njTmplKey);
+    if (params) {
+      const tmplFn = function () {
+        return tmplMainFn.apply(this, tools.arrayPush([params], arguments));
+      };
+      tools.defineProp(params, '_njParam', {
+        value: true
+      });
+      tools.defineProps(tmplFn, {
+        _njTmpl: {
+          value: true
+        }
+      });
+
+      return tmplFn;
+    }
+
+    return tmplMainFn;
+  };
+}
+
+export const buildRender = _buildRender();
+export const buildRenderH = _buildRender(true);
+
 tools.assign(nj, {
   compile,
   compileH,
   precompile,
   render,
-  renderH
+  renderH,
+  buildRender,
+  buildRenderH
 });

@@ -51,9 +51,9 @@
     </ul>
     <button id="clear-completed">
       <#props>
-        <#unless {{completedCount}}>
+        <#if {{!completedCount}}>
           <@class>hidden</@class>
-        </#unless>
+        </#if>
       </#props>
       Clear completed
     </button>
@@ -74,7 +74,7 @@
       <label>{{title}}</label>
       <button class="destroy"></button>
     </div>
-    <input class="edit" value="{title}" />
+    <input class="edit" value="{{title}}" />
   </script>
   <script type="text/nornj" id="template-todoListCompositeView">
     <input id="toggle-all" type="checkbox" />

@@ -1,4 +1,4 @@
-﻿njr.registerTmpl('Footer', '#template-footer')(createReactClass({
+﻿njr.bindTemplate('Footer', '#template-footer')(createReactClass({
   propTypes: {
     filter: PropTypes.oneOf([
       VisibilityFilters.SHOW_ALL,
@@ -20,7 +20,7 @@
   },
 
   render: function () {
-    return this.template({
+    return this.props.template({
       filters: [
         { filter: VisibilityFilters.SHOW_ALL, name: 'All' },
         { filter: VisibilityFilters.SHOW_COMPLETED, name: 'Completed' },

@@ -36,17 +36,17 @@ describe('test compile string', function() {
           return arg1;
         });
 
-        nj.registerExtension('vm-include', function(opts) {
-          const env = this.getData('env');
+        nj.registerExtension('vm-include', function({ context, props }) {
+          const env = context.getData('env');
           if (env === 'vm') {
-            return `#parse("${opts.props.src}")`;
+            return `#parse("${props.src}")`;
           } else {
-            return `<$include src="${opts.props.src}" />`;
+            return `<$include src="${props.src}" />`;
           }
         });
 
-        nj.registerFilter('vm-var', function(val, opts) {
-          const env = this.getData('env');
+        nj.registerFilter('vm_var', function(val, { context }) {
+          const env = context.getData('env');
           if (env === 'vm') {
             return `$!${val}`;
           } else {
@@ -318,10 +318,10 @@ describe('test compile string', function() {
             <#list {{1}} {{2}} />
           </@@name>
         </#textExpr>
-        <slider {{../name3}} step="{{'name5' | vm-var}}">
+        <slider {{../name3}} step="{{'name5' | vm_var}}">
           <div></div>
           <script></script>
-          <#prop {{'name1' | vm-var}} />
+          <#prop {{'name1' | vm_var}} />
           <#vm-include src="../a.vm" />
           #${nj`<#each {{list}}>
                   {{this}}
@@ -349,7 +349,7 @@ describe('test compile string', function() {
       </${'div'}>
       <#e1>111</#e1>
       {{Date.now()}} + {{Math.max(Math.max(10 + 1, 1), 2 + 20, 3)}}
-      <img src="test1.png" a="{{1 + (5 ** 2) + 'abc ' + a.c.d}}" b="{{{'1 + 5'}}}" c="{{ false ? 1 }}" alt="">
+      <img src="test1.png" a="{{1 + (5 ** 2) + 'abc ' + a.c.d}}" b="{{{'1 + 5'}}}" c="{{ false ?: 1 }}" alt="">
       {{fns[0]('fns[0]()')}}
       {{ -10 ..< 10 }}
       <#each {{list}}>{{ ../_test_.slice(1) }}</#each>

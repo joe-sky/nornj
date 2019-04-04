@@ -4,7 +4,7 @@
 
 nj.createElement = null;
 nj.components = {};
-nj.componentConfig = {};
+nj.componentConfig = new Map();
 nj.preAsts = {};
 nj.asts = {};
 nj.templates = {};

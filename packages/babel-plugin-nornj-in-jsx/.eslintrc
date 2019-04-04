@@ -36,14 +36,15 @@
     ],
     "max-len": [
       1,
-      120
+      150
     ],
     "consistent-return": 0,
     "vars-on-top": 0,
     "object-curly-spacing": 0,
     "global-require": 0,
     "react/display-name": 0,
-    "react/prop-types": 0
+    "react/prop-types": 0,
+    "react/jsx-no-undef": 0
   },
   "env": {
     "mocha": true

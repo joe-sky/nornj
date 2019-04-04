@@ -1,6 +1,6 @@
 ﻿import babel from 'rollup-plugin-babel';
 import replace from 'rollup-plugin-replace';
-import uglify from 'rollup-plugin-uglify';
+import { uglify } from 'rollup-plugin-uglify';
 import filesize from 'rollup-plugin-filesize';
 import license from 'rollup-plugin-license';
 
@@ -14,13 +14,12 @@ const config = {
       babelrc: false,
       presets: [
         [
-          "env",
+          '@babel/preset-env',
           {
             modules: false
           }
         ]
-      ],
-      plugins: ['external-helpers'],
+      ]
     })
   ]
 };
@@ -54,7 +53,7 @@ if (env === 'production') {
 config.plugins.push(license({
   banner: `/*!
 * NornJ template engine v${require("./package.json").version}
-* (c) 2016-2018 Joe_Sky
+* (c) 2016-2019 Joe_Sky
 * Released under the MIT License.
 */`
 }), filesize());

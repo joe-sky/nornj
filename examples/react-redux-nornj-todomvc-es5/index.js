@@ -1,6 +1,9 @@
 ﻿//Set default data for first render NornJ html template.
-njr.setInitialData({
-  store: store,
-  history: _history,
-  App: App
-});
+ReactDOM.render(
+  nj.renderH(document.getElementById('template-main').innerHTML, {
+    store: store,
+    history: _history,
+    App: App
+  }),
+  document.getElementById('app')
+);

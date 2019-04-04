@@ -5,6 +5,10 @@ import * as tranData from '../transforms/transformData';
 //Global extension list
 export const extensions = {
   'if': (value, options) => {
+    if (value && value._njOpts) {
+      options = value;
+      value = options.props.condition;
+    }
     if (value === 'false') {
       value = false;
     }
@@ -52,6 +56,11 @@ export const extensions = {
   'else': options => options.subExProps['else'] = options.result,
 
   'elseif': (value, options) => {
+    if (value && value._njOpts) {
+      options = value;
+      value = options.props.condition || options.props.value;
+    }
+
     const exProps = options.subExProps;
     if (!exProps.elseifs) {
       exProps.elseifs = [];
@@ -63,6 +72,11 @@ export const extensions = {
   },
 
   'switch': (value, options) => {
+    if (value && value._njOpts) {
+      options = value;
+      value = options.props.value;
+    }
+
     let ret,
       props = options.props,
       l = props.elseifs.length;
@@ -87,6 +101,11 @@ export const extensions = {
   },
 
   each: (list, options) => {
+    if (list && list._njOpts) {
+      options = list;
+      list = options.props.of;
+    }
+
     let useString = options.useString,
       props = options.props,
       ret;
@@ -108,14 +127,12 @@ export const extensions = {
         };
 
         let extra;
-        if (props && props.moreValues) {
-          const _len = isArrayLike ? len : lenObj;
-          extra = {
-            '@first': param.index === 0,
-            '@last': param.index === _len - 1,
-            '@length': _len
-          };
-        }
+        const _len = isArrayLike ? len : lenObj;
+        extra = {
+          '@first': param.index === 0,
+          '@last': param.index === _len - 1
+        };
+
         if (!isArrayLike) {
           if (!extra) {
             extra = {};
@@ -177,33 +194,62 @@ export const extensions = {
 
   show: options => {
     if (!options.result()) {
-      options.exProps.style = options.useString ? 'display:none' : { display: 'none' };
+      const {
+        attrs,
+        useString
+      } = options;
+
+      if (!attrs.style) {
+        attrs.style = useString ? '' : {};
+      }
+      if (useString) {
+        attrs.style += (attrs.style ? ';' : '') + 'display:none';
+      }
+      else if (tools.isArray(attrs.style)) {
+        attrs.style.push({ display: 'none' });
+      }
+      else {
+        attrs.style.display = 'none';
+      }
     }
   },
 
-  'for': (start, end, options) => {
-    if (end._njOpts) {
-      options = end;
-      end = start;
-      start = 0;
+  'for': (i, to, options) => {
+    let step = 1;
+    let indexKey;
+
+    if (i && i._njOpts) {
+      options = i;
+      const { props } = options;
+      Object.keys(props).forEach(prop => {
+        const value = props[prop];
+        if (prop === 'to') {
+          to = value;
+        }
+        else if (prop === 'step') {
+          step = value;
+        }
+        else {
+          i = value;
+          indexKey = prop;
+        }
+      });
+    }
+    else if (options.props) {
+      step = options.props.step || 1;
     }
 
-    let ret, useString = options.useString,
-      props = options.props,
-      loopLast = props && props.loopLast;
+    let ret, useString = options.useString;
     if (useString) {
       ret = '';
     } else {
       ret = [];
     }
 
-    for (; start <= end; start++) {
-      if (!loopLast && start === end) {
-        break;
-      }
-
+    for (; i <= to; i += step) {
       let retI = options.result({
-        index: start,
+        data: indexKey ? [{ [indexKey]: i }] : null,
+        index: i,
         fallback: true
       });
 
@@ -287,7 +333,7 @@ export const extensions = {
   once: options => {
     let cacheObj = options.context.root || options.context,
       props = options.props,
-      cacheKey = props && props.name ? props.name : ('_njOnceCache_' + options._njFnsNo),
+      cacheKey = props && props.name ? props.name : ('_njOnceCache_' + options.exNo),
       cache = cacheObj[cacheKey];
 
     if (cache === undefined) {
@@ -299,7 +345,7 @@ export const extensions = {
   css: options => options.props.style
 };
 
-function _config(params) {
+function _config(params, extra) {
   let ret = {
     onlyGlobal: false,
     useString: false,
@@ -315,6 +361,9 @@ function _config(params) {
   if (params) {
     ret = tools.assign(ret, params);
   }
+  if (extra) {
+    ret = tools.assign(ret, extra);
+  }
   return ret;
 }
 
@@ -324,21 +373,37 @@ const _defaultCfg = { onlyGlobal: true, newContext: false };
 export const extensionConfig = {
   'if': _config(_defaultCfg),
   'else': _config({ onlyGlobal: true, newContext: false, subExProps: true, isSub: true }),
-  'switch': _config(_defaultCfg),
+  'switch': _config(_defaultCfg, { needPrefix: 'onlyUpperCase' }),
   unless: _config(_defaultCfg),
-  each: _config({ onlyGlobal: true }),
+  each: _config({
+    onlyGlobal: true,
+    newContext: {
+      item: 'item',
+      index: 'index',
+      datas: {
+        first: ['@first', 'first'],
+        last: ['@last', 'last']
+      }
+    }
+  }),
+  'for': _config({
+    onlyGlobal: true,
+    newContext: {
+      index: 'index',
+      getDatasFromProp: { except: ['to', 'step', 'index'] }
+    }
+  }),
   prop: _config({ onlyGlobal: true, newContext: false, exProps: true, subExProps: true, isProp: true }),
   spread: _config({ onlyGlobal: true, newContext: false, exProps: true, subExProps: true, isProp: true }),
   obj: _config({ onlyGlobal: true, newContext: false }),
-  list: _config(_defaultCfg),
-  fn: _config({ onlyGlobal: true }),
-  'with': _config({ onlyGlobal: true }),
-  style: { useExpressionInJsx: false }
+  list: _config(_defaultCfg, { needPrefix: 'onlyUpperCase' }),
+  'with': _config({ onlyGlobal: true, newContext: { getDatasFromProp: true } }),
+  style: { useExpressionInJsx: false, needPrefix: true }
 };
 extensionConfig.elseif = _config(extensionConfig['else']);
-extensionConfig['for'] = _config(extensionConfig.each);
+extensionConfig.fn = _config(extensionConfig['with']);
 extensionConfig.block = _config(extensionConfig.obj);
-extensionConfig.pre = _config(extensionConfig.obj);
+extensionConfig.pre = _config(extensionConfig.obj, { needPrefix: true });
 extensionConfig.arg = _config(extensionConfig.prop);
 extensionConfig.once = _config(extensionConfig.obj);
 extensionConfig.show = _config(extensionConfig.prop);
@@ -350,12 +415,12 @@ extensionConfig['case'] = extensionConfig.elseif;
 extensions['empty'] = extensions['default'] = extensions['else'];
 extensionConfig['empty'] = extensionConfig['default'] = extensionConfig['else'];
 extensions.strProp = extensions.prop;
-extensionConfig.strProp = tools.assign(_config(extensionConfig.prop), { useString: true });
+extensionConfig.strProp = _config(extensionConfig.prop, { useString: true });
 extensions.strArg = extensions.arg;
 extensionConfig.strArg = _config(extensionConfig.strProp);
 
 //Register extension and also can batch add
-export function registerExtension(name, extension, options) {
+export function registerExtension(name, extension, options, mergeConfig) {
   let params = name;
   if (!tools.isObject(name)) {
     params = {};
@@ -371,10 +436,19 @@ export function registerExtension(name, extension, options) {
 
       if (extension) {
         extensions[name] = extension;
-      } else {
+      } else if (!mergeConfig) {
         extensions[name] = v;
       }
-      extensionConfig[name] = _config(options);
+
+      if (mergeConfig) {
+        if (!extensionConfig[name]) {
+          extensionConfig[name] = {};
+        }
+        tools.assign(extensionConfig[name], options);
+      }
+      else {
+        extensionConfig[name] = _config(options);
+      }
     }
   }, false, false);
 }

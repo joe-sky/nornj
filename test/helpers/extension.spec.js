@@ -1,7 +1,7 @@
 ﻿import { render } from '../../src/compiler/compile';
 import '../../src/utils/createTmplRule';
 
-describe('extension tag', () => {
+describe('Extension tag', () => {
   it('if', () => {
     expect(render(`
       <#if {{a}}>
@@ -63,7 +63,7 @@ describe('extension tag', () => {
       <nj-noWs>
         <#each {{list}} moreValues>
           <#if {{!(@last)}}>
-            <i>{{this}}</i>
+            <i>{{@item}}</i>
           </#if>
         </#each>
       </nj-noWs>
@@ -76,7 +76,7 @@ describe('extension tag', () => {
     expect(render(`
       <nj-noWs>
         <#each {{list}}>
-          <i>key:{{@key}},value:{{this}}</i>
+          <i>key:{{@key}},value:{{@item}}</i>
         </#each>
       </nj-noWs>
     `, {
@@ -87,13 +87,19 @@ describe('extension tag', () => {
   it('for', () => {
     expect(render(`
       <nj-noWs>
-        <#for {{1}} {{5}} loopLast>
+        <#for i={{1}} to={{5}} step={{2}}>
+          <i>{{i}}</i>
+        </#for>
+      </nj-noWs>
+    `)).toBe('<i>1</i><i>3</i><i>5</i>');
+
+    expect(render(`
+      <nj-noWs>
+        <#for {{1}} {{5}}>
           <i>{{@index}}</i>
         </#for>
       </nj-noWs>
-    `, {
-      list: { a: 1, b: 2 }
-    })).toBe('<i>1</i><i>2</i><i>3</i><i>4</i><i>5</i>');
+    `)).toBe('<i>1</i><i>2</i><i>3</i><i>4</i><i>5</i>');
   });
 
   it('prop', () => {

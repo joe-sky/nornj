@@ -1,4 +1,7 @@
-var TYPES = {
+const nj = require('nornj').default;
+const utils = require('./utils');
+
+const TYPES = {
   ELEMENT: 'JSXElement',
   EXPRESSION_CONTAINER: 'JSXExpressionContainer',
   STRING_LITERAL: 'StringLiteral'
@@ -75,7 +78,7 @@ exports.getAttributeMap = function (node) {
  * @returns {object} The string value of the key attribute of this node if present, otherwise undefined.
  */
 exports.getKey = function (node) {
-  var key = exports.getAttributeMap(node).key;
+  const key = exports.getAttributeMap(node).key;
   return key ? key.value.value : undefined;
 };
 
@@ -97,8 +100,8 @@ exports.getChildren = function (babelTypes, node) {
  * @param {JSXElement} node - Current node to which the new attribute is added
  * @param {string} keyValue - Value of the key
  */
-var addKeyAttribute = exports.addKeyAttribute = function (babelTypes, node, keyValue) {
-  var keyFound = false;
+const addKeyAttribute = exports.addKeyAttribute = function (babelTypes, node, keyValue) {
+  let keyFound = false;
 
   node.openingElement.attributes.forEach(function (attrib) {
     if (babelTypes.isJSXAttribute(attrib) && attrib.name.name === 'key') {
@@ -108,7 +111,7 @@ var addKeyAttribute = exports.addKeyAttribute = function (babelTypes, node, keyV
   });
 
   if (!keyFound) {
-    var keyAttrib = babelTypes.jSXAttribute(babelTypes.jSXIdentifier('key'), babelTypes.stringLiteral('' + keyValue));
+    const keyAttrib = babelTypes.jSXAttribute(babelTypes.jSXIdentifier('key'), babelTypes.stringLiteral('' + keyValue));
     node.openingElement.attributes.push(keyAttrib);
   }
 };
@@ -127,7 +130,7 @@ function addKeyAttributeByReactCreateElement(types, node, keyValue) {
     ]);
   }
   else {
-    var keyFound = false;
+    let keyFound = false;
 
     node.arguments[1].properties.forEach(function (attrib) {
       if (attrib.key.name === 'key') {
@@ -157,7 +160,7 @@ exports.getSanitizedExpressionForContent = function (babelTypes, blocks, keyPref
     return babelTypes.NullLiteral();
   }
   else if (blocks.length === 1) {
-    var firstBlock = blocks[0];
+    const firstBlock = blocks[0];
 
     if (keyPrefix && firstBlock.openingElement) {
       addKeyAttribute(babelTypes, firstBlock, keyPrefix);
@@ -166,9 +169,9 @@ exports.getSanitizedExpressionForContent = function (babelTypes, blocks, keyPref
     return firstBlock;
   }
 
-  for (var i = 0; i < blocks.length; i++) {
-    var thisBlock = blocks[i];
-    var key = keyPrefix ? keyPrefix + '-' + i : i;
+  for (let i = 0; i < blocks.length; i++) {
+    const thisBlock = blocks[i];
+    const key = keyPrefix ? keyPrefix + '-' + i : i;
 
     if (babelTypes.isJSXElement(thisBlock)) {
       addKeyAttribute(babelTypes, thisBlock, key);
@@ -202,9 +205,68 @@ exports.transformExAttr = function (attrName) {
 
 exports.REGEX_CAPITALIZE = /^[A-Z][\s\S]*$/;
 
+exports.REGEX_EX_ATTR = /([^\s-_.]+)((-[^\s-_.]+)*)(([_.][^\s-_.]+)*)/;
+
 exports.addImportNj = function (state) {
   const globalNj = state.addImport('nornj', 'default', 'nj');
   state.addImport('nornj-react');
 
   return globalNj;
+};
+
+function hasExPrefix(name) {
+  return name.indexOf('n-') === 0 || name.indexOf('Nj') === 0;
+}
+exports.hasExPrefix = hasExPrefix;
+
+const REGEX_LOWER_CASE = /^[a-z]/;
+
+exports.isExTag = function (nodeName) {
+  let exPrefix = hasExPrefix(nodeName);
+  let isSub;
+  let needPrefix;
+  if (exPrefix) {
+    nodeName = nodeName.substr(2);
+  }
+  const exConfig = nj.extensionConfig[utils.lowerFirst(nodeName)];
+  if (exConfig) {
+    isSub = exConfig.isSub;
+    needPrefix = exConfig.needPrefix;
+  }
+
+  let isExTag;
+  if (exPrefix) {
+    isExTag = !isSub;
+  }
+  else {
+    isExTag = exConfig && !isSub && (!needPrefix || (needPrefix == 'onlyUpperCase' && REGEX_LOWER_CASE.test(nodeName)));
+  }
+
+  return isExTag;
+};
+
+exports.isSubExTag = function (node) {
+  if (node.type !== TYPES.ELEMENT) {
+    return false;
+  }
+
+  let nodeName = getTagName(node);
+  if (nodeName == null) {
+    return false;
+  }
+
+  let exPrefix = hasExPrefix(nodeName);
+  let isSub;
+  let needPrefix;
+  if (exPrefix) {
+    nodeName = nodeName.substr(2);
+  }
+
+  const exConfig = nj.extensionConfig[utils.lowerFirst(nodeName)];
+  if (exConfig) {
+    isSub = exConfig.isSub;
+    needPrefix = exConfig.needPrefix;
+  }
+
+  return exPrefix ? isSub : (isSub && (!needPrefix || (needPrefix == 'onlyUpperCase' && REGEX_LOWER_CASE.test(nodeName))));
 };

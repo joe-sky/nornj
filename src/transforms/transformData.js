@@ -83,7 +83,7 @@ export function getComputedData(fn, p2, level) {
       _njIcp: p2.icp
     });
   } else { //普通函数
-    return fn.val.call(fn._njCtx, p2);
+    return fn.val.call(p2.data[p2.data.length - 1], p2);
   }
 }
 
@@ -102,11 +102,11 @@ export function getElement(name, p1, nameO, p2, subName) {
     element = element[subName];
   }
 
-  return element ? element : name;
+  return element ? element : nameO;
 }
 
 export function getElementRefer(refer, name, p1, nameO, p2) {
-  return refer != null ? (tools.isString(refer) ? getElement(refer.toLowerCase(), p1, nameO, p2) : refer) : getElement(name, p1, nameO, p2);
+  return refer != null ? (tools.isString(refer) ? getElement(refer.toLowerCase(), p1, refer, p2) : refer) : getElement(name, p1, nameO, p2);
 }
 
 export function getElementName(refer, name) {
@@ -156,13 +156,13 @@ export function fixPropName(name) {
 }
 
 //合并字符串属性
-export function assignStrProps(paramsE, keys) {
-  let ret = '';
-  for (let k in paramsE) {
-    if (!keys || !keys[k]) {
-      const v = paramsE[k];
-      ret += ' ' + k + (k !== v ? '="' + v + '"' : ' ');
-    }
+export function assignStrProps(...params) {
+  let ret = '',
+    retObj = tools.assign(...params);
+
+  for (let k in retObj) {
+    const v = retObj[k];
+    ret += ' ' + k + (k !== v ? '="' + v + '"' : ' ');
   }
   return ret;
 }
@@ -227,9 +227,14 @@ function createElementApply(p) {
   return nj.createElement.apply(null, p);
 }
 
+function callFilter(filter) {
+  return filter._njCtx ? filter.val.bind(filter._njCtx) : filter;
+}
+
 //创建模板函数
-export function template(fns) {
+export function template(fns, tmplKey) {
   const configs = {
+    tmplKey,
     us: fns.useString,
     x: nj.extensions,
     f: nj.filters,
@@ -246,7 +251,8 @@ export function template(fns) {
     aa: addArgs,
     an: tools.assign,
     g: nj.global,
-    l: _getLevel
+    l: _getLevel,
+    cf: callFilter
   };
 
   if (!configs.us) {

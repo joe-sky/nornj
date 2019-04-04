@@ -9,12 +9,110 @@
     <img width="100" height="100" title="Babel Plugin" src="https://michael-ciniawsky.github.io/postcss-load-plugins/logo.svg">
   </div>
   <h1>Babel-Plugin-NornJ-in-jsx</h1>
-  <p>Make the NornJ template work gracefully in the JSX environment</p>
+  <p>一个可支持自由扩展的JSX语法增强插件 :wink:</p>
 </div>
 
 [![NPM Version][npm-image]][npm-url]
 [![Coverage Status](https://coveralls.io/repos/github/joe-sky/nornj/badge.svg?branch=master)](https://coveralls.io/github/joe-sky/nornj?branch=master)
 [![NPM Downloads][downloads-image]][npm-url]
+
+`Babel-Plugin-NornJ-in-jsx`是一个能为JSX带来更多丰富语法的Babel插件，比如条件及循环语句：
+
+```js
+const Button = () => {
+  return (
+    <div>
+      <for i={0} to={10}>
+        <if condition={i < 5}>
+          <i>less than 5</i>
+          <else>
+            <i>greater than 5</i>
+          </else>
+        </if>
+      </for>
+    </div>
+  )
+}
+```
+
+以及类似Vue、Angular的指令：
+
+```js
+const Button = (props) => {
+  return (
+    <div>
+      <input type="button" n-show={props.showBtn} />
+    </div>
+  )
+}
+```
+
+还有过滤器：
+
+```js
+const Button = (props) => {
+  return (
+    <div>
+      {n`${props.name} | capitalize`}
+    </div>
+  )
+}
+```
+
+更重要的是，除了以上这些预置的语法，还支持像Vue、Angular那样自由扩展新的语法：
+
+```js
+import nj from 'nornj';
+import cn from 'classnames';
+nj.registerExtension('class', opts => cn(opts.result()));
+
+const Button = (props) => {
+  return (
+    <div>
+      <input type="button" n-class={{
+        className1: true,
+        className2: props.hasClassName2
+      }} />
+    </div>
+  )
+}
+```
+
+## 为什么创建这个插件？
+
+在`React`项目开发中，原生的`JSX`语法并没有提供类似`Vue`的`v-if`、`v-for`、`v-show`等模板语法糖。当然，社区为`JSX`贡献了不少相关的插件，比如[jsx-control-statements](https://github.com/AlexGilleran/jsx-control-statements)。
+
+而`Babel-Plugin-NornJ-in-jsx`的设计灵感就来源于上述的`jsx-control-statements`。只不过，它比前者的功能要更加丰富得多；且可以支持扩展 :wink:。
+
+## 目录
+
+* [安装](安装)
+* [它是如何工作的](#它是如何工作的)
+* [标签](#标签)
+  * [if](#if)
+  * [each](#each)
+  * [switch](#switch)
+  * [for](#for)
+  * [with](#with)
+  * [fn](#fn)
+  * [开发新的标签](#开发新的标签)
+* [指令](#指令)
+  * [n-show](#n-show)
+  * [n-style](#n-style)
+  * [n-mobx-bind](#n-mobx-bind)
+  * [n-mst-bind](#n-mst-bind)
+  * [开发新的指令](#开发新的指令)
+* [表达式](#表达式)
+  * [过滤器](#过滤器)
+    * [capitalize](#capitalize)
+    * [int](#int)
+    * [float](#float)
+    * [bool](#bool)
+  * [运算符](#运算符)
+    * [a.b\['c'\] (安全的属性访问器)](#安全的属性访问器)
+    * [a .. b (范围运算符)](#范围运算符)
+    * [a <=> b (飞船运算符)](#飞船运算符)
+  * [开发新的表达式](#开发新的表达式)
 
 ## 安装
 
@@ -32,7 +130,7 @@ npm i babel-plugin-nornj-in-jsx
 }
 ```
 
-## 扩展标签
+## 标签
 
 ### if
 
@@ -288,7 +386,7 @@ class TestComponent extends Component {
 }
 ```
 
-## 扩展属性
+## 指令
 
 ### n-show
 
@@ -332,29 +430,93 @@ class TestComponent extends Component {
 }
 ```
 
-### n-mobx-model
+### n-mobx-bind
 
-使用`n-mobx-model`可以在JSX中实现基于`Mobx`的双向数据绑定功能：
+类似于`Vue`的`v-model`指令，可以使用`n-mobx-bind`配合`Mobx`在`<input>`及`<textarea>`等表单元素上创建`双向数据绑定`，它会根据控件类型自动选取正确的方法来更新元素。
+
+* 基本使用方法
 
 ```js
 import { Component } from 'react';
 import { observable } from 'mobx';
-import nj from 'nornj';
 
 class TestComponent extends Component {
   @observable inputValue = '';
 
   render() {
-    return <input n-mobx-model="inputValue" />;
+    return <input n-mobx-bind="inputValue" />;
   }
 }
 ```
 
-`n-mobx-model`的详细文档请[查看这里](https://joe-sky.github.io/nornj-guide/templateSyntax/inlineExtensionTag.html#mobx-model)。
+如上所示，无需编写`<input>`标签的`onChange`事件，`inputValue`变量已自动和`<input>`标签建立了`双向数据绑定`的关系。
 
-### n-mst-model
+* 实质上，`n-mobx-bind`的实现原理和`v-model`很类似，上述示例其实就是下面的语法糖形式：
 
-`n-mst-model`即为`n-mobx-model`的`mobx-state-tree`版本：
+```js
+class TestComponent extends Component {
+  @observable inputValue = '';
+  @autobind
+  onChange(e) {
+    this.inputValue = e.target.value;
+  }
+
+  render() {
+    return <input value={this.inputValue} onChange={this.onChange} />;
+  }
+}
+```
+
+* `onChange`事件
+
+由于`n-mobx-bind`默认自动设置了组件的`onChange`事件，但有些情况下我们可能还是需要在`onChange`中做一些其他的操作：
+
+```js
+class TestComponent extends Component {
+  @observable inputValue = '1';
+
+  @autobind
+  onChange(e) {
+    console.log(e.target.value);
+  }
+
+  render() {
+    return <input n-mobx-bind="inputValue" onChange={this.onChange} />;
+  }
+}
+```
+
+如上所示，`onChange`事件的行为和标签原生的`onChange`完全相同，它会在文本框的值变化后执行。
+
+* 使用`action`更新变量
+
+在`mobx`开发中如果启动严格模式或者使用`mobx-state-tree`时，则须要使用`action`来更新变量。可按下面方式配置使用`action`：
+
+```js
+import { observable, action, configure } from 'mobx';
+
+// don't allow state modifications outside actions
+configure({enforceActions: true});
+
+class TestComponent extends Component {
+  @observable inputValue = '1';
+
+  @action.bound
+  setInputValue(v) {
+    this.inputValue = v;
+  }
+
+  render() {
+    return <input n-mobx-bind$action="inputValue" />;
+  }
+}
+```
+
+当有`action`修饰符时，`n-mobx-bind`会默认执行camel命名法(`set + 变量名`)定义的`action`，上例中为`setInputValue`。
+
+### n-mst-bind
+
+`n-mst-bind`即为`n-mobx-bind`的默认使用`action`来更新值的版本，用来配合`mobx-state-tree`的变量使用：
 
 store：
 
@@ -379,16 +541,16 @@ component：
 @observer
 class TestComponent extends Component {
   render() {
-    return <input n-mst-model={`${this}.props.rootStore.testStore.inputValue`} />;
+    return <input n-mst-bind={`${this}.props.rootStore.testStore`} />;
   }
 }
 ```
 
-`n-mst-model`的详细文档请[查看这里](https://joe-sky.github.io/nornj-guide/templateSyntax/inlineExtensionTag.html#mst-model)。
+如上，`n-mst-bind`会默认执行camel命名法(`set + 变量名`)定义的`action`来更新值，上例中为`setInputValue`。除此外`n-mst-bind`的其他特性与上述的`n-mobx-bind`完全相同。
 
-## 可在JSX中使用的NornJ模板字符串API
+`n-mobx-bind`和`n-mst-bind`的更多详细文档请[查看这里](https://joe-sky.github.io/nornj-guide/templateSyntax/inlineExtensionTag.html#mobx-bind)。
 
-### 在JSX中使用NornJ的过滤器和表达式
+## 表达式
 
 使用`nj.expression`可以在JSX中以标签模板字符串的方式使用`NornJ`的过滤器和表达式：
 
@@ -411,34 +573,6 @@ class TestComponent extends Component {
 ```
 
 `nj.expression`的文档请[查看这里](https://joe-sky.github.io/nornj-guide/templateSyntax/templateString.html#njexpression)。
-
-### 在JSX中使用NornJ的style语法
-
-使用`nj.css`可以在JSX中以标签模板字符串的方式使用`NornJ`的style语法：
-
-```js
-import nj, {
-  mustache as m,
-  css as s
-} from 'nornj';
-
-class TestComponent extends Component {
-  render() {
-    const a = { b: 1 };
-    const paddingValue = 20;
-
-    return (
-      <div style={s`color:blue;margin-left:10;padding:${paddingValue};`}>
-        <if condition={a.b == 1}>
-          <i>{m`(${a}.b | float).toFixed(2)`}</i>
-        </if>
-      </div>
-    );
-  }
-}
-```
-
-`nj.css`的文档请[查看这里](https://joe-sky.github.io/nornj-guide/templateSyntax/templateString.html#njcss)。
 
 ## License
 

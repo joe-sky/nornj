@@ -5,15 +5,16 @@ const generate = require('./util/generate');
 module.exports = function (babel) {
   const types = babel.types;
 
-  return function (node, file, state) {
+  return function (node, path, state) {
     const quasis = [];
     const expressions = [];
     const isJSXMemberExpression = types.isJSXMemberExpression(node.openingElement.name);
     let elName = node.openingElement.name.name;
+    const key = astUtil.getKey(node);
     const attrs = astUtil.getAttributeMap(node);
     const children = astUtil.getChildren(types, node);
     const isSelfClosing = node.openingElement.selfClosing;
-    const childrenExpression = !isSelfClosing && astUtil.getSanitizedExpressionForContent(types, children);
+    const childrenExpression = !isSelfClosing && astUtil.getSanitizedExpressionForContent(types, children, key);
     const isComponent = !isJSXMemberExpression ? astUtil.REGEX_CAPITALIZE.test(elName) : true;
     let tagName = '<';
 
@@ -35,6 +36,37 @@ module.exports = function (babel) {
     }
 
     let lastAttrStr = '';
+    function _buildFromNjExp(exAttrExpressions, attrStr) {
+      if (!nj.isString(exAttrExpressions[0])) {
+        exAttrExpressions.unshift('');
+      }
+      if (!nj.isString(exAttrExpressions[exAttrExpressions.length - 1])) {
+        exAttrExpressions.push('');
+      }
+
+      exAttrExpressions.forEach((e, i) => {
+        if (i == 0) {
+          quasis.push(types.TemplateElement({
+            cooked: attrStr + '"{{' + e
+          }));
+        }
+        else if (i == exAttrExpressions.length - 1) {
+          lastAttrStr = e + '}}"';
+        }
+        else {
+          if (nj.isString(e)) {
+            quasis.push(types.TemplateElement({
+              cooked: e
+            }));
+          }
+          else {
+            e.noMustache = true;
+            expressions.push(e);
+          }
+        }
+      });
+    }
+
     Object.keys(attrs).forEach((attrName, i) => {
       const attr = attrs[attrName];
 
@@ -42,7 +74,9 @@ module.exports = function (babel) {
         const isExAttr = astUtil.isExAttr(attrName);
         const _attrName = isExAttr ? astUtil.transformExAttr(attrName) : attrName;
         const attrStr = lastAttrStr + (i == 0 ? (!isComponent ? tagName : '') : '') + ' ' + _attrName + '=';
-        let exAttrConfig = isExAttr ? nj.extensionConfig[_attrName != 'style' ? _attrName.substr(1) : _attrName] : {};
+        let exAttrConfig = isExAttr ? nj.extensionConfig[_attrName != 'style'
+          ? _attrName.substr(1).replace(astUtil.REGEX_EX_ATTR, (all, name) => name)
+          : _attrName] : {};
         !exAttrConfig && (exAttrConfig = {});
 
         if (!attr.value) {
@@ -55,36 +89,21 @@ module.exports = function (babel) {
           if (isExAttr && !cannotUseExpression && types.isStringLiteral(expr)) {
             lastAttrStr = attrStr + '"{{' + expr.value + '}}"';
           }
+          //babel 6
           else if (isExAttr && !cannotUseExpression && types.isBinaryExpression(expr) && expr.operator === '+') {
             const exAttrExpressions = generate.getExAttrExpression(types, expr);
-            if (!nj.isString(exAttrExpressions[0])) {
-              exAttrExpressions.unshift('');
-            }
-            if (!nj.isString(exAttrExpressions[exAttrExpressions.length - 1])) {
-              exAttrExpressions.push('');
-            }
-
-            exAttrExpressions.forEach((e, i) => {
-              if (i == 0) {
-                quasis.push(types.TemplateElement({
-                  cooked: attrStr + '"{{' + e
-                }));
+            _buildFromNjExp(exAttrExpressions, attrStr);
+          }
+          //babel 7
+          else if (isExAttr && !cannotUseExpression && types.isCallExpression(expr)
+            && expr.callee.object.value === '' && expr.callee.property.name === 'concat') {
+            const exAttrExpressions = expr.arguments.map(e => {
+              if (types.isStringLiteral(e)) {
+                return e.value;
               }
-              else if (i == exAttrExpressions.length - 1) {
-                lastAttrStr = e + '}}"';
-              }
-              else {
-                if (nj.isString(e)) {
-                  quasis.push(types.TemplateElement({
-                    cooked: e
-                  }));
-                }
-                else {
-                  e.noMustache = true;
-                  expressions.push(e);
-                }
-              }
+              return e;
             });
+            _buildFromNjExp(exAttrExpressions, attrStr);
           }
           else {
             quasis.push(types.TemplateElement({
@@ -130,9 +149,11 @@ module.exports = function (babel) {
         }));
       }
       else {
-        quasis.push(types.TemplateElement({
+        const closeTagPrefix = types.TemplateElement({
           cooked: '</'
-        }));
+        });
+        closeTagPrefix.isCloseTagPrefix = true;
+        quasis.push(closeTagPrefix);
         expressions.push(elName);
         quasis.push(types.TemplateElement({
           cooked: '>'
@@ -145,6 +166,6 @@ module.exports = function (babel) {
       }));
     }
 
-    return generate.createRenderTmpl(babel, quasis, expressions, state.opts);
+    return generate.createRenderTmpl(babel, quasis, expressions, state.opts, path);
   };
 };

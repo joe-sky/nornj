@@ -2,7 +2,7 @@
 import * as tools from '../utils/tools';
 import * as tranElem from '../transforms/transformElement';
 const { preAsts } = nj;
-const SPLIT_FLAG = '_nj_split';
+const SPLIT_FLAG = '_njParam';
 const TEXT_CONTENT = [
   'style',
   'script',
@@ -103,22 +103,22 @@ export default function compileStringTmpl(tmpl) {
     preAsts[tmplKey] = ret;
   }
 
-  let params,
-    args = arguments,
-    paramCount = ret._njParamCount;
-  if (paramCount > 0) {
-    params = {};
-    tools.defineProp(params, '_njParam', {
-      value: true
-    });
-
-    for (let i = 0; i < paramCount; i++) {
-      params[SPLIT_FLAG + i] = args[i + 1];
-    }
-  }
-
   let tmplFn;
   if (!onlyParse) {
+    let params,
+      args = arguments,
+      paramCount = ret._njParamCount;
+    if (paramCount > 0) {
+      params = {};
+      tools.defineProp(params, '_njParam', {
+        value: true
+      });
+
+      for (let i = 0; i < paramCount; i++) {
+        params[SPLIT_FLAG + i] = args[i + 1];
+      }
+    }
+
     tmplFn = params ? function () {
       return tmplMainFn.apply(this, tools.arrayPush([params], arguments));
     } : function () {
@@ -319,6 +319,8 @@ function _setElem(elem, elemName, elemParams, elemArr, bySelfClose, tmplRule, ou
   }
 }
 
+const REGEX_EX_ATTR = /([^\s-$.]+)((-[^\s-$.]+)*)(([$.][^\s-$.]+)*)/;
+
 //Extract split parameters
 function _getSplitParams(elem, tmplRule, outputH) {
   const { extensionRule, startRule, endRule, firstChar, lastChar, spreadProp, exAttrs } = tmplRule;
@@ -348,7 +350,21 @@ function _getSplitParams(elem, tmplRule, outputH) {
       paramsEx = [extensionRule + 'props'];
     }
 
-    const exPreAst = [extensionRule + name + ' _njIsProp' + (hasEqual ? '' : ' /')];
+    let args, modifiers;
+    name = name.replace(REGEX_EX_ATTR, (all, name, arg, g3, modifier) => {
+      if (arg) {
+        args = arg.substr(1).split('-').map(item => '\'' + item + '\'');
+      }
+      if (modifier) {
+        modifiers = modifier.substr(1).split(/[_.]/).map(item => '\'' + item + '\'');
+      }
+      return name;
+    });
+
+    const exPreAst = [extensionRule + name + ' _njIsProp'
+      + (args ? ' arguments="' + startRule + '[' + args.join(',') + ']' + endRule + '"' : '')
+      + (modifiers ? ' modifiers="' + startRule + '[' + modifiers.join(',') + ']' + endRule + '"' : '')
+      + (hasEqual ? '' : ' /')];
     hasEqual && exPreAst.push((hasColon ? ((outputH ? firstChar : '') + startRule + ' ') : '') + tools.clearQuot(value) + (hasColon ? (' ' + endRule + (outputH ? lastChar : '')) : ''));
     paramsEx.push(exPreAst);
     return ' ';

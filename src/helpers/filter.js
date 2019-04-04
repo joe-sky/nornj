@@ -5,7 +5,7 @@ import { getComputedData, styleProps } from '../transforms/transformData';
 //Global filter list
 export const filters = {
   //Get properties
-  '.': (obj, prop) => {
+  '.': (obj, prop, callFn) => {
     if (obj == null) {
       return obj;
     }
@@ -16,18 +16,19 @@ export const filters = {
         prop
       };
     }
+    else if (callFn) {
+      return {
+        obj,
+        prop
+      };
+    }
 
     return obj[prop];
   },
 
-  //Call method
-  _: function(method) {
-    if (method == null) {
-      return method;
-    }
-
-    const args = arguments;
-    return method.apply(args[args.length - 1].lastValue, tools.arraySlice(args, 1, args.length - 1));
+  //Call function
+  _: function (fn, args) {
+    return (fn && fn.obj[fn.prop] != null) ? fn.obj[fn.prop].apply(fn.obj, args) : null;
   },
 
   //Get computed properties
@@ -42,41 +43,13 @@ export const filters = {
     }, options.context, options.level);
   },
 
-  '=': (obj, val) => {
-    if (obj == null) {
-      return obj;
-    }
+  // '=': (obj, val) => {
+  //   if (obj == null) {
+  //     return obj;
+  //   }
 
-    obj._njCtx[obj.prop] = val;
-  },
-
-  '==': (val1, val2) => val1 == val2,
-
-  '===': (val1, val2) => val1 === val2,
-
-  '!=': (val1, val2) => val1 != val2,
-
-  '!==': (val1, val2) => val1 !== val2,
-
-  //Less than
-  '<': (val1, val2) => val1 < val2,
-
-  '<=': (val1, val2) => val1 <= val2,
-
-  //Greater than
-  '>': (val1, val2) => val1 > val2,
-
-  '>=': (val1, val2) => val1 >= val2,
-
-  '+': (val1, val2) => val1 + val2,
-
-  '-': (val1, val2) => val1 - val2,
-
-  '*': (val1, val2) => val1 * val2,
-
-  '/': (val1, val2) => val1 / val2,
-
-  '%': (val1, val2) => val1 % val2,
+  //   obj._njCtx[obj.prop] = val;
+  // },
 
   '**': (val1, val2) => Math.pow(val1, val2),
 
@@ -86,10 +59,6 @@ export const filters = {
   '?:': (val, val1, val2) => val ? val1 : val2,
 
   '!': val => !val,
-
-  '&&': (val1, val2) => val1 && val2,
-
-  or: (val1, val2) => val1 || val2,
 
   //Convert to int 
   int: val => parseInt(val, 10),
@@ -104,29 +73,6 @@ export const filters = {
     }
 
     return Boolean(val);
-  },
-
-  obj: function() {
-    let args = arguments,
-      ret = {};
-
-    tools.each(args, (v, i) => {
-      ret[v.key] = v.val;
-    }, false, true);
-    return ret;
-  },
-
-  ':': (key, val) => {
-    return { key, val };
-  },
-
-  list: function() {
-    let args = arguments;
-    if (args.length === 0) {
-      return [];
-    } else {
-      return tools.arraySlice(args, 0, args.length);
-    }
   },
 
   reg: (pattern, flags) => new RegExp(pattern, flags),
@@ -151,11 +97,11 @@ export const filters = {
     }
   },
 
-  bracket: val => val
+  capitalize: str => tools.capitalize(str)
 };
 
 function _getArrayByNum(isContainEnd) {
-  return function(val1, val2) {
+  return function (val1, val2) {
     return Object.keys(Array.apply(null, { length: val2 - val1 + isContainEnd })).map(item => +item + val1);
   };
 }
@@ -179,49 +125,66 @@ export const filterConfig = {
   '.': _config(_defaultCfg),
   '_': _config({ onlyGlobal: true }),
   '#': _config({ onlyGlobal: true }),
-  '==': _config(_defaultCfg),
-  '===': _config(_defaultCfg),
-  '!=': _config(_defaultCfg),
-  '!==': _config(_defaultCfg),
-  '<': _config(_defaultCfg),
-  '<=': _config(_defaultCfg),
-  '>': _config(_defaultCfg),
-  '>=': _config(_defaultCfg),
-  '+': _config(_defaultCfg),
-  '-': _config(_defaultCfg),
-  '*': _config(_defaultCfg),
-  '/': _config(_defaultCfg),
-  '%': _config(_defaultCfg),
   '**': _config(_defaultCfg),
   '%%': _config(_defaultCfg),
   '?:': _config(_defaultCfg),
   '!': _config(_defaultCfg),
-  '&&': _config(_defaultCfg),
-  or: _config(_defaultCfg),
   int: _config(_defaultCfg),
   float: _config(_defaultCfg),
   bool: _config(_defaultCfg),
-  obj: _config(_defaultCfg),
-  ':': _config(_defaultCfg),
-  list: _config(_defaultCfg),
   reg: _config(_defaultCfg),
   css: _config(_defaultCfg),
   '..': _config(_defaultCfg),
   rLt: _config(_defaultCfg),
   '<=>': _config(_defaultCfg),
-  bracket: _config(_defaultCfg)
+  capitalize: _config(_defaultCfg)
 };
 
 //Filter alias
 filters.prop = filters['.'];
 filterConfig.prop = filterConfig['.'];
-filters['?'] = filters['?:'];
-filterConfig['?'] = filterConfig['?:'];
-filters['//'] = filters['%%'];
-filterConfig['//'] = filterConfig['%%'];
+
+export const operators = [
+  '+=',
+  '+',
+  '-[0-9]',
+  '-',
+  '**',
+  '*',
+  '%%',
+  '%',
+  '===',
+  '!==',
+  '==',
+  '!=',
+  '<=>',
+  '<=',
+  '>=',
+  '=',
+  '..<',
+  '<',
+  '>',
+  '&&',
+  '||',
+  '?:',
+  '?',
+  ':',
+  '../',
+  '..',
+  '/'
+];
+
+const REGEX_OPERATORS_ESCAPE = /\*|\||\/|\.|\?|\+/g;
+function _createRegexOperators() {
+  return new RegExp(operators.map(o => {
+    return o.replace(REGEX_OPERATORS_ESCAPE, match => '\\' + match);
+  }).join('|'), 'g');
+}
+
+nj.REGEX_OPERATORS = _createRegexOperators();
 
 //Register filter and also can batch add
-export function registerFilter(name, filter, options) {
+export function registerFilter(name, filter, options, mergeConfig) {
   let params = name;
   if (!tools.isObject(name)) {
     params = {};
@@ -237,10 +200,19 @@ export function registerFilter(name, filter, options) {
 
       if (filter) {
         filters[name] = filter;
-      } else {
+      } else if (!mergeConfig) {
         filters[name] = v;
       }
-      filterConfig[name] = _config(options);
+
+      if (mergeConfig) {
+        if (!filterConfig[name]) {
+          filterConfig[name] = {};
+        }
+        tools.assign(filterConfig[name], options);
+      }
+      else {
+        filterConfig[name] = _config(options);
+      }
     }
   }, false, false);
 }

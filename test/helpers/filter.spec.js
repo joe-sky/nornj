@@ -1,7 +1,21 @@
 ﻿import { render } from '../../src/compiler/compile';
 import '../../src/utils/createTmplRule';
+import { registerFilter } from '../../src/helpers/filter';
 
-describe('filter', () => {
+registerFilter({
+  cut: (v, len) => {
+    len && len._njOpts && (len = 2);
+    return v.substr(len);
+  }
+});
+
+describe('Filter', () => {
+  it('One filter', () => {
+    expect(render("{{ '12345' | cut | cut(1) }}")).toBe('45');
+  });
+});
+
+describe('Operator', () => {
   it('.', () => {
     expect(render("{{ a.b['c'].length }}", {
       a: {
@@ -45,11 +59,11 @@ describe('filter', () => {
   });
 
   it('?:', () => {
-    expect(render('{{ 1 > 2 ?: (true, false) }}')).toBe(false);
+    expect(render('{{ 1 > 2 ? true : false }}')).toBe(false);
   });
 
   it('!', () => {
-    expect(render('{{ true | ! }}')).toBe(false);
+    expect(render('{{ !true }}')).toBe(false);
   });
 
   it('+', () => {
@@ -73,15 +87,15 @@ describe('filter', () => {
   });
 
   it('&&', () => {
-    expect(render("{{ 1 == '1' && (1 == '2') }}")).toBe(false);
+    expect(render("{{ 1=='1' && 1 == '2' }}")).toBe(false);
   });
 
   it('||', () => {
-    expect(render("{{ 1 == '1' || (1 == '2') }}")).toBe(true);
+    expect(render("{{ 1 == '1' || 1=='2' }}")).toBe(true);
   });
 
   it('int & float', () => {
-    expect(render("{{ 20.5 | int * (10.05 | float) + (2 ** 3) + (19 %% 2) }}")).toBe(218);
+    expect(render("{{ 20.5 | int * (10.05 | float) + 2 ** 3 + 19 %% 2 }}")).toBe(218);
   });
 
   it('bool', () => {

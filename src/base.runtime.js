@@ -1,11 +1,12 @@
 ﻿import nj from './core';
 import { assign } from './utils/tools';
-import registerComponent from './utils/registerComponent';
+import registerComponent, { getComponentConfig } from './utils/registerComponent';
 import config from './config.runtime';
 import './utils/escape';
 
 assign(nj, {
   registerComponent,
+  getComponentConfig,
   config
 });
 

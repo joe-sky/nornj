@@ -1,4 +1,4 @@
-﻿njr.registerTmpl('Todo', '#template-todo')(createReactClass({
+﻿njr.bindTemplate('Todo', '#template-todo')(createReactClass({
   propTypes: {
     onClick: PropTypes.func.isRequired,
     text: PropTypes.string.isRequired,
@@ -12,6 +12,6 @@
   },
 
   render: function () {
-    return this.template(this.props, this);
+    return this.props.template(this.props, this);
   }
 }));

@@ -5,7 +5,7 @@ var util = require('../testUtil');
 chai.use(spies);
 var expect = chai.expect;
 
-describe('requiring in component with if', function () {
+describe('if extension tag', function () {
   var IfWithoutElse = require('../fixtures/if/if.jsx');
 
   it('should render if block when condition true', function () {
@@ -22,7 +22,7 @@ describe('requiring in component with if', function () {
   });
 });
 
-describe('requiring in component with if/else', function () {
+describe('if extension tag with else', function () {
   var IfWithElse = require('../fixtures/if/if-with-else.jsx');
 
   it('should render if block when condition true', function () {
@@ -40,7 +40,7 @@ describe('requiring in component with if/else', function () {
   });
 });
 
-describe('requiring in component with elseif', function () {
+describe('if extension tag with elseif', function () {
   var IfWithoutElse = require('../fixtures/if/else-if.jsx');
 
   it('should render if block when condition is "testIf"', function () {

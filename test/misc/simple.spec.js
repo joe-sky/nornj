@@ -14,9 +14,9 @@ describe('test compile string', function () {
     it('test compile simple', function () {
       const tmpl = nj`
         <${'div'} class="{{id}} {{name3}}" {{name3}} {{ ...props}} name={{name1}} autofocus name1={{a.c.d}} name2="{{ [a[a.e['h']].f.g, 2] }}" a="/%'aaa'%/" {{... Object.assign({ e: 0 }, ${{ a: '...123', b: 2 }}, { c: 3 }) }} {{... ${{ g: '...123', b: 20 }} }}>
-          <#prop {{'name1' | vm-var}} />
+          <!--# <#prop {{'name1' | vm_var}} /> #-->
           {{1 + ${2} + 3 + ${4}}}
-          {{111}}
+          {{-111 + 222-333 + -555}}
           {{{
             JSON.stringify([{
               a: { c: 1 },
@@ -37,7 +37,7 @@ describe('test compile string', function () {
           <#each {{1 .. 2}}>
             {{@item}}
             #${({ item, index }) => item + 100 * index}
-            <#for {{10}}>
+            <#for {{0}} {{10}}>
               |{{@item}}|
               |#${({ item }) => item}|
             </#for>
@@ -64,6 +64,7 @@ describe('test compile string', function () {
           `)}}}}
         </${'div'}>
       `;
+      //console.log(nj.templates[tmpl._njTmplKey]._main.toString());
 
       const html = tmpl({
         a: {

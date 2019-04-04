@@ -1,9 +1,12 @@
 const njInJsx = require('../src/index');
 const styledJsx = require('styled-jsx/babel').default;
-const objectRestSpread = require('babel-plugin-transform-object-rest-spread');
+const objectRestSpread = require('@babel/plugin-proposal-object-rest-spread').default;
 
-require('babel-core/register')({
-  presets: ['babel-preset-react'],
+require('@babel/register')({
+  presets: [
+    '@babel/preset-env',
+    '@babel/preset-react'
+  ],
   plugins: [
     styledJsx,
     [njInJsx, {
@@ -11,6 +14,12 @@ require('babel-core/register')({
         start: '{',
         end: '}',
         comment: ''
+      },
+      filterConfig: {
+        cut: {
+          onlyGlobal: true,
+          hasOptions: true
+        }
       }
     }],
     objectRestSpread
@@ -22,4 +31,6 @@ require('./specs/if.spec');
 require('./specs/each.spec');
 require('./specs/switch.spec');
 require('./specs/with.spec');
+require('./specs/fn.spec');
 require('./specs/exAttr.spec');
+require('./specs/taggedTemplate.spec');
