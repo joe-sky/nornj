@@ -89,7 +89,7 @@ describe('test compile string', function() {
                         name3: 'testF3'
                       },
                       e1: function(options) {
-                        return '<e1 name=' + this.name3 + '>' + options.result() + '</e1>';
+                        return '<e1 name=' + this.name3 + '>' + options.children() + '</e1>';
                       },
                       //env: 'vm',
                       name: "<i>joe_sky1</i>",

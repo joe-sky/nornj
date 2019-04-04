@@ -17,6 +17,7 @@
 <a href="https://travis-ci.org/joe-sky/nornj"><img src="https://travis-ci.org/joe-sky/nornj.svg?branch=master" alt="Travis CI Status"/></a>
 <a href="https://codecov.io/gh/joe-sky/nornj"><img src="https://codecov.io/gh/joe-sky/nornj/branch/master/graph/badge.svg" alt="Codecov" /></a>
 [![NPM Downloads][downloads-image]][npm-url]
+[![](https://img.shields.io/bundlephobia/minzip/nornj@next.svg?style=flat)](https://bundlephobia.com/result?p=nornj@next)
 
 English | [简体中文](https://github.com/joe-sky/nornj/blob/master/README.zh.md)
 
@@ -171,13 +172,13 @@ Next, add `nornj-in-jsx` to plugins in your babel configuration:
 * [babel-plugin-nornj-in-jsx(Babel plugin provided by NornJ)](https://github.com/joe-sky/nornj/tree/master/packages/babel-plugin-nornj-in-jsx)
 * [babel-plugin-nornj-loader(nornj-loader's Babel plugin ver)](https://github.com/yuhongda/babel-plugin-nornj-loader)
 * [react-native transformer(nornj-loader's RN ver)](https://github.com/joe-sky/nornj/blob/master/tools/metroTransformer.js)
-* [koa-nornj(NornJ's Koa middleware)](https://github.com/qingqinxl1/koa-nornj)
+<!--* [koa-nornj(NornJ's Koa middleware)](https://github.com/qingqinxl1/koa-nornj)-->
 * [express-nornj(NornJ's Express view engine)](https://github.com/joe-sky/nornj/blob/master/tools/expressEngine.js)
 
 ## Syntax highlight
 
 * [nornj-highlight(vscode)](https://github.com/joe-sky/nornj-highlight)
-* [language-nornj(atom)](https://github.com/zyj1022/language-nornj)
+<!--* [language-nornj(atom)](https://github.com/zyj1022/language-nornj)-->
 
 ## Browser support
 

@@ -60,7 +60,7 @@ module.exports = function (babel) {
             }));
           }
           else {
-            e.noMustache = true;
+            e.noExpression = true;
             expressions.push(e);
           }
         }

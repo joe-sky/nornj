@@ -114,7 +114,7 @@ export default function checkElem(obj, parent, tmplRule, hasExProps, noSplitNewl
             return;
           }
           else if (key === '_njIsProp') {
-            node.isProp = isProp = true;
+            node.isDirective = node.isProp = isProp = true;
             needAddToProps = !hasExProps;
             return;
           }

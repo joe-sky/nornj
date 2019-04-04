@@ -32,8 +32,7 @@ export {
   taggedTmpl,
   taggedTmplH,
   template,
-  mustache,
-  mustache as expression,
+  expression,
   css
 } from './utils/taggedTmpl';
 export {

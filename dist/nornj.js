@@ -1,5 +1,5 @@
 /*!
-* NornJ template engine v5.0.0-beta.7
+* NornJ template engine v5.0.0-rc.1
 * (c) 2016-2019 Joe_Sky
 * Released under the MIT License.
 */
@@ -901,7 +901,7 @@
       }
 
       if (valueR) {
-        ret = options.result();
+        ret = options.children();
       } else {
         var props = options.props;
 
@@ -935,7 +935,7 @@
       return ret;
     },
     'else': function _else(options) {
-      return options.subExProps['else'] = options.result;
+      return options.subExProps['else'] = options.children;
     },
     'elseif': function elseif(value, options) {
       if (value && value._njOpts) {
@@ -951,7 +951,7 @@
 
       exProps.elseifs.push({
         value: value,
-        fn: options.result
+        fn: options.children
       });
     },
     'switch': function _switch(value, options) {
@@ -1025,7 +1025,7 @@
             param.data.push(extra);
           }
 
-          var retI = options.result(param);
+          var retI = options.children(param);
 
           if (useString) {
             ret += retI;
@@ -1055,7 +1055,7 @@
     },
     //Parameter
     prop: function prop(name, options) {
-      var ret = options.result(),
+      var ret = options.children(),
           //Get parameter value
       value;
 
@@ -1075,7 +1075,7 @@
       }, false, false);
     },
     show: function show(options) {
-      if (!options.result()) {
+      if (!options.value()) {
         var attrs = options.attrs,
             useString = options.useString;
 
@@ -1128,7 +1128,7 @@
       }
 
       for (; i <= to; i += step) {
-        var retI = options.result({
+        var retI = options.children({
           data: indexKey ? [_defineProperty({}, indexKey, i)] : null,
           index: i,
           fallback: true
@@ -1160,7 +1160,7 @@
 
         return ret;
       } else {
-        return [options.result()];
+        return [options.children()];
       }
     },
     fn: function fn(options) {
@@ -1177,13 +1177,13 @@
           });
         }
 
-        return options.result({
+        return options.children({
           data: [params]
         });
       };
     },
     block: function block(options) {
-      return options.result();
+      return options.children();
     },
     pre: function pre(options) {
       return extensions.block(options);
@@ -1191,13 +1191,13 @@
     'with': function _with(originalData, options) {
       if (originalData && originalData._njOpts) {
         options = originalData;
-        return options.result({
+        return options.children({
           data: [options.props]
         });
       } else {
         var _options2 = options,
             props = _options2.props;
-        return options.result({
+        return options.children({
           data: [props && props.as ? _defineProperty({}, props.as, originalData) : originalData]
         });
       }
@@ -1209,7 +1209,7 @@
         exProps.args = [];
       }
 
-      exProps.args.push(options.result());
+      exProps.args.push(options.children());
     },
     once: function once(options) {
       var cacheObj = options.context.root || options.context,
@@ -1218,7 +1218,7 @@
           cache = cacheObj[cacheKey];
 
       if (cache === undefined) {
-        cache = cacheObj[cacheKey] = options.result();
+        cache = cacheObj[cacheKey] = options.children();
       }
 
       return cache;
@@ -1329,7 +1329,9 @@
   });
   extensionConfig.arg = _config(extensionConfig.prop);
   extensionConfig.once = _config(extensionConfig.obj);
-  extensionConfig.show = _config(extensionConfig.prop);
+  extensionConfig.show = _config(extensionConfig.prop, {
+    isDirective: true
+  });
   extensionConfig.css = _config(extensionConfig.obj); //Extension alias
 
   extensions['case'] = extensions.elseif;
@@ -2207,7 +2209,7 @@
               node.useString = !(value === 'false');
               return;
             } else if (key === '_njIsProp') {
-              node.isProp = isProp = true;
+              node.isDirective = node.isProp = isProp = true;
               needAddToProps = !hasExProps;
               return;
             }
@@ -2432,7 +2434,7 @@
         hashStr += ', attrs: ' + attrs;
       }
 
-      hashStr += ', result: ' + (node.content ? 'p1.r(p1, p2, p1.fn' + _buildFn(node.content, node, fns, ++fns._no, newContext, level, useStringLocal) + ', ' + exPropsStr + ', ' + subExPropsStr + ')' : 'p1.np');
+      hashStr += ', ' + (node.isDirective || config && config.isDirective ? 'value' : 'children') + ': ' + (node.content ? 'p1.r(p1, p2, p1.fn' + _buildFn(node.content, node, fns, ++fns._no, newContext, level, useStringLocal) + ', ' + exPropsStr + ', ' + subExPropsStr + ')' : 'p1.np');
 
       if (hashProps != null) {
         hashStr += ', props: ' + hashProps;
@@ -3223,7 +3225,7 @@
         tmplRule = this.tmplRule,
         onlyParse = this.onlyParse,
         fileName = this.fileName,
-        isMustache = this.isMustache,
+        isExpression = this.isExpression,
         isCss = this.isCss;
 
     if (!ret) {
@@ -3238,7 +3240,7 @@
         var split = '';
 
         if (i == 0) {
-          if (isMustache) {
+          if (isExpression) {
             xml = (outputH ? tmplRule.firstChar : '') + tmplRule.startRule + ' ' + xml;
           } else if (isCss) {
             xml = '<' + tmplRule.extensionRule + 'css style="' + xml;
@@ -3278,7 +3280,7 @@
         }
 
         if (i == l - 1) {
-          if (isMustache) {
+          if (isExpression) {
             xml += ' ' + tmplRule.endRule + (outputH ? tmplRule.lastChar : '');
           } else if (isCss) {
             xml += '" />';
@@ -3734,13 +3736,13 @@
     if (tmpl.quasis) {
       var _tmpl = tmpl,
           quasis = _tmpl.quasis,
-          isExpresson = _tmpl.isExpresson,
+          isExpression = _tmpl.isExpression,
           isCss = _tmpl.isCss;
       tmpl = compileStringTmpl.call({
         tmplRule: tmplRule,
         outputH: outputH,
         onlyParse: true,
-        isMustache: isExpresson,
+        isExpression: isExpression,
         isCss: isCss
       }, quasis);
     } else if (isString(tmpl)) {
@@ -3809,7 +3811,7 @@
     var outputH = opts.outputH,
         delimiters = opts.delimiters,
         fileName = opts.fileName,
-        isMustache = opts.isMustache,
+        isExpression = opts.isExpression,
         isCss = opts.isCss;
     var tmplRule = delimiters ? createTmplRule(delimiters) : nj.tmplRule;
     return function () {
@@ -3817,7 +3819,7 @@
         tmplRule: tmplRule,
         outputH: outputH,
         fileName: fileName,
-        isMustache: isMustache,
+        isExpression: isExpression,
         isCss: isCss
       }, arguments);
     };
@@ -3833,16 +3835,16 @@
     return (nj.outputH ? taggedTmplH : taggedTmpl).apply(null, arguments)();
   }
 
-  var _taggedMustache = createTaggedTmpl({
-    isMustache: true
+  var _taggedExpression = createTaggedTmpl({
+    isExpression: true
   });
 
-  var _taggedMustacheH = createTaggedTmplH({
-    isMustache: true
+  var _taggedExpressionH = createTaggedTmplH({
+    isExpression: true
   });
 
-  function mustache() {
-    return (nj.outputH ? _taggedMustacheH : _taggedMustache).apply(null, arguments)();
+  function expression() {
+    return (nj.outputH ? _taggedExpressionH : _taggedExpression).apply(null, arguments)();
   }
 
   var _taggedCssH = createTaggedTmplH({
@@ -3858,8 +3860,7 @@
     taggedTmpl: taggedTmpl,
     taggedTmplH: taggedTmplH,
     template: template$1,
-    mustache: mustache,
-    expression: mustache,
+    expression: expression,
     css: css
   });
 
@@ -3877,8 +3878,7 @@
   exports.compileH = compileH;
   exports.css = css;
   exports.default = nj;
-  exports.expression = mustache;
-  exports.mustache = mustache;
+  exports.expression = expression;
   exports.registerComponent = registerComponent;
   exports.registerExtension = registerExtension;
   exports.registerFilter = registerFilter;
