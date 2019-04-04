@@ -1597,17 +1597,14 @@
     return prop.replace(REGEX_REPLACE_CHAR, function (all, g1) {
       return innerQuotes[g1];
     });
-  }
+  } // const SPACE_ERROR = 'This may be because the operator must have at least one space before and after';
+  // function _syntaxError(errorStr, expression, source) {
+  //   return 'Filter or expression syntax error: ' + errorStr + ' in\n\nexpression: ' + expression + '\n\nsource: ' + source + '\n\nNornJ expression syntax specification please see the document: https://joe-sky.github.io/nornj-guide/templateSyntax/filter.html\n';
+  // }
 
-  var SPACE_ERROR = 'This may be because the operator must have at least one space before and after';
-
-  function _syntaxError(errorStr, expression, source) {
-    return 'Filter or expression syntax error: ' + errorStr + ' in\n\nexpression: ' + expression + '\n\nsource: ' + source + '\n\nNornJ expression syntax specification please see the document: https://joe-sky.github.io/nornj-guide/templateSyntax/filter.html\n';
-  }
 
   function _compiledProp(prop, innerBrackets, innerQuotes, source) {
     var ret = obj();
-    var propO = prop; //If there are vertical lines in the property,then use filter
 
     if (prop.indexOf('|') >= 0) {
       var filters = [],
@@ -1633,7 +1630,7 @@
           //Multiple params are separated by commas.
 
           if (paramsF != null) {
-            throwIf(innerBrackets[paramsF] != null, _syntaxError(_replaceStr(paramsF, innerQuotes) + '. ' + SPACE_ERROR, _replaceStr(propO, innerQuotes), source));
+            //tools.throwIf(innerBrackets[paramsF] != null, _syntaxError(_replaceStr(paramsF, innerQuotes) + '. ' + SPACE_ERROR, _replaceStr(propO, innerQuotes), source));
             var params = [];
             each(innerBrackets[paramsF].split(','), function (p) {
               if (p !== '') {
@@ -1666,11 +1663,9 @@
     if (prop !== '') {
       var matchProp = REGEX_JS_PROP.exec(prop);
       var hasComputed = matchProp[6] === '#';
-      ret.name = hasComputed ? matchProp[7] : matchProp[0];
-
-      if (matchProp[0] !== prop) {
-        error(_syntaxError(SPACE_ERROR, _replaceStr(propO, innerQuotes), source));
-      }
+      ret.name = hasComputed ? matchProp[7] : matchProp[0]; // if (matchProp[0] !== prop) {
+      //   tools.error(_syntaxError(SPACE_ERROR, _replaceStr(propO, innerQuotes), source));
+      // }
 
       if (!matchProp[5]) {
         //Sign the parameter is a basic type value.
@@ -3564,7 +3559,7 @@
     }
   }
 
-  var REGEX_EX_ATTR = /([^\s-$.]+)((-[^\s-$.]+)*)(([$.][^\s-$.]+)*)/; //Extract split parameters
+  var REGEX_EX_ATTR = /([^\s-$.]+)(([$.][^\s-$.]+)*)((-[^\s-$.]+([$.][^\s-$.]+)*)*)/; //Extract split parameters
 
   function _getSplitParams(elem, tmplRule, outputH) {
     var extensionRule = tmplRule.extensionRule,
@@ -3599,22 +3594,32 @@
       }
 
       var args, modifiers;
-      name = name.replace(REGEX_EX_ATTR, function (all, name, arg, g3, modifier) {
+      name = name.replace(REGEX_EX_ATTR, function (all, name, modifier, g3, arg) {
         if (arg) {
           args = arg.substr(1).split('-').map(function (item) {
-            return '\'' + item + '\'';
+            var argStr;
+            var modifierStr = '';
+            var strs = item.split(/[$.]/);
+            strs.forEach(function (str, i) {
+              if (i == 0) {
+                argStr = 'name:\'' + str + '\'' + (i < strs.length - 1 ? ',' : '');
+              } else {
+                modifierStr += '\'' + str + '\'' + (i < strs.length - 1 ? ',' : '');
+              }
+            });
+            return '{' + argStr + (modifierStr != '' ? 'modifiers:[' + modifierStr + ']' : '') + '}';
           });
         }
 
         if (modifier) {
-          modifiers = modifier.substr(1).split(/[_.]/).map(function (item) {
+          modifiers = modifier.substr(1).split(/[$.]/).map(function (item) {
             return '\'' + item + '\'';
           });
         }
 
         return name;
       });
-      var exPreAst = [extensionRule + name + ' _njIsProp' + (args ? ' arguments="' + startRule + '[' + args.join(',') + ']' + endRule + '"' : '') + (modifiers ? ' modifiers="' + startRule + '[' + modifiers.join(',') + ']' + endRule + '"' : '') + (hasEqual ? '' : ' /')];
+      var exPreAst = [extensionRule + name + ' _njIsProp' + (args ? ' arguments="' + firstChar + startRule + '[' + args.join(',') + ']' + endRule + lastChar + '"' : '') + (modifiers ? ' modifiers="' + startRule + '[' + modifiers.join(',') + ']' + endRule + '"' : '') + (hasEqual ? '' : ' /')];
       hasEqual && exPreAst.push((hasColon ? (outputH ? firstChar : '') + startRule + ' ' : '') + clearQuot(value) + (hasColon ? ' ' + endRule + (outputH ? lastChar : '') : ''));
       paramsEx.push(exPreAst);
       return ' ';
