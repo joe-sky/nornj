@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [v5.0.0-rc.1] 2019.04.02
+
+* 🌟 扩展函数中的`options.result`改为`options.children`或`options.value`。
+
 ## [v5.0.0-beta.3] 2019.03.13
 
 * 🌟 增加`nj.copyComponentConfig`方法。

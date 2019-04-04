@@ -73,7 +73,7 @@ function buildAttrs(types, tagName, attrs, quasis, expressions, lastAttrStr, new
                 }
 
                 if (i < expr.quasis.length - 1) {
-                  expr.expressions[i].noMustache = true;
+                  expr.expressions[i].noExpression = true;
                   expressions.push(expr.expressions[i]);
                 }
               });
@@ -112,7 +112,7 @@ function buildAttrs(types, tagName, attrs, quasis, expressions, lastAttrStr, new
   return lastAttrStr;
 }
 
-function _mustachePrefix(expr) {
+function _expressionPrefix(expr) {
   if (expr.isAccessor) {
     return '#';
   }
@@ -157,9 +157,9 @@ function createRenderTmpl(babel, quasis, expressions, opts, path, taggedName) {
     tmplStr += q.value.cooked;
     if (i < quasis.length - 1) {
       const expr = expressions[i];
-      tmplStr += (expr.noMustache ? '' : '{{')
-        + _mustachePrefix(expr) + '_njParam' + paramCount
-        + (expr.noMustache ? '' : '}}');
+      tmplStr += (expr.noExpression ? '' : '{{')
+        + _expressionPrefix(expr) + '_njParam' + paramCount
+        + (expr.noExpression ? '' : '}}');
       paramCount++;
     }
   });
@@ -169,7 +169,7 @@ function createRenderTmpl(babel, quasis, expressions, opts, path, taggedName) {
     let taggedTmplConfig = {};
     switch (taggedName) {
       case 'n':
-        taggedTmplConfig = { isExpresson: true };
+        taggedTmplConfig = { isExpression: true };
         break;
       case 's':
         taggedTmplConfig = { isCss: true };

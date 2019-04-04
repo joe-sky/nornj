@@ -37,7 +37,7 @@ describe('Register extension tag', () => {
         }
       },
       wrap5: options => {
-        return options.result();
+        return options.children();
       },
     });
   });

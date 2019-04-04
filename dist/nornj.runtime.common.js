@@ -1,5 +1,5 @@
 /*!
-* NornJ template engine v5.0.0-beta.7
+* NornJ template engine v5.0.0-rc.1
 * (c) 2016-2019 Joe_Sky
 * Released under the MIT License.
 */
@@ -694,7 +694,7 @@ var extensions = {
     }
 
     if (valueR) {
-      ret = options.result();
+      ret = options.children();
     } else {
       var props = options.props;
 
@@ -728,7 +728,7 @@ var extensions = {
     return ret;
   },
   'else': function _else(options) {
-    return options.subExProps['else'] = options.result;
+    return options.subExProps['else'] = options.children;
   },
   'elseif': function elseif(value, options) {
     if (value && value._njOpts) {
@@ -744,7 +744,7 @@ var extensions = {
 
     exProps.elseifs.push({
       value: value,
-      fn: options.result
+      fn: options.children
     });
   },
   'switch': function _switch(value, options) {
@@ -818,7 +818,7 @@ var extensions = {
           param.data.push(extra);
         }
 
-        var retI = options.result(param);
+        var retI = options.children(param);
 
         if (useString) {
           ret += retI;
@@ -848,7 +848,7 @@ var extensions = {
   },
   //Parameter
   prop: function prop(name, options) {
-    var ret = options.result(),
+    var ret = options.children(),
         //Get parameter value
     value;
 
@@ -868,7 +868,7 @@ var extensions = {
     }, false, false);
   },
   show: function show(options) {
-    if (!options.result()) {
+    if (!options.value()) {
       var attrs = options.attrs,
           useString = options.useString;
 
@@ -921,7 +921,7 @@ var extensions = {
     }
 
     for (; i <= to; i += step) {
-      var retI = options.result({
+      var retI = options.children({
         data: indexKey ? [_defineProperty({}, indexKey, i)] : null,
         index: i,
         fallback: true
@@ -953,7 +953,7 @@ var extensions = {
 
       return ret;
     } else {
-      return [options.result()];
+      return [options.children()];
     }
   },
   fn: function fn(options) {
@@ -970,13 +970,13 @@ var extensions = {
         });
       }
 
-      return options.result({
+      return options.children({
         data: [params]
       });
     };
   },
   block: function block(options) {
-    return options.result();
+    return options.children();
   },
   pre: function pre(options) {
     return extensions.block(options);
@@ -984,13 +984,13 @@ var extensions = {
   'with': function _with(originalData, options) {
     if (originalData && originalData._njOpts) {
       options = originalData;
-      return options.result({
+      return options.children({
         data: [options.props]
       });
     } else {
       var _options2 = options,
           props = _options2.props;
-      return options.result({
+      return options.children({
         data: [props && props.as ? _defineProperty({}, props.as, originalData) : originalData]
       });
     }
@@ -1002,7 +1002,7 @@ var extensions = {
       exProps.args = [];
     }
 
-    exProps.args.push(options.result());
+    exProps.args.push(options.children());
   },
   once: function once(options) {
     var cacheObj = options.context.root || options.context,
@@ -1011,7 +1011,7 @@ var extensions = {
         cache = cacheObj[cacheKey];
 
     if (cache === undefined) {
-      cache = cacheObj[cacheKey] = options.result();
+      cache = cacheObj[cacheKey] = options.children();
     }
 
     return cache;
@@ -1122,7 +1122,9 @@ extensionConfig.pre = _config(extensionConfig.obj, {
 });
 extensionConfig.arg = _config(extensionConfig.prop);
 extensionConfig.once = _config(extensionConfig.obj);
-extensionConfig.show = _config(extensionConfig.prop);
+extensionConfig.show = _config(extensionConfig.prop, {
+  isDirective: true
+});
 extensionConfig.css = _config(extensionConfig.obj); //Extension alias
 
 extensions['case'] = extensions.elseif;

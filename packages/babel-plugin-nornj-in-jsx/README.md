@@ -64,7 +64,7 @@ const Button = (props) => {
 ```js
 import nj from 'nornj';
 import cn from 'classnames';
-nj.registerExtension('class', opts => cn(opts.result()));
+nj.registerExtension('class', opts => cn(opts.value()));
 
 const Button = (props) => {
   return (

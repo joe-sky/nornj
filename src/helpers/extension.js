@@ -20,7 +20,7 @@ export const extensions = {
       valueR = !!!value;
     }
     if (valueR) {
-      ret = options.result();
+      ret = options.children();
     } else {
       let props = options.props;
       if (props) {
@@ -53,7 +53,7 @@ export const extensions = {
     return ret;
   },
 
-  'else': options => options.subExProps['else'] = options.result,
+  'else': options => options.subExProps['else'] = options.children,
 
   'elseif': (value, options) => {
     if (value && value._njOpts) {
@@ -67,7 +67,7 @@ export const extensions = {
     }
     exProps.elseifs.push({
       value,
-      fn: options.result
+      fn: options.children
     });
   },
 
@@ -143,7 +143,7 @@ export const extensions = {
           param.data.push(extra);
         }
 
-        let retI = options.result(param);
+        let retI = options.children(param);
         if (useString) {
           ret += retI;
         } else {
@@ -173,7 +173,7 @@ export const extensions = {
 
   //Parameter
   prop: (name, options) => {
-    let ret = options.result(), //Get parameter value
+    let ret = options.children(), //Get parameter value
       value;
 
     if (ret !== undefined) {
@@ -193,7 +193,7 @@ export const extensions = {
   },
 
   show: options => {
-    if (!options.result()) {
+    if (!options.value()) {
       const {
         attrs,
         useString
@@ -247,7 +247,7 @@ export const extensions = {
     }
 
     for (; i <= to; i += step) {
-      let retI = options.result({
+      let retI = options.children({
         data: indexKey ? [{ [indexKey]: i }] : null,
         index: i,
         fallback: true
@@ -278,7 +278,7 @@ export const extensions = {
 
       return ret;
     } else {
-      return [options.result()];
+      return [options.children()];
     }
   },
 
@@ -294,11 +294,11 @@ export const extensions = {
         paramNames.forEach((v, i) => params[paramNames[i]] = arguments[i]);
       }
 
-      return options.result({ data: [params] });
+      return options.children({ data: [params] });
     };
   },
 
-  block: options => options.result(),
+  block: options => options.children(),
 
   pre: options => extensions.block(options),
 
@@ -306,14 +306,14 @@ export const extensions = {
     if (originalData && originalData._njOpts) {
       options = originalData;
 
-      return options.result({
+      return options.children({
         data: [options.props]
       });
     }
     else {
       const { props } = options;
 
-      return options.result({
+      return options.children({
         data: [props && props.as ? {
           [props.as]: originalData
         } : originalData]
@@ -327,7 +327,7 @@ export const extensions = {
       exProps.args = [];
     }
 
-    exProps.args.push(options.result());
+    exProps.args.push(options.children());
   },
 
   once: options => {
@@ -337,7 +337,7 @@ export const extensions = {
       cache = cacheObj[cacheKey];
 
     if (cache === undefined) {
-      cache = cacheObj[cacheKey] = options.result();
+      cache = cacheObj[cacheKey] = options.children();
     }
     return cache;
   },
@@ -406,7 +406,7 @@ extensionConfig.block = _config(extensionConfig.obj);
 extensionConfig.pre = _config(extensionConfig.obj, { needPrefix: true });
 extensionConfig.arg = _config(extensionConfig.prop);
 extensionConfig.once = _config(extensionConfig.obj);
-extensionConfig.show = _config(extensionConfig.prop);
+extensionConfig.show = _config(extensionConfig.prop, { isDirective: true });
 extensionConfig.css = _config(extensionConfig.obj);
 
 //Extension alias

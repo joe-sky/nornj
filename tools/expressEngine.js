@@ -72,5 +72,5 @@ module.exports = (configs = {}) => {
 
       return callback(null, html);
     });
-  }
+  };
 };

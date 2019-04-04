@@ -16,7 +16,7 @@ const { OMITTED_CLOSE_TAGS } = tranElem;
 export default function compileStringTmpl(tmpl) {
   let tmplKey = tmpl.toString(), //Get unique key
     ret = preAsts[tmplKey];
-  const { outputH, tmplRule, onlyParse, fileName, isMustache, isCss } = this;
+  const { outputH, tmplRule, onlyParse, fileName, isExpression, isCss } = this;
 
   if (!ret) { //If the cache already has template data, direct return the template.
     let isStr = tools.isString(tmpl),
@@ -30,7 +30,7 @@ export default function compileStringTmpl(tmpl) {
       let split = '';
 
       if (i == 0) {
-        if (isMustache) {
+        if (isExpression) {
           xml = (outputH ? tmplRule.firstChar : '') + tmplRule.startRule + ' ' + xml;
         }
         else if (isCss) {
@@ -66,7 +66,7 @@ export default function compileStringTmpl(tmpl) {
         }
       }
       if (i == l - 1) {
-        if (isMustache) {
+        if (isExpression) {
           xml += ' ' + tmplRule.endRule + (outputH ? tmplRule.lastChar : '');
         }
         else if (isCss) {

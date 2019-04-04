@@ -102,7 +102,7 @@ function _buildOptions(config, useStringLocal, node, fns, exPropsStr, subExProps
       hashStr += ', attrs: ' + attrs;
     }
 
-    hashStr += ', result: ' + (node.content ? 'p1.r(p1, p2, p1.fn' + _buildFn(node.content, node, fns, ++fns._no, newContext, level, useStringLocal) + ', ' + exPropsStr + ', ' + subExPropsStr + ')' : 'p1.np');
+    hashStr += ', ' + (node.isDirective || (config && config.isDirective) ? 'value' : 'children') + ': ' + (node.content ? 'p1.r(p1, p2, p1.fn' + _buildFn(node.content, node, fns, ++fns._no, newContext, level, useStringLocal) + ', ' + exPropsStr + ', ' + subExPropsStr + ')' : 'p1.np');
 
     if (hashProps != null) {
       hashStr += ', props: ' + hashProps;

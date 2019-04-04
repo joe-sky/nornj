@@ -92,12 +92,12 @@ export function precompile(tmpl, outputH, tmplRule) {
   const root = _createAstRoot();
 
   if (tmpl.quasis) {
-    const { quasis, isExpresson, isCss } = tmpl;
+    const { quasis, isExpression, isCss } = tmpl;
     tmpl = compileStringTmpl.call({
       tmplRule,
       outputH,
       onlyParse: true,
-      isMustache: isExpresson,
+      isExpression,
       isCss
     }, quasis);
   }

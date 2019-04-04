@@ -1,5 +1,5 @@
 /*!
-* NornJ template engine v5.0.0-beta.7
+* NornJ template engine v5.0.0-rc.1
 * (c) 2016-2019 Joe_Sky
 * Released under the MIT License.
 */
@@ -895,7 +895,7 @@ var extensions = {
     }
 
     if (valueR) {
-      ret = options.result();
+      ret = options.children();
     } else {
       var props = options.props;
 
@@ -929,7 +929,7 @@ var extensions = {
     return ret;
   },
   'else': function _else(options) {
-    return options.subExProps['else'] = options.result;
+    return options.subExProps['else'] = options.children;
   },
   'elseif': function elseif(value, options) {
     if (value && value._njOpts) {
@@ -945,7 +945,7 @@ var extensions = {
 
     exProps.elseifs.push({
       value: value,
-      fn: options.result
+      fn: options.children
     });
   },
   'switch': function _switch(value, options) {
@@ -1019,7 +1019,7 @@ var extensions = {
           param.data.push(extra);
         }
 
-        var retI = options.result(param);
+        var retI = options.children(param);
 
         if (useString) {
           ret += retI;
@@ -1049,7 +1049,7 @@ var extensions = {
   },
   //Parameter
   prop: function prop(name, options) {
-    var ret = options.result(),
+    var ret = options.children(),
         //Get parameter value
     value;
 
@@ -1069,7 +1069,7 @@ var extensions = {
     }, false, false);
   },
   show: function show(options) {
-    if (!options.result()) {
+    if (!options.value()) {
       var attrs = options.attrs,
           useString = options.useString;
 
@@ -1122,7 +1122,7 @@ var extensions = {
     }
 
     for (; i <= to; i += step) {
-      var retI = options.result({
+      var retI = options.children({
         data: indexKey ? [_defineProperty({}, indexKey, i)] : null,
         index: i,
         fallback: true
@@ -1154,7 +1154,7 @@ var extensions = {
 
       return ret;
     } else {
-      return [options.result()];
+      return [options.children()];
     }
   },
   fn: function fn(options) {
@@ -1171,13 +1171,13 @@ var extensions = {
         });
       }
 
-      return options.result({
+      return options.children({
         data: [params]
       });
     };
   },
   block: function block(options) {
-    return options.result();
+    return options.children();
   },
   pre: function pre(options) {
     return extensions.block(options);
@@ -1185,13 +1185,13 @@ var extensions = {
   'with': function _with(originalData, options) {
     if (originalData && originalData._njOpts) {
       options = originalData;
-      return options.result({
+      return options.children({
         data: [options.props]
       });
     } else {
       var _options2 = options,
           props = _options2.props;
-      return options.result({
+      return options.children({
         data: [props && props.as ? _defineProperty({}, props.as, originalData) : originalData]
       });
     }
@@ -1203,7 +1203,7 @@ var extensions = {
       exProps.args = [];
     }
 
-    exProps.args.push(options.result());
+    exProps.args.push(options.children());
   },
   once: function once(options) {
     var cacheObj = options.context.root || options.context,
@@ -1212,7 +1212,7 @@ var extensions = {
         cache = cacheObj[cacheKey];
 
     if (cache === undefined) {
-      cache = cacheObj[cacheKey] = options.result();
+      cache = cacheObj[cacheKey] = options.children();
     }
 
     return cache;
@@ -1323,7 +1323,9 @@ extensionConfig.pre = _config(extensionConfig.obj, {
 });
 extensionConfig.arg = _config(extensionConfig.prop);
 extensionConfig.once = _config(extensionConfig.obj);
-extensionConfig.show = _config(extensionConfig.prop);
+extensionConfig.show = _config(extensionConfig.prop, {
+  isDirective: true
+});
 extensionConfig.css = _config(extensionConfig.obj); //Extension alias
 
 extensions['case'] = extensions.elseif;
@@ -2201,7 +2203,7 @@ function checkElem(obj$1, parent, tmplRule, hasExProps, noSplitNewline, isLast) 
             node.useString = !(value === 'false');
             return;
           } else if (key === '_njIsProp') {
-            node.isProp = isProp = true;
+            node.isDirective = node.isProp = isProp = true;
             needAddToProps = !hasExProps;
             return;
           }
@@ -2426,7 +2428,7 @@ function _buildOptions(config, useStringLocal, node, fns, exPropsStr, subExProps
       hashStr += ', attrs: ' + attrs;
     }
 
-    hashStr += ', result: ' + (node.content ? 'p1.r(p1, p2, p1.fn' + _buildFn(node.content, node, fns, ++fns._no, newContext, level, useStringLocal) + ', ' + exPropsStr + ', ' + subExPropsStr + ')' : 'p1.np');
+    hashStr += ', ' + (node.isDirective || config && config.isDirective ? 'value' : 'children') + ': ' + (node.content ? 'p1.r(p1, p2, p1.fn' + _buildFn(node.content, node, fns, ++fns._no, newContext, level, useStringLocal) + ', ' + exPropsStr + ', ' + subExPropsStr + ')' : 'p1.np');
 
     if (hashProps != null) {
       hashStr += ', props: ' + hashProps;
@@ -3217,7 +3219,7 @@ function compileStringTmpl(tmpl) {
       tmplRule = this.tmplRule,
       onlyParse = this.onlyParse,
       fileName = this.fileName,
-      isMustache = this.isMustache,
+      isExpression = this.isExpression,
       isCss = this.isCss;
 
   if (!ret) {
@@ -3232,7 +3234,7 @@ function compileStringTmpl(tmpl) {
       var split = '';
 
       if (i == 0) {
-        if (isMustache) {
+        if (isExpression) {
           xml = (outputH ? tmplRule.firstChar : '') + tmplRule.startRule + ' ' + xml;
         } else if (isCss) {
           xml = '<' + tmplRule.extensionRule + 'css style="' + xml;
@@ -3272,7 +3274,7 @@ function compileStringTmpl(tmpl) {
       }
 
       if (i == l - 1) {
-        if (isMustache) {
+        if (isExpression) {
           xml += ' ' + tmplRule.endRule + (outputH ? tmplRule.lastChar : '');
         } else if (isCss) {
           xml += '" />';
@@ -3728,13 +3730,13 @@ function precompile(tmpl, outputH, tmplRule) {
   if (tmpl.quasis) {
     var _tmpl = tmpl,
         quasis = _tmpl.quasis,
-        isExpresson = _tmpl.isExpresson,
+        isExpression = _tmpl.isExpression,
         isCss = _tmpl.isCss;
     tmpl = compileStringTmpl.call({
       tmplRule: tmplRule,
       outputH: outputH,
       onlyParse: true,
-      isMustache: isExpresson,
+      isExpression: isExpression,
       isCss: isCss
     }, quasis);
   } else if (isString(tmpl)) {
@@ -3803,7 +3805,7 @@ function createTaggedTmpl() {
   var outputH = opts.outputH,
       delimiters = opts.delimiters,
       fileName = opts.fileName,
-      isMustache = opts.isMustache,
+      isExpression = opts.isExpression,
       isCss = opts.isCss;
   var tmplRule = delimiters ? createTmplRule(delimiters) : nj.tmplRule;
   return function () {
@@ -3811,7 +3813,7 @@ function createTaggedTmpl() {
       tmplRule: tmplRule,
       outputH: outputH,
       fileName: fileName,
-      isMustache: isMustache,
+      isExpression: isExpression,
       isCss: isCss
     }, arguments);
   };
@@ -3827,16 +3829,16 @@ function template$1() {
   return (nj.outputH ? taggedTmplH : taggedTmpl).apply(null, arguments)();
 }
 
-var _taggedMustache = createTaggedTmpl({
-  isMustache: true
+var _taggedExpression = createTaggedTmpl({
+  isExpression: true
 });
 
-var _taggedMustacheH = createTaggedTmplH({
-  isMustache: true
+var _taggedExpressionH = createTaggedTmplH({
+  isExpression: true
 });
 
-function mustache() {
-  return (nj.outputH ? _taggedMustacheH : _taggedMustache).apply(null, arguments)();
+function expression() {
+  return (nj.outputH ? _taggedExpressionH : _taggedExpression).apply(null, arguments)();
 }
 
 var _taggedCssH = createTaggedTmplH({
@@ -3852,8 +3854,7 @@ assign(nj, {
   taggedTmpl: taggedTmpl,
   taggedTmplH: taggedTmplH,
   template: template$1,
-  mustache: mustache,
-  expression: mustache,
+  expression: expression,
   css: css
 });
 
@@ -3868,4 +3869,4 @@ var _global = nj.global;
 _global.NornJ = _global.nj = nj;
 
 export default nj;
-export { compile, compileH, css, mustache as expression, mustache, registerComponent, registerExtension, registerFilter, render, renderH, taggedTmpl, taggedTmplH, template$1 as template };
+export { compile, compileH, css, expression, registerComponent, registerExtension, registerFilter, render, renderH, taggedTmpl, taggedTmplH, template$1 as template };
