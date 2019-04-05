@@ -974,9 +974,6 @@ var extensions = {
   block: function block(options) {
     return options.children();
   },
-  pre: function pre(options) {
-    return extensions.block(options);
-  },
   'with': function _with(originalData, options) {
     if (originalData && originalData._njOpts) {
       options = originalData;
@@ -1048,9 +1045,7 @@ var _defaultCfg = {
 
 var extensionConfig = {
   'if': _config(_defaultCfg),
-  'else': _config({
-    onlyGlobal: true,
-    newContext: false,
+  'else': _config(_defaultCfg, {
     subExProps: true,
     isSub: true
   }),
@@ -1078,26 +1073,18 @@ var extensionConfig = {
       }
     }
   }),
-  prop: _config({
-    onlyGlobal: true,
-    newContext: false,
+  prop: _config(_defaultCfg, {
     exProps: true,
     subExProps: true,
-    isProp: true
+    isProp: true,
+    onlyTemplate: true
   }),
-  spread: _config({
-    onlyGlobal: true,
-    newContext: false,
-    exProps: true,
-    subExProps: true,
-    isProp: true
+  obj: _config(_defaultCfg, {
+    onlyTemplate: true
   }),
-  obj: _config({
-    onlyGlobal: true,
-    newContext: false
-  }),
-  list: _config(_defaultCfg, {
-    needPrefix: 'onlyUpperCase'
+  fn: _config(_defaultCfg, {
+    newContext: true,
+    onlyTemplate: true
   }),
   'with': _config({
     onlyGlobal: true,
@@ -1111,11 +1098,10 @@ var extensionConfig = {
   }
 };
 extensionConfig.elseif = _config(extensionConfig['else']);
-extensionConfig.fn = _config(extensionConfig['with']);
+extensionConfig.spread = _config(extensionConfig.prop);
+extensionConfig.list = _config(extensionConfig.obj);
 extensionConfig.block = _config(extensionConfig.obj);
-extensionConfig.pre = _config(extensionConfig.obj, {
-  needPrefix: true
-});
+extensionConfig.pre = _config(extensionConfig.obj);
 extensionConfig.arg = _config(extensionConfig.prop);
 extensionConfig.once = _config(extensionConfig.obj);
 extensionConfig.show = _config(extensionConfig.prop, {
@@ -1132,7 +1118,9 @@ extensionConfig.strProp = _config(extensionConfig.prop, {
   useString: true
 });
 extensions.strArg = extensions.arg;
-extensionConfig.strArg = _config(extensionConfig.strProp); //Register extension and also can batch add
+extensionConfig.strArg = _config(extensionConfig.strProp);
+extensions.pre = extensions.block;
+extensionConfig.pre = extensionConfig.block; //Register extension and also can batch add
 
 function registerExtension(name, extension, options, mergeConfig) {
   var params = name;
@@ -1211,12 +1199,6 @@ var filters = {
       _njCtx: obj
     }, options.context, options.level);
   },
-  // '=': (obj, val) => {
-  //   if (obj == null) {
-  //     return obj;
-  //   }
-  //   obj._njCtx[obj.prop] = val;
-  // },
   '**': function _(val1, val2) {
     return Math.pow(val1, val2);
   },
@@ -1321,10 +1303,7 @@ var filterConfig = {
   rLt: _config$1(_defaultCfg$1),
   '<=>': _config$1(_defaultCfg$1),
   capitalize: _config$1(_defaultCfg$1)
-}; //Filter alias
-
-filters.prop = filters['.'];
-filterConfig.prop = filterConfig['.'];
+};
 var operators = ['+=', '+', '-[0-9]', '-', '**', '*', '%%', '%', '===', '!==', '==', '!=', '<=>', '<=', '>=', '=', '..<', '<', '>', '&&', '||', '?:', '?', ':', '../', '..', '/'];
 var REGEX_OPERATORS_ESCAPE = /\*|\||\/|\.|\?|\+/g;
 

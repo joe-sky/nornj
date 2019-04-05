@@ -43,14 +43,6 @@ export const filters = {
     }, options.context, options.level);
   },
 
-  // '=': (obj, val) => {
-  //   if (obj == null) {
-  //     return obj;
-  //   }
-
-  //   obj._njCtx[obj.prop] = val;
-  // },
-
   '**': (val1, val2) => Math.pow(val1, val2),
 
   '%%': (val1, val2) => Math.floor(val1 / val2),
@@ -139,10 +131,6 @@ export const filterConfig = {
   '<=>': _config(_defaultCfg),
   capitalize: _config(_defaultCfg)
 };
-
-//Filter alias
-filters.prop = filters['.'];
-filterConfig.prop = filterConfig['.'];
 
 export const operators = [
   '+=',
