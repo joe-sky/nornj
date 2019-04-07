@@ -1,7 +1,7 @@
 ﻿import nj from '../core';
 import * as tools from '../utils/tools';
 import { getComputedData, styleProps } from '../transforms/transformData';
-
+const digitsRE = /(\d{3})(?=\d)/g;
 //Global filter list
 export const filters = {
   //Get properties
@@ -97,7 +97,29 @@ export const filters = {
     }
   },
 
-  capitalize: str => tools.capitalize(str)
+  capitalize: str => tools.capitalize(str),
+  
+  currency (value, currency, decimals) {
+    if(!(value - parseFloat(value) >= 0)) return '';
+    value = parseFloat(value);
+    currency = currency != null ? currency : '$';
+    decimals = decimals != null ? decimals : 2;
+    var stringified = Math.abs(value).toFixed(decimals);
+    var _int = decimals
+      ? stringified.slice(0, -1 - decimals)
+      : stringified;
+    var i = _int.length % 3;
+    var head = i > 0
+      ? (_int.slice(0, i) + (_int.length > 3 ? ',' : ''))
+      : '';
+    var _float = decimals
+      ? stringified.slice(-1 - decimals)
+      : '';
+    var sign = value < 0 ? '-' : '';
+    return sign + currency + head +
+      _int.slice(i).replace(digitsRE, '$1,') +
+      _float;
+  }
 };
 
 function _getArrayByNum(isContainEnd) {
@@ -137,7 +159,8 @@ export const filterConfig = {
   '..': _config(_defaultCfg),
   rLt: _config(_defaultCfg),
   '<=>': _config(_defaultCfg),
-  capitalize: _config(_defaultCfg)
+  capitalize: _config(_defaultCfg),
+  currency: _config(_defaultCfg)
 };
 
 //Filter alias
