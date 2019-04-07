@@ -28,9 +28,9 @@ module.exports = function (babel) {
           state.hasNjInJSX = true;
 
           const hasMobx = exAttrs.reduce((result, exAttr) =>
-            result || (exAttr.indexOf('n-mobx') > -1 || exAttr.indexOf('n-mst') > -1), false);
+            result || (exAttr.indexOf('n-mobxBind') > -1 || exAttr.indexOf('n-mstBind') > -1), false);
           hasMobx
-            && !nj.extensionConfig['mobx']
+            && !nj.extensionConfig['mobxBind']
             && Object.assign(nj.extensionConfig, require('nornj-react/mobx/extensionConfig'));
           if (hasMobx) {
             state.hasMobxWithNj = true;
