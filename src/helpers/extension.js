@@ -300,8 +300,6 @@ export const extensions = {
 
   block: options => options.children(),
 
-  pre: options => extensions.block(options),
-
   'with': function (originalData, options) {
     if (originalData && originalData._njOpts) {
       options = originalData;
@@ -372,7 +370,7 @@ const _defaultCfg = { onlyGlobal: true, newContext: false };
 //Extension default config
 export const extensionConfig = {
   'if': _config(_defaultCfg),
-  'else': _config({ onlyGlobal: true, newContext: false, subExProps: true, isSub: true }),
+  'else': _config(_defaultCfg, { subExProps: true, isSub: true }),
   'switch': _config(_defaultCfg, { needPrefix: 'onlyUpperCase' }),
   unless: _config(_defaultCfg),
   each: _config({
@@ -393,17 +391,17 @@ export const extensionConfig = {
       getDatasFromProp: { except: ['to', 'step', 'index'] }
     }
   }),
-  prop: _config({ onlyGlobal: true, newContext: false, exProps: true, subExProps: true, isProp: true }),
-  spread: _config({ onlyGlobal: true, newContext: false, exProps: true, subExProps: true, isProp: true }),
-  obj: _config({ onlyGlobal: true, newContext: false }),
-  list: _config(_defaultCfg, { needPrefix: 'onlyUpperCase' }),
+  prop: _config(_defaultCfg, { exProps: true, subExProps: true, isProp: true, onlyTemplate: true }),
+  obj: _config(_defaultCfg, { onlyTemplate: true }),
+  fn: _config(_defaultCfg, { newContext: true, onlyTemplate: true }),
   'with': _config({ onlyGlobal: true, newContext: { getDatasFromProp: true } }),
   style: { useExpressionInJsx: false, needPrefix: true }
 };
 extensionConfig.elseif = _config(extensionConfig['else']);
-extensionConfig.fn = _config(extensionConfig['with']);
+extensionConfig.spread = _config(extensionConfig.prop);
+extensionConfig.list = _config(extensionConfig.obj);
 extensionConfig.block = _config(extensionConfig.obj);
-extensionConfig.pre = _config(extensionConfig.obj, { needPrefix: true });
+extensionConfig.pre = _config(extensionConfig.obj);
 extensionConfig.arg = _config(extensionConfig.prop);
 extensionConfig.once = _config(extensionConfig.obj);
 extensionConfig.show = _config(extensionConfig.prop, { isDirective: true });
@@ -418,6 +416,8 @@ extensions.strProp = extensions.prop;
 extensionConfig.strProp = _config(extensionConfig.prop, { useString: true });
 extensions.strArg = extensions.arg;
 extensionConfig.strArg = _config(extensionConfig.strProp);
+extensions.pre = extensions.block;
+extensionConfig.pre = extensionConfig.block;
 
 //Register extension and also can batch add
 export function registerExtension(name, extension, options, mergeConfig) {

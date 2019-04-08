@@ -101,5 +101,15 @@ describe('test compile string', function () {
       const html = tmpl();
       expect(html).toBe('../../a.png');
     });
+
+    xit('test directive', function () {
+      const tmpl = nj`
+        <input #show-bcd.abc.vbn-bcd="{{ {name:[123]} }}">12345
+      `;
+
+      const html = tmpl();
+      console.log(html);
+      //expect(html).toBe('../../a.png');
+    });
   });
 });

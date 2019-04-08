@@ -230,6 +230,10 @@ exports.isExTag = function (nodeName) {
   }
   const exConfig = nj.extensionConfig[utils.lowerFirst(nodeName)];
   if (exConfig) {
+    if (exConfig.onlyTemplate) {
+      return false;
+    }
+
     isSub = exConfig.isSub;
     needPrefix = exConfig.needPrefix;
   }
@@ -264,6 +268,10 @@ exports.isSubExTag = function (node) {
 
   const exConfig = nj.extensionConfig[utils.lowerFirst(nodeName)];
   if (exConfig) {
+    if (exConfig.onlyTemplate) {
+      return false;
+    }
+
     isSub = exConfig.isSub;
     needPrefix = exConfig.needPrefix;
   }
