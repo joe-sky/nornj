@@ -125,4 +125,24 @@ describe('Operator', () => {
   it('object', () => {
     expect(render(`<img src="{{ { src: 'http://test.com/img.png' }.src }}">`)).toBe('<img src="http://test.com/img.png" />');
   });
+  it('currency', function () {
+    // default
+    expect(render("{{98765 | currency}}")).toBe('$98,765.00');
+    expect(render("{{'98765' | currency}}")).toBe('$98,765.00');
+    // expect(render("{{-98.765e3 | currency}}")).toBe('-$98,765.00');
+    expect(render("{{'-98.765e3' | currency}}")).toBe('-$98,765.00');
+    expect(render("{{98765.321 | currency}}")).toBe('$98,765.32');
+    expect(render("{{98765.32132 | currency(null,0)}}")).toBe('$98,765');
+    expect(render("{{98765.321 | currency('#')}}")).toBe('#98,765.32');
+    expect(render("{{98765.321 | currency('')}}")).toBe('98,765.32');
+    expect(render("{{-98765.321 | currency}}")).toBe('-$98,765.32');
+    expect(render("{{-0.99 | currency}}")).toBe('-$0.99');
+    expect(render("{{0.99999 | currency}}")).toBe('$1.00');
+    expect(render("{{null | currency}}")).toBe('');
+    expect(render("{{false | currency}}")).toBe('');
+    expect(render("{{Infinity | currency}}")).toBe('');
+    expect(render("{{NaN | currency}}")).toBe('');
+    expect(render("{{undefined | currency}}")).toBe('');
+    expect(render("{{'undefined' | currency}}")).toBe('');
+  })
 });
