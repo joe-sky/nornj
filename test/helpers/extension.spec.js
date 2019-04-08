@@ -48,16 +48,6 @@ describe('Extension tag', () => {
     })).toBe('2');
   });
 
-  it('unless', () => {
-    expect(render(`
-      <#unless {{a}}>
-        ok
-      </#unless>
-    `, {
-      a: false
-    })).toBe('ok');
-  });
-
   it('each for array', () => {
     expect(render(`
       <nj-noWs>

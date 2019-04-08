@@ -31,9 +31,7 @@ describe('test compile string', function () {
           {{ a._ }}
           {{ a.#prop }}
           {{ { a: 1 }.a }}
-          <#once name="test">
-            <i>test</i>
-          </#once>
+          <i>test</i>
           <#each {{1 .. 2}}>
             {{@item}}
             #${({ item, index }) => item + 100 * index}

@@ -120,7 +120,7 @@ describe('test speed', function() {
           <div key={@index}>
             <span>span{no}</span>
             <i>{no}</i>
-            <#once><div><i><i>1000</i></i><i><i>1000</i></i><i><i>1000</i></i><i><i>1000</i></i><i><i>1000</i></i></div></#once>
+            <div><i><i>1000</i></i><i><i>1000</i></i><i><i>1000</i></i><i><i>1000</i></i><i><i>1000</i></i></div>
           </div>
         </#each>
       </span>

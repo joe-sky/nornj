@@ -1,4 +1,4 @@
-const nj = require('nornj').default;
+const nj = require('nornj/dist/nornj.common').default;
 const transformExTag = require('./exTag');
 const transformExAttr = require('./exAttr');
 const transformTaggedTemplate = require('./taggedTemplate');

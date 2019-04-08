@@ -897,15 +897,9 @@
         value = false;
       }
 
-      var valueR, ret;
+      var ret;
 
-      if (!options.useUnless) {
-        valueR = !!value;
-      } else {
-        valueR = !!!value;
-      }
-
-      if (valueR) {
+      if (!!value) {
         ret = options.children();
       } else {
         var props = options.props;
@@ -979,10 +973,6 @@
         }
       }, false, true);
       return ret;
-    },
-    unless: function unless(value, options) {
-      options.useUnless = true;
-      return extensions['if'](value, options);
     },
     each: function each$1(list, options) {
       if (list && list._njOpts) {
@@ -1213,18 +1203,6 @@
 
       exProps.args.push(options.children());
     },
-    once: function once(options) {
-      var cacheObj = options.context.root || options.context,
-          props = options.props,
-          cacheKey = props && props.name ? props.name : '_njOnceCache_' + options.exNo,
-          cache = cacheObj[cacheKey];
-
-      if (cache === undefined) {
-        cache = cacheObj[cacheKey] = options.children();
-      }
-
-      return cache;
-    },
     css: function css(options) {
       return options.props.style;
     }
@@ -1240,7 +1218,12 @@
       subExProps: false,
       isSub: false,
       addSet: false,
-      useExpressionInJsx: 'onlyTemplateLiteral'
+      useExpressionInJsx: 'onlyTemplateLiteral',
+      hasName: true,
+      noTagName: false,
+      hasAttrs: true,
+      hasTmplCtx: true,
+      hasOutputH: false
     };
 
     if (params) {
@@ -1256,7 +1239,10 @@
 
   var _defaultCfg = {
     onlyGlobal: true,
-    newContext: false
+    newContext: false,
+    hasName: false,
+    hasAttrs: false,
+    hasTmplCtx: false
   }; //Extension default config
 
   var extensionConfig = {
@@ -1268,9 +1254,7 @@
     'switch': _config(_defaultCfg, {
       needPrefix: 'onlyUpperCase'
     }),
-    unless: _config(_defaultCfg),
-    each: _config({
-      onlyGlobal: true,
+    each: _config(_defaultCfg, {
       newContext: {
         item: 'item',
         index: 'index',
@@ -1280,8 +1264,7 @@
         }
       }
     }),
-    'for': _config({
-      onlyGlobal: true,
+    'for': _config(_defaultCfg, {
       newContext: {
         index: 'index',
         getDatasFromProp: {
@@ -1302,8 +1285,7 @@
       newContext: true,
       onlyTemplate: true
     }),
-    'with': _config({
-      onlyGlobal: true,
+    'with': _config(_defaultCfg, {
       newContext: {
         getDatasFromProp: true
       }
@@ -1319,9 +1301,11 @@
   extensionConfig.block = _config(extensionConfig.obj);
   extensionConfig.pre = _config(extensionConfig.obj);
   extensionConfig.arg = _config(extensionConfig.prop);
-  extensionConfig.once = _config(extensionConfig.obj);
   extensionConfig.show = _config(extensionConfig.prop, {
-    isDirective: true
+    isDirective: true,
+    noTagName: true,
+    hasAttrs: true,
+    hasOutputH: true
   });
   extensionConfig.css = _config(extensionConfig.obj); //Extension alias
 
@@ -1378,6 +1362,8 @@
     registerExtension: registerExtension
   });
 
+  var digitsRE = /(\d{3})(?=\d)/g; //Global filter list
+
   var filters = {
     //Get properties
     '.': function _(obj, prop, callFn) {
@@ -1430,7 +1416,8 @@
     },
     //Convert to int 
     int: function int(val) {
-      return parseInt(val, 10);
+      var radix = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 10;
+      return parseInt(val, radix);
     },
     //Convert to float 
     float: function float(val) {
@@ -1467,6 +1454,24 @@
     },
     capitalize: function capitalize$1(str) {
       return capitalize(str);
+    },
+    currency: function currency(value, decimals, _currency) {
+      if (!(value - parseFloat(value) >= 0)) return '';
+      value = parseFloat(value);
+      _currency = decimals != null && typeof decimals == 'string' ? decimals : _currency;
+      _currency = _currency != null && typeof _currency == 'string' ? _currency : filterConfig.currency.symbol;
+      decimals = decimals != null && typeof decimals == 'number' ? decimals : 2;
+      var stringified = Math.abs(value).toFixed(decimals);
+
+      var _int = decimals ? stringified.slice(0, -1 - decimals) : stringified;
+
+      var i = _int.length % 3;
+      var head = i > 0 ? _int.slice(0, i) + (_int.length > 3 ? ',' : '') : '';
+
+      var _float = decimals ? stringified.slice(-1 - decimals) : '';
+
+      var sign = value < 0 ? '-' : '';
+      return sign + _currency + head + _int.slice(i).replace(digitsRE, '$1,') + _float;
     }
   };
 
@@ -1480,14 +1485,20 @@
     };
   }
 
-  function _config$1(params) {
+  function _config$1(params, extra) {
     var ret = {
       onlyGlobal: false,
-      hasOptions: true
+      hasOptions: false,
+      hasLevel: false,
+      hasTmplCtx: true
     };
 
     if (params) {
       ret = assign(ret, params);
+    }
+
+    if (extra) {
+      ret = assign(ret, extra);
     }
 
     return ret;
@@ -1504,7 +1515,9 @@
       onlyGlobal: true
     }),
     '#': _config$1({
-      onlyGlobal: true
+      onlyGlobal: true,
+      hasOptions: true,
+      hasLevel: true
     }),
     '**': _config$1(_defaultCfg$1),
     '%%': _config$1(_defaultCfg$1),
@@ -1518,7 +1531,10 @@
     '..': _config$1(_defaultCfg$1),
     rLt: _config$1(_defaultCfg$1),
     '<=>': _config$1(_defaultCfg$1),
-    capitalize: _config$1(_defaultCfg$1)
+    capitalize: _config$1(_defaultCfg$1),
+    currency: _config$1(_defaultCfg$1, {
+      symbol: '$'
+    })
   };
   var operators = ['+=', '+', '-[0-9]', '-', '**', '*', '%%', '%', '===', '!==', '==', '!=', '<=>', '<=', '>=', '=', '..<', '<', '>', '&&', '||', '?:', '?', ':', '../', '..', '/'];
   var REGEX_OPERATORS_ESCAPE = /\*|\||\/|\.|\?|\+/g;
@@ -2380,13 +2396,15 @@
     return no;
   }
 
-  function _buildOptions(config, useStringLocal, node, fns, exPropsStr, subExPropsStr, level, hashProps, parent, tagName, attrs) {
+  function _buildOptions(config, useStringLocal, node, fns, exPropsStr, subExPropsStr, level, hashProps, tagName, attrs) {
     var hashStr = ', useString: ' + (useStringLocal == null ? 'p1.us' : useStringLocal ? 'true' : 'false'),
-        noConfig = !config;
+        noConfig = !config,
+        no = fns._no;
 
     if (node) {
-      //扩展标签
+      //tags
       var newContext = config ? config.newContext : true;
+      var isDirective = node.isDirective || config && config.isDirective;
 
       if (noConfig || config.exProps || node.isProp) {
         hashStr += ', exProps: ' + exPropsStr;
@@ -2396,31 +2414,27 @@
         hashStr += ', subExProps: ' + subExPropsStr;
       }
 
-      if (parent) {
-        var _parentType = parent.parentType != null ? parent.parentType : parent.ex ? parent.ex : parent.type;
-
-        hashStr += ', parentName: ' + (_parentType != null ? '\'' + _parentType + '\'' : _parentType);
+      if (noConfig || config.hasName) {
+        hashStr += ', name: \'' + node.ex + '\'';
       }
 
-      hashStr += ', name: \'' + node.ex + '\'';
-
-      if (tagName) {
+      if (tagName && isDirective && (noConfig || !config.noTagName)) {
         hashStr += ', tagName: ' + tagName;
         hashStr += ', setTagName: function(c) { ' + tagName + ' = c }';
       }
 
-      if (attrs) {
+      if (attrs && (noConfig || config.hasAttrs)) {
         hashStr += ', attrs: ' + attrs;
       }
-
-      hashStr += ', ' + (node.isDirective || config && config.isDirective ? 'value' : 'children') + ': ' + (node.content ? 'p1.r(p1, p2, p1.fn' + _buildFn(node.content, node, fns, ++fns._no, newContext, level, useStringLocal) + ', ' + exPropsStr + ', ' + subExPropsStr + ')' : 'p1.np');
 
       if (hashProps != null) {
         hashStr += ', props: ' + hashProps;
       }
+
+      hashStr += ', ' + (isDirective ? 'value' : 'children') + ': ' + (node.content ? 'p1.r(p1, p2, p1.fn' + _buildFn(node.content, node, fns, ++fns._no, newContext, level, useStringLocal) + ', ' + exPropsStr + ', ' + subExPropsStr + ')' : 'p1.np');
     }
 
-    return '{ _njOpts: true, exNo: ' + fns._no + ', global: p1, context: p2, outputH: ' + !fns.useString + hashStr + (level != null ? ', level: ' + level : '') + ' }';
+    return '{ _njOpts: ' + (no == 0 ? '\'main\'' : no) + (noConfig || config.hasTmplCtx ? ', global: p1, context: p2' : '') + (noConfig || config.hasOutputH ? ', outputH: ' + !fns.useString : '') + hashStr + (level != null && (noConfig || config.hasLevel) ? ', level: ' + level : '') + ' }';
   }
 
   var CUSTOM_VAR = 'nj_custom';
@@ -2678,10 +2692,10 @@
 
           if (filterName === '.' && nextFilter && replaceFilterName(nextFilter.name) === '_') {
             _codeStr2 += ', true';
-          } //if (configF && configF.hasOptions) {
+          } //if (!configF || configF.hasOptions) {
 
 
-          if (!configF || configF.hasOptions) {
+          if (configF && configF.hasOptions) {
             _codeStr2 += ", ".concat(_buildOptions(configF, useStringLocal, null, fns, null, null, level));
           }
         }
@@ -2957,7 +2971,7 @@
           paramsStr = retP[0],
           _paramsC = retP[1];
 
-      dataReferStr += _buildOptions(configE, useStringLocal, node, fns, exPropsStr, subExPropsStr, level, paramsStr !== '' ? '_params' + _paramsC : null, parent, tagName, attrs);
+      dataReferStr += _buildOptions(configE, useStringLocal, node, fns, exPropsStr, subExPropsStr, level, paramsStr !== '' ? '_params' + _paramsC : null, tagName, attrs);
       dataReferStr += '\n];\n'; //添加匿名参数
 
       if (paramsStr !== '') {
