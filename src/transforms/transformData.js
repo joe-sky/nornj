@@ -136,6 +136,9 @@ export function newContext(p2, p3) {
     item: 'item' in p3 ? p3.item : p2.item,
     level: p2.level,
     getData,
+    get ctxInstance() {
+      return this.data[this.data.length - 1];
+    },
     d: getData,
     icp: p2.icp
   };

@@ -719,6 +719,11 @@ function newContext(p2, p3) {
     item: 'item' in p3 ? p3.item : p2.item,
     level: p2.level,
     getData: getData,
+
+    get ctxInstance() {
+      return this.data[this.data.length - 1];
+    },
+
     d: getData,
     icp: p2.icp
   };
@@ -1179,9 +1184,6 @@ var extensions = {
   block: function block(options) {
     return options.children();
   },
-  pre: function pre(options) {
-    return extensions.block(options);
-  },
   'with': function _with(originalData, options) {
     if (originalData && originalData._njOpts) {
       options = originalData;
@@ -1253,9 +1255,7 @@ var _defaultCfg = {
 
 var extensionConfig = {
   'if': _config(_defaultCfg),
-  'else': _config({
-    onlyGlobal: true,
-    newContext: false,
+  'else': _config(_defaultCfg, {
     subExProps: true,
     isSub: true
   }),
@@ -1283,26 +1283,18 @@ var extensionConfig = {
       }
     }
   }),
-  prop: _config({
-    onlyGlobal: true,
-    newContext: false,
+  prop: _config(_defaultCfg, {
     exProps: true,
     subExProps: true,
-    isProp: true
+    isProp: true,
+    onlyTemplate: true
   }),
-  spread: _config({
-    onlyGlobal: true,
-    newContext: false,
-    exProps: true,
-    subExProps: true,
-    isProp: true
+  obj: _config(_defaultCfg, {
+    onlyTemplate: true
   }),
-  obj: _config({
-    onlyGlobal: true,
-    newContext: false
-  }),
-  list: _config(_defaultCfg, {
-    needPrefix: 'onlyUpperCase'
+  fn: _config(_defaultCfg, {
+    newContext: true,
+    onlyTemplate: true
   }),
   'with': _config({
     onlyGlobal: true,
@@ -1316,11 +1308,10 @@ var extensionConfig = {
   }
 };
 extensionConfig.elseif = _config(extensionConfig['else']);
-extensionConfig.fn = _config(extensionConfig['with']);
+extensionConfig.spread = _config(extensionConfig.prop);
+extensionConfig.list = _config(extensionConfig.obj);
 extensionConfig.block = _config(extensionConfig.obj);
-extensionConfig.pre = _config(extensionConfig.obj, {
-  needPrefix: true
-});
+extensionConfig.pre = _config(extensionConfig.obj);
 extensionConfig.arg = _config(extensionConfig.prop);
 extensionConfig.once = _config(extensionConfig.obj);
 extensionConfig.show = _config(extensionConfig.prop, {
@@ -1337,7 +1328,9 @@ extensionConfig.strProp = _config(extensionConfig.prop, {
   useString: true
 });
 extensions.strArg = extensions.arg;
-extensionConfig.strArg = _config(extensionConfig.strProp); //Register extension and also can batch add
+extensionConfig.strArg = _config(extensionConfig.strProp);
+extensions.pre = extensions.block;
+extensionConfig.pre = extensionConfig.block; //Register extension and also can batch add
 
 function registerExtension(name, extension, options, mergeConfig) {
   var params = name;
@@ -1416,12 +1409,6 @@ var filters = {
       _njCtx: obj
     }, options.context, options.level);
   },
-  // '=': (obj, val) => {
-  //   if (obj == null) {
-  //     return obj;
-  //   }
-  //   obj._njCtx[obj.prop] = val;
-  // },
   '**': function _(val1, val2) {
     return Math.pow(val1, val2);
   },
@@ -1526,10 +1513,7 @@ var filterConfig = {
   rLt: _config$1(_defaultCfg$1),
   '<=>': _config$1(_defaultCfg$1),
   capitalize: _config$1(_defaultCfg$1)
-}; //Filter alias
-
-filters.prop = filters['.'];
-filterConfig.prop = filterConfig['.'];
+};
 var operators = ['+=', '+', '-[0-9]', '-', '**', '*', '%%', '%', '===', '!==', '==', '!=', '<=>', '<=', '>=', '=', '..<', '<', '>', '&&', '||', '?:', '?', ':', '../', '..', '/'];
 var REGEX_OPERATORS_ESCAPE = /\*|\||\/|\.|\?|\+/g;
 
@@ -1591,17 +1575,14 @@ function _replaceStr(prop, innerQuotes) {
   return prop.replace(REGEX_REPLACE_CHAR, function (all, g1) {
     return innerQuotes[g1];
   });
-}
+} // const SPACE_ERROR = 'This may be because the operator must have at least one space before and after';
+// function _syntaxError(errorStr, expression, source) {
+//   return 'Filter or expression syntax error: ' + errorStr + ' in\n\nexpression: ' + expression + '\n\nsource: ' + source + '\n\nNornJ expression syntax specification please see the document: https://joe-sky.github.io/nornj-guide/templateSyntax/filter.html\n';
+// }
 
-var SPACE_ERROR = 'This may be because the operator must have at least one space before and after';
-
-function _syntaxError(errorStr, expression, source) {
-  return 'Filter or expression syntax error: ' + errorStr + ' in\n\nexpression: ' + expression + '\n\nsource: ' + source + '\n\nNornJ expression syntax specification please see the document: https://joe-sky.github.io/nornj-guide/templateSyntax/filter.html\n';
-}
 
 function _compiledProp(prop, innerBrackets, innerQuotes, source) {
   var ret = obj();
-  var propO = prop; //If there are vertical lines in the property,then use filter
 
   if (prop.indexOf('|') >= 0) {
     var filters = [],
@@ -1627,7 +1608,7 @@ function _compiledProp(prop, innerBrackets, innerQuotes, source) {
         //Multiple params are separated by commas.
 
         if (paramsF != null) {
-          throwIf(innerBrackets[paramsF] != null, _syntaxError(_replaceStr(paramsF, innerQuotes) + '. ' + SPACE_ERROR, _replaceStr(propO, innerQuotes), source));
+          //tools.throwIf(innerBrackets[paramsF] != null, _syntaxError(_replaceStr(paramsF, innerQuotes) + '. ' + SPACE_ERROR, _replaceStr(propO, innerQuotes), source));
           var params = [];
           each(innerBrackets[paramsF].split(','), function (p) {
             if (p !== '') {
@@ -1660,11 +1641,9 @@ function _compiledProp(prop, innerBrackets, innerQuotes, source) {
   if (prop !== '') {
     var matchProp = REGEX_JS_PROP.exec(prop);
     var hasComputed = matchProp[6] === '#';
-    ret.name = hasComputed ? matchProp[7] : matchProp[0];
-
-    if (matchProp[0] !== prop) {
-      error(_syntaxError(SPACE_ERROR, _replaceStr(propO, innerQuotes), source));
-    }
+    ret.name = hasComputed ? matchProp[7] : matchProp[0]; // if (matchProp[0] !== prop) {
+    //   tools.error(_syntaxError(SPACE_ERROR, _replaceStr(propO, innerQuotes), source));
+    // }
 
     if (!matchProp[5]) {
       //Sign the parameter is a basic type value.
@@ -3558,7 +3537,7 @@ function _setElem(elem, elemName, elemParams, elemArr, bySelfClose, tmplRule, ou
   }
 }
 
-var REGEX_EX_ATTR = /([^\s-$.]+)((-[^\s-$.]+)*)(([$.][^\s-$.]+)*)/; //Extract split parameters
+var REGEX_EX_ATTR = /([^\s-$.]+)(([$.][^\s-$.]+)*)((-[^\s-$.]+([$.][^\s-$.]+)*)*)/; //Extract split parameters
 
 function _getSplitParams(elem, tmplRule, outputH) {
   var extensionRule = tmplRule.extensionRule,
@@ -3593,22 +3572,32 @@ function _getSplitParams(elem, tmplRule, outputH) {
     }
 
     var args, modifiers;
-    name = name.replace(REGEX_EX_ATTR, function (all, name, arg, g3, modifier) {
+    name = name.replace(REGEX_EX_ATTR, function (all, name, modifier, g3, arg) {
       if (arg) {
         args = arg.substr(1).split('-').map(function (item) {
-          return '\'' + item + '\'';
+          var argStr;
+          var modifierStr = '';
+          var strs = item.split(/[$.]/);
+          strs.forEach(function (str, i) {
+            if (i == 0) {
+              argStr = 'name:\'' + str + '\'' + (i < strs.length - 1 ? ',' : '');
+            } else {
+              modifierStr += '\'' + str + '\'' + (i < strs.length - 1 ? ',' : '');
+            }
+          });
+          return '{' + argStr + (modifierStr != '' ? 'modifiers:[' + modifierStr + ']' : '') + '}';
         });
       }
 
       if (modifier) {
-        modifiers = modifier.substr(1).split(/[_.]/).map(function (item) {
+        modifiers = modifier.substr(1).split(/[$.]/).map(function (item) {
           return '\'' + item + '\'';
         });
       }
 
       return name;
     });
-    var exPreAst = [extensionRule + name + ' _njIsProp' + (args ? ' arguments="' + startRule + '[' + args.join(',') + ']' + endRule + '"' : '') + (modifiers ? ' modifiers="' + startRule + '[' + modifiers.join(',') + ']' + endRule + '"' : '') + (hasEqual ? '' : ' /')];
+    var exPreAst = [extensionRule + name + ' _njIsProp' + (args ? ' arguments="' + firstChar + startRule + '[' + args.join(',') + ']' + endRule + lastChar + '"' : '') + (modifiers ? ' modifiers="' + startRule + '[' + modifiers.join(',') + ']' + endRule + '"' : '') + (hasEqual ? '' : ' /')];
     hasEqual && exPreAst.push((hasColon ? (outputH ? firstChar : '') + startRule + ' ' : '') + clearQuot(value) + (hasColon ? ' ' + endRule + (outputH ? lastChar : '') : ''));
     paramsEx.push(exPreAst);
     return ' ';

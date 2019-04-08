@@ -319,7 +319,7 @@ function _setElem(elem, elemName, elemParams, elemArr, bySelfClose, tmplRule, ou
   }
 }
 
-const REGEX_EX_ATTR = /([^\s-$.]+)((-[^\s-$.]+)*)(([$.][^\s-$.]+)*)/;
+const REGEX_EX_ATTR = /([^\s-$.]+)(([$.][^\s-$.]+)*)((-[^\s-$.]+([$.][^\s-$.]+)*)*)/;
 
 //Extract split parameters
 function _getSplitParams(elem, tmplRule, outputH) {
@@ -351,18 +351,32 @@ function _getSplitParams(elem, tmplRule, outputH) {
     }
 
     let args, modifiers;
-    name = name.replace(REGEX_EX_ATTR, (all, name, arg, g3, modifier) => {
+    name = name.replace(REGEX_EX_ATTR, (all, name, modifier, g3, arg) => {
       if (arg) {
-        args = arg.substr(1).split('-').map(item => '\'' + item + '\'');
+        args = arg.substr(1).split('-').map(item => {
+          let argStr;
+          let modifierStr = '';
+          const strs = item.split(/[$.]/);
+          strs.forEach((str, i) => {
+            if (i == 0) {
+              argStr = 'name:\'' + str + '\'' + (i < strs.length - 1 ? ',' : '');
+            }
+            else {
+              modifierStr += '\'' + str + '\'' + (i < strs.length - 1 ? ',' : '');
+            }
+          });
+
+          return '{' + argStr + (modifierStr != '' ? 'modifiers:[' + modifierStr + ']' : '') + '}';
+        });
       }
       if (modifier) {
-        modifiers = modifier.substr(1).split(/[_.]/).map(item => '\'' + item + '\'');
+        modifiers = modifier.substr(1).split(/[$.]/).map(item => '\'' + item + '\'');
       }
       return name;
     });
 
     const exPreAst = [extensionRule + name + ' _njIsProp'
-      + (args ? ' arguments="' + startRule + '[' + args.join(',') + ']' + endRule + '"' : '')
+      + (args ? ' arguments="' + firstChar + startRule + '[' + args.join(',') + ']' + endRule + lastChar + '"' : '')
       + (modifiers ? ' modifiers="' + startRule + '[' + modifiers.join(',') + ']' + endRule + '"' : '')
       + (hasEqual ? '' : ' /')];
     hasEqual && exPreAst.push((hasColon ? ((outputH ? firstChar : '') + startRule + ' ') : '') + tools.clearQuot(value) + (hasColon ? (' ' + endRule + (outputH ? lastChar : '')) : ''));
