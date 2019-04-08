@@ -1,6 +1,6 @@
 ﻿import { render } from '../../src/compiler/compile';
 import '../../src/utils/createTmplRule';
-import { registerFilter } from '../../src/helpers/filter';
+import { registerFilter,filters } from '../../src/helpers/filter';
 
 registerFilter({
   cut: (v, len) => {
@@ -129,11 +129,11 @@ describe('Operator', () => {
     // default
     expect(render("{{98765 | currency}}")).toBe('$98,765.00');
     expect(render("{{'98765' | currency}}")).toBe('$98,765.00');
-    // expect(render("{{-98.765e3 | currency}}")).toBe('-$98,765.00');
+    expect(render("{{value | currency}}",{value:-98.765e3})).toBe('-$98,765.00');
     expect(render("{{'-98.765e3' | currency}}")).toBe('-$98,765.00');
     expect(render("{{98765.321 | currency}}")).toBe('$98,765.32');
-    expect(render("{{98765.32132 | currency(null,0)}}")).toBe('$98,765');
-    expect(render("{{98765.321 | currency('#')}}")).toBe('#98,765.32');
+    expect(render("{{98765.32132 | currency(0)}}")).toBe('$98,765');
+    expect(render("{{98765.321 | currency(0,'#')}}")).toBe('#98,765');
     expect(render("{{98765.321 | currency('')}}")).toBe('98,765.32');
     expect(render("{{-98765.321 | currency}}")).toBe('-$98,765.32');
     expect(render("{{-0.99 | currency}}")).toBe('-$0.99');
@@ -144,5 +144,8 @@ describe('Operator', () => {
     expect(render("{{NaN | currency}}")).toBe('');
     expect(render("{{undefined | currency}}")).toBe('');
     expect(render("{{'undefined' | currency}}")).toBe('');
+    
+    registerFilter('currency',filters.currency,{symbol:'￥'})
+    expect(render("{{98765 | currency}}")).toBe('￥98,765.00');
   })
 });

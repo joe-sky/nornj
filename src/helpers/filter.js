@@ -99,11 +99,12 @@ export const filters = {
 
   capitalize: str => tools.capitalize(str),
   
-  currency (value, currency, decimals) {
+  currency (value, decimals,currency) {
     if(!(value - parseFloat(value) >= 0)) return '';
     value = parseFloat(value);
-    currency = currency != null ? currency : '$';
-    decimals = decimals != null ? decimals : 2;
+    currency = decimals != null &&  typeof decimals == 'string' ? decimals : currency;
+    currency = currency != null &&  typeof currency == 'string' ? currency: filterConfig.currency.symbol;
+    decimals = decimals != null &&  typeof decimals == 'number' ? decimals : 2;
     var stringified = Math.abs(value).toFixed(decimals);
     var _int = decimals
       ? stringified.slice(0, -1 - decimals)
@@ -160,7 +161,7 @@ export const filterConfig = {
   rLt: _config(_defaultCfg),
   '<=>': _config(_defaultCfg),
   capitalize: _config(_defaultCfg),
-  currency: _config(_defaultCfg)
+  currency: _config({symbol:'$'})
 };
 
 //Filter alias
