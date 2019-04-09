@@ -17,7 +17,7 @@
 <a href="https://travis-ci.org/joe-sky/nornj"><img src="https://travis-ci.org/joe-sky/nornj.svg?branch=master" alt="Travis CI Status"/></a>
 <a href="https://codecov.io/gh/joe-sky/nornj"><img src="https://codecov.io/gh/joe-sky/nornj/branch/master/graph/badge.svg" alt="Codecov" /></a>
 [![NPM Downloads][downloads-image]][npm-url]
-[![](https://img.shields.io/bundlephobia/minzip/nornj@next.svg?style=flat)](https://bundlephobia.com/result?p=nornj@next)
+[![](https://img.shields.io/bundlephobia/minzip/nornj@5.0.0-rc.1.svg?style=flat)](https://bundlephobia.com/result?p=nornj@next)
 
 English | [简体中文](https://github.com/joe-sky/nornj/blob/master/README.zh.md)
 
@@ -28,13 +28,7 @@ English | [简体中文](https://github.com/joe-sky/nornj/blob/master/README.zh.
 
 ## Introduction
 
-In `React` development, the `JSX` can use almost all the syntax of javascript and it's very flexible. But if we use `NornJ` with `React` and `JSX`, we can do better:
-
-* Support directives：
-
-```js
-<img n-show={false} />
-```
+In `React` development, the `JSX` can use almost all the syntax of javascript and it's very flexible. But if we use `NornJ` with `React` and `JSX`, we can do better, because it can gives JSX `template engine` features:
 
 * Support control statements：
 
@@ -42,10 +36,16 @@ In `React` development, the `JSX` can use almost all the syntax of javascript an
 <each of={[1, 2, 3]}><i>{item}</i></each>
 ```
 
+* Support directives：
+
+```js
+<img n-show={false} />
+```
+
 * Support filters：
 
 ```js
-<button>{n`${'abc'} | capitalize`}</button>
+<button>{n`${foo} | capitalize`}</button>
 ```
 
 * Support custom operators：
@@ -62,10 +62,11 @@ In `React` development, the `JSX` can use almost all the syntax of javascript an
 
 ```js
 class App extends Component {
-  addTodo() {
+  addTodo = e => {
     const { todos = [] } = this.state;
     this.setState({ todos: todos.concat(`Item ${todos.length}`) });
-  }
+  };
+
   render({ page }, { todos = [] }) {
     return (
       <div className="app">
@@ -85,7 +86,7 @@ class App extends Component {
             </if>
           </each>
         </ul>
-        <button n-show={todos.length > 0} onClick={() => this.addTodo()}>Add Todo</button>
+        <button n-show={todos.length > 0} onClick={this.addTodo}>Add Todo</button>
       </div>
     );
   }
@@ -109,7 +110,7 @@ const template = nj`
         </#if>
       </#each>
     </ul>
-    <button :#show="todos.length > 0" :onClick="() => addTodo()">Add Todo</button>
+    <button :#show="todos.length > 0" :onClick="addTodo">Add Todo</button>
   </Container>
 `;
 
@@ -119,10 +120,11 @@ const Container = styled.div`
 `;
 
 class App extends Component {
-  addTodo() {
+  addTodo = e => {
     const { todos = [] } = this.state;
     this.setState({ todos: todos.concat(`Item ${todos.length}`) });
-  }
+  };
+
   render() {
     return template({ components: { Container } }, this.state, this);
   }
@@ -172,8 +174,8 @@ Next, add `nornj-in-jsx` to plugins in your babel configuration:
 * [babel-plugin-nornj-in-jsx(Babel plugin provided by NornJ)](https://github.com/joe-sky/nornj/tree/master/packages/babel-plugin-nornj-in-jsx)
 * [babel-plugin-nornj-loader(nornj-loader's Babel plugin ver)](https://github.com/yuhongda/babel-plugin-nornj-loader)
 * [react-native transformer(nornj-loader's RN ver)](https://github.com/joe-sky/nornj/blob/master/tools/metroTransformer.js)
-<!--* [koa-nornj(NornJ's Koa middleware)](https://github.com/qingqinxl1/koa-nornj)-->
 * [express-nornj(NornJ's Express view engine)](https://github.com/joe-sky/nornj/blob/master/tools/expressEngine.js)
+<!--* [koa-nornj(NornJ's Koa middleware)](https://github.com/qingqinxl1/koa-nornj)-->
 
 ## Syntax highlight
 

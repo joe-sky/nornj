@@ -1,5 +1,5 @@
 /*!
-* NornJ template engine v5.0.0-rc.1
+* NornJ template engine v5.0.0-rc.3
 * (c) 2016-2019 Joe_Sky
 * Released under the MIT License.
 */
@@ -1139,7 +1139,7 @@ function registerExtension(name, extension, options, mergeConfig) {
 
       if (mergeConfig) {
         if (!extensionConfig[name]) {
-          extensionConfig[name] = {};
+          extensionConfig[name] = _config();
         }
 
         assign(extensionConfig[name], _options3);
@@ -1366,7 +1366,7 @@ function registerFilter(name, filter, options, mergeConfig) {
 
       if (mergeConfig) {
         if (!filterConfig[name]) {
-          filterConfig[name] = {};
+          filterConfig[name] = _config$1();
         }
 
         assign(filterConfig[name], _options);

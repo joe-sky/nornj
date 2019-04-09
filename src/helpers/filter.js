@@ -224,7 +224,7 @@ export function registerFilter(name, filter, options, mergeConfig) {
 
       if (mergeConfig) {
         if (!filterConfig[name]) {
-          filterConfig[name] = {};
+          filterConfig[name] = _config();
         }
         tools.assign(filterConfig[name], options);
       }

@@ -30,8 +30,8 @@ module.exports = function (babel) {
           const hasMobx = exAttrs.reduce((result, exAttr) =>
             result || (exAttr.indexOf('n-mobxBind') > -1 || exAttr.indexOf('n-mstBind') > -1), false);
           hasMobx
-            && !nj.extensionConfig['mobxBind']
-            && Object.assign(nj.extensionConfig, require('nornj-react/mobx/extensionConfig'));
+            && !nj.extensionConfig.mobxBind
+            && utils.setTmplConfig({ extensionConfig: require('nornj-react/mobx/extensionConfig') });
           if (hasMobx) {
             state.hasMobxWithNj = true;
           }
@@ -85,7 +85,7 @@ module.exports = function (babel) {
         state.hasImportNj = false;
         state.hasImportNjr = false;
         state.hasImportNjrMobx = false;
-        utils.setTmplConfig(state.opts);
+        utils.setTmplConfig(state.opts, true);
       },
       exit(path, state) {
         if (!state.hasNjInJSX) {

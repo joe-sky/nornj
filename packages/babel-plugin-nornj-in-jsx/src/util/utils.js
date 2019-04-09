@@ -1,7 +1,7 @@
 const nj = require('nornj/dist/nornj.common').default;
 
-function setTmplConfig(opts) {
-  if (nj._alreadySetConfigs) {
+function setTmplConfig(opts, isInit) {
+  if (isInit && nj._alreadySetConfigs) {
     return;
   }
 
@@ -38,7 +38,7 @@ function setTmplConfig(opts) {
     nj.registerFilter(filterConfig, null, null, true);
   }
 
-  nj._alreadySetConfigs = true;
+  isInit && (nj._alreadySetConfigs = true);
 }
 
 function lowerFirst(str) {
