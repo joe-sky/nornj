@@ -1,0 +1,46 @@
+{
+  "name": "typescript-nornj-plugin",
+  "version": "0.9.0",
+  "description": "TypeScript language service plugin that adds IntelliSense for nornj tagged templates",
+  "keywords": [
+    "TypeScript",
+    "nornj",
+    "NornJ",
+    "nj",
+    "literal html",
+    "templates"
+  ],
+  "main": "lib/index.js",
+  "author": "Microsoft",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/joe-sky/nornj.git"
+  },
+  "bugs": {
+    "url": "https://github.com/joe-sky/nornj/issues"
+  },
+  "dependencies": {
+    "typescript-styled-plugin": "^0.13.0",
+    "typescript-template-language-service-decorator": "^2.2.0",
+    "vscode-html-languageservice": "^2.1.10",
+    "vscode-languageserver-types": "^3.13.0"
+  },
+  "files": [
+    "lib"
+  ],
+  "devDependencies": {
+    "@types/node": "^8.0.0",
+    "chai": "^4.1.2",
+    "glob": "^7.1.3",
+    "mocha": "^5.2.0",
+    "tslint": "^5.11.0",
+    "typescript": "^3.1.3"
+  },
+  "scripts": {
+    "compile": "./node_modules/.bin/tsc -p .",
+    "watch:compile": "./node_modules/.bin/tsc --watch -p .",
+    "e2e": "./node_modules/.bin/mocha e2e/tests --slow 2000 --timeout 10000",
+    "lint": "./node_modules/.bin/tslint -c tslint.json -p tsconfig.json"
+  }
+}
