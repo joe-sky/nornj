@@ -1,5 +1,5 @@
 /*!
-* NornJ template engine v5.0.0-rc.3
+* NornJ template engine v5.0.0-rc.4
 * (c) 2016-2019 Joe_Sky
 * Released under the MIT License.
 */
@@ -1450,7 +1450,7 @@ var filters = {
     return capitalize(str);
   },
   currency: function currency(value, decimals, _currency) {
-    if (!(value - parseFloat(value) >= 0)) return '';
+    if (!(value - parseFloat(value) >= 0)) return filterConfig.currency.placeholder;
     value = parseFloat(value);
     _currency = decimals != null && typeof decimals == 'string' ? decimals : _currency;
     _currency = _currency != null && typeof _currency == 'string' ? _currency : filterConfig.currency.symbol;
@@ -1527,7 +1527,8 @@ var filterConfig = {
   '<=>': _config$1(_defaultCfg$1),
   capitalize: _config$1(_defaultCfg$1),
   currency: _config$1(_defaultCfg$1, {
-    symbol: '$'
+    symbol: '$',
+    placeholder: ''
   })
 };
 var operators = ['+=', '+', '-[0-9]', '-', '**', '*', '%%', '%', '===', '!==', '==', '!=', '<=>', '<=', '>=', '=', '..<', '<', '>', '&&', '||', '?:', '?', ':', '../', '..', '/'];
