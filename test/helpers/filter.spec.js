@@ -146,5 +146,7 @@ describe('Operator', () => {
 
     filterConfig.currency.symbol = '￥';
     expect(render("{{98765 | currency}}")).toBe('￥98,765.00');
+    filterConfig.currency.placeholder = '-';
+    expect(render("{{NaN | currency}}")).toBe('-');
   })
 });

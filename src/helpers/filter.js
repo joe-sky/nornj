@@ -93,7 +93,7 @@ export const filters = {
   capitalize: str => tools.capitalize(str),
 
   currency(value, decimals, currency) {
-    if (!(value - parseFloat(value) >= 0)) return '';
+    if (!(value - parseFloat(value) >= 0)) return filterConfig.currency.placeholder;
     value = parseFloat(value);
     currency = decimals != null && typeof decimals == 'string' ? decimals : currency;
     currency = currency != null && typeof currency == 'string' ? currency : filterConfig.currency.symbol;
@@ -159,7 +159,7 @@ export const filterConfig = {
   rLt: _config(_defaultCfg),
   '<=>': _config(_defaultCfg),
   capitalize: _config(_defaultCfg),
-  currency: _config(_defaultCfg, { symbol: '$' })
+  currency: _config(_defaultCfg, { symbol: '$',placeholder:'' })
 };
 
 export const operators = [
