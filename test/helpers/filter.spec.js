@@ -1,10 +1,9 @@
 ﻿import { render } from '../../src/compiler/compile';
 import '../../src/utils/createTmplRule';
-import { registerFilter,filters } from '../../src/helpers/filter';
+import { registerFilter, filters, filterConfig } from '../../src/helpers/filter';
 
 registerFilter({
-  cut: (v, len) => {
-    len && len._njOpts && (len = 2);
+  cut: (v, len = 2) => {
     return v.substr(len);
   }
 });
@@ -125,11 +124,11 @@ describe('Operator', () => {
   it('object', () => {
     expect(render(`<img src="{{ { src: 'http://test.com/img.png' }.src }}">`)).toBe('<img src="http://test.com/img.png" />');
   });
+
   it('currency', function () {
-    // default
     expect(render("{{98765 | currency}}")).toBe('$98,765.00');
     expect(render("{{'98765' | currency}}")).toBe('$98,765.00');
-    expect(render("{{value | currency}}",{value:-98.765e3})).toBe('-$98,765.00');
+    expect(render("{{value | currency}}", { value: -98.765e3 })).toBe('-$98,765.00');
     expect(render("{{'-98.765e3' | currency}}")).toBe('-$98,765.00');
     expect(render("{{98765.321 | currency}}")).toBe('$98,765.32');
     expect(render("{{98765.32132 | currency(0)}}")).toBe('$98,765');
@@ -144,8 +143,8 @@ describe('Operator', () => {
     expect(render("{{NaN | currency}}")).toBe('');
     expect(render("{{undefined | currency}}")).toBe('');
     expect(render("{{'undefined' | currency}}")).toBe('');
-    
-    registerFilter('currency',filters.currency,{symbol:'￥'})
+
+    filterConfig.currency.symbol = '￥';
     expect(render("{{98765 | currency}}")).toBe('￥98,765.00');
   })
 });

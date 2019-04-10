@@ -89,18 +89,19 @@ const Button = (props) => {
 * [安装](安装)
 * [它是如何工作的](#它是如何工作的)
 * [标签](#标签)
-  * [if](#if)
-  * [each](#each)
-  * [switch](#switch)
-  * [for](#for)
-  * [with](#with)
-  * [fn](#fn)
+  * [If](#if)
+  * [Each](#each)
+  * [Switch](#switch)
+  * [For](#for)
+  * [With](#with)
+  * [MobxObserver](#mobxObserver)
   * [开发新的标签](#开发新的标签)
 * [指令](#指令)
   * [n-show](#n-show)
   * [n-style](#n-style)
-  * [n-mobx-bind](#n-mobx-bind)
-  * [n-mst-bind](#n-mst-bind)
+  * [n-debounce](#n-debounce)
+  * [n-mobxBind](#n-mobxBind)
+  * [n-mstBind](#n-mstBind)
   * [开发新的指令](#开发新的指令)
 * [表达式](#表达式)
   * [过滤器](#过滤器)
@@ -108,11 +109,14 @@ const Button = (props) => {
     * [int](#int)
     * [float](#float)
     * [bool](#bool)
+    * [currency](#currency)
+    * [开发新的过滤器](#开发新的过滤器)
   * [运算符](#运算符)
-    * [a.b\['c'\] (安全的属性访问器)](#安全的属性访问器)
+    * [a.b\[c\] (安全访问器)](#安全访问器)
     * [a .. b (范围运算符)](#范围运算符)
     * [a <=> b (飞船运算符)](#飞船运算符)
-  * [开发新的表达式](#开发新的表达式)
+    * [a %% b (向下取整)](#向下取整)
+    * [开发新的运算符](#开发新的运算符)
 
 ## 安装
 
@@ -430,9 +434,9 @@ class TestComponent extends Component {
 }
 ```
 
-### n-mobx-bind
+### n-mobxBind
 
-类似于`Vue`的`v-model`指令，可以使用`n-mobx-bind`配合`Mobx`在`<input>`及`<textarea>`等表单元素上创建`双向数据绑定`，它会根据控件类型自动选取正确的方法来更新元素。
+类似于`Vue`的`v-model`指令，可以使用`n-mobxBind`配合`Mobx`在`<input>`及`<textarea>`等表单元素上创建`双向数据绑定`，它会根据控件类型自动选取正确的方法来更新元素。
 
 * 基本使用方法
 
@@ -444,22 +448,22 @@ class TestComponent extends Component {
   @observable inputValue = '';
 
   render() {
-    return <input n-mobx-bind="inputValue" />;
+    return <input n-mobxBind="inputValue" />;
   }
 }
 ```
 
 如上所示，无需编写`<input>`标签的`onChange`事件，`inputValue`变量已自动和`<input>`标签建立了`双向数据绑定`的关系。
 
-* 实质上，`n-mobx-bind`的实现原理和`v-model`很类似，上述示例其实就是下面的语法糖形式：
+* 实质上，`n-mobxBind`的实现原理和`v-model`很类似，上述示例其实就是下面的语法糖形式：
 
 ```js
 class TestComponent extends Component {
   @observable inputValue = '';
-  @autobind
-  onChange(e) {
+
+  onChange = e => {
     this.inputValue = e.target.value;
-  }
+  };
 
   render() {
     return <input value={this.inputValue} onChange={this.onChange} />;
@@ -469,19 +473,18 @@ class TestComponent extends Component {
 
 * `onChange`事件
 
-由于`n-mobx-bind`默认自动设置了组件的`onChange`事件，但有些情况下我们可能还是需要在`onChange`中做一些其他的操作：
+由于`n-mobxBind`默认自动设置了组件的`onChange`事件，但有些情况下我们可能还是需要在`onChange`中做一些其他的操作：
 
 ```js
 class TestComponent extends Component {
   @observable inputValue = '1';
 
-  @autobind
-  onChange(e) {
+  onChange = e => {
     console.log(e.target.value);
-  }
+  };
 
   render() {
-    return <input n-mobx-bind="inputValue" onChange={this.onChange} />;
+    return <input n-mobxBind="inputValue" onChange={this.onChange} />;
   }
 }
 ```
@@ -496,7 +499,7 @@ class TestComponent extends Component {
 import { observable, action, configure } from 'mobx';
 
 // don't allow state modifications outside actions
-configure({enforceActions: true});
+configure({ enforceActions: true });
 
 class TestComponent extends Component {
   @observable inputValue = '1';
@@ -507,16 +510,16 @@ class TestComponent extends Component {
   }
 
   render() {
-    return <input n-mobx-bind$action="inputValue" />;
+    return <input n-mobxBind-action="inputValue" />;
   }
 }
 ```
 
-当有`action`修饰符时，`n-mobx-bind`会默认执行camel命名法(`set + 变量名`)定义的`action`，上例中为`setInputValue`。
+当有`action`参数时，`n-mobxBind`会默认执行camel命名法(`set + 变量名`)定义的`action`，上例中为`setInputValue`。
 
-### n-mst-bind
+### n-mstBind
 
-`n-mst-bind`即为`n-mobx-bind`的默认使用`action`来更新值的版本，用来配合`mobx-state-tree`的变量使用：
+`n-mstBind`即为`n-mobxBind`的默认使用`action`来更新值的版本，用来配合`mobx-state-tree`的变量使用：
 
 store：
 
@@ -541,14 +544,12 @@ component：
 @observer
 class TestComponent extends Component {
   render() {
-    return <input n-mst-bind={`${this}.props.rootStore.testStore`} />;
+    return <input n-mstBind="rootStore.testStore" />;
   }
 }
 ```
 
-如上，`n-mst-bind`会默认执行camel命名法(`set + 变量名`)定义的`action`来更新值，上例中为`setInputValue`。除此外`n-mst-bind`的其他特性与上述的`n-mobx-bind`完全相同。
-
-`n-mobx-bind`和`n-mst-bind`的更多详细文档请[查看这里](https://joe-sky.github.io/nornj-guide/templateSyntax/inlineExtensionTag.html#mobx-bind)。
+如上，`n-mstBind`会默认执行camel命名法(`set + 变量名`)定义的`action`来更新值，上例中为`setInputValue`。除此外`n-mstBind`的其他特性与上述的`n-mobxBind`完全相同。
 
 ## 表达式
 

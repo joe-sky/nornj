@@ -13,13 +13,8 @@ export const extensions = {
       value = false;
     }
 
-    let valueR, ret;
-    if (!options.useUnless) {
-      valueR = !!value;
-    } else {
-      valueR = !!!value;
-    }
-    if (valueR) {
+    let ret;
+    if (!!value) {
       ret = options.children();
     } else {
       let props = options.props;
@@ -93,11 +88,6 @@ export const extensions = {
     }, false, true);
 
     return ret;
-  },
-
-  unless: (value, options) => {
-    options.useUnless = true;
-    return extensions['if'](value, options);
   },
 
   each: (list, options) => {
@@ -328,18 +318,6 @@ export const extensions = {
     exProps.args.push(options.children());
   },
 
-  once: options => {
-    let cacheObj = options.context.root || options.context,
-      props = options.props,
-      cacheKey = props && props.name ? props.name : ('_njOnceCache_' + options.exNo),
-      cache = cacheObj[cacheKey];
-
-    if (cache === undefined) {
-      cache = cacheObj[cacheKey] = options.children();
-    }
-    return cache;
-  },
-
   css: options => options.props.style
 };
 
@@ -353,7 +331,12 @@ function _config(params, extra) {
     subExProps: false,
     isSub: false,
     addSet: false,
-    useExpressionInJsx: 'onlyTemplateLiteral'
+    useExpressionInJsx: 'onlyTemplateLiteral',
+    hasName: true,
+    noTagName: false,
+    hasAttrs: true,
+    hasTmplCtx: true,
+    hasOutputH: false
   };
 
   if (params) {
@@ -365,16 +348,14 @@ function _config(params, extra) {
   return ret;
 }
 
-const _defaultCfg = { onlyGlobal: true, newContext: false };
+const _defaultCfg = { onlyGlobal: true, newContext: false, hasName: false, hasAttrs: false, hasTmplCtx: false };
 
 //Extension default config
 export const extensionConfig = {
   'if': _config(_defaultCfg),
   'else': _config(_defaultCfg, { subExProps: true, isSub: true }),
   'switch': _config(_defaultCfg, { needPrefix: 'onlyUpperCase' }),
-  unless: _config(_defaultCfg),
-  each: _config({
-    onlyGlobal: true,
+  each: _config(_defaultCfg, {
     newContext: {
       item: 'item',
       index: 'index',
@@ -384,8 +365,7 @@ export const extensionConfig = {
       }
     }
   }),
-  'for': _config({
-    onlyGlobal: true,
+  'for': _config(_defaultCfg, {
     newContext: {
       index: 'index',
       getDatasFromProp: { except: ['to', 'step', 'index'] }
@@ -394,7 +374,7 @@ export const extensionConfig = {
   prop: _config(_defaultCfg, { exProps: true, subExProps: true, isProp: true, onlyTemplate: true }),
   obj: _config(_defaultCfg, { onlyTemplate: true }),
   fn: _config(_defaultCfg, { newContext: true, onlyTemplate: true }),
-  'with': _config({ onlyGlobal: true, newContext: { getDatasFromProp: true } }),
+  'with': _config(_defaultCfg, { newContext: { getDatasFromProp: true } }),
   style: { useExpressionInJsx: false, needPrefix: true }
 };
 extensionConfig.elseif = _config(extensionConfig['else']);
@@ -403,8 +383,7 @@ extensionConfig.list = _config(extensionConfig.obj);
 extensionConfig.block = _config(extensionConfig.obj);
 extensionConfig.pre = _config(extensionConfig.obj);
 extensionConfig.arg = _config(extensionConfig.prop);
-extensionConfig.once = _config(extensionConfig.obj);
-extensionConfig.show = _config(extensionConfig.prop, { isDirective: true });
+extensionConfig.show = _config(extensionConfig.prop, { isDirective: true, noTagName: true, hasAttrs: true, hasOutputH: true });
 extensionConfig.css = _config(extensionConfig.obj);
 
 //Extension alias
@@ -442,7 +421,7 @@ export function registerExtension(name, extension, options, mergeConfig) {
 
       if (mergeConfig) {
         if (!extensionConfig[name]) {
-          extensionConfig[name] = {};
+          extensionConfig[name] = _config();
         }
         tools.assign(extensionConfig[name], options);
       }

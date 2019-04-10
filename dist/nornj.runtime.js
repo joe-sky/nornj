@@ -1,5 +1,5 @@
 /*!
-* NornJ template engine v5.0.0-rc.1
+* NornJ template engine v5.0.0-rc.3
 * (c) 2016-2019 Joe_Sky
 * Released under the MIT License.
 */
@@ -692,15 +692,9 @@
         value = false;
       }
 
-      var valueR, ret;
+      var ret;
 
-      if (!options.useUnless) {
-        valueR = !!value;
-      } else {
-        valueR = !!!value;
-      }
-
-      if (valueR) {
+      if (!!value) {
         ret = options.children();
       } else {
         var props = options.props;
@@ -774,10 +768,6 @@
         }
       }, false, true);
       return ret;
-    },
-    unless: function unless(value, options) {
-      options.useUnless = true;
-      return extensions['if'](value, options);
     },
     each: function each$1(list, options) {
       if (list && list._njOpts) {
@@ -1008,18 +998,6 @@
 
       exProps.args.push(options.children());
     },
-    once: function once(options) {
-      var cacheObj = options.context.root || options.context,
-          props = options.props,
-          cacheKey = props && props.name ? props.name : '_njOnceCache_' + options.exNo,
-          cache = cacheObj[cacheKey];
-
-      if (cache === undefined) {
-        cache = cacheObj[cacheKey] = options.children();
-      }
-
-      return cache;
-    },
     css: function css(options) {
       return options.props.style;
     }
@@ -1035,7 +1013,12 @@
       subExProps: false,
       isSub: false,
       addSet: false,
-      useExpressionInJsx: 'onlyTemplateLiteral'
+      useExpressionInJsx: 'onlyTemplateLiteral',
+      hasName: true,
+      noTagName: false,
+      hasAttrs: true,
+      hasTmplCtx: true,
+      hasOutputH: false
     };
 
     if (params) {
@@ -1051,7 +1034,10 @@
 
   var _defaultCfg = {
     onlyGlobal: true,
-    newContext: false
+    newContext: false,
+    hasName: false,
+    hasAttrs: false,
+    hasTmplCtx: false
   }; //Extension default config
 
   var extensionConfig = {
@@ -1063,9 +1049,7 @@
     'switch': _config(_defaultCfg, {
       needPrefix: 'onlyUpperCase'
     }),
-    unless: _config(_defaultCfg),
-    each: _config({
-      onlyGlobal: true,
+    each: _config(_defaultCfg, {
       newContext: {
         item: 'item',
         index: 'index',
@@ -1075,8 +1059,7 @@
         }
       }
     }),
-    'for': _config({
-      onlyGlobal: true,
+    'for': _config(_defaultCfg, {
       newContext: {
         index: 'index',
         getDatasFromProp: {
@@ -1097,8 +1080,7 @@
       newContext: true,
       onlyTemplate: true
     }),
-    'with': _config({
-      onlyGlobal: true,
+    'with': _config(_defaultCfg, {
       newContext: {
         getDatasFromProp: true
       }
@@ -1114,9 +1096,11 @@
   extensionConfig.block = _config(extensionConfig.obj);
   extensionConfig.pre = _config(extensionConfig.obj);
   extensionConfig.arg = _config(extensionConfig.prop);
-  extensionConfig.once = _config(extensionConfig.obj);
   extensionConfig.show = _config(extensionConfig.prop, {
-    isDirective: true
+    isDirective: true,
+    noTagName: true,
+    hasAttrs: true,
+    hasOutputH: true
   });
   extensionConfig.css = _config(extensionConfig.obj); //Extension alias
 
@@ -1157,7 +1141,7 @@
 
         if (mergeConfig) {
           if (!extensionConfig[name]) {
-            extensionConfig[name] = {};
+            extensionConfig[name] = _config();
           }
 
           assign(extensionConfig[name], _options3);
@@ -1172,6 +1156,8 @@
     extensionConfig: extensionConfig,
     registerExtension: registerExtension
   });
+
+  var digitsRE = /(\d{3})(?=\d)/g; //Global filter list
 
   var filters = {
     //Get properties
@@ -1225,7 +1211,8 @@
     },
     //Convert to int 
     int: function int(val) {
-      return parseInt(val, 10);
+      var radix = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 10;
+      return parseInt(val, radix);
     },
     //Convert to float 
     float: function float(val) {
@@ -1262,6 +1249,24 @@
     },
     capitalize: function capitalize$1(str) {
       return capitalize(str);
+    },
+    currency: function currency(value, decimals, _currency) {
+      if (!(value - parseFloat(value) >= 0)) return '';
+      value = parseFloat(value);
+      _currency = decimals != null && typeof decimals == 'string' ? decimals : _currency;
+      _currency = _currency != null && typeof _currency == 'string' ? _currency : filterConfig.currency.symbol;
+      decimals = decimals != null && typeof decimals == 'number' ? decimals : 2;
+      var stringified = Math.abs(value).toFixed(decimals);
+
+      var _int = decimals ? stringified.slice(0, -1 - decimals) : stringified;
+
+      var i = _int.length % 3;
+      var head = i > 0 ? _int.slice(0, i) + (_int.length > 3 ? ',' : '') : '';
+
+      var _float = decimals ? stringified.slice(-1 - decimals) : '';
+
+      var sign = value < 0 ? '-' : '';
+      return sign + _currency + head + _int.slice(i).replace(digitsRE, '$1,') + _float;
     }
   };
 
@@ -1275,14 +1280,20 @@
     };
   }
 
-  function _config$1(params) {
+  function _config$1(params, extra) {
     var ret = {
       onlyGlobal: false,
-      hasOptions: true
+      hasOptions: false,
+      hasLevel: false,
+      hasTmplCtx: true
     };
 
     if (params) {
       ret = assign(ret, params);
+    }
+
+    if (extra) {
+      ret = assign(ret, extra);
     }
 
     return ret;
@@ -1299,7 +1310,9 @@
       onlyGlobal: true
     }),
     '#': _config$1({
-      onlyGlobal: true
+      onlyGlobal: true,
+      hasOptions: true,
+      hasLevel: true
     }),
     '**': _config$1(_defaultCfg$1),
     '%%': _config$1(_defaultCfg$1),
@@ -1313,7 +1326,10 @@
     '..': _config$1(_defaultCfg$1),
     rLt: _config$1(_defaultCfg$1),
     '<=>': _config$1(_defaultCfg$1),
-    capitalize: _config$1(_defaultCfg$1)
+    capitalize: _config$1(_defaultCfg$1),
+    currency: _config$1(_defaultCfg$1, {
+      symbol: '$'
+    })
   };
   var operators = ['+=', '+', '-[0-9]', '-', '**', '*', '%%', '%', '===', '!==', '==', '!=', '<=>', '<=', '>=', '=', '..<', '<', '>', '&&', '||', '?:', '?', ':', '../', '..', '/'];
   var REGEX_OPERATORS_ESCAPE = /\*|\||\/|\.|\?|\+/g;
@@ -1352,7 +1368,7 @@
 
         if (mergeConfig) {
           if (!filterConfig[name]) {
-            filterConfig[name] = {};
+            filterConfig[name] = _config$1();
           }
 
           assign(filterConfig[name], _options);

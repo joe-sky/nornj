@@ -9,7 +9,7 @@ describe('test compile string', function() {
       beforeAll(function() {
         nj.registerFilter('filter1', function(v, p1) {
           //console.log(this.getData('name1'));
-          return v * 2 + ((p1 != null && !p1._njOpts) ? parseInt(p1, 10) : 0);
+          return v * 2 + (p1 != null ? parseInt(p1, 10) : 0);
         });
         nj.registerFilter('filter2', function(v, p1, p2) {
           //console.log(p1 + '_' + p2);
@@ -18,8 +18,7 @@ describe('test compile string', function() {
         nj.registerFilter('filter3', function(v) {
           return !!!v;
         });
-        nj.registerFilter('tagName', function(v1, v2, v3, options) {
-          //console.log(options.lastValue);
+        nj.registerFilter('tagName', function(v1, v2, v3) {
           return v1 + 'Tmp';
         });
         nj.registerFilter('emptyFilter', function(n) {
@@ -52,7 +51,7 @@ describe('test compile string', function() {
           } else {
             return `{${val}}`;
           }
-        });
+        }, { hasOptions: true });
       });
 
       describe('compile string template to html', function() {
@@ -141,9 +140,6 @@ describe('test compile string', function() {
           <div id=555>
             <a />
             <input type=button />
-            <#unless {{false}}>
-              <input id="test5" />
-            </#unless>
           </div>
         </div>
       `;
@@ -201,58 +197,56 @@ describe('test compile string', function() {
       `;
 
       var tmplTest = nj`
-      <#once>
-        <!DOCTYPE html>
-        <#with {{name3}} as=name5>{{{
-          JSON.stringify( 
-            [
-              1,
-              {
-                a: 1,
-                b: 2
-              }
-            ]
-          )
-        }}}</#with>
-        <#each {{list}}>
-          <div>{{this}}</div>
-          {{this}}
-          <#empty>
-            no data
-          </#empty>
-        </#each>
-        <style>
-          .class1 {
-            margin-left: 10px;
-          }
-        </style>
-        <script>
-          <@type>text</@type>
-          function test() {
-            console.log(1);
-
-            <#if {{true}}>var reg = /\\n+/;</#if>
-            var a = '{{ @lt +('test') +(@gt) }}';
-
-            if(i < 10) {
-              return;
+      <!DOCTYPE html>
+      <#with {{name3}} as=name5>{{{
+        JSON.stringify( 
+          [
+            1,
+            {
+              a: 1,
+              b: 2
             }
+          ]
+        )
+      }}}</#with>
+      <#each {{list}}>
+        <div>{{this}}</div>
+        {{this}}
+        <#empty>
+          no data
+        </#empty>
+      </#each>
+      <style>
+        .class1 {
+          margin-left: 10px;
+        }
+      </style>
+      <script>
+        <@type>text</@type>
+        function test() {
+          console.log(1);
 
-            var num = <#each><#arg>{{ list(1, 2, 3) }}</#arg>{{this}}</#each>;
+          <#if {{true}}>var reg = /\\n+/;</#if>
+          var a = '{{ @lt +('test') +(@gt) }}';
 
-            function test2() {
-              console.log('    <div  >a<img    />  b  </div>  <div>  '
-                + ' <img /> </div>  ');
-            }
-
-            var scriptUrl = '<script src="'+prefix+'/resources/app/pages/'+path+'index.js">' + '<' + '/script>';
+          if(i < 10) {
+            return;
           }
-        </script>
-        <textarea>
-          1 < 123
-          <img src="test1.png">
-        </textarea>
-      </#once>
+
+          var num = <#each><#arg>{{ list(1, 2, 3) }}</#arg>{{this}}</#each>;
+
+          function test2() {
+            console.log('    <div  >a<img    />  b  </div>  <div>  '
+              + ' <img /> </div>  ');
+          }
+
+          var scriptUrl = '<script src="'+prefix+'/resources/app/pages/'+path+'index.js">' + '<' + '/script>';
+        }
+      </script>
+      <textarea>
+        1 < 123
+        <img src="test1.png">
+      </textarea>
       <${'img'} src="test1.png" />
       <img src="test1.png">
         <#prop {{'id'}}>img</#prop>

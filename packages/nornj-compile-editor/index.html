@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+
+<title>NornJ Compile Editor</title>
+<meta charset="utf-8" />
+<link rel="stylesheet" href="./lib/codemirror.css" />
+<script src="./lib/codemirror.js"></script>
+<script src="./addon/edit/closetag.js"></script>
+<script src="./addon/fold/xml-fold.js"></script>
+<script src="./mode/xml/xml.js"></script>
+<script src="./mode/javascript/javascript.js"></script>
+<script src="./mode/css/css.js"></script>
+<script src="./mode/htmlmixed/htmlmixed.js"></script>
+<script>
+  var tag = 'script';
+  var v4 = location.search == '?0.4';
+  document.write(`<${tag} src="${v4 ? './lib/nornj.0.4.18.min.js' : '../../dist/nornj.min.js' }"></${tag}>`);
+</script>
+<style>
+  .CodeMirror {
+    border-top: 1px solid #888;
+    border-bottom: 1px solid #888;
+  }
+</style>
+<select id="sel">
+  <option id="opt1">v5.0.0</option>
+  <option id="opt2">v0.4.18</option>
+</select>
+<script>
+  v4 && (document.getElementById('opt2').selected = true);
+  sel.onchange = function(e) {
+    var optId = this.options[this.selectedIndex].id;
+    location.href = location.pathname + (optId == 'opt2' ? '?0.4' : '');
+  };
+</script>
+
+<article>
+  <h2>NornJ source code</h2>
+  <form>
+    <textarea id="code" name="code"><ul>
+  <#each {todos}>
+    <#if {index > 5}>
+      <li>{@item * 2}</li>
+      <#elseif {index > 10}>
+        <li>{@item * 3}</li>
+      </#elseif>
+    </#if>
+  </#each>
+</ul>
+<button #show="{todos.length > 0}">Add Todo</button></textarea>
+  </form>
+
+  <script>
+    function _buildTmplFns(fns, tmplKey) {
+      let ret = "{\n";
+      ret += "  _njTmplKey: '" + tmplKey + "',\n";
+
+      nj.each(fns, (v, k, i, l) => {
+        if (k.indexOf("_") != 0) {
+          ret += "  " + k + ": " + v.toString() + (i < l - 1 ? "," : "") + "\n";
+        }
+      });
+
+      return ret + "}";
+    }
+
+    function generate(str) {
+      return _buildTmplFns(
+        nj.precompile(
+          str,
+          true,
+          nj.createTmplRule({
+            start: "{",
+            end: "}",
+            comment: ""
+          })
+        ),
+        "testKey"
+      );
+    }
+
+    var editor = CodeMirror.fromTextArea(document.getElementById("code"), {
+      mode: "text/html",
+      lineNumbers: true,
+      autoCloseTags: true
+    });
+
+    editor.on("change", function(instance, changeObj) {
+      editor2.setValue(generate(instance.getValue()));
+    });
+  </script>
+</article>
+<article>
+  <h2>NornJ generate code</h2>
+  <form><textarea id="code2" name="code2"><html</textarea></form>
+
+  <script>
+    var editor2 = CodeMirror.fromTextArea(document.getElementById("code2"), {
+      mode: "text/javascript",
+      lineNumbers: true,
+      autoCloseTags: true
+    });
+
+    editor2.setValue(generate(editor.getValue()));
+  </script>
+</article>

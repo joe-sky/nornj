@@ -17,6 +17,7 @@
 <a href="https://travis-ci.org/joe-sky/nornj"><img src="https://travis-ci.org/joe-sky/nornj.svg?branch=master" alt="Travis CI Status"/></a>
 <a href="https://codecov.io/gh/joe-sky/nornj"><img src="https://codecov.io/gh/joe-sky/nornj/branch/master/graph/badge.svg" alt="Codecov" /></a>
 [![NPM Downloads][downloads-image]][npm-url]
+[![](https://img.shields.io/bundlephobia/minzip/nornj@5.0.0-rc.1.svg?style=flat)](https://bundlephobia.com/result?p=nornj@next)
 
 [English](https://github.com/joe-sky/nornj/blob/master/README.md) | 简体中文
 
@@ -27,13 +28,7 @@
 
 ## 概述
 
-`React`的`JSX`几乎可以使用`javascript`的全部语法且非常灵活，可配合`babel`适应各种复杂的使用场景。但是，使用`NornJ`配合`React`开发还能做得更好：
-
-* 支持指令语法：
-
-```js
-<img n-show={false} />
-```
+`React`的`JSX`几乎可以使用`javascript`的全部语法且非常灵活，可配合`babel`适应各种复杂的使用场景。但是，使用`NornJ`配合`React`开发还能做得更好，因为它能给JSX带来`模板引擎`的特性：
 
 * 支持流程控制语法：
 
@@ -41,10 +36,16 @@
 <each of={[1, 2, 3]}><i>{item}</i></each>
 ```
 
+* 支持指令语法：
+
+```js
+<img n-show={false} />
+```
+
 * 支持过滤器语法：
 
 ```js
-<button>{n`${'abc'} | capitalize`}</button>
+<button>{n`${foo} | capitalize`}</button>
 ```
 
 * 支持自定义运算符：
@@ -61,10 +62,11 @@
 
 ```js
 class App extends Component {
-  addTodo() {
+  addTodo = e => {
     const { todos = [] } = this.state;
     this.setState({ todos: todos.concat(`Item ${todos.length}`) });
-  }
+  };
+
   render({ page }, { todos = [] }) {
     return (
       <div className="app">
@@ -84,7 +86,7 @@ class App extends Component {
             </if>
           </each>
         </ul>
-        <button n-show={todos.length > 0} onClick={() => this.addTodo()}>Add Todo</button>
+        <button n-show={todos.length > 0} onClick={this.addTodo}>Add Todo</button>
       </div>
     );
   }
@@ -108,7 +110,7 @@ const template = nj`
         </#if>
       </#each>
     </ul>
-    <button :#show="todos.length > 0" :onClick="() => addTodo()">Add Todo</button>
+    <button :#show="todos.length > 0" :onClick="addTodo">Add Todo</button>
   </Container>
 `;
 
@@ -118,10 +120,11 @@ const Container = styled.div`
 `;
 
 class App extends Component {
-  addTodo() {
+  addTodo = e => {
     const { todos = [] } = this.state;
     this.setState({ todos: todos.concat(`Item ${todos.length}`) });
-  }
+  };
+
   render() {
     return template({ components: { Container } }, this.state, this);
   }
@@ -171,13 +174,13 @@ npm install babel-plugin-nornj-in-jsx  #or yarn add babel-plugin-nornj-in-jsx
 * [babel-plugin-nornj-in-jsx(支持在JSX中写NornJ语法的Babel插件)](https://github.com/joe-sky/nornj/tree/master/packages/babel-plugin-nornj-in-jsx)
 * [babel-plugin-nornj-loader(nornj-loader的Babel插件版)](https://github.com/yuhongda/babel-plugin-nornj-loader)
 * [react-native transformer(nornj-loader的RN版)](https://github.com/joe-sky/nornj/blob/master/tools/metroTransformer.js)
-* [koa-nornj(NornJ适配Koa的中间件)](https://github.com/qingqinxl1/koa-nornj)
 * [express-nornj(NornJ适配Express的视图引擎)](https://github.com/joe-sky/nornj/blob/master/tools/expressEngine.js)
+<!-- * [koa-nornj(NornJ适配Koa的中间件)](https://github.com/qingqinxl1/koa-nornj) -->
 
 ## 语法高亮插件
 
 * [nornj-highlight(vscode)](https://github.com/joe-sky/nornj-highlight)
-* [language-nornj(atom)](https://github.com/zyj1022/language-nornj)
+<!-- * [language-nornj(atom)](https://github.com/zyj1022/language-nornj) -->
 
 ## 浏览器支持
 

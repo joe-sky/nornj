@@ -77,39 +77,42 @@ function _buildFn(content, node, fns, no, newContext, level, useStringLocal, nam
   return no;
 }
 
-function _buildOptions(config, useStringLocal, node, fns, exPropsStr, subExPropsStr, level, hashProps, parent, tagName, attrs) {
+function _buildOptions(config, useStringLocal, node, fns, exPropsStr, subExPropsStr, level, hashProps, tagName, attrs) {
   let hashStr = ', useString: ' + (useStringLocal == null ? 'p1.us' : (useStringLocal ? 'true' : 'false')),
-    noConfig = !config;
+    noConfig = !config,
+    no = fns._no;
 
-  if (node) { //扩展标签
+  if (node) { //tags
     let newContext = config ? config.newContext : true;
+    const isDirective = node.isDirective || (config && config.isDirective);
     if (noConfig || config.exProps || node.isProp) {
       hashStr += ', exProps: ' + exPropsStr;
     }
     if (noConfig || config.subExProps || node.isProp) {
       hashStr += ', subExProps: ' + subExPropsStr;
     }
-    if (parent) {
-      const _parentType = parent.parentType != null ? parent.parentType : (parent.ex ? parent.ex : parent.type);
-      hashStr += ', parentName: ' + (_parentType != null ? ('\'' + _parentType + '\'') : _parentType);
+    if (noConfig || config.hasName) {
+      hashStr += ', name: \'' + node.ex + '\'';
     }
-    hashStr += ', name: \'' + node.ex + '\'';
-    if (tagName) {
+    if (tagName && isDirective && (noConfig || !config.noTagName)) {
       hashStr += ', tagName: ' + tagName;
       hashStr += ', setTagName: function(c) { ' + tagName + ' = c }';
     }
-    if (attrs) {
+    if (attrs && (noConfig || config.hasAttrs)) {
       hashStr += ', attrs: ' + attrs;
     }
-
-    hashStr += ', ' + (node.isDirective || (config && config.isDirective) ? 'value' : 'children') + ': ' + (node.content ? 'p1.r(p1, p2, p1.fn' + _buildFn(node.content, node, fns, ++fns._no, newContext, level, useStringLocal) + ', ' + exPropsStr + ', ' + subExPropsStr + ')' : 'p1.np');
-
     if (hashProps != null) {
       hashStr += ', props: ' + hashProps;
     }
+    hashStr += ', ' + (isDirective ? 'value' : 'children') + ': ' + (node.content ? 'p1.r(p1, p2, p1.fn' + _buildFn(node.content, node, fns, ++fns._no, newContext, level, useStringLocal) + ', ' + exPropsStr + ', ' + subExPropsStr + ')' : 'p1.np');
   }
 
-  return '{ _njOpts: true, exNo: ' + fns._no + ', global: p1, context: p2, outputH: ' + !fns.useString + hashStr + (level != null ? ', level: ' + level : '') + ' }';
+  return '{ _njOpts: ' + (no == 0 ? '\'main\'' : no)
+    + ((noConfig || config.hasTmplCtx) ? ', global: p1, context: p2' : '')
+    + ((noConfig || config.hasOutputH) ? ', outputH: ' + !fns.useString : '')
+    + hashStr 
+    + ((level != null && (noConfig || config.hasLevel)) ? ', level: ' + level : '') 
+    + ' }';
 }
 
 const CUSTOM_VAR = 'nj_custom';
@@ -348,8 +351,8 @@ export function buildExpression(ast, inObj, escape, fns, useStringLocal, level) 
           _codeStr += ', true';
         }
 
-        //if (configF && configF.hasOptions) {
-        if (!configF || configF.hasOptions) {
+        //if (!configF || configF.hasOptions) {
+        if (configF && configF.hasOptions) {
           _codeStr += `, ${_buildOptions(configF, useStringLocal, null, fns, null, null, level)}`;
         }
       }
@@ -605,7 +608,7 @@ function _buildNode(node, parent, fns, counter, retType, level, useStringLocal, 
       paramsStr = retP[0],
       _paramsC = retP[1];
 
-    dataReferStr += _buildOptions(configE, useStringLocal, node, fns, exPropsStr, subExPropsStr, level, paramsStr !== '' ? '_params' + _paramsC : null, parent, tagName, attrs);
+    dataReferStr += _buildOptions(configE, useStringLocal, node, fns, exPropsStr, subExPropsStr, level, paramsStr !== '' ? '_params' + _paramsC : null, tagName, attrs);
     dataReferStr += '\n];\n';
 
     //添加匿名参数
