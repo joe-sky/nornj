@@ -13,15 +13,15 @@ describe('test compile string', function () {
   describe('compile string template to html', function () {
     it('test compile simple', function () {
       const tmpl = nj`
-        <${'div'} class="{{id}} {{name3}}" {{name3}} {{ ...props}} name={{name1}} autofocus name1={{a.c.d}} name2="{{ [a[a.e['h']].f.g, 2] }}" a="/%'aaa'%/" {{... Object.assign({ e: 0 }, ${{ a: '...123', b: 2 }}, { c: 3 }) }} {{... ${{ g: '...123', b: 20 }} }}>
+        <${'div1'} class="{{id}} {{name3}}" {{name3}} {{ ...props}} name={{name1}} autofocus name1={{a.c.d}} name2="{{ [a[a.e['h']].f.g, 2] }}" a="/%'aaa'%/" {{... Object.assign({ e: 0 }, ${{ a: '...123', b: 2 }}, { c: 3 }) }} {{... ${{ g: '...123', b: 20 }} }}>
           <!--# <#prop {{'name1' | vm_var}} /> #-->
           {{1 + ${2} + 3 + ${4}}}
           {{-111 + 222-333 + -555}}
           {{{
-            JSON.stringify([{
-              a: { c: 1 },
-              b: [2, { d: 5 }]
-            }, { e: 10 }])
+          JSON.stringify([{
+          a: { c: 1 },
+          b: [2, { d: 5 }]
+          }, { e: 10 }])
           }}}
           {{ { a: 1 } }}
           {{ 20.5 | int * (10.05 | float) + (2 ** 3) + (19 %% 2) }}
@@ -60,7 +60,13 @@ describe('test compile string', function () {
             margin:${0};
             background-image:url('../a.png');
           `)}}}}
-        </${'div'}>
+          <${'span'}>
+            12345
+            <${'span'}>
+              12345
+            <//>
+          <//>
+        <//>
       `;
       //console.log(nj.templates[tmpl._njTmplKey]._main.toString());
 
@@ -83,7 +89,7 @@ describe('test compile string', function () {
         x: '__xyz'
       });
 
-      //console.log(html);
+      console.log(html);
       expect(html).toBeTruthy();
     });
 
