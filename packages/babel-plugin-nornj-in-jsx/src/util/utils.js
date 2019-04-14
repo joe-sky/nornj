@@ -41,10 +41,6 @@ function setTmplConfig(opts, isInit) {
   isInit && (nj._alreadySetConfigs = true);
 }
 
-function lowerFirst(str) {
-  return str[0].toLowerCase() + str.substr(1);
-}
-
 function locInfo(path) {
   let ret = '';
   if (path && path.node && path.node.loc) {
@@ -57,6 +53,5 @@ function locInfo(path) {
 
 module.exports = {
   setTmplConfig,
-  lowerFirst,
   locInfo
 };

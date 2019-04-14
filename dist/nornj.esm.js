@@ -1,5 +1,5 @@
 /*!
-* NornJ template engine v5.0.0-rc.4
+* NornJ template engine v5.0.0-rc.5
 * (c) 2016-2019 Joe_Sky
 * Released under the MIT License.
 */
@@ -266,6 +266,9 @@ var assign = Object.assign || function (target) {
 function capitalize(str) {
   return str[0].toUpperCase() + str.substr(1);
 }
+function lowerFirst(str) {
+  return str[0].toLowerCase() + str.substr(1);
+}
 assign(nj, {
   defineProp: defineProp,
   defineProps: defineProps,
@@ -283,7 +286,8 @@ assign(nj, {
   obj: obj,
   toCamelCase: toCamelCase,
   assign: assign,
-  capitalize: capitalize
+  capitalize: capitalize,
+  lowerFirst: lowerFirst
 });
 
 var tools = /*#__PURE__*/Object.freeze({
@@ -306,7 +310,8 @@ var tools = /*#__PURE__*/Object.freeze({
   clearQuot: clearQuot,
   toCamelCase: toCamelCase,
   assign: assign,
-  capitalize: capitalize
+  capitalize: capitalize,
+  lowerFirst: lowerFirst
 });
 
 var components = nj.components,
@@ -474,7 +479,7 @@ function createTmplRule() {
     braceParamStr: braceParamStr,
     xmlOpenTag: _createRegExp('^<([a-z' + firstChar + extensionRules + '][^\\s>]*)[^>]*>$', 'i'),
     openTagParams: _createRegExp('[\\s]+(((' + startRuleR + '(' + varContent + ')' + endRuleR + ')|(' + startRule + '(' + varContent + ')' + endRule + '))|[^\\s=>]+)(=((\'[^\']+\')|("[^"]+")|([^"\'\\s]+)))?', 'g'),
-    exAttrs: _createRegExp('[\\s]+(((' + startRuleR + '(' + varContent + ')' + endRuleR + ')|(' + startRule + '(' + varContent + ')' + endRule + '))|((:?)(' + escapeExtensionRule + ')?([^\\s=>]+)))(=((\'[^\']+\')|("[^"]+")|([^"\'\\s>]+)))?', 'g'),
+    exAttrs: _createRegExp('[\\s]+(((' + startRuleR + '(' + varContent + ')' + endRuleR + ')|(' + startRule + '(' + varContent + ')' + endRule + '))|((:?)(' + escapeExtensionRule + '|n-)?([^\\s=>]+)))(=((\'[^\']+\')|("[^"]+")|([^"\'\\s>]+)))?', 'g'),
     braceParam: _createRegExp(braceParamStr, 'i'),
     braceParamG: _createRegExp(braceParamStr, 'ig'),
     spreadProp: _createRegExp('[\\s]+(' + startRuleR + '[\\s]*(' + varContentS + ')' + endRuleR + ')|(' + startRule + '[\\s]*(' + varContentS + ')' + endRule + ')', 'g'),
@@ -1270,14 +1275,14 @@ var extensionConfig = {
     exProps: true,
     subExProps: true,
     isProp: true,
-    onlyTemplate: true
+    needPrefix: true
   }),
   obj: _config(_defaultCfg, {
-    onlyTemplate: true
+    needPrefix: true
   }),
   fn: _config(_defaultCfg, {
     newContext: true,
-    onlyTemplate: true
+    needPrefix: true
   }),
   'with': _config(_defaultCfg, {
     newContext: {
@@ -1449,6 +1454,9 @@ var filters = {
   capitalize: function capitalize$1(str) {
     return capitalize(str);
   },
+  lowerFirst: function lowerFirst$1(str) {
+    return lowerFirst(str);
+  },
   currency: function currency(value, decimals, _currency) {
     if (!(value - parseFloat(value) >= 0)) return filterConfig.currency.placeholder;
     value = parseFloat(value);
@@ -1526,6 +1534,7 @@ var filterConfig = {
   rLt: _config$1(_defaultCfg$1),
   '<=>': _config$1(_defaultCfg$1),
   capitalize: _config$1(_defaultCfg$1),
+  lowerFirst: _config$1(_defaultCfg$1),
   currency: _config$1(_defaultCfg$1, {
     symbol: '$',
     placeholder: ''
@@ -2007,6 +2016,19 @@ function isEx(obj, tmplRule, noParams) {
 }
 function isExAll(obj, tmplRule) {
   return obj.match(tmplRule.exAll);
+}
+var REGEX_LOWER_CASE = /^[a-z]/;
+function fixExTagName(tagName, tmplRule) {
+  var ret;
+
+  var _tagName = lowerFirst(tagName),
+      config = extensionConfig[_tagName];
+
+  if (config && (!config.needPrefix || config.needPrefix == 'onlyUpperCase' && REGEX_LOWER_CASE.test(tagName))) {
+    ret = tmplRule.extensionRule + _tagName;
+  }
+
+  return ret;
 } //判断是否模板元素
 
 function isTmpl(obj) {
@@ -3430,7 +3452,7 @@ function _checkStringElem(xml, tmplRule, outputH) {
             if (_isEx || !inTextContent) {
               var cName = current.elemName;
 
-              if (cName.indexOf(SPLIT_FLAG) < 0 ? elemName === '/' + cName : elemName.indexOf(SPLIT_FLAG) > -1) {
+              if (cName.indexOf(SPLIT_FLAG) < 0 ? elemName === '/' + cName : elemName.indexOf(SPLIT_FLAG) > -1 || elemName === '//') {
                 //如果开始标签包含SPLIT_FLAG，则只要结束标签包含SPLIT_FLAG就认为该标签已关闭
                 current = current.parent;
               }
@@ -3520,10 +3542,20 @@ function _transformToEx(isStr, elemName, elemParams, tmplRule) {
 
 
 function _setElem(elem, elemName, elemParams, elemArr, bySelfClose, tmplRule, outputH) {
-  var ret, paramsEx;
+  var ret,
+      paramsEx,
+      fixedExTagName = fixExTagName(elemName, tmplRule);
+
+  if (fixedExTagName) {
+    elemName = fixedExTagName;
+  }
 
   if (isEx(elemName, tmplRule, true)) {
     ret = elem.substring(1, elem.length - 1);
+
+    if (fixedExTagName) {
+      ret = tmplRule.extensionRule + lowerFirst(ret);
+    }
   } else if (isStrPropS(elemName, tmplRule)) {
     ret = _transformToEx(true, elemName, elemParams, tmplRule);
   } else if (isPropS(elemName, tmplRule)) {

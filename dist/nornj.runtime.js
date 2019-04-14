@@ -1,5 +1,5 @@
 /*!
-* NornJ template engine v5.0.0-rc.4
+* NornJ template engine v5.0.0-rc.5
 * (c) 2016-2019 Joe_Sky
 * Released under the MIT License.
 */
@@ -234,6 +234,9 @@
   function capitalize(str) {
     return str[0].toUpperCase() + str.substr(1);
   }
+  function lowerFirst(str) {
+    return str[0].toLowerCase() + str.substr(1);
+  }
   assign(nj, {
     defineProp: defineProp,
     defineProps: defineProps,
@@ -251,7 +254,8 @@
     obj: obj,
     toCamelCase: toCamelCase,
     assign: assign,
-    capitalize: capitalize
+    capitalize: capitalize,
+    lowerFirst: lowerFirst
   });
 
   var tools = /*#__PURE__*/Object.freeze({
@@ -274,7 +278,8 @@
     clearQuot: clearQuot,
     toCamelCase: toCamelCase,
     assign: assign,
-    capitalize: capitalize
+    capitalize: capitalize,
+    lowerFirst: lowerFirst
   });
 
   var components = nj.components,
@@ -1071,14 +1076,14 @@
       exProps: true,
       subExProps: true,
       isProp: true,
-      onlyTemplate: true
+      needPrefix: true
     }),
     obj: _config(_defaultCfg, {
-      onlyTemplate: true
+      needPrefix: true
     }),
     fn: _config(_defaultCfg, {
       newContext: true,
-      onlyTemplate: true
+      needPrefix: true
     }),
     'with': _config(_defaultCfg, {
       newContext: {
@@ -1250,6 +1255,9 @@
     capitalize: function capitalize$1(str) {
       return capitalize(str);
     },
+    lowerFirst: function lowerFirst$1(str) {
+      return lowerFirst(str);
+    },
     currency: function currency(value, decimals, _currency) {
       if (!(value - parseFloat(value) >= 0)) return filterConfig.currency.placeholder;
       value = parseFloat(value);
@@ -1327,6 +1335,7 @@
     rLt: _config$1(_defaultCfg$1),
     '<=>': _config$1(_defaultCfg$1),
     capitalize: _config$1(_defaultCfg$1),
+    lowerFirst: _config$1(_defaultCfg$1),
     currency: _config$1(_defaultCfg$1, {
       symbol: '$',
       placeholder: ''

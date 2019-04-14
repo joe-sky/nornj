@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [v5.0.0-rc.7] 2019.04.14
+
+* 🌟 Support tagged template tag `html`.
+
 ## [v0.4.15] 2018.12.29
 
 * 🌟 支持在`react-native`中自动引入`nornj-react/mobx/native`包。

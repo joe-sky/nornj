@@ -2,7 +2,7 @@ var React = require('react');
 const createReactClass = require('create-react-class');
 
 module.exports = createReactClass({
-  contentTmpl: nj`
+  contentTmpl: html`
     <i>${'content'}</i>
   `,
 

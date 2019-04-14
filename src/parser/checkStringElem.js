@@ -291,9 +291,16 @@ function _transformToEx(isStr, elemName, elemParams, tmplRule) {
 
 //Set element node
 function _setElem(elem, elemName, elemParams, elemArr, bySelfClose, tmplRule, outputH) {
-  let ret, paramsEx;
+  let ret, paramsEx,
+    fixedExTagName = tranElem.fixExTagName(elemName, tmplRule);
+  if (fixedExTagName) {
+    elemName = fixedExTagName;
+  }
   if (tranElem.isEx(elemName, tmplRule, true)) {
     ret = elem.substring(1, elem.length - 1);
+    if (fixedExTagName) {
+      ret = tmplRule.extensionRule + tools.lowerFirst(ret);
+    }
   } else if (tranElem.isStrPropS(elemName, tmplRule)) {
     ret = _transformToEx(true, elemName, elemParams, tmplRule);
   } else if (tranElem.isPropS(elemName, tmplRule)) {

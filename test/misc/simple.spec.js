@@ -106,14 +106,27 @@ describe('test compile string', function () {
       expect(html).toBe('../../a.png');
     });
 
-    xit('test directive', function () {
+    it('test directive', function () {
       const tmpl = nj`
         <input #show-bcd.abc.vbn-bcd="{{ {name:[123]} }}">12345
       `;
 
       const html = tmpl();
       console.log(html);
-      //expect(html).toBe('../../a.png');
+    });
+
+    it('tag no prefix', function () {
+      const tmpl = nj`
+        <If {{true}}>
+          <#switch value={{5}}>
+            <Case value={{1}}>111</Case>
+            <default>555</default>
+          </#switch>
+        </If>
+      `;
+
+      const html = tmpl();
+      console.log(html);
     });
   });
 });

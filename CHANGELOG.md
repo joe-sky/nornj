@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [v5.0.0-rc.5] 2019.04.14
+
+* 🌟 Support nj`<Extag></Extag>` auto transform to nj`<#extag></#extag>`.
+
 ## [v5.0.0-rc.1] 2019.04.02
 
 * 🌟 扩展函数中的`options.result`改为`options.children`或`options.value`。

@@ -77,14 +77,14 @@ class App extends Component {
           }
         `</style>
         <ul>
-          <each of={todos} item="todo">
-            <if condition={index > 5}>
+          <Each of={todos} item="todo">
+            <If condition={index > 5}>
               <li>{todo * 2}</li>
-              <elseif condition={index > 10}>
+              <Elseif condition={index > 10}>
                 <li>{todo * 3}</li>
-              </elseif>
-            </if>
-          </each>
+              </Elseif>
+            </If>
+          </Each>
         </ul>
         <button n-show={todos.length > 0} onClick={this.addTodo}>Add Todo</button>
       </div>
@@ -98,19 +98,19 @@ For above example, combining with the [Babel plugin provided by NornJ](https://g
 * Use NornJ tagged templates syntaxs(with [styled-components](https://github.com/styled-components/styled-components))：
 
 ```js
-const template = nj`
+const template = html`
   <Container>
     <ul>
-      <#each of={todos}>
-        <#if {@index > 5}>
+      <each of={todos}>
+        <if {@index > 5}>
           <li>{@item * 2}</li>
-          <#elseif {@index > 10}>
+          <elseif {@index > 10}>
             <li>{@item * 3}</li>
-          </#elseif>
-        </#if>
-      </#each>
+          </elseif>
+        </if>
+      </each>
     </ul>
-    <button :#show="todos.length > 0" :onClick="addTodo">Add Todo</button>
+    <button n-show="{todos.length > 0}" :onClick="addTodo">Add Todo</button>
   </Container>
 `;
 

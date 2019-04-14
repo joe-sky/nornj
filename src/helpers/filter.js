@@ -92,6 +92,8 @@ export const filters = {
 
   capitalize: str => tools.capitalize(str),
 
+  lowerFirst: str => tools.lowerFirst(str),
+
   currency(value, decimals, currency) {
     if (!(value - parseFloat(value) >= 0)) return filterConfig.currency.placeholder;
     value = parseFloat(value);
@@ -159,6 +161,7 @@ export const filterConfig = {
   rLt: _config(_defaultCfg),
   '<=>': _config(_defaultCfg),
   capitalize: _config(_defaultCfg),
+  lowerFirst: _config(_defaultCfg),
   currency: _config(_defaultCfg, { symbol: '$',placeholder:'' })
 };
 

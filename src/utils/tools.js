@@ -188,6 +188,10 @@ export function capitalize(str) {
   return str[0].toUpperCase() + str.substr(1);
 }
 
+export function lowerFirst(str) {
+  return str[0].toLowerCase() + str.substr(1);
+}
+
 assign(nj, {
   defineProp,
   defineProps,
@@ -205,5 +209,6 @@ assign(nj, {
   obj,
   toCamelCase,
   assign,
-  capitalize
+  capitalize,
+  lowerFirst
 });

@@ -371,9 +371,9 @@ export const extensionConfig = {
       getDatasFromProp: { except: ['to', 'step', 'index'] }
     }
   }),
-  prop: _config(_defaultCfg, { exProps: true, subExProps: true, isProp: true, onlyTemplate: true }),
-  obj: _config(_defaultCfg, { onlyTemplate: true }),
-  fn: _config(_defaultCfg, { newContext: true, onlyTemplate: true }),
+  prop: _config(_defaultCfg, { exProps: true, subExProps: true, isProp: true, needPrefix: true }),
+  obj: _config(_defaultCfg, { needPrefix: true }),
+  fn: _config(_defaultCfg, { newContext: true, needPrefix: true }),
   'with': _config(_defaultCfg, { newContext: { getDatasFromProp: true } }),
   style: { useExpressionInJsx: false, needPrefix: true }
 };

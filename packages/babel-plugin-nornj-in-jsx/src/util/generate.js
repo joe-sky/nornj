@@ -149,7 +149,7 @@ const CTX_GET_DATA = 'getData';
 function createRenderTmpl(babel, quasis, expressions, opts, path, taggedName) {
   const types = babel.types;
   const isTmplFnS = taggedName === 'njs';
-  const isTmplFn = taggedName === 'nj' || isTmplFnS;
+  const isTmplFn = taggedName === 'nj' || taggedName === 'html' || isTmplFnS;
 
   let tmplStr = '';
   let paramCount = 0;

@@ -228,12 +228,8 @@ exports.isExTag = function (nodeName) {
   if (exPrefix) {
     nodeName = nodeName.substr(2);
   }
-  const exConfig = nj.extensionConfig[utils.lowerFirst(nodeName)];
+  const exConfig = nj.extensionConfig[nj.lowerFirst(nodeName)];
   if (exConfig) {
-    if (exConfig.onlyTemplate) {
-      return false;
-    }
-
     isSub = exConfig.isSub;
     needPrefix = exConfig.needPrefix;
   }
@@ -266,12 +262,8 @@ exports.isSubExTag = function (node) {
     nodeName = nodeName.substr(2);
   }
 
-  const exConfig = nj.extensionConfig[utils.lowerFirst(nodeName)];
+  const exConfig = nj.extensionConfig[nj.lowerFirst(nodeName)];
   if (exConfig) {
-    if (exConfig.onlyTemplate) {
-      return false;
-    }
-
     isSub = exConfig.isSub;
     needPrefix = exConfig.needPrefix;
   }

@@ -124,6 +124,19 @@ export function isExAll(obj, tmplRule) {
   return obj.match(tmplRule.exAll);
 }
 
+const REGEX_LOWER_CASE = /^[a-z]/;
+
+export function fixExTagName(tagName, tmplRule) {
+  let ret;
+  const _tagName = tools.lowerFirst(tagName),
+    config = extensionConfig[_tagName];
+  if (config && (!config.needPrefix || (config.needPrefix == 'onlyUpperCase' && REGEX_LOWER_CASE.test(tagName)))) {
+    ret = tmplRule.extensionRule + _tagName;
+  }
+
+  return ret;
+}
+
 //判断是否模板元素
 export function isTmpl(obj) {
   return obj === 'tmpl';

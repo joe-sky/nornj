@@ -169,7 +169,7 @@ describe('test compile string', function () {
             </#each>
           </#props>
           <input autofocus />
-          <br><!--</br>-->
+          <br><!--#</br>#-->
           test2
           <span>
             #${tmpl2}

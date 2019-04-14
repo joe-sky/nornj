@@ -10,7 +10,7 @@ module.exports = function (babel) {
   const exTagHandler = transformExTag(babel);
   const exAttrHandler = transformExAttr(babel);
   const taggedTemplateHandler = transformTaggedTemplate(babel);
-  const TAGGED_TEMPLATES = ['nj', 'njs', 'n', 't', 's'];
+  const TAGGED_TEMPLATES = ['html', 'nj', 'njs', 'n', 't', 's'];
 
   const visitor = {
     JSXElement: {
