@@ -106,6 +106,7 @@ const Button = (props) => {
 * [表达式](#表达式)
   * [过滤器](#过滤器)
     * [capitalize](#capitalize)
+    * [lowerFirst](#lowerFirst)
     * [int](#int)
     * [float](#float)
     * [bool](#bool)
@@ -434,6 +435,46 @@ class TestComponent extends Component {
 }
 ```
 
+### n-debounce
+
+使用`n-debounce`可以在JSX中为`input`等表单元素增加防抖效果，以减少用户输入频率而提高性能：
+
+```js
+class TestComponent extends Component {
+  onChange = e => {
+    //每次输入后延迟一定毫秒才触发一次
+    console.log(e.target.value);
+  };
+
+  render() {
+    return (
+      <>
+        <input n-debounce onChange={this.onChange} defaultValue="test" />
+        <input n-debounce={200} onChange={this.onChange} />
+      </>
+    );
+  }
+}
+```
+
+如上，`n-debounce`的触发事件默认为`onChange`。如果不写`n-debounce`的值，默认为`100毫秒`。
+
+* 指定任意事件
+
+`n-debounce`也可以支持`onChange`以外的其他事件。比如`onInput`，则需要在`n-debounce`后面添加`onInput`参数：
+
+```js
+class TestComponent extends Component {
+  onInput = e => {
+    console.log(e.target.value);
+  };
+
+  render() {
+    return <input n-debounce-onInput={200} onInput={this.onInput} />;
+  }
+}
+```
+
 ### n-mobxBind
 
 类似于`Vue`的`v-model`指令，可以使用`n-mobxBind`配合`Mobx`在`<input>`及`<textarea>`等表单元素上创建`双向数据绑定`，它会根据控件类型自动选取正确的方法来更新元素。
@@ -490,6 +531,28 @@ class TestComponent extends Component {
 ```
 
 如上所示，`onChange`事件的行为和标签原生的`onChange`完全相同，它会在文本框的值变化后执行。
+
+* 增加防抖效果
+
+可以同时使用`n-debounce`为`n-mobxBind`提供防抖效果：
+
+```js
+import { Component } from 'react';
+import { observable } from 'mobx';
+
+class TestComponent extends Component {
+  @observable inputValue = '';
+
+  render() {
+    return <input n-mobxBind-defaultValue="inputValue" n-debounce={200} />;
+  }
+}
+```
+
+使用方法如上，但有两个须要注意的地方：
+
+1. `n-debounce`必须在`n-mobxBind`的后面添加，注意顺序。
+2. `n-mobxBind`需要添加`defaultValue`参数。
 
 * 使用`action`更新变量
 
@@ -573,7 +636,7 @@ class TestComponent extends Component {
 }
 ```
 
-`nj.expression`的文档请[查看这里](https://joe-sky.github.io/nornj-guide/templateSyntax/templateString.html#njexpression)。
+<!-- `nj.expression`的文档请[查看这里](https://joe-sky.github.io/nornj-guide/templateSyntax/templateString.html#njexpression)。 -->
 
 ## License
 
