@@ -1,5 +1,5 @@
 /*!
-* NornJ template engine v5.0.0-rc.5
+* NornJ template engine v5.0.0-rc.6
 * (c) 2016-2019 Joe_Sky
 * Released under the MIT License.
 */
@@ -933,7 +933,7 @@ var extensions = {
     return ret;
   },
   'else': function _else(options) {
-    return options.subExProps['else'] = options.children;
+    return options.attrs['else'] = options.children;
   },
   'elseif': function elseif(value, options) {
     if (value && value._njOpts) {
@@ -941,13 +941,14 @@ var extensions = {
       value = options.props.condition || options.props.value;
     }
 
-    var exProps = options.subExProps;
+    var _options = options,
+        attrs = _options.attrs;
 
-    if (!exProps.elseifs) {
-      exProps.elseifs = [];
+    if (!attrs.elseifs) {
+      attrs.elseifs = [];
     }
 
-    exProps.elseifs.push({
+    attrs.elseifs.push({
       value: value,
       fn: options.children
     });
@@ -1060,12 +1061,13 @@ var extensions = {
       value = !options.useString ? true : name;
     }
 
-    options.exProps[options.outputH ? fixPropName(name) : name] = value;
+    options.attrs[options.outputH ? fixPropName(name) : name] = value;
   },
   //Spread parameters
   spread: function spread(props, options) {
+    var attrs = options.attrs;
     each(props, function (v, k) {
-      options.exProps[k] = v;
+      attrs[k] === undefined && (options.attrs[k] = v);
     }, false, false);
   },
   show: function show(options) {
@@ -1094,8 +1096,8 @@ var extensions = {
 
     if (i && i._njOpts) {
       options = i;
-      var _options = options,
-          props = _options.props;
+      var _options2 = options,
+          props = _options2.props;
       Object.keys(props).forEach(function (prop) {
         var value = props[prop];
 
@@ -1186,21 +1188,21 @@ var extensions = {
         data: [options.props]
       });
     } else {
-      var _options2 = options,
-          props = _options2.props;
+      var _options3 = options,
+          props = _options3.props;
       return options.children({
         data: [props && props.as ? _defineProperty({}, props.as, originalData) : originalData]
       });
     }
   },
   arg: function arg(options) {
-    var exProps = options.exProps;
+    var attrs = options.attrs;
 
-    if (!exProps.args) {
-      exProps.args = [];
+    if (!attrs.args) {
+      attrs.args = [];
     }
 
-    exProps.args.push(options.children());
+    attrs.args.push(options.children());
   },
   css: function css(options) {
     return options.props.style;
@@ -1248,7 +1250,8 @@ var extensionConfig = {
   'if': _config(_defaultCfg),
   'else': _config(_defaultCfg, {
     subExProps: true,
-    isSub: true
+    isSub: true,
+    hasAttrs: true
   }),
   'switch': _config(_defaultCfg, {
     needPrefix: 'onlyUpperCase'
@@ -1275,7 +1278,8 @@ var extensionConfig = {
     exProps: true,
     subExProps: true,
     isProp: true,
-    needPrefix: true
+    needPrefix: true,
+    hasAttrs: true
   }),
   obj: _config(_defaultCfg, {
     needPrefix: true
@@ -1335,7 +1339,7 @@ function registerExtension(name, extension, options, mergeConfig) {
   each(params, function (v, name) {
     if (v) {
       var _extension = v.extension,
-          _options3 = v.options;
+          _options4 = v.options;
 
       if (_extension) {
         extensions[name] = _extension;
@@ -1348,9 +1352,9 @@ function registerExtension(name, extension, options, mergeConfig) {
           extensionConfig[name] = _config();
         }
 
-        assign(extensionConfig[name], _options3);
+        assign(extensionConfig[name], _options4);
       } else {
-        extensionConfig[name] = _config(_options3);
+        extensionConfig[name] = _config(_options4);
       }
     }
   }, false, false);
@@ -2397,10 +2401,8 @@ function _buildFn(content, node, fns, no, newContext, level, useStringLocal, nam
      p1: 模板全局数据
      p2: 节点上下文数据
      p3: 扩展标签内调用result方法传递的参数
-     p4: #props变量
-     p5：子扩展标签#props变量
     */
-    var fn = fns[main ? 'main' + (isTmplEx ? no : '') : 'fn' + no] = new Function('p1', 'p2', 'p3', 'p4', 'p5', fnStr);
+    var fn = fns[main ? 'main' + (isTmplEx ? no : '') : 'fn' + no] = new Function('p1', 'p2', 'p3', fnStr);
 
     if (isTmplEx && name != null) {
       //设置函数名
@@ -2421,15 +2423,12 @@ function _buildOptions(config, useStringLocal, node, fns, exPropsStr, subExProps
   if (node) {
     //tags
     var newContext = config ? config.newContext : true;
-    var isDirective = node.isDirective || config && config.isDirective;
-
-    if (noConfig || config.exProps || node.isProp) {
-      hashStr += ', exProps: ' + exPropsStr;
-    }
-
-    if (noConfig || config.subExProps || node.isProp) {
-      hashStr += ', subExProps: ' + subExPropsStr;
-    }
+    var isDirective = node.isDirective || config && config.isDirective; // if (noConfig || config.exProps || node.isProp) {
+    //   hashStr += ', exProps: ' + exPropsStr;
+    // }
+    // if (noConfig || config.subExProps || node.isProp) {
+    //   hashStr += ', subExProps: ' + subExPropsStr;
+    // }
 
     if (noConfig || config.hasName) {
       hashStr += ', name: \'' + node.ex + '\'';
@@ -2448,7 +2447,7 @@ function _buildOptions(config, useStringLocal, node, fns, exPropsStr, subExProps
       hashStr += ', props: ' + hashProps;
     }
 
-    hashStr += ', ' + (isDirective ? 'value' : 'children') + ': ' + (node.content ? 'p1.r(p1, p2, p1.fn' + _buildFn(node.content, node, fns, ++fns._no, newContext, level, useStringLocal) + ', ' + exPropsStr + ', ' + subExPropsStr + ')' : 'p1.np');
+    hashStr += ', ' + (isDirective ? 'value' : 'children') + ': ' + (node.content ? 'p1.r(p1, p2, p1.fn' + _buildFn(node.content, node, fns, ++fns._no, newContext, level, useStringLocal) + ')' : 'p1.np');
   }
 
   return '{ _njOpts: ' + (no == 0 ? '\'main\'' : no) + (noConfig || config.hasTmplCtx ? ', global: p1, context: p2' : '') + (noConfig || config.hasOutputH ? ', outputH: ' + !fns.useString : '') + hashStr + (level != null && (noConfig || config.hasLevel) ? ', level: ' + level : '') + ' }';
@@ -2815,15 +2814,14 @@ function _buildProps(obj, fns, useStringLocal, level) {
 }
 
 function _buildPropsEx(isSub, paramsEC, propsEx, fns, counter, useString, exPropsStr, subExPropsStr, tagName, attrs) {
+  //let paramsStr = '';
   var paramsStr = 'var _paramsE' + paramsEC + ' = {};\n';
   var ret = {};
 
   if (isSub) {
-    ret._paramsE = exPropsStr;
-    ret._paramsSE = '_paramsE' + paramsEC;
+    ret._paramsE = exPropsStr; //ret._paramsSE = '_paramsE' + paramsEC;
   } else {
-    ret._paramsE = '_paramsE' + paramsEC;
-    ret._paramsSE = subExPropsStr;
+    ret._paramsE = '_paramsE' + paramsEC; //ret._paramsSE = subExPropsStr;
   } //props标签的子节点
 
 
@@ -2873,8 +2871,7 @@ function _buildParams(node, fns, counter, useString, level, exPropsStr, subExPro
     }
 
     if (hasPropsEx) {
-      var bothPropsEx = paramsEx && propsExS,
-          _paramsEC,
+      var _paramsEC,
           _paramsSEC;
 
       if (!params) {
@@ -2891,14 +2888,9 @@ function _buildParams(node, fns, counter, useString, level, exPropsStr, subExPro
         paramsStr += _buildPropsEx(true, _paramsSEC, propsExS, fns, counter, useString, exPropsStr, subExPropsStr, tagName, _attrs);
       }
 
-      if (!useString) {
-        if (bothPropsEx) {
-          paramsStr += '\n' + _attrs + ' = p1.an({}, _paramsE' + _paramsEC + ', _paramsE' + _paramsSEC + ', ' + _attrs + ');\n';
-        } else {
-          paramsStr += '\n' + _attrs + ' = p1.an({}, _paramsE' + (_paramsEC != null ? _paramsEC : _paramsSEC) + ', ' + _attrs + ');\n';
-        }
-      } else {
-        paramsStr += '\n' + _attrs + ' = p1.ans({}, _paramsE' + _paramsEC + ', ' + _attrs + ');\n';
+      if (!useString) ; else {
+        // paramsStr += '\n' + _attrs + ' = p1.ans({}, _paramsE' + _paramsEC + ', ' + _attrs + ');\n';
+        paramsStr += '\n' + _attrs + ' = p1.ans(' + _attrs + ');\n';
       }
     } else if (useString) {
       paramsStr += '\n' + _attrs + ' = p1.ans({}, ' + _attrs + ');\n';

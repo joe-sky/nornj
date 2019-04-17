@@ -89,7 +89,7 @@ describe('test compile string', function () {
         x: '__xyz'
       });
 
-      console.log(html);
+      //console.log(html);
       expect(html).toBeTruthy();
     });
 
@@ -112,7 +112,7 @@ describe('test compile string', function () {
       `;
 
       const html = tmpl();
-      console.log(html);
+      //console.log(html);
     });
 
     it('tag no prefix', function () {
@@ -126,7 +126,7 @@ describe('test compile string', function () {
       `;
 
       const html = tmpl();
-      console.log(html);
+      //console.log(html);
     });
   });
 });

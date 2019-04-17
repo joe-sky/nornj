@@ -48,7 +48,7 @@ export const extensions = {
     return ret;
   },
 
-  'else': options => options.subExProps['else'] = options.children,
+  'else': options => options.attrs['else'] = options.children,
 
   'elseif': (value, options) => {
     if (value && value._njOpts) {
@@ -56,11 +56,11 @@ export const extensions = {
       value = options.props.condition || options.props.value;
     }
 
-    const exProps = options.subExProps;
-    if (!exProps.elseifs) {
-      exProps.elseifs = [];
+    const { attrs } = options;
+    if (!attrs.elseifs) {
+      attrs.elseifs = [];
     }
-    exProps.elseifs.push({
+    attrs.elseifs.push({
       value,
       fn: options.children
     });
@@ -172,13 +172,14 @@ export const extensions = {
       value = !options.useString ? true : name;
     }
 
-    options.exProps[options.outputH ? tranData.fixPropName(name) : name] = value;
+    options.attrs[options.outputH ? tranData.fixPropName(name) : name] = value;
   },
 
   //Spread parameters
   spread: (props, options) => {
+    const { attrs } = options;
     tools.each(props, (v, k) => {
-      options.exProps[k] = v;
+      attrs[k] === undefined && (options.attrs[k] = v);
     }, false, false);
   },
 
@@ -310,12 +311,12 @@ export const extensions = {
   },
 
   arg: options => {
-    const { exProps } = options;
-    if (!exProps.args) {
-      exProps.args = [];
+    const { attrs } = options;
+    if (!attrs.args) {
+      attrs.args = [];
     }
 
-    exProps.args.push(options.children());
+    attrs.args.push(options.children());
   },
 
   css: options => options.props.style
@@ -353,7 +354,7 @@ const _defaultCfg = { onlyGlobal: true, newContext: false, hasName: false, hasAt
 //Extension default config
 export const extensionConfig = {
   'if': _config(_defaultCfg),
-  'else': _config(_defaultCfg, { subExProps: true, isSub: true }),
+  'else': _config(_defaultCfg, { subExProps: true, isSub: true, hasAttrs: true }),
   'switch': _config(_defaultCfg, { needPrefix: 'onlyUpperCase' }),
   each: _config(_defaultCfg, {
     newContext: {
@@ -371,7 +372,7 @@ export const extensionConfig = {
       getDatasFromProp: { except: ['to', 'step', 'index'] }
     }
   }),
-  prop: _config(_defaultCfg, { exProps: true, subExProps: true, isProp: true, needPrefix: true }),
+  prop: _config(_defaultCfg, { exProps: true, subExProps: true, isProp: true, needPrefix: true, hasAttrs: true }),
   obj: _config(_defaultCfg, { needPrefix: true }),
   fn: _config(_defaultCfg, { newContext: true, needPrefix: true }),
   'with': _config(_defaultCfg, { newContext: { getDatasFromProp: true } }),

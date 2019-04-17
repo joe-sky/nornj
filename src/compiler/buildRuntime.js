@@ -64,10 +64,8 @@ function _buildFn(content, node, fns, no, newContext, level, useStringLocal, nam
      p1: 模板全局数据
      p2: 节点上下文数据
      p3: 扩展标签内调用result方法传递的参数
-     p4: #props变量
-     p5：子扩展标签#props变量
     */
-    const fn = fns[main ? 'main' + (isTmplEx ? no : '') : 'fn' + no] = new Function('p1', 'p2', 'p3', 'p4', 'p5', fnStr);
+    const fn = fns[main ? 'main' + (isTmplEx ? no : '') : 'fn' + no] = new Function('p1', 'p2', 'p3', fnStr);
     if (isTmplEx && name != null) { //设置函数名
       fn._njName = name;
     }
@@ -85,12 +83,12 @@ function _buildOptions(config, useStringLocal, node, fns, exPropsStr, subExProps
   if (node) { //tags
     let newContext = config ? config.newContext : true;
     const isDirective = node.isDirective || (config && config.isDirective);
-    if (noConfig || config.exProps || node.isProp) {
-      hashStr += ', exProps: ' + exPropsStr;
-    }
-    if (noConfig || config.subExProps || node.isProp) {
-      hashStr += ', subExProps: ' + subExPropsStr;
-    }
+    // if (noConfig || config.exProps || node.isProp) {
+    //   hashStr += ', exProps: ' + exPropsStr;
+    // }
+    // if (noConfig || config.subExProps || node.isProp) {
+    //   hashStr += ', subExProps: ' + subExPropsStr;
+    // }
     if (noConfig || config.hasName) {
       hashStr += ', name: \'' + node.ex + '\'';
     }
@@ -104,7 +102,7 @@ function _buildOptions(config, useStringLocal, node, fns, exPropsStr, subExProps
     if (hashProps != null) {
       hashStr += ', props: ' + hashProps;
     }
-    hashStr += ', ' + (isDirective ? 'value' : 'children') + ': ' + (node.content ? 'p1.r(p1, p2, p1.fn' + _buildFn(node.content, node, fns, ++fns._no, newContext, level, useStringLocal) + ', ' + exPropsStr + ', ' + subExPropsStr + ')' : 'p1.np');
+    hashStr += ', ' + (isDirective ? 'value' : 'children') + ': ' + (node.content ? 'p1.r(p1, p2, p1.fn' + _buildFn(node.content, node, fns, ++fns._no, newContext, level, useStringLocal) + ')' : 'p1.np');
   }
 
   return '{ _njOpts: ' + (no == 0 ? '\'main\'' : no)
@@ -455,15 +453,16 @@ function _buildProps(obj, fns, useStringLocal, level) {
 }
 
 function _buildPropsEx(isSub, paramsEC, propsEx, fns, counter, useString, exPropsStr, subExPropsStr, tagName, attrs) {
+  //let paramsStr = '';
   let paramsStr = 'var _paramsE' + paramsEC + ' = {};\n';
 
   const ret = {};
   if (isSub) {
     ret._paramsE = exPropsStr;
-    ret._paramsSE = '_paramsE' + paramsEC;
+    //ret._paramsSE = '_paramsE' + paramsEC;
   } else {
     ret._paramsE = '_paramsE' + paramsEC;
-    ret._paramsSE = subExPropsStr;
+    //ret._paramsSE = subExPropsStr;
   }
 
   //props标签的子节点
@@ -524,13 +523,14 @@ function _buildParams(node, fns, counter, useString, level, exPropsStr, subExPro
       }
 
       if (!useString) {
-        if (bothPropsEx) {
-          paramsStr += '\n' + _attrs + ' = p1.an({}, _paramsE' + _paramsEC + ', _paramsE' + _paramsSEC + ', ' + _attrs + ');\n';
-        } else {
-          paramsStr += '\n' + _attrs + ' = p1.an({}, _paramsE' + (_paramsEC != null ? _paramsEC : _paramsSEC) + ', ' + _attrs + ');\n';
-        }
+        // if (bothPropsEx) {
+        //   paramsStr += '\n' + _attrs + ' = p1.an({}, _paramsE' + _paramsEC + ', _paramsE' + _paramsSEC + ', ' + _attrs + ');\n';
+        // } else {
+        //   paramsStr += '\n' + _attrs + ' = p1.an({}, _paramsE' + (_paramsEC != null ? _paramsEC : _paramsSEC) + ', ' + _attrs + ');\n';
+        // }
       } else {
-        paramsStr += '\n' + _attrs + ' = p1.ans({}, _paramsE' + _paramsEC + ', ' + _attrs + ');\n';
+        // paramsStr += '\n' + _attrs + ' = p1.ans({}, _paramsE' + _paramsEC + ', ' + _attrs + ');\n';
+        paramsStr += '\n' + _attrs + ' = p1.ans(' + _attrs + ');\n';
       }
     }
     else if (useString) {

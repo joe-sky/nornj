@@ -197,61 +197,7 @@ describe('test compile string', function () {
       `;
 
       var tmplTest = nj`
-      <!DOCTYPE html>
-      <#with {{name3}} as=name5>{{{
-        JSON.stringify( 
-          [
-            1,
-            {
-              a: 1,
-              b: 2
-            }
-          ]
-        )
-      }}}</#with>
-      <#each {{list}}>
-        <div>{{this}}</div>
-        {{this}}
-        <#empty>
-          no data
-        </#empty>
-      </#each>
-      <style>
-        .class1 {
-          margin-left: 10px;
-        }
-      </style>
-      <script>
-        <@type>text</@type>
-        function test() {
-          console.log(1);
-
-          <#if {{true}}>var reg = /\\n+/;</#if>
-          var a = '{{ @lt +('test') +(@gt) }}';
-
-          if(i < 10) {
-            return;
-          }
-
-          var num = <#each><#arg>{{ list(1, 2, 3) }}</#arg>{{this}}</#each>;
-
-          function test2() {
-            console.log('    <div  >a<img    />  b  </div>  <div>  '
-              + ' <img /> </div>  ');
-          }
-
-          var scriptUrl = '<script src="'+prefix+'/resources/app/pages/'+path+'index.js">' + '<' + '/script>';
-        }
-      </script>
-      <textarea>
-        1 < 123
-        <img src="test1.png">
-      </textarea>
-      <${'img'} src="test1.png" />
-      <img src="test1.png">
-        <#prop {{'id'}}>img</#prop>
-        <@id1>img1</@id1>
-      </img>
+      
       <img src="test1.png">
       {{{JSON.stringify_(@data[0])}}}
       <#each {{ list2 }}>
@@ -275,9 +221,9 @@ describe('test compile string', function () {
             img
           </@name>
           <#props>
-            <#if {{id > (50) && (id <= (100))}}>
+            <!--# <#if {{id > (50) && (id <= (100))}}> #-->
               <@id1>d{{@g.parseInt_(2.01, 10)}}</@id1>
-            </#if>
+            <!--# </#if> #-->
           </#props>
           <@name1>{{../@data[2].name1}}</@name1>
         </div>
@@ -356,7 +302,7 @@ describe('test compile string', function () {
 
       //console.log(tmplTest._njTmpl);
 
-      var tmplTest2 = nj.compile(`
+      /*var tmplTest2 = nj.compile(`
       <div>
         <#props>
           <#if {{false}}>
@@ -383,7 +329,7 @@ describe('test compile string', function () {
           </#if>
         </#props>
       </div>
-      `, 'test2');
+      `, 'test2');*/
 
       // let str1 = `
       //   <div name1=../111>
@@ -452,7 +398,7 @@ describe('test compile string', function () {
 </script></nj-text>`;
 
       const html = tmplTest.apply(null, data);
-      const html2 = tmplTest2();
+      //const html2 = tmplTest2();
       const html3 = nj.compile(tmplTest3, {
         delimiters: {
           start: '{%',

@@ -1,5 +1,5 @@
-﻿import { render } from '../../src/compiler/compile';
-import '../../src/utils/createTmplRule';
+﻿import { render, precompile } from '../../src/compiler/compile';
+import createTmplRule from '../../src/utils/createTmplRule';
 import { registerExtension } from '../../src/helpers/extension';
 
 describe('Register extension tag', () => {
@@ -11,7 +11,7 @@ describe('Register extension tag', () => {
       wrap2: {
         extension: options => {
           const { props } = options;
-          options.subExProps.subProps = props && props.subProps ? props.subProps : 'test';
+          options.attrs.subProps = props && props.subProps ? props.subProps : 'test';
         },
         options: {
           isSub: true,
@@ -20,7 +20,7 @@ describe('Register extension tag', () => {
       },
       wrap3: {
         extension: options => {
-          options.subExProps.subProps = 'test3';
+          options.attrs.subProps = 'test3';
         },
         options: {
           isSub: true,
@@ -29,15 +29,22 @@ describe('Register extension tag', () => {
       },
       wrap4: {
         extension: options => {
-          options.exProps.props = 'test4';
+          options.attrs.props = 'test4';
         },
         options: {
-          isProp: true,
-          exProps: true
+          isSub: true,
+          subExProps: true
         }
       },
-      wrap5: options => {
-        return options.children();
+      wrap5: {
+        extension: options => {
+          const { props } = options;
+          options.attrs.props = props.props;
+        },
+        options: {
+          isSub: true,
+          subExProps: true
+        }
       },
     });
   });
@@ -61,13 +68,20 @@ describe('Register extension tag', () => {
   });
 
   it('3 layers and has isProp', () => {
+    // console.log(precompile(`
+    //   <#wrap1>
+    //     <#props>
+    //       <#wrap5>
+    //         <#wrap4 />
+    //       </#wrap5>
+    //     </#props>
+    //   </#wrap1>
+    // `, false, createTmplRule()).main.toString());
     expect(render(`
       <#wrap1>
-        <#props>
-          <#wrap5>
-            <#wrap4 />
-          </#wrap5>
-        </#props>
+        <#wrap5>
+          <#wrap4 />
+        </#wrap5>
       </#wrap1>
     `)).toBe('subProps:test4');
   });

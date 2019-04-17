@@ -1,5 +1,5 @@
-﻿import { render } from '../../src/compiler/compile';
-import '../../src/utils/createTmplRule';
+﻿import { render, precompile } from '../../src/compiler/compile';
+import createTmplRule from '../../src/utils/createTmplRule';
 
 describe('Extension tag', () => {
   it('if', () => {
@@ -102,6 +102,7 @@ describe('Extension tag', () => {
   });
 
   it('spread', () => {
+    //console.log(precompile(`<div {{... { type: 'text', value: 'abc' } }}></div>`, false, createTmplRule()).main.toString());
     expect(render(`
       <input {{... { type: 'text', value: 'abc' } }}>
     `)).toBe('<input type="text" value="abc" />');

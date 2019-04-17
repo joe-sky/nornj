@@ -1,5 +1,5 @@
 /*!
-* NornJ template engine v5.0.0-rc.5
+* NornJ template engine v5.0.0-rc.6
 * (c) 2016-2019 Joe_Sky
 * Released under the MIT License.
 */
@@ -734,7 +734,7 @@
       return ret;
     },
     'else': function _else(options) {
-      return options.subExProps['else'] = options.children;
+      return options.attrs['else'] = options.children;
     },
     'elseif': function elseif(value, options) {
       if (value && value._njOpts) {
@@ -742,13 +742,14 @@
         value = options.props.condition || options.props.value;
       }
 
-      var exProps = options.subExProps;
+      var _options = options,
+          attrs = _options.attrs;
 
-      if (!exProps.elseifs) {
-        exProps.elseifs = [];
+      if (!attrs.elseifs) {
+        attrs.elseifs = [];
       }
 
-      exProps.elseifs.push({
+      attrs.elseifs.push({
         value: value,
         fn: options.children
       });
@@ -861,12 +862,13 @@
         value = !options.useString ? true : name;
       }
 
-      options.exProps[options.outputH ? fixPropName(name) : name] = value;
+      options.attrs[options.outputH ? fixPropName(name) : name] = value;
     },
     //Spread parameters
     spread: function spread(props, options) {
+      var attrs = options.attrs;
       each(props, function (v, k) {
-        options.exProps[k] = v;
+        attrs[k] === undefined && (options.attrs[k] = v);
       }, false, false);
     },
     show: function show(options) {
@@ -895,8 +897,8 @@
 
       if (i && i._njOpts) {
         options = i;
-        var _options = options,
-            props = _options.props;
+        var _options2 = options,
+            props = _options2.props;
         Object.keys(props).forEach(function (prop) {
           var value = props[prop];
 
@@ -987,21 +989,21 @@
           data: [options.props]
         });
       } else {
-        var _options2 = options,
-            props = _options2.props;
+        var _options3 = options,
+            props = _options3.props;
         return options.children({
           data: [props && props.as ? _defineProperty({}, props.as, originalData) : originalData]
         });
       }
     },
     arg: function arg(options) {
-      var exProps = options.exProps;
+      var attrs = options.attrs;
 
-      if (!exProps.args) {
-        exProps.args = [];
+      if (!attrs.args) {
+        attrs.args = [];
       }
 
-      exProps.args.push(options.children());
+      attrs.args.push(options.children());
     },
     css: function css(options) {
       return options.props.style;
@@ -1049,7 +1051,8 @@
     'if': _config(_defaultCfg),
     'else': _config(_defaultCfg, {
       subExProps: true,
-      isSub: true
+      isSub: true,
+      hasAttrs: true
     }),
     'switch': _config(_defaultCfg, {
       needPrefix: 'onlyUpperCase'
@@ -1076,7 +1079,8 @@
       exProps: true,
       subExProps: true,
       isProp: true,
-      needPrefix: true
+      needPrefix: true,
+      hasAttrs: true
     }),
     obj: _config(_defaultCfg, {
       needPrefix: true
@@ -1136,7 +1140,7 @@
     each(params, function (v, name) {
       if (v) {
         var _extension = v.extension,
-            _options3 = v.options;
+            _options4 = v.options;
 
         if (_extension) {
           extensions[name] = _extension;
@@ -1149,9 +1153,9 @@
             extensionConfig[name] = _config();
           }
 
-          assign(extensionConfig[name], _options3);
+          assign(extensionConfig[name], _options4);
         } else {
-          extensionConfig[name] = _config(_options3);
+          extensionConfig[name] = _config(_options4);
         }
       }
     }, false, false);
