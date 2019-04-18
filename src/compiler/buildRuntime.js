@@ -24,7 +24,6 @@ function _buildFn(content, node, fns, no, newContext, level, useStringLocal, nam
     counter = {
       _type: 0,
       _params: 0,
-      _paramsE: 0,
       _compParam: 0,
       _dataRefer: 0,
       _ex: 0,
@@ -75,7 +74,7 @@ function _buildFn(content, node, fns, no, newContext, level, useStringLocal, nam
   return no;
 }
 
-function _buildOptions(config, useStringLocal, node, fns, exPropsStr, subExPropsStr, level, hashProps, tagName, attrs) {
+function _buildOptions(config, useStringLocal, node, fns, level, hashProps, tagName, attrs) {
   let hashStr = ', useString: ' + (useStringLocal == null ? 'p1.us' : (useStringLocal ? 'true' : 'false')),
     noConfig = !config,
     no = fns._no;
@@ -83,12 +82,6 @@ function _buildOptions(config, useStringLocal, node, fns, exPropsStr, subExProps
   if (node) { //tags
     let newContext = config ? config.newContext : true;
     const isDirective = node.isDirective || (config && config.isDirective);
-    // if (noConfig || config.exProps || node.isProp) {
-    //   hashStr += ', exProps: ' + exPropsStr;
-    // }
-    // if (noConfig || config.subExProps || node.isProp) {
-    //   hashStr += ', subExProps: ' + subExPropsStr;
-    // }
     if (noConfig || config.hasName) {
       hashStr += ', name: \'' + node.ex + '\'';
     }
@@ -351,7 +344,7 @@ export function buildExpression(ast, inObj, escape, fns, useStringLocal, level) 
 
         //if (!configF || configF.hasOptions) {
         if (configF && configF.hasOptions) {
-          _codeStr += `, ${_buildOptions(configF, useStringLocal, null, fns, null, null, level)}`;
+          _codeStr += `, ${_buildOptions(configF, useStringLocal, null, fns, level)}`;
         }
       }
       _codeStr += endStr;
@@ -452,29 +445,11 @@ function _buildProps(obj, fns, useStringLocal, level) {
   return valueStr;
 }
 
-function _buildPropsEx(isSub, paramsEC, propsEx, fns, counter, useString, exPropsStr, subExPropsStr, tagName, attrs) {
-  //let paramsStr = '';
-  let paramsStr = 'var _paramsE' + paramsEC + ' = {};\n';
-
-  const ret = {};
-  if (isSub) {
-    ret._paramsE = exPropsStr;
-    //ret._paramsSE = '_paramsE' + paramsEC;
-  } else {
-    ret._paramsE = '_paramsE' + paramsEC;
-    //ret._paramsSE = subExPropsStr;
-  }
-
-  //props标签的子节点
-  paramsStr += _buildContent(propsEx.content, propsEx, fns, counter, ret, null, useString, tagName, attrs);
-  return paramsStr;
-}
-
-function _buildParams(node, fns, counter, useString, level, exPropsStr, subExPropsStr, tagName) {
+function _buildParams(node, fns, counter, useString, level, tagName) {
   //节点参数
-  const { params, paramsEx, propsExS } = node;
+  const { params, paramsEx } = node;
   const useStringF = fns.useString,
-    hasPropsEx = paramsEx || propsExS;
+    hasPropsEx = paramsEx;
   let paramsStr = '',
     _paramsC,
     _attrs;
@@ -507,29 +482,15 @@ function _buildParams(node, fns, counter, useString, level, exPropsStr, subExPro
     }
 
     if (hasPropsEx) {
-      let bothPropsEx = paramsEx && propsExS,
-        _paramsEC, _paramsSEC;
       if (!params) {
         paramsStr += '{};\n';
       }
 
       if (paramsEx) {
-        _paramsEC = counter._paramsE++;
-        paramsStr += _buildPropsEx(false, _paramsEC, paramsEx, fns, counter, useString, exPropsStr, subExPropsStr, tagName, _attrs);
-      }
-      if (propsExS) {
-        _paramsSEC = counter._paramsE++;
-        paramsStr += _buildPropsEx(true, _paramsSEC, propsExS, fns, counter, useString, exPropsStr, subExPropsStr, tagName, _attrs);
+        paramsStr += _buildContent(paramsEx.content, paramsEx, fns, counter, { _paramsE: true }, null, useString, tagName, _attrs);
       }
 
-      if (!useString) {
-        // if (bothPropsEx) {
-        //   paramsStr += '\n' + _attrs + ' = p1.an({}, _paramsE' + _paramsEC + ', _paramsE' + _paramsSEC + ', ' + _attrs + ');\n';
-        // } else {
-        //   paramsStr += '\n' + _attrs + ' = p1.an({}, _paramsE' + (_paramsEC != null ? _paramsEC : _paramsSEC) + ', ' + _attrs + ');\n';
-        // }
-      } else {
-        // paramsStr += '\n' + _attrs + ' = p1.ans({}, _paramsE' + _paramsEC + ', ' + _attrs + ');\n';
+      if (useString) {
         paramsStr += '\n' + _attrs + ' = p1.ans(' + _attrs + ');\n';
       }
     }
@@ -590,25 +551,12 @@ function _buildNode(node, parent, fns, counter, retType, level, useStringLocal, 
       }, false, true);
     }
 
-    //props块
-    let exPropsStr = 'p4',
-      subExPropsStr = 'p5';
-    if (retType) {
-      const { _paramsE, _paramsSE } = retType;
-      if (_paramsE) {
-        exPropsStr = _paramsE;
-      }
-      if (_paramsSE) {
-        subExPropsStr = _paramsSE;
-      }
-    }
-
     //hash参数
-    let retP = _buildParams(node, fns, counter, false, level, exPropsStr, subExPropsStr, tagName),
+    let retP = _buildParams(node, fns, counter, false, level, tagName),
       paramsStr = retP[0],
       _paramsC = retP[1];
 
-    dataReferStr += _buildOptions(configE, useStringLocal, node, fns, exPropsStr, subExPropsStr, level, paramsStr !== '' ? '_params' + _paramsC : null, tagName, attrs);
+    dataReferStr += _buildOptions(configE, useStringLocal, node, fns, level, paramsStr !== '' ? '_params' + _paramsC : null, tagName, attrs);
     dataReferStr += '\n];\n';
 
     //添加匿名参数
@@ -662,7 +610,7 @@ function _buildNode(node, parent, fns, counter, retType, level, useStringLocal, 
     fnStr += '\nvar _type' + _typeC + ' = ' + typeStr + ';\n';
 
     //节点参数
-    let retP = _buildParams(node, fns, counter, useStringF, level, null, null, _tagName),
+    let retP = _buildParams(node, fns, counter, useStringF, level, _tagName),
       paramsStr = retP[0],
       _paramsC = retP[1];
     fnStr += paramsStr;
@@ -760,7 +708,7 @@ function _buildRender(node, parent, nodeType, retType, params, fns, level, useSt
     } else {
       return '\nret += ' + retStr + ';\n';
     }
-  } else if (retType._paramsE || retType._paramsSE) {
+  } else if (retType._paramsE) {
     return '\n' + retStr + ';\n';
   } else {
     if (!useStringF) {

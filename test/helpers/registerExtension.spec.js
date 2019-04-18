@@ -11,11 +11,11 @@ describe('Register extension tag', () => {
       wrap2: {
         extension: options => {
           const { props } = options;
+          //console.log(props);
           options.attrs.subProps = props && props.subProps ? props.subProps : 'test';
         },
         options: {
-          isSub: true,
-          subExProps: true
+          isSubTag: true
         }
       },
       wrap3: {
@@ -23,8 +23,7 @@ describe('Register extension tag', () => {
           options.attrs.subProps = 'test3';
         },
         options: {
-          isSub: true,
-          subExProps: true
+          isSubTag: true
         }
       },
       wrap4: {
@@ -32,8 +31,7 @@ describe('Register extension tag', () => {
           options.attrs.props = 'test4';
         },
         options: {
-          isSub: true,
-          subExProps: true
+          isSubTag: true
         }
       },
       wrap5: {
@@ -42,8 +40,7 @@ describe('Register extension tag', () => {
           options.attrs.props = props.props;
         },
         options: {
-          isSub: true,
-          subExProps: true
+          isSubTag: true
         }
       },
     });
@@ -61,13 +58,14 @@ describe('Register extension tag', () => {
     expect(render(`
       <#wrap1>
         <#wrap2>
+          <@title>1</@title>
           <#wrap3 />
         </#wrap2>
       </#wrap1>
     `)).toBe('subProps:test3');
   });
 
-  it('3 layers and has isProp', () => {
+  it('3 layers', () => {
     // console.log(precompile(`
     //   <#wrap1>
     //     <#props>

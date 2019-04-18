@@ -559,9 +559,9 @@ function assignStrProps() {
   return ret;
 } //创建扩展标签子节点函数
 
-function exRet(p1, p2, fn, p4, p5) {
+function exRet(p1, p2, fn) {
   return function (param) {
-    return fn(p1, p2, param, p4, p5);
+    return fn(p1, p2, param);
   };
 }
 
@@ -849,7 +849,7 @@ var extensions = {
   },
   //Parameter
   prop: function prop(name, options) {
-    var ret = options.children(),
+    var ret = options.value(),
         //Get parameter value
     value;
 
@@ -1001,7 +1001,7 @@ var extensions = {
       attrs.args = [];
     }
 
-    attrs.args.push(options.children());
+    attrs.args.push(options.value());
   },
   css: function css(options) {
     return options.props.style;
@@ -1013,10 +1013,8 @@ function _config(params, extra) {
     onlyGlobal: false,
     useString: false,
     newContext: true,
-    exProps: false,
-    isProp: false,
-    subExProps: false,
-    isSub: false,
+    isSubTag: false,
+    isDirective: false,
     addSet: false,
     useExpressionInJsx: 'onlyTemplateLiteral',
     hasName: true,
@@ -1048,8 +1046,7 @@ var _defaultCfg = {
 var extensionConfig = {
   'if': _config(_defaultCfg),
   'else': _config(_defaultCfg, {
-    subExProps: true,
-    isSub: true,
+    isSubTag: true,
     hasAttrs: true
   }),
   'switch': _config(_defaultCfg, {
@@ -1074,9 +1071,7 @@ var extensionConfig = {
     }
   }),
   prop: _config(_defaultCfg, {
-    exProps: true,
-    subExProps: true,
-    isProp: true,
+    isDirective: true,
     needPrefix: true,
     hasAttrs: true
   }),
@@ -1104,9 +1099,7 @@ extensionConfig.block = _config(extensionConfig.obj);
 extensionConfig.pre = _config(extensionConfig.obj);
 extensionConfig.arg = _config(extensionConfig.prop);
 extensionConfig.show = _config(extensionConfig.prop, {
-  isDirective: true,
   noTagName: true,
-  hasAttrs: true,
   hasOutputH: true
 });
 extensionConfig.css = _config(extensionConfig.obj); //Extension alias

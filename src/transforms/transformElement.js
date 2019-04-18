@@ -172,11 +172,11 @@ export function isParamsEx(name) {
 }
 
 //Add to the "paramsEx" property of the parent node
-export function addParamsEx(node, parent, isProp, isSub) {
-  const exPropsName = isSub ? 'propsExS' : 'paramsEx';
+export function addParamsEx(node, parent, isDirective, isSubTag) {
+  const exPropsName = 'paramsEx';
   if (!parent[exPropsName]) {
     let exPropsNode;
-    if (isProp || isSub) {
+    if (isDirective || isSubTag) {
       exPropsNode = {
         type: 'nj_ex',
         ex: 'props',
@@ -189,18 +189,12 @@ export function addParamsEx(node, parent, isProp, isSub) {
     exPropsNode.parentType = parent.type;
     parent[exPropsName] = exPropsNode;
   } else {
-    tools.arrayPush(parent[exPropsName].content, isProp || isSub ? [node] : node.content);
+    tools.arrayPush(parent[exPropsName].content, isDirective || isSubTag ? [node] : node.content);
   }
 }
 
 export function exCompileConfig(name) {
-  const config = extensionConfig[name];
-  return {
-    isSub: config ? config.isSub : false,
-    isProp: config ? config.isProp : false,
-    useString: config ? config.useString : false,
-    addSet: config ? config.addSet : false
-  };
+  return extensionConfig[name] || {};
 }
 
 export function isPropS(elemName, tmplRule) {

@@ -764,9 +764,9 @@ function assignStrProps() {
   return ret;
 } //创建扩展标签子节点函数
 
-function exRet(p1, p2, fn, p4, p5) {
+function exRet(p1, p2, fn) {
   return function (param) {
-    return fn(p1, p2, param, p4, p5);
+    return fn(p1, p2, param);
   };
 }
 
@@ -1054,7 +1054,7 @@ var extensions = {
   },
   //Parameter
   prop: function prop(name, options) {
-    var ret = options.children(),
+    var ret = options.value(),
         //Get parameter value
     value;
 
@@ -1206,7 +1206,7 @@ var extensions = {
       attrs.args = [];
     }
 
-    attrs.args.push(options.children());
+    attrs.args.push(options.value());
   },
   css: function css(options) {
     return options.props.style;
@@ -1218,10 +1218,8 @@ function _config(params, extra) {
     onlyGlobal: false,
     useString: false,
     newContext: true,
-    exProps: false,
-    isProp: false,
-    subExProps: false,
-    isSub: false,
+    isSubTag: false,
+    isDirective: false,
     addSet: false,
     useExpressionInJsx: 'onlyTemplateLiteral',
     hasName: true,
@@ -1253,8 +1251,7 @@ var _defaultCfg = {
 var extensionConfig = {
   'if': _config(_defaultCfg),
   'else': _config(_defaultCfg, {
-    subExProps: true,
-    isSub: true,
+    isSubTag: true,
     hasAttrs: true
   }),
   'switch': _config(_defaultCfg, {
@@ -1279,9 +1276,7 @@ var extensionConfig = {
     }
   }),
   prop: _config(_defaultCfg, {
-    exProps: true,
-    subExProps: true,
-    isProp: true,
+    isDirective: true,
     needPrefix: true,
     hasAttrs: true
   }),
@@ -1309,9 +1304,7 @@ extensionConfig.block = _config(extensionConfig.obj);
 extensionConfig.pre = _config(extensionConfig.obj);
 extensionConfig.arg = _config(extensionConfig.prop);
 extensionConfig.show = _config(extensionConfig.prop, {
-  isDirective: true,
   noTagName: true,
-  hasAttrs: true,
   hasOutputH: true
 });
 extensionConfig.css = _config(extensionConfig.obj); //Extension alias
@@ -2076,13 +2069,13 @@ function isParamsEx(name) {
   return name === 'params' || name === 'props';
 } //Add to the "paramsEx" property of the parent node
 
-function addParamsEx(node, parent, isProp, isSub) {
-  var exPropsName = isSub ? 'propsExS' : 'paramsEx';
+function addParamsEx(node, parent, isDirective, isSubTag) {
+  var exPropsName = 'paramsEx';
 
   if (!parent[exPropsName]) {
     var exPropsNode;
 
-    if (isProp || isSub) {
+    if (isDirective || isSubTag) {
       exPropsNode = {
         type: 'nj_ex',
         ex: 'props',
@@ -2095,17 +2088,11 @@ function addParamsEx(node, parent, isProp, isSub) {
     exPropsNode.parentType = parent.type;
     parent[exPropsName] = exPropsNode;
   } else {
-    arrayPush(parent[exPropsName].content, isProp || isSub ? [node] : node.content);
+    arrayPush(parent[exPropsName].content, isDirective || isSubTag ? [node] : node.content);
   }
 }
 function exCompileConfig(name) {
-  var config = extensionConfig[name];
-  return {
-    isSub: config ? config.isSub : false,
-    isProp: config ? config.isProp : false,
-    useString: config ? config.useString : false,
-    addSet: config ? config.addSet : false
-  };
+  return extensionConfig[name] || {};
 }
 function isPropS(elemName, tmplRule) {
   return elemName.indexOf(tmplRule.propRule) === 0;
@@ -2169,8 +2156,8 @@ function checkElem(obj$1, parent, tmplRule, hasExProps, noSplitNewline, isLast) 
         hasCloseTag = false,
         isTmpl$1,
         isParamsEx$1,
-        isProp,
-        isSub,
+        isDirective,
+        isSubTag,
         needAddToProps;
     ex = isEx(first, tmplRule);
 
@@ -2204,9 +2191,9 @@ function checkElem(obj$1, parent, tmplRule, hasExProps, noSplitNewline, isLast) 
 
       if (!isParamsEx$1) {
         var exConfig = exCompileConfig(exName);
-        isProp = exConfig.isProp;
-        isSub = exConfig.isSub;
-        needAddToProps = isProp ? !hasExProps : isSub;
+        isDirective = exConfig.isDirective;
+        isSubTag = exConfig.isSubTag;
+        needAddToProps = isDirective ? !hasExProps : isSubTag;
 
         if (exConfig.useString) {
           node.useString = exConfig.useString;
@@ -2228,8 +2215,8 @@ function checkElem(obj$1, parent, tmplRule, hasExProps, noSplitNewline, isLast) 
           if (key === 'useString') {
             node.useString = !(value === 'false');
             return;
-          } else if (key === '_njIsProp') {
-            node.isDirective = node.isProp = isProp = true;
+          } else if (key === '_njIsDirective') {
+            node.isDirective = isDirective = true;
             needAddToProps = !hasExProps;
             return;
           }
@@ -2318,12 +2305,12 @@ function checkElem(obj$1, parent, tmplRule, hasExProps, noSplitNewline, isLast) 
           content = obj$1.slice(1, end);
 
       if (content && content.length) {
-        _checkContentElem(content, node, tmplRule, isParamsEx$1 || hasExProps && !isProp, noSplitNewline, tmplRule);
+        _checkContentElem(content, node, tmplRule, isParamsEx$1 || hasExProps && !isDirective, noSplitNewline, tmplRule);
       } //If this is params block, set on the "paramsEx" property of the parent node.
 
 
       if (isParamsEx$1 || needAddToProps) {
-        addParamsEx(node, parent, isProp, isSub);
+        addParamsEx(node, parent, isDirective, isSubTag);
       }
     } else {
       //如果不是元素节点,则为节点集合
@@ -2365,7 +2352,6 @@ function _buildFn(content, node, fns, no, newContext, level, useStringLocal, nam
       counter = {
     _type: 0,
     _params: 0,
-    _paramsE: 0,
     _compParam: 0,
     _dataRefer: 0,
     _ex: 0,
@@ -2419,7 +2405,7 @@ function _buildFn(content, node, fns, no, newContext, level, useStringLocal, nam
   return no;
 }
 
-function _buildOptions(config, useStringLocal, node, fns, exPropsStr, subExPropsStr, level, hashProps, tagName, attrs) {
+function _buildOptions(config, useStringLocal, node, fns, level, hashProps, tagName, attrs) {
   var hashStr = ', useString: ' + (useStringLocal == null ? 'p1.us' : useStringLocal ? 'true' : 'false'),
       noConfig = !config,
       no = fns._no;
@@ -2427,12 +2413,7 @@ function _buildOptions(config, useStringLocal, node, fns, exPropsStr, subExProps
   if (node) {
     //tags
     var newContext = config ? config.newContext : true;
-    var isDirective = node.isDirective || config && config.isDirective; // if (noConfig || config.exProps || node.isProp) {
-    //   hashStr += ', exProps: ' + exPropsStr;
-    // }
-    // if (noConfig || config.subExProps || node.isProp) {
-    //   hashStr += ', subExProps: ' + subExPropsStr;
-    // }
+    var isDirective = node.isDirective || config && config.isDirective;
 
     if (noConfig || config.hasName) {
       hashStr += ', name: \'' + node.ex + '\'';
@@ -2716,7 +2697,7 @@ function buildExpression(ast, inObj, escape, fns, useStringLocal, level) {
 
 
         if (configF && configF.hasOptions) {
-          _codeStr2 += ", ".concat(_buildOptions(configF, useStringLocal, null, fns, null, null, level));
+          _codeStr2 += ", ".concat(_buildOptions(configF, useStringLocal, null, fns, level));
         }
       }
 
@@ -2817,29 +2798,12 @@ function _buildProps(obj, fns, useStringLocal, level) {
   return valueStr;
 }
 
-function _buildPropsEx(isSub, paramsEC, propsEx, fns, counter, useString, exPropsStr, subExPropsStr, tagName, attrs) {
-  //let paramsStr = '';
-  var paramsStr = 'var _paramsE' + paramsEC + ' = {};\n';
-  var ret = {};
-
-  if (isSub) {
-    ret._paramsE = exPropsStr; //ret._paramsSE = '_paramsE' + paramsEC;
-  } else {
-    ret._paramsE = '_paramsE' + paramsEC; //ret._paramsSE = subExPropsStr;
-  } //props标签的子节点
-
-
-  paramsStr += _buildContent(propsEx.content, propsEx, fns, counter, ret, null, useString, tagName, attrs);
-  return paramsStr;
-}
-
-function _buildParams(node, fns, counter, useString, level, exPropsStr, subExPropsStr, tagName) {
+function _buildParams(node, fns, counter, useString, level, tagName) {
   //节点参数
   var params = node.params,
-      paramsEx = node.paramsEx,
-      propsExS = node.propsExS;
+      paramsEx = node.paramsEx;
   var useStringF = fns.useString,
-      hasPropsEx = paramsEx || propsExS;
+      hasPropsEx = paramsEx;
 
   var paramsStr = '',
       _paramsC,
@@ -2875,25 +2839,17 @@ function _buildParams(node, fns, counter, useString, level, exPropsStr, subExPro
     }
 
     if (hasPropsEx) {
-      var _paramsEC,
-          _paramsSEC;
-
       if (!params) {
         paramsStr += '{};\n';
       }
 
       if (paramsEx) {
-        _paramsEC = counter._paramsE++;
-        paramsStr += _buildPropsEx(false, _paramsEC, paramsEx, fns, counter, useString, exPropsStr, subExPropsStr, tagName, _attrs);
+        paramsStr += _buildContent(paramsEx.content, paramsEx, fns, counter, {
+          _paramsE: true
+        }, null, useString, tagName, _attrs);
       }
 
-      if (propsExS) {
-        _paramsSEC = counter._paramsE++;
-        paramsStr += _buildPropsEx(true, _paramsSEC, propsExS, fns, counter, useString, exPropsStr, subExPropsStr, tagName, _attrs);
-      }
-
-      if (!useString) ; else {
-        // paramsStr += '\n' + _attrs + ' = p1.ans({}, _paramsE' + _paramsEC + ', ' + _attrs + ');\n';
+      if (useString) {
         paramsStr += '\n' + _attrs + ' = p1.ans(' + _attrs + ');\n';
       }
     } else if (useString) {
@@ -2960,31 +2916,14 @@ function _buildNode(node, parent, fns, counter, retType, level, useStringLocal, 
 
         dataReferStr += '  ' + valueStr + ',';
       }, false, true);
-    } //props块
-
-
-    var exPropsStr = 'p4',
-        subExPropsStr = 'p5';
-
-    if (retType) {
-      var _paramsE = retType._paramsE,
-          _paramsSE = retType._paramsSE;
-
-      if (_paramsE) {
-        exPropsStr = _paramsE;
-      }
-
-      if (_paramsSE) {
-        subExPropsStr = _paramsSE;
-      }
     } //hash参数
 
 
-    var retP = _buildParams(node, fns, counter, false, level, exPropsStr, subExPropsStr, tagName),
+    var retP = _buildParams(node, fns, counter, false, level, tagName),
         paramsStr = retP[0],
         _paramsC = retP[1];
 
-    dataReferStr += _buildOptions(configE, useStringLocal, node, fns, exPropsStr, subExPropsStr, level, paramsStr !== '' ? '_params' + _paramsC : null, tagName, attrs);
+    dataReferStr += _buildOptions(configE, useStringLocal, node, fns, level, paramsStr !== '' ? '_params' + _paramsC : null, tagName, attrs);
     dataReferStr += '\n];\n'; //添加匿名参数
 
     if (paramsStr !== '') {
@@ -3042,7 +2981,7 @@ function _buildNode(node, parent, fns, counter, retType, level, useStringLocal, 
 
     fnStr += '\nvar _type' + _typeC + ' = ' + typeStr + ';\n'; //节点参数
 
-    var _retP = _buildParams(node, fns, counter, useStringF, level, null, null, _tagName),
+    var _retP = _buildParams(node, fns, counter, useStringF, level, _tagName),
         _paramsStr = _retP[0],
         _paramsC2 = _retP[1];
 
@@ -3164,7 +3103,7 @@ function _buildRender(node, parent, nodeType, retType, params, fns, level, useSt
     } else {
       return '\nret += ' + retStr + ';\n';
     }
-  } else if (retType._paramsE || retType._paramsSE) {
+  } else if (retType._paramsE) {
     return '\n' + retStr + ';\n';
   } else {
     if (!useStringF) {
@@ -3410,7 +3349,7 @@ function _checkStringElem(xml, tmplRule, outputH) {
 
       var isEx = elem ? isExAll(elemName, tmplRule) : false;
 
-      if (isEx && !isEx[1] && (isPropS(elemName, tmplRule) || isStrPropS(elemName, tmplRule) || isParamsEx(isEx[3]) || exCompileConfig(isEx[3]).isProp)) {
+      if (isEx && !isEx[1] && (isPropS(elemName, tmplRule) || isStrPropS(elemName, tmplRule) || isParamsEx(isEx[3]) || exCompileConfig(isEx[3]).isDirective)) {
         parent = current;
         current = _createCurrent(_elemName, parent);
 
@@ -3640,7 +3579,7 @@ function _getSplitParams(elem, tmplRule, outputH) {
 
       return name;
     });
-    var exPreAst = [extensionRule + name + ' _njIsProp' + (args ? ' arguments="' + firstChar + startRule + '[' + args.join(',') + ']' + endRule + lastChar + '"' : '') + (modifiers ? ' modifiers="' + startRule + '[' + modifiers.join(',') + ']' + endRule + '"' : '') + (hasEqual ? '' : ' /')];
+    var exPreAst = [extensionRule + name + ' _njIsDirective' + (args ? ' arguments="' + firstChar + startRule + '[' + args.join(',') + ']' + endRule + lastChar + '"' : '') + (modifiers ? ' modifiers="' + startRule + '[' + modifiers.join(',') + ']' + endRule + '"' : '') + (hasEqual ? '' : ' /')];
     hasEqual && exPreAst.push((hasColon ? (outputH ? firstChar : '') + startRule + ' ' : '') + clearQuot(value) + (hasColon ? ' ' + endRule + (outputH ? lastChar : '') : ''));
     paramsEx.push(exPreAst);
     return ' ';

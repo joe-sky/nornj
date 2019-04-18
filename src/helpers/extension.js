@@ -163,7 +163,7 @@ export const extensions = {
 
   //Parameter
   prop: (name, options) => {
-    let ret = options.children(), //Get parameter value
+    let ret = options.value(), //Get parameter value
       value;
 
     if (ret !== undefined) {
@@ -316,7 +316,7 @@ export const extensions = {
       attrs.args = [];
     }
 
-    attrs.args.push(options.children());
+    attrs.args.push(options.value());
   },
 
   css: options => options.props.style
@@ -327,10 +327,8 @@ function _config(params, extra) {
     onlyGlobal: false,
     useString: false,
     newContext: true,
-    exProps: false,
-    isProp: false,
-    subExProps: false,
-    isSub: false,
+    isSubTag: false,
+    isDirective: false,
     addSet: false,
     useExpressionInJsx: 'onlyTemplateLiteral',
     hasName: true,
@@ -354,7 +352,7 @@ const _defaultCfg = { onlyGlobal: true, newContext: false, hasName: false, hasAt
 //Extension default config
 export const extensionConfig = {
   'if': _config(_defaultCfg),
-  'else': _config(_defaultCfg, { subExProps: true, isSub: true, hasAttrs: true }),
+  'else': _config(_defaultCfg, { isSubTag: true, hasAttrs: true }),
   'switch': _config(_defaultCfg, { needPrefix: 'onlyUpperCase' }),
   each: _config(_defaultCfg, {
     newContext: {
@@ -372,7 +370,7 @@ export const extensionConfig = {
       getDatasFromProp: { except: ['to', 'step', 'index'] }
     }
   }),
-  prop: _config(_defaultCfg, { exProps: true, subExProps: true, isProp: true, needPrefix: true, hasAttrs: true }),
+  prop: _config(_defaultCfg, { isDirective: true, needPrefix: true, hasAttrs: true }),
   obj: _config(_defaultCfg, { needPrefix: true }),
   fn: _config(_defaultCfg, { newContext: true, needPrefix: true }),
   'with': _config(_defaultCfg, { newContext: { getDatasFromProp: true } }),
@@ -384,7 +382,7 @@ extensionConfig.list = _config(extensionConfig.obj);
 extensionConfig.block = _config(extensionConfig.obj);
 extensionConfig.pre = _config(extensionConfig.obj);
 extensionConfig.arg = _config(extensionConfig.prop);
-extensionConfig.show = _config(extensionConfig.prop, { isDirective: true, noTagName: true, hasAttrs: true, hasOutputH: true });
+extensionConfig.show = _config(extensionConfig.prop, { noTagName: true, hasOutputH: true });
 extensionConfig.css = _config(extensionConfig.obj);
 
 //Extension alias

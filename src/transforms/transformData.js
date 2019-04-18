@@ -171,9 +171,9 @@ export function assignStrProps(...params) {
 }
 
 //创建扩展标签子节点函数
-export function exRet(p1, p2, fn, p4, p5) {
+export function exRet(p1, p2, fn) {
   return function (param) {
-    return fn(p1, p2, param, p4, p5);
+    return fn(p1, p2, param);
   };
 }
 

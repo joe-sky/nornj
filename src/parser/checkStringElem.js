@@ -188,7 +188,7 @@ function _checkStringElem(xml, tmplRule, outputH) {
       if (isEx && !isEx[1] && (tranElem.isPropS(elemName, tmplRule) ||
         tranElem.isStrPropS(elemName, tmplRule) ||
         tranElem.isParamsEx(isEx[3]) ||
-        tranElem.exCompileConfig(isEx[3]).isProp)) {
+        tranElem.exCompileConfig(isEx[3]).isDirective)) {
         parent = current;
         current = _createCurrent(_elemName, parent);
         _setElem(_elem, _elemName, _elemParams, current.elem, null, tmplRule, outputH);
@@ -382,7 +382,7 @@ function _getSplitParams(elem, tmplRule, outputH) {
       return name;
     });
 
-    const exPreAst = [extensionRule + name + ' _njIsProp'
+    const exPreAst = [extensionRule + name + ' _njIsDirective'
       + (args ? ' arguments="' + firstChar + startRule + '[' + args.join(',') + ']' + endRule + lastChar + '"' : '')
       + (modifiers ? ' modifiers="' + startRule + '[' + modifiers.join(',') + ']' + endRule + '"' : '')
       + (hasEqual ? '' : ' /')];

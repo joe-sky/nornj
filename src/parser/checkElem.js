@@ -64,8 +64,8 @@ export default function checkElem(obj, parent, tmplRule, hasExProps, noSplitNewl
       hasCloseTag = false,
       isTmpl,
       isParamsEx,
-      isProp,
-      isSub,
+      isDirective,
+      isSubTag,
       needAddToProps;
 
     ex = tranElem.isEx(first, tmplRule);
@@ -91,9 +91,9 @@ export default function checkElem(obj, parent, tmplRule, hasExProps, noSplitNewl
       isParamsEx = tranElem.isParamsEx(exName);
       if (!isParamsEx) {
         let exConfig = tranElem.exCompileConfig(exName);
-        isProp = exConfig.isProp;
-        isSub = exConfig.isSub;
-        needAddToProps = isProp ? !hasExProps : isSub;
+        isDirective = exConfig.isDirective;
+        isSubTag = exConfig.isSubTag;
+        needAddToProps = isDirective ? !hasExProps : isSubTag;
 
         if (exConfig.useString) {
           node.useString = exConfig.useString;
@@ -113,8 +113,8 @@ export default function checkElem(obj, parent, tmplRule, hasExProps, noSplitNewl
             node.useString = !(value === 'false');
             return;
           }
-          else if (key === '_njIsProp') {
-            node.isDirective = node.isProp = isProp = true;
+          else if (key === '_njIsDirective') {
+            node.isDirective = isDirective = true;
             needAddToProps = !hasExProps;
             return;
           }
@@ -195,12 +195,12 @@ export default function checkElem(obj, parent, tmplRule, hasExProps, noSplitNewl
       const end = len - (hasCloseTag ? 1 : 0),
         content = obj.slice(1, end);
       if (content && content.length) {
-        _checkContentElem(content, node, tmplRule, isParamsEx || (hasExProps && !isProp), noSplitNewline, tmplRule);
+        _checkContentElem(content, node, tmplRule, isParamsEx || (hasExProps && !isDirective), noSplitNewline, tmplRule);
       }
 
       //If this is params block, set on the "paramsEx" property of the parent node.
       if (isParamsEx || needAddToProps) {
-        tranElem.addParamsEx(node, parent, isProp, isSub);
+        tranElem.addParamsEx(node, parent, isDirective, isSubTag);
       }
     } else { //如果不是元素节点,则为节点集合
       _checkContentElem(obj, parent, tmplRule, hasExProps, noSplitNewline);
