@@ -32,7 +32,7 @@ export const extensions = {
                 ret = elseFn();
               }
             }
-          }, false, true);
+          }, true);
         } else {
           if (elseFn) {
             ret = elseFn();
@@ -85,7 +85,7 @@ export const extensions = {
           ret = props['else']();
         }
       }
-    }, false, true);
+    }, true);
 
     return ret;
   },
@@ -139,7 +139,7 @@ export const extensions = {
         } else {
           ret.push(retI);
         }
-      }, false, isArrayLike);
+      }, isArrayLike);
 
       //Return null when not use string and result is empty.
       if (!useString && !ret.length) {
@@ -180,7 +180,7 @@ export const extensions = {
     const { attrs } = options;
     tools.each(props, (v, k) => {
       attrs[k] === undefined && (options.attrs[k] = v);
-    }, false, false);
+    }, false);
   },
 
   show: options => {
@@ -203,55 +203,6 @@ export const extensions = {
         attrs.style.display = 'none';
       }
     }
-  },
-
-  'for': (i, to, options) => {
-    let step = 1;
-    let indexKey;
-
-    if (i && i._njOpts) {
-      options = i;
-      const { props } = options;
-      Object.keys(props).forEach(prop => {
-        const value = props[prop];
-        if (prop === 'to') {
-          to = value;
-        }
-        else if (prop === 'step') {
-          step = value;
-        }
-        else {
-          i = value;
-          indexKey = prop;
-        }
-      });
-    }
-    else if (options.props) {
-      step = options.props.step || 1;
-    }
-
-    let ret, useString = options.useString;
-    if (useString) {
-      ret = '';
-    } else {
-      ret = [];
-    }
-
-    for (; i <= to; i += step) {
-      let retI = options.children({
-        data: indexKey ? [{ [indexKey]: i }] : null,
-        index: i,
-        fallback: true
-      });
-
-      if (useString) {
-        ret += retI;
-      } else {
-        ret.push(retI);
-      }
-    }
-
-    return ret;
   },
 
   obj: options => options.props,
@@ -364,12 +315,12 @@ export const extensionConfig = {
       }
     }
   }),
-  'for': _config(_defaultCfg, {
-    newContext: {
-      index: 'index',
-      getDatasFromProp: { except: ['to', 'step', 'index'] }
-    }
-  }),
+  // 'for': _config(_defaultCfg, {
+  //   newContext: {
+  //     index: 'index',
+  //     getDatasFromProp: { except: ['to', 'step', 'index'] }
+  //   }
+  // }),
   prop: _config(_defaultCfg, { isDirective: true, needPrefix: true, hasAttrs: true }),
   obj: _config(_defaultCfg, { needPrefix: true }),
   fn: _config(_defaultCfg, { newContext: true, needPrefix: true }),
@@ -428,7 +379,7 @@ export function registerExtension(name, extension, options, mergeConfig) {
         extensionConfig[name] = _config(options);
       }
     }
-  }, false, false);
+  }, false);
 }
 
 tools.assign(nj, {

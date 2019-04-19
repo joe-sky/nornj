@@ -16,7 +16,10 @@
     ],
     "quotes": [
       1,
-      "single"
+      "single",
+      {
+        "allowTemplateLiterals": true
+      }
     ],
     "strict": [
       0,

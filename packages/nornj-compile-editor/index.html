@@ -56,7 +56,18 @@
 
       nj.each(fns, (v, k, i, l) => {
         if (k.indexOf("_") != 0) {
-          ret += "  " + k + ": " + v.toString() + (i < l - 1 ? "," : "") + "\n";
+          let fnStr = v.toString();
+          const fnLines = fnStr.split('\n');
+          fnStr = fnLines.map((s, j) => {
+            if(j == 0) {
+              return s.replace(/\\n/g, '').replace(/\sanonymous\(/, ' ' + k + '(');
+            }
+            else if(j == fnLines.length - 1) {
+              return '  ' + s;
+            }
+            return (j != 1 ? '    ' : '') + s + (j < fnLines.length - 1 ? '\n' : '');
+          }).join('');
+          ret += "  " + k + ": " + fnStr + (i < l - 1 ? "," : "") + "\n";
         }
       });
 

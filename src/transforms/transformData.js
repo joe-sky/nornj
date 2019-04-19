@@ -1,6 +1,5 @@
 ﻿import nj from '../core';
 import * as tools from '../utils/tools';
-const { errorTitle } = nj;
 const REGEX_NUM = /^(-?([0-9]+[\.]?[0-9]+)|[0-9])$/;
 
 //提取style内参数
@@ -62,39 +61,39 @@ export function getData(prop, data, hasCtx) {
   }
 }
 
-function _getLevel(level, p2) {
-  if (level != null && p2.level != null) {
-    level += p2.level;
+function _getLevel(level, context) {
+  if (level != null && context.level != null) {
+    level += context.level;
   }
   return level;
 }
 
-export function getComputedData(fn, p2, level) {
+export function getComputedData(fn, context, level) {
   if (fn == null) {
     return fn;
   }
 
   if (fn.val._njTmpl) { //模板函数
     return fn.val.call({
-      _njData: p2.data,
-      _njParent: p2.parent,
-      _njIndex: p2.index,
-      _njLevel: _getLevel(level, p2),
-      _njIcp: p2.icp
+      _njData: context.data,
+      _njParent: context.parent,
+      _njIndex: context.index,
+      _njLevel: _getLevel(level, context),
+      _njIcp: context.icp
     });
   } else { //普通函数
-    return fn.val.call(p2.data[p2.data.length - 1], p2);
+    return fn.val.call(context.data[context.data.length - 1], context);
   }
 }
 
-export function getElement(name, p1, nameO, p2, subName) {
+export function getElement(name, global, nameO, context, subName) {
   let element;
-  if (!p2.icp) {
-    element = p1.cp[name];
+  if (!context.icp) {
+    element = global.cp[name];
   } else {
-    element = getData(nameO, p2.icp);
+    element = getData(nameO, context.icp);
     if (!element) {
-      element = p1.cp[name];
+      element = global.cp[name];
     }
   }
 
@@ -105,8 +104,8 @@ export function getElement(name, p1, nameO, p2, subName) {
   return element ? element : nameO;
 }
 
-export function getElementRefer(refer, name, p1, nameO, p2) {
-  return refer != null ? (tools.isString(refer) ? getElement(refer.toLowerCase(), p1, refer, p2) : refer) : getElement(name, p1, nameO, p2);
+export function getElementRefer(refer, name, global, nameO, context) {
+  return refer != null ? (tools.isString(refer) ? getElement(refer.toLowerCase(), global, refer, context) : refer) : getElement(name, global, nameO, context);
 }
 
 export function getElementName(refer, name) {
@@ -123,24 +122,24 @@ export function addArgs(props, dataRefer) {
 }
 
 //Rebuild local variables in the new context
-export function newContext(p2, p3) {
-  if (!p3) {
-    return p2;
+export function newContext(context, params) {
+  if (!params) {
+    return context;
   }
 
   return {
-    data: p3.data ? tools.arrayPush(p3.data, p2.data) : p2.data,
-    parent: p3.fallback ? p2 : p2.parent,
-    root: p2.root || p2,
-    index: 'index' in p3 ? p3.index : p2.index,
-    item: 'item' in p3 ? p3.item : p2.item,
-    level: p2.level,
+    data: params.data ? tools.arrayPush(params.data, context.data) : context.data,
+    parent: params.fallback ? context : context.parent,
+    root: context.root || context,
+    index: 'index' in params ? params.index : context.index,
+    item: 'item' in params ? params.item : context.item,
+    level: context.level,
     getData,
     get ctxInstance() {
       return this.data[this.data.length - 1];
     },
     d: getData,
-    icp: p2.icp
+    icp: context.icp
   };
 }
 
@@ -171,9 +170,9 @@ export function assignStrProps(...params) {
 }
 
 //创建扩展标签子节点函数
-export function exRet(p1, p2, fn) {
+export function exRet(global, context, fn) {
   return function (param) {
-    return fn(p1, p2, param);
+    return fn(global, context, param);
   };
 }
 
@@ -210,20 +209,20 @@ export function tmplWrap(configs, main) {
   };
 }
 
-function levelSpace(p2) {
-  if (p2.level == null) {
+function levelSpace(context) {
+  if (context.level == null) {
     return '';
   }
 
   let ret = '';
-  for (let i = 0; i < p2.level; i++) {
+  for (let i = 0; i < context.level; i++) {
     ret += '  ';
   }
   return ret;
 }
 
-function firstNewline(p2) {
-  return p2.index == null ? '' : (p2.index == 0 ? '' : '\n');
+function firstNewline(context) {
+  return context.index == null ? '' : (context.index == 0 ? '' : '\n');
 }
 
 function createElementApply(p) {
@@ -270,21 +269,18 @@ export function template(fns, tmplKey) {
   }
 
   tools.each(fns, (v, k) => {
-    if (k.indexOf('main') === 0) { //将每个主函数构建为可运行的模板函数
+    if (k === 'main') { //将每个主函数构建为可运行的模板函数
       configs[k] = tmplWrap(configs, v);
       tools.defineProps(configs[k], {
         _njTmpl: {
           value: true
-        },
-        tmplName: { //设置函数名
-          value: v._njName
         }
       });
       configs['_' + k] = v;
     } else if (k.indexOf('fn') === 0) { //扩展标签函数
       configs[k] = v;
     }
-  }, false, false);
+  }, false);
 
   return configs;
 }

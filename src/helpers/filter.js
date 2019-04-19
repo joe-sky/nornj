@@ -235,7 +235,7 @@ export function registerFilter(name, filter, options, mergeConfig) {
         filterConfig[name] = _config(options);
       }
     }
-  }, false, false);
+  }, false);
 }
 
 tools.assign(nj, {

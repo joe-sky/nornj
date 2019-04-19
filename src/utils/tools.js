@@ -55,7 +55,7 @@ export function isArrayLike(obj) {
 }
 
 //遍历数组或对象
-export function each(obj, func, context, isArr) {
+export function each(obj, func, isArr) {
   if (!obj) {
     return;
   }
@@ -64,12 +64,9 @@ export function each(obj, func, context, isArr) {
     isArr = isArrayLike(obj);
   }
 
-  //设置回调函数上下文
-  context = context ? context : obj;
-
   if (isArr) {
     for (let i = 0, l = obj.length; i < l; i++) {
-      let ret = func.call(context, obj[i], i, l);
+      let ret = func.call(obj, obj[i], i, l);
 
       if (ret === false) {
         break;
@@ -80,7 +77,7 @@ export function each(obj, func, context, isArr) {
       l = keys.length;
     for (let i = 0; i < l; i++) {
       let k = keys[i],
-        ret = func.call(context, obj[k], k, i, l);
+        ret = func.call(obj, obj[k], k, i, l);
 
       if (ret === false) {
         break;

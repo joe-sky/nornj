@@ -18,7 +18,7 @@ describe('Precompile', () => {
 
     //console.log(ret.main.toString());
     expect(Object.keys(ret).length).not.toBe(8);
-    expect(ret.main.toString()).toContain('p1.x[\'noMargin\']');
+    expect(ret.main.toString()).toContain('g.x[\'noMargin\']');
   });
 
   xit('Simple', () => {
@@ -139,7 +139,6 @@ describe('Precompile', () => {
     const tmpl = `<div>
       {{ d.e ** a.b.c(1, 2, 3) }}
       <!--#
-      <#tmpl>{123}</#tmpl>
       {{1 + 2 > 2 && 2 ** (3 + 1) <= 5 && (5 + 6 %% 7) >= 10}}
       {{1 + 2 ** 3 - 4 * 5 %% (6 + 7)}}
       {{'111'.length + 2 * 3}}

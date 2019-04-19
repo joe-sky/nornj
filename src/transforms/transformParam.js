@@ -50,7 +50,7 @@ function _compiledProp(prop, innerBrackets, innerQuotes, source) {
             if (p !== '') {
               params[params.length] = _compiledProp(p.trim(), innerBrackets, innerQuotes, source);
             }
-          }, false, true);
+          }, true);
 
           filterObj.params = params;
         }
@@ -58,7 +58,7 @@ function _compiledProp(prop, innerBrackets, innerQuotes, source) {
         filterObj.name = filterName;
         filters.push(filterObj);
       }
-    }, false, true);
+    }, true);
 
     ret.filters = filters;
   }
@@ -285,7 +285,7 @@ export function compiledParam(value, tmplRule, hasColon, onlyKey, addSet) {
       //To determine whether it is necessary to escape
       retP.escape = param[1] !== tmplRule.firstChar + tmplRule.startRule;
       props.push(retP);
-    }, false, true);
+    }, true);
   }
 
   ret.props = props;

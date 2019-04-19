@@ -63,9 +63,6 @@ describe('test speed', function() {
     </#each>
     <TestComp2>
       <@store><#obj id=1 name="2" /></@store>
-      <#tmpl>
-        <span>{no}</span>
-      </#tmpl>
     </TestComp2>
     <#each {arr}>
       <span class=test_{@index}
@@ -244,12 +241,6 @@ describe('test speed', function() {
     &nbsp;1&gt;2
     <#each {arr}>
       <TestComp id={'false'}>
-        <#tmpl>
-          <span>{text}</span>
-        </#tmpl>
-        <#tmpl {'t2'}>
-          <span key={@index}>{@item}test!</span>
-        </#tmpl>
       </TestComp>
       <span class=test_{@index}
             style={../styles}
@@ -471,8 +462,7 @@ describe('test speed', function() {
 
     nj.registerComponent('TestComp', createReactClass({
       render: function() {
-        return Nj `<div><#each {arr}>{../#text}</#each></div>` ({
-          text: this.props.tmpls['t2'],
+        return Nj `<div><#each {arr}></#each></div>` ({
           arr: _.times(2, function(n) {
             return n;
           })
@@ -484,13 +474,9 @@ describe('test speed', function() {
       render: function() {
         return Nj `
         <div>
-          {tmpl}
           <br />
-          {#tmplFn}
         </div>
         ` ({
-          tmpl: this.props.tmpls[0]({ no: this.props.store.id }),
-          tmplFn: this.props.tmpls[0],
           no: 5002
         });
       }

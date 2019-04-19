@@ -92,7 +92,6 @@ const Button = (props) => {
   * [If](#if)
   * [Each](#each)
   * [Switch](#switch)
-  * [For](#for)
   * [With](#with)
   * [MobxObserver](#mobxObserver)
   * [开发新的标签](#开发新的标签)

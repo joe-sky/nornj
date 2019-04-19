@@ -72,22 +72,12 @@ describe('Extension tag', () => {
     `, {
       list: { a: 1, b: 2 }
     })).toBe('<i>key:a,value:1</i><i>key:b,value:2</i>');
-  });
-
-  it('for', () => {
-    expect(render(`
-      <nj-noWs>
-        <#for i={{1}} to={{5}} step={{2}}>
-          <i>{{i}}</i>
-        </#for>
-      </nj-noWs>
-    `)).toBe('<i>1</i><i>3</i><i>5</i>');
 
     expect(render(`
       <nj-noWs>
-        <#for {{1}} {{5}}>
-          <i>{{@index}}</i>
-        </#for>
+        <#each {{1 .. 5}}>
+          <i>{{@item}}</i>
+        </#each>
       </nj-noWs>
     `)).toBe('<i>1</i><i>2</i><i>3</i><i>4</i><i>5</i>');
   });

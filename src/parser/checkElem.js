@@ -62,7 +62,6 @@ export default function checkElem(obj, parent, tmplRule, hasExProps, noSplitNewl
     //判断是否为xml标签
     let openTagName,
       hasCloseTag = false,
-      isTmpl,
       isParamsEx,
       isDirective,
       isSubTag,
@@ -87,7 +86,6 @@ export default function checkElem(obj, parent, tmplRule, hasExProps, noSplitNewl
     } else { //为扩展标签,也可视为一个元素节点
       const exName = ex[0];
       exParams = ex[1];
-      isTmpl = tranElem.isTmpl(exName);
       isParamsEx = tranElem.isParamsEx(exName);
       if (!isParamsEx) {
         let exConfig = tranElem.exCompileConfig(exName);
@@ -102,7 +100,7 @@ export default function checkElem(obj, parent, tmplRule, hasExProps, noSplitNewl
 
       node.type = 'nj_ex';
       node.ex = exName;
-      if (exParams != null && !isTmpl && !isParamsEx) {
+      if (exParams != null && !isParamsEx) {
         if (!node.args) {
           node.args = [];
         }
@@ -128,7 +126,7 @@ export default function checkElem(obj, parent, tmplRule, hasExProps, noSplitNewl
             }
             node.params[key] = paramV;
           }
-        }, false, true);
+        }, true);
       }
 
       isElemNode = true;
@@ -158,7 +156,7 @@ export default function checkElem(obj, parent, tmplRule, hasExProps, noSplitNewl
 
           tools.each(tagParams, param => { //The parameter like "{prop}" needs to be replaced.
             node.params[param.onlyBrace ? param.onlyBrace.replace(/\.\.\//g, '') : param.key] = tranParam.compiledParam(param.value, tmplRule, param.hasColon, param.onlyKey);
-          }, false, true);
+          }, true);
         }
 
         //Verify if self closing tag again, because the tag may be similar to "<br></br>".
@@ -171,12 +169,7 @@ export default function checkElem(obj, parent, tmplRule, hasExProps, noSplitNewl
           node.allowNewline = 'nlElem';
         }
       } else {
-        if (isTmpl) { //模板元素
-          pushContent = false;
-
-          //将模板添加到父节点的params中
-          tranElem.addTmpl(node, parent, exParams ? exParams[0].value : null);
-        } else if (isParamsEx || needAddToProps) {
+        if (isParamsEx || needAddToProps) {
           pushContent = false;
         }
 
@@ -218,5 +211,5 @@ function _checkContentElem(obj, parent, tmplRule, hasExProps, noSplitNewline) {
 
   tools.each(obj, (item, i, l) => {
     checkElem(item, parent, tmplRule, hasExProps, noSplitNewline, i == l - 1);
-  }, false, true);
+  }, true);
 }

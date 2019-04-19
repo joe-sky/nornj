@@ -32,7 +32,7 @@ export default function registerComponent(name, component, options) {
       }
       ret.push(comp);
     }
-  }, false, false);
+  }, false);
 
   return ret;
 }

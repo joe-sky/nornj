@@ -103,21 +103,18 @@ function isArrayLike(obj) {
   return typeof length == 'number' && length >= 0;
 } //遍历数组或对象
 
-function each(obj, func, context, isArr) {
+function each(obj, func, isArr) {
   if (!obj) {
     return;
   }
 
   if (isArr == null) {
     isArr = isArrayLike(obj);
-  } //设置回调函数上下文
-
-
-  context = context ? context : obj;
+  }
 
   if (isArr) {
     for (var i = 0, l = obj.length; i < l; i++) {
-      var ret = func.call(context, obj[i], i, l);
+      var ret = func.call(obj, obj[i], i, l);
 
       if (ret === false) {
         break;
@@ -129,7 +126,7 @@ function each(obj, func, context, isArr) {
 
     for (var _i = 0; _i < _l; _i++) {
       var k = keys[_i],
-          _ret = func.call(context, obj[k], k, _i, _l);
+          _ret = func.call(obj, obj[k], k, _i, _l);
 
       if (_ret === false) {
         break;
@@ -317,7 +314,7 @@ function registerComponent(name, component, options) {
 
       ret.push(comp);
     }
-  }, false, false);
+  }, false);
   return ret;
 }
 function getComponentConfig(name) {
@@ -448,15 +445,15 @@ function getData(prop, data, hasCtx) {
   }
 }
 
-function _getLevel(level, p2) {
-  if (level != null && p2.level != null) {
-    level += p2.level;
+function _getLevel(level, context) {
+  if (level != null && context.level != null) {
+    level += context.level;
   }
 
   return level;
 }
 
-function getComputedData(fn, p2, level) {
+function getComputedData(fn, context, level) {
   if (fn == null) {
     return fn;
   }
@@ -464,27 +461,27 @@ function getComputedData(fn, p2, level) {
   if (fn.val._njTmpl) {
     //模板函数
     return fn.val.call({
-      _njData: p2.data,
-      _njParent: p2.parent,
-      _njIndex: p2.index,
-      _njLevel: _getLevel(level, p2),
-      _njIcp: p2.icp
+      _njData: context.data,
+      _njParent: context.parent,
+      _njIndex: context.index,
+      _njLevel: _getLevel(level, context),
+      _njIcp: context.icp
     });
   } else {
     //普通函数
-    return fn.val.call(p2.data[p2.data.length - 1], p2);
+    return fn.val.call(context.data[context.data.length - 1], context);
   }
 }
-function getElement(name, p1, nameO, p2, subName) {
+function getElement(name, global, nameO, context, subName) {
   var element;
 
-  if (!p2.icp) {
-    element = p1.cp[name];
+  if (!context.icp) {
+    element = global.cp[name];
   } else {
-    element = getData(nameO, p2.icp);
+    element = getData(nameO, context.icp);
 
     if (!element) {
-      element = p1.cp[name];
+      element = global.cp[name];
     }
   }
 
@@ -494,8 +491,8 @@ function getElement(name, p1, nameO, p2, subName) {
 
   return element ? element : nameO;
 }
-function getElementRefer(refer, name, p1, nameO, p2) {
-  return refer != null ? isString(refer) ? getElement(refer.toLowerCase(), p1, refer, p2) : refer : getElement(name, p1, nameO, p2);
+function getElementRefer(refer, name, global, nameO, context) {
+  return refer != null ? isString(refer) ? getElement(refer.toLowerCase(), global, refer, context) : refer : getElement(name, global, nameO, context);
 }
 function getElementName(refer, name) {
   return refer != null && refer !== '' ? refer : name;
@@ -510,18 +507,18 @@ function addArgs(props, dataRefer) {
   }
 } //Rebuild local variables in the new context
 
-function newContext(p2, p3) {
-  if (!p3) {
-    return p2;
+function newContext(context, params) {
+  if (!params) {
+    return context;
   }
 
   return {
-    data: p3.data ? arrayPush(p3.data, p2.data) : p2.data,
-    parent: p3.fallback ? p2 : p2.parent,
-    root: p2.root || p2,
-    index: 'index' in p3 ? p3.index : p2.index,
-    item: 'item' in p3 ? p3.item : p2.item,
-    level: p2.level,
+    data: params.data ? arrayPush(params.data, context.data) : context.data,
+    parent: params.fallback ? context : context.parent,
+    root: context.root || context,
+    index: 'index' in params ? params.index : context.index,
+    item: 'item' in params ? params.item : context.item,
+    level: context.level,
     getData: getData,
 
     get ctxInstance() {
@@ -529,7 +526,7 @@ function newContext(p2, p3) {
     },
 
     d: getData,
-    icp: p2.icp
+    icp: context.icp
   };
 } //修正属性名
 
@@ -559,9 +556,9 @@ function assignStrProps() {
   return ret;
 } //创建扩展标签子节点函数
 
-function exRet(p1, p2, fn) {
+function exRet(global, context, fn) {
   return function (param) {
-    return fn(p1, p2, param);
+    return fn(global, context, param);
   };
 }
 
@@ -601,22 +598,22 @@ function tmplWrap(configs, main) {
   };
 }
 
-function levelSpace(p2) {
-  if (p2.level == null) {
+function levelSpace(context) {
+  if (context.level == null) {
     return '';
   }
 
   var ret = '';
 
-  for (var i = 0; i < p2.level; i++) {
+  for (var i = 0; i < context.level; i++) {
     ret += '  ';
   }
 
   return ret;
 }
 
-function firstNewline(p2) {
-  return p2.index == null ? '' : p2.index == 0 ? '' : '\n';
+function firstNewline(context) {
+  return context.index == null ? '' : context.index == 0 ? '' : '\n';
 }
 
 function createElementApply(p) {
@@ -663,16 +660,12 @@ function template(fns, tmplKey) {
   }
 
   each(fns, function (v, k) {
-    if (k.indexOf('main') === 0) {
+    if (k === 'main') {
       //将每个主函数构建为可运行的模板函数
       configs[k] = tmplWrap(configs, v);
       defineProps(configs[k], {
         _njTmpl: {
           value: true
-        },
-        tmplName: {
-          //设置函数名
-          value: v._njName
         }
       });
       configs['_' + k] = v;
@@ -680,7 +673,7 @@ function template(fns, tmplKey) {
       //扩展标签函数
       configs[k] = v;
     }
-  }, false, false);
+  }, false);
   return configs;
 }
 
@@ -716,7 +709,7 @@ var extensions = {
                 ret = elseFn();
               }
             }
-          }, false, true);
+          }, true);
         } else {
           if (elseFn) {
             ret = elseFn();
@@ -770,7 +763,7 @@ var extensions = {
           ret = props['else']();
         }
       }
-    }, false, true);
+    }, true);
     return ret;
   },
   each: function each$1(list, options) {
@@ -826,7 +819,7 @@ var extensions = {
         } else {
           ret.push(retI);
         }
-      }, false, isArrayLike$1); //Return null when not use string and result is empty.
+      }, isArrayLike$1); //Return null when not use string and result is empty.
 
       if (!useString && !ret.length) {
         ret = null;
@@ -867,7 +860,7 @@ var extensions = {
     var attrs = options.attrs;
     each(props, function (v, k) {
       attrs[k] === undefined && (options.attrs[k] = v);
-    }, false, false);
+    }, false);
   },
   show: function show(options) {
     if (!options.value()) {
@@ -888,55 +881,6 @@ var extensions = {
         attrs.style.display = 'none';
       }
     }
-  },
-  'for': function _for(i, to, options) {
-    var step = 1;
-    var indexKey;
-
-    if (i && i._njOpts) {
-      options = i;
-      var _options2 = options,
-          props = _options2.props;
-      Object.keys(props).forEach(function (prop) {
-        var value = props[prop];
-
-        if (prop === 'to') {
-          to = value;
-        } else if (prop === 'step') {
-          step = value;
-        } else {
-          i = value;
-          indexKey = prop;
-        }
-      });
-    } else if (options.props) {
-      step = options.props.step || 1;
-    }
-
-    var ret,
-        useString = options.useString;
-
-    if (useString) {
-      ret = '';
-    } else {
-      ret = [];
-    }
-
-    for (; i <= to; i += step) {
-      var retI = options.children({
-        data: indexKey ? [_defineProperty({}, indexKey, i)] : null,
-        index: i,
-        fallback: true
-      });
-
-      if (useString) {
-        ret += retI;
-      } else {
-        ret.push(retI);
-      }
-    }
-
-    return ret;
   },
   obj: function obj(options) {
     return options.props;
@@ -987,8 +931,8 @@ var extensions = {
         data: [options.props]
       });
     } else {
-      var _options3 = options,
-          props = _options3.props;
+      var _options2 = options,
+          props = _options2.props;
       return options.children({
         data: [props && props.as ? _defineProperty({}, props.as, originalData) : originalData]
       });
@@ -1062,14 +1006,12 @@ var extensionConfig = {
       }
     }
   }),
-  'for': _config(_defaultCfg, {
-    newContext: {
-      index: 'index',
-      getDatasFromProp: {
-        except: ['to', 'step', 'index']
-      }
-    }
-  }),
+  // 'for': _config(_defaultCfg, {
+  //   newContext: {
+  //     index: 'index',
+  //     getDatasFromProp: { except: ['to', 'step', 'index'] }
+  //   }
+  // }),
   prop: _config(_defaultCfg, {
     isDirective: true,
     needPrefix: true,
@@ -1131,7 +1073,7 @@ function registerExtension(name, extension, options, mergeConfig) {
   each(params, function (v, name) {
     if (v) {
       var _extension = v.extension,
-          _options4 = v.options;
+          _options3 = v.options;
 
       if (_extension) {
         extensions[name] = _extension;
@@ -1144,12 +1086,12 @@ function registerExtension(name, extension, options, mergeConfig) {
           extensionConfig[name] = _config();
         }
 
-        assign(extensionConfig[name], _options4);
+        assign(extensionConfig[name], _options3);
       } else {
-        extensionConfig[name] = _config(_options4);
+        extensionConfig[name] = _config(_options3);
       }
     }
-  }, false, false);
+  }, false);
 }
 assign(nj, {
   extensions: extensions,
@@ -1381,7 +1323,7 @@ function registerFilter(name, filter, options, mergeConfig) {
         filterConfig[name] = _config$1(_options);
       }
     }
-  }, false, false);
+  }, false);
 }
 assign(nj, {
   filters: filters,

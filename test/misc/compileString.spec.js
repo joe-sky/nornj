@@ -29,7 +29,6 @@ describe('test compile string', function () {
     }, { transOperator: true });
 
     nj.registerExtension('textExpr', function (arg1, arg2, opts) {
-      //return opts.props.tmpls[0]();
       //console.log(opts.props.args);
       //console.log(opts.props.a);
       return arg1;
@@ -231,9 +230,6 @@ describe('test compile string', function () {
           {{../../list2.length}}${'split1'}{{../@index}}
         </#each>
         <#textExpr>
-          <#tmpl>
-            <TextExpr name="{{no}}" />
-          </#tmpl>
           <@@a />
           <#strArg>
             num:

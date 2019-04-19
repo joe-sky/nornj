@@ -1,6 +1,5 @@
 ﻿import nj from '../core';
 import * as tools from '../utils/tools';
-import * as tranParam from './transformParam';
 import { extensionConfig } from '../helpers/extension';
 
 //提取xml open tag
@@ -135,35 +134,6 @@ export function fixExTagName(tagName, tmplRule) {
   }
 
   return ret;
-}
-
-//判断是否模板元素
-export function isTmpl(obj) {
-  return obj === 'tmpl';
-}
-
-//加入到模板集合中
-export function addTmpl(node, parent, name) {
-  let paramsP = parent.params;
-  if (!paramsP) {
-    paramsP = parent.params = tools.obj();
-  }
-
-  const tmpls = paramsP.tmpls;
-  if (!tmpls) {
-    const objT = {
-      [name != null ? name : '_njT0']: { node, no: 0 },
-      _njLen: 1
-    };
-
-    paramsP.tmpls = tranParam.compiledParam(objT);
-  } else { //Insert the compiled template to the parameter name for "tmpls"'s "strs" array.
-    let objT = tmpls.strs[0],
-      len = objT._njLen;
-
-    objT[name != null ? name : ('_njT' + len)] = { node, no: len };
-    objT._njLen = ++len;
-  }
 }
 
 //Test whether as parameters extension

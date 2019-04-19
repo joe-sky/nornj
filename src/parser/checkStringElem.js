@@ -75,7 +75,7 @@ export default function compileStringTmpl(tmpl) {
       }
 
       fullXml += xml + split;
-    }, false, true);
+    }, true);
 
     //Merge all include tags
     const includeParser = nj.includeParser;
