@@ -14,7 +14,22 @@ describe('Filter', () => {
   });
 });
 
+registerFilter({
+  '&': {
+    filter: (a, b) => {
+      return a * b + b;
+    },
+    options: {
+      isOperator: true
+    }
+  }
+});
+
 describe('Operator', () => {
+  it('&', () => {
+    expect(render("{{ 2&3**2 }}")).toBe(81);
+  });
+
   it('.', () => {
     expect(render("{{ a.b['c'].length }}", {
       a: {

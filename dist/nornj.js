@@ -1436,6 +1436,7 @@
     var ret = {
       onlyGlobal: false,
       hasOptions: false,
+      isOperator: false,
       hasLevel: false,
       hasTmplCtx: true
     };
@@ -1484,19 +1485,7 @@
       symbol: '$',
       placeholder: ''
     })
-  };
-  var operators = ['+=', '+', '-[0-9]', '-', '**', '*', '%%', '%', '===', '!==', '==', '!=', '<=>', '<=', '>=', '=', '..<', '<', '>', '&&', '||', '?:', '?', ':', '../', '..', '/'];
-  var REGEX_OPERATORS_ESCAPE = /\*|\||\/|\.|\?|\+/g;
-
-  function _createRegexOperators() {
-    return new RegExp(operators.map(function (o) {
-      return o.replace(REGEX_OPERATORS_ESCAPE, function (match) {
-        return '\\' + match;
-      });
-    }).join('|'), 'g');
-  }
-
-  nj.REGEX_OPERATORS = _createRegexOperators(); //Register filter and also can batch add
+  }; //Register filter and also can batch add
 
   function registerFilter(name, filter, options, mergeConfig) {
     var params = name;
@@ -1513,6 +1502,14 @@
       if (v) {
         var _filter = v.filter,
             _options = v.options;
+
+        if (_options && _options.isOperator) {
+          var createRegexOperators = nj.createRegexOperators;
+
+          if (createRegexOperators) {
+            createRegexOperators(name);
+          }
+        }
 
         if (_filter) {
           filters[name] = _filter;
@@ -1674,6 +1671,29 @@
   var NOT_OPERATORS = ['../'];
   var REGEX_NEGATIVE = /-[0-9]/;
   var BEGIN_CHARS = ['', '(', '[', ','];
+  var OPERATORS = ['+=', '+', '-[0-9]', '-', '**', '*', '%%', '%', '===', '!==', '==', '!=', '<=>', '<=', '>=', '=', '..<', '<', '>', '&&', '||', '?:', '?', ':', '../', '..', '/'];
+  var REGEX_OPERATORS_ESCAPE = /\*|\||\/|\.|\?|\+/g;
+  var REGEX_OPERATORS;
+
+  function createRegexOperators(operator) {
+    if (operator) {
+      var insertIndex = 0;
+      OPERATORS.forEach(function (o, i) {
+        if (o.indexOf(operator) >= 0) {
+          insertIndex = i + 1;
+        }
+      });
+      OPERATORS.splice(insertIndex, 0, operator);
+    }
+
+    REGEX_OPERATORS = new RegExp(OPERATORS.map(function (o) {
+      return o.replace(REGEX_OPERATORS_ESCAPE, function (match) {
+        return '\\' + match;
+      });
+    }).join('|'), 'g');
+  }
+
+  createRegexOperators();
 
   function _getProp(matchArr, innerQuotes, i, addSet) {
     var prop = matchArr[2].trim(),
@@ -1694,7 +1714,7 @@
       innerQuotes.push(match);
       return '_njQs' + (innerQuotes.length - 1) + '_';
     });
-    prop = prop.replace(nj.REGEX_OPERATORS, function (match, index) {
+    prop = prop.replace(REGEX_OPERATORS, function (match, index) {
       if (REGEX_NEGATIVE.test(match)) {
         if (index > 0 && BEGIN_CHARS.indexOf(prop[index - 1].trim()) < 0) {
           //Example: 123-456
@@ -1842,6 +1862,9 @@
     ret.onlyKey = onlyKey;
     return ret;
   }
+  assign(nj, {
+    createRegexOperators: createRegexOperators
+  });
 
   function getXmlOpenTag(obj, tmplRule) {
     return tmplRule.xmlOpenTag.exec(obj);
@@ -2336,7 +2359,7 @@
   }
 
   var CUSTOM_VAR = 'nj_custom';
-  var OPERATORS = ['+', '-', '*', '/', '%', '===', '!==', '==', '!=', '<=', '>=', '=', '+=', '<', '>', '&&', '||', '?', ':'];
+  var OPERATORS$1 = ['+', '-', '*', '/', '%', '===', '!==', '==', '!=', '<=', '>=', '=', '+=', '<', '>', '&&', '||', '?', ':'];
   var ASSIGN_OPERATORS = ['=', '+='];
   var SP_FILTER_REPLACE = {
     'or': '||'
@@ -2470,13 +2493,13 @@
   }
 
   function buildExpression(ast, inObj, escape, fns, useStringLocal, level) {
-    var codeStr = ast.filters && OPERATORS.indexOf(replaceFilterName(ast.filters[0].name)) < 0 ? '' : !inObj ? _buildDataValue(ast, escape, fns, level) : ast.name;
+    var codeStr = ast.filters && OPERATORS$1.indexOf(replaceFilterName(ast.filters[0].name)) < 0 ? '' : !inObj ? _buildDataValue(ast, escape, fns, level) : ast.name;
     var lastCodeStr = '';
     ast.filters && ast.filters.forEach(function (filter, i) {
-      var hasFilterNext = ast.filters[i + 1] && OPERATORS.indexOf(replaceFilterName(ast.filters[i + 1].name)) < 0;
+      var hasFilterNext = ast.filters[i + 1] && OPERATORS$1.indexOf(replaceFilterName(ast.filters[i + 1].name)) < 0;
       var filterName = replaceFilterName(filter.name);
 
-      if (OPERATORS.indexOf(filterName) >= 0) {
+      if (OPERATORS$1.indexOf(filterName) >= 0) {
         //Native operator
         if (ASSIGN_OPERATORS.indexOf(filterName) >= 0) {
           codeStr += "._njCtx.".concat(i == 0 ? ast.name : clearQuot(ast.filters[i - 1].params[0].name), " ").concat(filterName, " ");
@@ -2484,7 +2507,7 @@
           codeStr += " ".concat(filterName, " ");
         }
 
-        if (!ast.filters[i + 1] || OPERATORS.indexOf(replaceFilterName(ast.filters[i + 1].name)) >= 0) {
+        if (!ast.filters[i + 1] || OPERATORS$1.indexOf(replaceFilterName(ast.filters[i + 1].name)) >= 0) {
           if (filter.params[0].filters) {
             codeStr += '(';
             codeStr += buildExpression(filter.params[0], null, escape, fns, useStringLocal, level);

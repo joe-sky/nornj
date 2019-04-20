@@ -128,6 +128,7 @@ function _config(params, extra) {
   let ret = {
     onlyGlobal: false,
     hasOptions: false,
+    isOperator: false,
     hasLevel: false,
     hasTmplCtx: true
   };
@@ -162,47 +163,8 @@ export const filterConfig = {
   '<=>': _config(_defaultCfg),
   capitalize: _config(_defaultCfg),
   lowerFirst: _config(_defaultCfg),
-  currency: _config(_defaultCfg, { symbol: '$',placeholder:'' })
+  currency: _config(_defaultCfg, { symbol: '$', placeholder: '' })
 };
-
-export const operators = [
-  '+=',
-  '+',
-  '-[0-9]',
-  '-',
-  '**',
-  '*',
-  '%%',
-  '%',
-  '===',
-  '!==',
-  '==',
-  '!=',
-  '<=>',
-  '<=',
-  '>=',
-  '=',
-  '..<',
-  '<',
-  '>',
-  '&&',
-  '||',
-  '?:',
-  '?',
-  ':',
-  '../',
-  '..',
-  '/'
-];
-
-const REGEX_OPERATORS_ESCAPE = /\*|\||\/|\.|\?|\+/g;
-function _createRegexOperators() {
-  return new RegExp(operators.map(o => {
-    return o.replace(REGEX_OPERATORS_ESCAPE, match => '\\' + match);
-  }).join('|'), 'g');
-}
-
-nj.REGEX_OPERATORS = _createRegexOperators();
 
 //Register filter and also can batch add
 export function registerFilter(name, filter, options, mergeConfig) {
@@ -218,6 +180,12 @@ export function registerFilter(name, filter, options, mergeConfig) {
   tools.each(params, (v, name) => {
     if (v) {
       const { filter, options } = v;
+      if (options && options.isOperator) {
+        const createRegexOperators = nj.createRegexOperators;
+        if (createRegexOperators) {
+          createRegexOperators(name);
+        }
+      }
 
       if (filter) {
         filters[name] = filter;

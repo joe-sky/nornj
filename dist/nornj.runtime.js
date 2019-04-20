@@ -1231,6 +1231,7 @@
     var ret = {
       onlyGlobal: false,
       hasOptions: false,
+      isOperator: false,
       hasLevel: false,
       hasTmplCtx: true
     };
@@ -1279,19 +1280,7 @@
       symbol: '$',
       placeholder: ''
     })
-  };
-  var operators = ['+=', '+', '-[0-9]', '-', '**', '*', '%%', '%', '===', '!==', '==', '!=', '<=>', '<=', '>=', '=', '..<', '<', '>', '&&', '||', '?:', '?', ':', '../', '..', '/'];
-  var REGEX_OPERATORS_ESCAPE = /\*|\||\/|\.|\?|\+/g;
-
-  function _createRegexOperators() {
-    return new RegExp(operators.map(function (o) {
-      return o.replace(REGEX_OPERATORS_ESCAPE, function (match) {
-        return '\\' + match;
-      });
-    }).join('|'), 'g');
-  }
-
-  nj.REGEX_OPERATORS = _createRegexOperators(); //Register filter and also can batch add
+  }; //Register filter and also can batch add
 
   function registerFilter(name, filter, options, mergeConfig) {
     var params = name;
@@ -1308,6 +1297,14 @@
       if (v) {
         var _filter = v.filter,
             _options = v.options;
+
+        if (_options && _options.isOperator) {
+          var createRegexOperators = nj.createRegexOperators;
+
+          if (createRegexOperators) {
+            createRegexOperators(name);
+          }
+        }
 
         if (_filter) {
           filters[name] = _filter;
