@@ -1,6 +1,6 @@
 const nj = require('nornj/dist/nornj.common').default;
 const transformExTag = require('./exTag');
-const transformExAttr = require('./exAttr');
+const transformDirective = require('./directive');
 const transformTaggedTemplate = require('./taggedTemplate');
 const astUtil = require('./util/ast');
 const utils = require('./util/utils');
@@ -8,7 +8,7 @@ const utils = require('./util/utils');
 module.exports = function (babel) {
   const types = babel.types;
   const exTagHandler = transformExTag(babel);
-  const exAttrHandler = transformExAttr(babel);
+  const directiveHandler = transformDirective(babel);
   const taggedTemplateHandler = transformTaggedTemplate(babel);
   const TAGGED_TEMPLATES = ['html', 'nj', 'njs', 'n', 't', 's'];
 
@@ -23,12 +23,12 @@ module.exports = function (babel) {
         }
       },
       exit(path, state) {
-        const exAttrs = astUtil.hasExAttr(path.node);
-        if (exAttrs.length) {
+        const directives = astUtil.hasDirective(path.node);
+        if (directives.length) {
           state.hasNjInJSX = true;
 
-          const hasMobx = exAttrs.reduce((result, exAttr) =>
-            result || (exAttr.indexOf('n-mobxBind') > -1 || exAttr.indexOf('n-mstBind') > -1), false);
+          const hasMobx = directives.reduce((result, directive) =>
+            result || (directive.indexOf('n-mobxBind') > -1 || directive.indexOf('n-mstBind') > -1), false);
           hasMobx
             && !nj.extensionConfig.mobxBind
             && utils.setTmplConfig({ extensionConfig: require('nornj-react/mobx/extensionConfig') });
@@ -36,7 +36,7 @@ module.exports = function (babel) {
             state.hasMobxWithNj = true;
           }
 
-          path.replaceWith(exAttrHandler(path.node, path, state));
+          path.replaceWith(directiveHandler(path.node, path, state));
         }
       }
     },

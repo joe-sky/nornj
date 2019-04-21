@@ -12,7 +12,7 @@ describe('Register extension tag', () => {
         extension: options => {
           const { props } = options;
           //console.log(props);
-          options.attrs.subProps = props && props.subProps ? props.subProps : 'test';
+          options.tagProps.subProps = props && props.subProps ? props.subProps : 'test';
         },
         options: {
           isSubTag: true
@@ -20,7 +20,7 @@ describe('Register extension tag', () => {
       },
       wrap3: {
         extension: options => {
-          options.attrs.subProps = 'test3';
+          options.tagProps.subProps = 'test3';
         },
         options: {
           isSubTag: true
@@ -28,7 +28,7 @@ describe('Register extension tag', () => {
       },
       wrap4: {
         extension: options => {
-          options.attrs.props = 'test4';
+          options.tagProps.props = 'test4';
         },
         options: {
           isSubTag: true
@@ -37,7 +37,7 @@ describe('Register extension tag', () => {
       wrap5: {
         extension: options => {
           const { props } = options;
-          options.attrs.props = props.props;
+          options.tagProps.props = props.props;
         },
         options: {
           isSubTag: true

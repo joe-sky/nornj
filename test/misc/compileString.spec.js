@@ -234,10 +234,10 @@ describe('test compile string', function () {
           <#strArg>
             num:
             <#block>
-              <#list {{1}} {{2}} {{3}} />
+              {{[1, 2, 3]}}
             </#block>
             <#block>
-              <#list {{4}} {{5}} {{6}} useString="false" />
+              {{[4, 5, 6]}}
             </#block>
           </#strArg>
           <#arg>{{1 +(2)}}</#arg>
@@ -248,10 +248,10 @@ describe('test compile string', function () {
               <@name>
                 1
                 2
-                <#list {{3}} {{4}} {{5}} />
+                {{[3, 4, 5]}}
               </@name>
             </div>
-            <#list {{1}} {{2}} />
+            {{[1, 2]}}
           </@@name>
         </#textExpr>
         <slider {{../name3}} step="{{'name5' | vm_var}}">

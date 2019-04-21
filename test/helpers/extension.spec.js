@@ -111,30 +111,6 @@ describe('Extension tag', () => {
     `)).toBe('<input type="text" value="abc" />');
   });
 
-  it('obj', () => {
-    expect(render(`
-      <#obj a={{1}} b={{2}} />
-    `)).toEqual({ a: 1, b: 2 });
-  });
-
-  it('list', () => {
-    expect(render(`
-      <#obj>
-        <@list>
-          <#list {{1}} {{2}} />
-        </@list>
-      </#obj>
-    `)).toEqual({ list: [1, 2] });
-  });
-
-  it('fn', () => {
-    expect(render(`
-      <#fn a b>
-        {{a + b}}
-      </#fn>
-    `)).toBeDefined();
-  });
-
   it('with', () => {
     expect(render(`
       <#with {{a.b}}>

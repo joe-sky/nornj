@@ -80,8 +80,8 @@ function _compiledProp(prop, innerBrackets, innerQuotes, source) {
   //Extract the js property
   if (prop !== '') {
     const matchProp = REGEX_JS_PROP.exec(prop);
-    const hasComputed = matchProp[6] === '#';
-    ret.name = hasComputed ? matchProp[7] : matchProp[0];
+    const hasAccessor = matchProp[6] === '#';
+    ret.name = hasAccessor ? matchProp[7] : matchProp[0];
 
     // if (matchProp[0] !== prop) {
     //   tools.error(_syntaxError(SPACE_ERROR, _replaceStr(propO, innerQuotes), source));
@@ -89,8 +89,8 @@ function _compiledProp(prop, innerBrackets, innerQuotes, source) {
     if (!matchProp[5]) { //Sign the parameter is a basic type value.
       ret.isBasicType = true;
     }
-    if (hasComputed) {
-      ret.isComputed = true;
+    if (hasAccessor) {
+      ret.isAccessor = true;
     }
     ret.name = ret.name.replace(REGEX_REPLACE_SET, () => {
       ret.hasSet = true;
@@ -115,11 +115,24 @@ const LT_GT_LOOKUP = {
   '_njGt_': '>'
 };
 const REGEX_QUOTE = /"[^"]*"|'[^']*'/g;
+const REGEX_OPERATORS_ESCAPE = /\*|\||\/|\.|\?|\+/g;
 const SP_FILTER_LOOKUP = {
   '||': 'or',
   '..<': 'rLt'
 };
-const REGEX_SP_FILTER = /[\s]+((\|\||\.\.<)[\s]*)/g;
+let REGEX_SP_FILTER;
+
+function createFilterAlias(name, alias) {
+  if (name && alias) {
+    SP_FILTER_LOOKUP[name] = alias;
+  }
+
+  REGEX_SP_FILTER = new RegExp('[\\s]+((' + Object.keys(SP_FILTER_LOOKUP).map(o => {
+    return o.replace(REGEX_OPERATORS_ESCAPE, match => '\\' + match);
+  }).join('|') + ')[\\s]*)', 'g');
+}
+createFilterAlias();
+
 const FN_FILTER_LOOKUP = {
   ')': ')_(',
   ']': ']_('
@@ -171,7 +184,6 @@ const OPERATORS = [
   '/'
 ];
 
-const REGEX_OPERATORS_ESCAPE = /\*|\||\/|\.|\?|\+/g;
 let REGEX_OPERATORS;
 function createRegexOperators(operator) {
   if (operator) {
@@ -207,20 +219,21 @@ function _getProp(matchArr, innerQuotes, i, addSet) {
     .replace(REGEX_QUOTE, match => {
       innerQuotes.push(match);
       return '_njQs' + (innerQuotes.length - 1) + '_';
-    });
-  prop = prop.replace(REGEX_OPERATORS, (match, index) => {
-    if (REGEX_NEGATIVE.test(match)) {
-      if (index > 0 && BEGIN_CHARS.indexOf(prop[index - 1].trim()) < 0) {  //Example: 123-456
-        return match.split('-').join(' - ');
+    })
+    .replace(REGEX_OPERATORS, (match, index) => {
+      if (REGEX_NEGATIVE.test(match)) {
+        if (index > 0 && BEGIN_CHARS.indexOf(prop[index - 1].trim()) < 0) {  //Example: 123-456
+          return match.split('-').join(' - ');
+        }
+        else {  //Example: -123+456
+          return match;
+        }
       }
-      else {  //Example: -123+456
-        return match;
+      else {
+        return NOT_OPERATORS.indexOf(match) < 0 ? ` ${match} ` : match;
       }
-    }
-    else {
-      return NOT_OPERATORS.indexOf(match) < 0 ? ` ${match} ` : match;
-    }
-  })
+    })
+    .replace(REGEX_SP_FILTER, (all, g1, match) => ' ' + SP_FILTER_LOOKUP[match] + ' ')
     .replace(REGEX_PROP_FILTER, (all, g1) => {
       const startWithHash = g1[0] === '#';
       if (startWithHash) {
@@ -236,7 +249,6 @@ function _getProp(matchArr, innerQuotes, i, addSet) {
     .replace(REGEX_SET_FILTER, (all, g1) => (g1 ? g1 : '') + '_njSet_')
     .replace(REGEX_BRACKET_FILTER, (all, g1, g2, g3) => (g2 ? g2 : '') + (g2 ? g3 : g1).replace(/[(]/g, 'bracket('))
     //.replace(REGEX_OBJKEY_FILTER, (all, g1, g2) => g1 + ' \'' + g2 + '\' : ')
-    .replace(REGEX_SP_FILTER, (all, g1, match) => ' ' + SP_FILTER_LOOKUP[match] + ' ')
     .replace(REGEX_SPACE_S_FILTER, (all, match) => match)
     .replace(REGEX_FN_FILTER, (all, match, g1) => !g1 ? FN_FILTER_LOOKUP[match] : '.(\'' + g1 + '\')_(');
 
@@ -345,5 +357,6 @@ export function compiledParam(value, tmplRule, hasColon, onlyKey, addSet) {
 }
 
 tools.assign(nj, {
+  createFilterAlias,
   createRegexOperators
 });

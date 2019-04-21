@@ -41,7 +41,7 @@ export default function compileStringTmpl(tmpl) {
         const last = xml.length - 1,
           lastChar = xml[last],
           lastChar3 = xml.substr(last - 2),
-          isComputed = lastChar === '#',
+          isAccessor = lastChar === '#',
           isSpread = lastChar3 === '...';
 
         if (isInBrace) {
@@ -54,13 +54,13 @@ export default function compileStringTmpl(tmpl) {
             isInBrace = tmplRule.incompleteStart.test(xml);
           }
         }
-        if (isComputed) {
+        if (isAccessor) {
           xml = xml.substr(0, last);
         } else if (isSpread) {
           xml = xml.substr(0, last - 2);
         }
 
-        split = (isComputed ? '#' : (isSpread ? '...' : '')) + SPLIT_FLAG + i;
+        split = (isAccessor ? '#' : (isSpread ? '...' : '')) + SPLIT_FLAG + i;
         if (!isInBrace) {
           split = tmplRule.startRule + split + tmplRule.endRule;
         }
@@ -330,7 +330,7 @@ const REGEX_EX_ATTR = /([^\s-$.]+)(([$.][^\s-$.]+)*)((-[^\s-$.]+([$.][^\s-$.]+)*
 
 //Extract split parameters
 function _getSplitParams(elem, tmplRule, outputH) {
-  const { extensionRule, startRule, endRule, firstChar, lastChar, spreadProp, exAttrs } = tmplRule;
+  const { extensionRule, startRule, endRule, firstChar, lastChar, spreadProp, directives } = tmplRule;
   let paramsEx;
 
   //Replace the parameter like "{...props}".
@@ -348,7 +348,7 @@ function _getSplitParams(elem, tmplRule, outputH) {
   });
 
   //Replace the parameter like "#show={false}".
-  elem = elem.replace(exAttrs, (all, g1, g2, g3, g4, g5, g6, key, hasColon, hasEx, name, hasEqual, value) => {
+  elem = elem.replace(directives, (all, g1, g2, g3, g4, g5, g6, key, hasColon, hasEx, name, hasEqual, value) => {
     if (hasEx == null) {
       return all;
     }

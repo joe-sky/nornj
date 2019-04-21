@@ -68,7 +68,7 @@ function _buildFn(content, node, fns, no, newContext, level, useStringLocal) {
   return no;
 }
 
-function _buildOptions(config, useStringLocal, node, fns, level, hashProps, tagName, attrs) {
+function _buildOptions(config, useStringLocal, node, fns, level, hashProps, tagName, tagProps) {
   let hashStr = ', useString: ' + (useStringLocal == null ? `${GLOBAL}.us` : (useStringLocal ? 'true' : 'false')),
     noConfig = !config,
     no = fns._no;
@@ -83,8 +83,8 @@ function _buildOptions(config, useStringLocal, node, fns, level, hashProps, tagN
       hashStr += ', tagName: ' + tagName;
       hashStr += ', setTagName: function(c) { ' + tagName + ' = c }';
     }
-    if (attrs && (noConfig || config.hasAttrs)) {
-      hashStr += ', attrs: ' + attrs;
+    if (tagProps && (noConfig || config.hasTagProps)) {
+      hashStr += ', tagProps: ' + tagProps;
     }
     if (hashProps != null) {
       hashStr += ', props: ' + hashProps;
@@ -109,7 +109,7 @@ const SP_FILTER_REPLACE = {
 
 function _buildDataValue(ast, escape, fns, level) {
   let dataValueStr, special = false;
-  const { isBasicType, isComputed, hasSet } = ast;
+  const { isBasicType, isAccessor, hasSet } = ast;
 
   if (isBasicType) {
     dataValueStr = ast.name;
@@ -189,20 +189,20 @@ function _buildDataValue(ast, escape, fns, level) {
     }
 
     if (!special && !specialP) {
-      dataValueStr = (isComputed ? `${GLOBAL}.c(` : '') + `${CONTEXT}.d('` + name + '\'' + ((isComputed || hasSet) ? ', 0, true' : '') + ')' + (isComputed ? `, ${CONTEXT}, ` + level + ')' : '');
+      dataValueStr = (isAccessor ? `${GLOBAL}.c(` : '') + `${CONTEXT}.d('` + name + '\'' + ((isAccessor || hasSet) ? ', 0, true' : '') + ')' + (isAccessor ? `, ${CONTEXT}, ` + level + ')' : '');
     } else {
       let dataStr = special === CUSTOM_VAR ? data : `${CONTEXT}.` + data;
       if (tools.isObject(special)) {
         dataStr = special(dataStr);
       }
-      dataValueStr = (special ? dataStr : (isComputed ? `${GLOBAL}.c(` : '') + `${CONTEXT}.d('` + name + '\', ' + dataStr + ((isComputed || hasSet) ? ', true' : '') + ')' + (isComputed ? `, ${CONTEXT}, ` + level + ')' : ''));
+      dataValueStr = (special ? dataStr : (isAccessor ? `${GLOBAL}.c(` : '') + `${CONTEXT}.d('` + name + '\', ' + dataStr + ((isAccessor || hasSet) ? ', true' : '') + ')' + (isAccessor ? `, ${CONTEXT}, ` + level + ')' : ''));
     }
   }
   if (dataValueStr) {
     dataValueStr = _replaceBackslash(dataValueStr);
   }
 
-  return _buildEscape(dataValueStr, fns, (isBasicType || isComputed) ? false : escape, special);
+  return _buildEscape(dataValueStr, fns, (isBasicType || isAccessor) ? false : escape, special);
 }
 
 function replaceFilterName(name) {
@@ -420,12 +420,12 @@ function _buildParams(node, fns, counter, useString, level, tagName) {
     hasPropsEx = paramsEx;
   let paramsStr = '',
     _paramsC,
-    _attrs;
+    _tagProps;
 
   if (params || hasPropsEx) {
     _paramsC = counter._params++;
-    _attrs = '_params' + _paramsC;
-    paramsStr = 'var ' + _attrs + ' = ';
+    _tagProps = '_params' + _paramsC;
+    paramsStr = 'var ' + _tagProps + ' = ';
 
     if (params) {
       let paramKeys = Object.keys(params),
@@ -455,22 +455,22 @@ function _buildParams(node, fns, counter, useString, level, tagName) {
       }
 
       if (paramsEx) {
-        paramsStr += _buildContent(paramsEx.content, paramsEx, fns, counter, { _paramsE: true }, null, useString, tagName, _attrs);
+        paramsStr += _buildContent(paramsEx.content, paramsEx, fns, counter, { _paramsE: true }, null, useString, tagName, _tagProps);
       }
 
       if (useString) {
-        paramsStr += '\n' + _attrs + ` = ${GLOBAL}.ans(` + _attrs + ');\n';
+        paramsStr += '\n' + _tagProps + ` = ${GLOBAL}.ans(` + _tagProps + ');\n';
       }
     }
     else if (useString) {
-      paramsStr += '\n' + _attrs + ` = ${GLOBAL}.ans({}, ` + _attrs + ');\n';
+      paramsStr += '\n' + _tagProps + ` = ${GLOBAL}.ans({}, ` + _tagProps + ');\n';
     }
   }
 
   return [paramsStr, _paramsC];
 }
 
-function _buildNode(node, parent, fns, counter, retType, level, useStringLocal, isFirst, tagName, attrs) {
+function _buildNode(node, parent, fns, counter, retType, level, useStringLocal, isFirst, tagName, tagProps) {
   let fnStr = '',
     useStringF = fns.useString;
 
@@ -524,7 +524,7 @@ function _buildNode(node, parent, fns, counter, retType, level, useStringLocal, 
       paramsStr = retP[0],
       _paramsC = retP[1];
 
-    dataReferStr += _buildOptions(configE, useStringLocal, node, fns, level, paramsStr !== '' ? '_params' + _paramsC : null, tagName, attrs);
+    dataReferStr += _buildOptions(configE, useStringLocal, node, fns, level, paramsStr !== '' ? '_params' + _paramsC : null, tagName, tagProps);
     dataReferStr += '\n];\n';
 
     //添加匿名参数
@@ -602,7 +602,7 @@ function _buildNode(node, parent, fns, counter, retType, level, useStringLocal, 
   return fnStr;
 }
 
-function _buildContent(content, parent, fns, counter, retType, level, useStringLocal, tagName, attrs) {
+function _buildContent(content, parent, fns, counter, retType, level, useStringLocal, tagName, tagProps) {
   let fnStr = '';
   if (!content) {
     return fnStr;
@@ -610,7 +610,7 @@ function _buildContent(content, parent, fns, counter, retType, level, useStringL
 
   tools.each(content, node => {
     const { useString } = node;
-    fnStr += _buildNode(node, parent, fns, counter, retType, level, useString != null ? useString : useStringLocal, fns._firstNode && level == 0, tagName, attrs);
+    fnStr += _buildNode(node, parent, fns, counter, retType, level, useString != null ? useString : useStringLocal, fns._firstNode && level == 0, tagName, tagProps);
 
     if (fns._firstNode) { //输出字符串时模板第一个节点前面不加换行符
       fns._firstNode = false;

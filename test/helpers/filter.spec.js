@@ -25,9 +25,25 @@ registerFilter({
   }
 });
 
+registerFilter({
+  '#.#._..#': {
+    filter: (a, b) => {
+      return Math.pow(a + b, b);
+    },
+    options: {
+      isOperator: true,
+      alias: 'plusAndPow'
+    }
+  }
+});
+
 describe('Operator', () => {
-  it('&', () => {
+  it('register operator', () => {
     expect(render("{{ 2&3**2 }}")).toBe(81);
+  });
+
+  it('register alias', () => {
+    expect(render("{{ 2&3#.#._..#2 }}")).toBe(121);
   });
 
   it('.', () => {
@@ -110,6 +126,10 @@ describe('Operator', () => {
 
   it('int & float', () => {
     expect(render("{{ 20.5 | int * (10.05 | float) + 2 ** 3 + 19 %% 2 }}")).toBe(218);
+  });
+
+  it('float with bit', () => {
+    expect(render("{{ 10.54321 | float(2) }}")).toBe('10.54');
   });
 
   it('bool', () => {

@@ -205,7 +205,7 @@
     return value;
   } //Transform to camel-case
 
-  function toCamelCase(str) {
+  function camelCase(str) {
     if (str.indexOf('-') > -1) {
       str = str.replace(/-\w/g, function (letter) {
         return letter.substr(1).toUpperCase();
@@ -249,7 +249,7 @@
     throwIf: throwIf,
     warn: warn,
     obj: obj,
-    toCamelCase: toCamelCase,
+    camelCase: camelCase,
     assign: assign,
     capitalize: capitalize,
     lowerFirst: lowerFirst
@@ -273,7 +273,7 @@
     error: error,
     obj: obj,
     clearQuot: clearQuot,
-    toCamelCase: toCamelCase,
+    camelCase: camelCase,
     assign: assign,
     capitalize: capitalize,
     lowerFirst: lowerFirst
@@ -412,7 +412,7 @@
       } //将连字符转为驼峰命名
 
 
-      key = toCamelCase(key);
+      key = camelCase(key);
       ret[key] = REGEX_NUM.test(value) ? Number(value) : value;
     }
 
@@ -455,7 +455,7 @@
     return level;
   }
 
-  function getComputedData(fn, context, level) {
+  function getAccessorData(fn, context, level) {
     if (fn == null) {
       return fn;
     }
@@ -637,7 +637,7 @@
       tf: throwIf,
       wn: warn,
       n: newContext,
-      c: getComputedData,
+      c: getAccessorData,
       sp: styleProps,
       r: exRet,
       e: getElement,
@@ -727,7 +727,7 @@
       return ret;
     },
     'else': function _else(options) {
-      return options.attrs['else'] = options.children;
+      return options.tagProps['else'] = options.children;
     },
     'elseif': function elseif(value, options) {
       if (value && value._njOpts) {
@@ -736,13 +736,13 @@
       }
 
       var _options = options,
-          attrs = _options.attrs;
+          tagProps = _options.tagProps;
 
-      if (!attrs.elseifs) {
-        attrs.elseifs = [];
+      if (!tagProps.elseifs) {
+        tagProps.elseifs = [];
       }
 
-      attrs.elseifs.push({
+      tagProps.elseifs.push({
         value: value,
         fn: options.children
       });
@@ -855,73 +855,37 @@
         value = !options.useString ? true : name;
       }
 
-      options.attrs[options.outputH ? fixPropName(name) : name] = value;
+      options.tagProps[options.outputH ? fixPropName(name) : name] = value;
     },
     //Spread parameters
     spread: function spread(props, options) {
-      var attrs = options.attrs;
+      var tagProps = options.tagProps;
       each(props, function (v, k) {
-        attrs[k] === undefined && (options.attrs[k] = v);
+        tagProps[k] === undefined && (options.tagProps[k] = v);
       }, false);
     },
     show: function show(options) {
       if (!options.value()) {
-        var attrs = options.attrs,
+        var tagProps = options.tagProps,
             useString = options.useString;
 
-        if (!attrs.style) {
-          attrs.style = useString ? '' : {};
+        if (!tagProps.style) {
+          tagProps.style = useString ? '' : {};
         }
 
         if (useString) {
-          attrs.style += (attrs.style ? ';' : '') + 'display:none';
-        } else if (isArray(attrs.style)) {
-          attrs.style.push({
+          tagProps.style += (tagProps.style ? ';' : '') + 'display:none';
+        } else if (isArray(tagProps.style)) {
+          tagProps.style.push({
             display: 'none'
           });
         } else {
-          attrs.style.display = 'none';
+          tagProps.style.display = 'none';
         }
       }
     },
     obj: function obj(options) {
       return options.props;
-    },
-    list: function list() {
-      var args = arguments,
-          last = args.length - 1,
-          options = args[last];
-
-      if (last > 0) {
-        var ret = arraySlice(args, 0, last);
-
-        if (options.useString) {
-          ret = ret.join('');
-        }
-
-        return ret;
-      } else {
-        return [options.children()];
-      }
-    },
-    fn: function fn(options) {
-      var props = options.props;
-      return function () {
-        var _arguments = arguments;
-        var params;
-
-        if (props) {
-          params = {};
-          var paramNames = Object.keys(props);
-          paramNames.forEach(function (v, i) {
-            return params[paramNames[i]] = _arguments[i];
-          });
-        }
-
-        return options.children({
-          data: [params]
-        });
-      };
     },
     block: function block(options) {
       return options.children();
@@ -941,13 +905,13 @@
       }
     },
     arg: function arg(options) {
-      var attrs = options.attrs;
+      var tagProps = options.tagProps;
 
-      if (!attrs.args) {
-        attrs.args = [];
+      if (!tagProps.args) {
+        tagProps.args = [];
       }
 
-      attrs.args.push(options.value());
+      tagProps.args.push(options.value());
     },
     css: function css(options) {
       return options.props.style;
@@ -965,7 +929,7 @@
       useExpressionInJsx: 'onlyTemplateLiteral',
       hasName: true,
       noTagName: false,
-      hasAttrs: true,
+      hasTagProps: true,
       hasTmplCtx: true,
       hasOutputH: false
     };
@@ -985,7 +949,7 @@
     onlyGlobal: true,
     newContext: false,
     hasName: false,
-    hasAttrs: false,
+    hasTagProps: false,
     hasTmplCtx: false
   }; //Extension default config
 
@@ -993,7 +957,7 @@
     'if': _config(_defaultCfg),
     'else': _config(_defaultCfg, {
       isSubTag: true,
-      hasAttrs: true
+      hasTagProps: true
     }),
     'switch': _config(_defaultCfg, {
       needPrefix: 'onlyUpperCase'
@@ -1008,22 +972,12 @@
         }
       }
     }),
-    // 'for': _config(_defaultCfg, {
-    //   newContext: {
-    //     index: 'index',
-    //     getDatasFromProp: { except: ['to', 'step', 'index'] }
-    //   }
-    // }),
     prop: _config(_defaultCfg, {
       isDirective: true,
       needPrefix: true,
-      hasAttrs: true
+      hasTagProps: true
     }),
     obj: _config(_defaultCfg, {
-      needPrefix: true
-    }),
-    fn: _config(_defaultCfg, {
-      newContext: true,
       needPrefix: true
     }),
     'with': _config(_defaultCfg, {
@@ -1038,9 +992,7 @@
   };
   extensionConfig.elseif = _config(extensionConfig['else']);
   extensionConfig.spread = _config(extensionConfig.prop);
-  extensionConfig.list = _config(extensionConfig.obj);
   extensionConfig.block = _config(extensionConfig.obj);
-  extensionConfig.pre = _config(extensionConfig.obj);
   extensionConfig.arg = _config(extensionConfig.prop);
   extensionConfig.show = _config(extensionConfig.prop, {
     noTagName: true,
@@ -1048,6 +1000,8 @@
   });
   extensionConfig.css = _config(extensionConfig.obj); //Extension alias
 
+  extensions['for'] = extensions.each;
+  extensionConfig['for'] = _config(extensionConfig.each);
   extensions['case'] = extensions.elseif;
   extensionConfig['case'] = extensionConfig.elseif;
   extensions['empty'] = extensions['default'] = extensions['else'];
@@ -1101,7 +1055,7 @@
     registerExtension: registerExtension
   });
 
-  var digitsRE = /(\d{3})(?=\d)/g; //Global filter list
+  var REGEX_DIGITS_RE = /(\d{3})(?=\d)/g; //Global filter list
 
   var filters = {
     //Get properties
@@ -1129,22 +1083,24 @@
     _: function _(fn, args) {
       return fn && fn.obj[fn.prop] != null ? fn.obj[fn.prop].apply(fn.obj, args) : null;
     },
-    //Get computed properties
+    //Get accessor properties
     '#': function _(obj, prop, options) {
       if (obj == null) {
         return obj;
       }
 
-      return getComputedData({
+      return getAccessorData({
         val: obj[prop],
         _njCtx: obj
       }, options.context, options.level);
     },
     '**': function _(val1, val2) {
-      return Math.pow(val1, val2);
+      var ret = Math.pow(val1, val2);
+      return isNaN(ret) ? 0 : ret;
     },
     '%%': function _(val1, val2) {
-      return Math.floor(val1 / val2);
+      var ret = Math.floor(val1 / val2);
+      return isNaN(ret) ? 0 : ret;
     },
     //Ternary operator
     '?:': function _(val, val1, val2) {
@@ -1156,11 +1112,13 @@
     //Convert to int 
     int: function int(val) {
       var radix = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 10;
-      return parseInt(val, radix);
+      var ret = parseInt(val, radix);
+      return isNaN(ret) ? 0 : ret;
     },
     //Convert to float 
-    float: function float(val) {
-      return parseFloat(val);
+    float: function float(val, bit) {
+      var ret = parseFloat(val);
+      return isNaN(ret) ? 0 : bit != null ? ret.toFixed(bit) : ret;
     },
     //Convert to boolean 
     bool: function bool(val) {
@@ -1197,6 +1155,21 @@
     lowerFirst: function lowerFirst$1(str) {
       return lowerFirst(str);
     },
+    camelCase: function camelCase$1(str) {
+      return camelCase(str);
+    },
+    isObject: function isObject$1(val) {
+      return isObject(val);
+    },
+    isNumber: function isNumber$1(val) {
+      return isNumber(val);
+    },
+    isString: function isString$1(val) {
+      return isString(val);
+    },
+    isArrayLike: function isArrayLike$1(val) {
+      return isArrayLike(val);
+    },
     currency: function currency(value, decimals, _currency) {
       if (!(value - parseFloat(value) >= 0)) return filterConfig.currency.placeholder;
       value = parseFloat(value);
@@ -1213,7 +1186,7 @@
       var _float = decimals ? stringified.slice(-1 - decimals) : '';
 
       var sign = value < 0 ? '-' : '';
-      return sign + _currency + head + _int.slice(i).replace(digitsRE, '$1,') + _float;
+      return sign + _currency + head + _int.slice(i).replace(REGEX_DIGITS_RE, '$1,') + _float;
     }
   };
 
@@ -1233,7 +1206,8 @@
       hasOptions: false,
       isOperator: false,
       hasLevel: false,
-      hasTmplCtx: true
+      hasTmplCtx: true,
+      alias: null
     };
 
     if (params) {
@@ -1276,6 +1250,11 @@
     '<=>': _config$1(_defaultCfg$1),
     capitalize: _config$1(_defaultCfg$1),
     lowerFirst: _config$1(_defaultCfg$1),
+    camelCase: _config$1(_defaultCfg$1),
+    isObject: _config$1(_defaultCfg$1),
+    isNumber: _config$1(_defaultCfg$1),
+    isString: _config$1(_defaultCfg$1),
+    isArrayLike: _config$1(_defaultCfg$1),
     currency: _config$1(_defaultCfg$1, {
       symbol: '$',
       placeholder: ''
@@ -1298,11 +1277,24 @@
         var _filter = v.filter,
             _options = v.options;
 
-        if (_options && _options.isOperator) {
-          var createRegexOperators = nj.createRegexOperators;
+        if (_options) {
+          if (_options.isOperator) {
+            var createRegexOperators = nj.createRegexOperators;
 
-          if (createRegexOperators) {
-            createRegexOperators(name);
+            if (createRegexOperators) {
+              createRegexOperators(name);
+            }
+          }
+
+          var alias = _options.alias;
+
+          if (alias) {
+            var createFilterAlias = nj.createFilterAlias;
+
+            if (createFilterAlias) {
+              createFilterAlias(name, alias);
+              name = alias;
+            }
           }
         }
 

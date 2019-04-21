@@ -1,4 +1,7 @@
 {
   "javascript.suggest.autoImports": false,
-  "typescript.suggest.autoImports": false
+  "typescript.suggest.autoImports": false,
+  "[javascript]": {
+    "editor.defaultFormatter": "vscode.typescript-language-features"
+  }
 }

@@ -184,21 +184,21 @@ exports.getSanitizedExpressionForContent = function (babelTypes, blocks, keyPref
   return babelTypes.arrayExpression(blocks);
 };
 
-exports.hasExAttr = function (node) {
+exports.hasDirective = function (node) {
   return node.openingElement && node.openingElement.attributes.reduce(function (result, attr) {
-    if (attr.name && isExAttr(attr.name.name)) {
+    if (attr.name && isDirective(attr.name.name)) {
       result.push(attr.name.name);
     }
     return result;
   }, []);
 };
 
-function isExAttr(name) {
+function isDirective(name) {
   return name.indexOf('n-') === 0;
 }
-exports.isExAttr = isExAttr;
+exports.isDirective = isDirective;
 
-exports.transformExAttr = function (attrName) {
+exports.transformDirective = function (attrName) {
   const ret = attrName.substr(2);
   return (ret === 'style' ? '' : '#') + ret;
 };

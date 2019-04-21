@@ -156,7 +156,7 @@ export function clearQuot(value, clearDouble) {
 }
 
 //Transform to camel-case
-export function toCamelCase(str) {
+export function camelCase(str) {
   if (str.indexOf('-') > -1) {
     str = str.replace(/-\w/g, function (letter) {
       return letter.substr(1).toUpperCase();
@@ -204,7 +204,7 @@ assign(nj, {
   throwIf,
   warn,
   obj,
-  toCamelCase,
+  camelCase,
   assign,
   capitalize,
   lowerFirst

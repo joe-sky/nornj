@@ -133,9 +133,9 @@ function getElName(types, expr) {
   }
 }
 
-function getExAttrExpression(types, expr) {
+function getDirectiveExpression(types, expr) {
   if (types.isBinaryExpression(expr)) {
-    return [...getExAttrExpression(types, expr.left), ...getExAttrExpression(types, expr.right)];
+    return [...getDirectiveExpression(types, expr.left), ...getDirectiveExpression(types, expr.right)];
   }
   else {
     return [expr.loc ? expr : expr.value];
@@ -282,6 +282,6 @@ function _buildTmplFns(fns, tmplKey) {
 module.exports = {
   buildAttrs,
   getElName,
-  getExAttrExpression,
+  getDirectiveExpression,
   createRenderTmpl
 };

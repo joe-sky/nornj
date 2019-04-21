@@ -27,7 +27,7 @@ export function styleProps(obj) {
     }
 
     //将连字符转为驼峰命名
-    key = tools.toCamelCase(key);
+    key = tools.camelCase(key);
 
     ret[key] = REGEX_NUM.test(value) ? Number(value) : value;
   }
@@ -68,7 +68,7 @@ function _getLevel(level, context) {
   return level;
 }
 
-export function getComputedData(fn, context, level) {
+export function getAccessorData(fn, context, level) {
   if (fn == null) {
     return fn;
   }
@@ -244,7 +244,7 @@ export function template(fns, tmplKey) {
     tf: tools.throwIf,
     wn: tools.warn,
     n: newContext,
-    c: getComputedData,
+    c: getAccessorData,
     sp: styleProps,
     r: exRet,
     e: getElement,

@@ -243,7 +243,7 @@
     return value;
   } //Transform to camel-case
 
-  function toCamelCase(str) {
+  function camelCase(str) {
     if (str.indexOf('-') > -1) {
       str = str.replace(/-\w/g, function (letter) {
         return letter.substr(1).toUpperCase();
@@ -287,7 +287,7 @@
     throwIf: throwIf,
     warn: warn,
     obj: obj,
-    toCamelCase: toCamelCase,
+    camelCase: camelCase,
     assign: assign,
     capitalize: capitalize,
     lowerFirst: lowerFirst
@@ -311,7 +311,7 @@
     error: error,
     obj: obj,
     clearQuot: clearQuot,
-    toCamelCase: toCamelCase,
+    camelCase: camelCase,
     assign: assign,
     capitalize: capitalize,
     lowerFirst: lowerFirst
@@ -482,7 +482,7 @@
       braceParamStr: braceParamStr,
       xmlOpenTag: _createRegExp('^<([a-z' + firstChar + extensionRules + '][^\\s>]*)[^>]*>$', 'i'),
       openTagParams: _createRegExp('[\\s]+(((' + startRuleR + '(' + varContent + ')' + endRuleR + ')|(' + startRule + '(' + varContent + ')' + endRule + '))|[^\\s=>]+)(=((\'[^\']+\')|("[^"]+")|([^"\'\\s]+)))?', 'g'),
-      exAttrs: _createRegExp('[\\s]+(((' + startRuleR + '(' + varContent + ')' + endRuleR + ')|(' + startRule + '(' + varContent + ')' + endRule + '))|((:?)(' + escapeExtensionRule + '|n-)?([^\\s=>]+)))(=((\'[^\']+\')|("[^"]+")|([^"\'\\s>]+)))?', 'g'),
+      directives: _createRegExp('[\\s]+(((' + startRuleR + '(' + varContent + ')' + endRuleR + ')|(' + startRule + '(' + varContent + ')' + endRule + '))|((:?)(' + escapeExtensionRule + '|n-)?([^\\s=>]+)))(=((\'[^\']+\')|("[^"]+")|([^"\'\\s>]+)))?', 'g'),
       braceParam: _createRegExp(braceParamStr, 'i'),
       braceParamG: _createRegExp(braceParamStr, 'ig'),
       spreadProp: _createRegExp('[\\s]+(' + startRuleR + '[\\s]*(' + varContentS + ')' + endRuleR + ')|(' + startRule + '[\\s]*(' + varContentS + ')' + endRule + ')', 'g'),
@@ -617,7 +617,7 @@
       } //将连字符转为驼峰命名
 
 
-      key = toCamelCase(key);
+      key = camelCase(key);
       ret[key] = REGEX_NUM.test(value) ? Number(value) : value;
     }
 
@@ -660,7 +660,7 @@
     return level;
   }
 
-  function getComputedData(fn, context, level) {
+  function getAccessorData(fn, context, level) {
     if (fn == null) {
       return fn;
     }
@@ -842,7 +842,7 @@
       tf: throwIf,
       wn: warn,
       n: newContext,
-      c: getComputedData,
+      c: getAccessorData,
       sp: styleProps,
       r: exRet,
       e: getElement,
@@ -932,7 +932,7 @@
       return ret;
     },
     'else': function _else(options) {
-      return options.attrs['else'] = options.children;
+      return options.tagProps['else'] = options.children;
     },
     'elseif': function elseif(value, options) {
       if (value && value._njOpts) {
@@ -941,13 +941,13 @@
       }
 
       var _options = options,
-          attrs = _options.attrs;
+          tagProps = _options.tagProps;
 
-      if (!attrs.elseifs) {
-        attrs.elseifs = [];
+      if (!tagProps.elseifs) {
+        tagProps.elseifs = [];
       }
 
-      attrs.elseifs.push({
+      tagProps.elseifs.push({
         value: value,
         fn: options.children
       });
@@ -1060,73 +1060,37 @@
         value = !options.useString ? true : name;
       }
 
-      options.attrs[options.outputH ? fixPropName(name) : name] = value;
+      options.tagProps[options.outputH ? fixPropName(name) : name] = value;
     },
     //Spread parameters
     spread: function spread(props, options) {
-      var attrs = options.attrs;
+      var tagProps = options.tagProps;
       each(props, function (v, k) {
-        attrs[k] === undefined && (options.attrs[k] = v);
+        tagProps[k] === undefined && (options.tagProps[k] = v);
       }, false);
     },
     show: function show(options) {
       if (!options.value()) {
-        var attrs = options.attrs,
+        var tagProps = options.tagProps,
             useString = options.useString;
 
-        if (!attrs.style) {
-          attrs.style = useString ? '' : {};
+        if (!tagProps.style) {
+          tagProps.style = useString ? '' : {};
         }
 
         if (useString) {
-          attrs.style += (attrs.style ? ';' : '') + 'display:none';
-        } else if (isArray(attrs.style)) {
-          attrs.style.push({
+          tagProps.style += (tagProps.style ? ';' : '') + 'display:none';
+        } else if (isArray(tagProps.style)) {
+          tagProps.style.push({
             display: 'none'
           });
         } else {
-          attrs.style.display = 'none';
+          tagProps.style.display = 'none';
         }
       }
     },
     obj: function obj(options) {
       return options.props;
-    },
-    list: function list() {
-      var args = arguments,
-          last = args.length - 1,
-          options = args[last];
-
-      if (last > 0) {
-        var ret = arraySlice(args, 0, last);
-
-        if (options.useString) {
-          ret = ret.join('');
-        }
-
-        return ret;
-      } else {
-        return [options.children()];
-      }
-    },
-    fn: function fn(options) {
-      var props = options.props;
-      return function () {
-        var _arguments = arguments;
-        var params;
-
-        if (props) {
-          params = {};
-          var paramNames = Object.keys(props);
-          paramNames.forEach(function (v, i) {
-            return params[paramNames[i]] = _arguments[i];
-          });
-        }
-
-        return options.children({
-          data: [params]
-        });
-      };
     },
     block: function block(options) {
       return options.children();
@@ -1146,13 +1110,13 @@
       }
     },
     arg: function arg(options) {
-      var attrs = options.attrs;
+      var tagProps = options.tagProps;
 
-      if (!attrs.args) {
-        attrs.args = [];
+      if (!tagProps.args) {
+        tagProps.args = [];
       }
 
-      attrs.args.push(options.value());
+      tagProps.args.push(options.value());
     },
     css: function css(options) {
       return options.props.style;
@@ -1170,7 +1134,7 @@
       useExpressionInJsx: 'onlyTemplateLiteral',
       hasName: true,
       noTagName: false,
-      hasAttrs: true,
+      hasTagProps: true,
       hasTmplCtx: true,
       hasOutputH: false
     };
@@ -1190,7 +1154,7 @@
     onlyGlobal: true,
     newContext: false,
     hasName: false,
-    hasAttrs: false,
+    hasTagProps: false,
     hasTmplCtx: false
   }; //Extension default config
 
@@ -1198,7 +1162,7 @@
     'if': _config(_defaultCfg),
     'else': _config(_defaultCfg, {
       isSubTag: true,
-      hasAttrs: true
+      hasTagProps: true
     }),
     'switch': _config(_defaultCfg, {
       needPrefix: 'onlyUpperCase'
@@ -1213,22 +1177,12 @@
         }
       }
     }),
-    // 'for': _config(_defaultCfg, {
-    //   newContext: {
-    //     index: 'index',
-    //     getDatasFromProp: { except: ['to', 'step', 'index'] }
-    //   }
-    // }),
     prop: _config(_defaultCfg, {
       isDirective: true,
       needPrefix: true,
-      hasAttrs: true
+      hasTagProps: true
     }),
     obj: _config(_defaultCfg, {
-      needPrefix: true
-    }),
-    fn: _config(_defaultCfg, {
-      newContext: true,
       needPrefix: true
     }),
     'with': _config(_defaultCfg, {
@@ -1243,9 +1197,7 @@
   };
   extensionConfig.elseif = _config(extensionConfig['else']);
   extensionConfig.spread = _config(extensionConfig.prop);
-  extensionConfig.list = _config(extensionConfig.obj);
   extensionConfig.block = _config(extensionConfig.obj);
-  extensionConfig.pre = _config(extensionConfig.obj);
   extensionConfig.arg = _config(extensionConfig.prop);
   extensionConfig.show = _config(extensionConfig.prop, {
     noTagName: true,
@@ -1253,6 +1205,8 @@
   });
   extensionConfig.css = _config(extensionConfig.obj); //Extension alias
 
+  extensions['for'] = extensions.each;
+  extensionConfig['for'] = _config(extensionConfig.each);
   extensions['case'] = extensions.elseif;
   extensionConfig['case'] = extensionConfig.elseif;
   extensions['empty'] = extensions['default'] = extensions['else'];
@@ -1306,7 +1260,7 @@
     registerExtension: registerExtension
   });
 
-  var digitsRE = /(\d{3})(?=\d)/g; //Global filter list
+  var REGEX_DIGITS_RE = /(\d{3})(?=\d)/g; //Global filter list
 
   var filters = {
     //Get properties
@@ -1334,22 +1288,24 @@
     _: function _(fn, args) {
       return fn && fn.obj[fn.prop] != null ? fn.obj[fn.prop].apply(fn.obj, args) : null;
     },
-    //Get computed properties
+    //Get accessor properties
     '#': function _(obj, prop, options) {
       if (obj == null) {
         return obj;
       }
 
-      return getComputedData({
+      return getAccessorData({
         val: obj[prop],
         _njCtx: obj
       }, options.context, options.level);
     },
     '**': function _(val1, val2) {
-      return Math.pow(val1, val2);
+      var ret = Math.pow(val1, val2);
+      return isNaN(ret) ? 0 : ret;
     },
     '%%': function _(val1, val2) {
-      return Math.floor(val1 / val2);
+      var ret = Math.floor(val1 / val2);
+      return isNaN(ret) ? 0 : ret;
     },
     //Ternary operator
     '?:': function _(val, val1, val2) {
@@ -1361,11 +1317,13 @@
     //Convert to int 
     int: function int(val) {
       var radix = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 10;
-      return parseInt(val, radix);
+      var ret = parseInt(val, radix);
+      return isNaN(ret) ? 0 : ret;
     },
     //Convert to float 
-    float: function float(val) {
-      return parseFloat(val);
+    float: function float(val, bit) {
+      var ret = parseFloat(val);
+      return isNaN(ret) ? 0 : bit != null ? ret.toFixed(bit) : ret;
     },
     //Convert to boolean 
     bool: function bool(val) {
@@ -1402,6 +1360,21 @@
     lowerFirst: function lowerFirst$1(str) {
       return lowerFirst(str);
     },
+    camelCase: function camelCase$1(str) {
+      return camelCase(str);
+    },
+    isObject: function isObject$1(val) {
+      return isObject(val);
+    },
+    isNumber: function isNumber$1(val) {
+      return isNumber(val);
+    },
+    isString: function isString$1(val) {
+      return isString(val);
+    },
+    isArrayLike: function isArrayLike$1(val) {
+      return isArrayLike(val);
+    },
     currency: function currency(value, decimals, _currency) {
       if (!(value - parseFloat(value) >= 0)) return filterConfig.currency.placeholder;
       value = parseFloat(value);
@@ -1418,7 +1391,7 @@
       var _float = decimals ? stringified.slice(-1 - decimals) : '';
 
       var sign = value < 0 ? '-' : '';
-      return sign + _currency + head + _int.slice(i).replace(digitsRE, '$1,') + _float;
+      return sign + _currency + head + _int.slice(i).replace(REGEX_DIGITS_RE, '$1,') + _float;
     }
   };
 
@@ -1438,7 +1411,8 @@
       hasOptions: false,
       isOperator: false,
       hasLevel: false,
-      hasTmplCtx: true
+      hasTmplCtx: true,
+      alias: null
     };
 
     if (params) {
@@ -1481,6 +1455,11 @@
     '<=>': _config$1(_defaultCfg$1),
     capitalize: _config$1(_defaultCfg$1),
     lowerFirst: _config$1(_defaultCfg$1),
+    camelCase: _config$1(_defaultCfg$1),
+    isObject: _config$1(_defaultCfg$1),
+    isNumber: _config$1(_defaultCfg$1),
+    isString: _config$1(_defaultCfg$1),
+    isArrayLike: _config$1(_defaultCfg$1),
     currency: _config$1(_defaultCfg$1, {
       symbol: '$',
       placeholder: ''
@@ -1503,11 +1482,24 @@
         var _filter = v.filter,
             _options = v.options;
 
-        if (_options && _options.isOperator) {
-          var createRegexOperators = nj.createRegexOperators;
+        if (_options) {
+          if (_options.isOperator) {
+            var createRegexOperators = nj.createRegexOperators;
 
-          if (createRegexOperators) {
-            createRegexOperators(name);
+            if (createRegexOperators) {
+              createRegexOperators(name);
+            }
+          }
+
+          var alias = _options.alias;
+
+          if (alias) {
+            var createFilterAlias = nj.createFilterAlias;
+
+            if (createFilterAlias) {
+              createFilterAlias(name, alias);
+              name = alias;
+            }
           }
         }
 
@@ -1608,8 +1600,8 @@
 
     if (prop !== '') {
       var matchProp = REGEX_JS_PROP.exec(prop);
-      var hasComputed = matchProp[6] === '#';
-      ret.name = hasComputed ? matchProp[7] : matchProp[0]; // if (matchProp[0] !== prop) {
+      var hasAccessor = matchProp[6] === '#';
+      ret.name = hasAccessor ? matchProp[7] : matchProp[0]; // if (matchProp[0] !== prop) {
       //   tools.error(_syntaxError(SPACE_ERROR, _replaceStr(propO, innerQuotes), source));
       // }
 
@@ -1618,8 +1610,8 @@
         ret.isBasicType = true;
       }
 
-      if (hasComputed) {
-        ret.isComputed = true;
+      if (hasAccessor) {
+        ret.isAccessor = true;
       }
 
       ret.name = ret.name.replace(REGEX_REPLACE_SET, function () {
@@ -1645,11 +1637,26 @@
     '_njGt_': '>'
   };
   var REGEX_QUOTE = /"[^"]*"|'[^']*'/g;
+  var REGEX_OPERATORS_ESCAPE = /\*|\||\/|\.|\?|\+/g;
   var SP_FILTER_LOOKUP = {
     '||': 'or',
     '..<': 'rLt'
   };
-  var REGEX_SP_FILTER = /[\s]+((\|\||\.\.<)[\s]*)/g;
+  var REGEX_SP_FILTER;
+
+  function createFilterAlias(name, alias) {
+    if (name && alias) {
+      SP_FILTER_LOOKUP[name] = alias;
+    }
+
+    REGEX_SP_FILTER = new RegExp('[\\s]+((' + Object.keys(SP_FILTER_LOOKUP).map(function (o) {
+      return o.replace(REGEX_OPERATORS_ESCAPE, function (match) {
+        return '\\' + match;
+      });
+    }).join('|') + ')[\\s]*)', 'g');
+  }
+
+  createFilterAlias();
   var FN_FILTER_LOOKUP = {
     ')': ')_(',
     ']': ']_('
@@ -1672,7 +1679,6 @@
   var REGEX_NEGATIVE = /-[0-9]/;
   var BEGIN_CHARS = ['', '(', '[', ','];
   var OPERATORS = ['+=', '+', '-[0-9]', '-', '**', '*', '%%', '%', '===', '!==', '==', '!=', '<=>', '<=', '>=', '=', '..<', '<', '>', '&&', '||', '?:', '?', ':', '../', '..', '/'];
-  var REGEX_OPERATORS_ESCAPE = /\*|\||\/|\.|\?|\+/g;
   var REGEX_OPERATORS;
 
   function createRegexOperators(operator) {
@@ -1713,8 +1719,7 @@
     }).replace(REGEX_QUOTE, function (match) {
       innerQuotes.push(match);
       return '_njQs' + (innerQuotes.length - 1) + '_';
-    });
-    prop = prop.replace(REGEX_OPERATORS, function (match, index) {
+    }).replace(REGEX_OPERATORS, function (match, index) {
       if (REGEX_NEGATIVE.test(match)) {
         if (index > 0 && BEGIN_CHARS.indexOf(prop[index - 1].trim()) < 0) {
           //Example: 123-456
@@ -1726,6 +1731,8 @@
       } else {
         return NOT_OPERATORS.indexOf(match) < 0 ? " ".concat(match, " ") : match;
       }
+    }).replace(REGEX_SP_FILTER, function (all, g1, match) {
+      return ' ' + SP_FILTER_LOOKUP[match] + ' ';
     }).replace(REGEX_PROP_FILTER, function (all, g1) {
       var startWithHash = g1[0] === '#';
 
@@ -1745,9 +1752,7 @@
     }).replace(REGEX_BRACKET_FILTER, function (all, g1, g2, g3) {
       return (g2 ? g2 : '') + (g2 ? g3 : g1).replace(/[(]/g, 'bracket(');
     }) //.replace(REGEX_OBJKEY_FILTER, (all, g1, g2) => g1 + ' \'' + g2 + '\' : ')
-    .replace(REGEX_SP_FILTER, function (all, g1, match) {
-      return ' ' + SP_FILTER_LOOKUP[match] + ' ';
-    }).replace(REGEX_SPACE_S_FILTER, function (all, match) {
+    .replace(REGEX_SPACE_S_FILTER, function (all, match) {
       return match;
     }).replace(REGEX_FN_FILTER, function (all, match, g1) {
       return !g1 ? FN_FILTER_LOOKUP[match] : '.(\'' + g1 + '\')_(';
@@ -1863,6 +1868,7 @@
     return ret;
   }
   assign(nj, {
+    createFilterAlias: createFilterAlias,
     createRegexOperators: createRegexOperators
   });
 
@@ -2325,7 +2331,7 @@
     return no;
   }
 
-  function _buildOptions(config, useStringLocal, node, fns, level, hashProps, tagName, attrs) {
+  function _buildOptions(config, useStringLocal, node, fns, level, hashProps, tagName, tagProps) {
     var hashStr = ', useString: ' + (useStringLocal == null ? "".concat(GLOBAL, ".us") : useStringLocal ? 'true' : 'false'),
         noConfig = !config,
         no = fns._no;
@@ -2344,8 +2350,8 @@
         hashStr += ', setTagName: function(c) { ' + tagName + ' = c }';
       }
 
-      if (attrs && (noConfig || config.hasAttrs)) {
-        hashStr += ', attrs: ' + attrs;
+      if (tagProps && (noConfig || config.hasTagProps)) {
+        hashStr += ', tagProps: ' + tagProps;
       }
 
       if (hashProps != null) {
@@ -2369,7 +2375,7 @@
     var dataValueStr,
         special = false;
     var isBasicType = ast.isBasicType,
-        isComputed = ast.isComputed,
+        isAccessor = ast.isAccessor,
         hasSet = ast.hasSet;
 
     if (isBasicType) {
@@ -2468,7 +2474,7 @@
       }
 
       if (!special && !specialP) {
-        dataValueStr = (isComputed ? "".concat(GLOBAL, ".c(") : '') + "".concat(CONTEXT, ".d('") + name + '\'' + (isComputed || hasSet ? ', 0, true' : '') + ')' + (isComputed ? ", ".concat(CONTEXT, ", ") + level + ')' : '');
+        dataValueStr = (isAccessor ? "".concat(GLOBAL, ".c(") : '') + "".concat(CONTEXT, ".d('") + name + '\'' + (isAccessor || hasSet ? ', 0, true' : '') + ')' + (isAccessor ? ", ".concat(CONTEXT, ", ") + level + ')' : '');
       } else {
         var dataStr = special === CUSTOM_VAR ? data : "".concat(CONTEXT, ".") + data;
 
@@ -2476,7 +2482,7 @@
           dataStr = special(dataStr);
         }
 
-        dataValueStr = special ? dataStr : (isComputed ? "".concat(GLOBAL, ".c(") : '') + "".concat(CONTEXT, ".d('") + name + '\', ' + dataStr + (isComputed || hasSet ? ', true' : '') + ')' + (isComputed ? ", ".concat(CONTEXT, ", ") + level + ')' : '');
+        dataValueStr = special ? dataStr : (isAccessor ? "".concat(GLOBAL, ".c(") : '') + "".concat(CONTEXT, ".d('") + name + '\', ' + dataStr + (isAccessor || hasSet ? ', true' : '') + ')' + (isAccessor ? ", ".concat(CONTEXT, ", ") + level + ')' : '');
       }
     }
 
@@ -2484,7 +2490,7 @@
       dataValueStr = _replaceBackslash(dataValueStr);
     }
 
-    return _buildEscape(dataValueStr, fns, isBasicType || isComputed ? false : escape, special);
+    return _buildEscape(dataValueStr, fns, isBasicType || isAccessor ? false : escape, special);
   }
 
   function replaceFilterName(name) {
@@ -2697,12 +2703,12 @@
 
     var paramsStr = '',
         _paramsC,
-        _attrs;
+        _tagProps;
 
     if (params || hasPropsEx) {
       _paramsC = counter._params++;
-      _attrs = '_params' + _paramsC;
-      paramsStr = 'var ' + _attrs + ' = ';
+      _tagProps = '_params' + _paramsC;
+      paramsStr = 'var ' + _tagProps + ' = ';
 
       if (params) {
         var paramKeys = Object.keys(params),
@@ -2736,21 +2742,21 @@
         if (paramsEx) {
           paramsStr += _buildContent(paramsEx.content, paramsEx, fns, counter, {
             _paramsE: true
-          }, null, useString, tagName, _attrs);
+          }, null, useString, tagName, _tagProps);
         }
 
         if (useString) {
-          paramsStr += '\n' + _attrs + " = ".concat(GLOBAL, ".ans(") + _attrs + ');\n';
+          paramsStr += '\n' + _tagProps + " = ".concat(GLOBAL, ".ans(") + _tagProps + ');\n';
         }
       } else if (useString) {
-        paramsStr += '\n' + _attrs + " = ".concat(GLOBAL, ".ans({}, ") + _attrs + ');\n';
+        paramsStr += '\n' + _tagProps + " = ".concat(GLOBAL, ".ans({}, ") + _tagProps + ');\n';
       }
     }
 
     return [paramsStr, _paramsC];
   }
 
-  function _buildNode(node, parent, fns, counter, retType, level, useStringLocal, isFirst, tagName, attrs) {
+  function _buildNode(node, parent, fns, counter, retType, level, useStringLocal, isFirst, tagName, tagProps) {
     var fnStr = '',
         useStringF = fns.useString;
 
@@ -2813,7 +2819,7 @@
           paramsStr = retP[0],
           _paramsC = retP[1];
 
-      dataReferStr += _buildOptions(configE, useStringLocal, node, fns, level, paramsStr !== '' ? '_params' + _paramsC : null, tagName, attrs);
+      dataReferStr += _buildOptions(configE, useStringLocal, node, fns, level, paramsStr !== '' ? '_params' + _paramsC : null, tagName, tagProps);
       dataReferStr += '\n];\n'; //添加匿名参数
 
       if (paramsStr !== '') {
@@ -2911,7 +2917,7 @@
     return fnStr;
   }
 
-  function _buildContent(content, parent, fns, counter, retType, level, useStringLocal, tagName, attrs) {
+  function _buildContent(content, parent, fns, counter, retType, level, useStringLocal, tagName, tagProps) {
     var fnStr = '';
 
     if (!content) {
@@ -2920,7 +2926,7 @@
 
     each(content, function (node) {
       var useString = node.useString;
-      fnStr += _buildNode(node, parent, fns, counter, retType, level, useString != null ? useString : useStringLocal, fns._firstNode && level == 0, tagName, attrs);
+      fnStr += _buildNode(node, parent, fns, counter, retType, level, useString != null ? useString : useStringLocal, fns._firstNode && level == 0, tagName, tagProps);
 
       if (fns._firstNode) {
         //输出字符串时模板第一个节点前面不加换行符
@@ -3084,7 +3090,7 @@
           var last = xml.length - 1,
               lastChar = xml[last],
               lastChar3 = xml.substr(last - 2),
-              isComputed = lastChar === '#',
+              isAccessor = lastChar === '#',
               isSpread = lastChar3 === '...';
 
           if (isInBrace) {
@@ -3099,13 +3105,13 @@
             }
           }
 
-          if (isComputed) {
+          if (isAccessor) {
             xml = xml.substr(0, last);
           } else if (isSpread) {
             xml = xml.substr(0, last - 2);
           }
 
-          split = (isComputed ? '#' : isSpread ? '...' : '') + SPLIT_FLAG + i;
+          split = (isAccessor ? '#' : isSpread ? '...' : '') + SPLIT_FLAG + i;
 
           if (!isInBrace) {
             split = tmplRule.startRule + split + tmplRule.endRule;
@@ -3416,7 +3422,7 @@
         firstChar = tmplRule.firstChar,
         lastChar = tmplRule.lastChar,
         spreadProp = tmplRule.spreadProp,
-        exAttrs = tmplRule.exAttrs;
+        directives = tmplRule.directives;
     var paramsEx; //Replace the parameter like "{...props}".
 
     elem = elem.replace(spreadProp, function (all, g1, propR, g3, prop) {
@@ -3432,7 +3438,7 @@
       return ' ';
     }); //Replace the parameter like "#show={false}".
 
-    elem = elem.replace(exAttrs, function (all, g1, g2, g3, g4, g5, g6, key, hasColon, hasEx, name, hasEqual, value) {
+    elem = elem.replace(directives, function (all, g1, g2, g3, g4, g5, g6, key, hasColon, hasEx, name, hasEqual, value) {
       if (hasEx == null) {
         return all;
       }
