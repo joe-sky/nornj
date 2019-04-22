@@ -10,7 +10,7 @@ describe('n-show directive', function () {
 
   it('should render n-show when value is true', function () {
     const rendered = util.render(nShow, { condition: true, show: true });
-    expect(rendered).to.contain('<p name="wrap" class="wrap" id="wrap">');
+    expect(rendered).to.contain('<p id="wrap" name="wrap" class="wrap">');
     expect(rendered).to.contain(' style="display:none">');
     expect(rendered).not.to.contain('<p style="display:none"');
   });

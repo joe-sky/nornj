@@ -5,8 +5,8 @@ module.exports = createReactClass({
   render: function () {
     return (
       <div>
-        <for i={30} to={60}>
-          <i key={index}>{i}</i>
+        <for of={`30 .. 60`}>
+          <i key={index}>{item}</i>
         </for>
       </div>
     );
