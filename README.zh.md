@@ -21,10 +21,11 @@
 
 [English](https://github.com/joe-sky/nornj/blob/master/README.md) | 简体中文
 
+> 通知：`NornJ`的最新版`5.0.0`即将发布，旧版`0.4.x`将不再更新。
+
 ## 文档
 
-* [NornJ指南(github pages版)](https://joe-sky.github.io/nornj-guide)
-* [NornJ指南(gitbook版)](https://joe-sky.gitbooks.io/nornj-guide)
+* [NornJ指南v0.4(github pages版)](https://joe-sky.github.io/nornj-guide)
 
 ## 概述
 
@@ -146,7 +147,7 @@ class App extends Component {
 ## 安装
 
 ```sh
-npm install babel-plugin-nornj-in-jsx  #or yarn add babel-plugin-nornj-in-jsx
+npm install babel-plugin-nornj-in-jsx@next  #or yarn add babel-plugin-nornj-in-jsx@next
 ```
 
 然后配置`.babelrc`:

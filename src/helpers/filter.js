@@ -10,17 +10,20 @@ export const filters = {
     if (obj == null) {
       return obj;
     }
-    if (obj._njCtx) {
+    if (obj._njSrc) {
       return {
-        _njCtx: obj.val,
-        val: obj.val[prop],
-        prop
+        source: obj.value,
+        value: obj.value[prop],
+        prop,
+        _njSrc: true
       };
     }
     else if (callFn) {
       return {
-        obj,
-        prop
+        source: obj,
+        value: obj[prop],
+        prop,
+        _njSrc: true
       };
     }
 
@@ -29,7 +32,15 @@ export const filters = {
 
   //Call function
   _: function (fn, args) {
-    return (fn && fn.obj[fn.prop] != null) ? fn.obj[fn.prop].apply(fn.obj, args) : null;
+    if (fn == null) {
+      return fn;
+    }
+    if (fn._njSrc) {
+      const _fn = fn.source[fn.prop];
+      return _fn != null ? _fn.apply(fn.source, args) : _fn;
+    }
+
+    return fn.apply(null, args);
   },
 
   //Get accessor properties
@@ -38,10 +49,7 @@ export const filters = {
       return obj;
     }
 
-    return getAccessorData({
-      val: obj[prop],
-      _njCtx: obj
-    }, options.context, options.level);
+    return getAccessorData(obj[prop], options.context, options.level);
   },
 
   '**': (val1, val2) => {

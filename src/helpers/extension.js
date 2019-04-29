@@ -113,7 +113,7 @@ export const extensions = {
           data: [item],
           index: isArrayLike ? index : len,
           item,
-          fallback: true
+          newParent: true
         };
 
         let extra;

@@ -189,13 +189,13 @@ function _buildDataValue(ast, escape, fns, level) {
     }
 
     if (!special && !specialP) {
-      dataValueStr = (isAccessor ? `${GLOBAL}.c(` : '') + `${CONTEXT}.d('` + name + '\'' + ((isAccessor || hasSet) ? ', 0, true' : '') + ')' + (isAccessor ? `, ${CONTEXT}, ` + level + ')' : '');
+      dataValueStr = (isAccessor ? `${GLOBAL}.c(` : '') + `${CONTEXT}.d('` + name + '\'' + (hasSet ? ', 0, true' : '') + ')' + (isAccessor ? `, ${CONTEXT}, ` + level + ')' : '');
     } else {
       let dataStr = special === CUSTOM_VAR ? data : `${CONTEXT}.` + data;
       if (tools.isObject(special)) {
         dataStr = special(dataStr);
       }
-      dataValueStr = (special ? dataStr : (isAccessor ? `${GLOBAL}.c(` : '') + `${CONTEXT}.d('` + name + '\', ' + dataStr + ((isAccessor || hasSet) ? ', true' : '') + ')' + (isAccessor ? `, ${CONTEXT}, ` + level + ')' : ''));
+      dataValueStr = (special ? dataStr : (isAccessor ? `${GLOBAL}.c(` : '') + `${CONTEXT}.d('` + name + '\', ' + dataStr + (hasSet ? ', true' : '') + ')' + (isAccessor ? `, ${CONTEXT}, ` + level + ')' : ''));
     }
   }
   if (dataValueStr) {
@@ -220,7 +220,7 @@ export function buildExpression(ast, inObj, escape, fns, useStringLocal, level) 
 
     if (OPERATORS.indexOf(filterName) >= 0) {  //Native operator
       if (ASSIGN_OPERATORS.indexOf(filterName) >= 0) {
-        codeStr += `._njCtx.${i == 0 ? ast.name : tools.clearQuot(ast.filters[i - 1].params[0].name)} ${filterName} `;
+        codeStr += `.source.${i == 0 ? ast.name : tools.clearQuot(ast.filters[i - 1].params[0].name)} ${filterName} `;
       }
       else {
         codeStr += ` ${filterName} `;
@@ -504,7 +504,7 @@ function _buildNode(node, parent, fns, counter, retType, level, useStringLocal, 
       fnStr += 'var ' + fnHVarStr + ` = ${CONTEXT}.d('` + node.ex + '\', 0, true);\n';
 
       fnStr += 'if (' + fnHVarStr + ') {\n';
-      fnStr += '  ' + exVarStr + ' = ' + fnHVarStr + '.val;\n';
+      fnStr += '  ' + exVarStr + ' = ' + fnHVarStr + '.value;\n';
       fnStr += '} else {\n';
       fnStr += '  ' + exVarStr + ' = ' + globalExStr + ';\n';
       fnStr += '}\n';
@@ -631,7 +631,7 @@ function _buildRender(node, parent, nodeType, retType, params, fns, level, useSt
       retStr = (!useStringF || allowNewline || noLevel ? '' : (isFirst ? (parent.type !== 'nj_root' ? `${GLOBAL}.fl(${CONTEXT}) + ` : '') : '\'\\n\' + ')) + _buildLevelSpace(level, fns, allowNewline) + _buildLevelSpaceRt(useStringF, isFirst || noLevel) + params.text;
       break;
     case 2: //扩展标签
-      retStr = '_ex' + params._ex + '.apply(' + (params.fnH ? params.fnH + ' ? ' + params.fnH + `._njCtx : ${CONTEXT}` : CONTEXT) + ', _dataRefer' + params._dataRefer + ')';
+      retStr = '_ex' + params._ex + '.apply(' + (params.fnH ? params.fnH + ' ? ' + params.fnH + `.source : ${CONTEXT}` : CONTEXT) + ', _dataRefer' + params._dataRefer + ')';
       break;
     case 3: //元素节点
       if (!useStringF) {

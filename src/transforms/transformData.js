@@ -36,8 +36,8 @@ export function styleProps(obj) {
 }
 
 //Get value from multiple datas
-export function getData(prop, data, hasCtx) {
-  let ret, obj;
+export function getData(prop, data, hasSource) {
+  let value, obj;
   if (!data) {
     data = this.data;
   }
@@ -45,17 +45,18 @@ export function getData(prop, data, hasCtx) {
   for (let i = 0, l = data.length; i < l; i++) {
     obj = data[i];
     if (obj) {
-      ret = obj[prop];
-      if (ret !== undefined) {
-        if (hasCtx) {
+      value = obj[prop];
+      if (value !== undefined) {
+        if (hasSource) {
           return {
-            _njCtx: obj,
-            val: ret,
-            prop
+            source: obj,
+            value,
+            prop,
+            _njSrc: true
           };
         }
 
-        return ret;
+        return value;
       }
     }
   }
@@ -73,8 +74,8 @@ export function getAccessorData(fn, context, level) {
     return fn;
   }
 
-  if (fn.val._njTmpl) { //模板函数
-    return fn.val.call({
+  if (fn._njTmpl) { //模板函数
+    return fn.call({
       _njData: context.data,
       _njParent: context.parent,
       _njIndex: context.index,
@@ -82,7 +83,7 @@ export function getAccessorData(fn, context, level) {
       _njIcp: context.icp
     });
   } else { //普通函数
-    return fn.val.call(context.data[context.data.length - 1], context);
+    return fn.call(context.data[context.data.length - 1], context);
   }
 }
 
@@ -129,13 +130,13 @@ export function newContext(context, params) {
 
   return {
     data: params.data ? tools.arrayPush(params.data, context.data) : context.data,
-    parent: params.fallback ? context : context.parent,
+    parent: params.newParent ? context : context.parent,
     root: context.root || context,
     index: 'index' in params ? params.index : context.index,
     item: 'item' in params ? params.item : context.item,
     level: context.level,
     getData,
-    get ctxInstance() {
+    get $this() {
       return this.data[this.data.length - 1];
     },
     d: getData,
@@ -230,7 +231,7 @@ function createElementApply(p) {
 }
 
 function callFilter(filter) {
-  return filter._njCtx ? filter.val.bind(filter._njCtx) : filter;
+  return filter.source ? filter.value.bind(filter.source) : filter;
 }
 
 //创建模板函数

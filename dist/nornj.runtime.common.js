@@ -1,5 +1,5 @@
 /*!
-* NornJ template engine v5.0.0-rc.6
+* NornJ template engine v5.0.0-rc.7
 * (c) 2016-2019 Joe_Sky
 * Released under the MIT License.
 */
@@ -417,8 +417,8 @@ function styleProps(obj) {
   return ret;
 } //Get value from multiple datas
 
-function getData(prop, data, hasCtx) {
-  var ret, obj;
+function getData(prop, data, hasSource) {
+  var value, obj;
 
   if (!data) {
     data = this.data;
@@ -428,18 +428,19 @@ function getData(prop, data, hasCtx) {
     obj = data[i];
 
     if (obj) {
-      ret = obj[prop];
+      value = obj[prop];
 
-      if (ret !== undefined) {
-        if (hasCtx) {
+      if (value !== undefined) {
+        if (hasSource) {
           return {
-            _njCtx: obj,
-            val: ret,
-            prop: prop
+            source: obj,
+            value: value,
+            prop: prop,
+            _njSrc: true
           };
         }
 
-        return ret;
+        return value;
       }
     }
   }
@@ -458,9 +459,9 @@ function getAccessorData(fn, context, level) {
     return fn;
   }
 
-  if (fn.val._njTmpl) {
+  if (fn._njTmpl) {
     //模板函数
-    return fn.val.call({
+    return fn.call({
       _njData: context.data,
       _njParent: context.parent,
       _njIndex: context.index,
@@ -469,7 +470,7 @@ function getAccessorData(fn, context, level) {
     });
   } else {
     //普通函数
-    return fn.val.call(context.data[context.data.length - 1], context);
+    return fn.call(context.data[context.data.length - 1], context);
   }
 }
 function getElement(name, global, nameO, context, subName) {
@@ -514,14 +515,14 @@ function newContext(context, params) {
 
   return {
     data: params.data ? arrayPush(params.data, context.data) : context.data,
-    parent: params.fallback ? context : context.parent,
+    parent: params.newParent ? context : context.parent,
     root: context.root || context,
     index: 'index' in params ? params.index : context.index,
     item: 'item' in params ? params.item : context.item,
     level: context.level,
     getData: getData,
 
-    get ctxInstance() {
+    get $this() {
       return this.data[this.data.length - 1];
     },
 
@@ -621,7 +622,7 @@ function createElementApply(p) {
 }
 
 function callFilter(filter) {
-  return filter._njCtx ? filter.val.bind(filter._njCtx) : filter;
+  return filter.source ? filter.value.bind(filter.source) : filter;
 } //创建模板函数
 
 
@@ -789,7 +790,7 @@ var extensions = {
           data: [item],
           index: isArrayLike$1 ? index : len,
           item: item,
-          fallback: true
+          newParent: true
         };
         var extra;
 
@@ -1062,16 +1063,19 @@ var filters = {
       return obj;
     }
 
-    if (obj._njCtx) {
+    if (obj._njSrc) {
       return {
-        _njCtx: obj.val,
-        val: obj.val[prop],
-        prop: prop
+        source: obj.value,
+        value: obj.value[prop],
+        prop: prop,
+        _njSrc: true
       };
     } else if (callFn) {
       return {
-        obj: obj,
-        prop: prop
+        source: obj,
+        value: obj[prop],
+        prop: prop,
+        _njSrc: true
       };
     }
 
@@ -1079,7 +1083,16 @@ var filters = {
   },
   //Call function
   _: function _(fn, args) {
-    return fn && fn.obj[fn.prop] != null ? fn.obj[fn.prop].apply(fn.obj, args) : null;
+    if (fn == null) {
+      return fn;
+    }
+
+    if (fn._njSrc) {
+      var _fn = fn.source[fn.prop];
+      return _fn != null ? _fn.apply(fn.source, args) : _fn;
+    }
+
+    return fn.apply(null, args);
   },
   //Get accessor properties
   '#': function _(obj, prop, options) {
@@ -1087,10 +1100,7 @@ var filters = {
       return obj;
     }
 
-    return getAccessorData({
-      val: obj[prop],
-      _njCtx: obj
-    }, options.context, options.level);
+    return getAccessorData(obj[prop], options.context, options.level);
   },
   '**': function _(val1, val2) {
     var ret = Math.pow(val1, val2);

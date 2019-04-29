@@ -216,7 +216,7 @@ describe('Precompile', () => {
 
         if (OPERATORS.indexOf(filter.name) >= 0) {  //Native operator
           if (ASSIGN_OPERATORS.indexOf(filter.name) >= 0) {
-            codeStr += `._njCtx.${i == 0 ? ast.name : tools.clearQuot(ast.filters[i - 1].params[0].name)} ${filter.name} `;
+            codeStr += `.source.${i == 0 ? ast.name : tools.clearQuot(ast.filters[i - 1].params[0].name)} ${filter.name} `;
           }
           else {
             codeStr += ` ${filter.name} `;
@@ -365,7 +365,7 @@ describe('Precompile', () => {
       
       { fn: param => param + (p1.sc(p1.f['.']('abc', 'substring'))(param, 10)) }
 
-      p2.d('a', 0, true)._njCtx.a = '123' + '456'
+      p2.d('a', 0, true).source.a = '123' + '456'
     `;
 
     //console.log(ret.main.toString());
