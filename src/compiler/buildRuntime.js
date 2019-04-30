@@ -95,8 +95,8 @@ function _buildOptions(config, useStringLocal, node, fns, level, hashProps, tagN
   return '{ _njOpts: ' + (no + 1)
     + ((noConfig || config.hasTmplCtx) ? `, global: ${GLOBAL}, context: ${CONTEXT}` : '')
     + ((noConfig || config.hasOutputH) ? ', outputH: ' + !fns.useString : '')
-    + hashStr 
-    + ((level != null && (noConfig || config.hasLevel)) ? ', level: ' + level : '') 
+    + hashStr
+    + ((level != null && (noConfig || config.hasLevel)) ? ', level: ' + level : '')
     + ' }';
 }
 
@@ -137,10 +137,6 @@ function _buildDataValue(ast, escape, fns, level) {
         break;
       case '@g':
         data = `${GLOBAL}.g`;
-        special = CUSTOM_VAR;
-        break;
-      case '@root':
-        data = `(${CONTEXT}.root || ${CONTEXT})`;
         special = CUSTOM_VAR;
         break;
       case '@context':
@@ -189,13 +185,13 @@ function _buildDataValue(ast, escape, fns, level) {
     }
 
     if (!special && !specialP) {
-      dataValueStr = (isAccessor ? `${GLOBAL}.c(` : '') + `${CONTEXT}.d('` + name + '\'' + (hasSet ? ', 0, true' : '') + ')' + (isAccessor ? `, ${CONTEXT}, ` + level + ')' : '');
+      dataValueStr = (isAccessor ? `${GLOBAL}.c(` : '') + `${CONTEXT}.d('` + name + '\'' + (hasSet ? ', 0, true' : '') + ')' + (isAccessor ? `, ${CONTEXT}` + ')' : '');
     } else {
       let dataStr = special === CUSTOM_VAR ? data : `${CONTEXT}.` + data;
       if (tools.isObject(special)) {
         dataStr = special(dataStr);
       }
-      dataValueStr = (special ? dataStr : (isAccessor ? `${GLOBAL}.c(` : '') + `${CONTEXT}.d('` + name + '\', ' + dataStr + (hasSet ? ', true' : '') + ')' + (isAccessor ? `, ${CONTEXT}, ` + level + ')' : ''));
+      dataValueStr = (special ? dataStr : (isAccessor ? `${GLOBAL}.c(` : '') + `${CONTEXT}.d('` + name + '\', ' + dataStr + (hasSet ? ', true' : '') + ')' + (isAccessor ? `, ${CONTEXT}` + ')' : ''));
     }
   }
   if (dataValueStr) {

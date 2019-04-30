@@ -652,32 +652,17 @@
       }
     }
   }
-
-  function _getLevel(level, context) {
-    if (level != null && context.level != null) {
-      level += context.level;
-    }
-
-    return level;
-  }
-
-  function getAccessorData(fn, context, level) {
+  function getAccessorData(fn, context) {
     if (fn == null) {
       return fn;
     }
 
     if (fn._njTmpl) {
       //模板函数
-      return fn.call({
-        _njData: context.data,
-        _njParent: context.parent,
-        _njIndex: context.index,
-        _njLevel: _getLevel(level, context),
-        _njIcp: context.icp
-      });
+      return fn.call(context);
     } else {
       //普通函数
-      return fn.call(context.data[context.data.length - 1], context);
+      return fn.call(context.$this, context);
     }
   }
   function getElement(name, global, nameO, context, subName) {
@@ -720,22 +705,12 @@
       return context;
     }
 
-    return {
+    return assign({}, context, {
       data: params.data ? arrayPush(params.data, context.data) : context.data,
       parent: params.newParent ? context : context.parent,
-      root: context.root || context,
       index: 'index' in params ? params.index : context.index,
-      item: 'item' in params ? params.item : context.item,
-      level: context.level,
-      getData: getData,
-
-      get $this() {
-        return this.data[this.data.length - 1];
-      },
-
-      d: getData,
-      icp: context.icp
-    };
+      item: 'item' in params ? params.item : context.item
+    });
   } //修正属性名
 
   function fixPropName(name) {
@@ -770,7 +745,7 @@
     };
   }
 
-  function _getLocalComponents(localConfigs, initCtx) {
+  function _getLocalComponents(localConfigs) {
     var icp;
 
     if (localConfigs && localConfigs.components) {
@@ -781,27 +756,27 @@
       }
     }
 
-    if (initCtx && initCtx._njIcp) {
-      icp = icp ? arrayPush(icp, initCtx._njIcp) : initCtx._njIcp;
-    }
-
     return icp;
   } //构建可运行的模板函数
 
 
   function tmplWrap(configs, main) {
-    return function (lc, lc2) {
-      var initCtx = this,
+    return function (param1, param2) {
+      var ctx = this,
           data = arraySlice(arguments);
-      return main(configs, {
-        data: initCtx && initCtx._njData ? arrayPush(data, initCtx._njData) : data,
-        parent: initCtx ? initCtx._njParent : null,
-        index: initCtx ? initCtx._njIndex : null,
-        item: initCtx ? initCtx._njItem : null,
-        level: initCtx ? initCtx._njLevel : null,
+      return main(configs, ctx && ctx._njCtx ? assign({}, ctx, {
+        data: arrayPush(data, ctx.data)
+      }) : {
+        data: data,
         getData: getData,
+
+        get $this() {
+          return this.data[this.data.length - 1];
+        },
+
         d: getData,
-        icp: _getLocalComponents(lc && lc._njParam ? lc2 : lc, initCtx)
+        icp: _getLocalComponents(param1 && param1._njParam ? param2 : param1),
+        _njCtx: true
       });
     };
   }
@@ -852,7 +827,6 @@
       aa: addArgs,
       an: assign,
       g: nj.global,
-      l: _getLevel,
       cf: callFilter
     };
 
@@ -1307,7 +1281,7 @@
         return obj;
       }
 
-      return getAccessorData(obj[prop], options.context, options.level);
+      return getAccessorData(obj[prop], options.context);
     },
     '**': function _(val1, val2) {
       var ret = Math.pow(val1, val2);
@@ -2426,11 +2400,6 @@
           special = CUSTOM_VAR;
           break;
 
-        case '@root':
-          data = "(".concat(CONTEXT, ".root || ").concat(CONTEXT, ")");
-          special = CUSTOM_VAR;
-          break;
-
         case '@context':
           data = CONTEXT;
           special = CUSTOM_VAR;
@@ -2484,7 +2453,7 @@
       }
 
       if (!special && !specialP) {
-        dataValueStr = (isAccessor ? "".concat(GLOBAL, ".c(") : '') + "".concat(CONTEXT, ".d('") + name + '\'' + (hasSet ? ', 0, true' : '') + ')' + (isAccessor ? ", ".concat(CONTEXT, ", ") + level + ')' : '');
+        dataValueStr = (isAccessor ? "".concat(GLOBAL, ".c(") : '') + "".concat(CONTEXT, ".d('") + name + '\'' + (hasSet ? ', 0, true' : '') + ')' + (isAccessor ? ", ".concat(CONTEXT) + ')' : '');
       } else {
         var dataStr = special === CUSTOM_VAR ? data : "".concat(CONTEXT, ".") + data;
 
@@ -2492,7 +2461,7 @@
           dataStr = special(dataStr);
         }
 
-        dataValueStr = special ? dataStr : (isAccessor ? "".concat(GLOBAL, ".c(") : '') + "".concat(CONTEXT, ".d('") + name + '\', ' + dataStr + (hasSet ? ', true' : '') + ')' + (isAccessor ? ", ".concat(CONTEXT, ", ") + level + ')' : '');
+        dataValueStr = special ? dataStr : (isAccessor ? "".concat(GLOBAL, ".c(") : '') + "".concat(CONTEXT, ".d('") + name + '\', ' + dataStr + (hasSet ? ', true' : '') + ')' + (isAccessor ? ", ".concat(CONTEXT) + ')' : '');
       }
     }
 

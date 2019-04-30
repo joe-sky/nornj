@@ -10,7 +10,7 @@
 
 ```
 
-`NornJ`(pronounced [ˈnɔ:ndʒeɪ]，abbreviated as `nj`) is a template engine that can works with React, JSX enhancement or alternative tools.
+`NornJ`(pronounced [ˌnɔ:nˈdʒeɪ]，abbreviated as `nj`) is a template engine that can works with React, JSX enhancement or alternative tools.
 
 [![NPM Version][npm-image]][npm-url]
 <a href="https://www.npmjs.com/package/nornj"><img src="https://img.shields.io/npm/l/nornj.svg" alt="License"></a>
@@ -21,7 +21,7 @@
 
 English | [简体中文](https://github.com/joe-sky/nornj/blob/master/README.zh.md)
 
-> Notice: `NornJ` latest major version `5.0.0` will release soon, the `0.4.x` will no longer be updated.
+> Notice: NornJ latest major version `5.0.0` will release soon, the `0.4.x` will no longer be updated.
 
 ## Documents
 

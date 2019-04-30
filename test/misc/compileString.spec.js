@@ -260,8 +260,8 @@ describe('test compile string', function () {
           <#prop {{'name1' | vm_var}} />
           <#vm-include src="../a.vm" />
           #${nj`<#each {{list}}>
-                  {{this}}
-                  {{this}}
+                  {{@item}}
+                  {{@item}}
                 </#each>
                 <div>
                   111

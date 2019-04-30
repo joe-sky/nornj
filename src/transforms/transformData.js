@@ -62,28 +62,15 @@ export function getData(prop, data, hasSource) {
   }
 }
 
-function _getLevel(level, context) {
-  if (level != null && context.level != null) {
-    level += context.level;
-  }
-  return level;
-}
-
-export function getAccessorData(fn, context, level) {
+export function getAccessorData(fn, context) {
   if (fn == null) {
     return fn;
   }
 
   if (fn._njTmpl) { //模板函数
-    return fn.call({
-      _njData: context.data,
-      _njParent: context.parent,
-      _njIndex: context.index,
-      _njLevel: _getLevel(level, context),
-      _njIcp: context.icp
-    });
+    return fn.call(context);
   } else { //普通函数
-    return fn.call(context.data[context.data.length - 1], context);
+    return fn.call(context.$this, context);
   }
 }
 
@@ -128,20 +115,12 @@ export function newContext(context, params) {
     return context;
   }
 
-  return {
+  return tools.assign({}, context, {
     data: params.data ? tools.arrayPush(params.data, context.data) : context.data,
     parent: params.newParent ? context : context.parent,
-    root: context.root || context,
     index: 'index' in params ? params.index : context.index,
-    item: 'item' in params ? params.item : context.item,
-    level: context.level,
-    getData,
-    get $this() {
-      return this.data[this.data.length - 1];
-    },
-    d: getData,
-    icp: context.icp
-  };
+    item: 'item' in params ? params.item : context.item
+  });
 }
 
 //修正属性名
@@ -177,7 +156,7 @@ export function exRet(global, context, fn) {
   };
 }
 
-function _getLocalComponents(localConfigs, initCtx) {
+function _getLocalComponents(localConfigs) {
   let icp;
   if (localConfigs && localConfigs.components) {
     icp = localConfigs.components;
@@ -185,28 +164,28 @@ function _getLocalComponents(localConfigs, initCtx) {
       icp = [icp];
     }
   }
-  if (initCtx && initCtx._njIcp) {
-    icp = icp ? tools.arrayPush(icp, initCtx._njIcp) : initCtx._njIcp;
-  }
+
   return icp;
 }
 
 //构建可运行的模板函数
 export function tmplWrap(configs, main) {
-  return function (lc, lc2) {
-    const initCtx = this,
+  return function (param1, param2) {
+    const ctx = this,
       data = tools.arraySlice(arguments);
 
-    return main(configs, {
-      data: initCtx && initCtx._njData ? tools.arrayPush(data, initCtx._njData) : data,
-      parent: initCtx ? initCtx._njParent : null,
-      index: initCtx ? initCtx._njIndex : null,
-      item: initCtx ? initCtx._njItem : null,
-      level: initCtx ? initCtx._njLevel : null,
-      getData,
-      d: getData,
-      icp: _getLocalComponents(lc && lc._njParam ? lc2 : lc, initCtx)
-    });
+    return main(configs, ctx && ctx._njCtx ? tools.assign({}, ctx, {
+      data: tools.arrayPush(data, ctx.data)
+    }) : {
+        data,
+        getData,
+        get $this() {
+          return this.data[this.data.length - 1];
+        },
+        d: getData,
+        icp: _getLocalComponents(param1 && param1._njParam ? param2 : param1),
+        _njCtx: true
+      });
   };
 }
 
@@ -254,7 +233,6 @@ export function template(fns, tmplKey) {
     aa: addArgs,
     an: tools.assign,
     g: nj.global,
-    l: _getLevel,
     cf: callFilter
   };
 

@@ -10,7 +10,7 @@
 
 ```
 
-`NornJ`(读音[ˈnɔ:ndʒeɪ]，简称`nj`)是一个可以同React一起工作的模板引擎，**JSX的增强或替代工具**。
+`NornJ`(读音[ˌnɔ:nˈdʒeɪ]，简称`nj`)是一个可以同React一起工作的模板引擎，**JSX的增强或替代工具**。
 
 [![NPM Version][npm-image]][npm-url]
 <a href="https://www.npmjs.com/package/nornj"><img src="https://img.shields.io/npm/l/nornj.svg" alt="License"></a>
@@ -21,7 +21,7 @@
 
 [English](https://github.com/joe-sky/nornj/blob/master/README.md) | 简体中文
 
-> 通知：`NornJ`的最新版`5.0.0`即将发布，旧版`0.4.x`将不再更新。
+> 通知：NornJ的最新版`5.0.0`即将发布，旧版`0.4.x`将不再更新。
 
 ## 文档
 

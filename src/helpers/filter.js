@@ -49,7 +49,7 @@ export const filters = {
       return obj;
     }
 
-    return getAccessorData(obj[prop], options.context, options.level);
+    return getAccessorData(obj[prop], options.context);
   },
 
   '**': (val1, val2) => {
