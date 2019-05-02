@@ -38,7 +38,7 @@ export default function registerComponent(name, component, options) {
 }
 
 export function getComponentConfig(name) {
-  return componentConfig.get(tools.isString(name) ? components[name] : name);
+  return componentConfig.get(tools.isString(name) ? components[name] || name : name);
 }
 
 export function copyComponentConfig(component, from) {
