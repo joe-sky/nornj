@@ -75,7 +75,7 @@ module.exports = function (babel) {
         const _attrName = isDirective ? astUtil.transformDirective(attrName) : attrName;
         const attrStr = lastAttrStr + (i == 0 ? (!isComponent ? tagName : '') : '') + ' ' + _attrName + '=';
         let directiveConfig = isDirective ? nj.extensionConfig[_attrName != 'style'
-          ? _attrName.substr(1).replace(astUtil.REGEX_EX_ATTR, (all, name) => name)
+          ? _attrName.substr(2).replace(astUtil.REGEX_EX_ATTR, (all, name) => name)
           : _attrName] : {};
         !directiveConfig && (directiveConfig = {});
 
