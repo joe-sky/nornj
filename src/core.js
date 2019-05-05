@@ -16,3 +16,4 @@ nj.textTag = 'nj-text';
 nj.textMode = false;
 nj.noWsTag = 'nj-noWs';
 nj.noWsMode = false;
+nj.fixTagName = true;

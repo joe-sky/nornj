@@ -26,6 +26,7 @@
   nj.textMode = false;
   nj.noWsTag = 'nj-noWs';
   nj.noWsMode = false;
+  nj.fixTagName = true;
 
   function _typeof(obj) {
     if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") {
@@ -320,7 +321,7 @@
     return ret;
   }
   function getComponentConfig(name) {
-    return componentConfig.get(isString(name) ? components[name] : name);
+    return componentConfig.get(isString(name) ? components[name] || name : name);
   }
 
   function config (configs) {

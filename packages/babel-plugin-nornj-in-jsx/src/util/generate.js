@@ -26,7 +26,7 @@ function buildAttrs(types, tagName, attrs, quasis, expressions, lastAttrStr, new
       const attr = attrs[attrName];
 
       if (attr.type != 'JSXSpreadAttribute') {
-        let attrStr = lastAttrStr + (i == 0 ? '<#' + tagName : '') + ' ' + attrName + '=';
+        let attrStr = lastAttrStr + (i == 0 ? '<n-' + tagName : '') + ' ' + attrName + '=';
         let isGetDatasFromProp = false;
         if (getDatasFromProp) {
           isGetDatasFromProp = !datasFromPropExcept
@@ -39,11 +39,11 @@ function buildAttrs(types, tagName, attrs, quasis, expressions, lastAttrStr, new
         }
         if (isCtxObject && !isGetDatasFromProp && newContext[attrName] != null) {
           newContextData[attrName] = attr.value.value;
-          lastAttrStr += (i == 0 ? '<#' + tagName : '');
+          lastAttrStr += (i == 0 ? '<n-' + tagName : '');
         }
         else if (isCtxObject && !isGetDatasFromProp && newContext.datas && newContext.datas[attrName] != null) {
           newContextData.datas[attrName] = [newContextData.datas[attrName][0], attr.value.value];
-          lastAttrStr += (i == 0 ? '<#' + tagName : '');
+          lastAttrStr += (i == 0 ? '<n-' + tagName : '');
         }
         else if (!attr.value) {
           lastAttrStr = attrStr.substr(0, attrStr.length - 1);
@@ -106,7 +106,7 @@ function buildAttrs(types, tagName, attrs, quasis, expressions, lastAttrStr, new
     });
   }
   else {
-    lastAttrStr += '<#' + tagName;
+    lastAttrStr += '<n-' + tagName;
   }
 
   return lastAttrStr;

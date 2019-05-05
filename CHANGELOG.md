@@ -1,8 +1,12 @@
 # CHANGELOG
 
+## [v5.0.0-rc.7] 2019.05.05
+
+* 🌟 Changed the default template rule of tags from `<#extag>` to `<n-extag>`. If you need to adapt version 0.4, you can use `nj.config` to modify the rules.
+
 ## [v5.0.0-rc.5] 2019.04.14
 
-* 🌟 Support nj`<Extag></Extag>` auto transform to nj`<#extag></#extag>`.
+* 🌟 Support nj`<Extag></Extag>` auto transform to nj`<n-extag></n-extag>`.
 
 ## [v5.0.0-rc.1] 2019.04.02
 

@@ -127,6 +127,10 @@ const REGEX_LOWER_CASE = /^[a-z]/;
 
 export function fixExTagName(tagName, tmplRule) {
   let ret;
+  if (!nj.fixTagName) {
+    return ret;
+  }
+
   const _tagName = tools.lowerFirst(tagName),
     config = extensionConfig[_tagName];
   if (config && (!config.needPrefix || (config.needPrefix == 'onlyUpperCase' && REGEX_LOWER_CASE.test(tagName)))) {

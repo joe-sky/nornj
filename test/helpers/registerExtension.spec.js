@@ -48,39 +48,30 @@ describe('Register extension tag', () => {
 
   it('2 layers', () => {
     expect(render(`
-      <#wrap1>
-        <#wrap2 />
-      </#wrap1>
+      <wrap1>
+        <wrap2 />
+      </wrap1>
     `)).toBe('subProps:test');
   });
 
   it('3 layers', () => {
     expect(render(`
-      <#wrap1>
-        <#wrap2>
-          <@title>1</@title>
-          <#wrap3 />
-        </#wrap2>
-      </#wrap1>
+      <wrap1>
+        <wrap2>
+          <p-title>1</p-title>
+          <wrap3 />
+        </wrap2>
+      </wrap1>
     `)).toBe('subProps:test3');
   });
 
   it('3 layers', () => {
-    // console.log(precompile(`
-    //   <#wrap1>
-    //     <#props>
-    //       <#wrap5>
-    //         <#wrap4 />
-    //       </#wrap5>
-    //     </#props>
-    //   </#wrap1>
-    // `, false, createTmplRule()).main.toString());
     expect(render(`
-      <#wrap1>
-        <#wrap5>
-          <#wrap4 />
-        </#wrap5>
-      </#wrap1>
+      <wrap1>
+        <wrap5>
+          <wrap4 />
+        </wrap5>
+      </wrap1>
     `)).toBe('subProps:test4');
   });
 });

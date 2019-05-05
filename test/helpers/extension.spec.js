@@ -4,9 +4,9 @@ import createTmplRule from '../../src/utils/createTmplRule';
 describe('Extension tag', () => {
   it('if', () => {
     expect(render(`
-      <#if {{a}}>
+      <if {{a}}>
         ok
-      </#if>
+      </if>
     `, {
       a: true
     })).toBe('ok');
@@ -14,10 +14,10 @@ describe('Extension tag', () => {
 
   it('else', () => {
     expect(render(`
-      <#if {{a}}>
+      <if {{a}}>
         ok
-        <#else>no</#else>
-      </#if>
+        <else>no</else>
+      </if>
     `, {
       a: false
     })).toBe('no');
@@ -25,11 +25,11 @@ describe('Extension tag', () => {
 
   it('elseif', () => {
     expect(render(`
-      <#if {{a}}>
+      <if {{a}}>
         a
-        <#elseif {{b}}>b</#elseif>
-        <#else>c</#else>
-      </#if>
+        <elseif {{b}}>b</elseif>
+        <else>c</else>
+      </if>
     `, {
       a: false,
       b: true
@@ -38,11 +38,11 @@ describe('Extension tag', () => {
 
   it('switch', () => {
     expect(render(`
-      <#switch {{a}}>
-        <#case {{1}}>1</#case>
-        <#case {{2}}>2</#case>
-        <#default>3</#default>
-      </#switch>
+      <switch {{a}}>
+        <case {{1}}>1</case>
+        <case {{2}}>2</case>
+        <default>3</default>
+      </switch>
     `, {
       a: 2
     })).toBe('2');
@@ -51,11 +51,11 @@ describe('Extension tag', () => {
   it('each for array', () => {
     expect(render(`
       <nj-noWs>
-        <#each {{list}} moreValues>
-          <#if {{!(@last)}}>
+        <each {{list}} moreValues>
+          <if {{!(@last)}}>
             <i>{{@item}}</i>
-          </#if>
-        </#each>
+          </if>
+        </each>
       </nj-noWs>
     `, {
       list: [1, 2, 3]
@@ -65,9 +65,9 @@ describe('Extension tag', () => {
   it('each for object', () => {
     expect(render(`
       <nj-noWs>
-        <#each {{list}}>
+        <each {{list}}>
           <i>key:{{@key}},value:{{@item}}</i>
-        </#each>
+        </each>
       </nj-noWs>
     `, {
       list: { a: 1, b: 2 }
@@ -75,9 +75,9 @@ describe('Extension tag', () => {
 
     expect(render(`
       <nj-noWs>
-        <#each {{1 .. 5}}>
+        <each {{1 .. 5}}>
           <i>{{@item}}</i>
-        </#each>
+        </each>
       </nj-noWs>
     `)).toBe('<i>1</i><i>2</i><i>3</i><i>4</i><i>5</i>');
   });
@@ -85,8 +85,8 @@ describe('Extension tag', () => {
   it('prop', () => {
     expect(render(`
       <input>
-        <@type>text</@type>
-        <@value>abc</@value>
+        <p-type>text</p-type>
+        <p-value>abc</p-value>
       </input>
     `)).toBe('<input type="text" value="abc" />');
   });
@@ -101,21 +101,21 @@ describe('Extension tag', () => {
   it('strProp', () => {
     expect(render(`
       <input>
-        <@@type>text</@@type>
-        <@@value>
+        <sp-type>text</sp-type>
+        <sp-value>
           a
           b
           c
-        </@@value>
+        </sp-value>
       </input>
     `)).toBe('<input type="text" value="abc" />');
   });
 
   it('with', () => {
     expect(render(`
-      <#with {{a.b}}>
+      <with {{a.b}}>
         {{c}}
-      </#with>
+      </with>
     `, {
       a: {
         b: {
@@ -127,9 +127,9 @@ describe('Extension tag', () => {
 
   it('with as', () => {
     expect(render(`
-      <#with {{a.b}} as="val">
+      <with {{a.b}} as="val">
         {{val.c}}
-      </#with>
+      </with>
     `, {
       a: {
         b: {
@@ -141,9 +141,9 @@ describe('Extension tag', () => {
 
   it('with multi parameters', () => {
     expect(render(`
-      <#with p1={{a}} p2={{a.b}}>
+      <with p1={{a}} p2={{a.b}}>
         {{p2.c}}-{{p1.d}}
-      </#with>
+      </with>
     `, {
       a: {
         b: {

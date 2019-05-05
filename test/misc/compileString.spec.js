@@ -131,9 +131,7 @@ describe('test compile string', function () {
             sky:{{name}},{{id}}
           </span>
           <span1>
-            <#props>
-              <#prop {{'test12'}}>test</#prop>
-            </#props>
+            <n-prop {{'test12'}}>test</n-prop>
             joe
           </span1>
           <div id=555>
@@ -155,18 +153,13 @@ describe('test compile string', function () {
 
       var tmpl3 = nj`
         <div class="{{id}} {{name3}}" {{name3}} {{ ...props}} name={{name1}} autofocus name1={{a.c.d}} name2="{{a.e .('f') .('g')}}" a="/%'aaa'%/">
-          <@name checked>{{test0 | filter1}}{{'test1' | filter2}}test2</@name>
-          <@checked />
-          <@data-name10>
-            <#each {{{list}}}>
-              <#if {{@item}}>{{ @index | filter2 }}<#else>{{ 100 | filter1 }}</#else></#if>
-            </#each>
-          </@data-name10>
-          <#props>
-            <#each {{list}}>
-              <#prop {{'data-name'}}>{{@item | filter1}}{{'test1'}}test2</#prop>
-            </#each>
-          </#props>
+          <p-name checked>{{test0 | filter1}}{{'test1' | filter2}}test2</p-name>
+          <p-checked />
+          <p-data-name10>
+            <each {{{list}}}>
+              <if {{@item}}>{{ @index | filter2 }}<else>{{ 100 | filter1 }}</else></if>
+            </each>
+          </p-data-name10>
           <input autofocus />
           <br><!--#</br>#-->
           test2
@@ -179,17 +172,16 @@ describe('test compile string', function () {
             </section>
             <input type=button />
             #${nj`
-              <#each {{ list2 }}>
-                <#each {{list}}>
-                  <@moreValues />
-                  <#if {{@last | filter3}}>
+              <each {{ list2 }}>
+                <each {{list}}>
+                  <if {{@last | filter3}}>
                     {{../../list2.length}}split{{@index}}
-                  </#if>
-                </#each>
+                  </if>
+                </each>
                 <slider {{../name3}}>
                   <{{../sliderItem.a|tagName}} no1={{no}} no2="{{-0.05 | filter2}}" checked no='{{ ../sliderItem.b }}' />
                 </slider>
-              </#each>
+              </each>
             `}
           </span>
         </div>
@@ -199,12 +191,12 @@ describe('test compile string', function () {
       
       <img src="test1.png">
       {{{JSON.stringify_(@data[0])}}}
-      <#each {{ list2 }}>
+      <each {{ list2 }}>
         <!--<i>test</i>-->
         <![CDATA[
           test2
         ]]>
-        <#pre>
+        <n-pre>
           <!-- <message> Welcome to YiiBai </message> -->
           <![CDATA[
             function() {
@@ -212,57 +204,53 @@ describe('test compile string', function () {
             }
             <message> Welcome to YiiBai </message>
           ]]>
-        </#pre>
+        </n-pre>
         <div {{...props}} ...${{ id10: 'id_10' }}>
-          <@id>{{'bbb' + (${'aaa'}) + (${'ccc'} | filter2)}}</@id>
-          <@name>
+          <p-id>{{'bbb' + (${'aaa'}) + (${'ccc'} | filter2)}}</p-id>
+          <p-name>
             img
             img
-          </@name>
-          <#props>
-            <!--# <#if {{id > (50) && (id <= (100))}}> #-->
-              <@id1>d{{@g.parseInt_(2.01, 10)}}</@id1>
-            <!--# </#if> #-->
-          </#props>
-          <@name1>{{../@data[2].name1}}</@name1>
+          </p-name>
+          <p-id1>d{{@g.parseInt_(2.01, 10)}}</p-id1>
+          <p-name1>{{../@data[2].name1}}</p-name1>
         </div>
-        <#each {{list}}>
+        <each {{list}}>
           {{../../list2.length}}${'split1'}{{../@index}}
-        </#each>
-        <#textExpr>
-          <@@a />
-          <#strArg>
+        </each>
+        <n-textExpr>
+          <sp-a />
+          <n-strArg>
             num:
-            <#block>
+            <n-block>
               {{[1, 2, 3]}}
-            </#block>
-            <#block>
+            </n-block>
+            <n-block>
               {{[4, 5, 6]}}
-            </#block>
-          </#strArg>
-          <#arg>{{1 +(2)}}</#arg>
+            </n-block>
+          </n-strArg>
+          <n-arg>{{1 +(2)}}</n-arg>
           <img /><img />
-          <@@name>
+          <sp-name>
             img
             <div>
-              <@name>
+              <p-name>
                 1
                 2
                 {{[3, 4, 5]}}
-              </@name>
+              </p-name>
             </div>
             {{[1, 2]}}
-          </@@name>
-        </#textExpr>
+          </sp-name>
+        </n-textExpr>
         <slider {{../name3}} step="{{'name5' | vm_var}}">
           <div></div>
           <script></script>
-          <#prop {{'name1' | vm_var}} />
-          <#vm-include src="../a.vm" />
-          #${nj`<#each {{list}}>
+          <n-prop {{'name1' | vm_var}} />
+          <n-vm-include src="../a.vm" />
+          #${nj`<each {{list}}>
                   {{@item}}
                   {{@item}}
-                </#each>
+                </each>
                 <div>
                   111
                   #${nj`<span>1</span>`}
@@ -270,7 +258,7 @@ describe('test compile string', function () {
           #${nj`<div>{{../name3.substring(0, 3)}}</div>`}
           <{{tagName(../sliderItem.('a'),1,2)}} no0="/" no1={{no}} no2="{{-0.05 | filter2}}" checked no='{{ ../sliderItem.b }}' />
         </slider>
-      </#each>
+      </each>
       <$if {a.('length')}>1</$if>
       {{{a.c.d.substr(1) + ("a,(b)" + (@sq)) + 'a,b'}}}
       {{{[[JSON.stringify({a:'1',b:2}), 2], 3]}}}
@@ -283,13 +271,13 @@ describe('test compile string', function () {
           <${'span'}>aaa</${'span'}>
         </${'div'}>
       </${'div'}>
-      <#e1>111</#e1>
+      <n-e1>111</n-e1>
       {{Date.now()}} + {{Math.max(Math.max(10 + 1, 1), 2 + 20, 3)}}
       <img src="test1.png" a="{{1 + (5 ** 2) + 'abc ' + a.c.d}}" b="{{{'1 + 5'}}}" c="{{ false ?: 1 }}" alt="">
       {{fns[0]('fns[0]()')}}
       {{ -10 ..< 10 }}
-      <#each {{list}}>{{ ../_test_.slice(1) }}</#each>
-      <div data-auto :name="1 + props.n2 + ({ a: 20, b: ({ c: 50 }) }.('b').('c'))" :name2="1 > 2"><@id>1</@id></div>
+      <each {{list}}>{{ ../_test_.slice(1) }}</each>
+      <div data-auto :name="1 + props.n2 + ({ a: 20, b: ({ c: 50 }) }.('b').('c'))" :name2="1 > 2"><p-id>1</p-id></div>
       {{'123'[1]['length'] + ([[[-1, 0], 1], 2, 3])}}
       {{moment('2011-10-10', 'hh:mm:ss').format('hh:mm:ss')}}
       <div :#show="'1' !== '1'">

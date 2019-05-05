@@ -30,18 +30,18 @@ describe('test speed', function() {
 
   var tmpl = Nj `
   <{div} id="{num}_100'200'">
-    <@class useString>
+    <p-class useString>
       test
-      <#if {true}>
+      <if {true}>
         Ok
-      </#if>
-    </@class>
+      </if>
+    </p-class>
     <pre>
       <input />
       aaa
       <img />
     </pre>
-    <#pre>
+    <n-pre>
     <!--
       aaa
       <div>
@@ -53,81 +53,76 @@ describe('test speed', function() {
         <span />
       </div>
     ]]>
-    </#pre>
+    </n-pre>
     #${t1}
     ${t2()}
-    <#each ${[1, 2, 3]}>
+    <each ${[1, 2, 3]}>
       #${(ctx) => {
         return ctx.getData('no') + 1;
       }}
-    </#each>
+    </each>
     <TestComp2>
-      <@store><#obj id=1 name="2" /></@store>
+      <p-store><n-obj id=1 name="2" /></p-store>
     </TestComp2>
-    <#each {arr}>
+    <each {arr}>
       <span class=test_{@index}
             style={../styles}
             onClick={../onClick}>
         test_{../num}
-        <#each {../list2}>
+        <each {../list2}>
           <div key={@index}>
-            <#props>
-              <#if {../@index | five}>
-                <@name>five</@name>
-              </#if>
-            </#props>
             <span>span{no}</span>
             <i>{no-1 ? 10 : 20}</i>
           </div>
-        </#each>
+        </each>
       </span>
-      <#if {@index | five(1)}>
+      <if {@index | five(1)}>
         <br />
-        <#elseif {@index >= 1}>
+        <elseif {@index >= 1}>
           <img name="elseif" />
-        </#elseif>
-        <#else>
+        </elseif>
+        <else>
           <img />
-        </#else>
-      </#if>
-      <#switch {@index}>
-        <#case {1}>
+        </else>
+      </if>
+      <switch {@index}>
+        <case {1}>
           <img name="case_1{100 | test(500, styles.color)}" />
-        </#case>
-        <#case {2}>
+        </case>
+        <case {2}>
           <img name="case_2" />
-        </#case>
-        <#default>
+        </case>
+        <default>
           <img name="case_default" />
-        </#default>
-      </#switch>
-    </#each>
+        </default>
+      </switch>
+    </each>
   </{div}>
   `;
 
   var tmpl2 = Nj `
   <{div} id="{num}_100">
-    <#each {arr}>
+    <each {arr}>
       {item.name['fullName']}
       <span class=test_{@index}
             style={../styles}
             onClick={../onClick}>
         test_{../num}
-        <#each {../list2}>
+        <each {../list2}>
           <div key={@index}>
             <span>span{no}</span>
             <i>{no}</i>
             <div><i><i>1000</i></i><i><i>1000</i></i><i><i>1000</i></i><i><i>1000</i></i><i><i>1000</i></i></div>
           </div>
-        </#each>
+        </each>
       </span>
-      <#if {@index | five(1)}>
+      <if {@index | five(1)}>
         <br />
-        <#else>
+        <else>
           <img />
-        </#else>
-      </#if>
-    </#each>
+        </else>
+      </if>
+    </each>
   </{div}>
   `;
 
@@ -239,32 +234,27 @@ describe('test speed', function() {
   var _tmpl = Nj `
   <{div} id="{num}_100" {...props}>
     &nbsp;1&gt;2
-    <#each {arr}>
+    <each {arr}>
       <TestComp id={'false'}>
       </TestComp>
       <span class=test_{@index}
             style={../styles}
             onClick={../onClick}>
         test_{../num}
-        <#each {../list2}>
+        <each {../list2}>
           <div key={@index}>
-            <#props>
-              <#if {../@index | five}>
-                <@name>five</@name>
-              </#if>
-            </#props>
             <span>span{no}</span>
             <i>{no}</i>
           </div>
-        </#each>
+        </each>
       </span>
-      <#if {@index | five(1) | test}>
+      <if {@index | five(1) | test}>
         <br />
-        <#else>
+        <else>
           <img />
-        </#else>
-      </#if>
-    </#each>
+        </else>
+      </if>
+    </each>
   </{div}>
   `;
 
@@ -288,20 +278,20 @@ describe('test speed', function() {
 
   var tmplNj = `
   <{{div}} id="{{num}}_100" id2="2">
-    <#each {{arr}}>
+    <each {{arr}}>
       <span class="test_{{@index}}">
         test_{{../num}}
-        <#each {{../list2}}>
+        <each {{../list2}}>
           {{no}}{{no}}<div>{{no}}</div>{{no}}{{no}}
-        </#each>
+        </each>
       </span>
-      <#if {{@index | five}}>
+      <if {{@index | five}}>
         <br />
-        <#else>
+        <else>
           <img />
-        </#else>
-      </#if>
-    </#each>
+        </else>
+      </if>
+    </each>
   </{{div}}>
   `;
 
@@ -462,7 +452,7 @@ describe('test speed', function() {
 
     nj.registerComponent('TestComp', createReactClass({
       render: function() {
-        return Nj `<div><#each {arr}></#each></div>` ({
+        return Nj `<div><each {arr}></each></div>` ({
           arr: _.times(2, function(n) {
             return n;
           })

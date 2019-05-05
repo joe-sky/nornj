@@ -93,14 +93,14 @@ declare function nj(strs: TemplateStringsArray, ...args: any);
 /**
  * NornJ tagged templates syntax `njs`(full name is `nj.taggedTmpl`), example:
  * 
- * `njs'<#each {[1, 2, 3]}><i key={@index}>{@item}</i></#each>'()`
+ * `njs'<each {[1, 2, 3]}><i key={@index}>{@item}</i></each>'()`
  */
 declare function njs(strs: TemplateStringsArray, ...args: any);
 
 /**
  * NornJ tagged templates syntax `t`(full name is `nj.template`), example:
  * 
- * `t'<#each {[1, 2, 3]}><i key={@index}>{@item}</i></#each>'`
+ * `t'<each {[1, 2, 3]}><i key={@index}>{@item}</i></each>'`
  */
 declare function t(strs: TemplateStringsArray, ...args: any);
 

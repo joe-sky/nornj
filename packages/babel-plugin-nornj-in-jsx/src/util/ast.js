@@ -200,7 +200,7 @@ exports.isDirective = isDirective;
 
 exports.transformDirective = function (attrName) {
   const ret = attrName.substr(2);
-  return (ret === 'style' ? '' : '#') + ret;
+  return (ret === 'style' ? '' : 'n-') + ret;
 };
 
 exports.REGEX_CAPITALIZE = /^[A-Z][\s\S]*$/;

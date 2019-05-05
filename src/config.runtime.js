@@ -1,14 +1,16 @@
 ﻿import nj from './core';
 
 export default function (configs) {
-  const createElement = configs.createElement,
-    outputH = configs.outputH;
+  const {
+    createElement,
+    outputH
+  } = configs;
 
-  if(createElement) {
+  if (createElement) {
     nj.createElement = createElement;
   }
 
-  if(outputH != null) {
+  if (outputH != null) {
     nj.outputH = outputH;
   }
 };

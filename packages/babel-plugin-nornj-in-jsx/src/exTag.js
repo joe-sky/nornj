@@ -69,11 +69,11 @@ module.exports = function (babel) {
           subChildrenExpression.newContextData = subNewContextData;
           expressions.push(subChildrenExpression);
 
-          lastAttrStr = '</#' + subElName + '>';
+          lastAttrStr = '</n-' + subElName + '>';
         });
 
         quasis.push(types.TemplateElement({
-          cooked: lastAttrStr + '</#' + elName + '>'
+          cooked: lastAttrStr + '</n-' + elName + '>'
         }));
       }
       else {
@@ -84,7 +84,7 @@ module.exports = function (babel) {
         expressions.push(childrenExpression);
 
         quasis.push(types.TemplateElement({
-          cooked: '</#' + elName + '>'
+          cooked: '</n-' + elName + '>'
         }));
       }
     }

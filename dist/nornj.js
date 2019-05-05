@@ -26,6 +26,7 @@
   nj.textMode = false;
   nj.noWsTag = 'nj-noWs';
   nj.noWsMode = false;
+  nj.fixTagName = true;
 
   function _typeof(obj) {
     if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") {
@@ -358,7 +359,7 @@
     return ret;
   }
   function getComponentConfig(name) {
-    return componentConfig.get(isString(name) ? components[name] : name);
+    return componentConfig.get(isString(name) ? components[name] || name : name);
   }
   function copyComponentConfig(component, from) {
     componentConfig.set(component, componentConfig.get(from));
@@ -404,11 +405,11 @@
         _nj$tmplRule$endRule = _nj$tmplRule.endRule,
         endRule = _nj$tmplRule$endRule === void 0 ? '}}' : _nj$tmplRule$endRule,
         _nj$tmplRule$extensio = _nj$tmplRule.extensionRule,
-        extensionRule = _nj$tmplRule$extensio === void 0 ? '#' : _nj$tmplRule$extensio,
+        extensionRule = _nj$tmplRule$extensio === void 0 ? 'n-' : _nj$tmplRule$extensio,
         _nj$tmplRule$propRule = _nj$tmplRule.propRule,
-        propRule = _nj$tmplRule$propRule === void 0 ? '@' : _nj$tmplRule$propRule,
+        propRule = _nj$tmplRule$propRule === void 0 ? 'p-' : _nj$tmplRule$propRule,
         _nj$tmplRule$strPropR = _nj$tmplRule.strPropRule,
-        strPropRule = _nj$tmplRule$strPropR === void 0 ? '@' : _nj$tmplRule$strPropR,
+        strPropRule = _nj$tmplRule$strPropR === void 0 ? 's' : _nj$tmplRule$strPropR,
         _nj$tmplRule$template = _nj$tmplRule.templateRule,
         templateRule = _nj$tmplRule$template === void 0 ? 'template' : _nj$tmplRule$template,
         _nj$tmplRule$tagSpRul = _nj$tmplRule.tagSpRule,
@@ -482,7 +483,7 @@
       braceParamStr: braceParamStr,
       xmlOpenTag: _createRegExp('^<([a-z' + firstChar + extensionRules + '][^\\s>]*)[^>]*>$', 'i'),
       openTagParams: _createRegExp('[\\s]+(((' + startRuleR + '(' + varContent + ')' + endRuleR + ')|(' + startRule + '(' + varContent + ')' + endRule + '))|[^\\s=>]+)(=((\'[^\']+\')|("[^"]+")|([^"\'\\s]+)))?', 'g'),
-      directives: _createRegExp('[\\s]+(((' + startRuleR + '(' + varContent + ')' + endRuleR + ')|(' + startRule + '(' + varContent + ')' + endRule + '))|((:?)(' + escapeExtensionRule + '|n-)?([^\\s=>]+)))(=((\'[^\']+\')|("[^"]+")|([^"\'\\s>]+)))?', 'g'),
+      directives: _createRegExp('[\\s]+(((' + startRuleR + '(' + varContent + ')' + endRuleR + ')|(' + startRule + '(' + varContent + ')' + endRule + '))|((:?)(' + escapeExtensionRule + ')?([^\\s=>]+)))(=((\'[^\']+\')|("[^"]+")|([^"\'\\s>]+)))?', 'g'),
       braceParam: _createRegExp(braceParamStr, 'i'),
       braceParamG: _createRegExp(braceParamStr, 'ig'),
       spreadProp: _createRegExp('[\\s]+(' + startRuleR + '[\\s]*(' + varContentS + ')' + endRuleR + ')|(' + startRule + '[\\s]*(' + varContentS + ')' + endRule + ')', 'g'),
@@ -514,7 +515,8 @@
         createElement = configs.createElement,
         outputH = configs.outputH,
         textMode = configs.textMode,
-        noWsMode = configs.noWsMode;
+        noWsMode = configs.noWsMode,
+        fixTagName = configs.fixTagName;
 
     if (delimiters) {
       createTmplRule(delimiters, true);
@@ -538,6 +540,10 @@
 
     if (noWsMode != null) {
       nj.noWsMode = noWsMode;
+    }
+
+    if (fixTagName != null) {
+      nj.fixTagName = fixTagName;
     }
   }
 
@@ -1978,6 +1984,10 @@
   var REGEX_LOWER_CASE = /^[a-z]/;
   function fixExTagName(tagName, tmplRule) {
     var ret;
+
+    if (!nj.fixTagName) {
+      return ret;
+    }
 
     var _tagName = lowerFirst(tagName),
         config = extensionConfig[_tagName];

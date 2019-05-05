@@ -14,7 +14,7 @@ describe('test compile string', function () {
     it('test compile simple', function () {
       const tmpl = nj`
         <${'div1'} class="{{id}} {{name3}}" {{name3}} {{ ...props}} name={{name1}} autofocus name1={{a.c.d}} name2="{{ [a[a.e['h']].f.g, 2] }}" a="/%'aaa'%/" {{... Object.assign({ e: 0 }, ${{ a: '...123', b: 2 }}, { c: 3 }) }} {{... ${{ g: '...123', b: 20 }} }}>
-          <!--# <#prop {{'name1' | vm_var}} /> #-->
+          <!--# <n-prop {{'name1' | vm_var}} /> #-->
           {{1 + ${2} + 3 + ${4}}}
           {{-111 + 222-333 + -555}}
           {{{
@@ -32,25 +32,25 @@ describe('test compile string', function () {
           {{ a.#prop }}
           {{ { a: 1 }.a }}
           <i>test</i>
-          <#each {{1 .. 2}}>
+          <each {{1 .. 2}}>
             {{@item}}
             #${({ item, index }) => item + 100 * index}
             {{@root.test}}
             {{@context.data[2].a.b}}
             {{../@context.data[1].a.b}}
-            <#each {{1 .. 2}}>
+            <each {{1 .. 2}}>
               {{../../@context.data[1].a.b}}
-            </#each>
-          </#each>
+            </each>
+          </each>
           {{ set a.b = '__cde' }}{{ a.b }}
-          <#if {{ a._ > 100 }}>{{ set x = '__yzx' }}</#if>{{ x }}
+          <if {{ a._ > 100 }}>{{ set x = '__yzx' }}</if>{{ x }}
           {{{${nj.template`
             <input value="${100}">
           `}}}}
           {{!a.f != !x}}
           {{(('abc') + ('def')).substr((2), ((2 - 1)))}}
           {{{${nj.expression`${10} .. ${20}`}}}}
-          <br><#css style="color:${'blue'};margin:${0};" />
+          <br><n-css style="color:${'blue'};margin:${0};" />
           {{{${JSON.stringify(nj.css`
             color:${'yel'}low;
             margin:${0};
@@ -114,10 +114,10 @@ describe('test compile string', function () {
     it('tag no prefix', function () {
       const tmpl = nj`
         <If {{true}}>
-          <#switch value={{5}}>
+          <n-switch value={{5}}>
             <Case value={{1}}>111</Case>
             <default>555</default>
-          </#switch>
+          </n-switch>
         </If>
       `;
 

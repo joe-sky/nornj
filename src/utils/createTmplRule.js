@@ -34,9 +34,9 @@ export default function createTmplRule(rules = {}, isGlobal) {
   let {
     startRule = '{{',
     endRule = '}}',
-    extensionRule = '#',
-    propRule = '@',
-    strPropRule = '@',
+    extensionRule = 'n-',
+    propRule = 'p-',
+    strPropRule = 's',
     templateRule = 'template',
     tagSpRule = '#$@',
     commentRule = '#'
@@ -105,7 +105,7 @@ export default function createTmplRule(rules = {}, isGlobal) {
     braceParamStr,
     xmlOpenTag: _createRegExp('^<([a-z' + firstChar + extensionRules + '][^\\s>]*)[^>]*>$', 'i'),
     openTagParams: _createRegExp('[\\s]+(((' + startRuleR + '(' + varContent + ')' + endRuleR + ')|(' + startRule + '(' + varContent + ')' + endRule + '))|[^\\s=>]+)(=((\'[^\']+\')|("[^"]+")|([^"\'\\s]+)))?', 'g'),
-    directives: _createRegExp('[\\s]+(((' + startRuleR + '(' + varContent + ')' + endRuleR + ')|(' + startRule + '(' + varContent + ')' + endRule + '))|((:?)(' + escapeExtensionRule + '|n-)?([^\\s=>]+)))(=((\'[^\']+\')|("[^"]+")|([^"\'\\s>]+)))?', 'g'),
+    directives: _createRegExp('[\\s]+(((' + startRuleR + '(' + varContent + ')' + endRuleR + ')|(' + startRule + '(' + varContent + ')' + endRule + '))|((:?)(' + escapeExtensionRule + ')?([^\\s=>]+)))(=((\'[^\']+\')|("[^"]+")|([^"\'\\s>]+)))?', 'g'),
     braceParam: _createRegExp(braceParamStr, 'i'),
     braceParamG: _createRegExp(braceParamStr, 'ig'),
     spreadProp: _createRegExp('[\\s]+(' + startRuleR + '[\\s]*(' + varContentS + ')' + endRuleR + ')|(' + startRule + '[\\s]*(' + varContentS + ')' + endRule + ')', 'g'),

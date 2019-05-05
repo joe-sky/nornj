@@ -10,9 +10,9 @@ describe('test compile string', function() {
   it('test include parser', function () {
     const tmplFn = NJ`
       <section>
-        <#include src="./resources/testInclude.html" />
+        <n-include src="./resources/testInclude.html" />
         <img />
-        <#include src="./resources/testInclude2.html" />
+        <n-include src="./resources/testInclude2.html" />
       </section>
     `;
 

@@ -174,12 +174,12 @@ class TestComponent extends Component {
     return (
       <div>
         {nj`
-          <#if ${a.b == 1}>
+          <if ${a.b == 1}>
             ${<i>ifBlock</i>}
-            <#else>
+            <else>
               ${<i>elseBlock</i>}
-            </#else>
-          </#if>
+            </else>
+          </if>
         `()}
       </div>
     );
@@ -281,14 +281,14 @@ class TestComponent extends Component {
     return (
       <div>
         {nj`
-          <#each ${[1, 2, 3]}>
+          <each ${[1, 2, 3]}>
             #${({ item: item, index: index }) => {
               return [
                 <i key={0}>{item}</i>
                 <i key={1}>{index}</i>
               ];
             }}
-          </#each>
+          </each>
         `()}
       </div>
     );
@@ -351,17 +351,17 @@ class TestComponent extends Component {
     return (
       <div>
         {nj`
-          <#switch {{${a.b}}}>
-            <#case {{${1}}}>
+          <switch {{${a.b}}}>
+            <case {{${1}}}>
               ${<i>1</i>}
-            </#case>
-            <#case {{${2}}}>
+            </case>
+            <case {{${2}}}>
               ${<i>2</i>}
-            </#case>
-            <#default>
+            </case>
+            <default>
               ${<i>3</i>}
-            </#default>
-          </#switch>
+            </default>
+          </switch>
         `()}
       </div>
     );
