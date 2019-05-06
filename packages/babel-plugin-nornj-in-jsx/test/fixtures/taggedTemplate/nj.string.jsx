@@ -5,7 +5,11 @@ module.exports = createReactClass({
   render: function () {
     return (
       <div dangerouslySetInnerHTML={{
-        __html: njs`<i>${'content'}</i>`()
+        __html: njs`
+          <if {{true}}>
+            <i>${'content'}</i>
+          </if>
+        `()
       }} />
     );
   }

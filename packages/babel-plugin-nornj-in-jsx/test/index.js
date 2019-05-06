@@ -10,11 +10,11 @@ require('@babel/register')({
   plugins: [
     styledJsx,
     [njInJsx, {
-      delimiters: {
-        start: '{',
-        end: '}',
-        comment: ''
-      },
+      // delimiters: {
+      //   start: '{',
+      //   end: '}',
+      //   comment: ''
+      // },
       filterConfig: {
         cut: {
           onlyGlobal: true,

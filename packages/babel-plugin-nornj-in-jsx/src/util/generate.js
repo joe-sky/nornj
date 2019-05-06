@@ -182,11 +182,11 @@ function createRenderTmpl(babel, quasis, expressions, opts, path, taggedName) {
   const tmplObj = _buildTmplFns(nj.precompile(
     tmplStr,
     !isTmplFnS ? (opts.outputH != null ? opts.outputH : true) : false,
-    nj.createTmplRule(opts.delimiters != null ? opts.delimiters : {
+    nj.createTmplRule(opts.delimiters != null ? opts.delimiters : (!isTmplFnS ? {
       start: '{',
       end: '}',
       comment: ''
-    })),
+    } : {}))),
     tmplKey);
 
   const tmplParams = [];
