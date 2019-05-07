@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [v5.0.0-rc.12] 2019.05.07
+
+* 🐞 Fixed error on auto add key for children elements with spread attributes.
+
 ## [v5.0.0-rc.7] 2019.04.14
 
 * 🌟 Support tagged template tag `html`.

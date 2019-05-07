@@ -131,17 +131,20 @@ function addKeyAttributeByReactCreateElement(types, node, keyValue) {
   }
   else {
     let keyFound = false;
+    const properties = node.arguments[1].properties;
 
-    node.arguments[1].properties.forEach(function (attrib) {
-      if (attrib.key.name === 'key') {
-        keyFound = true;
-        return false;
+    if (properties) {
+      properties.forEach(function (attrib) {
+        if (attrib.key.name === 'key') {
+          keyFound = true;
+          return false;
+        }
+      });
+
+      if (!keyFound) {
+        properties.push(types.objectProperty(types.identifier('key'),
+          types.stringLiteral(keyValue + '')));
       }
-    });
-
-    if (!keyFound) {
-      node.arguments[1].properties.push(types.objectProperty(types.identifier('key'),
-        types.stringLiteral(keyValue + '')));
     }
   }
 };
