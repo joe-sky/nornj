@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [v5.0.0-rc.8] 2019.05.08
+
+* 🌟 Support `key` variable for `each` tag in jsx.
+
 ## [v5.0.0-rc.7] 2019.05.05
 
 * 🌟 Changed the default template rule of tags from `<#extag>` to `<n-extag>`. If you need to adapt version 0.4, you can use `nj.config` to modify the rules.

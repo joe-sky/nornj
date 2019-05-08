@@ -7,7 +7,7 @@ function buildAttrs(types, tagName, attrs, quasis, expressions, lastAttrStr, new
   const exTagConfig = nj.extensionConfig[tagName];
   const newContext = exTagConfig && exTagConfig.newContext;
   const isCtxObject = nj.isObject(newContext);
-  const getDatasFromProp = newContext.getDatasFromProp;
+  const getDatasFromProp = newContext && newContext.getDatasFromProp;
   let datasFromPropExcept = getDatasFromProp && getDatasFromProp.except;
   if (isCtxObject) {
     Object.keys(newContext).forEach(k => {

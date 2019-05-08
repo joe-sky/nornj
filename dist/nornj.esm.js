@@ -1,5 +1,5 @@
 /*!
-* NornJ template engine v5.0.0-rc.7
+* NornJ template engine v5.0.0-rc.9
 * (c) 2016-2019 Joe_Sky
 * Released under the MIT License.
 */
@@ -973,27 +973,19 @@ var extensions = {
           item: item,
           newParent: true
         };
-        var extra;
 
         var _len = isArrayLike$1 ? len : lenObj;
 
-        extra = {
+        var extra = {
           '@first': param.index === 0,
           '@last': param.index === _len - 1
         };
 
         if (!isArrayLike$1) {
-          if (!extra) {
-            extra = {};
-          }
-
           extra['@key'] = index;
         }
 
-        if (extra) {
-          param.data.push(extra);
-        }
-
+        param.data.push(extra);
         var retI = options.children(param);
 
         if (useString) {
@@ -1148,7 +1140,8 @@ var extensionConfig = {
       index: 'index',
       datas: {
         first: ['@first', 'first'],
-        last: ['@last', 'last']
+        last: ['@last', 'last'],
+        key: ['@key', 'key']
       }
     }
   }),

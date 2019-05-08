@@ -116,22 +116,16 @@ export const extensions = {
           newParent: true
         };
 
-        let extra;
         const _len = isArrayLike ? len : lenObj;
-        extra = {
+        const extra = {
           '@first': param.index === 0,
           '@last': param.index === _len - 1
         };
 
         if (!isArrayLike) {
-          if (!extra) {
-            extra = {};
-          }
           extra['@key'] = index;
         }
-        if (extra) {
-          param.data.push(extra);
-        }
+        param.data.push(extra);
 
         let retI = options.children(param);
         if (useString) {
@@ -278,7 +272,8 @@ export const extensionConfig = {
       index: 'index',
       datas: {
         first: ['@first', 'first'],
-        last: ['@last', 'last']
+        last: ['@last', 'last'],
+        key: ['@key', 'key']
       }
     }
   }),
