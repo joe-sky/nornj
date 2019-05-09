@@ -16,10 +16,20 @@ module.exports = function (babel) {
     JSXElement: {
       enter(path, state) {
         const nodeName = path.node.openingElement.name.name;
-        if (nodeName != null && astUtil.isExTag(nodeName)) {
-          state.hasNjInJSX = true;
+        if (nodeName != null) {
+          const hasMobx = nodeName.toLowerCase() === 'mobxobserver';
+          hasMobx
+            && !nj.extensionConfig.mobxObserver
+            && utils.setTmplConfig({ extensionConfig: require('nornj-react/mobx/extensionConfig') });
 
-          path.replaceWith(exTagHandler(path.node, path, state));
+          if (astUtil.isExTag(nodeName)) {
+            state.hasNjInJSX = true;
+            if (hasMobx) {
+              state.hasMobxWithNj = true;
+            }
+
+            path.replaceWith(exTagHandler(path.node, path, state));
+          }
         }
       },
       exit(path, state) {
