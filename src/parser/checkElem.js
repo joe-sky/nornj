@@ -16,7 +16,7 @@ const NO_SPLIT_NEWLINE = [
 function _plainTextNode(obj, parent, parentContent, noSplitNewline, tmplRule) {
   const node = {};
   node.type = 'nj_plaintext';
-  node.content = [tranParam.compiledParam(obj, tmplRule, null, null, parent.ex != null ? tranElem.exCompileConfig(parent.ex).addSet : null)];
+  node.content = [tranParam.compiledParam(obj, tmplRule, null, null, parent.ex != null ? tranElem.exCompileConfig(parent.ex).isBindable : null)];
   node.allowNewline = noSplitNewline;
   parent[parentContent].push(node);
 }

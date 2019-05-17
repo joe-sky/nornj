@@ -241,7 +241,7 @@ function _config(params, extra) {
     newContext: true,
     isSubTag: false,
     isDirective: false,
-    addSet: false,
+    isBindable: false,
     useExpressionInJsx: 'onlyTemplateLiteral',
     hasName: true,
     noTagName: false,

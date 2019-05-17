@@ -540,7 +540,7 @@ class TestComponent extends Component {
 
 * 增加防抖效果
 
-可以同时使用`n-debounce`为`n-mobxBind`提供防抖效果：
+可以使用`debounce`修饰符为`n-mobxBind`提供防抖效果：
 
 ```js
 import { Component } from 'react';
@@ -550,15 +550,10 @@ class TestComponent extends Component {
   @observable inputValue = '';
 
   render() {
-    return <input n-mobxBind-defaultValue="inputValue" n-debounce={200} />;
+    return <input n-mobxBind-debounce$200="inputValue" />;
   }
 }
 ```
-
-使用方法如上，但有两个须要注意的地方：
-
-1. `n-debounce`必须在`n-mobxBind`的后面添加，注意顺序。
-2. `n-mobxBind`需要添加`defaultValue`参数。
 
 * 使用`action`更新变量
 
