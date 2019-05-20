@@ -24,9 +24,10 @@ function buildAttrs(types, tagName, attrs, quasis, expressions, lastAttrStr, new
   if (attrNames.length) {
     attrNames.forEach((attrName, i) => {
       const attr = attrs[attrName];
+      let attrStr = lastAttrStr + (i == 0 ? '<n-' + tagName : '');
 
       if (attr.type != 'JSXSpreadAttribute') {
-        let attrStr = lastAttrStr + (i == 0 ? '<n-' + tagName : '') + ' ' + attrName + '=';
+        attrStr = attrStr + ' ' + attrName + '=';
         let isGetDatasFromProp = false;
         if (getDatasFromProp) {
           isGetDatasFromProp = !datasFromPropExcept
@@ -97,7 +98,7 @@ function buildAttrs(types, tagName, attrs, quasis, expressions, lastAttrStr, new
       }
       else {
         quasis.push(types.TemplateElement({
-          cooked: ' '
+          cooked: attrStr + ' '
         }));
         attr.argument.isSpread = true;
         expressions.push(attr.argument);
@@ -139,6 +140,15 @@ function getDirectiveExpression(types, expr) {
   }
   else {
     return [expr.loc ? expr : expr.value];
+  }
+}
+
+function getDirectiveMemberExpression(types, expr) {
+  if (types.isMemberExpression(expr)) {
+    return [...getDirectiveMemberExpression(types, expr.object), ...getDirectiveMemberExpression(types, expr.property)];
+  }
+  else {
+    return [expr];
   }
 }
 
@@ -251,11 +261,7 @@ function createRenderTmpl(babel, quasis, expressions, opts, path, taggedName) {
     renderFnParams.push(types.objectExpression(tmplParams));
   }
   if (!isTmplFn) {
-    renderFnParams.push(path.scope.hasBinding('props') ? types.identifier('props') :
-      types.conditionalExpression(types.thisExpression(), types.memberExpression(
-        types.thisExpression(),
-        types.identifier('props')
-      ), types.nullLiteral()), types.thisExpression());
+    renderFnParams.push(types.thisExpression());
   }
 
   return types.CallExpression(
@@ -283,5 +289,6 @@ module.exports = {
   buildAttrs,
   getElName,
   getDirectiveExpression,
+  getDirectiveMemberExpression,
   createRenderTmpl
 };

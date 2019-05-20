@@ -301,6 +301,10 @@ function _setElem(elem, elemName, elemParams, elemArr, bySelfClose, tmplRule, ou
     if (fixedExTagName) {
       ret = tmplRule.extensionRule + tools.lowerFirst(ret);
     }
+
+    const retS = _getSplitParams(ret, tmplRule, outputH);
+    ret = retS.elem;
+    paramsEx = retS.params;
   } else if (tranElem.isStrPropS(elemName, tmplRule)) {
     ret = _transformToEx(true, elemName, elemParams, tmplRule);
   } else if (tranElem.isPropS(elemName, tmplRule)) {

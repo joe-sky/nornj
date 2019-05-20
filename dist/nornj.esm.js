@@ -1,5 +1,5 @@
 /*!
-* NornJ template engine v5.0.0-rc.9
+* NornJ template engine v5.0.0-rc.10
 * (c) 2016-2019 Joe_Sky
 * Released under the MIT License.
 */
@@ -1097,8 +1097,8 @@ function _config(params, extra) {
     newContext: true,
     isSubTag: false,
     isDirective: false,
-    addSet: false,
-    useExpressionInJsx: 'onlyTemplateLiteral',
+    isBindable: false,
+    useExpressionInProps: true,
     hasName: true,
     noTagName: false,
     hasTagProps: true,
@@ -1159,7 +1159,7 @@ var extensionConfig = {
     }
   }),
   style: {
-    useExpressionInJsx: false,
+    useExpressionInProps: false,
     needPrefix: true
   }
 };
@@ -2027,7 +2027,7 @@ var NO_SPLIT_NEWLINE = ['style', 'script', 'textarea', 'pre', 'xmp', 'template',
 function _plainTextNode(obj, parent, parentContent, noSplitNewline, tmplRule) {
   var node = {};
   node.type = 'nj_plaintext';
-  node.content = [compiledParam(obj, tmplRule, null, null, parent.ex != null ? exCompileConfig(parent.ex).addSet : null)];
+  node.content = [compiledParam(obj, tmplRule, null, null, parent.ex != null ? exCompileConfig(parent.ex).isBindable : null)];
   node.allowNewline = noSplitNewline;
   parent[parentContent].push(node);
 }
@@ -3361,15 +3361,20 @@ function _setElem(elem, elemName, elemParams, elemArr, bySelfClose, tmplRule, ou
     if (fixedExTagName) {
       ret = tmplRule.extensionRule + lowerFirst(ret);
     }
+
+    var retS = _getSplitParams(ret, tmplRule, outputH);
+
+    ret = retS.elem;
+    paramsEx = retS.params;
   } else if (isStrPropS(elemName, tmplRule)) {
     ret = _transformToEx(true, elemName, elemParams, tmplRule);
   } else if (isPropS(elemName, tmplRule)) {
     ret = _transformToEx(false, elemName, elemParams, tmplRule);
   } else {
-    var retS = _getSplitParams(elem, tmplRule, outputH);
+    var _retS = _getSplitParams(elem, tmplRule, outputH);
 
-    ret = retS.elem;
-    paramsEx = retS.params;
+    ret = _retS.elem;
+    paramsEx = _retS.params;
   }
 
   if (bySelfClose) {

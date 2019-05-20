@@ -242,7 +242,7 @@ function _config(params, extra) {
     isSubTag: false,
     isDirective: false,
     isBindable: false,
-    useExpressionInJsx: 'onlyTemplateLiteral',
+    useExpressionInProps: true,
     hasName: true,
     noTagName: false,
     hasTagProps: true,
@@ -280,7 +280,7 @@ export const extensionConfig = {
   prop: _config(_defaultCfg, { isDirective: true, needPrefix: true, hasTagProps: true }),
   obj: _config(_defaultCfg, { needPrefix: true }),
   'with': _config(_defaultCfg, { newContext: { getDatasFromProp: true } }),
-  style: { useExpressionInJsx: false, needPrefix: true }
+  style: { useExpressionInProps: false, needPrefix: true }
 };
 extensionConfig.elseif = _config(extensionConfig['else']);
 extensionConfig.spread = _config(extensionConfig.prop);

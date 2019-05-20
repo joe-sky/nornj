@@ -84,26 +84,37 @@ module.exports = function (babel) {
         }
         else if (attr.value.type == 'JSXExpressionContainer') {
           const expr = attr.value.expression;
-          const cannotUseExpression = directiveConfig.useExpressionInJsx === false;
+          const cannotUseExpression = directiveConfig.useExpressionInProps === false;
 
-          if (isDirective && !cannotUseExpression && types.isStringLiteral(expr)) {
+          //Template literal case 1: `123 + abc`
+          if (isDirective && !cannotUseExpression && types.isStringLiteral(expr) && !expr.extra) {
             lastAttrStr = attrStr + '"{{' + expr.value + '}}"';
           }
-          //babel 6
-          else if (isDirective && !cannotUseExpression && types.isBinaryExpression(expr) && expr.operator === '+') {
-            const directiveExpressions = generate.getDirectiveExpression(types, expr);
-            _buildFromNjExp(directiveExpressions, attrStr);
-          }
-          //babel 7
+          //Template literal case 2: `123 + abc + ${def}`
           else if (isDirective && !cannotUseExpression && types.isCallExpression(expr)
-            && expr.callee.object.value === '' && expr.callee.property.name === 'concat') {
+            && types.isStringLiteral(expr.callee.object) && expr.callee.property.name === 'concat') {
             const directiveExpressions = expr.arguments.map(e => {
-              if (types.isStringLiteral(e)) {
+              if (types.isStringLiteral(e) && !e.extra) {
                 return e.value;
               }
               return e;
             });
+            if (expr.callee.object.value !== '') {
+              directiveExpressions.unshift(!expr.callee.object.extra ? expr.callee.object.value : expr.callee.object);
+            }
+
             _buildFromNjExp(directiveExpressions, attrStr);
+          }
+          else if (isDirective && !cannotUseExpression && directiveConfig.isBindable && types.isMemberExpression(expr)) {
+            const directiveMemberExpressions = generate.getDirectiveMemberExpression(types, expr);
+            quasis.push(types.TemplateElement({
+              cooked: attrStr + '"{{'
+            }));
+
+            const exprFirst = directiveMemberExpressions[0];
+            exprFirst.noExpression = true;
+            expressions.push(exprFirst);
+            lastAttrStr = '.' + directiveMemberExpressions.slice(1).map(e => e.name).join('.') + '}}"';
           }
           else {
             quasis.push(types.TemplateElement({
@@ -114,16 +125,11 @@ module.exports = function (babel) {
           }
         }
         else {
-          if (directiveConfig.useExpressionInJsx === true) {
-            lastAttrStr = attrStr + '"{{' + attr.value.value + '}}"';
-          }
-          else {
-            quasis.push(types.TemplateElement({
-              cooked: attrStr
-            }));
-            expressions.push(attr.value);
-            lastAttrStr = '';
-          }
+          quasis.push(types.TemplateElement({
+            cooked: attrStr
+          }));
+          expressions.push(attr.value);
+          lastAttrStr = '';
         }
       }
       else {

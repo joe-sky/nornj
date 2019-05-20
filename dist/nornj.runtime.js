@@ -1,5 +1,5 @@
 /*!
-* NornJ template engine v5.0.0-rc.9
+* NornJ template engine v5.0.0-rc.10
 * (c) 2016-2019 Joe_Sky
 * Released under the MIT License.
 */
@@ -893,8 +893,8 @@
       newContext: true,
       isSubTag: false,
       isDirective: false,
-      addSet: false,
-      useExpressionInJsx: 'onlyTemplateLiteral',
+      isBindable: false,
+      useExpressionInProps: true,
       hasName: true,
       noTagName: false,
       hasTagProps: true,
@@ -955,7 +955,7 @@
       }
     }),
     style: {
-      useExpressionInJsx: false,
+      useExpressionInProps: false,
       needPrefix: true
     }
   };

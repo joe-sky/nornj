@@ -11,14 +11,12 @@ describe('Precompile', () => {
 
   it('Extension attribute', () => {
     const ret = precompile(`
-      <div type="radio" n-show={{show}} n-noMargin-arg1-arg2.modifier1.modifier2={{show}}>
-        <i><n-test /></i>
-      </div>
+      <i><n-test {{...abc}} /></i>
     `, true, nj.tmplRule);
 
-    //console.log(ret.main.toString());
-    expect(Object.keys(ret).length).not.toBe(8);
-    expect(ret.main.toString()).toContain('g.x[\'noMargin\']');
+    console.log(ret.main.toString());
+    //expect(Object.keys(ret).length).not.toBe(8);
+    //expect(ret.main.toString()).toContain('g.x[\'noMargin\']');
   });
 
   xit('Simple', () => {

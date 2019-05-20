@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [v5.0.0-rc.10] 2019.05.20
+
+* 🌟 Support spread props in extension tags.
+
 ## [v5.0.0-rc.8] 2019.05.08
 
 * 🌟 Support `key` variable for `each` tag in jsx.
