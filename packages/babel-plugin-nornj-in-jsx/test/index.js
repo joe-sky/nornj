@@ -20,6 +20,17 @@ require('@babel/register')({
           onlyGlobal: true,
           hasOptions: true
         }
+      },
+      extensionConfig: {
+        simpleFor: {
+          newContext: {
+            datas: {
+              item: 'item',
+              index: 'index',
+              first: 'firstItem'
+            }
+          }
+        }
       }
     }],
     objectRestSpread
@@ -33,3 +44,4 @@ require('./specs/switch.spec');
 require('./specs/with.spec');
 require('./specs/directive.spec');
 require('./specs/taggedTemplate.spec');
+require('./specs/customTag.spec');

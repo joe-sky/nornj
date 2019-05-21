@@ -1,6 +1,6 @@
 {
   "name": "babel-plugin-nornj-in-jsx",
-  "version": "5.0.0-rc.21",
+  "version": "5.0.0-rc.22",
   "description": "Make the NornJ template work gracefully in the JSX environment",
   "author": {
     "name": "Joe_Sky",

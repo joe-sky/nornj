@@ -244,7 +244,12 @@ export function registerFilter(name, filter, options, mergeConfig) {
         if (!filterConfig[name]) {
           filterConfig[name] = _config();
         }
-        tools.assign(filterConfig[name], options);
+        if (tools.isObject(options)) {
+          tools.assign(filterConfig[name], options);
+        }
+        else {
+          filterConfig[name] = _config();
+        }
       }
       else {
         filterConfig[name] = _config(options);

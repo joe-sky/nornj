@@ -1,5 +1,5 @@
 /*!
-* NornJ template engine v5.0.0-rc.10
+* NornJ template engine v5.0.0-rc.11
 * (c) 2016-2019 Joe_Sky
 * Released under the MIT License.
 */
@@ -1011,7 +1011,11 @@
             extensionConfig[name] = _config();
           }
 
-          assign(extensionConfig[name], _options3);
+          if (isObject(_options3)) {
+            assign(extensionConfig[name], _options3);
+          } else {
+            extensionConfig[name] = _config();
+          }
         } else {
           extensionConfig[name] = _config(_options3);
         }
@@ -1287,7 +1291,11 @@
             filterConfig[name] = _config$1();
           }
 
-          assign(filterConfig[name], _options);
+          if (isObject(_options)) {
+            assign(filterConfig[name], _options);
+          } else {
+            filterConfig[name] = _config$1();
+          }
         } else {
           filterConfig[name] = _config$1(_options);
         }

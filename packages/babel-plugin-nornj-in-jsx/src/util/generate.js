@@ -43,7 +43,8 @@ function buildAttrs(types, tagName, attrs, quasis, expressions, lastAttrStr, new
           lastAttrStr += (i == 0 ? '<n-' + tagName : '');
         }
         else if (isCtxObject && !isGetDatasFromProp && newContext.datas && newContext.datas[attrName] != null) {
-          newContextData.datas[attrName] = [newContextData.datas[attrName][0], attr.value.value];
+          const attrDatas = newContextData.datas[attrName];
+          newContextData.datas[attrName] = [Array.isArray(attrDatas) ? attrDatas[0] : attrDatas, attr.value.value];
           lastAttrStr += (i == 0 ? '<n-' + tagName : '');
         }
         else if (!attr.value) {
@@ -231,9 +232,19 @@ function createRenderTmpl(babel, quasis, expressions, opts, path, taggedName) {
       if (newDatas) {
         const declarations = [];
         Object.keys(newDatas).forEach(k => {
+          let varName,
+            dataName;
+          if (Array.isArray(newDatas[k])) {
+            varName = newDatas[k][1];
+            dataName = newDatas[k][0];
+          }
+          else {
+            dataName = varName = newDatas[k];
+          }
+
           declarations.push(types.variableDeclarator(
-            types.Identifier(newDatas[k][1]),
-            types.callExpression(types.Identifier(CTX_GET_DATA), [types.stringLiteral(newDatas[k][0]), types.Identifier(CTX_DATA)])
+            types.Identifier(varName),
+            types.callExpression(types.Identifier(CTX_GET_DATA), [types.stringLiteral(dataName), types.Identifier(CTX_DATA)])
           ));
         });
 

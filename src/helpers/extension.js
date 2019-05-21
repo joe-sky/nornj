@@ -328,7 +328,12 @@ export function registerExtension(name, extension, options, mergeConfig) {
         if (!extensionConfig[name]) {
           extensionConfig[name] = _config();
         }
-        tools.assign(extensionConfig[name], options);
+        if (tools.isObject(options)) {
+          tools.assign(extensionConfig[name], options);
+        }
+        else {
+          extensionConfig[name] = _config();
+        }
       }
       else {
         extensionConfig[name] = _config(options);
