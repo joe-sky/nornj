@@ -270,7 +270,7 @@ export const extensionConfig = {
     newContext: {
       item: 'item',
       index: 'index',
-      datas: {
+      data: {
         first: ['@first', 'first'],
         last: ['@last', 'last'],
         key: ['@key', 'key']
@@ -279,7 +279,7 @@ export const extensionConfig = {
   }),
   prop: _config(_defaultCfg, { isDirective: true, needPrefix: true, hasTagProps: true }),
   obj: _config(_defaultCfg, { needPrefix: true }),
-  'with': _config(_defaultCfg, { newContext: { getDatasFromProp: true } }),
+  'with': _config(_defaultCfg, { newContext: { getDataFromProps: true } }),
   style: { useExpressionInProps: false, needPrefix: true }
 };
 extensionConfig.elseif = _config(extensionConfig['else']);

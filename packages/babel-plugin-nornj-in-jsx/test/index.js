@@ -24,13 +24,15 @@ require('@babel/register')({
       extensionConfig: {
         simpleFor: {
           newContext: {
-            datas: {
+            data: {
               item: 'item',
               index: 'index',
               first: 'firstItem'
             }
           }
-        }
+        },
+        while: true,
+        set: true
       }
     }],
     objectRestSpread

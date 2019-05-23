@@ -14,7 +14,7 @@ describe('Precompile', () => {
       <i><n-test {{...abc}} /></i>
     `, true, nj.tmplRule);
 
-    console.log(ret.main.toString());
+    //console.log(ret.main.toString());
     //expect(Object.keys(ret).length).not.toBe(8);
     //expect(ret.main.toString()).toContain('g.x[\'noMargin\']');
   });

@@ -15,6 +15,7 @@ export const filters = {
         source: obj.value,
         value: obj.value[prop],
         prop,
+        parent: obj,
         _njSrc: true
       };
     }

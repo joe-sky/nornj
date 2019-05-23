@@ -118,8 +118,8 @@ export function newContext(context, params) {
   return tools.assign({}, context, {
     data: params.data ? tools.arrayPush(params.data, context.data) : context.data,
     parent: params.newParent ? context : context.parent,
-    index: 'index' in params ? params.index : context.index,
-    item: 'item' in params ? params.item : context.item
+    index: params.index != null ? params.index : context.index,
+    item: params.item != null ? params.item : context.item
   });
 }
 

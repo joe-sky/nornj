@@ -1,6 +1,6 @@
 {
   "name": "babel-plugin-nornj-in-jsx",
-  "version": "5.0.0-rc.22",
+  "version": "5.0.0-rc.23",
   "description": "Make the NornJ template work gracefully in the JSX environment",
   "author": {
     "name": "Joe_Sky",
@@ -42,7 +42,7 @@
   },
   "dependencies": {
     "@babel/core": "^7.1.2",
-    "nornj": "^5.0.0-rc.10",
+    "nornj": "^5.0.0-rc.12",
     "nornj-react": "^5.0.0-rc.10"
   },
   "devDependencies": {
@@ -59,8 +59,8 @@
     "eslint-plugin-react": "^6.2.0",
     "istanbul": "^0.4.1",
     "mocha": "^3.0.2",
-    "react": "^16.3.0",
-    "react-dom": "^16.3.0",
+    "react": "^16.8.6",
+    "react-dom": "^16.8.6",
     "styled-jsx": "^2.2.7"
   }
 }

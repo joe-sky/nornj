@@ -14,3 +14,13 @@ describe('simpleFor tag', function () {
     expect(rendered).not.to.contain('<div>1</div>');
   });
 });
+
+describe('while tag', function () {
+  var While = require('../fixtures/customTag/while.jsx');
+
+  it('should render while tag', function () {
+    var rendered = util.render(While);
+    expect(rendered).to.contain('<div>5</div>');
+    expect(rendered).not.to.contain('<div>10</div>');
+  });
+});

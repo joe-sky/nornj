@@ -1,5 +1,5 @@
 /*!
-* NornJ template engine v5.0.0-rc.11
+* NornJ template engine v5.0.0-rc.12
 * (c) 2016-2019 Joe_Sky
 * Released under the MIT License.
 */
@@ -708,8 +708,8 @@ function newContext(context, params) {
   return assign({}, context, {
     data: params.data ? arrayPush(params.data, context.data) : context.data,
     parent: params.newParent ? context : context.parent,
-    index: 'index' in params ? params.index : context.index,
-    item: 'item' in params ? params.item : context.item
+    index: params.index != null ? params.index : context.index,
+    item: params.item != null ? params.item : context.item
   });
 } //修正属性名
 
@@ -1138,7 +1138,7 @@ var extensionConfig = {
     newContext: {
       item: 'item',
       index: 'index',
-      datas: {
+      data: {
         first: ['@first', 'first'],
         last: ['@last', 'last'],
         key: ['@key', 'key']
@@ -1155,7 +1155,7 @@ var extensionConfig = {
   }),
   'with': _config(_defaultCfg, {
     newContext: {
-      getDatasFromProp: true
+      getDataFromProps: true
     }
   }),
   style: {
@@ -1246,6 +1246,7 @@ var filters = {
         source: obj.value,
         value: obj.value[prop],
         prop: prop,
+        parent: obj,
         _njSrc: true
       };
     } else if (callFn) {

@@ -7,17 +7,17 @@ function buildAttrs(types, tagName, attrs, quasis, expressions, lastAttrStr, new
   const exTagConfig = nj.extensionConfig[tagName];
   const newContext = exTagConfig && exTagConfig.newContext;
   const isCtxObject = nj.isObject(newContext);
-  const getDatasFromProp = newContext && newContext.getDatasFromProp;
-  let datasFromPropExcept = getDatasFromProp && getDatasFromProp.except;
+  const getDataFromProps = newContext && newContext.getDataFromProps;
+  let dataFromPropsExcept = getDataFromProps && getDataFromProps.except;
   if (isCtxObject) {
     Object.keys(newContext).forEach(k => {
-      if (k !== 'getDatasFromProp') {
+      if (k !== 'getDataFromProps') {
         newContextData[k] = newContext[k];
       }
     });
 
-    if (getDatasFromProp && !newContextData.datas) {
-      newContextData.datas = {};
+    if (getDataFromProps && !newContextData.data) {
+      newContextData.data = {};
     }
   }
 
@@ -28,23 +28,23 @@ function buildAttrs(types, tagName, attrs, quasis, expressions, lastAttrStr, new
 
       if (attr.type != 'JSXSpreadAttribute') {
         attrStr = attrStr + ' ' + attrName + '=';
-        let isGetDatasFromProp = false;
-        if (getDatasFromProp) {
-          isGetDatasFromProp = !datasFromPropExcept
+        let isGetDataFromProps = false;
+        if (getDataFromProps) {
+          isGetDataFromProps = !dataFromPropsExcept
             ? true
-            : datasFromPropExcept.indexOf(attrName) < 0;
+            : dataFromPropsExcept.indexOf(attrName) < 0;
         }
 
-        if (isCtxObject && isGetDatasFromProp) {
-          newContextData.datas[attrName] = [attrName, attrName];
+        if (isCtxObject && isGetDataFromProps) {
+          newContextData.data[attrName] = [attrName, attrName];
         }
-        if (isCtxObject && !isGetDatasFromProp && newContext[attrName] != null) {
+        if (isCtxObject && !isGetDataFromProps && newContext[attrName] != null) {
           newContextData[attrName] = attr.value.value;
           lastAttrStr += (i == 0 ? '<n-' + tagName : '');
         }
-        else if (isCtxObject && !isGetDatasFromProp && newContext.datas && newContext.datas[attrName] != null) {
-          const attrDatas = newContextData.datas[attrName];
-          newContextData.datas[attrName] = [Array.isArray(attrDatas) ? attrDatas[0] : attrDatas, attr.value.value];
+        else if (isCtxObject && !isGetDataFromProps && newContext.data && newContext.data[attrName] != null) {
+          const attrDatas = newContextData.data[attrName];
+          newContextData.data[attrName] = [Array.isArray(attrDatas) ? attrDatas[0] : attrDatas, attr.value.value];
           lastAttrStr += (i == 0 ? '<n-' + tagName : '');
         }
         else if (!attr.value) {
@@ -153,7 +153,6 @@ function getDirectiveMemberExpression(types, expr) {
   }
 }
 
-const CTX_DATAS = 'datas';
 const CTX_DATA = 'data';
 const CTX_GET_DATA = 'getData';
 
@@ -213,7 +212,7 @@ function createRenderTmpl(babel, quasis, expressions, opts, path, taggedName) {
       let newDatas;
       if (newCtxDatakeys.length) {
         const properties = newCtxDatakeys.map(k => {
-          if (k !== CTX_DATAS) {
+          if (k !== CTX_DATA) {
             return types.objectProperty(types.Identifier(k), types.Identifier(e.newContextData[k]));
           }
           else {
