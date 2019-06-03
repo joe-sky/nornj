@@ -116,12 +116,6 @@ const addKeyAttribute = exports.addKeyAttribute = function (babelTypes, node, ke
   }
 };
 
-function isReactCreateElement(types, expr) {
-  return types.isCallExpression(expr)
-    && expr.callee.object.name === 'React'
-    && expr.callee.property.name === 'createElement';
-}
-
 function addKeyAttributeByReactCreateElement(types, node, keyValue) {
   if (types.isNullLiteral(node.arguments[1])) {
     node.arguments[1] = types.objectExpression([
@@ -178,9 +172,6 @@ exports.getSanitizedExpressionForContent = function (babelTypes, blocks, keyPref
 
     if (babelTypes.isJSXElement(thisBlock)) {
       addKeyAttribute(babelTypes, thisBlock, key);
-    }
-    else if (isReactCreateElement(babelTypes, thisBlock)) {
-      addKeyAttributeByReactCreateElement(babelTypes, thisBlock, key);
     }
   }
 

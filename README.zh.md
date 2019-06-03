@@ -25,7 +25,8 @@
 
 ## 文档
 
-* [NornJ指南v0.4(github pages版)](https://joe-sky.github.io/nornj-guide)
+* [NornJ指南(v5)](https://joe-sky.gitbooks.io/nornj-guide/zh/)
+* [NornJ指南(v0.4)](https://joe-sky.github.io/nornj-guide)
 
 ## 概述
 
