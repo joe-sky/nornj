@@ -35,7 +35,7 @@
 * 支持流程控制语法：
 
 ```js
-<each of={[1, 2, 3]}><i>{item}</i></each>
+<Each of={[1, 2, 3]}><i>{item}</i></Each>
 ```
 
 * 支持指令语法：
@@ -100,7 +100,7 @@ class App extends Component {
 * 使用`tagged templates`语法(结合[styled-components](https://github.com/styled-components/styled-components))：
 
 ```js
-const template = nj`
+const template = html`
   <Container>
     <ul>
       <each of={todos}>

@@ -43,7 +43,7 @@
   "dependencies": {
     "@babel/core": "^7.1.2",
     "nornj": "^5.0.0-rc.12",
-    "nornj-react": "^5.0.0-rc.10"
+    "nornj-react": "^5.0.0-rc.13"
   },
   "devDependencies": {
     "@babel/plugin-proposal-object-rest-spread": "^7.4.0",

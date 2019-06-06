@@ -35,7 +35,7 @@ In `React` development, the `JSX` can use almost all the syntax of javascript an
 * Support control statements：
 
 ```js
-<each of={[1, 2, 3]}><i>{item}</i></each>
+<Each of={[1, 2, 3]}><i>{item}</i></Each>
 ```
 
 * Support directives：
