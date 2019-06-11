@@ -39,7 +39,7 @@ export default function createTmplRule(rules = {}, isGlobal) {
     strPropRule = 's',
     templateRule = 'template',
     tagSpRule = '#$@',
-    commentRule = '#'
+    commentRule = '-'
   } = nj.tmplRule;
 
   let {

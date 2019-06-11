@@ -1,5 +1,5 @@
 /*!
-* NornJ template engine v5.0.0-rc.12
+* NornJ template engine v5.0.0-rc.13
 * (c) 2016-2019 Joe_Sky
 * Released under the MIT License.
 */
@@ -409,7 +409,7 @@ function createTmplRule() {
       _nj$tmplRule$tagSpRul = _nj$tmplRule.tagSpRule,
       tagSpRule = _nj$tmplRule$tagSpRul === void 0 ? '#$@' : _nj$tmplRule$tagSpRul,
       _nj$tmplRule$commentR = _nj$tmplRule.commentRule,
-      commentRule = _nj$tmplRule$commentR === void 0 ? '#' : _nj$tmplRule$commentR;
+      commentRule = _nj$tmplRule$commentR === void 0 ? '-' : _nj$tmplRule$commentR;
   var start = rules.start,
       end = rules.end,
       extension = rules.extension,
@@ -1132,7 +1132,7 @@ var extensionConfig = {
     hasTagProps: true
   }),
   'switch': _config(_defaultCfg, {
-    needPrefix: 'onlyUpperCase'
+    needPrefix: 'onlyLowerCase'
   }),
   each: _config(_defaultCfg, {
     newContext: {
@@ -1978,6 +1978,7 @@ function isExAll(obj, tmplRule) {
   return obj.match(tmplRule.exAll);
 }
 var REGEX_LOWER_CASE = /^[a-z]/;
+var REGEX_UPPER_CASE = /^[A-Z]/;
 function fixExTagName(tagName, tmplRule) {
   var ret;
 
@@ -1988,7 +1989,7 @@ function fixExTagName(tagName, tmplRule) {
   var _tagName = lowerFirst(tagName),
       config = extensionConfig[_tagName];
 
-  if (config && (!config.needPrefix || config.needPrefix == 'onlyUpperCase' && REGEX_LOWER_CASE.test(tagName))) {
+  if (config && (!config.needPrefix || config.needPrefix == 'onlyUpperCase' && REGEX_LOWER_CASE.test(tagName) || config.needPrefix == 'onlyLowerCase' && REGEX_UPPER_CASE.test(tagName))) {
     ret = tmplRule.extensionRule + _tagName;
   }
 

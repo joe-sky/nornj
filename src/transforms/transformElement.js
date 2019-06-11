@@ -124,6 +124,7 @@ export function isExAll(obj, tmplRule) {
 }
 
 const REGEX_LOWER_CASE = /^[a-z]/;
+const REGEX_UPPER_CASE = /^[A-Z]/;
 
 export function fixExTagName(tagName, tmplRule) {
   let ret;
@@ -133,7 +134,9 @@ export function fixExTagName(tagName, tmplRule) {
 
   const _tagName = tools.lowerFirst(tagName),
     config = extensionConfig[_tagName];
-  if (config && (!config.needPrefix || (config.needPrefix == 'onlyUpperCase' && REGEX_LOWER_CASE.test(tagName)))) {
+  if (config && (!config.needPrefix
+    || (config.needPrefix == 'onlyUpperCase' && REGEX_LOWER_CASE.test(tagName))
+    || (config.needPrefix == 'onlyLowerCase' && REGEX_UPPER_CASE.test(tagName)))) {
     ret = tmplRule.extensionRule + _tagName;
   }
 

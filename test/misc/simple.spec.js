@@ -14,7 +14,7 @@ describe('test compile string', function () {
     it('test compile simple', function () {
       const tmpl = nj`
         <${'div1'} class="{{id}} {{name3}}" {{name3}} {{ ...props}} name={{name1}} autofocus name1={{a.c.d}} name2="{{ [a[a.e['h']].f.g, 2] }}" a="/%'aaa'%/" {{... Object.assign({ e: 0 }, ${{ a: '...123', b: 2 }}, { c: 3 }) }} {{... ${{ g: '...123', b: 20 }} }}>
-          <!--# <n-prop {{'name1' | vm_var}} /> #-->
+          <!--- <n-prop {{'name1' | vm_var}} /> --->
           {{1 + ${2} + 3 + ${4}}}
           {{-111 + 222-333 + -555}}
           {{{

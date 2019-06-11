@@ -1,5 +1,5 @@
 /*!
-* NornJ template engine v5.0.0-rc.12
+* NornJ template engine v5.0.0-rc.13
 * (c) 2016-2019 Joe_Sky
 * Released under the MIT License.
 */
@@ -922,7 +922,7 @@ var extensionConfig = {
     hasTagProps: true
   }),
   'switch': _config(_defaultCfg, {
-    needPrefix: 'onlyUpperCase'
+    needPrefix: 'onlyLowerCase'
   }),
   each: _config(_defaultCfg, {
     newContext: {

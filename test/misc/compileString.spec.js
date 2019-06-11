@@ -161,7 +161,7 @@ describe('test compile string', function () {
             </each>
           </p-data-name10>
           <input autofocus />
-          <br><!--#</br>#-->
+          <br><!---</br>--->
           test2
           <span>
             #${tmpl2}
@@ -298,9 +298,9 @@ describe('test compile string', function () {
               <@id0>2</@id0>
             </#elseif>
             <#else>
-              <!--#<#props>
+              <!---<#props>
                 <@id21>21</@id21>
-              </#props>#-->
+              </#props>--->
               <@id2>2</@id2>
               <@id3>2</@id3>
               <#if {{false}}>

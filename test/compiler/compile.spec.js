@@ -136,7 +136,7 @@ describe('Precompile', () => {
 
     const tmpl = `<div>
       {{ d.e ** a.b.c(1, 2, 3) }}
-      <!--#
+      <!---
       {{1 + 2 > 2 && 2 ** (3 + 1) <= 5 && (5 + 6 %% 7) >= 10}}
       {{1 + 2 ** 3 - 4 * 5 %% (6 + 7)}}
       {{'111'.length + 2 * 3}}
@@ -153,7 +153,7 @@ describe('Precompile', () => {
       {{ { a: require('../image1.png'), b: { c: { d: (1 + 2) | test } } }[b] * 100 }}
       {{ d.e ** a.b.c(1, 2, 3) }}
       {{ { fn: param => param + 'abc'.substring(param, 10) } }}
-      #-->
+      --->
     </div>`;
 
     const ast = {

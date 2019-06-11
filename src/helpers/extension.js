@@ -265,7 +265,7 @@ const _defaultCfg = { onlyGlobal: true, newContext: false, hasName: false, hasTa
 export const extensionConfig = {
   'if': _config(_defaultCfg),
   'else': _config(_defaultCfg, { isSubTag: true, hasTagProps: true }),
-  'switch': _config(_defaultCfg, { needPrefix: 'onlyUpperCase' }),
+  'switch': _config(_defaultCfg, { needPrefix: 'onlyLowerCase' }),
   each: _config(_defaultCfg, {
     newContext: {
       item: 'item',
