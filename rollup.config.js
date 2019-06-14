@@ -3,6 +3,7 @@ import replace from 'rollup-plugin-replace';
 import { uglify } from 'rollup-plugin-uglify';
 import filesize from 'rollup-plugin-filesize';
 import license from 'rollup-plugin-license';
+import resolve from 'rollup-plugin-node-resolve';
 
 const env = process.env.NODE_ENV;
 const type = process.env.TYPE;
@@ -13,13 +14,21 @@ const config = {
     babel({
       babelrc: false,
       presets: [
+        '@babel/preset-typescript',
         [
           '@babel/preset-env',
           {
             modules: false
           }
         ]
-      ]
+      ],
+      extensions: ['.js', '.jsx', '.ts', '.tsx']
+    }),
+    resolve({
+      customResolveOptions: {
+        moduleDirectory: 'src'
+      },
+      extensions: ['.js', '.jsx', '.ts', '.tsx']
     })
   ]
 };

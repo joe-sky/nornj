@@ -32,7 +32,10 @@ require('@babel/register')({
           }
         },
         while: true,
-        set: true
+        set: true,
+        switch: {
+          needPrefix: 'onlyUpperCase'
+        }
       }
     }],
     objectRestSpread

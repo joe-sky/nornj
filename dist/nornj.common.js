@@ -1,5 +1,5 @@
 /*!
-* NornJ template engine v5.0.0-rc.13
+* NornJ template engine v5.0.0-rc.14
 * (c) 2016-2019 Joe_Sky
 * Released under the MIT License.
 */
@@ -863,6 +863,13 @@ function template(fns, tmplKey) {
   return configs;
 }
 
+var SwitchPrefixConfig;
+
+(function (SwitchPrefixConfig) {
+  SwitchPrefixConfig["OnlyLowerCase"] = "onlyLowerCase";
+  SwitchPrefixConfig["OnlyUpperCase"] = "onlyUpperCase";
+})(SwitchPrefixConfig || (SwitchPrefixConfig = {}));
+
 var extensions = {
   'if': function _if(value, options) {
     if (value && value._njOpts) {
@@ -1136,7 +1143,7 @@ var extensionConfig = {
     hasTagProps: true
   }),
   'switch': _config(_defaultCfg, {
-    needPrefix: 'onlyLowerCase'
+    needPrefix: SwitchPrefixConfig.OnlyLowerCase
   }),
   each: _config(_defaultCfg, {
     newContext: {
@@ -1562,7 +1569,7 @@ function _compiledProp(prop, innerBrackets, innerQuotes, source) {
           var params = [];
           each(innerBrackets[paramsF].split(','), function (p) {
             if (p !== '') {
-              params[params.length] = _compiledProp(p.trim(), innerBrackets, innerQuotes, source);
+              params[params.length] = _compiledProp(p.trim(), innerBrackets, innerQuotes);
             }
           }, true);
           filterObj.params = params;
@@ -1844,7 +1851,7 @@ function compiledParam(value, tmplRule, hasColon, onlyKey, addSet) {
 
       var prop = _replaceInnerBrackets(param[2], innerBrackets);
 
-      retP.prop = _compiledProp(prop, innerBrackets, innerQuotes, value); //To determine whether it is necessary to escape
+      retP.prop = _compiledProp(prop, innerBrackets, innerQuotes); //To determine whether it is necessary to escape
 
       retP.escape = param[1] !== tmplRule.firstChar + tmplRule.startRule;
       props.push(retP);
@@ -2233,7 +2240,7 @@ function checkElem(obj$1, parent, tmplRule, hasExProps, noSplitNewline, isLast) 
           content = obj$1.slice(1, end);
 
       if (content && content.length) {
-        _checkContentElem(content, node, tmplRule, isParamsEx$1 || hasExProps && !isDirective, noSplitNewline, tmplRule);
+        _checkContentElem(content, node, tmplRule, isParamsEx$1 || hasExProps && !isDirective, noSplitNewline);
       } //If this is params block, set on the "paramsEx" property of the parent node.
 
 
@@ -2489,7 +2496,7 @@ function replaceFilterName(name) {
 }
 
 function buildExpression(ast, inObj, escape, fns, useStringLocal, level) {
-  var codeStr = ast.filters && OPERATORS$1.indexOf(replaceFilterName(ast.filters[0].name)) < 0 ? '' : !inObj ? _buildDataValue(ast, escape, fns, level) : ast.name;
+  var codeStr = ast.filters && OPERATORS$1.indexOf(replaceFilterName(ast.filters[0].name)) < 0 ? '' : !inObj ? _buildDataValue(ast, escape, fns) : ast.name;
   var lastCodeStr = '';
   ast.filters && ast.filters.forEach(function (filter, i) {
     var hasFilterNext = ast.filters[i + 1] && OPERATORS$1.indexOf(replaceFilterName(ast.filters[i + 1].name)) < 0;
@@ -2509,7 +2516,7 @@ function buildExpression(ast, inObj, escape, fns, useStringLocal, level) {
           codeStr += buildExpression(filter.params[0], null, escape, fns, useStringLocal, level);
           codeStr += ')';
         } else {
-          codeStr += _buildDataValue(filter.params[0], escape, fns, level);
+          codeStr += _buildDataValue(filter.params[0], escape, fns);
         }
       }
     } else if (filterName === '_') {
@@ -2585,14 +2592,14 @@ function buildExpression(ast, inObj, escape, fns, useStringLocal, level) {
       } else {
         //Operator
         if (i == 0) {
-          _codeStr2 += _buildDataValue(ast, escape, fns, level);
+          _codeStr2 += _buildDataValue(ast, escape, fns);
         } else if (lastCodeStr !== '') {
           _codeStr2 += lastCodeStr;
         } else {
           if (ast.filters[i - 1].params[0].filters) {
             _codeStr2 += buildExpression(ast.filters[i - 1].params[0], null, escape, fns, useStringLocal, level);
           } else {
-            _codeStr2 += _buildDataValue(ast.filters[i - 1].params[0], escape, fns, level);
+            _codeStr2 += _buildDataValue(ast.filters[i - 1].params[0], escape, fns);
           }
         }
 
@@ -2602,7 +2609,7 @@ function buildExpression(ast, inObj, escape, fns, useStringLocal, level) {
           if (param.filters) {
             _codeStr2 += buildExpression(param, null, escape, fns, useStringLocal, level);
           } else {
-            _codeStr2 += _buildDataValue(param, escape, fns, level);
+            _codeStr2 += _buildDataValue(param, escape, fns);
           }
         });
         var nextFilter = ast.filters[i + 1];

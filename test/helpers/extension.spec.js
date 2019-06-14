@@ -38,11 +38,11 @@ describe('Extension tag', () => {
 
   it('switch', () => {
     expect(render(`
-      <switch {{a}}>
+      <Switch {{a}}>
         <case {{1}}>1</case>
         <case {{2}}>2</case>
         <default>3</default>
-      </switch>
+      </Switch>
     `, {
       a: 2
     })).toBe('2');

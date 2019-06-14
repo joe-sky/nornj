@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [v5.0.0-rc.14] 2019.06.14
+
+* 🌟 The `switch` tag should be prefixed by default when it begin in lowercase.
+
 ## [v5.0.0-rc.10] 2019.05.20
 
 * 🌟 Support spread props in extension tags.

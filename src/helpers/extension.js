@@ -1,6 +1,7 @@
 ﻿import nj from '../core';
 import * as tools from '../utils/tools';
 import * as tranData from '../transforms/transformData';
+import { SwitchPrefixConfig } from './enums';
 
 //Global extension list
 export const extensions = {
@@ -265,7 +266,7 @@ const _defaultCfg = { onlyGlobal: true, newContext: false, hasName: false, hasTa
 export const extensionConfig = {
   'if': _config(_defaultCfg),
   'else': _config(_defaultCfg, { isSubTag: true, hasTagProps: true }),
-  'switch': _config(_defaultCfg, { needPrefix: 'onlyLowerCase' }),
+  'switch': _config(_defaultCfg, { needPrefix: SwitchPrefixConfig.OnlyLowerCase }),
   each: _config(_defaultCfg, {
     newContext: {
       item: 'item',

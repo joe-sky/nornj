@@ -1,5 +1,5 @@
 /*!
-* NornJ template engine v5.0.0-rc.13
+* NornJ template engine v5.0.0-rc.14
 * (c) 2016-2019 Joe_Sky
 * Released under the MIT License.
 */
@@ -649,6 +649,13 @@ function template(fns, tmplKey) {
   return configs;
 }
 
+var SwitchPrefixConfig;
+
+(function (SwitchPrefixConfig) {
+  SwitchPrefixConfig["OnlyLowerCase"] = "onlyLowerCase";
+  SwitchPrefixConfig["OnlyUpperCase"] = "onlyUpperCase";
+})(SwitchPrefixConfig || (SwitchPrefixConfig = {}));
+
 var extensions = {
   'if': function _if(value, options) {
     if (value && value._njOpts) {
@@ -922,7 +929,7 @@ var extensionConfig = {
     hasTagProps: true
   }),
   'switch': _config(_defaultCfg, {
-    needPrefix: 'onlyLowerCase'
+    needPrefix: SwitchPrefixConfig.OnlyLowerCase
   }),
   each: _config(_defaultCfg, {
     newContext: {
@@ -1345,7 +1352,7 @@ function _createCompile(outputH) {
 }
 
 var compile = _createCompile();
-var compileH = _createCompile(true);
+var compileH = _createCompile();
 
 function _createRender(outputH) {
   return function (tmpl, options) {
