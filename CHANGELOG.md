@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [v5.0.0-rc.15] 2019.06.17
+
+* 🌟 Added `rawStart` and `rawEnd` parameters for delimiters config.
+
 ## [v5.0.0-rc.14] 2019.06.14
 
 * 🌟 The `switch` tag should be prefixed by default when it begin in lowercase.
