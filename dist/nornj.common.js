@@ -1,5 +1,5 @@
 /*!
-* NornJ template engine v5.0.0-rc.15
+* NornJ template engine v5.0.0-rc.16
 * (c) 2016-2019 Joe_Sky
 * Released under the MIT License.
 */
@@ -2822,7 +2822,7 @@ function _buildNode(node, parent, fns, counter, retType, level, useStringLocal, 
     } //hash参数
 
 
-    var retP = _buildParams(node, fns, counter, false, level, tagName),
+    var retP = _buildParams(node, fns, counter, useStringLocal, level, tagName),
         paramsStr = retP[0],
         _paramsC = retP[1];
 
@@ -3706,16 +3706,12 @@ function template$1() {
   return (nj.outputH ? taggedTmplH : taggedTmpl).apply(null, arguments)();
 }
 
-var _taggedExpression = createTaggedTmpl({
-  isExpression: true
-});
-
 var _taggedExpressionH = createTaggedTmplH({
   isExpression: true
 });
 
 function expression() {
-  return (nj.outputH ? _taggedExpressionH : _taggedExpression).apply(null, arguments)();
+  return _taggedExpressionH.apply(null, arguments)();
 }
 
 var _taggedCssH = createTaggedTmplH({

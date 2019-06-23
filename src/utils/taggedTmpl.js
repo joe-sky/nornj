@@ -23,10 +23,9 @@ export function template() {
   return (nj.outputH ? taggedTmplH : taggedTmpl).apply(null, arguments)();
 }
 
-const _taggedExpression = createTaggedTmpl({ isExpression: true });
 const _taggedExpressionH = createTaggedTmplH({ isExpression: true });
 export function expression() {
-  return (nj.outputH ? _taggedExpressionH : _taggedExpression).apply(null, arguments)();
+  return _taggedExpressionH.apply(null, arguments)();
 }
 
 const _taggedCssH = createTaggedTmplH({ isCss: true });

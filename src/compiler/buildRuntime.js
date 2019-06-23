@@ -516,7 +516,7 @@ function _buildNode(node, parent, fns, counter, retType, level, useStringLocal, 
     }
 
     //hash参数
-    let retP = _buildParams(node, fns, counter, false, level, tagName),
+    let retP = _buildParams(node, fns, counter, useStringLocal, level, tagName),
       paramsStr = retP[0],
       _paramsC = retP[1];
 
