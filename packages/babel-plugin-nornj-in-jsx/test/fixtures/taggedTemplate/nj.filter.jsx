@@ -7,7 +7,9 @@ nj.registerFilter({
 });
 
 module.exports = props => {
+  const count = 2;
+
   return (
-    <i>{n`${props.value} | cut(2) | capitalize`}</i>
+    <i>{n`props.value | cut(count) | capitalize`}</i>
   );
 };

@@ -1,4 +1,4 @@
-const nj = require('nornj/dist/nornj.common').default;
+const { default: nj, expression: n } = require('nornj/dist/nornj.common');
 const njUtils = require('nornj/tools/utils');
 const { locInfo } = require('./utils');
 
@@ -189,16 +189,26 @@ function createRenderTmpl(babel, quasis, expressions, opts, path, taggedName) {
     tmplStr = Object.assign({ quasis: quasis.map(q => q.value.cooked) }, taggedTmplConfig);
   }
 
-  const tmplObj = _buildTmplFns(nj.precompile(
+  let hasAst = taggedName === 'n', tmplFns, tmplAst;
+  tmplFns = nj.precompile(
     tmplStr,
     !isTmplFnS ? (opts.outputH != null ? opts.outputH : true) : false,
     nj.createTmplRule(opts.delimiters != null ? opts.delimiters : (!isTmplFnS ? {
       start: '{',
       end: '}',
       comment: ''
-    } : {}))),
-    tmplKey);
+    } : {})), hasAst);
+  if (hasAst) {
+    tmplAst = tmplFns.ast;
+    tmplFns = tmplFns.fns;
+  }
 
+  const paramIdentifiers = new Set();
+  if (tmplAst) {
+    _getExpressionParams([tmplAst.content[0].content[0].props[0].prop], paramIdentifiers);
+  }
+
+  const tmplObj = _buildTmplFns(tmplFns, tmplKey);
   const tmplParams = [];
   expressions.forEach((e, i) => {
     if (quasis[i].isCloseTagPrefix) {
@@ -266,6 +276,17 @@ function createRenderTmpl(babel, quasis, expressions, opts, path, taggedName) {
     ));
   });
 
+  if (paramIdentifiers.size) {
+    paramIdentifiers.forEach(paramIdentifier => {
+      if (path.scope.hasBinding(paramIdentifier)) {
+        tmplParams.push(types.objectProperty(
+          types.identifier(paramIdentifier),
+          types.identifier(paramIdentifier)
+        ));
+      }
+    });
+  }
+
   const renderFnParams = [types.identifier(tmplObj)];
   if (tmplParams.length) {
     renderFnParams.push(types.objectExpression(tmplParams));
@@ -293,6 +314,21 @@ function _buildTmplFns(fns, tmplKey) {
   });
 
   return ret + '}';
+}
+
+function _getExpressionParams(paramsAst, paramIdentifiers) {
+  paramsAst.forEach(pAst => {
+    if (!pAst.isBasicType && pAst.name !== 'this' && !n`${pAst}.name.startsWith('_njParam')`) {
+      paramIdentifiers.add(pAst.name);
+    }
+    if (pAst.filters) {
+      pAst.filters.forEach(filter => {
+        if (filter.params) {
+          _getExpressionParams(filter.params, paramIdentifiers);
+        }
+      });
+    }
+  });
 }
 
 module.exports = {

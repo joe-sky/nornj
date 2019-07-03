@@ -1,5 +1,5 @@
 /*!
-* NornJ template engine v5.0.0-rc.16
+* NornJ template engine v5.0.0-rc.17
 * (c) 2016-2019 Joe_Sky
 * Released under the MIT License.
 */
@@ -3597,7 +3597,7 @@ function _createAstRoot() {
 } //Precompile template
 
 
-function precompile(tmpl, outputH, tmplRule) {
+function precompile(tmpl, outputH, tmplRule, hasAst) {
   var root = _createAstRoot();
 
   if (tmpl.quasis) {
@@ -3621,7 +3621,16 @@ function precompile(tmpl, outputH, tmplRule) {
   }
 
   checkElem(tmpl._njTmpl, root, tmplRule);
-  return buildRuntime(root.content, root, !outputH);
+  var tmplFns = buildRuntime(root.content, root, !outputH);
+
+  if (hasAst) {
+    return {
+      fns: tmplFns,
+      ast: root
+    };
+  } else {
+    return tmplFns;
+  }
 }
 
 function _createRender(outputH) {

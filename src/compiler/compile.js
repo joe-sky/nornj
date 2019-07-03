@@ -88,7 +88,7 @@ function _createAstRoot() {
 }
 
 //Precompile template
-export function precompile(tmpl, outputH, tmplRule) {
+export function precompile(tmpl, outputH, tmplRule, hasAst) {
   const root = _createAstRoot();
 
   if (tmpl.quasis) {
@@ -106,7 +106,16 @@ export function precompile(tmpl, outputH, tmplRule) {
   }
   checkElem(tmpl._njTmpl, root, tmplRule);
 
-  return buildRuntime(root.content, root, !outputH);
+  const tmplFns = buildRuntime(root.content, root, !outputH);
+  if (hasAst) {
+    return {
+      fns: tmplFns,
+      ast: root
+    };
+  }
+  else {
+    return tmplFns;
+  }
 }
 
 function _createRender(outputH) {
