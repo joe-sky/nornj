@@ -75,9 +75,10 @@ export const extensions = {
 
     let ret,
       props = options.props,
-      l = props.elseifs.length;
+      elseifs = props.elseifs || [{}],
+      l = elseifs.length;
 
-    tools.each(props.elseifs, (elseif, i) => {
+    tools.each(elseifs, (elseif, i) => {
       if (value === elseif.value) {
         ret = elseif.fn();
         return false;

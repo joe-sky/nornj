@@ -48,6 +48,16 @@ describe('Extension tag', () => {
     })).toBe('2');
   });
 
+  it('switch without case', () => {
+    expect(render(`
+      <Switch {{a}}>
+        <default>3</default>
+      </Switch>
+    `, {
+      a: 2
+    })).toBe('3');
+  });
+
   it('each for array', () => {
     expect(render(`
       <nj-noWs>
