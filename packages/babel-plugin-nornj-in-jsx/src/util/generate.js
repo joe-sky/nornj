@@ -62,6 +62,7 @@ function buildAttrs(types, tagName, attrs, quasis, expressions, lastAttrStr, new
                 if (i == 0) {
                   attrStr += '"{{' + q.value.cooked;
                   quasis.push(types.TemplateElement({
+                    raw: attrStr,
                     cooked: attrStr
                   }));
                 }
@@ -70,6 +71,7 @@ function buildAttrs(types, tagName, attrs, quasis, expressions, lastAttrStr, new
                 }
                 else {
                   quasis.push(types.TemplateElement({
+                    raw: q.value.cooked,
                     cooked: q.value.cooked
                   }));
                 }
@@ -83,6 +85,7 @@ function buildAttrs(types, tagName, attrs, quasis, expressions, lastAttrStr, new
           }
           else {
             quasis.push(types.TemplateElement({
+              raw: attrStr,
               cooked: attrStr
             }));
             expressions.push(expr);
@@ -91,6 +94,7 @@ function buildAttrs(types, tagName, attrs, quasis, expressions, lastAttrStr, new
         }
         else {
           quasis.push(types.TemplateElement({
+            raw: attrStr,
             cooked: attrStr
           }));
           expressions.push(attr.value);
@@ -99,6 +103,7 @@ function buildAttrs(types, tagName, attrs, quasis, expressions, lastAttrStr, new
       }
       else {
         quasis.push(types.TemplateElement({
+          raw: attrStr + ' ',
           cooked: attrStr + ' '
         }));
         attr.argument.isSpread = true;

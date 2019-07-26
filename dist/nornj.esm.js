@@ -1,5 +1,5 @@
 /*!
-* NornJ template engine v5.0.0-rc.18
+* NornJ template engine v5.0.0-rc.19
 * (c) 2016-2019 Joe_Sky
 * Released under the MIT License.
 */
@@ -887,32 +887,29 @@ var extensions = {
       value = false;
     }
 
-    var ret;
+    var ret,
+        props = options.props;
 
     if (!!value) {
-      ret = options.children();
-    } else {
-      var props = options.props;
+      ret = (props && props.then || options.children)();
+    } else if (props) {
+      var elseFn = props['else'];
 
-      if (props) {
-        var elseFn = props['else'];
-
-        if (props.elseifs) {
-          var l = props.elseifs.length;
-          each(props.elseifs, function (elseif, i) {
-            if (!!elseif.value) {
-              ret = elseif.fn();
-              return false;
-            } else if (i === l - 1) {
-              if (elseFn) {
-                ret = elseFn();
-              }
+      if (props.elseifs) {
+        var l = props.elseifs.length;
+        each(props.elseifs, function (elseif, i) {
+          if (!!elseif.value) {
+            ret = elseif.fn();
+            return false;
+          } else if (i === l - 1) {
+            if (elseFn) {
+              ret = elseFn();
             }
-          }, true);
-        } else {
-          if (elseFn) {
-            ret = elseFn();
           }
+        }, true);
+      } else {
+        if (elseFn) {
+          ret = elseFn();
         }
       }
     }
@@ -922,6 +919,9 @@ var extensions = {
     }
 
     return ret;
+  },
+  'then': function then(options) {
+    return options.tagProps.then = options.children;
   },
   'else': function _else(options) {
     return options.tagProps['else'] = options.children;
@@ -1181,6 +1181,7 @@ var extensionConfig = {
     needPrefix: true
   }
 };
+extensionConfig.then = _config(extensionConfig['else']);
 extensionConfig.elseif = _config(extensionConfig['else']);
 extensionConfig.spread = _config(extensionConfig.prop);
 extensionConfig.block = _config(extensionConfig.obj);
@@ -1195,8 +1196,8 @@ extensions['for'] = extensions.each;
 extensionConfig['for'] = _config(extensionConfig.each);
 extensions['case'] = extensions.elseif;
 extensionConfig['case'] = extensionConfig.elseif;
-extensions['empty'] = extensions['default'] = extensions['else'];
-extensionConfig['empty'] = extensionConfig['default'] = extensionConfig['else'];
+extensions.empty = extensions['default'] = extensions['else'];
+extensionConfig.empty = extensionConfig['default'] = extensionConfig['else'];
 extensions.strProp = extensions.prop;
 extensionConfig.strProp = _config(extensionConfig.prop, {
   useString: true

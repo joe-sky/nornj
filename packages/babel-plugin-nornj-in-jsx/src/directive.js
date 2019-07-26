@@ -23,6 +23,7 @@ module.exports = function (babel) {
     }
     else {
       quasis.push(types.TemplateElement({
+        raw: '',
         cooked: tagName
       }));
 
@@ -47,6 +48,7 @@ module.exports = function (babel) {
       directiveExpressions.forEach((e, i) => {
         if (i == 0) {
           quasis.push(types.TemplateElement({
+            raw: '',
             cooked: attrStr + '"{{' + e
           }));
         }
@@ -56,6 +58,7 @@ module.exports = function (babel) {
         else {
           if (nj.isString(e)) {
             quasis.push(types.TemplateElement({
+              raw: '',
               cooked: e
             }));
           }
@@ -108,6 +111,7 @@ module.exports = function (babel) {
           else if (isDirective && !cannotUseExpression && directiveConfig.isBindable && types.isMemberExpression(expr)) {
             const directiveMemberExpressions = generate.getDirectiveMemberExpression(types, expr);
             quasis.push(types.TemplateElement({
+              raw: '',
               cooked: attrStr + '"{{'
             }));
 
@@ -118,6 +122,7 @@ module.exports = function (babel) {
           }
           else {
             quasis.push(types.TemplateElement({
+              raw: '',
               cooked: attrStr
             }));
             expressions.push(expr);
@@ -126,6 +131,7 @@ module.exports = function (babel) {
         }
         else {
           quasis.push(types.TemplateElement({
+            raw: '',
             cooked: attrStr
           }));
           expressions.push(attr.value);
@@ -134,6 +140,7 @@ module.exports = function (babel) {
       }
       else {
         quasis.push(types.TemplateElement({
+          raw: '',
           cooked: ' '
         }));
         attr.argument.isSpread = true;
@@ -144,6 +151,7 @@ module.exports = function (babel) {
 
     if (!isSelfClosing) {
       quasis.push(types.TemplateElement({
+        raw: '',
         cooked: lastAttrStr + '>'
       }));
 
@@ -151,23 +159,27 @@ module.exports = function (babel) {
 
       if (!isComponent) {
         quasis.push(types.TemplateElement({
+          raw: '',
           cooked: '</' + elName + '>'
         }));
       }
       else {
         const closeTagPrefix = types.TemplateElement({
+          raw: '',
           cooked: '</'
         });
         closeTagPrefix.isCloseTagPrefix = true;
         quasis.push(closeTagPrefix);
         expressions.push(elName);
         quasis.push(types.TemplateElement({
+          raw: '',
           cooked: '>'
         }));
       }
     }
     else {
       quasis.push(types.TemplateElement({
+        raw: '',
         cooked: lastAttrStr + ' />'
       }));
     }

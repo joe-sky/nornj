@@ -14,30 +14,28 @@ export const extensions = {
       value = false;
     }
 
-    let ret;
+    let ret,
+      props = options.props;
     if (!!value) {
-      ret = options.children();
-    } else {
-      let props = options.props;
-      if (props) {
-        let elseFn = props['else'];
+      ret = ((props && props.then) || options.children)();
+    } else if (props) {
+      let elseFn = props['else'];
 
-        if (props.elseifs) {
-          let l = props.elseifs.length;
-          tools.each(props.elseifs, (elseif, i) => {
-            if (!!elseif.value) {
-              ret = elseif.fn();
-              return false;
-            } else if (i === l - 1) {
-              if (elseFn) {
-                ret = elseFn();
-              }
+      if (props.elseifs) {
+        let l = props.elseifs.length;
+        tools.each(props.elseifs, (elseif, i) => {
+          if (!!elseif.value) {
+            ret = elseif.fn();
+            return false;
+          } else if (i === l - 1) {
+            if (elseFn) {
+              ret = elseFn();
             }
-          }, true);
-        } else {
-          if (elseFn) {
-            ret = elseFn();
           }
+        }, true);
+      } else {
+        if (elseFn) {
+          ret = elseFn();
         }
       }
     }
@@ -48,6 +46,8 @@ export const extensions = {
 
     return ret;
   },
+
+  'then': options => options.tagProps.then = options.children,
 
   'else': options => options.tagProps['else'] = options.children,
 
@@ -284,6 +284,7 @@ export const extensionConfig = {
   'with': _config(_defaultCfg, { newContext: { getDataFromProps: true } }),
   style: { useExpressionInProps: false, needPrefix: true }
 };
+extensionConfig.then = _config(extensionConfig['else']);
 extensionConfig.elseif = _config(extensionConfig['else']);
 extensionConfig.spread = _config(extensionConfig.prop);
 extensionConfig.block = _config(extensionConfig.obj);
@@ -296,8 +297,8 @@ extensions['for'] = extensions.each;
 extensionConfig['for'] = _config(extensionConfig.each);
 extensions['case'] = extensions.elseif;
 extensionConfig['case'] = extensionConfig.elseif;
-extensions['empty'] = extensions['default'] = extensions['else'];
-extensionConfig['empty'] = extensionConfig['default'] = extensionConfig['else'];
+extensions.empty = extensions['default'] = extensions['else'];
+extensionConfig.empty = extensionConfig['default'] = extensionConfig['else'];
 extensions.strProp = extensions.prop;
 extensionConfig.strProp = _config(extensionConfig.prop, { useString: true });
 extensions.strArg = extensions.arg;

@@ -40,6 +40,7 @@ module.exports = function (babel) {
       if (subExTags.length) {
         if (childrenBlocks.length) {
           quasis.push(types.TemplateElement({
+            raw: '',
             cooked: lastAttrStr + '>'
           }));
           expressions.push(childrenExpression);
@@ -59,6 +60,7 @@ module.exports = function (babel) {
           const subNewContextData = {};
           lastAttrStr = generate.buildAttrs(types, subElName, subAttrs, quasis, expressions, lastAttrStr, subNewContextData);
           quasis.push(types.TemplateElement({
+            raw: '',
             cooked: lastAttrStr + '>'
           }));
 
@@ -73,23 +75,27 @@ module.exports = function (babel) {
         });
 
         quasis.push(types.TemplateElement({
+          raw: '',
           cooked: lastAttrStr + '</n-' + elName + '>'
         }));
       }
       else {
         quasis.push(types.TemplateElement({
+          raw: '',
           cooked: lastAttrStr + '>'
         }));
 
         expressions.push(childrenExpression);
 
         quasis.push(types.TemplateElement({
+          raw: '',
           cooked: '</n-' + elName + '>'
         }));
       }
     }
     else {
       quasis.push(types.TemplateElement({
+        raw: '',
         cooked: lastAttrStr + ' />'
       }));
     }

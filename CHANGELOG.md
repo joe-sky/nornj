@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [v5.0.0-rc.19] 2019.07.24
+
+* 🌟 Added sub tag `then` for `if` tag.
+
 ## [v5.0.0-rc.15] 2019.06.17
 
 * 🌟 Added `rawStart` and `rawEnd` parameters for delimiters config.

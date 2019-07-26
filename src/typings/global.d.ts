@@ -6,6 +6,13 @@
 declare function If(props: { condition: boolean | string }): any;
 
 /**
+ * NornJ tag `Then`, example:
+ * 
+ * `<If condition={foo > 10}><input /><Then>100</Then><Else>200</Else></If>`
+ */
+declare function Then(): any;
+
+/**
  * NornJ tag `Elseif`, example:
  * 
  * `<If condition={foo > 10}><input /><Elseif condition={foo > 5}><input type="button" /></Elseif></If>`
