@@ -47,7 +47,7 @@ In `React` development, the `JSX` can use almost all the syntax of javascript an
 * Support filters：
 
 ```js
-<button>{n`foo | capitalize`}</button>
+<button>{n`foo | upperFirst`}</button>
 ```
 
 * Support custom operators：

@@ -53,7 +53,7 @@ const Button = (props) => {
 const Button = (props) => {
   return (
     <div>
-      {n`${props.name} | capitalize`}
+      {n`${props.name} | upperFirst`}
     </div>
   )
 }

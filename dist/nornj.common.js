@@ -1,5 +1,5 @@
 /*!
-* NornJ template engine v5.0.0-rc.19
+* NornJ template engine v5.0.0-rc.20
 * (c) 2016-2019 Joe_Sky
 * Released under the MIT License.
 */
@@ -265,11 +265,14 @@ var assign = Object.assign || function (target) {
 
   return target;
 };
-function capitalize(str) {
+function upperFirst(str) {
   return str[0].toUpperCase() + str.substr(1);
 }
 function lowerFirst(str) {
   return str[0].toLowerCase() + str.substr(1);
+}
+function capitalize(str) {
+  return upperFirst(str);
 }
 assign(nj, {
   defineProp: defineProp,
@@ -288,8 +291,9 @@ assign(nj, {
   obj: obj,
   camelCase: camelCase,
   assign: assign,
-  capitalize: capitalize,
-  lowerFirst: lowerFirst
+  upperFirst: upperFirst,
+  lowerFirst: lowerFirst,
+  capitalize: capitalize
 });
 
 var tools = /*#__PURE__*/Object.freeze({
@@ -312,8 +316,9 @@ var tools = /*#__PURE__*/Object.freeze({
   clearQuot: clearQuot,
   camelCase: camelCase,
   assign: assign,
-  capitalize: capitalize,
-  lowerFirst: lowerFirst
+  upperFirst: upperFirst,
+  lowerFirst: lowerFirst,
+  capitalize: capitalize
 });
 
 var components = nj.components,
@@ -1359,8 +1364,8 @@ var filters = {
       return -1;
     }
   },
-  capitalize: function capitalize$1(str) {
-    return capitalize(str);
+  upperFirst: function upperFirst$1(str) {
+    return upperFirst(str);
   },
   lowerFirst: function lowerFirst$1(str) {
     return lowerFirst(str);
@@ -1380,12 +1385,15 @@ var filters = {
   isArrayLike: function isArrayLike$1(val) {
     return isArrayLike(val);
   },
-  currency: function currency(value, decimals, _currency) {
-    if (!(value - parseFloat(value) >= 0)) return filterConfig.currency.placeholder;
+  currency: function currency(value, decimals, symbol, placeholder) {
+    if (!(value - parseFloat(value) >= 0)) {
+      return placeholder != null ? placeholder : filterConfig.currency.placeholder;
+    }
+
     value = parseFloat(value);
-    _currency = decimals != null && typeof decimals == 'string' ? decimals : _currency;
-    _currency = _currency != null && typeof _currency == 'string' ? _currency : filterConfig.currency.symbol;
-    decimals = decimals != null && typeof decimals == 'number' ? decimals : 2;
+    symbol = decimals != null && nj.isString(decimals) ? decimals : symbol;
+    symbol = symbol != null && nj.isString(symbol) ? symbol : filterConfig.currency.symbol;
+    decimals = decimals != null && nj.isNumber(decimals) ? decimals : 2;
     var stringified = Math.abs(value).toFixed(decimals);
 
     var _int = decimals ? stringified.slice(0, -1 - decimals) : stringified;
@@ -1396,7 +1404,7 @@ var filters = {
     var _float = decimals ? stringified.slice(-1 - decimals) : '';
 
     var sign = value < 0 ? '-' : '';
-    return sign + _currency + head + _int.slice(i).replace(REGEX_DIGITS_RE, '$1,') + _float;
+    return sign + symbol + head + _int.slice(i).replace(REGEX_DIGITS_RE, '$1,') + _float;
   }
 };
 
@@ -1458,7 +1466,7 @@ var filterConfig = {
   '..': _config$1(_defaultCfg$1),
   rLt: _config$1(_defaultCfg$1),
   '<=>': _config$1(_defaultCfg$1),
-  capitalize: _config$1(_defaultCfg$1),
+  upperFirst: _config$1(_defaultCfg$1),
   lowerFirst: _config$1(_defaultCfg$1),
   camelCase: _config$1(_defaultCfg$1),
   isObject: _config$1(_defaultCfg$1),
@@ -1469,7 +1477,9 @@ var filterConfig = {
     symbol: '$',
     placeholder: ''
   })
-}; //Register filter and also can batch add
+};
+filters.capitalize = filters.upperFirst;
+filterConfig.capitalize = _config$1(filterConfig.upperFirst); //Register filter and also can batch add
 
 function registerFilter(name, filter, options, mergeConfig) {
   var params = name;

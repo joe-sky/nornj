@@ -111,7 +111,7 @@ export const filters = {
     }
   },
 
-  capitalize: str => tools.capitalize(str),
+  upperFirst: str => tools.upperFirst(str),
 
   lowerFirst: str => tools.lowerFirst(str),
 
@@ -125,12 +125,15 @@ export const filters = {
 
   isArrayLike: val => tools.isArrayLike(val),
 
-  currency(value, decimals, currency) {
-    if (!(value - parseFloat(value) >= 0)) return filterConfig.currency.placeholder;
+  currency(value, decimals, symbol, placeholder) {
+    if (!(value - parseFloat(value) >= 0)) {
+      return placeholder != null ? placeholder : filterConfig.currency.placeholder;
+    }
     value = parseFloat(value);
-    currency = decimals != null && typeof decimals == 'string' ? decimals : currency;
-    currency = currency != null && typeof currency == 'string' ? currency : filterConfig.currency.symbol;
-    decimals = decimals != null && typeof decimals == 'number' ? decimals : 2;
+    symbol = decimals != null && nj.isString(decimals) ? decimals : symbol;
+    symbol = symbol != null && nj.isString(symbol) ? symbol : filterConfig.currency.symbol;
+    decimals = decimals != null && nj.isNumber(decimals) ? decimals : 2;
+
     const stringified = Math.abs(value).toFixed(decimals);
     const _int = decimals
       ? stringified.slice(0, -1 - decimals)
@@ -143,7 +146,8 @@ export const filters = {
       ? stringified.slice(-1 - decimals)
       : '';
     const sign = value < 0 ? '-' : '';
-    return sign + currency + head +
+
+    return sign + symbol + head +
       _int.slice(i).replace(REGEX_DIGITS_RE, '$1,') +
       _float;
   }
@@ -193,7 +197,7 @@ export const filterConfig = {
   '..': _config(_defaultCfg),
   rLt: _config(_defaultCfg),
   '<=>': _config(_defaultCfg),
-  capitalize: _config(_defaultCfg),
+  upperFirst: _config(_defaultCfg),
   lowerFirst: _config(_defaultCfg),
   camelCase: _config(_defaultCfg),
   isObject: _config(_defaultCfg),
@@ -202,6 +206,9 @@ export const filterConfig = {
   isArrayLike: _config(_defaultCfg),
   currency: _config(_defaultCfg, { symbol: '$', placeholder: '' })
 };
+
+filters.capitalize = filters.upperFirst;
+filterConfig.capitalize = _config(filterConfig.upperFirst);
 
 //Register filter and also can batch add
 export function registerFilter(name, filter, options, mergeConfig) {

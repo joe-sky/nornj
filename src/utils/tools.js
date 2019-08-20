@@ -181,12 +181,16 @@ export const assign = Object.assign || function (target) {
   return target;
 };
 
-export function capitalize(str) {
+export function upperFirst(str) {
   return str[0].toUpperCase() + str.substr(1);
 }
 
 export function lowerFirst(str) {
   return str[0].toLowerCase() + str.substr(1);
+}
+
+export function capitalize(str) {
+  return upperFirst(str);
 }
 
 assign(nj, {
@@ -206,6 +210,7 @@ assign(nj, {
   obj,
   camelCase,
   assign,
-  capitalize,
-  lowerFirst
+  upperFirst,
+  lowerFirst,
+  capitalize
 });

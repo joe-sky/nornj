@@ -47,7 +47,7 @@
 * 支持过滤器语法：
 
 ```js
-<button>{n`foo | capitalize`}</button>
+<button>{n`foo | upperFirst`}</button>
 ```
 
 * 支持自定义运算符：
