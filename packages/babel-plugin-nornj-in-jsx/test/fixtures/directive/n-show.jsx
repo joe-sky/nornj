@@ -17,6 +17,8 @@ const Noop = () => <i>noop</i>;
 
 module.exports = createReactClass({
   render: function () {
+    const { show } = this.props;
+
     return (
       <div>
         <style jsx>{`
@@ -25,7 +27,7 @@ module.exports = createReactClass({
           }
         `}</style>
         <Test.Show.Wrap id="wrap" n-show={this.props.show} {...{ name: 'wrap' }} {...{ className: 'wrap' }}>
-          <div className="test" n-show={!this.props.show}>
+          <div className="test" n-show={`show == false`}>
             <if condition={this.props.condition}>
               {n`100 * 10 + ${20}`}
               <span>IfBlock</span>

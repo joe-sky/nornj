@@ -100,6 +100,6 @@ module.exports = function (babel) {
       }));
     }
 
-    return generate.createRenderTmpl(babel, quasis, expressions, state.opts, path);
+    return generate.createRenderTmpl(babel, quasis, expressions, state.opts, path, 'tag');
   };
 };

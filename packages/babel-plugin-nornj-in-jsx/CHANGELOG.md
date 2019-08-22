@@ -1,5 +1,16 @@
 # CHANGELOG
 
+## [v5.0.0-rc.32] 2019.08.22
+
+* 🌟 Support syntax such as:
+
+```js
+const foo = 100,
+  bar = 100;
+
+const tag = <input n-show={`foo === bar`} />;
+```
+
 ## [v5.0.0-rc.12] 2019.05.07
 
 * 🐞 Fixed error on auto add key for children elements with spread attributes.

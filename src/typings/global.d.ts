@@ -3,7 +3,7 @@
  * 
  * `<If condition={false}><input /></If>`
  */
-declare function If(props: { condition: boolean | string }): any;
+declare function If(props: { condition: boolean | number | string }): any;
 
 /**
  * NornJ tag `Then`, example:
@@ -17,7 +17,7 @@ declare function Then(): any;
  * 
  * `<If condition={foo > 10}><input /><Elseif condition={foo > 5}><input type="button" /></Elseif></If>`
  */
-declare function Elseif(props: { condition: boolean | string }): any;
+declare function Elseif(props: { condition: boolean | number | string }): any;
 
 /**
  * NornJ tag `Else`, example:
@@ -82,13 +82,18 @@ declare const index: number;
  */
 declare function Empty(): any;
 
+/**
+ * NornJ tag `Empty`, example:
+ * 
+ * `<Each of={[1, 2, 3]}><i key={index}>{item}</i><Empty>nothing</Empty></Each>`
+ */
+declare function NjEmpty(): any;
+
 declare function For<T>(props: { [id: string]: any; i?: number; to: number; step?: number; index?: string }): any;
 
 declare const i: number;
 
 declare function With(props: { [id: string]: any }): any;
-
-declare function Fn(props: { [id: string]: any }): any;
 
 /**
  * NornJ tagged templates syntax `nj`(full name is `nj.taggedTmplH`), example:
@@ -134,7 +139,142 @@ declare namespace JSX {
     | null
     | typeof undefined;
 
+  declare namespace NornJ {
+    interface Childrenable {
+      children?: TChildren | TChildren[];
+    }
+
+    interface If extends Childrenable {
+      condition: boolean | number | string;
+    }
+
+    interface Then extends Childrenable { }
+
+    interface Elseif extends Childrenable {
+      condition: boolean | number | string;
+    }
+
+    interface Else extends Childrenable { }
+
+    interface Switch extends Childrenable {
+      value: any
+    }
+
+    interface Case extends Childrenable {
+      value: any
+    }
+
+    interface Default extends Childrenable { }
+
+    interface Each<T> extends Childrenable {
+      of: Iterable<T> | string;
+      item?: string;
+      index?: string;
+    }
+
+    interface With extends Childrenable {
+      [id: string]: any
+    }
+  }
+
+  interface IntrinsicElements {
+    /**
+     * NornJ tag `if`, example:
+     * 
+     * `<if condition={false}><input /></if>`
+     */
+    if: NornJ.If;
+
+    /**
+     * NornJ tag `then`, example:
+     * 
+     * `<if condition={foo > 10}><input /><then>100</then><else>200</else></if>`
+     */
+    then: NornJ.Then;
+
+    /**
+     * NornJ tag `elseif`, example:
+     * 
+     * `<if condition={foo > 10}><input /><elseif condition={foo > 5}><input type="button" /></elseif></if>`
+     */
+    elseif: NornJ.Elseif;
+
+    /**
+     * NornJ tag `else`, example:
+     * 
+     * `<if condition={foo > 10}><input /><else><input type="button" /></else></if>`
+     */
+    else: NornJ.Else;
+
+    /**
+    * NornJ tag `Switch`, example:
+    * 
+    * `<Switch value={foo}><Case value={1}><input /></Case><Case value={2}><input type="button" /></Case><Default>nothing</Default></Switch>`
+    */
+    switch: NornJ.Switch;
+
+    /**
+     * NornJ tag `Case`, example:
+     * 
+     * `<Switch value={foo}><Case value={1}><input /></Case><Case value={2}><input type="button" /></Case><Default>nothing</Default></Switch>`
+     */
+    case: NornJ.Case;
+
+    /**
+     * NornJ tag `Default`, example:
+     * 
+     * `<Switch value={foo}><Case value={1}><input /></Case><Case value={2}><input type="button" /></Case><Default>nothing</Default></Switch>`
+     */
+    default: NornJ.Default;
+
+    /**
+     * NornJ tag `Each`, example:
+     * 
+     * `<Each of={[1, 2, 3]}><i key={index}>{item}</i></Each>`
+     */
+    each: NornJ.Each;
+
+    /**
+     * NornJ tag `Empty`, example:
+     * 
+     * `<Each of={[1, 2, 3]}><i key={index}>{item}</i><Empty>nothing</Empty></Each>`
+     */
+    empty: NornJ.Empty;
+
+    for: NornJ.Each;
+
+    with: NornJ.With;
+  }
+
   interface IntrinsicAttributes {
     children?: TChildren | TChildren[];
+
+    /**
+     * NornJ directive `n-show`, example:
+     * 
+     * `<input n-show={false} />`
+     */
+    ['n-show']?: boolean | number | string
+
+    /**
+     * NornJ directive `n-style`, example:
+     * 
+     * `<input n-style="margin-left:5px;padding:10" />`
+     */
+    ['n-style']?: string
+
+    /**
+     * NornJ directive `n-debounce`, example:
+     * 
+     * `<input n-debounce={200} />`
+     */
+    ['n-debounce']?: number | string
+
+    /**
+     * NornJ directive `n-mobxBind`, example:
+     * 
+     * `<input n-mobxBind={this.inputValue} />`
+     */
+    ['n-mobxBind']?: any
   }
 }

@@ -1,11 +1,12 @@
 const React = require('react');
+const testIf = 'testIf';
 
 module.exports = function (props) {
   return (
     <div>
-      <if condition={`${props}.condition === 'testIf'`}>
+      <If condition={`${props}.condition === testIf`}>
         <span>IfBlock</span>
-      </if>
+      </If>
     </div>
   );
 };

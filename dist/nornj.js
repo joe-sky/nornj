@@ -1,5 +1,5 @@
 /*!
-* NornJ template engine v5.0.0-rc.20
+* NornJ template engine v5.0.0-rc.22
 * (c) 2016-2019 Joe_Sky
 * Released under the MIT License.
 */
@@ -1515,8 +1515,9 @@
 
             if (createFilterAlias) {
               createFilterAlias(name, alias);
-              name = alias;
             }
+
+            name = alias;
           }
         }
 

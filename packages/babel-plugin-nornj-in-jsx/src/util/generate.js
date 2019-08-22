@@ -180,7 +180,7 @@ function createRenderTmpl(babel, quasis, expressions, opts, path, taggedName) {
   });
 
   const tmplKey = `${njUtils.uniqueKey(tmplStr)}_${locInfo(path)}`;
-  if (taggedName) {
+  if (taggedName && !['tag', 'directive'].includes(taggedName)) {
     let taggedTmplConfig = {};
     switch (taggedName) {
       case 'n':
@@ -194,7 +194,7 @@ function createRenderTmpl(babel, quasis, expressions, opts, path, taggedName) {
     tmplStr = Object.assign({ quasis: quasis.map(q => q.value.cooked) }, taggedTmplConfig);
   }
 
-  let hasAst = taggedName === 'n', tmplFns, tmplAst;
+  let hasAst = ['tag', 'directive', 'n'].includes(taggedName), tmplFns, tmplAst;
   tmplFns = nj.precompile(
     tmplStr,
     !isTmplFnS ? (opts.outputH != null ? opts.outputH : true) : false,
@@ -210,7 +210,21 @@ function createRenderTmpl(babel, quasis, expressions, opts, path, taggedName) {
 
   const paramIdentifiers = new Set();
   if (tmplAst) {
-    _getExpressionParams([tmplAst.content[0].content[0].props[0].prop], paramIdentifiers);
+    switch (taggedName) {
+      case 'tag':
+        nj.each(tmplAst.content[0].params, attr => {
+          _getExpressionParams([attr.props[0].prop], paramIdentifiers);
+        });
+        break;
+      case 'directive':
+        tmplAst.content[0].paramsEx && nj.each(tmplAst.content[0].paramsEx.content, attr => {
+          attr.content && _getExpressionParams([attr.content[0].content[0].props[0].prop], paramIdentifiers);
+        });
+        break;
+      default:
+        _getExpressionParams([tmplAst.content[0].content[0].props[0].prop], paramIdentifiers);
+        break;
+    }
   }
 
   const tmplObj = _buildTmplFns(tmplFns, tmplKey);

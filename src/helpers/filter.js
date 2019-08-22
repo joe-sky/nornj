@@ -237,8 +237,8 @@ export function registerFilter(name, filter, options, mergeConfig) {
           const createFilterAlias = nj.createFilterAlias;
           if (createFilterAlias) {
             createFilterAlias(name, alias);
-            name = alias;
           }
+          name = alias;
         }
       }
 
