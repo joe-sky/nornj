@@ -76,6 +76,27 @@ declare const item: any;
 declare const index: number;
 
 /**
+ * The parameter `first` in NornJ tag `Each` loop, example:
+ * 
+ * `<Each of={[1, 2, 3]}><i key={index}>isFirst:{first}</i></Each>`
+ */
+declare const first: number;
+
+/**
+ * The parameter `last` in NornJ tag `Each` loop, example:
+ * 
+ * `<Each of={[1, 2, 3]}><i key={index}>isLast:{last}</i></Each>`
+ */
+declare const last: number;
+
+/**
+ * The parameter `key` in NornJ tag `Each` loop, example:
+ * 
+ * `<Each of={{ a: 1, b: 2 }}><i key={index}>{key},{item}</i></Each>`
+ */
+declare const key: any;
+
+/**
  * NornJ tag `Empty`, example:
  * 
  * `<Each of={[1, 2, 3]}><i key={index}>{item}</i><Empty>nothing</Empty></Each>`

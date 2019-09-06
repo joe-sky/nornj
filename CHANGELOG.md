@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [v5.0.0-rc.23] 2019.09.06
+
+* 🐞 Fixed the key prop name of each tag.
+
 ## [v5.0.0-rc.20] 2019.08.20
 
 * 🌟 Added `nornj/lib/filter/lodash`.

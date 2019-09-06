@@ -275,7 +275,7 @@ export const extensionConfig = {
       data: {
         first: ['@first', 'first'],
         last: ['@last', 'last'],
-        key: ['@key', 'key']
+        $key: ['@key', 'key']
       }
     }
   }),
@@ -296,15 +296,16 @@ extensionConfig.css = _config(extensionConfig.obj);
 extensions['for'] = extensions.each;
 extensionConfig['for'] = _config(extensionConfig.each);
 extensions['case'] = extensions.elseif;
-extensionConfig['case'] = extensionConfig.elseif;
+extensionConfig['case'] = _config(extensionConfig.elseif);
 extensions.empty = extensions['default'] = extensions['else'];
-extensionConfig.empty = extensionConfig['default'] = extensionConfig['else'];
+extensionConfig.empty = _config(extensionConfig['else']);
+extensionConfig['default'] = _config(extensionConfig['else']);
 extensions.strProp = extensions.prop;
 extensionConfig.strProp = _config(extensionConfig.prop, { useString: true });
 extensions.strArg = extensions.arg;
 extensionConfig.strArg = _config(extensionConfig.strProp);
 extensions.pre = extensions.block;
-extensionConfig.pre = extensionConfig.block;
+extensionConfig.pre = _config(extensionConfig.block);
 
 //Register extension and also can batch add
 export function registerExtension(name, extension, options, mergeConfig) {

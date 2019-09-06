@@ -1,5 +1,5 @@
 /*!
-* NornJ template engine v5.0.0-rc.22
+* NornJ template engine v5.0.0-rc.23
 * (c) 2016-2019 Joe_Sky
 * Released under the MIT License.
 */
@@ -1170,7 +1170,7 @@
         data: {
           first: ['@first', 'first'],
           last: ['@last', 'last'],
-          key: ['@key', 'key']
+          $key: ['@key', 'key']
         }
       }
     }),
@@ -1206,9 +1206,10 @@
   extensions['for'] = extensions.each;
   extensionConfig['for'] = _config(extensionConfig.each);
   extensions['case'] = extensions.elseif;
-  extensionConfig['case'] = extensionConfig.elseif;
+  extensionConfig['case'] = _config(extensionConfig.elseif);
   extensions.empty = extensions['default'] = extensions['else'];
-  extensionConfig.empty = extensionConfig['default'] = extensionConfig['else'];
+  extensionConfig.empty = _config(extensionConfig['else']);
+  extensionConfig['default'] = _config(extensionConfig['else']);
   extensions.strProp = extensions.prop;
   extensionConfig.strProp = _config(extensionConfig.prop, {
     useString: true
@@ -1216,7 +1217,7 @@
   extensions.strArg = extensions.arg;
   extensionConfig.strArg = _config(extensionConfig.strProp);
   extensions.pre = extensions.block;
-  extensionConfig.pre = extensionConfig.block; //Register extension and also can batch add
+  extensionConfig.pre = _config(extensionConfig.block); //Register extension and also can batch add
 
   function registerExtension(name, extension, options, mergeConfig) {
     var params = name;
