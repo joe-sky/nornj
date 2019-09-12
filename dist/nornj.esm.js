@@ -1,5 +1,5 @@
 /*!
-* NornJ template engine v5.0.0-rc.23
+* NornJ template engine v5.0.0-rc.24
 * (c) 2016-2019 Joe_Sky
 * Released under the MIT License.
 */
@@ -2094,7 +2094,7 @@ function checkElem(obj$1, parent, tmplRule, hasExProps, noSplitNewline, isLast) 
           }), parent, parentContent, noSplitNewline, tmplRule);
         });
       } else {
-        _plainTextNode(isLast && parent.allowNewline === 'nlElem' ? trimRight(obj$1) : obj$1, parent, parentContent, noSplitNewline, tmplRule);
+        _plainTextNode(isLast && parent.allowNewline === 'nlElem' && !nj.textMode ? trimRight(obj$1) : obj$1, parent, parentContent, noSplitNewline, tmplRule);
       }
     } else {
       _plainTextNode(obj$1, parent, parentContent, noSplitNewline, tmplRule);

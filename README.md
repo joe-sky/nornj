@@ -25,8 +25,8 @@ English | [简体中文](https://github.com/joe-sky/nornj/blob/master/README.zh.
 
 ## Documents
 
-* [NornJ Guide(v5)](https://joe-sky.gitbooks.io/nornj-guide/zh/)
-* [NornJ Guide(v0.4)](https://joe-sky.github.io/nornj-guide)
+* [NornJ Guide(v5)](https://joe-sky.github.io/nornj-guide/zh)
+* [NornJ Guide(v0.4)](https://joe-sky.github.io/nornj-guide-v0.4)
 
 ## Introduction
 

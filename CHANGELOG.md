@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [v5.0.0-rc.24] 2019.09.12
+
+* 🐞 Fixed rendering spaces with text mode.
+
 ## [v5.0.0-rc.23] 2019.09.06
 
 * 🐞 Fixed the key prop name of each tag.

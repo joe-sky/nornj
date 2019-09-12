@@ -41,7 +41,7 @@ export default function checkElem(obj, parent, tmplRule, hasExProps, noSplitNewl
           str !== '' && _plainTextNode(str.replace(REGEX_REPLACE_BP, (all, g1) => braceParams[g1]), parent, parentContent, noSplitNewline, tmplRule);
         });
       } else {
-        _plainTextNode(isLast && parent.allowNewline === 'nlElem' ? tools.trimRight(obj) : obj, parent, parentContent, noSplitNewline, tmplRule);
+        _plainTextNode(isLast && parent.allowNewline === 'nlElem' && !nj.textMode ? tools.trimRight(obj) : obj, parent, parentContent, noSplitNewline, tmplRule);
       }
     } else {
       _plainTextNode(obj, parent, parentContent, noSplitNewline, tmplRule);
