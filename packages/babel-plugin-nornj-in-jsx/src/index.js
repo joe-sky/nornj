@@ -62,7 +62,12 @@ module.exports = function (babel) {
       const { value } = path.node.source;
       switch (value) {
         case 'nornj':
-          state.hasImportNj = true;
+          const specifiers = path.node.specifiers;
+          if (specifiers && specifiers.length
+            && specifiers[0].type === 'ImportDefaultSpecifier'
+            && specifiers[0].local.name === 'nj') {
+            state.hasImportNj = true;
+          }
           break;
         case 'nornj-react':
         case 'nornj-react/native':
@@ -116,12 +121,7 @@ module.exports = function (babel) {
         }
         if (!state.hasImportNj) {
           path.node.body.unshift(types.importDeclaration(
-            [
-              types.importDefaultSpecifier(types.identifier('nj')),
-              types.importSpecifier(types.identifier('n'), types.identifier('expression')),
-              types.importSpecifier(types.identifier('t'), types.identifier('template')),
-              types.importSpecifier(types.identifier('s'), types.identifier('css'))
-            ],
+            [types.importDefaultSpecifier(types.identifier('nj'))],
             types.stringLiteral('nornj')
           ));
         }

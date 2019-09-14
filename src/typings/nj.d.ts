@@ -43,7 +43,7 @@ export interface NornJ {
   taggedTmpl(strs: TemplateStringsArray, ...args: any);
 
   /**
-   * `nj.taggedTmplH`, NornJ tagged templates syntax `nj`.
+   * `nj.taggedTmplH`, NornJ tagged templates syntax `nj` and `html`.
    */
   taggedTmplH(strs: TemplateStringsArray, ...args: any);
 

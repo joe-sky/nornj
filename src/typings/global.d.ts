@@ -124,6 +124,13 @@ declare function With(props: { [id: string]: any }): any;
 declare function nj(strs: TemplateStringsArray, ...args: any);
 
 /**
+ * NornJ tagged templates syntax `html`(full name is `nj.taggedTmplH`), example:
+ * 
+ * `html'<html>Hello World!</html>'()`
+ */
+declare function html(strs: TemplateStringsArray, ...args: any);
+
+/**
  * NornJ tagged templates syntax `njs`(full name is `nj.taggedTmpl`), example:
  * 
  * `njs'<each {[1, 2, 3]}><i key={@index}>{@item}</i></each>'()`
