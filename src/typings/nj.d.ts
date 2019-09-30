@@ -4,6 +4,28 @@
 export interface NornJComponent { }
 
 /**
+ * NornJ filter options.
+ */
+export interface FilterOption {
+  onlyGlobal: boolean;
+  hasOptions: boolean;
+  isOperator: boolean;
+  hasLevel: boolean;
+  hasTmplCtx: boolean;
+  alias: string;
+  symbol: string;
+  placeholder: string;
+  [key: string]: any;
+}
+
+/**
+ * NornJ filter configs.
+ */
+export interface FilterConfig {
+  [key: string]: FilterOption;
+}
+
+/**
  * NornJ template engine.
  */
 export interface NornJ {
@@ -20,7 +42,7 @@ export interface NornJ {
   /**
    * `nj.registerFilter`, register filter and expression to NornJ.
    */
-  registerFilter(name: string, filter: Function, options?: object, mergeConfig?: boolean): void;
+  registerFilter(name: string, filter: Function, options?: FilterOption, mergeConfig?: boolean): void;
 
   /**
    * `nj.registerFilter`, register filter and expression to NornJ.
@@ -80,7 +102,7 @@ export interface NornJ {
   /**
    * `nj.filterConfig`.
    */
-  filterConfig: object;
+  filterConfig: FilterConfig;
 
   /**
    * `nj.extensions`.
