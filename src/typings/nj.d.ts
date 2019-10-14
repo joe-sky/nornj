@@ -1,14 +1,14 @@
 /**
- * React(or other such as Preact) components.
- */
-export interface NornJComponent { }
-
-/**
  * NornJ tagged templates syntax `nj`(full name is `nj.taggedTmplH`), example:
  * 
  * `nj'<html>Hello World!</html>'()`
  */
 declare namespace NornJ {
+  /**
+   * React(or other such as Preact) components.
+   */
+  export interface Component { }
+
   /**
    * NornJ filter options.
    */
@@ -34,12 +34,12 @@ declare namespace NornJ {
   /**
    * `nj.registerComponent`, register component to NornJ.
    */
-  export function registerComponent(name: string, component: NornJComponent, options?: object): NornJComponent | NornJComponent[];
+  export function registerComponent(name: string, component: Component, options?: object): Component | Component[];
 
   /**
    * `nj.registerComponent`, register component to NornJ.
    */
-  export function registerComponent(options: object): NornJComponent | NornJComponent[];
+  export function registerComponent(options: object): Component | Component[];
 
   /**
    * `nj.registerFilter`, register filter and expression to NornJ.
@@ -116,3 +116,15 @@ declare namespace NornJ {
    */
   export const extensionConfig: object;
 }
+
+declare module 'nornj' {
+  export = NornJ;
+  export default NornJ;
+}
+
+declare module 'nornj/dist/nornj.common' {
+  export = NornJ;
+  export default NornJ;
+}
+
+declare module 'nornj/lib/*';
