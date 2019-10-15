@@ -32,6 +32,32 @@ declare namespace NornJ {
   }
 
   /**
+   * NornJ extension options.
+   */
+  export interface ExtensionOption {
+    onlyGlobal: boolean;
+    useString: boolean;
+    newContext: boolean;
+    isSubTag: boolean;
+    isDirective: boolean;
+    isBindable: boolean;
+    useExpressionInProps: boolean;
+    hasName: boolean;
+    noTagName: boolean;
+    hasTagProps: boolean;
+    hasTmplCtx: boolean;
+    hasOutputH: boolean;
+    [key: string]: any;
+  }
+
+  /**
+   * NornJ extension configs.
+   */
+  export interface ExtensionConfig {
+    [key: string]: ExtensionOption;
+  }
+
+  /**
    * `nj.registerComponent`, register component to NornJ.
    */
   export function registerComponent(name: string, component: Component, options?: object): Component | Component[];
@@ -54,7 +80,7 @@ declare namespace NornJ {
   /**
    * `nj.registerExtension`, register tag and directive to NornJ.
    */
-  export function registerExtension(name: string, extension: Function, options?: object, mergeConfig?: boolean): void;
+  export function registerExtension(name: string, extension: Function, options?: ExtensionOption, mergeConfig?: boolean): void;
 
   /**
    * `nj.registerExtension`, register tag and directive to NornJ.
@@ -114,7 +140,7 @@ declare namespace NornJ {
   /**
    * `nj.extensionConfig`.
    */
-  export const extensionConfig: object;
+  export const extensionConfig: ExtensionConfig;
 }
 
 declare module 'nornj' {
