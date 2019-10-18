@@ -5,11 +5,6 @@
  */
 declare namespace NornJ {
   /**
-   * React(or other such as Preact) components.
-   */
-  export interface Component { }
-
-  /**
    * NornJ filter options.
    */
   export interface FilterOption {
@@ -30,6 +25,26 @@ declare namespace NornJ {
   export interface FilterConfig {
     [key: string]: FilterOption;
   }
+
+  /**
+   * `nj.filters`.
+   */
+  export const filters: object;
+
+  /**
+   * `nj.filterConfig`.
+   */
+  export const filterConfig: FilterConfig;
+
+  /**
+   * `nj.registerFilter`, register filter and expression to NornJ.
+   */
+  export function registerFilter(name: string, filter: Function, options?: FilterOption, mergeConfig?: boolean): void;
+
+  /**
+   * `nj.registerFilter`, register filter and expression to NornJ.
+   */
+  export function registerFilter(options: object): void;
 
   /**
    * NornJ extension options.
@@ -58,24 +73,14 @@ declare namespace NornJ {
   }
 
   /**
-   * `nj.registerComponent`, register component to NornJ.
+   * `nj.extensions`.
    */
-  export function registerComponent(name: string, component: Component, options?: object): Component | Component[];
+  export const extensions: object;
 
   /**
-   * `nj.registerComponent`, register component to NornJ.
+   * `nj.extensionConfig`.
    */
-  export function registerComponent(options: object): Component | Component[];
-
-  /**
-   * `nj.registerFilter`, register filter and expression to NornJ.
-   */
-  export function registerFilter(name: string, filter: Function, options?: FilterOption, mergeConfig?: boolean): void;
-
-  /**
-   * `nj.registerFilter`, register filter and expression to NornJ.
-   */
-  export function registerFilter(options: object): void;
+  export const extensionConfig: ExtensionConfig;
 
   /**
    * `nj.registerExtension`, register tag and directive to NornJ.
@@ -86,6 +91,31 @@ declare namespace NornJ {
    * `nj.registerExtension`, register tag and directive to NornJ.
    */
   export function registerExtension(options: object): void;
+
+  /**
+   * React(or other such as Preact) components.
+   */
+  export interface Component { }
+
+  /**
+   * `nj.components`.
+   */
+  export const components: object;
+
+  /**
+   * `nj.componentConfig`.
+   */
+  export const componentConfig: object;
+
+  /**
+   * `nj.registerComponent`, register component to NornJ.
+   */
+  export function registerComponent(name: string, component: Component, options?: object): Component | Component[];
+
+  /**
+   * `nj.registerComponent`, register component to NornJ.
+   */
+  export function registerComponent(options: object): Component | Component[];
 
   /**
    * `nj.taggedTmpl`, NornJ tagged templates syntax `njs`.
@@ -111,36 +141,6 @@ declare namespace NornJ {
    * `nj.css`, NornJ tagged templates syntax `s`.
    */
   export function css(strs: TemplateStringsArray, ...args: any);
-
-  /**
-   * `nj.components`.
-   */
-  export const components: object;
-
-  /**
-   * `nj.componentConfig`.
-   */
-  export const componentConfig: object;
-
-  /**
-   * `nj.filters`.
-   */
-  export const filters: object;
-
-  /**
-   * `nj.filterConfig`.
-   */
-  export const filterConfig: FilterConfig;
-
-  /**
-   * `nj.extensions`.
-   */
-  export const extensions: object;
-
-  /**
-   * `nj.extensionConfig`.
-   */
-  export const extensionConfig: ExtensionConfig;
 }
 
 declare module 'nornj' {
