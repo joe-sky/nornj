@@ -3,10 +3,34 @@
  * 
  * `nj'<html>Hello World!</html>'()`
  */
-declare namespace NornJ {
+export namespace NornJ {
   /**
-   * NornJ filter options.
+   * React(or other such as Preact) components.
    */
+  export type Component = React.ElementType;
+
+  /**
+   * Properties of React(or other such as Preact) components.
+   */
+  export interface ComponentProps {
+    [name: string]: any;
+  }
+
+  export interface HelperDelegate<T> {
+    (arg1?: any, arg2?: any, arg3?: any, arg4?: any, arg5?: any, options?: T): any;
+  }
+
+  export interface FilterDelegateOption {
+    _njOpts: number,
+    useString?: boolean,
+    global?: object,
+    context?: object,
+    outputH?: boolean,
+    level?: number
+  }
+
+  export type FilterDelegate = HelperDelegate<FilterDelegateOption>;
+
   export interface FilterOption {
     onlyGlobal: boolean;
     hasOptions: boolean;
@@ -19,36 +43,32 @@ declare namespace NornJ {
     [key: string]: any;
   }
 
-  /**
-   * NornJ filter configs.
-   */
-  export interface FilterConfig {
-    [key: string]: FilterOption;
-  }
+  export const filters: { [name: string]: FilterDelegate };
 
-  /**
-   * `nj.filters`.
-   */
-  export const filters: object;
-
-  /**
-   * `nj.filterConfig`.
-   */
-  export const filterConfig: FilterConfig;
+  export const filterConfig: { [name: string]: FilterOption };
 
   /**
    * `nj.registerFilter`, register filter and expression to NornJ.
    */
-  export function registerFilter(name: string, filter: Function, options?: FilterOption, mergeConfig?: boolean): void;
+  export function registerFilter(name: string, filter: FilterDelegate, options?: FilterOption, mergeConfig?: boolean): void;
 
   /**
    * `nj.registerFilter`, register filter and expression to NornJ.
    */
   export function registerFilter(options: object): void;
 
-  /**
-   * NornJ extension options.
-   */
+  export interface ExtensionDelegateOption extends FilterDelegateOption {
+    name?: string;
+    tagName?: Component;
+    setTagName?(c: Component): void;
+    tagProps?: ComponentProps;
+    props?: ComponentProps;
+    value?: Function;
+    children?: Function;
+  }
+
+  export type ExtensionDelegate = HelperDelegate<ExtensionDelegateOption>;
+
   export interface ExtensionOption {
     onlyGlobal: boolean;
     useString: boolean;
@@ -65,46 +85,22 @@ declare namespace NornJ {
     [key: string]: any;
   }
 
-  /**
-   * NornJ extension configs.
-   */
-  export interface ExtensionConfig {
-    [key: string]: ExtensionOption;
-  }
+  export const extensions: { [name: string]: ExtensionDelegate };
 
-  /**
-   * `nj.extensions`.
-   */
-  export const extensions: object;
-
-  /**
-   * `nj.extensionConfig`.
-   */
-  export const extensionConfig: ExtensionConfig;
+  export const extensionConfig: { [name: string]: ExtensionOption };
 
   /**
    * `nj.registerExtension`, register tag and directive to NornJ.
    */
-  export function registerExtension(name: string, extension: Function, options?: ExtensionOption, mergeConfig?: boolean): void;
+  export function registerExtension(name: string, extension: ExtensionDelegate, options?: ExtensionOption, mergeConfig?: boolean): void;
 
   /**
    * `nj.registerExtension`, register tag and directive to NornJ.
    */
   export function registerExtension(options: object): void;
 
-  /**
-   * React(or other such as Preact) components.
-   */
-  export interface Component { }
+  export const components: { [name: string]: Component };
 
-  /**
-   * `nj.components`.
-   */
-  export const components: object;
-
-  /**
-   * `nj.componentConfig`.
-   */
   export const componentConfig: object;
 
   /**
@@ -141,11 +137,6 @@ declare namespace NornJ {
    * `nj.css`, NornJ tagged templates syntax `s`.
    */
   export function css(strs: TemplateStringsArray, ...args: any);
-}
-
-declare module 'nornj' {
-  export = NornJ;
-  export default NornJ;
 }
 
 declare module 'nornj/dist/nornj.common' {

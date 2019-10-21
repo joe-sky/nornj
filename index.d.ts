@@ -1,2 +1,5 @@
 import './src/typings/global';
-import './src/typings/nj';
+import { NornJ } from './src/typings/nj';
+
+export = NornJ;
+export as namespace NornJ;
