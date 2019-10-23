@@ -1,6 +1,6 @@
 {
   "name": "nornj",
-  "version": "5.0.0-rc.26",
+  "version": "5.0.0-rc.28",
   "description": "A powerful template engine that can works with React, JSX enhancement or alternative tools.",
   "main": "dist/nornj.runtime.common.js",
   "module": "dist/nornj.runtime.esm.js",
@@ -11,6 +11,7 @@
     "lib/",
     "src/",
     "tools/",
+    "typings/",
     "index.d.ts",
     "CHANGELOG.md",
     "LICENSE",
