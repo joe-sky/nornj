@@ -1,0 +1,56 @@
+{
+  "name": "nornj",
+  "version": "5.0.0-rc.39",
+  "description": "A powerful template engine that can works with React, JSX enhancement or alternative tools.",
+  "main": "dist/nornj.runtime.common.js",
+  "module": "dist/nornj.runtime.esm.js",
+  "unpkg": "dist/nornj.js",
+  "jsdelivr": "dist/nornj.js",
+  "files": [
+    "dist/",
+    "lib/",
+    "src/",
+    "tools/",
+    "typings/",
+    "index.d.ts",
+    "CHANGELOG.md",
+    "LICENSE",
+    "README.md"
+  ],
+  "scripts": {
+    "cjs": "cross-env NODE_ENV=cjs rollup -c -o dist/nornj.common.js",
+    "esm": "cross-env NODE_ENV=es rollup -c -o dist/nornj.esm.js",
+    "umd": "cross-env NODE_ENV=development rollup -c -o dist/nornj.js",
+    "min": "cross-env NODE_ENV=production rollup -c -o dist/nornj.min.js",
+    "runtime-cjs": "cross-env TYPE=runtime NODE_ENV=cjs rollup -c -o dist/nornj.runtime.common.js",
+    "runtime-esm": "cross-env TYPE=runtime NODE_ENV=es rollup -c -o dist/nornj.runtime.esm.js",
+    "runtime-umd": "cross-env TYPE=runtime NODE_ENV=development rollup -c -o dist/nornj.runtime.js",
+    "runtime-min": "cross-env TYPE=runtime NODE_ENV=production rollup -c -o dist/nornj.runtime.min.js",
+    "lib": "babel src --out-dir lib --extensions \".js,.ts\" --config-file \"../../.babelrc\"",
+    "build": "npm run cjs && npm run esm && npm run umd && npm run min && npm run runtime-cjs && npm run runtime-esm && npm run runtime-umd && npm run runtime-min && npm run lib",
+    "test": "jest --config=test/jest/jest.config.json",
+    "coverage": "jest --coverage --config=test/jest/jest.config.json",
+    "ci": "npm run coverage && codecov test/coverage/coverage-final.json"
+  },
+  "keywords": [
+    "nornj",
+    "nj",
+    "template",
+    "react",
+    "jsx",
+    "babel"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/joe-sky/nornj.git"
+  },
+  "bugs": {
+    "url": "https://github.com/joe-sky/nornj/issues"
+  },
+  "author": "Joe_Sky <hitomi_doax@sina.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "handlebars": "^4.0.5",
+    "moment": "^2.20.1"
+  }
+}

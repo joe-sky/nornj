@@ -1,0 +1,32 @@
+{
+  "name": "nornj-loader",
+  "version": "5.0.0-rc.39",
+  "description": "Webpack loader for template engine NornJ",
+  "main": "index.js",
+  "files": [
+    "index.js",
+    "LICENSE",
+    "README.md"
+  ],
+  "keywords": [
+    "nornj",
+    "nj",
+    "template",
+    "react"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/joe-sky/nornj.git"
+  },
+  "bugs": {
+    "url": "https://github.com/joe-sky/nornj/issues"
+  },
+  "author": "Joe_Sky <hitomi_doax@sina.com>",
+  "license": "MIT",
+  "dependencies": {
+    "loader-utils": "^1.0.2"
+  },
+  "peerDependencies": {
+    "nornj": "*"
+  }
+}

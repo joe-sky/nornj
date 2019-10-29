@@ -1,0 +1,15 @@
+{
+  "packages": [
+    "packages/babel-plugin-nornj-in-jsx",
+    "packages/nornj",
+    "packages/nornj-loader",
+    "packages/nornj-react"
+  ],
+  "command": {
+    "publish": {
+      "message": "chore(release): publish %s"
+    }
+  },
+  "version": "5.0.0-rc.39",
+  "npmClient": "yarn"
+}

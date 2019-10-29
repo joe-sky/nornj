@@ -1,0 +1,69 @@
+{
+  "name": "nornj-react",
+  "version": "5.0.0-rc.39",
+  "description": "React bindings for NornJ template engine.",
+  "main": "dist/nornj-react.common.js",
+  "module": "dist/nornj-react.esm.js",
+  "unpkg": "dist/nornj-react.js",
+  "jsdelivr": "dist/nornj-react.js",
+  "files": [
+    "dist/",
+    "lib/",
+    "mobx/",
+    "native/",
+    "redux/",
+    "router/",
+    "antd/",
+    "echarts/",
+    "src/",
+    "typings/",
+    "index.d.ts",
+    "CHANGELOG.md",
+    "LICENSE",
+    "README.md"
+  ],
+  "scripts": {
+    "cjs": "cross-env NODE_ENV=cjs rollup -c -o dist/nornj-react.common.js",
+    "esm": "cross-env NODE_ENV=es rollup -c -o dist/nornj-react.esm.js",
+    "umd": "cross-env NODE_ENV=development rollup -c -o dist/nornj-react.js",
+    "min": "cross-env NODE_ENV=production rollup -c -o dist/nornj-react.min.js",
+    "umd:mobx": "cross-env NODE_ENV=development WITH_EX=Mobx rollup -c -o dist/nornj-react-mobx.js",
+    "min:mobx": "cross-env NODE_ENV=production WITH_EX=Mobx rollup -c -o dist/nornj-react-mobx.min.js",
+    "umd:redux": "cross-env NODE_ENV=development WITH_EX=Redux rollup -c -o dist/nornj-react-redux.js",
+    "min:redux": "cross-env NODE_ENV=production WITH_EX=Redux rollup -c -o dist/nornj-react-redux.min.js",
+    "umd:router": "cross-env NODE_ENV=development WITH_EX=Router rollup -c -o dist/nornj-react-router.js",
+    "min:router": "cross-env NODE_ENV=production WITH_EX=Router rollup -c -o dist/nornj-react-router.min.js",
+    "lib": "babel src --out-dir lib --config-file \"../../.babelrc\"",
+    "lib:mobx": "babel mobx/base.js --out-file mobx/index.js && babel mobx/baseNative.js --out-file mobx/native.js && babel mobx/src --out-dir mobx/lib --config-file \"../../.babelrc\"",
+    "lib:redux": "babel redux/base.js --out-file redux/index.js --config-file \"../../.babelrc\"",
+    "lib:router": "babel router/base.js --out-file router/index.js --config-file \"../../.babelrc\"",
+    "lib:native": "babel native/base.js --out-file native/index.js --config-file \"../../.babelrc\"",
+    "lib:antd": "babel antd --out-dir antd/lib --ignore \"antd/lib\" --config-file \"../../.babelrc\"",
+    "lib:echarts": "babel echarts/base.js --out-file echarts/index.js && babel echarts/baseCore.js --out-file echarts/core.js --config-file \"../../.babelrc\"",
+    "build": "npm run lib && npm run lib:mobx && npm run lib:redux && npm run lib:router && npm run lib:native && npm run lib:antd && npm run lib:echarts && npm run cjs && npm run esm && npm run umd && npm run umd:mobx && npm run umd:redux && npm run umd:router && npm run min && npm run min:mobx && npm run min:redux && npm run min:router"
+  },
+  "keywords": [
+    "nornj",
+    "nj",
+    "template",
+    "react"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/joe-sky/nornj.git"
+  },
+  "bugs": {
+    "url": "https://github.com/joe-sky/nornj/issues"
+  },
+  "author": "Joe_Sky <hitomi_doax@sina.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "antd": "^3.20.5",
+    "babel-plugin-nornj-in-jsx": "^5.0.0-rc.39",
+    "echarts-for-react": "^2.0.15-beta.0",
+    "mobx": "^5.9.0",
+    "mobx-react": "^5.4.3",
+    "mobx-react-lite": "^1.2.0",
+    "nornj": "^5.0.0-rc.39"
+  }
+}
