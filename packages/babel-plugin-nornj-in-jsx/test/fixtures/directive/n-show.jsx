@@ -2,9 +2,7 @@ const React = require('react');
 const createReactClass = require('create-react-class');
 
 const Wrap = ({ children, ...props }) => {
-  return <p {...props}>
-    {children}
-  </p>;
+  return <p {...props}>{children}</p>;
 };
 const Show = {
   Wrap
@@ -16,7 +14,7 @@ const Test = {
 const Noop = () => <i>noop</i>;
 
 module.exports = createReactClass({
-  render: function () {
+  render: function() {
     const { show } = this.props;
 
     return (

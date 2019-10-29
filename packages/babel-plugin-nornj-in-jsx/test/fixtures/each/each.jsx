@@ -2,7 +2,7 @@ const React = require('react');
 const createReactClass = require('create-react-class');
 
 module.exports = createReactClass({
-  render: function () {
+  render: function() {
     return (
       <div>
         <each of={this.props.of} item="item" index="index" last="l">

@@ -2,7 +2,7 @@ const React = require('react');
 const createReactClass = require('create-react-class');
 
 module.exports = createReactClass({
-  render: function () {
+  render: function() {
     return (
       <div>
         <switch value={this.props.condition1}>
@@ -14,9 +14,7 @@ module.exports = createReactClass({
               <case value={2}>
                 <i>NestedCase2Block</i>
               </case>
-              <default>
-                NestedDefaultBlock
-              </default>
+              <default>NestedDefaultBlock</default>
             </switch>
           </case>
           <case value={'case2'}>

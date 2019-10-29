@@ -8,7 +8,7 @@ function buildAttrs(types, tagName, attrs, quasis, expressions, lastAttrStr, new
   const newContext = exTagConfig && exTagConfig.newContext;
   const isCtxObject = nj.isObject(newContext);
   const getDataFromProps = newContext && newContext.getDataFromProps;
-  let dataFromPropsExcept = getDataFromProps && getDataFromProps.except;
+  const dataFromPropsExcept = getDataFromProps && getDataFromProps.except;
   if (isCtxObject) {
     Object.keys(newContext).forEach(k => {
       if (k !== 'getDataFromProps') {
@@ -30,9 +30,7 @@ function buildAttrs(types, tagName, attrs, quasis, expressions, lastAttrStr, new
         attrStr = attrStr + ' ' + attrName + '=';
         let isGetDataFromProps = false;
         if (getDataFromProps) {
-          isGetDataFromProps = !dataFromPropsExcept
-            ? true
-            : dataFromPropsExcept.indexOf(attrName) < 0;
+          isGetDataFromProps = !dataFromPropsExcept ? true : dataFromPropsExcept.indexOf(attrName) < 0;
         }
 
         if (isCtxObject && isGetDataFromProps) {
@@ -40,40 +38,38 @@ function buildAttrs(types, tagName, attrs, quasis, expressions, lastAttrStr, new
         }
         if (isCtxObject && !isGetDataFromProps && newContext[attrName] != null) {
           newContextData[attrName] = attr.value.value;
-          lastAttrStr += (i == 0 ? '<n-' + tagName : '');
-        }
-        else if (isCtxObject && !isGetDataFromProps && newContext.data && newContext.data[attrName] != null) {
+          lastAttrStr += i == 0 ? '<n-' + tagName : '';
+        } else if (isCtxObject && !isGetDataFromProps && newContext.data && newContext.data[attrName] != null) {
           const attrDatas = newContextData.data[attrName];
           newContextData.data[attrName] = [Array.isArray(attrDatas) ? attrDatas[0] : attrDatas, attr.value.value];
-          lastAttrStr += (i == 0 ? '<n-' + tagName : '');
-        }
-        else if (!attr.value) {
+          lastAttrStr += i == 0 ? '<n-' + tagName : '';
+        } else if (!attr.value) {
           lastAttrStr = attrStr.substr(0, attrStr.length - 1);
-        }
-        else if (attr.value.type == 'JSXExpressionContainer') {
+        } else if (attr.value.type == 'JSXExpressionContainer') {
           const expr = attr.value.expression;
 
           if (types.isTemplateLiteral(expr)) {
             if (expr.quasis.length === 1) {
               lastAttrStr = attrStr + '"{{' + expr.quasis[0].value.cooked + '}}"';
-            }
-            else {
+            } else {
               expr.quasis.forEach((q, i) => {
                 if (i == 0) {
                   attrStr += '"{{' + q.value.cooked;
-                  quasis.push(types.TemplateElement({
-                    raw: attrStr,
-                    cooked: attrStr
-                  }));
-                }
-                else if (i == expr.quasis.length - 1) {
+                  quasis.push(
+                    types.TemplateElement({
+                      raw: attrStr,
+                      cooked: attrStr
+                    })
+                  );
+                } else if (i == expr.quasis.length - 1) {
                   lastAttrStr = q.value.cooked + '}}"';
-                }
-                else {
-                  quasis.push(types.TemplateElement({
-                    raw: q.value.cooked,
-                    cooked: q.value.cooked
-                  }));
+                } else {
+                  quasis.push(
+                    types.TemplateElement({
+                      raw: q.value.cooked,
+                      cooked: q.value.cooked
+                    })
+                  );
                 }
 
                 if (i < expr.quasis.length - 1) {
@@ -82,37 +78,39 @@ function buildAttrs(types, tagName, attrs, quasis, expressions, lastAttrStr, new
                 }
               });
             }
-          }
-          else {
-            quasis.push(types.TemplateElement({
-              raw: attrStr,
-              cooked: attrStr
-            }));
+          } else {
+            quasis.push(
+              types.TemplateElement({
+                raw: attrStr,
+                cooked: attrStr
+              })
+            );
             expressions.push(expr);
             lastAttrStr = '';
           }
-        }
-        else {
-          quasis.push(types.TemplateElement({
-            raw: attrStr,
-            cooked: attrStr
-          }));
+        } else {
+          quasis.push(
+            types.TemplateElement({
+              raw: attrStr,
+              cooked: attrStr
+            })
+          );
           expressions.push(attr.value);
           lastAttrStr = '';
         }
-      }
-      else {
-        quasis.push(types.TemplateElement({
-          raw: attrStr + ' ',
-          cooked: attrStr + ' '
-        }));
+      } else {
+        quasis.push(
+          types.TemplateElement({
+            raw: attrStr + ' ',
+            cooked: attrStr + ' '
+          })
+        );
         attr.argument.isSpread = true;
         expressions.push(attr.argument);
         lastAttrStr = '';
       }
     });
-  }
-  else {
+  } else {
     lastAttrStr += '<n-' + tagName;
   }
 
@@ -122,11 +120,9 @@ function buildAttrs(types, tagName, attrs, quasis, expressions, lastAttrStr, new
 function _expressionPrefix(expr) {
   if (expr.isAccessor) {
     return '#';
-  }
-  else if (expr.isSpread) {
+  } else if (expr.isSpread) {
     return '...';
-  }
-  else {
+  } else {
     return '';
   }
 }
@@ -134,8 +130,7 @@ function _expressionPrefix(expr) {
 function getElName(types, expr) {
   if (types.isJSXMemberExpression(expr)) {
     return types.memberExpression(getElName(types, expr.object), getElName(types, expr.property));
-  }
-  else {
+  } else {
     return types.identifier(expr.name);
   }
 }
@@ -143,8 +138,7 @@ function getElName(types, expr) {
 function getDirectiveExpression(types, expr) {
   if (types.isBinaryExpression(expr)) {
     return [...getDirectiveExpression(types, expr.left), ...getDirectiveExpression(types, expr.right)];
-  }
-  else {
+  } else {
     return [expr.loc ? expr : expr.value];
   }
 }
@@ -152,8 +146,7 @@ function getDirectiveExpression(types, expr) {
 function getDirectiveMemberExpression(types, expr) {
   if (types.isMemberExpression(expr)) {
     return [...getDirectiveMemberExpression(types, expr.object), ...getDirectiveMemberExpression(types, expr.property)];
-  }
-  else {
+  } else {
     return [expr];
   }
 }
@@ -172,9 +165,12 @@ function createRenderTmpl(babel, quasis, expressions, opts, path, taggedName) {
     tmplStr += q.value.cooked;
     if (i < quasis.length - 1) {
       const expr = expressions[i];
-      tmplStr += (expr.noExpression ? '' : '{{')
-        + _expressionPrefix(expr) + '_njParam' + paramCount
-        + (expr.noExpression ? '' : '}}');
+      tmplStr +=
+        (expr.noExpression ? '' : '{{') +
+        _expressionPrefix(expr) +
+        '_njParam' +
+        paramCount +
+        (expr.noExpression ? '' : '}}');
       paramCount++;
     }
   });
@@ -194,15 +190,24 @@ function createRenderTmpl(babel, quasis, expressions, opts, path, taggedName) {
     tmplStr = Object.assign({ quasis: quasis.map(q => q.value.cooked) }, taggedTmplConfig);
   }
 
-  let hasAst = ['tag', 'directive', 'n'].includes(taggedName), tmplFns, tmplAst;
+  const hasAst = ['tag', 'directive', 'n'].includes(taggedName);
+  let tmplFns, tmplAst;
   tmplFns = nj.precompile(
     tmplStr,
     !isTmplFnS ? (opts.outputH != null ? opts.outputH : true) : false,
-    nj.createTmplRule(opts.delimiters != null ? opts.delimiters : (!isTmplFnS ? {
-      start: '{',
-      end: '}',
-      comment: ''
-    } : {})), hasAst);
+    nj.createTmplRule(
+      opts.delimiters != null
+        ? opts.delimiters
+        : !isTmplFnS
+          ? {
+            start: '{',
+            end: '}',
+            comment: ''
+          }
+          : {}
+    ),
+    hasAst
+  );
   if (hasAst) {
     tmplAst = tmplFns.ast;
     tmplFns = tmplFns.fns;
@@ -217,9 +222,10 @@ function createRenderTmpl(babel, quasis, expressions, opts, path, taggedName) {
         });
         break;
       case 'directive':
-        tmplAst.content[0].paramsEx && nj.each(tmplAst.content[0].paramsEx.content, attr => {
-          attr.content && _getExpressionParams([attr.content[0].content[0].props[0].prop], paramIdentifiers);
-        });
+        tmplAst.content[0].paramsEx &&
+          nj.each(tmplAst.content[0].paramsEx.content, attr => {
+            attr.content && _getExpressionParams([attr.content[0].content[0].props[0].prop], paramIdentifiers);
+          });
         break;
       default:
         _getExpressionParams([tmplAst.content[0].content[0].props[0].prop], paramIdentifiers);
@@ -243,8 +249,7 @@ function createRenderTmpl(babel, quasis, expressions, opts, path, taggedName) {
         const properties = newCtxDatakeys.map(k => {
           if (k !== CTX_DATA) {
             return types.objectProperty(types.Identifier(k), types.Identifier(e.newContextData[k]));
-          }
-          else {
+          } else {
             newDatas = e.newContextData[k];
             return types.objectProperty(types.Identifier(CTX_GET_DATA), types.Identifier(CTX_GET_DATA));
           }
@@ -260,48 +265,41 @@ function createRenderTmpl(babel, quasis, expressions, opts, path, taggedName) {
       if (newDatas) {
         const declarations = [];
         Object.keys(newDatas).forEach(k => {
-          let varName,
-            dataName;
+          let varName, dataName;
           if (Array.isArray(newDatas[k])) {
             varName = newDatas[k][1];
             dataName = newDatas[k][0];
-          }
-          else {
+          } else {
             dataName = varName = newDatas[k];
           }
 
-          declarations.push(types.variableDeclarator(
-            types.Identifier(varName),
-            types.callExpression(types.Identifier(CTX_GET_DATA), [types.stringLiteral(dataName), types.Identifier(CTX_DATA)])
-          ));
+          declarations.push(
+            types.variableDeclarator(
+              types.Identifier(varName),
+              types.callExpression(types.Identifier(CTX_GET_DATA), [
+                types.stringLiteral(dataName),
+                types.Identifier(CTX_DATA)
+              ])
+            )
+          );
         });
 
         declarations.length && arrowFnContent.push(types.variableDeclaration('const', declarations));
       }
       arrowFnContent.push(types.returnStatement(e));
 
-      block = types.ArrowFunctionExpression(
-        arrowFnParams,
-        types.blockStatement(arrowFnContent)
-      );
-    }
-    else {
+      block = types.ArrowFunctionExpression(arrowFnParams, types.blockStatement(arrowFnContent));
+    } else {
       block = e;
     }
 
-    tmplParams.push(types.objectProperty(
-      types.identifier('_njParam' + i),
-      block
-    ));
+    tmplParams.push(types.objectProperty(types.identifier('_njParam' + i), block));
   });
 
   if (paramIdentifiers.size) {
     paramIdentifiers.forEach(paramIdentifier => {
       if (path.scope.hasBinding(paramIdentifier)) {
-        tmplParams.push(types.objectProperty(
-          types.identifier(paramIdentifier),
-          types.identifier(paramIdentifier)
-        ));
+        tmplParams.push(types.objectProperty(types.identifier(paramIdentifier), types.identifier(paramIdentifier)));
       }
     });
   }
@@ -317,14 +315,15 @@ function createRenderTmpl(babel, quasis, expressions, opts, path, taggedName) {
   return types.CallExpression(
     types.memberExpression(
       types.identifier('nj'),
-      types.identifier(!isTmplFn ? 'renderH' : (taggedName === 'njs' ? 'buildRender' : 'buildRenderH'))
-    ), renderFnParams
+      types.identifier(!isTmplFn ? 'renderH' : taggedName === 'njs' ? 'buildRender' : 'buildRenderH')
+    ),
+    renderFnParams
   );
 }
 
 function _buildTmplFns(fns, tmplKey) {
   let ret = '{\n';
-  ret += '  _njTmplKey: \'' + tmplKey + '\',\n';
+  ret += `  _njTmplKey: '${tmplKey}',\n`;
 
   nj.each(fns, (v, k, i, l) => {
     if (k.indexOf('_') != 0) {

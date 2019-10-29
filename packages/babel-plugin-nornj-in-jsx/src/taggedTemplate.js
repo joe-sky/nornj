@@ -2,10 +2,10 @@ const nj = require('nornj/dist/nornj.common').default;
 const astUtil = require('./util/ast');
 const generate = require('./util/generate');
 
-module.exports = function (babel) {
+module.exports = function(babel) {
   const types = babel.types;
 
-  return function (node, path, state, taggedName) {
+  return function(node, path, state, taggedName) {
     const { quasis, expressions } = node.quasi;
     return generate.createRenderTmpl(babel, quasis, expressions, state.opts, path, taggedName);
   };

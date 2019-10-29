@@ -1,28 +1,22 @@
 import React from 'react';
 import nj from 'nornj';
 
-nj.registerExtension(
-  'while',
-  options => {
-    const { props, children } = options;
-    const ret = [];
+nj.registerExtension('while', options => {
+  const { props, children } = options;
+  const ret = [];
 
-    while (props.test()) {
-      ret.push(children());
-    }
-
-    return ret;
+  while (props.test()) {
+    ret.push(children());
   }
-);
 
-nj.registerExtension(
-  'set',
-  options => {
-    options.children();
-  }
-);
+  return ret;
+});
 
-module.exports = function (props) {
+nj.registerExtension('set', options => {
+  options.children();
+});
+
+module.exports = function(props) {
   let count = 0;
 
   return (

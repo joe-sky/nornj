@@ -1,8 +1,8 @@
-var React = require('react');
-var ReactDOMServer = require('react-dom/server');
+const React = require('react');
+const ReactDOMServer = require('react-dom/server');
 
 exports.render = function(Fixture, args) {
-  var fixture = React.createElement(Fixture, args);
+  const fixture = React.createElement(Fixture, args);
   return ReactDOMServer.renderToString(fixture);
 };
 
@@ -42,8 +42,8 @@ exports.matchEmptyDiv = function() {
   return buildRegExp(getDiv(''));
 };
 
-var Builder = function(type) {
-  var items = [];
+const Builder = function(type) {
+  const items = [];
 
   return {
     addReactText: function(content) {
@@ -59,7 +59,7 @@ var Builder = function(type) {
       return this;
     },
     build: function() {
-      var result = items.join('');
+      const result = items.join('');
       return buildRegExp(type === 'div' ? getDiv(result) : getSpan(result));
     }
   };

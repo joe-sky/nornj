@@ -1,19 +1,41 @@
 {
+  "parser": "@typescript-eslint/parser",
+  "plugins": ["@typescript-eslint", "react"],
+  "parserOptions": {
+    "ecmaVersion": 2018,
+    "sourceType": "module",
+    "ecmaFeatures": {
+      "jsx": true
+    }
+  },
+  "extends": [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/eslint-recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:react/recommended"
+  ],
+  "settings": {
+    "react": {
+      "version": "detect"
+    }
+  },
+  "env": {
+    "browser": true,
+    "node": true,
+    "jest": true,
+    "es6": true
+  },
   "rules": {
+    "no-undef": [0, "never"],
+    "jsx-quotes": [1, "prefer-double"],
     "camelcase": [
-      2,
+      1,
       {
         "properties": "always"
       }
     ],
-    "comma-dangle": [
-      2,
-      "never"
-    ],
-    "semi": [
-      2,
-      "always"
-    ],
+    "comma-dangle": [0, "never"],
+    "semi": [1, "always"],
     "quotes": [
       1,
       "single",
@@ -21,19 +43,41 @@
         "allowTemplateLiterals": true
       }
     ],
-    "strict": [
-      0,
-      "global"
-    ],
+    "strict": [1, "global"],
     "no-multiple-empty-lines": [
       1,
       {
         "max": 1
       }
-    ]
-  },
-  "parser": "babel-eslint",
-  "parserOptions": {
-    "sourceType": "module"
+    ],
+    "no-control-regex": 0,
+    "prefer-spread": 0,
+    "prefer-rest-params": 0,
+    "@typescript-eslint/indent": [
+      1,
+      2,
+      {
+        "SwitchCase": 1,
+        "ignoredNodes": ["TemplateLiteral > *", "JSXOpeningElement > *"]
+      }
+    ],
+    "@typescript-eslint/interface-name-prefix": [0, "always"],
+    "@typescript-eslint/explicit-member-accessibility": 0,
+    "@typescript-eslint/explicit-function-return-type": 0,
+    "@typescript-eslint/no-unused-vars": 0,
+    "@typescript-eslint/no-var-requires": 0,
+    "@typescript-eslint/no-explicit-any": 0,
+    "@typescript-eslint/no-empty-interface": 0,
+    "@typescript-eslint/no-use-before-define": 0,
+    "@typescript-eslint/no-this-alias": 0,
+    "@typescript-eslint/no-empty-function": 0,
+    "react/jsx-curly-spacing": 0,
+    "react/jsx-indent-props": 0,
+    "react/jsx-indent": [1, 2],
+    "react/jsx-no-undef": 0,
+    "react/prop-types": 0,
+    "react/display-name": 0,
+    "react/no-string-refs": 0,
+    "react/jsx-key": 0
   }
 }

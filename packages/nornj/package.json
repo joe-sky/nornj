@@ -27,10 +27,7 @@
     "runtime-umd": "cross-env TYPE=runtime NODE_ENV=development rollup -c -o dist/nornj.runtime.js",
     "runtime-min": "cross-env TYPE=runtime NODE_ENV=production rollup -c -o dist/nornj.runtime.min.js",
     "lib": "babel src --out-dir lib --extensions \".js,.ts\" --config-file \"../../.babelrc\"",
-    "build": "npm run cjs && npm run esm && npm run umd && npm run min && npm run runtime-cjs && npm run runtime-esm && npm run runtime-umd && npm run runtime-min && npm run lib",
-    "test": "jest --config=test/jest/jest.config.json",
-    "coverage": "jest --coverage --config=test/jest/jest.config.json",
-    "ci": "npm run coverage && codecov test/coverage/coverage-final.json"
+    "build": "yarn run cjs && yarn run esm && yarn run umd && yarn run min && yarn run runtime-cjs && yarn run runtime-esm && yarn run runtime-umd && yarn run runtime-min && yarn run lib"
   },
   "keywords": [
     "nornj",

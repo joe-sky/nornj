@@ -3,10 +3,10 @@ const astUtil = require('./util/ast');
 const generate = require('./util/generate');
 const utils = require('./util/utils');
 
-module.exports = function (babel) {
+module.exports = function(babel) {
   const types = babel.types;
 
-  return function (node, path, state) {
+  return function(node, path, state) {
     const quasis = [];
     const expressions = [];
     let elName = node.openingElement.name.name;
@@ -21,11 +21,10 @@ module.exports = function (babel) {
     const childrenBlocks = [];
     const subExTags = [];
 
-    children.forEach(function (childNode) {
+    children.forEach(function(childNode) {
       if (astUtil.isSubExTag(childNode)) {
         subExTags.push(childNode);
-      }
-      else {
+      } else {
         childrenBlocks.push(childNode);
       }
     });
@@ -39,14 +38,15 @@ module.exports = function (babel) {
 
       if (subExTags.length) {
         if (childrenBlocks.length) {
-          quasis.push(types.TemplateElement({
-            raw: '',
-            cooked: lastAttrStr + '>'
-          }));
+          quasis.push(
+            types.TemplateElement({
+              raw: '',
+              cooked: lastAttrStr + '>'
+            })
+          );
           expressions.push(childrenExpression);
           lastAttrStr = '';
-        }
-        else {
+        } else {
           lastAttrStr += '>';
         }
 
@@ -58,14 +58,26 @@ module.exports = function (babel) {
           subElName = nj.lowerFirst(subElName);
           const subAttrs = astUtil.getAttributeMap(subExTagNode);
           const subNewContextData = {};
-          lastAttrStr = generate.buildAttrs(types, subElName, subAttrs, quasis, expressions, lastAttrStr, subNewContextData);
-          quasis.push(types.TemplateElement({
-            raw: '',
-            cooked: lastAttrStr + '>'
-          }));
+          lastAttrStr = generate.buildAttrs(
+            types,
+            subElName,
+            subAttrs,
+            quasis,
+            expressions,
+            lastAttrStr,
+            subNewContextData
+          );
+          quasis.push(
+            types.TemplateElement({
+              raw: '',
+              cooked: lastAttrStr + '>'
+            })
+          );
 
           const subChildrenExpression = astUtil.getSanitizedExpressionForContent(
-            types, astUtil.getChildren(types, subExTagNode), key
+            types,
+            astUtil.getChildren(types, subExTagNode),
+            key
           );
           subChildrenExpression.isAccessor = true;
           subChildrenExpression.newContextData = subNewContextData;
@@ -74,30 +86,36 @@ module.exports = function (babel) {
           lastAttrStr = '</n-' + subElName + '>';
         });
 
-        quasis.push(types.TemplateElement({
-          raw: '',
-          cooked: lastAttrStr + '</n-' + elName + '>'
-        }));
-      }
-      else {
-        quasis.push(types.TemplateElement({
-          raw: '',
-          cooked: lastAttrStr + '>'
-        }));
+        quasis.push(
+          types.TemplateElement({
+            raw: '',
+            cooked: lastAttrStr + '</n-' + elName + '>'
+          })
+        );
+      } else {
+        quasis.push(
+          types.TemplateElement({
+            raw: '',
+            cooked: lastAttrStr + '>'
+          })
+        );
 
         expressions.push(childrenExpression);
 
-        quasis.push(types.TemplateElement({
-          raw: '',
-          cooked: '</n-' + elName + '>'
-        }));
+        quasis.push(
+          types.TemplateElement({
+            raw: '',
+            cooked: '</n-' + elName + '>'
+          })
+        );
       }
-    }
-    else {
-      quasis.push(types.TemplateElement({
-        raw: '',
-        cooked: lastAttrStr + ' />'
-      }));
+    } else {
+      quasis.push(
+        types.TemplateElement({
+          raw: '',
+          cooked: lastAttrStr + ' />'
+        })
+      );
     }
 
     return generate.createRenderTmpl(babel, quasis, expressions, state.opts, path, 'tag');

@@ -3,41 +3,41 @@ const styledJsx = require('styled-jsx/babel').default;
 const objectRestSpread = require('@babel/plugin-proposal-object-rest-spread').default;
 
 require('@babel/register')({
-  presets: [
-    '@babel/preset-env',
-    '@babel/preset-react'
-  ],
+  presets: ['@babel/preset-env', '@babel/preset-react'],
   plugins: [
     styledJsx,
-    [njInJsx, {
-      // delimiters: {
-      //   start: '{',
-      //   end: '}',
-      //   comment: ''
-      // },
-      filterConfig: {
-        cut: {
-          onlyGlobal: true,
-          hasOptions: true
-        }
-      },
-      extensionConfig: {
-        simpleFor: {
-          newContext: {
-            data: {
-              item: 'item',
-              index: 'index',
-              first: 'firstItem'
-            }
+    [
+      njInJsx,
+      {
+        // delimiters: {
+        //   start: '{',
+        //   end: '}',
+        //   comment: ''
+        // },
+        filterConfig: {
+          cut: {
+            onlyGlobal: true,
+            hasOptions: true
           }
         },
-        while: true,
-        set: true,
-        switch: {
-          needPrefix: 'onlyUpperCase'
+        extensionConfig: {
+          simpleFor: {
+            newContext: {
+              data: {
+                item: 'item',
+                index: 'index',
+                first: 'firstItem'
+              }
+            }
+          },
+          while: true,
+          set: true,
+          switch: {
+            needPrefix: 'onlyUpperCase'
+          }
         }
       }
-    }],
+    ],
     objectRestSpread
   ],
   cache: false

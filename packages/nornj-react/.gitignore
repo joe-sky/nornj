@@ -1,0 +1,13 @@
+/node_modules/
+/lib/
+/mobx/index.js
+/mobx/native.js
+/mobx/lib/
+/native/index.js
+/router/index.js
+/redux/index.js
+/server/index.js
+/antd/lib/
+/echarts/index.js
+/echarts/core.js
+/test/coverage/

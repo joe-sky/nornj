@@ -6,8 +6,8 @@ function setTmplConfig(opts, isInit) {
   }
 
   if (opts.extensionConfig) {
-    let extensionConfig = {},
-      extensionConfigs = opts.extensionConfig;
+    const extensionConfig = {};
+    let extensionConfigs = opts.extensionConfig;
     if (!Array.isArray(extensionConfigs)) {
       extensionConfigs = [extensionConfigs];
     }
@@ -22,8 +22,8 @@ function setTmplConfig(opts, isInit) {
     nj.registerExtension(extensionConfig, null, null, true);
   }
   if (opts.filterConfig) {
-    let filterConfig = {},
-      filterConfigs = opts.filterConfig;
+    const filterConfig = {};
+    let filterConfigs = opts.filterConfig;
     if (!Array.isArray(filterConfigs)) {
       filterConfigs = [filterConfigs];
     }

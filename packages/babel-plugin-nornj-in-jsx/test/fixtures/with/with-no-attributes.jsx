@@ -1,9 +1,9 @@
-var React = require('react');
+const React = require('react');
 const createReactClass = require('create-react-class');
 
 module.exports = createReactClass({
   render: function() {
-    let test = 'test';
+    const test = 'test';
     return (
       <div>
         <with>

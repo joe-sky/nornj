@@ -1,4 +1,4 @@
-var React = require('react');
+const React = require('react');
 const createReactClass = require('create-react-class');
 
 module.exports = createReactClass({
@@ -6,11 +6,13 @@ module.exports = createReactClass({
     <i>${'content'}</i>
   `,
 
-  render: function () {
+  render: function() {
     return (
-      <div>{nj`<${'b'}>{content}</${'b'}>`({
-        content: this.contentTmpl()
-      })}</div>
+      <div>
+        {nj`<${'b'}>{content}</${'b'}>`({
+          content: this.contentTmpl()
+        })}
+      </div>
     );
   }
 });

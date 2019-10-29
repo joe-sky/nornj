@@ -9,7 +9,5 @@ nj.registerFilter({
 module.exports = props => {
   const count = 2;
 
-  return (
-    <i>{n`props.value | cut(count) | upperFirst`}</i>
-  );
+  return <i>{n`props.value | cut(count) | upperFirst`}</i>;
 };

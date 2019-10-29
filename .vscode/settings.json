@@ -1,16 +1,5 @@
 {
   "javascript.suggest.autoImports": false,
   "typescript.suggest.autoImports": false,
-  "[javascript]": {
-    "editor.defaultFormatter": "vscode.typescript-language-features"
-  },
-  "[javascriptreact]": {
-    "editor.defaultFormatter": "vscode.typescript-language-features"
-  },
-  "[typescript]": {
-    "editor.defaultFormatter": "vscode.typescript-language-features"
-  },
-  "[typescriptreact]": {
-    "editor.defaultFormatter": "vscode.typescript-language-features"
-  }
+  "eslint.validate": ["javascript", "javascriptreact", "typescript", "typescriptreact"]
 }
