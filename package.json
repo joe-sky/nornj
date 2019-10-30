@@ -27,8 +27,8 @@
     "cover:njx": "lerna run --scope babel-plugin-nornj-in-jsx cover",
     "ci": "yarn run cover && codecov test/coverage/coverage-final.json",
     "ci:njx": "lerna run --scope babel-plugin-nornj-in-jsx ci",
-    "release": "lerna publish --force-publish --skip-git",
-    "release:next": "lerna publish --force-publish --skip-git --dist-tag next"
+    "release": "lerna publish --force-publish",
+    "release:next": "lerna publish --force-publish --dist-tag next"
   },
   "keywords": [
     "nornj",

@@ -92,7 +92,7 @@ if (env === 'production') {
 config.plugins.push(
   license({
     banner: `/*!
-* NornJ-React${withEx ? '-' + withEx : ''} v${require('./package.json').version}
+* NornJ-React${withEx ? '-' + withEx : ''} v${require('../../lerna.json').version}
 * (c) 2016-2019 Joe_Sky
 * Released under the MIT License.
 */`

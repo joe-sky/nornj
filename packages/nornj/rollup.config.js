@@ -62,7 +62,7 @@ if (env === 'production') {
 config.plugins.push(
   license({
     banner: `/*!
-* NornJ template engine v${require('./package.json').version}
+* NornJ template engine v${require('../../lerna.json').version}
 * (c) 2016-2019 Joe_Sky
 * Released under the MIT License.
 */`
