@@ -34,12 +34,12 @@
     "umd:router": "cross-env NODE_ENV=development WITH_EX=Router rollup -c -o dist/nornj-react-router.js",
     "min:router": "cross-env NODE_ENV=production WITH_EX=Router rollup -c -o dist/nornj-react-router.min.js",
     "lib": "babel src --out-dir lib --config-file \"../../.babelrc\"",
-    "lib:mobx": "babel mobx/base.js --out-file mobx/index.js && babel mobx/baseNative.js --out-file mobx/native.js && babel mobx/src --out-dir mobx/lib --config-file \"../../.babelrc\"",
+    "lib:mobx": "babel mobx/base.js --out-file mobx/index.js --config-file \"../../.babelrc\" && babel mobx/baseNative.js --out-file mobx/native.js --config-file \"../../.babelrc\" && babel mobx/src --out-dir mobx/lib --config-file \"../../.babelrc\"",
     "lib:redux": "babel redux/base.js --out-file redux/index.js --config-file \"../../.babelrc\"",
     "lib:router": "babel router/base.js --out-file router/index.js --config-file \"../../.babelrc\"",
     "lib:native": "babel native/base.js --out-file native/index.js --config-file \"../../.babelrc\"",
     "lib:antd": "babel antd --out-dir antd/lib --ignore \"antd/lib\" --config-file \"../../.babelrc\"",
-    "lib:echarts": "babel echarts/base.js --out-file echarts/index.js && babel echarts/baseCore.js --out-file echarts/core.js --config-file \"../../.babelrc\"",
+    "lib:echarts": "babel echarts/base.js --out-file echarts/index.js --config-file \"../../.babelrc\" && babel echarts/baseCore.js --out-file echarts/core.js --config-file \"../../.babelrc\"",
     "build": "yarn run lib && yarn run lib:mobx && yarn run lib:redux && yarn run lib:router && yarn run lib:native && yarn run lib:antd && yarn run lib:echarts && yarn run cjs && yarn run esm && yarn run umd && yarn run umd:mobx && yarn run umd:redux && yarn run umd:router && yarn run min && yarn run min:mobx && yarn run min:redux && yarn run min:router"
   },
   "keywords": [
