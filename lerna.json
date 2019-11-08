@@ -10,6 +10,6 @@
       "message": "chore(release): publish %s"
     }
   },
-  "version": "5.0.0-rc.41",
+  "version": "5.0.0-rc.42",
   "npmClient": "yarn"
 }

@@ -21,6 +21,7 @@
     "format:njr": "prettier-eslint --write packages/nornj-react/**/*.{js,jsx,ts,tsx}",
     "format:njl": "prettier-eslint --write packages/nornj-loader/**/*.{js,jsx,ts,tsx}",
     "format:njx": "prettier-eslint --write packages/babel-plugin-nornj-in-jsx/**/*.{js,jsx,ts,tsx}",
+    "type-check": "tsc --noEmit",
     "test": "jest --config=test/jest.config.js",
     "test:njx": "lerna run --scope babel-plugin-nornj-in-jsx test",
     "cover": "jest --coverage --config=test/jest.config.js",
@@ -58,32 +59,50 @@
     "@babel/preset-react": "^7.0.0",
     "@babel/preset-typescript": "^7.3.3",
     "@babel/register": "^7.0.0",
+    "@commitlint/cli": "^8.2.0",
+    "@commitlint/config-conventional": "^8.2.0",
     "@typescript-eslint/eslint-plugin": "^2.5.0",
     "@typescript-eslint/parser": "^2.5.0",
     "codecov": "^3.0.0",
+    "commitlint": "^8.2.0",
     "create-react-class": "^15.6.3",
     "cross-env": "^5.1.0",
     "enzyme": "^3.9.0",
     "enzyme-adapter-react-16": "^1.11.2",
     "eslint": "^6.5.1",
     "eslint-plugin-react": "^7.8.2",
+    "husky": "^3.0.9",
     "jest": "^24.5.0",
     "jest-css-modules-transform": "^2.1.1",
     "jest-environment-enzyme": "^7.0.2",
     "jest-enzyme": "^7.0.2",
     "lerna": "^3.18.3",
+    "lint-staged": "^9.4.2",
     "lodash": "^4.13.1",
     "prettier": "^1.18.2",
     "prettier-eslint": "^9.0.0",
     "prettier-eslint-cli": "^5.0.0",
     "react": "^16.11.0",
     "react-dom": "^16.11.0",
-    "rollup": "^1.15.3",
+    "rollup": "^1.26.3",
     "rollup-plugin-babel": "^4.3.2",
     "rollup-plugin-filesize": "^6.0.1",
     "rollup-plugin-license": "^0.8.1",
     "rollup-plugin-node-resolve": "^5.0.2",
     "rollup-plugin-replace": "^2.1.0",
-    "rollup-plugin-uglify": "^6.0.2"
+    "rollup-plugin-uglify": "^6.0.2",
+    "typescript": "^3.7.2"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged",
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
+    }
+  },
+  "lint-staged": {
+    "packages/{nornj,nornj-react,nornj-loader,babel-plugin-nornj-in-jsx}/**/*.{js,jsx,ts,tsx}": [
+      "prettier-eslint --write",
+      "git add"
+    ]
   }
 }

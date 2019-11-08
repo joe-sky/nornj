@@ -1,10 +1,10 @@
 ﻿import nj from '../core';
 import * as tools from '../utils/tools';
 import * as tranData from '../transforms/transformData';
-import { SwitchPrefixConfig } from './enums';
+import { ExtensionDelegate, ExtensionDelegateMultiParams, SwitchPrefixConfig, ExtensionOption } from '../../typings/nj';
 
 //Global extension list
-export const extensions = {
+export const extensions: { [name: string]: ExtensionDelegate | ExtensionDelegateMultiParams } = {
   if: (value, options) => {
     if (value && value._njOpts) {
       options = value;
@@ -251,8 +251,8 @@ export const extensions = {
   css: options => options.props.style
 };
 
-function _config(params, extra) {
-  let ret = {
+function _config(params?: ExtensionOption, extra?: ExtensionOption): ExtensionOption {
+  let ret: ExtensionOption = {
     onlyGlobal: false,
     useString: false,
     newContext: true,
@@ -276,10 +276,16 @@ function _config(params, extra) {
   return ret;
 }
 
-const _defaultCfg = { onlyGlobal: true, newContext: false, hasName: false, hasTagProps: false, hasTmplCtx: false };
+const _defaultCfg: ExtensionOption = {
+  onlyGlobal: true,
+  newContext: false,
+  hasName: false,
+  hasTagProps: false,
+  hasTmplCtx: false
+};
 
 //Extension default config
-export const extensionConfig = {
+export const extensionConfig: { [name: string]: ExtensionOption } = {
   if: _config(_defaultCfg),
   else: _config(_defaultCfg, { isSubTag: true, hasTagProps: true }),
   switch: _config(_defaultCfg, { needPrefix: SwitchPrefixConfig.OnlyLowerCase }),
@@ -322,8 +328,21 @@ extensionConfig.strArg = _config(extensionConfig.strProp);
 extensions.pre = extensions.block;
 extensionConfig.pre = _config(extensionConfig.block);
 
-//Register extension and also can batch add
-export function registerExtension(name, extension, options, mergeConfig) {
+export function registerExtension<T extends ExtensionDelegate>(options: {
+  [name: string]: T | { extension?: T; options?: ExtensionOption };
+}): void;
+export function registerExtension<T extends ExtensionDelegate>(
+  name: string,
+  extension: T,
+  options?: ExtensionOption,
+  mergeConfig?: boolean
+): void;
+export function registerExtension<T extends ExtensionDelegate>(
+  name,
+  extension?: T,
+  options?: ExtensionOption,
+  mergeConfig?: boolean
+): void {
   let params = name;
   if (!tools.isObject(name)) {
     params = {};
@@ -337,7 +356,7 @@ export function registerExtension(name, extension, options, mergeConfig) {
     params,
     function(v, name) {
       if (v) {
-        const { extension, options } = v;
+        const { extension, options }: { extension: T; options: ExtensionOption } = v;
 
         if (extension) {
           extensions[name] = extension;

@@ -1,14 +1,14 @@
 ﻿import nj from '../core';
 import * as tools from '../utils/tools';
-import checkElem from '../parser/checkElem';
+import { checkElem } from '../parser/checkElem';
 import * as tranData from '../transforms/transformData';
-import buildRuntime from './buildRuntime';
-import compileStringTmpl from '../parser/checkStringElem';
-import createTmplRule from '../utils/createTmplRule';
+import { buildRuntime } from './buildRuntime';
+import { compileStringTmpl } from '../parser/checkStringElem';
+import { createTmplRule } from '../utils/createTmplRule';
 
 //编译模板并返回转换函数
-function _createCompile(outputH) {
-  return (tmpl, tmplKey, fileName, delimiters, tmplRule) => {
+function _createCompile(outputH?) {
+  return (tmpl, tmplKey, fileName?, delimiters?, tmplRule?) => {
     if (!tmpl) {
       return;
     }
@@ -121,7 +121,7 @@ export function precompile(tmpl, outputH, tmplRule, hasAst) {
   }
 }
 
-function _createRender(outputH) {
+function _createRender(outputH?) {
   return function(tmpl, options) {
     return (outputH ? compileH : compile)(
       tmpl,
@@ -139,7 +139,7 @@ function _createRender(outputH) {
 export const render = _createRender();
 export const renderH = _createRender(true);
 
-function _buildRender(outputH) {
+function _buildRender(outputH?) {
   return function(tmpl, params) {
     const tmplMainFn = (outputH ? compileH : compile)(tmpl, tmpl._njTmplKey);
     if (params) {

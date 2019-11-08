@@ -71,6 +71,8 @@
     "@typescript-eslint/no-use-before-define": 0,
     "@typescript-eslint/no-this-alias": 0,
     "@typescript-eslint/no-empty-function": 0,
+    "@typescript-eslint/triple-slash-reference": 0,
+    "@typescript-eslint/no-namespace": 0,
     "react/jsx-curly-spacing": 0,
     "react/jsx-indent-props": 0,
     "react/jsx-indent": [1, 2],

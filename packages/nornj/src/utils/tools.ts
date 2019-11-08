@@ -14,7 +14,7 @@ export function arrayPush(arr1, arr2) {
   return arr1;
 }
 
-export function arraySlice(arrLike, start, end) {
+export function arraySlice(arrLike?, start?, end?) {
   return nativeArraySlice.call(arrLike, start, end);
 }
 
@@ -130,7 +130,7 @@ export function obj() {
 const REGEX_QUOT_D = /["]+/g,
   REGEX_QUOT_S = /[']+/g;
 
-export function clearQuot(value, clearDouble) {
+export function clearQuot(value, clearDouble?) {
   if (value == null) {
     return;
   }

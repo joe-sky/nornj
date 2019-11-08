@@ -1,5 +1,5 @@
 ﻿import { render, precompile } from '../../src/compiler/compile';
-import createTmplRule from '../../src/utils/createTmplRule';
+import { createTmplRule } from '../../src/utils/createTmplRule';
 import { registerExtension } from '../../src/helpers/extension';
 
 describe('Register extension tag', () => {

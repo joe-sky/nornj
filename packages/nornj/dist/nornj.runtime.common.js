@@ -1,5 +1,5 @@
 /*!
-* NornJ template engine v5.0.0-rc.41
+* NornJ template engine v5.0.0-rc.42
 * (c) 2016-2019 Joe_Sky
 * Released under the MIT License.
 */
@@ -7,12 +7,11 @@
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
-function nj() {
+var nj = function nj() {
   return nj['taggedTmpl' + (nj.outputH ? 'H' : '')].apply(null, arguments);
-}
+};
+
 nj.createElement = null;
-nj.components = {};
-nj.componentConfig = new Map();
 nj.preAsts = {};
 nj.asts = {};
 nj.templates = {};
@@ -284,51 +283,7 @@ var tools = /*#__PURE__*/Object.freeze({
   capitalize: capitalize
 });
 
-var components = nj.components,
-    componentConfig = nj.componentConfig;
-function registerComponent(name, component, options) {
-  var params = name,
-      ret;
-
-  if (!isObject(name)) {
-    params = {};
-    params[name] = {
-      component: component,
-      options: options
-    };
-  }
-
-  each(params, function (v, k, i) {
-    var comp;
-
-    if (v != null) {
-      var _component = v.component,
-          _options = v.options;
-
-      var _name = k.toLowerCase();
-
-      comp = _component ? _component : v;
-      components[_name] = comp;
-      componentConfig.set(comp, _options);
-    }
-
-    if (i == 0) {
-      ret = comp;
-    } else {
-      if (i == 1) {
-        ret = [ret];
-      }
-
-      ret.push(comp);
-    }
-  }, false);
-  return ret;
-}
-function getComponentConfig(name) {
-  return componentConfig.get(isString(name) ? components[name] || name : name);
-}
-
-function config (configs) {
+function config(configs) {
   var createElement = configs.createElement,
       outputH = configs.outputH;
 
@@ -340,6 +295,9 @@ function config (configs) {
     nj.outputH = outputH;
   }
 }
+assign(nj, {
+  config: config
+});
 
 var ESCAPE_LOOKUP = {
   '&': '&amp;',
@@ -526,9 +484,14 @@ function fixPropName(name) {
   return name;
 } //合并字符串属性
 
-function assignStrProps() {
+function assignStrProps(target) {
   var ret = '';
-  var retObj = assign.apply(tools, arguments);
+
+  for (var _len = arguments.length, params = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+    params[_key - 1] = arguments[_key];
+  }
+
+  var retObj = assign.apply(tools, [target].concat(params));
 
   for (var k in retObj) {
     var v = retObj[k];
@@ -657,6 +620,10 @@ function template(fns, tmplKey) {
   }, false);
   return configs;
 }
+
+/**
+ * React(or other such as Preact) components.
+ */
 
 var SwitchPrefixConfig;
 
@@ -995,8 +962,7 @@ extensionConfig.strProp = _config(extensionConfig.prop, {
 extensions.strArg = extensions.arg;
 extensionConfig.strArg = _config(extensionConfig.strProp);
 extensions.pre = extensions.block;
-extensionConfig.pre = _config(extensionConfig.block); //Register extension and also can batch add
-
+extensionConfig.pre = _config(extensionConfig.block);
 function registerExtension(name, extension, options, mergeConfig) {
   var params = name;
 
@@ -1172,9 +1138,9 @@ var filters = {
     }
 
     value = parseFloat(value);
-    symbol = decimals != null && nj.isString(decimals) ? decimals : symbol;
-    symbol = symbol != null && nj.isString(symbol) ? symbol : filterConfig.currency.symbol;
-    decimals = decimals != null && nj.isNumber(decimals) ? decimals : 2;
+    symbol = decimals != null && isString(decimals) ? decimals : symbol;
+    symbol = symbol != null && isString(symbol) ? symbol : filterConfig.currency.symbol;
+    decimals = decimals != null && isNumber(decimals) ? decimals : 2;
     var stringified = Math.abs(value).toFixed(decimals);
 
     var _int = decimals ? stringified.slice(0, -1 - decimals) : stringified;
@@ -1260,8 +1226,7 @@ var filterConfig = {
   })
 };
 filters.capitalize = filters.upperFirst;
-filterConfig.capitalize = _config$1(filterConfig.upperFirst); //Register filter and also can batch add
-
+filterConfig.capitalize = _config$1(filterConfig.upperFirst);
 function registerFilter(name, filter, options, mergeConfig) {
   var params = name;
 
@@ -1326,6 +1291,61 @@ assign(nj, {
   filters: filters,
   filterConfig: filterConfig,
   registerFilter: registerFilter
+});
+
+var components = {};
+var componentConfig = new Map();
+function registerComponent(name, component, options) {
+  var params = name,
+      ret;
+
+  if (!isObject(name)) {
+    params = {};
+    params[name] = {
+      component: component,
+      options: options
+    };
+  }
+
+  each(params, function (v, k, i) {
+    var comp;
+
+    if (v != null) {
+      var _component = v.component,
+          _options = v.options;
+
+      var _name = k.toLowerCase();
+
+      comp = _component ? _component : v;
+      components[_name] = comp;
+      componentConfig.set(comp, _options);
+    }
+
+    if (i == 0) {
+      ret = comp;
+    } else {
+      if (i == 1) {
+        ret = [ret];
+      }
+
+      ret.push(comp);
+    }
+  }, false);
+  return ret;
+}
+function getComponentConfig(name) {
+  return componentConfig.get(isString(name) ? components[name] || name : name);
+}
+function copyComponentConfig(component, from) {
+  componentConfig.set(component, componentConfig.get(from));
+  return component;
+}
+assign(nj, {
+  components: components,
+  componentConfig: componentConfig,
+  registerComponent: registerComponent,
+  getComponentConfig: getComponentConfig,
+  copyComponentConfig: copyComponentConfig
 });
 
 function _createCompile(outputH) {
@@ -1420,11 +1440,6 @@ assign(nj, {
   buildRenderH: buildRenderH
 });
 
-assign(nj, {
-  registerComponent: registerComponent,
-  getComponentConfig: getComponentConfig,
-  config: config
-});
 var _global = nj.global;
 _global.NornJ = _global.nj = nj;
 

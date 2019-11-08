@@ -1,9 +1,9 @@
 ﻿import nj from '../core';
 import { assign } from '../utils/tools';
-import compileStringTmpl from '../parser/checkStringElem';
-import createTmplRule from '../utils/createTmplRule';
+import { compileStringTmpl } from '../parser/checkStringElem';
+import { createTmplRule } from '../utils/createTmplRule';
 
-export function createTaggedTmpl(opts = {}) {
+export function createTaggedTmpl(opts: any = {}) {
   const { outputH, delimiters, fileName, isExpression, isCss } = opts;
   const tmplRule = delimiters ? createTmplRule(delimiters) : nj.tmplRule;
 
@@ -12,7 +12,7 @@ export function createTaggedTmpl(opts = {}) {
   };
 }
 
-export function createTaggedTmplH(opts = {}) {
+export function createTaggedTmplH(opts: any = {}) {
   opts.outputH = true;
   return createTaggedTmpl(opts);
 }
@@ -37,7 +37,9 @@ assign(nj, {
   createTaggedTmpl,
   createTaggedTmplH,
   taggedTmpl,
+  htmlString: taggedTmpl,
   taggedTmplH,
+  html: taggedTmplH,
   template,
   expression,
   css

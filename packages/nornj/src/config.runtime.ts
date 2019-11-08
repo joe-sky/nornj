@@ -1,6 +1,7 @@
 ﻿import nj from './core';
+import { assign } from './utils/tools';
 
-export default function(configs) {
+export function config(configs) {
   const { createElement, outputH } = configs;
 
   if (createElement) {
@@ -11,3 +12,7 @@ export default function(configs) {
     nj.outputH = outputH;
   }
 }
+
+assign(nj, {
+  config
+});

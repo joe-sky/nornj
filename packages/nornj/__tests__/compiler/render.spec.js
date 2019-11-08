@@ -1,6 +1,6 @@
 import { render } from '../../src/compiler/compile';
 import '../../src/utils/createTmplRule';
-import config from '../../src/config';
+import { config } from '../../src/config';
 
 describe('Render with global text mode', () => {
   beforeEach(() => {

@@ -5,7 +5,7 @@ import * as tranElem from '../transforms/transformElement';
 const NO_SPLIT_NEWLINE = ['style', 'script', 'textarea', 'pre', 'xmp', 'template', 'noscript', nj.textTag];
 
 function _plainTextNode(obj, parent, parentContent, noSplitNewline, tmplRule) {
-  const node = {};
+  const node: any = {};
   node.type = 'nj_plaintext';
   node.content = [
     tranParam.compiledParam(
@@ -23,7 +23,7 @@ function _plainTextNode(obj, parent, parentContent, noSplitNewline, tmplRule) {
 const REGEX_REPLACE_BP = /_njBp(\d+)_/g;
 
 //检测元素节点
-export default function checkElem(obj, parent, tmplRule, hasExProps, noSplitNewline, isLast) {
+export function checkElem(obj, parent, tmplRule, hasExProps?, noSplitNewline?, isLast?) {
   const parentContent = 'content';
 
   if (!tools.isArray(obj)) {
@@ -65,7 +65,7 @@ export default function checkElem(obj, parent, tmplRule, hasExProps, noSplitNewl
     return;
   }
 
-  const node = {},
+  const node: any = {},
     first = obj[0];
   if (tools.isString(first)) {
     //第一个子节点为字符串
@@ -219,14 +219,7 @@ export default function checkElem(obj, parent, tmplRule, hasExProps, noSplitNewl
       const end = len - (hasCloseTag ? 1 : 0),
         content = obj.slice(1, end);
       if (content && content.length) {
-        _checkContentElem(
-          content,
-          node,
-          tmplRule,
-          isParamsEx || (hasExProps && !isDirective),
-          noSplitNewline,
-          tmplRule
-        );
+        _checkContentElem(content, node, tmplRule, isParamsEx || (hasExProps && !isDirective), noSplitNewline);
       }
 
       //If this is params block, set on the "paramsEx" property of the parent node.

@@ -11,11 +11,6 @@ function _replaceStr(prop, innerQuotes) {
   return prop.replace(REGEX_REPLACE_CHAR, (all, g1) => innerQuotes[g1]);
 }
 
-// const SPACE_ERROR = 'This may be because the operator must have at least one space before and after';
-// function _syntaxError(errorStr, expression, source) {
-//   return 'Filter or expression syntax error: ' + errorStr + ' in\n\nexpression: ' + expression + '\n\nsource: ' + source + '\n\nNornJ expression syntax specification please see the document: https://joe-sky.github.io/nornj-guide/templateSyntax/filter.html\n';
-// }
-
 function _compiledProp(prop, innerBrackets, innerQuotes, source) {
   const ret = tools.obj();
   const propO = prop;
@@ -45,8 +40,6 @@ function _compiledProp(prop, innerBrackets, innerQuotes, source) {
 
           //Multiple params are separated by commas.
           if (paramsF != null) {
-            //tools.throwIf(innerBrackets[paramsF] != null, _syntaxError(_replaceStr(paramsF, innerQuotes) + '. ' + SPACE_ERROR, _replaceStr(propO, innerQuotes), source));
-
             const params = [];
             tools.each(
               innerBrackets[paramsF].split(','),
@@ -91,9 +84,6 @@ function _compiledProp(prop, innerBrackets, innerQuotes, source) {
     const hasAccessor = matchProp[6] === '#';
     ret.name = hasAccessor ? matchProp[7] : matchProp[0];
 
-    // if (matchProp[0] !== prop) {
-    //   tools.error(_syntaxError(SPACE_ERROR, _replaceStr(propO, innerQuotes), source));
-    // }
     if (!matchProp[5]) {
       //Sign the parameter is a basic type value.
       ret.isBasicType = true;
@@ -114,7 +104,7 @@ function _compiledProp(prop, innerBrackets, innerQuotes, source) {
 
 //Get filter param
 function _getFilterParam(obj) {
-  return obj.split('\'bracket_');
+  return obj.split(`'bracket_`);
 }
 
 //Extract replace parameters
@@ -131,7 +121,7 @@ const SP_FILTER_LOOKUP = {
 };
 let REGEX_SP_FILTER;
 
-function createFilterAlias(name, alias) {
+function createFilterAlias(name?, alias?) {
   if (name && alias) {
     SP_FILTER_LOOKUP[name] = alias;
   }
@@ -201,7 +191,7 @@ const OPERATORS = [
 ];
 
 let REGEX_OPERATORS;
-function createRegexOperators(operator) {
+function createRegexOperators(operator?) {
   if (operator) {
     let insertIndex = 0;
     OPERATORS.forEach((o, i) => {
@@ -264,9 +254,9 @@ function _getProp(matchArr, innerQuotes, i, addSet) {
         endWithUnderline = lastCharIndex > 0 && g1[lastCharIndex] === '_';
       return (
         (startWithHash ? '#' : '.') +
-        '(\'' +
+        `('` +
         (endWithUnderline ? g1.substr(0, lastCharIndex) : g1) +
-        '\')' +
+        `')` +
         (endWithUnderline ? '_' : '')
       );
     })
@@ -276,7 +266,7 @@ function _getProp(matchArr, innerQuotes, i, addSet) {
     .replace(REGEX_BRACKET_FILTER, (all, g1, g2, g3) => (g2 ? g2 : '') + (g2 ? g3 : g1).replace(/[(]/g, 'bracket('))
     //.replace(REGEX_OBJKEY_FILTER, (all, g1, g2) => g1 + ' \'' + g2 + '\' : ')
     .replace(REGEX_SPACE_S_FILTER, (all, match) => match)
-    .replace(REGEX_FN_FILTER, (all, match, g1) => (!g1 ? FN_FILTER_LOOKUP[match] : '.(\'' + g1 + '\')_('));
+    .replace(REGEX_FN_FILTER, (all, match, g1) => (!g1 ? FN_FILTER_LOOKUP[match] : `.('` + g1 + `')_(`));
 
   item[2] = prop.trim();
   return item;
@@ -323,14 +313,14 @@ function _fixOperator(prop, innerBrackets) {
   prop = prop.replace(REGEX_FIX_OPERATOR_1, function() {
     const args = arguments;
     innerBrackets.push(_fixFilter(args[2]));
-    return args[1] + '\'bracket_' + (innerBrackets.length - 1);
+    return args[1] + `'bracket_` + (innerBrackets.length - 1);
   });
 
   return _fixFilter(
     prop.replace(REGEX_FIX_OPERATOR, function() {
       const args = arguments;
       innerBrackets.push(_fixFilter(args[2]));
-      return ' ' + args[1] + '\'bracket_' + (innerBrackets.length - 1);
+      return ' ' + args[1] + `'bracket_` + (innerBrackets.length - 1);
     })
   );
 }
@@ -345,7 +335,7 @@ function _fixFilter(prop) {
 function _replaceInnerBrackets(prop, innerBrackets) {
   const propR = prop.replace(REGEX_INNER_BRACKET, (all, s1) => {
     innerBrackets.push(_fixOperator(s1, innerBrackets));
-    return '\'bracket_' + (innerBrackets.length - 1);
+    return `'bracket_` + (innerBrackets.length - 1);
   });
 
   if (propR !== prop) {
@@ -356,7 +346,7 @@ function _replaceInnerBrackets(prop, innerBrackets) {
 }
 
 //Get compiled parameter
-export function compiledParam(value, tmplRule, hasColon, onlyKey, addSet) {
+export function compiledParam(value, tmplRule, hasColon?, onlyKey?, addSet?) {
   const ret = tools.obj(),
     isStr = tools.isString(value);
   let strs = isStr ? (!hasColon ? value.split(tmplRule.replaceSplit) : ['', '']) : [value],

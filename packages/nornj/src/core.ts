@@ -1,10 +1,13 @@
-﻿export default function nj() {
+﻿const nj: {
+  (strs: TemplateStringsArray, ...args: any[]): any;
+  createRegexOperators?: Function;
+  createFilterAlias?: Function;
+  [name: string]: any;
+} = function() {
   return nj['taggedTmpl' + (nj.outputH ? 'H' : '')].apply(null, arguments);
-}
+};
 
 nj.createElement = null;
-nj.components = {};
-nj.componentConfig = new Map();
 nj.preAsts = {};
 nj.asts = {};
 nj.templates = {};
@@ -17,3 +20,5 @@ nj.textMode = false;
 nj.noWsTag = 'nj-noWs';
 nj.noWsMode = false;
 nj.fixTagName = true;
+
+export default nj;

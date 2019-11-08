@@ -5,9 +5,9 @@ module.exports = createReactClass({
   render: function() {
     return (
       <div>
-        <switch value={this.props.condition1}>
+        <n-switch value={this.props.condition1}>
           <case value={'case1'}>
-            <switch value={this.props.condition2}>
+            <n-switch value={this.props.condition2}>
               <case value={1}>
                 <i>NestedCase1Block</i>
               </case>
@@ -15,7 +15,7 @@ module.exports = createReactClass({
                 <i>NestedCase2Block</i>
               </case>
               <default>NestedDefaultBlock</default>
-            </switch>
+            </n-switch>
           </case>
           <case value={'case2'}>
             <span>Case2Block</span>
@@ -23,7 +23,7 @@ module.exports = createReactClass({
           <default>
             <span>DefaultBlock</span>
           </default>
-        </switch>
+        </n-switch>
       </div>
     );
   }

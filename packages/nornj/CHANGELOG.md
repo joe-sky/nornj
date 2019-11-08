@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [v5.0.0-rc.42] 2019.09.12
+
+* ♻️ Refactoring code using typescript.
+
 ## [v5.0.0-rc.24] 2019.09.12
 
 * 🐞 Fixed rendering spaces with text mode.

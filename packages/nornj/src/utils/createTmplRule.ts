@@ -1,7 +1,7 @@
 ﻿import nj from '../core';
 import * as tools from './tools';
 
-function _createRegExp(reg, mode) {
+function _createRegExp(reg, mode?) {
   return new RegExp(reg, mode);
 }
 
@@ -34,7 +34,7 @@ function _replaceMulti(str) {
   return str.replace(/\*/g, '\\*');
 }
 
-export default function createTmplRule(rules = {}, isGlobal) {
+export function createTmplRule(rules: any = {}, isGlobal?) {
   let {
     startRule = '{{',
     endRule = '}}',
@@ -198,3 +198,7 @@ export default function createTmplRule(rules = {}, isGlobal) {
 
 //Set global template rules
 createTmplRule({}, true);
+
+tools.assign(nj, {
+  createTmplRule
+});

@@ -220,11 +220,11 @@ declare function n(strs: TemplateStringsArray, ...args: any);
 declare function s(strs: TemplateStringsArray, ...args: any);
 
 declare namespace JSX {
-  type TChildren = Element | string | number | boolean | null | typeof undefined;
+  namespace NornJ {
+    type Children = Element | string | number | boolean | null | typeof undefined;
 
-  declare namespace NornJ {
     interface Childrenable {
-      children?: TChildren | TChildren[];
+      children?: Children | Children[];
     }
 
     interface If extends Childrenable {
@@ -249,7 +249,7 @@ declare namespace JSX {
 
     interface Default extends Childrenable {}
 
-    interface Each<T> extends Childrenable {
+    interface Each<T = any> extends Childrenable {
       of: Iterable<T> | string;
       item?: string;
       index?: string;
@@ -258,6 +258,8 @@ declare namespace JSX {
     interface With extends Childrenable {
       [id: string]: any;
     }
+
+    interface Empty extends Childrenable {}
   }
 
   interface IntrinsicElements {
@@ -316,13 +318,6 @@ declare namespace JSX {
      * `<n-if condition={foo > 10}><input /><n-else><input type="button" /></n-else></n-if>`
      */
     'n-else': NornJ.Else;
-
-    /**
-     * NornJ tag `switch`, example:
-     *
-     * `<switch value={foo}><case value={1}><input /></case><case value={2}><input type="button" /></case><default>nothing</default></switch>`
-     */
-    switch: NornJ.Switch;
 
     /**
      * NornJ tag `Switch`, example:
@@ -397,7 +392,7 @@ declare namespace JSX {
   }
 
   interface IntrinsicAttributes {
-    children?: TChildren | TChildren[];
+    children?: NornJ.Children | NornJ.Children[];
 
     /**
      * NornJ directive `n-show`, example:

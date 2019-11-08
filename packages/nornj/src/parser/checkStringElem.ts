@@ -7,7 +7,7 @@ const TEXT_CONTENT = ['style', 'script', 'textarea', 'xmp', nj.textTag];
 const { OMITTED_CLOSE_TAGS } = tranElem;
 
 //Compile string template
-export default function compileStringTmpl(tmpl) {
+export function compileStringTmpl(tmpl) {
   const tmplKey = tmpl.toString(); //Get unique key
   let ret = preAsts[tmplKey];
   const { outputH, tmplRule, onlyParse, fileName, isExpression, isCss } = this;
@@ -18,7 +18,7 @@ export default function compileStringTmpl(tmpl) {
       xmls = isStr ? [tmpl] : tmpl,
       l = xmls.length;
     let fullXml = '',
-      isInBrace = false;
+      isInBrace: boolean | string = false;
 
     //Connection xml string
     tools.each(

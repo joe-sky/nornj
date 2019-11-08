@@ -8,7 +8,7 @@ const GLOBAL = 'g';
 const CONTEXT = 'c';
 const PARAMS = 'p';
 
-function _buildFn(content, node, fns, no, newContext, level, useStringLocal) {
+function _buildFn(content, node, fns, no, newContext, level, useStringLocal?) {
   let fnStr = '';
   const useString = useStringLocal != null ? useStringLocal : fns.useString,
     main = no === 0,
@@ -22,6 +22,7 @@ function _buildFn(content, node, fns, no, newContext, level, useStringLocal) {
       _type: 0,
       _params: 0,
       _compParam: 0,
+      _children: 0,
       _dataRefer: 0,
       _ex: 0,
       _value: 0,
@@ -68,7 +69,7 @@ function _buildFn(content, node, fns, no, newContext, level, useStringLocal) {
   return no;
 }
 
-function _buildOptions(config, useStringLocal, node, fns, level, hashProps, tagName, tagProps) {
+function _buildOptions(config, useStringLocal, node, fns, level, hashProps?, tagName?, tagProps?) {
   let hashStr = ', useString: ' + (useStringLocal == null ? `${GLOBAL}.us` : useStringLocal ? 'true' : 'false');
   const noConfig = !config,
     no = fns._no;
@@ -141,7 +142,7 @@ const SP_FILTER_REPLACE = {
 
 function _buildDataValue(ast, escape, fns, level) {
   let dataValueStr,
-    special = false;
+    special: any = false;
   const { isBasicType, isAccessor, hasSet } = ast;
 
   if (isBasicType) {
@@ -422,7 +423,7 @@ function _replaceBackslash(str) {
   return (str = str.replace(/\\/g, '\\\\'));
 }
 
-function _buildProps(obj, fns, useStringLocal, level) {
+function _buildProps(obj, fns, useStringLocal, level?) {
   const str0 = obj.strs[0];
   let valueStr = '';
 
@@ -749,7 +750,7 @@ function _buildNode(node, parent, fns, counter, retType, level, useStringLocal, 
   return fnStr;
 }
 
-function _buildContent(content, parent, fns, counter, retType, level, useStringLocal, tagName, tagProps) {
+function _buildContent(content, parent, fns, counter, retType, level, useStringLocal, tagName?, tagProps?) {
   let fnStr = '';
   if (!content) {
     return fnStr;
@@ -901,7 +902,7 @@ function _buildLevelSpaceRt(useString, noSpace) {
   return '';
 }
 
-export default (astContent, ast, useString) => {
+export function buildRuntime(astContent, ast, useString) {
   const fns = {
     useString,
     _no: 0, //扩展标签函数计数
@@ -910,4 +911,4 @@ export default (astContent, ast, useString) => {
 
   _buildFn(astContent, ast, fns, fns._no, null, 0);
   return fns;
-};
+}

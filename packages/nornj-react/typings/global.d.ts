@@ -3,11 +3,9 @@ declare function MobxObserver(): any;
 declare function NjMobxObserver(): any;
 
 declare namespace JSX {
-  type TChildren = Element | string | number | boolean | null | typeof undefined;
-
-  declare namespace NornJReact {
+  namespace NornJReact {
     interface Childrenable {
-      children?: TChildren | TChildren[];
+      children?: NornJ.Children | NornJ.Children[];
     }
 
     interface MobxObserver extends Childrenable {}

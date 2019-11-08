@@ -8,13 +8,13 @@ import resolve from 'rollup-plugin-node-resolve';
 const env = process.env.NODE_ENV;
 const type = process.env.TYPE;
 const config = {
-  input: './src/base' + (type == 'runtime' ? '.runtime' : '') + '.js',
+  input: './src/base' + (type == 'runtime' ? '.runtime' : '') + '.ts',
   output: { name: 'NornJ' },
   plugins: [
     babel({
       babelrc: false,
       presets: [
-        '@babel/preset-typescript',
+        ['@babel/preset-typescript', { allowNamespaces: true }],
         [
           '@babel/preset-env',
           {

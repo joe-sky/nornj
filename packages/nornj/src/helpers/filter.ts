@@ -1,10 +1,11 @@
 ﻿import nj from '../core';
 import * as tools from '../utils/tools';
 import { getAccessorData, styleProps } from '../transforms/transformData';
+import { FilterDelegate, FilterOption } from '../../typings/nj';
 const REGEX_DIGITS_RE = /(\d{3})(?=\d)/g;
 
 //Global filter list
-export const filters = {
+export const filters: { [name: string]: FilterDelegate } = {
   //Get properties
   '.': (obj, prop, callFn) => {
     if (obj == null) {
@@ -52,12 +53,12 @@ export const filters = {
     return getAccessorData(obj[prop], options.context);
   },
 
-  '**': (val1, val2) => {
+  '**': (val1: number, val2: number) => {
     const ret = Math.pow(val1, val2);
     return isNaN(ret) ? 0 : ret;
   },
 
-  '%%': (val1, val2) => {
+  '%%': (val1: number, val2: number) => {
     const ret = Math.floor(val1 / val2);
     return isNaN(ret) ? 0 : ret;
   },
@@ -68,19 +69,19 @@ export const filters = {
   '!': val => !val,
 
   //Convert to int
-  int: (val, radix = 10) => {
+  int: (val: string, radix = 10) => {
     const ret = parseInt(val, radix);
     return isNaN(ret) ? 0 : ret;
   },
 
   //Convert to float
-  float: (val, bit) => {
+  float: (val: string, bit: number) => {
     const ret = parseFloat(val);
     return isNaN(ret) ? 0 : bit != null ? ret.toFixed(bit) : ret;
   },
 
   //Convert to boolean
-  bool: val => {
+  bool: (val: boolean | string) => {
     if (val === 'false') {
       return false;
     }
@@ -88,7 +89,7 @@ export const filters = {
     return Boolean(val);
   },
 
-  reg: (pattern, flags) => new RegExp(pattern, flags),
+  reg: (pattern: string | RegExp, flags: string) => new RegExp(pattern, flags),
 
   //Transform css string to object
   css: cssText => styleProps(cssText),
@@ -110,11 +111,11 @@ export const filters = {
     }
   },
 
-  upperFirst: str => tools.upperFirst(str),
+  upperFirst: (str: string) => tools.upperFirst(str),
 
-  lowerFirst: str => tools.lowerFirst(str),
+  lowerFirst: (str: string) => tools.lowerFirst(str),
 
-  camelCase: str => tools.camelCase(str),
+  camelCase: (str: string) => tools.camelCase(str),
 
   isObject: val => tools.isObject(val),
 
@@ -124,14 +125,14 @@ export const filters = {
 
   isArrayLike: val => tools.isArrayLike(val),
 
-  currency(value, decimals, symbol, placeholder) {
+  currency(value, decimals: number, symbol, placeholder: string) {
     if (!(value - parseFloat(value) >= 0)) {
       return placeholder != null ? placeholder : filterConfig.currency.placeholder;
     }
     value = parseFloat(value);
-    symbol = decimals != null && nj.isString(decimals) ? decimals : symbol;
-    symbol = symbol != null && nj.isString(symbol) ? symbol : filterConfig.currency.symbol;
-    decimals = decimals != null && nj.isNumber(decimals) ? decimals : 2;
+    symbol = decimals != null && tools.isString(decimals) ? decimals : symbol;
+    symbol = symbol != null && tools.isString(symbol) ? symbol : filterConfig.currency.symbol;
+    decimals = decimals != null && tools.isNumber(decimals) ? decimals : 2;
 
     const stringified = Math.abs(value).toFixed(decimals);
     const _int = decimals ? stringified.slice(0, -1 - decimals) : stringified;
@@ -150,8 +151,8 @@ function _getArrayByNum(isContainEnd) {
   };
 }
 
-function _config(params, extra) {
-  let ret = {
+function _config(params?: FilterOption, extra?: FilterOption): FilterOption {
+  let ret: FilterOption = {
     onlyGlobal: false,
     hasOptions: false,
     isOperator: false,
@@ -169,10 +170,10 @@ function _config(params, extra) {
   return ret;
 }
 
-const _defaultCfg = { onlyGlobal: true, hasOptions: false };
+const _defaultCfg: FilterOption = { onlyGlobal: true, hasOptions: false };
 
 //Filter default config
-export const filterConfig = {
+export const filterConfig: { [name: string]: FilterOption } = {
   '.': _config(_defaultCfg),
   _: _config({ onlyGlobal: true }),
   '#': _config({ onlyGlobal: true, hasOptions: true, hasLevel: true }),
@@ -201,8 +202,16 @@ export const filterConfig = {
 filters.capitalize = filters.upperFirst;
 filterConfig.capitalize = _config(filterConfig.upperFirst);
 
-//Register filter and also can batch add
-export function registerFilter(name, filter, options, mergeConfig) {
+export function registerFilter(options: {
+  [name: string]: FilterDelegate | { filter?: FilterDelegate; options?: FilterOption };
+}): void;
+export function registerFilter(
+  name: string,
+  filter: FilterDelegate,
+  options?: FilterOption,
+  mergeConfig?: boolean
+): void;
+export function registerFilter(name, filter?: FilterDelegate, options?: FilterOption, mergeConfig?: boolean): void {
   let params = name;
   if (!tools.isObject(name)) {
     params = {};
@@ -216,7 +225,7 @@ export function registerFilter(name, filter, options, mergeConfig) {
     params,
     (v, name) => {
       if (v) {
-        const { filter, options } = v;
+        const { filter, options }: { filter: FilterDelegate; options: FilterOption } = v;
         if (options) {
           if (options.isOperator) {
             const createRegexOperators = nj.createRegexOperators;

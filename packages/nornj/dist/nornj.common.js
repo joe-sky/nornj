@@ -1,5 +1,5 @@
 /*!
-* NornJ template engine v5.0.0-rc.41
+* NornJ template engine v5.0.0-rc.42
 * (c) 2016-2019 Joe_Sky
 * Released under the MIT License.
 */
@@ -7,12 +7,11 @@
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
-function nj() {
+var nj = function nj() {
   return nj['taggedTmpl' + (nj.outputH ? 'H' : '')].apply(null, arguments);
-}
+};
+
 nj.createElement = null;
-nj.components = {};
-nj.componentConfig = new Map();
 nj.preAsts = {};
 nj.asts = {};
 nj.templates = {};
@@ -326,54 +325,6 @@ var tools = /*#__PURE__*/Object.freeze({
   capitalize: capitalize
 });
 
-var components = nj.components,
-    componentConfig = nj.componentConfig;
-function registerComponent(name, component, options) {
-  var params = name,
-      ret;
-
-  if (!isObject(name)) {
-    params = {};
-    params[name] = {
-      component: component,
-      options: options
-    };
-  }
-
-  each(params, function (v, k, i) {
-    var comp;
-
-    if (v != null) {
-      var _component = v.component,
-          _options = v.options;
-
-      var _name = k.toLowerCase();
-
-      comp = _component ? _component : v;
-      components[_name] = comp;
-      componentConfig.set(comp, _options);
-    }
-
-    if (i == 0) {
-      ret = comp;
-    } else {
-      if (i == 1) {
-        ret = [ret];
-      }
-
-      ret.push(comp);
-    }
-  }, false);
-  return ret;
-}
-function getComponentConfig(name) {
-  return componentConfig.get(isString(name) ? components[name] || name : name);
-}
-function copyComponentConfig(component, from) {
-  componentConfig.set(component, componentConfig.get(from));
-  return component;
-}
-
 function _createRegExp(reg, mode) {
   return new RegExp(reg, mode);
 } //Clear the repeated characters
@@ -527,8 +478,11 @@ function createTmplRule() {
 } //Set global template rules
 
 createTmplRule({}, true);
+assign(nj, {
+  createTmplRule: createTmplRule
+});
 
-function config (configs) {
+function config(configs) {
   var delimiters = configs.delimiters,
       includeParser = configs.includeParser,
       createElement = configs.createElement,
@@ -565,6 +519,9 @@ function config (configs) {
     nj.fixTagName = fixTagName;
   }
 }
+assign(nj, {
+  config: config
+});
 
 var ESCAPE_LOOKUP = {
   '&': '&amp;',
@@ -751,9 +708,14 @@ function fixPropName(name) {
   return name;
 } //合并字符串属性
 
-function assignStrProps() {
+function assignStrProps(target) {
   var ret = '';
-  var retObj = assign.apply(tools, arguments);
+
+  for (var _len = arguments.length, params = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+    params[_key - 1] = arguments[_key];
+  }
+
+  var retObj = assign.apply(tools, [target].concat(params));
 
   for (var k in retObj) {
     var v = retObj[k];
@@ -882,6 +844,10 @@ function template(fns, tmplKey) {
   }, false);
   return configs;
 }
+
+/**
+ * React(or other such as Preact) components.
+ */
 
 var SwitchPrefixConfig;
 
@@ -1220,8 +1186,7 @@ extensionConfig.strProp = _config(extensionConfig.prop, {
 extensions.strArg = extensions.arg;
 extensionConfig.strArg = _config(extensionConfig.strProp);
 extensions.pre = extensions.block;
-extensionConfig.pre = _config(extensionConfig.block); //Register extension and also can batch add
-
+extensionConfig.pre = _config(extensionConfig.block);
 function registerExtension(name, extension, options, mergeConfig) {
   var params = name;
 
@@ -1397,9 +1362,9 @@ var filters = {
     }
 
     value = parseFloat(value);
-    symbol = decimals != null && nj.isString(decimals) ? decimals : symbol;
-    symbol = symbol != null && nj.isString(symbol) ? symbol : filterConfig.currency.symbol;
-    decimals = decimals != null && nj.isNumber(decimals) ? decimals : 2;
+    symbol = decimals != null && isString(decimals) ? decimals : symbol;
+    symbol = symbol != null && isString(symbol) ? symbol : filterConfig.currency.symbol;
+    decimals = decimals != null && isNumber(decimals) ? decimals : 2;
     var stringified = Math.abs(value).toFixed(decimals);
 
     var _int = decimals ? stringified.slice(0, -1 - decimals) : stringified;
@@ -1485,8 +1450,7 @@ var filterConfig = {
   })
 };
 filters.capitalize = filters.upperFirst;
-filterConfig.capitalize = _config$1(filterConfig.upperFirst); //Register filter and also can batch add
-
+filterConfig.capitalize = _config$1(filterConfig.upperFirst);
 function registerFilter(name, filter, options, mergeConfig) {
   var params = name;
 
@@ -1553,6 +1517,61 @@ assign(nj, {
   registerFilter: registerFilter
 });
 
+var components = {};
+var componentConfig = new Map();
+function registerComponent(name, component, options) {
+  var params = name,
+      ret;
+
+  if (!isObject(name)) {
+    params = {};
+    params[name] = {
+      component: component,
+      options: options
+    };
+  }
+
+  each(params, function (v, k, i) {
+    var comp;
+
+    if (v != null) {
+      var _component = v.component,
+          _options = v.options;
+
+      var _name = k.toLowerCase();
+
+      comp = _component ? _component : v;
+      components[_name] = comp;
+      componentConfig.set(comp, _options);
+    }
+
+    if (i == 0) {
+      ret = comp;
+    } else {
+      if (i == 1) {
+        ret = [ret];
+      }
+
+      ret.push(comp);
+    }
+  }, false);
+  return ret;
+}
+function getComponentConfig(name) {
+  return componentConfig.get(isString(name) ? components[name] || name : name);
+}
+function copyComponentConfig(component, from) {
+  componentConfig.set(component, componentConfig.get(from));
+  return component;
+}
+assign(nj, {
+  components: components,
+  componentConfig: componentConfig,
+  registerComponent: registerComponent,
+  getComponentConfig: getComponentConfig,
+  copyComponentConfig: copyComponentConfig
+});
+
 var REGEX_JS_PROP = /('[^']*')|("[^"]*")|(-?[0-9][0-9]*(\.\d+)?)|true|false|null|undefined|Object|Array|Math|Date|JSON|(([a-zA-Z_$#@])([a-zA-Z_$\d]*))/;
 var REGEX_REPLACE_CHAR = /_njQs(\d+)_/g;
 var REGEX_REPLACE_SET = /_njSet_/;
@@ -1561,11 +1580,7 @@ function _replaceStr(prop, innerQuotes) {
   return prop.replace(REGEX_REPLACE_CHAR, function (all, g1) {
     return innerQuotes[g1];
   });
-} // const SPACE_ERROR = 'This may be because the operator must have at least one space before and after';
-// function _syntaxError(errorStr, expression, source) {
-//   return 'Filter or expression syntax error: ' + errorStr + ' in\n\nexpression: ' + expression + '\n\nsource: ' + source + '\n\nNornJ expression syntax specification please see the document: https://joe-sky.github.io/nornj-guide/templateSyntax/filter.html\n';
-// }
-
+}
 
 function _compiledProp(prop, innerBrackets, innerQuotes, source) {
   var ret = obj();
@@ -1594,7 +1609,6 @@ function _compiledProp(prop, innerBrackets, innerQuotes, source) {
         //Multiple params are separated by commas.
 
         if (paramsF != null) {
-          //tools.throwIf(innerBrackets[paramsF] != null, _syntaxError(_replaceStr(paramsF, innerQuotes) + '. ' + SPACE_ERROR, _replaceStr(propO, innerQuotes), source));
           var params = [];
           each(innerBrackets[paramsF].split(','), function (p) {
             if (p !== '') {
@@ -1627,9 +1641,7 @@ function _compiledProp(prop, innerBrackets, innerQuotes, source) {
   if (prop !== '') {
     var matchProp = REGEX_JS_PROP.exec(prop);
     var hasAccessor = matchProp[6] === '#';
-    ret.name = hasAccessor ? matchProp[7] : matchProp[0]; // if (matchProp[0] !== prop) {
-    //   tools.error(_syntaxError(SPACE_ERROR, _replaceStr(propO, innerQuotes), source));
-    // }
+    ret.name = hasAccessor ? matchProp[7] : matchProp[0];
 
     if (!matchProp[5]) {
       //Sign the parameter is a basic type value.
@@ -1653,7 +1665,7 @@ function _compiledProp(prop, innerBrackets, innerQuotes, source) {
 
 
 function _getFilterParam(obj) {
-  return obj.split('\'bracket_');
+  return obj.split("'bracket_");
 } //Extract replace parameters
 
 
@@ -1768,7 +1780,7 @@ function _getProp(matchArr, innerQuotes, i, addSet) {
 
     var lastCharIndex = g1.length - 1,
         endWithUnderline = lastCharIndex > 0 && g1[lastCharIndex] === '_';
-    return (startWithHash ? '#' : '.') + '(\'' + (endWithUnderline ? g1.substr(0, lastCharIndex) : g1) + '\')' + (endWithUnderline ? '_' : '');
+    return (startWithHash ? '#' : '.') + "('" + (endWithUnderline ? g1.substr(0, lastCharIndex) : g1) + "')" + (endWithUnderline ? '_' : '');
   }).replace(REGEX_ARRPROP_FILTER, function (all, g1, g2) {
     return g1 + '.(';
   }).replace(REGEX_ARR_OBJ_FILTER, function (match) {
@@ -1781,7 +1793,7 @@ function _getProp(matchArr, innerQuotes, i, addSet) {
   .replace(REGEX_SPACE_S_FILTER, function (all, match) {
     return match;
   }).replace(REGEX_FN_FILTER, function (all, match, g1) {
-    return !g1 ? FN_FILTER_LOOKUP[match] : '.(\'' + g1 + '\')_(';
+    return !g1 ? FN_FILTER_LOOKUP[match] : ".('" + g1 + "')_(";
   });
   item[2] = prop.trim();
   return item;
@@ -1821,12 +1833,12 @@ function _fixOperator(prop, innerBrackets) {
   prop = prop.replace(REGEX_FIX_OPERATOR_1, function () {
     var args = arguments;
     innerBrackets.push(_fixFilter(args[2]));
-    return args[1] + '\'bracket_' + (innerBrackets.length - 1);
+    return args[1] + "'bracket_" + (innerBrackets.length - 1);
   });
   return _fixFilter(prop.replace(REGEX_FIX_OPERATOR, function () {
     var args = arguments;
     innerBrackets.push(_fixFilter(args[2]));
-    return ' ' + args[1] + '\'bracket_' + (innerBrackets.length - 1);
+    return ' ' + args[1] + "'bracket_" + (innerBrackets.length - 1);
   }));
 }
 
@@ -1841,7 +1853,7 @@ function _fixFilter(prop) {
 function _replaceInnerBrackets(prop, innerBrackets) {
   var propR = prop.replace(REGEX_INNER_BRACKET, function (all, s1) {
     innerBrackets.push(_fixOperator(s1, innerBrackets));
-    return '\'bracket_' + (innerBrackets.length - 1);
+    return "'bracket_" + (innerBrackets.length - 1);
   });
 
   if (propR !== prop) {
@@ -2313,6 +2325,7 @@ function _buildFn(content, node, fns, no, newContext, level, useStringLocal) {
     _type: 0,
     _params: 0,
     _compParam: 0,
+    _children: 0,
     _dataRefer: 0,
     _ex: 0,
     _value: 0,
@@ -3064,7 +3077,7 @@ function _buildLevelSpaceRt(useString, noSpace) {
   return '';
 }
 
-var buildRuntime = (function (astContent, ast, useString) {
+function buildRuntime(astContent, ast, useString) {
   var fns = {
     useString: useString,
     _no: 0,
@@ -3075,7 +3088,7 @@ var buildRuntime = (function (astContent, ast, useString) {
   _buildFn(astContent, ast, fns, fns._no, null, 0);
 
   return fns;
-});
+}
 
 var preAsts = nj.preAsts;
 var SPLIT_FLAG = '_njParam';
@@ -3752,19 +3765,14 @@ assign(nj, {
   createTaggedTmpl: createTaggedTmpl,
   createTaggedTmplH: createTaggedTmplH,
   taggedTmpl: taggedTmpl,
+  htmlString: taggedTmpl,
   taggedTmplH: taggedTmplH,
+  html: taggedTmplH,
   template: template$1,
   expression: expression,
   css: css
 });
 
-assign(nj, {
-  registerComponent: registerComponent,
-  getComponentConfig: getComponentConfig,
-  copyComponentConfig: copyComponentConfig,
-  createTmplRule: createTmplRule,
-  config: config
-});
 var _global = nj.global;
 _global.NornJ = _global.nj = nj;
 
@@ -3773,6 +3781,8 @@ exports.compileH = compileH;
 exports.css = css;
 exports.default = nj;
 exports.expression = expression;
+exports.html = taggedTmplH;
+exports.htmlString = taggedTmpl;
 exports.registerComponent = registerComponent;
 exports.registerExtension = registerExtension;
 exports.registerFilter = registerFilter;

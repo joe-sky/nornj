@@ -1,7 +1,8 @@
 ﻿import nj from './core';
-import createTmplRule from './utils/createTmplRule';
+import { assign } from './utils/tools';
+import { createTmplRule } from './utils/createTmplRule';
 
-export default function(configs) {
+export function config(configs) {
   const { delimiters, includeParser, createElement, outputH, textMode, noWsMode, fixTagName } = configs;
 
   if (delimiters) {
@@ -32,3 +33,7 @@ export default function(configs) {
     nj.fixTagName = fixTagName;
   }
 }
+
+assign(nj, {
+  config
+});

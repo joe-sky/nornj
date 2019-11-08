@@ -36,7 +36,7 @@ export function styleProps(obj) {
 }
 
 //Get value from multiple datas
-export function getData(prop, data, hasSource) {
+export function getData(prop, data, hasSource?) {
   let value, obj;
   if (!data) {
     data = this.data;
@@ -76,7 +76,7 @@ export function getAccessorData(fn, context) {
   }
 }
 
-export function getElement(name, global, nameO, context, subName) {
+export function getElement(name, global, nameO, context, subName?) {
   let element;
   if (!context.icp) {
     element = global.cp[name];
@@ -144,9 +144,9 @@ export function fixPropName(name) {
 }
 
 //合并字符串属性
-export function assignStrProps(...params) {
+export function assignStrProps(target, ...params) {
   let ret = '';
-  const retObj = tools.assign(...params);
+  const retObj = tools.assign(target, ...params);
 
   for (const k in retObj) {
     const v = retObj[k];
@@ -225,8 +225,8 @@ function callFilter(filter) {
 }
 
 //创建模板函数
-export function template(fns, tmplKey) {
-  const configs = {
+export function template(fns, tmplKey?) {
+  const configs: any = {
     tmplKey,
     us: fns.useString,
     x: nj.extensions,
