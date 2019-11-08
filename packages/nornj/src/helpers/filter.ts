@@ -1,7 +1,7 @@
 ﻿import nj from '../core';
 import * as tools from '../utils/tools';
 import { getAccessorData, styleProps } from '../transforms/transformData';
-import { FilterDelegate, FilterOption } from '../../typings/nj';
+import { FilterDelegate, FilterOption } from '../interface';
 const REGEX_DIGITS_RE = /(\d{3})(?=\d)/g;
 
 //Global filter list

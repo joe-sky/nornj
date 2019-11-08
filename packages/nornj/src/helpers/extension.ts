@@ -1,7 +1,7 @@
 ﻿import nj from '../core';
 import * as tools from '../utils/tools';
 import * as tranData from '../transforms/transformData';
-import { ExtensionDelegate, ExtensionDelegateMultiParams, SwitchPrefixConfig, ExtensionOption } from '../../typings/nj';
+import { ExtensionDelegate, ExtensionDelegateMultiParams, SwitchPrefixConfig, ExtensionOption } from '../interface';
 
 //Global extension list
 export const extensions: { [name: string]: ExtensionDelegate | ExtensionDelegateMultiParams } = {

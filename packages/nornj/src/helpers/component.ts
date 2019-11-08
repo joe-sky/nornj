@@ -1,6 +1,6 @@
 ﻿import nj from '../core';
 import * as tools from '../utils/tools';
-import { Component, ComponentOption } from '../../typings/nj';
+import { Component, ComponentOption } from '../interface';
 
 export const components: { [name: string]: Component } = {};
 

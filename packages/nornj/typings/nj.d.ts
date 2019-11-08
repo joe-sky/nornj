@@ -1,4 +1,4 @@
-import * as nj from './nj';
+import * as nj from '../src/interface';
 
 export = nj;
 

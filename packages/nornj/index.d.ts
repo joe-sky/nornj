@@ -1,5 +1,5 @@
 /// <reference path="./typings/global.d.ts" />
-/// <reference path="./typings/namespace.d.ts" />
+/// <reference path="./typings/nj.d.ts" />
 
 declare module 'nornj' {
   /**
