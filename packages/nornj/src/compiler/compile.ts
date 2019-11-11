@@ -7,8 +7,8 @@ import { compileStringTmpl } from '../parser/checkStringElem';
 import { createTmplRule } from '../utils/createTmplRule';
 
 //编译模板并返回转换函数
-function _createCompile(outputH?) {
-  return (tmpl, tmplKey, fileName?, delimiters?, tmplRule?) => {
+function _createCompile(outputH?: boolean) {
+  return (tmpl, tmplKey, fileName?: string, delimiters?: object, tmplRule?: object) => {
     if (!tmpl) {
       return;
     }
@@ -90,7 +90,7 @@ function _createAstRoot() {
 }
 
 //Precompile template
-export function precompile(tmpl, outputH, tmplRule, hasAst) {
+export function precompile(tmpl, outputH: boolean, tmplRule: object, hasAst?: boolean) {
   const root = _createAstRoot();
 
   if (tmpl.quasis) {
@@ -121,7 +121,7 @@ export function precompile(tmpl, outputH, tmplRule, hasAst) {
   }
 }
 
-function _createRender(outputH?) {
+function _createRender(outputH?: boolean) {
   return function(tmpl, options) {
     return (outputH ? compileH : compile)(
       tmpl,
@@ -139,7 +139,7 @@ function _createRender(outputH?) {
 export const render = _createRender();
 export const renderH = _createRender(true);
 
-function _buildRender(outputH?) {
+function _buildRender(outputH?: boolean) {
   return function(tmpl, params) {
     const tmplMainFn = (outputH ? compileH : compile)(tmpl, tmpl._njTmplKey);
     if (params) {

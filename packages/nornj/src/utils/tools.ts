@@ -14,7 +14,7 @@ export function arrayPush(arr1, arr2) {
   return arr1;
 }
 
-export function arraySlice(arrLike?, start?, end?) {
+export function arraySlice(arrLike?, start?: number, end?: number) {
   return nativeArraySlice.call(arrLike, start, end);
 }
 
@@ -40,7 +40,7 @@ export function isString(obj) {
 }
 
 //获取属性值
-function _getProperty(key) {
+function _getProperty(key: string) {
   return function(obj) {
     return obj == null ? void 0 : obj[key];
   };
@@ -55,7 +55,7 @@ export function isArrayLike(obj) {
 }
 
 //遍历数组或对象
-export function each(obj, func, isArr) {
+export function each(obj, func: Function, isArr?: boolean) {
   if (!obj) {
     return;
   }
@@ -87,7 +87,7 @@ export function each(obj, func, isArr) {
 }
 
 const REGEX_TRIM_RIGHT = /(\n|\r)?[\s\xA0]+$/;
-export function trimRight(str) {
+export function trimRight(str: string) {
   return str.replace(REGEX_TRIM_RIGHT, (all, s1) => (s1 ? '\n' : ''));
 }
 
@@ -95,7 +95,7 @@ export function trimRight(str) {
 export function noop() {}
 
 //抛出异常
-export function throwIf(val, msg, type) {
+export function throwIf(val, msg: string, type: string) {
   if (!val) {
     switch (type) {
       case 'ex':
@@ -107,7 +107,7 @@ export function throwIf(val, msg, type) {
 }
 
 //Print warn
-export function warn(msg, type) {
+export function warn(msg: string, type: string) {
   switch (type) {
     case 'f':
       msg = 'A filter called "' + msg + '" is undefined.';
@@ -117,7 +117,7 @@ export function warn(msg, type) {
 }
 
 //Print error
-export function error(msg) {
+export function error(msg: string) {
   console.error(errorTitle + msg);
 }
 
@@ -130,7 +130,7 @@ export function obj() {
 const REGEX_QUOT_D = /["]+/g,
   REGEX_QUOT_S = /[']+/g;
 
-export function clearQuot(value, clearDouble?) {
+export function clearQuot(value: string, clearDouble?: boolean) {
   if (value == null) {
     return;
   }
@@ -138,7 +138,7 @@ export function clearQuot(value, clearDouble?) {
   let regex;
   if (clearDouble == null) {
     const charF = value[0];
-    if (charF === '\'') {
+    if (charF === `'`) {
       regex = REGEX_QUOT_S;
     } else if (charF === '"') {
       regex = REGEX_QUOT_D;
@@ -156,7 +156,7 @@ export function clearQuot(value, clearDouble?) {
 }
 
 //Transform to camel-case
-export function camelCase(str) {
+export function camelCase(str: string) {
   if (str.indexOf('-') > -1) {
     str = str.replace(/-\w/g, function(letter) {
       return letter.substr(1).toUpperCase();
@@ -183,15 +183,15 @@ export const assign =
     return target;
   };
 
-export function upperFirst(str) {
+export function upperFirst(str: string) {
   return str[0].toUpperCase() + str.substr(1);
 }
 
-export function lowerFirst(str) {
+export function lowerFirst(str: string) {
   return str[0].toLowerCase() + str.substr(1);
 }
 
-export function capitalize(str) {
+export function capitalize(str: string) {
   return upperFirst(str);
 }
 

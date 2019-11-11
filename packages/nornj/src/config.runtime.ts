@@ -1,7 +1,8 @@
 ﻿import nj from './core';
 import { assign } from './utils/tools';
+import { ConfigOption } from './interface';
 
-export function config(configs) {
+export function config(configs: ConfigOption): void {
   const { createElement, outputH } = configs;
 
   if (createElement) {

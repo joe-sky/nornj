@@ -121,6 +121,16 @@ export interface ExtensionOption {
   [key: string]: any;
 }
 
+export interface ConfigOption {
+  delimiters?: object;
+  includeParser?: Function;
+  createElement?: Function;
+  outputH?: boolean;
+  textMode?: boolean;
+  noWsMode?: boolean;
+  fixTagName?: boolean;
+}
+
 export interface Export {
   /**
    * `nj.taggedTmplH`, NornJ tagged templates syntax `nj` and `html`.
@@ -192,6 +202,42 @@ export interface Export {
    * `nj.css`, NornJ tagged templates syntax `s`.
    */
   css(strs: TemplateStringsArray, ...args: any[]);
+
+  compile: typeof import('../src/compiler/compile').compile;
+
+  compileH: typeof import('../src/compiler/compile').compileH;
+
+  precompile: typeof import('../src/compiler/compile').precompile;
+
+  render: typeof import('../src/compiler/compile').render;
+
+  renderH: typeof import('../src/compiler/compile').renderH;
+
+  buildRender: typeof import('../src/compiler/compile').buildRender;
+
+  buildRenderH: typeof import('../src/compiler/compile').buildRenderH;
+
+  isObject: typeof import('../src/utils/tools').isObject;
+
+  isNumber: typeof import('../src/utils/tools').isNumber;
+
+  isString: typeof import('../src/utils/tools').isString;
+
+  isArrayLike: typeof import('../src/utils/tools').isArrayLike;
+
+  each: typeof import('../src/utils/tools').each;
+
+  noop: typeof import('../src/utils/tools').noop;
+
+  upperFirst: typeof import('../src/utils/tools').upperFirst;
+
+  lowerFirst: typeof import('../src/utils/tools').lowerFirst;
+
+  capitalize: typeof import('../src/utils/tools').capitalize;
+
+  config: typeof import('../src/config').config;
+
+  outputH: typeof import('../src/core').default.outputH;
 
   default: Export;
 }

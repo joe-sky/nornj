@@ -1,8 +1,9 @@
 ﻿import nj from './core';
 import { assign } from './utils/tools';
 import { createTmplRule } from './utils/createTmplRule';
+import { ConfigOption } from './interface';
 
-export function config(configs) {
+export function config(configs: ConfigOption): void {
   const { delimiters, includeParser, createElement, outputH, textMode, noWsMode, fixTagName } = configs;
 
   if (delimiters) {

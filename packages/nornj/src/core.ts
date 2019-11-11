@@ -1,7 +1,13 @@
 ﻿const nj: {
   (strs: TemplateStringsArray, ...args: any[]): any;
+  includeParser?: Function;
+  createElement?: Function;
   createRegexOperators?: Function;
   createFilterAlias?: Function;
+  outputH: boolean;
+  textMode: boolean;
+  noWsMode: boolean;
+  fixTagName: boolean;
   [name: string]: any;
 } = function() {
   return nj['taggedTmpl' + (nj.outputH ? 'H' : '')].apply(null, arguments);
