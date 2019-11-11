@@ -1,6 +1,6 @@
 {
   "name": "babel-plugin-nornj-in-jsx",
-  "version": "5.0.0-rc.43",
+  "version": "5.0.0-rc.44",
   "description": "Make the NornJ template work gracefully in the JSX environment",
   "author": {
     "name": "Joe_Sky",
@@ -41,8 +41,8 @@
   },
   "dependencies": {
     "@babel/core": "^7.1.2",
-    "nornj": "^5.0.0-rc.43",
-    "nornj-react": "^5.0.0-rc.43"
+    "nornj": "^5.0.0-rc.44",
+    "nornj-react": "^5.0.0-rc.44"
   },
   "devDependencies": {
     "@babel/plugin-proposal-object-rest-spread": "^7.4.0",
