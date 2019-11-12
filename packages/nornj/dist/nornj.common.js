@@ -1,5 +1,5 @@
 /*!
-* NornJ template engine v5.0.0-rc.43
+* NornJ template engine v5.0.0-rc.45
 * (c) 2016-2019 Joe_Sky
 * Released under the MIT License.
 */
@@ -227,7 +227,7 @@ function clearQuot(value, clearDouble) {
   if (clearDouble == null) {
     var charF = value[0];
 
-    if (charF === '\'') {
+    if (charF === "'") {
       regex = REGEX_QUOT_S;
     } else if (charF === '"') {
       regex = REGEX_QUOT_D;

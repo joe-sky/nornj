@@ -229,6 +229,8 @@ export interface Export {
 
   noop: typeof import('../src/utils/tools').noop;
 
+  assign: typeof import('../src/utils/tools').assign;
+
   upperFirst: typeof import('../src/utils/tools').upperFirst;
 
   lowerFirst: typeof import('../src/utils/tools').lowerFirst;
@@ -238,6 +240,8 @@ export interface Export {
   config: typeof import('../src/config').config;
 
   outputH: typeof import('../src/core').default.outputH;
+
+  global: { [name: string]: any };
 
   default: Export;
 }

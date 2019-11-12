@@ -1,7 +1,7 @@
 ﻿import njr from './core';
 import nj from 'nornj';
 import React from 'react';
-import bindTemplate from './bindTemplate';
+import { bindTemplate } from './bindTemplate';
 import './extension/debounce';
 
 nj.assign(njr, {
@@ -26,7 +26,7 @@ componentConfig.set('input', _defaultCfg);
 componentConfig.set('select', _defaultCfg);
 componentConfig.set('textarea', _defaultCfg);
 
-const _global = typeof self !== 'undefined' ? self : global;
+const { global: _global } = nj;
 _global.NornJReact = _global.njr = njr;
 
 export { bindTemplate, bindTemplate as registerTmpl };

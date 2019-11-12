@@ -1,6 +1,6 @@
 import nj from 'nornj';
 
-export function debounce(fn, delay) {
+export function debounce(fn: Function, delay: number) {
   let timeoutID = null;
 
   return function() {

@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { shallow, mount } from 'enzyme';
 import nj, { template as t } from 'nornj';
 import '../src/base';
-import bindTemplate from '../src/bindTemplate';
+import { bindTemplate } from '../src/bindTemplate';
 
 @bindTemplate
 class TestNoParam extends Component {

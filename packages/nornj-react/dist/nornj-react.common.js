@@ -1,5 +1,5 @@
 /*!
-* NornJ-React v5.0.0-rc.43
+* NornJ-React v5.0.0-rc.45
 * (c) 2016-2019 Joe_Sky
 * Released under the MIT License.
 */
@@ -297,9 +297,7 @@ var _defaultCfg = {
 componentConfig.set('input', _defaultCfg);
 componentConfig.set('select', _defaultCfg);
 componentConfig.set('textarea', _defaultCfg);
-
-var _global = typeof self !== 'undefined' ? self : global;
-
+var _global = nj__default.global;
 _global.NornJReact = _global.njr = njr;
 
 exports.bindTemplate = bindTemplate;

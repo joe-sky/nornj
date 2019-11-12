@@ -3,12 +3,13 @@ import replace from 'rollup-plugin-replace';
 import { uglify } from 'rollup-plugin-uglify';
 import filesize from 'rollup-plugin-filesize';
 import license from 'rollup-plugin-license';
+import resolve from 'rollup-plugin-node-resolve';
 
 const env = process.env.NODE_ENV;
 const type = process.env.TYPE;
 const withEx = process.env.WITH_EX || '';
 const libName = `NornJReact${withEx}`;
-let indexEntry = './src/base.js';
+let indexEntry = './src/base.ts';
 const external = ['nornj', 'react', 'react-dom'];
 switch (withEx) {
   case 'Mobx':
@@ -43,6 +44,7 @@ const config = {
     babel({
       babelrc: false,
       presets: [
+        ['@babel/preset-typescript', { allowNamespaces: true }],
         [
           '@babel/preset-env',
           {
@@ -58,7 +60,14 @@ const config = {
             loose: true
           }
         ]
-      ]
+      ],
+      extensions: ['.js', '.jsx', '.ts', '.tsx']
+    }),
+    resolve({
+      customResolveOptions: {
+        moduleDirectory: ['src', 'mobx', 'redux', 'router']
+      },
+      extensions: ['.js', '.jsx', '.ts', '.tsx']
     })
   ]
 };
