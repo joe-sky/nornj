@@ -1,4 +1,4 @@
-﻿import { registerComponent } from 'nornj';
+import { registerComponent } from 'nornj';
 import Timeline from 'antd/lib/timeline';
 
 registerComponent({

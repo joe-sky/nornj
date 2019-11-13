@@ -1,3 +1,3 @@
-﻿const njr: { [name: string]: any } = {};
+const njr: { [name: string]: any } = {};
 
 export default njr;

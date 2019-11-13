@@ -1,4 +1,4 @@
-﻿import nj from './core';
+import nj from './core';
 import './utils/createTmplRule';
 import './config';
 import './utils/escape';

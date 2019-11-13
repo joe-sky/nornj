@@ -1,4 +1,4 @@
-﻿const nj = require('../../src/base').default,
+const nj = require('../../src/base').default,
   includeParser = require('../../tools/includeParser');
 
 nj.config({ includeParser });

@@ -1,4 +1,4 @@
-﻿import { registerComponent } from 'nornj';
+import { registerComponent } from 'nornj';
 import Divider from 'antd/lib/divider';
 
 registerComponent({

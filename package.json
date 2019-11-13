@@ -17,10 +17,10 @@
     "lint:njl": "eslint packages/nornj-loader --ext .js,.jsx,.ts,.tsx",
     "lint:njx": "eslint packages/babel-plugin-nornj-in-jsx --ext .js,.jsx,.ts,.tsx",
     "format": "yarn run format:nj & yarn run format:njr & yarn run format:njl & yarn run format:njx",
-    "format:nj": "prettier-eslint --write packages/nornj/**/*.{js,jsx,ts,tsx}",
-    "format:njr": "prettier-eslint --write packages/nornj-react/**/*.{js,jsx,ts,tsx}",
-    "format:njl": "prettier-eslint --write packages/nornj-loader/**/*.{js,jsx,ts,tsx}",
-    "format:njx": "prettier-eslint --write packages/babel-plugin-nornj-in-jsx/**/*.{js,jsx,ts,tsx}",
+    "format:nj": "eslint --fix --ext .jsx,.js,.ts,.tsx packages/nornj/**/*.{js,jsx,ts,tsx}",
+    "format:njr": "eslint --fix --ext .jsx,.js,.ts,.tsx packages/nornj-react/**/*.{js,jsx,ts,tsx}",
+    "format:njl": "eslint --fix --ext .jsx,.js,.ts,.tsx packages/nornj-loader/**/*.{js,jsx,ts,tsx}",
+    "format:njx": "eslint --fix --ext .jsx,.js,.ts,.tsx packages/babel-plugin-nornj-in-jsx/**/*.{js,jsx,ts,tsx}",
     "type-check": "tsc --noEmit",
     "test": "jest --config=test/jest.config.js",
     "test:njx": "lerna run --scope babel-plugin-nornj-in-jsx test",
@@ -64,6 +64,7 @@
     "@types/chai": "^4.2.4",
     "@types/enzyme": "^3.10.3",
     "@types/jest": "^24.0.22",
+    "@types/jsdom": "^12.2.4",
     "@typescript-eslint/eslint-plugin": "^2.5.0",
     "@typescript-eslint/parser": "^2.5.0",
     "codecov": "^3.0.0",
@@ -73,7 +74,8 @@
     "enzyme": "^3.9.0",
     "enzyme-adapter-react-16": "^1.11.2",
     "eslint": "^6.5.1",
-    "eslint-plugin-react": "^7.8.2",
+    "eslint-plugin-prettier": "^3.1.1",
+    "eslint-plugin-react": "^7.16.0",
     "husky": "^3.0.9",
     "jest": "^24.5.0",
     "jest-css-modules-transform": "^2.1.1",
@@ -82,9 +84,7 @@
     "lerna": "^3.18.3",
     "lint-staged": "^9.4.2",
     "lodash": "^4.13.1",
-    "prettier": "^1.18.2",
-    "prettier-eslint": "^9.0.0",
-    "prettier-eslint-cli": "^5.0.0",
+    "prettier": "^1.19.1",
     "react": "^16.11.0",
     "react-dom": "^16.11.0",
     "rollup": "^1.26.3",
@@ -104,7 +104,7 @@
   },
   "lint-staged": {
     "packages/{nornj,nornj-react,nornj-loader,babel-plugin-nornj-in-jsx}/**/*.{js,jsx,ts,tsx}": [
-      "prettier-eslint --write",
+      "eslint --fix",
       "git add"
     ]
   }

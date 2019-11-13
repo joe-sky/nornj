@@ -27,6 +27,7 @@ describe('Precompile', () => {
     //expect(ret.main.toString()).toContain('g.x[\'noMargin\']');
   });
 
+  /* eslint-disable */
   xit('Simple', () => {
     const CUSTOM_VAR = 'nj_custom';
 
@@ -80,23 +81,23 @@ describe('Precompile', () => {
             special = CUSTOM_VAR;
             break;
           case '@lt':
-            data = '\'<\'';
+            data = "'<'"; // eslint-disable-line
             special = CUSTOM_VAR;
             break;
           case '@gt':
-            data = '\'>\'';
+            data = "'>'"; // eslint-disable-line
             special = CUSTOM_VAR;
             break;
           case '@lb':
-            data = '\'{\'';
+            data = "'{'"; // eslint-disable-line
             special = CUSTOM_VAR;
             break;
           case '@rb':
-            data = '\'}\'';
+            data = "'}'"; // eslint-disable-line
             special = CUSTOM_VAR;
             break;
           case '@q':
-            data = '\'"\'';
+            data = "'\"'"; // eslint-disable-line
             special = CUSTOM_VAR;
             break;
           case '@sq':
@@ -123,9 +124,9 @@ describe('Precompile', () => {
         if (!special && !specialP) {
           dataValueStr =
             (isComputed ? 'p1.c(' : '') +
-            'p2.d(\'' +
+            "p2.d('" +
             name +
-            '\'' +
+            "'" +
             (isComputed || hasSet ? ', 0, true' : '') +
             ')' +
             (isComputed ? ', p2, ' + level + ')' : '');
@@ -137,9 +138,9 @@ describe('Precompile', () => {
           dataValueStr = special
             ? dataStr
             : (isComputed ? 'p1.c(' : '') +
-              'p2.d(\'' +
+              "p2.d('" +
               name +
-              '\', ' +
+              "', " +
               dataStr +
               (isComputed || hasSet ? ', true' : '') +
               ')' +
@@ -152,6 +153,7 @@ describe('Precompile', () => {
 
       return dataValueStr;
     }
+    /* eslint-enable */
 
     //console.log(render(`<i>{{(1+2**3) %% 5+'_123'}}</i>`));
 
@@ -200,13 +202,14 @@ describe('Precompile', () => {
       --->
     </div>`;
 
+    /* eslint-disable */
     const ast = {
       prop: {
         filters: [
           {
             params: [
               {
-                name: '\'e\'',
+                name: "'e'",
                 isBasicType: true
               }
             ],
@@ -219,7 +222,7 @@ describe('Precompile', () => {
                   {
                     params: [
                       {
-                        name: '\'b\'',
+                        name: "'b'",
                         isBasicType: true
                       }
                     ],
@@ -228,7 +231,7 @@ describe('Precompile', () => {
                   {
                     params: [
                       {
-                        name: '\'c\'',
+                        name: "'c'",
                         isBasicType: true
                       }
                     ],
@@ -262,6 +265,7 @@ describe('Precompile', () => {
       },
       escape: true
     };
+    /* eslint-enable */
 
     function _buildExpression(ast, inObj) {
       let codeStr =

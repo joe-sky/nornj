@@ -1,5 +1,5 @@
 /*!
-* NornJ template engine v5.0.0-rc.45
+* NornJ template engine v5.0.0-rc.46
 * (c) 2016-2019 Joe_Sky
 * Released under the MIT License.
 */
@@ -306,7 +306,8 @@
     '>': '&gt;',
     '<': '&lt;',
     '"': '&quot;',
-    '\'': '&#x27;'
+    "'": '&#x27;' // eslint-disable-line
+
   };
   var REGEX_ESCAPE = /[&><"']/g;
   function escape(str) {
@@ -331,7 +332,8 @@
     gt: '>',
     amp: '&',
     quot: '"',
-    '#x27': '\''
+    '#x27': "'" // eslint-disable-line
+
   };
   var REGEX_UNESCAPE = new RegExp('&(' + Object.keys(UNESCAPE_LOOKUP).join('|') + ');', 'g');
   function unescape(str) {
@@ -528,7 +530,9 @@
     return function (param1, param2) {
       var ctx = this,
           data = arraySlice(arguments);
-      return main(configs, ctx && ctx._njCtx ? assign({}, ctx, {
+      return main(configs, ctx &&
+      /* eslint-disable */
+      ctx._njCtx ? assign({}, ctx, {
         data: arrayPush(data, ctx.data)
       }) : {
         data: data,
@@ -541,7 +545,9 @@
         d: getData,
         icp: _getLocalComponents(param1 && param1._njParam ? param2 : param1),
         _njCtx: true
-      });
+      }
+      /* eslint-enable */
+      );
     };
   }
 
@@ -848,7 +854,11 @@
         var _options2 = options,
             props = _options2.props;
         return options.children({
-          data: [props && props.as ? _defineProperty({}, props.as, originalData) : originalData]
+          data: [props && props.as ?
+          /* eslint-disable */
+          _defineProperty({}, props.as, originalData)
+          /* eslint-enable */
+          : originalData]
         });
       }
     },
@@ -1396,11 +1406,15 @@
 
   function _createRender(outputH) {
     return function (tmpl, options) {
-      return (outputH ? compileH : compile)(tmpl, options ? {
+      return (outputH ? compileH : compile)(tmpl, options ?
+      /* eslint-disable */
+      {
         tmplKey: options.tmplKey ? options.tmplKey : tmpl._njTmplKey,
         fileName: options.fileName,
         delimiters: options.delimiters
-      } : tmpl._njTmplKey).apply(null, arraySlice(arguments, 1));
+      }
+      /* eslint-enable */
+      : tmpl._njTmplKey).apply(null, arraySlice(arguments, 1));
     };
   }
 

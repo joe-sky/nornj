@@ -1,4 +1,4 @@
-﻿import nj from './core';
+import nj from './core';
 import { assign } from './utils/tools';
 import { createTmplRule } from './utils/createTmplRule';
 import { ConfigOption } from './interface';

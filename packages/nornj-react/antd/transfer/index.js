@@ -1,4 +1,4 @@
-﻿import { registerComponent } from 'nornj';
+import { registerComponent } from 'nornj';
 import Transfer from 'antd/lib/transfer';
 
 registerComponent({

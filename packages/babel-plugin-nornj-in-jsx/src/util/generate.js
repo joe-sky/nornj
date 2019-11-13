@@ -198,13 +198,13 @@ function createRenderTmpl(babel, quasis, expressions, opts, path, taggedName) {
     nj.createTmplRule(
       opts.delimiters != null
         ? opts.delimiters
-        : !isTmplFnS
-          ? {
+        : !isTmplFnS // eslint-disable-next-line
+        ? {
             start: '{',
             end: '}',
             comment: ''
           }
-          : {}
+        : {} // eslint-disable-line
     ),
     hasAst
   );

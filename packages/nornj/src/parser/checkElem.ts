@@ -1,4 +1,4 @@
-﻿import nj from '../core';
+import nj from '../core';
 import * as tools from '../utils/tools';
 import * as tranParam from '../transforms/transformParam';
 import * as tranElem from '../transforms/transformElement';

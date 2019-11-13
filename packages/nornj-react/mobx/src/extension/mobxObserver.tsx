@@ -6,7 +6,7 @@ import extensionConfigs from '../../extensionConfig';
 registerExtension(
   'mobxObserver',
   options => {
-    return <Observer>{() => options.children()}</Observer>;
+    return <Observer>{() => options.children() as JSX.Element}</Observer>;
   },
   extensionConfigs.mobxObserver
 );

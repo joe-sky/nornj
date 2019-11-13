@@ -1,4 +1,4 @@
-﻿import { registerComponent } from 'nornj';
+import { registerComponent } from 'nornj';
 import Slider from 'antd/lib/slider';
 
 registerComponent({

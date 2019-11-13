@@ -1,4 +1,4 @@
-﻿import nj from '../core';
+import nj from '../core';
 import * as tools from '../utils/tools';
 import * as tranElem from '../transforms/transformElement';
 const { preAsts } = nj;
@@ -116,13 +116,13 @@ export function compileStringTmpl(tmpl) {
       }
     }
 
-    tmplFn = params
+    tmplFn = /* eslint-disable */ params
       ? function() {
-        return tmplMainFn.apply(this, tools.arrayPush([params], arguments));
-      }
+          return tmplMainFn.apply(this, tools.arrayPush([params], arguments));
+        }
       : function() {
-        return tmplMainFn.apply(this, arguments);
-      };
+          return tmplMainFn.apply(this, arguments);
+        }; /* eslint-enable */
     tools.defineProps(tmplFn, {
       _njTmpl: {
         value: ret

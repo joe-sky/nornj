@@ -1,6 +1,6 @@
 {
   "parser": "@typescript-eslint/parser",
-  "plugins": ["@typescript-eslint", "react"],
+  "plugins": ["@typescript-eslint", "react", "prettier"],
   "parserOptions": {
     "ecmaVersion": 2018,
     "sourceType": "module",
@@ -26,6 +26,18 @@
     "es6": true
   },
   "rules": {
+    "prettier/prettier": [
+      "error",
+      {
+        "printWidth": 120,
+        "tabWidth": 2,
+        "singleQuote": true,
+        "semi": true,
+        "jsxBracketSameLine": true,
+        "useTabs": false,
+        "endOfLine": "lf"
+      }
+    ],
     "no-undef": [0, "never"],
     "jsx-quotes": [1, "prefer-double"],
     "camelcase": [

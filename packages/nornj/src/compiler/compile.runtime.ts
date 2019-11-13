@@ -1,4 +1,4 @@
-﻿import nj from '../core';
+import nj from '../core';
 import * as tools from '../utils/tools';
 import * as tranData from '../transforms/transformData';
 
@@ -49,11 +49,11 @@ function _createRender(outputH?: boolean) {
     return (outputH ? compileH : compile)(
       tmpl,
       options
-        ? {
-          tmplKey: options.tmplKey ? options.tmplKey : tmpl._njTmplKey,
-          fileName: options.fileName,
-          delimiters: options.delimiters
-        }
+        ? /* eslint-disable */ {
+            tmplKey: options.tmplKey ? options.tmplKey : tmpl._njTmplKey,
+            fileName: options.fileName,
+            delimiters: options.delimiters
+          } /* eslint-enable */
         : tmpl._njTmplKey
     ).apply(null, tools.arraySlice(arguments, 1));
   };

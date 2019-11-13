@@ -1,4 +1,4 @@
-﻿import { registerComponent } from 'nornj';
+import { registerComponent } from 'nornj';
 import Radio from 'antd/lib/radio';
 
 registerComponent({

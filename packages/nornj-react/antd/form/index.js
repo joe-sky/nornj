@@ -1,4 +1,4 @@
-﻿import { registerComponent } from 'nornj';
+import { registerComponent } from 'nornj';
 import Form from 'antd/lib/form';
 const FormItem = Form.Item;
 

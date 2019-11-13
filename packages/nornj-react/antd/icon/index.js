@@ -1,4 +1,4 @@
-﻿import { registerComponent } from 'nornj';
+import { registerComponent } from 'nornj';
 import Icon from 'antd/lib/icon';
 
 registerComponent({

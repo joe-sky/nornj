@@ -1,4 +1,4 @@
-﻿import { registerComponent } from 'nornj';
+import { registerComponent } from 'nornj';
 import Mention from 'antd/lib/mention';
 
 registerComponent({

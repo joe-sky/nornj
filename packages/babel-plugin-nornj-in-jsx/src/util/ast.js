@@ -119,8 +119,10 @@ function isReactCreateElement(types, expr) {
   return (
     types.isCallExpression(expr) &&
     expr.callee &&
-    (expr.callee.object && expr.callee.object.name === 'React') &&
-    (expr.callee.property && expr.callee.property.name === 'createElement')
+    expr.callee.object &&
+    expr.callee.object.name === 'React' &&
+    expr.callee.property &&
+    expr.callee.property.name === 'createElement'
   );
 }
 

@@ -1,4 +1,4 @@
-﻿import nj from '../core';
+import nj from '../core';
 import * as tools from '../utils/tools';
 import { getAccessorData, styleProps } from '../transforms/transformData';
 import { FilterDelegate, FilterOption } from '../interface';

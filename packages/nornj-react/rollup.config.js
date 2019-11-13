@@ -1,4 +1,4 @@
-﻿import babel from 'rollup-plugin-babel';
+import babel from 'rollup-plugin-babel';
 import replace from 'rollup-plugin-replace';
 import { uglify } from 'rollup-plugin-uglify';
 import filesize from 'rollup-plugin-filesize';
@@ -14,7 +14,7 @@ const external = ['nornj', 'react', 'react-dom'];
 switch (withEx) {
   case 'Mobx':
     external.push('mobx', 'mobx-react');
-    indexEntry = './mobx/base.js';
+    indexEntry = './mobx/base.ts';
     break;
   case 'Redux':
     external.push('react-redux');

@@ -1,4 +1,4 @@
-﻿import nj from '../core';
+import nj from '../core';
 import { assign } from './tools';
 
 const ESCAPE_LOOKUP = {
@@ -6,7 +6,7 @@ const ESCAPE_LOOKUP = {
   '>': '&gt;',
   '<': '&lt;',
   '"': '&quot;',
-  '\'': '&#x27;'
+  "'": '&#x27;' // eslint-disable-line
 };
 
 const REGEX_ESCAPE = /[&><"']/g;
@@ -31,7 +31,7 @@ const UNESCAPE_LOOKUP = {
   gt: '>',
   amp: '&',
   quot: '"',
-  '#x27': '\''
+  '#x27': "'" // eslint-disable-line
 };
 
 const REGEX_UNESCAPE = new RegExp('&(' + Object.keys(UNESCAPE_LOOKUP).join('|') + ');', 'g');

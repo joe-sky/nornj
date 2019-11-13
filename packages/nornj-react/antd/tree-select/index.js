@@ -1,4 +1,4 @@
-﻿import { registerComponent } from 'nornj';
+import { registerComponent } from 'nornj';
 import TreeSelect from 'antd/lib/tree-select';
 
 registerComponent({

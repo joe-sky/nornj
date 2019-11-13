@@ -1,4 +1,4 @@
-﻿import { registerComponent } from 'nornj';
+import { registerComponent } from 'nornj';
 import Spin from 'antd/lib/spin';
 
 registerComponent({

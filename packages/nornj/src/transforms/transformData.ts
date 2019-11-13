@@ -1,4 +1,4 @@
-﻿import nj from '../core';
+import nj from '../core';
 import * as tools from '../utils/tools';
 const REGEX_NUM = /^(-?([0-9]+[.]?[0-9]+)|[0-9])$/;
 
@@ -182,20 +182,20 @@ export function tmplWrap(configs, main) {
 
     return main(
       configs,
-      ctx && ctx._njCtx
+      ctx && /* eslint-disable */ ctx._njCtx
         ? tools.assign({}, ctx, {
-          data: tools.arrayPush(data, ctx.data)
-        })
+            data: tools.arrayPush(data, ctx.data)
+          })
         : {
-          data,
-          getData,
-          get $this() {
-            return this.data[this.data.length - 1];
-          },
-          d: getData,
-          icp: _getLocalComponents(param1 && param1._njParam ? param2 : param1),
-          _njCtx: true
-        }
+            data,
+            getData,
+            get $this() {
+              return this.data[this.data.length - 1];
+            },
+            d: getData,
+            icp: _getLocalComponents(param1 && param1._njParam ? param2 : param1),
+            _njCtx: true
+          } /* eslint-enable */
     );
   };
 }

@@ -1,4 +1,4 @@
-﻿const nj = require('../../src/base').default,
+const nj = require('../../src/base').default,
   compiler = require('../../src/compiler/compile'),
   compile = compiler.compile,
   _ = require('lodash'),
@@ -28,6 +28,7 @@ describe('test speed', function() {
   <img src="t2" style="margin:0 auto" />
   `;
 
+  /* eslint-disable */
   const tmpl = Nj`
   <{div} id="{num}_100'200'">
     <p-class useString>
@@ -58,8 +59,8 @@ describe('test speed', function() {
     ${t2()}
     <each ${[1, 2, 3]}>
       #${ctx => {
-    return ctx.getData('no') + 1;
-  }}
+        return ctx.getData('no') + 1;
+      }}
     </each>
     <TestComp2>
       <p-store><n-obj id=1 name="2" /></p-store>
@@ -99,6 +100,7 @@ describe('test speed', function() {
     </each>
   </{div}>
   `;
+  /* eslint-enable */
 
   const tmpl2 = Nj`
   <{div} id="{num}_100">
@@ -476,7 +478,11 @@ describe('test speed', function() {
             };
           })}
           a={1}
-          list={[{ no: 1, b: 1 }, { no: 2, b: 0 }, { no: 3, b: 1 }]}
+          list={[
+            { no: 1, b: 1 },
+            { no: 2, b: 0 },
+            { no: 3, b: 1 }
+          ]}
         />
       );
 

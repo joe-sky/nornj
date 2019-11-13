@@ -1,4 +1,4 @@
-﻿import { registerComponent } from 'nornj';
+import { registerComponent } from 'nornj';
 import Notification from 'antd/lib/notification';
 
 registerComponent({

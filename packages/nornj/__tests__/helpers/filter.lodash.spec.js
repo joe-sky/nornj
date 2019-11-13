@@ -1,4 +1,4 @@
-﻿import { render } from '../../src/compiler/compile';
+import { render } from '../../src/compiler/compile';
 import '../../src/utils/createTmplRule';
 import { registerFilter, filters, filterConfig } from '../../src/helpers/filter';
 import _ from 'lodash';

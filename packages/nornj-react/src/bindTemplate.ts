@@ -1,4 +1,4 @@
-﻿import nj from 'nornj';
+import nj from 'nornj';
 
 function _registerComponent(name: string, component: React.ElementType) {
   if (name != null) {

@@ -1,4 +1,4 @@
-﻿function uniqueKey(str, hash) {
+function uniqueKey(str, hash) {
   let len = str.length;
   if (len == 0) {
     return str;

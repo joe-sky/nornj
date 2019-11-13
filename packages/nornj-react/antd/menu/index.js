@@ -1,4 +1,4 @@
-﻿import { registerComponent } from 'nornj';
+import { registerComponent } from 'nornj';
 import Menu from 'antd/lib/menu';
 
 registerComponent({

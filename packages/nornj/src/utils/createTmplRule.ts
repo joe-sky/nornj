@@ -1,4 +1,4 @@
-﻿import nj from '../core';
+import nj from '../core';
 import * as tools from './tools';
 
 function _createRegExp(reg, mode?) {

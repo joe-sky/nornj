@@ -1,4 +1,4 @@
-﻿import { render } from '../../src/compiler/compile';
+import { render } from '../../src/compiler/compile';
 import '../../src/utils/createTmplRule';
 import { registerFilter, filters, filterConfig } from '../../src/helpers/filter';
 
@@ -10,7 +10,7 @@ registerFilter({
 
 describe('Filter', () => {
   it('One filter', () => {
-    expect(render('{{ \'12345\' | cut | cut(1) }}')).toBe('45');
+    expect(render("{{ '12345' | cut | cut(1) }}")).toBe('45'); // eslint-disable-line
   });
 });
 
@@ -48,7 +48,8 @@ describe('Operator', () => {
 
   it('.', () => {
     expect(
-      render('{{ a.b[\'c\'].length }}', {
+      // eslint-disable-next-line
+      render("{{ a.b['c'].length }}", {
         a: {
           b: {
             c: 'abc'
@@ -119,11 +120,11 @@ describe('Operator', () => {
   });
 
   it('&&', () => {
-    expect(render('{{ 1==\'1\' && 1 == \'2\' }}')).toBe(false);
+    expect(render("{{ 1=='1' && 1 == '2' }}")).toBe(false); // eslint-disable-line
   });
 
   it('||', () => {
-    expect(render('{{ 1 == \'1\' || 1==\'2\' }}')).toBe(true);
+    expect(render("{{ 1 == '1' || 1=='2' }}")).toBe(true); // eslint-disable-line
   });
 
   it('int & float', () => {
@@ -135,11 +136,11 @@ describe('Operator', () => {
   });
 
   it('bool', () => {
-    expect(render('{{ \'false\' | bool }}')).toBe(false);
+    expect(render("{{ 'false' | bool }}")).toBe(false); // eslint-disable-line
   });
 
   it('_(method)', () => {
-    expect(render('{{ \'abc\'.substr(1) }}')).toBe('bc');
+    expect(render("{{ 'abc'.substr(1) }}")).toBe('bc'); // eslint-disable-line
   });
 
   it('..', () => {
@@ -155,7 +156,8 @@ describe('Operator', () => {
   });
 
   it('array', () => {
-    expect(render('{{[\'1\'[0][\'length\'], \'123\'[1], \'345\'[0], [\'4567\'[\'length\'], 5].join(\'-\')].join(\'-\')}}')).toBe(
+    // eslint-disable-next-line
+    expect(render("{{['1'[0]['length'], '123'[1], '345'[0], ['4567'['length'], 5].join('-')].join('-')}}")).toBe(
       '1-2-3-4-5'
     );
   });
@@ -168,13 +170,13 @@ describe('Operator', () => {
 
   it('currency', function() {
     expect(render('{{98765 | currency}}')).toBe('$98,765.00');
-    expect(render('{{\'98765\' | currency}}')).toBe('$98,765.00');
+    expect(render("{{'98765' | currency}}")).toBe('$98,765.00'); // eslint-disable-line
     expect(render('{{value | currency}}', { value: -98.765e3 })).toBe('-$98,765.00');
-    expect(render('{{\'-98.765e3\' | currency}}')).toBe('-$98,765.00');
+    expect(render("{{'-98.765e3' | currency}}")).toBe('-$98,765.00'); // eslint-disable-line
     expect(render('{{98765.321 | currency}}')).toBe('$98,765.32');
     expect(render('{{98765.32132 | currency(0)}}')).toBe('$98,765');
-    expect(render('{{98765.321 | currency(0,\'#\')}}')).toBe('#98,765');
-    expect(render('{{98765.321 | currency(\'\')}}')).toBe('98,765.32');
+    expect(render("{{98765.321 | currency(0,'#')}}")).toBe('#98,765'); // eslint-disable-line
+    expect(render("{{98765.321 | currency('')}}")).toBe('98,765.32'); // eslint-disable-line
     expect(render('{{-98765.321 | currency}}')).toBe('-$98,765.32');
     expect(render('{{-0.99 | currency}}')).toBe('-$0.99');
     expect(render('{{0.99999 | currency}}')).toBe('$1.00');
@@ -183,7 +185,7 @@ describe('Operator', () => {
     expect(render('{{Infinity | currency}}')).toBe('');
     expect(render('{{NaN | currency}}')).toBe('');
     expect(render('{{undefined | currency}}')).toBe('');
-    expect(render('{{\'undefined\' | currency}}')).toBe('');
+    expect(render("{{'undefined' | currency}}")).toBe(''); // eslint-disable-line
 
     filterConfig.currency.symbol = '￥';
     expect(render('{{98765 | currency}}')).toBe('￥98,765.00');

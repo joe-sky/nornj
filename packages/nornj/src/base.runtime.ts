@@ -1,4 +1,4 @@
-﻿import nj from './core';
+import nj from './core';
 import './config.runtime';
 import './utils/escape';
 

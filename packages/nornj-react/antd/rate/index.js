@@ -1,4 +1,4 @@
-﻿import { registerComponent } from 'nornj';
+import { registerComponent } from 'nornj';
 import Rate from 'antd/lib/rate';
 
 registerComponent({

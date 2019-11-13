@@ -1,4 +1,4 @@
-﻿import nj from '../core';
+import nj from '../core';
 import * as tools from '../utils/tools';
 import * as tranData from '../transforms/transformData';
 import { ExtensionDelegate, ExtensionDelegateMultiParams, SwitchPrefixConfig, ExtensionOption } from '../interface';
@@ -230,9 +230,9 @@ export const extensions: { [name: string]: ExtensionDelegate | ExtensionDelegate
       return options.children({
         data: [
           props && props.as
-            ? {
-              [props.as]: originalData
-            }
+            ? /* eslint-disable */ {
+                [props.as]: originalData
+              } /* eslint-enable */
             : originalData
         ]
       });

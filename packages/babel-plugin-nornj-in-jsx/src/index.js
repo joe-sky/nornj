@@ -39,7 +39,7 @@ module.exports = function(babel) {
 
           const hasMobx = directives.reduce(
             (result, directive) =>
-              result || (directive.indexOf('n-mobxBind') > -1 || directive.indexOf('n-mstBind') > -1),
+              result || directive.indexOf('n-mobxBind') > -1 || directive.indexOf('n-mstBind') > -1,
             false
           );
           hasMobx &&

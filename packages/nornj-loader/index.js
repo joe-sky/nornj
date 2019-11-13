@@ -135,5 +135,5 @@ module.exports = function(source) {
     output += `{\n${tmplsStr}};`;
   }
 
-  return '\'use strict\';\n\n' + (compiled ? 'var nj = require(\'nornj\');\n\n' : '') + `module.exports = ${output}`;
+  return `'use strict';\n\n` + (compiled ? `var nj = require('nornj');\n\n` : '') + `module.exports = ${output}`;
 };

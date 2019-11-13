@@ -1,4 +1,4 @@
-﻿import nj from '../core';
+import nj from '../core';
 const nativeArrayPush = Array.prototype.push,
   nativeArraySlice = Array.prototype.slice,
   hasOwnProperty = Object.prototype.hasOwnProperty,

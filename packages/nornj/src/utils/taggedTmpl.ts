@@ -1,4 +1,4 @@
-﻿import nj from '../core';
+import nj from '../core';
 import { assign } from '../utils/tools';
 import { compileStringTmpl } from '../parser/checkStringElem';
 import { createTmplRule } from '../utils/createTmplRule';

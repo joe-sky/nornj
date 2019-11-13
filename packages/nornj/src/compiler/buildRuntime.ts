@@ -261,8 +261,8 @@ export function buildExpression(ast, inObj, escape, fns, useStringLocal, level) 
     ast.filters && OPERATORS.indexOf(replaceFilterName(ast.filters[0].name)) < 0
       ? ''
       : !inObj
-        ? _buildDataValue(ast, escape, fns, level)
-        : ast.name;
+      ? _buildDataValue(ast, escape, fns, level) // eslint-disable-line
+      : ast.name; // eslint-disable-line
   let lastCodeStr = '';
 
   ast.filters &&
@@ -731,14 +731,14 @@ function _buildNode(node, parent, fns, counter, retType, level, useStringLocal, 
       retType,
       !useStringF
         ? { _compParam: _compParamC }
-        : {
-          _type: _typeC,
-          _typeS: _type,
-          _typeR: _typeRefer,
-          _params: paramsStr !== '' ? _paramsC : null,
-          _children: _childrenC,
-          _selfClose: node.selfCloseTag
-        },
+        : /* eslint-disable */ {
+            _type: _typeC,
+            _typeS: _type,
+            _typeR: _typeRefer,
+            _params: paramsStr !== '' ? _paramsC : null,
+            _children: _childrenC,
+            _selfClose: node.selfCloseTag
+          } /* eslint-enable */,
       fns,
       level,
       useStringLocal,
@@ -792,17 +792,19 @@ function _buildRender(node, parent, nodeType, retType, params, fns, level, useSt
 
   switch (nodeType) {
     case 1: //文本节点
+      /* eslint-disable */
       retStr =
         (!useStringF || allowNewline || noLevel
           ? ''
           : isFirst
-            ? parent.type !== 'nj_root'
-              ? `${GLOBAL}.fl(${CONTEXT}) + `
-              : ''
-            : `'\\n' + `) +
+          ? parent.type !== 'nj_root'
+            ? `${GLOBAL}.fl(${CONTEXT}) + `
+            : ''
+          : `'\\n' + `) +
         _buildLevelSpace(level, fns, allowNewline) +
         _buildLevelSpaceRt(useStringF, isFirst || noLevel) +
         params.text;
+      /* eslint-enable */
       break;
     case 2: //扩展标签
       retStr =

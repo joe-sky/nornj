@@ -1,4 +1,4 @@
-﻿const nj = require('../lib/base').default,
+const nj = require('../lib/base').default,
   getOpenTagParams = require('../lib/transforms/transformElement').getOpenTagParams,
   fs = require('fs'),
   path = require('path');

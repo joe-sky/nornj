@@ -34,12 +34,12 @@
     "umd:router": "cross-env NODE_ENV=development WITH_EX=Router rollup -c -o dist/nornj-react-router.js",
     "min:router": "cross-env NODE_ENV=production WITH_EX=Router rollup -c -o dist/nornj-react-router.min.js",
     "lib": "babel src --out-dir lib --extensions \".js,.jsx,.ts,.tsx\" --config-file \"../../.babelrc\"",
-    "lib:mobx": "babel mobx/base.js --out-file mobx/index.js --extensions \".js,.jsx,.ts,.tsx\" --config-file \"../../.babelrc\" && babel mobx/baseNative.js --out-file mobx/native.js --extensions \".js,.jsx,.ts,.tsx\" --config-file \"../../.babelrc\" && babel mobx/src --out-dir mobx/lib --extensions \".js,.jsx,.ts,.tsx\" --config-file \"../../.babelrc\"",
+    "lib:mobx": "babel mobx/base.ts --out-file mobx/index.js --extensions \".js,.jsx,.ts,.tsx\" --config-file \"../../.babelrc\" && babel mobx/base.native.ts --out-file mobx/native.js --extensions \".js,.jsx,.ts,.tsx\" --config-file \"../../.babelrc\" && babel mobx/src --out-dir mobx/lib --extensions \".js,.jsx,.ts,.tsx\" --config-file \"../../.babelrc\"",
     "lib:redux": "babel redux/base.js --out-file redux/index.js --extensions \".js,.jsx,.ts,.tsx\" --config-file \"../../.babelrc\"",
     "lib:router": "babel router/base.js --out-file router/index.js --extensions \".js,.jsx,.ts,.tsx\" --config-file \"../../.babelrc\"",
     "lib:native": "babel native/base.js --out-file native/index.js --extensions \".js,.jsx,.ts,.tsx\" --config-file \"../../.babelrc\"",
     "lib:antd": "babel antd --out-dir antd/lib --ignore \"antd/lib\" --extensions \".js,.jsx,.ts,.tsx\" --config-file \"../../.babelrc\"",
-    "lib:echarts": "babel echarts/base.js --out-file echarts/index.js --extensions \".js,.jsx,.ts,.tsx\" --config-file \"../../.babelrc\" && babel echarts/baseCore.js --out-file echarts/core.js --extensions \".js,.jsx,.ts,.tsx\" --config-file \"../../.babelrc\"",
+    "lib:echarts": "babel echarts/base.js --out-file echarts/index.js --extensions \".js,.jsx,.ts,.tsx\" --config-file \"../../.babelrc\" && babel echarts/base.core.js --out-file echarts/core.js --extensions \".js,.jsx,.ts,.tsx\" --config-file \"../../.babelrc\"",
     "build": "yarn run lib && yarn run lib:mobx && yarn run lib:redux && yarn run lib:router && yarn run lib:native && yarn run lib:antd && yarn run lib:echarts && yarn run cjs && yarn run esm && yarn run umd && yarn run umd:mobx && yarn run umd:redux && yarn run umd:router && yarn run min && yarn run min:mobx && yarn run min:redux && yarn run min:router"
   },
   "keywords": [
@@ -58,12 +58,17 @@
   "author": "Joe_Sky <hitomi_doax@sina.com>",
   "license": "MIT",
   "devDependencies": {
+    "@types/react-native": "^0.60.22",
+    "@types/react-redux": "^7.1.5",
+    "@types/react-router-dom": "^5.1.2",
     "antd": "^3.20.5",
     "babel-plugin-nornj-in-jsx": "^5.0.0-rc.45",
     "echarts-for-react": "^2.0.15-beta.0",
     "mobx": "^5.9.0",
     "mobx-react": "^5.4.3",
     "mobx-react-lite": "^1.2.0",
-    "nornj": "^5.0.0-rc.45"
+    "nornj": "^5.0.0-rc.45",
+    "react-redux": "^7.1.3",
+    "react-router-dom": "^5.1.2"
   }
 }

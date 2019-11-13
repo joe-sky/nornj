@@ -1,4 +1,4 @@
-﻿import njr from './core';
+import njr from './core';
 import nj from 'nornj';
 import React from 'react';
 import { bindTemplate } from './bindTemplate';

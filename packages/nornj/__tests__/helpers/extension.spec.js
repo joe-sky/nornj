@@ -1,4 +1,4 @@
-﻿import { render, precompile } from '../../src/compiler/compile';
+import { render, precompile } from '../../src/compiler/compile';
 import { createTmplRule } from '../../src/utils/createTmplRule';
 
 describe('Extension tag', () => {

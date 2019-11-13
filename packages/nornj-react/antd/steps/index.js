@@ -1,4 +1,4 @@
-﻿import { registerComponent } from 'nornj';
+import { registerComponent } from 'nornj';
 import Steps from 'antd/lib/steps';
 
 registerComponent({

@@ -1,4 +1,4 @@
-﻿const nj: {
+const nj: {
   (strs: TemplateStringsArray, ...args: any[]): any;
   includeParser?: Function;
   createElement?: Function;
