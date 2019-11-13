@@ -34,8 +34,7 @@
         "singleQuote": true,
         "semi": true,
         "jsxBracketSameLine": true,
-        "useTabs": false,
-        "endOfLine": "lf"
+        "useTabs": false
       }
     ],
     "no-undef": [0, "never"],

@@ -103,8 +103,20 @@
     }
   },
   "lint-staged": {
-    "packages/{nornj,nornj-react,nornj-loader,babel-plugin-nornj-in-jsx}/**/*.{js,jsx,ts,tsx}": [
-      "eslint --fix",
+    "packages/nornj/**/*.{js,jsx,ts,tsx}": [
+      "yarn run format:nj", 
+      "git add"
+    ],
+    "packages/nornj-react/**/*.{js,jsx,ts,tsx}": [
+      "yarn run format:njr",
+      "git add"
+    ],
+    "packages/nornj-loader/**/*.{js,jsx,ts,tsx}": [
+      "yarn run format:njl",
+      "git add"
+    ],
+    "packages/babel-plugin-nornj-in-jsx/**/*.{js,jsx,ts,tsx}": [
+      "yarn run format:njx",
       "git add"
     ]
   }

@@ -1,4 +1,4 @@
-﻿import nj from '../core';
+import nj from '../core';
 import * as tools from '../utils/tools';
 import * as tranData from '../transforms/transformData';
 import { unescape } from '../utils/escape';
