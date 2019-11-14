@@ -104,19 +104,19 @@
   },
   "lint-staged": {
     "packages/nornj/**/*.{js,jsx,ts,tsx}": [
-      "yarn run format:nj", 
+      "eslint --fix", 
       "git add"
     ],
     "packages/nornj-react/**/*.{js,jsx,ts,tsx}": [
-      "yarn run format:njr",
+      "eslint --fix",
       "git add"
     ],
     "packages/nornj-loader/**/*.{js,jsx,ts,tsx}": [
-      "yarn run format:njl",
+      "eslint --fix",
       "git add"
     ],
     "packages/babel-plugin-nornj-in-jsx/**/*.{js,jsx,ts,tsx}": [
-      "yarn run format:njx",
+      "eslint --fix",
       "git add"
     ]
   }
