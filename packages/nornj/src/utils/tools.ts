@@ -9,12 +9,12 @@ export const defineProp = Object.defineProperty;
 export const defineProps = Object.defineProperties;
 
 //Push one by one to array
-export function arrayPush(arr1, arr2) {
+export function arrayPush(arr1, arr2): number {
   nativeArrayPush.apply(arr1, arr2);
   return arr1;
 }
 
-export function arraySlice(arrLike?, start?: number, end?: number) {
+export function arraySlice(arrLike?, start?: number, end?: number): any[] {
   return nativeArraySlice.call(arrLike, start, end);
 }
 

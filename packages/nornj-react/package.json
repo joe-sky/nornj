@@ -34,7 +34,7 @@
     "umd:router": "cross-env NODE_ENV=development WITH_EX=Router rollup -c -o dist/nornj-react-router.js",
     "min:router": "cross-env NODE_ENV=production WITH_EX=Router rollup -c -o dist/nornj-react-router.min.js",
     "lib": "babel src --out-dir lib --extensions \".js,.jsx,.ts,.tsx\" --config-file \"../../.babelrc\"",
-    "lib:mobx": "babel mobx/base.ts --out-file mobx/index.js --extensions \".js,.jsx,.ts,.tsx\" --config-file \"../../.babelrc\" && babel mobx/base.native.ts --out-file mobx/native.js --extensions \".js,.jsx,.ts,.tsx\" --config-file \"../../.babelrc\" && babel mobx/src --out-dir mobx/lib --extensions \".js,.jsx,.ts,.tsx\" --config-file \"../../.babelrc\"",
+    "lib:mobx": "babel mobx/base.js --out-file mobx/index.js --extensions \".js,.jsx,.ts,.tsx\" --config-file \"../../.babelrc\" && babel mobx/base.native.js --out-file mobx/native.js --extensions \".js,.jsx,.ts,.tsx\" --config-file \"../../.babelrc\"",
     "lib:redux": "babel redux/base.js --out-file redux/index.js --extensions \".js,.jsx,.ts,.tsx\" --config-file \"../../.babelrc\"",
     "lib:router": "babel router/base.js --out-file router/index.js --extensions \".js,.jsx,.ts,.tsx\" --config-file \"../../.babelrc\"",
     "lib:native": "babel native/base.js --out-file native/index.js --extensions \".js,.jsx,.ts,.tsx\" --config-file \"../../.babelrc\"",

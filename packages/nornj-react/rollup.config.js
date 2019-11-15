@@ -14,7 +14,7 @@ const external = ['nornj', 'react', 'react-dom'];
 switch (withEx) {
   case 'Mobx':
     external.push('mobx', 'mobx-react');
-    indexEntry = './mobx/base.ts';
+    indexEntry = './mobx/base.js';
     break;
   case 'Redux':
     external.push('react-redux');

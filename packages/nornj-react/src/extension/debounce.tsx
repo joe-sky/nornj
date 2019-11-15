@@ -1,9 +1,21 @@
 import nj, { registerExtension } from 'nornj';
+import { ExtensionDelegateOption, Component as NjComponent, ComponentOption, Template } from 'nornj/typings';
 import React, { Component } from 'react';
 import { debounce } from '../utils';
 
-class DebounceWrapClass extends Component {
-  constructor(props) {
+interface IProps {
+  debounceDirectiveOptions: ExtensionDelegateOption;
+  DebounceTag: NjComponent;
+  innerRef: React.Ref<any>;
+}
+
+class DebounceWrapClass extends Component<IProps> {
+  private componentConfig: ComponentOption;
+  private changeEventName: string;
+  private $this: Template.ContextThis;
+  private emitChangeDebounced: Function;
+
+  constructor(props: IProps) {
     super(props);
     this.handleChange = this.handleChange.bind(this);
 
@@ -37,7 +49,7 @@ class DebounceWrapClass extends Component {
     }
   }
 
-  handleChange(e) {
+  handleChange(e: React.BaseSyntheticEvent) {
     // React pools events, so we read the value before debounce.
     // Alternately we could call `event.persist()` and pass the entire event.
     // For more info see reactjs.org/docs/events.html#event-pooling
@@ -64,7 +76,7 @@ class DebounceWrapClass extends Component {
   }
 }
 
-const DebounceWrap = React.forwardRef((props, ref) => <DebounceWrapClass innerRef={ref} {...props} />);
+const DebounceWrap = React.forwardRef<any, IProps>((props, ref) => <DebounceWrapClass innerRef={ref} {...props} />);
 
 registerExtension(
   'debounce',

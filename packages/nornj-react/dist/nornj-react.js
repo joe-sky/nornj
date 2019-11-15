@@ -1,5 +1,5 @@
 /*!
-* NornJ-React v5.0.0-rc.46
+* NornJ-React v5.0.0-rc-47
 * (c) 2016-2019 Joe_Sky
 * Released under the MIT License.
 */
@@ -198,6 +198,10 @@
       _classCallCheck(this, DebounceWrapClass);
 
       _this = _possibleConstructorReturn(this, _getPrototypeOf(DebounceWrapClass).call(this, props));
+      _this.componentConfig = void 0;
+      _this.changeEventName = void 0;
+      _this.$this = void 0;
+      _this.emitChangeDebounced = void 0;
 
       _this.emitChange = function (args) {
         _this.props[_this.changeEventName].apply(_this.$this, args);

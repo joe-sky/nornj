@@ -1,8 +1,8 @@
 import { registerComponent, registerFilter } from 'nornj';
 import { toJS } from 'mobx';
-import { Provider } from 'mobx-react/native';
-import './lib/extension/mobxBind';
-import './lib/extension/mobxObserver';
+import { Provider } from 'mobx-react';
+import './mobxBind';
+import './mobxObserver';
 
 registerComponent('mobx-Provider', Provider);
 registerFilter('toJS', v => toJS(v));

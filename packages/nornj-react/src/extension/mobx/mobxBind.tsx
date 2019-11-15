@@ -1,10 +1,18 @@
 import nj, { registerExtension } from 'nornj';
+import { ExtensionDelegateOption, Component } from 'nornj/typings';
 import React, { useRef } from 'react';
 import { toJS } from 'mobx';
-import extensionConfigs from '../../extensionConfig';
-import { debounce } from '../../../lib/utils';
+import extensionConfigs from '../../../mobx/extensionConfig';
+import { debounce } from '../../utils';
 
-const MobxBindWrap = React.forwardRef(
+interface IProps extends React.InputHTMLAttributes<any> {
+  mobxBindDirectiveOptions: ExtensionDelegateOption;
+  MobxBindTag: Component;
+  _mobxBindValue: any;
+  innerRef: React.Ref<any>;
+}
+
+const MobxBindWrap = React.forwardRef<any, IProps>(
   (
     {
       MobxBindTag,
@@ -48,7 +56,7 @@ const MobxBindWrap = React.forwardRef(
       );
     }
 
-    const compProps = {};
+    const compProps: React.InputHTMLAttributes<any> = {};
     if (componentConfig.hasEventObject) {
       const targetPropName = componentConfig.targetPropName || 'value';
       const isRadio = tagName === 'input' && props.type === 'radio';

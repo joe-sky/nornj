@@ -21,7 +21,6 @@
     "format:njr": "eslint --fix --ext .jsx,.js,.ts,.tsx packages/nornj-react/**/*.{js,jsx,ts,tsx}",
     "format:njl": "eslint --fix --ext .jsx,.js,.ts,.tsx packages/nornj-loader/**/*.{js,jsx,ts,tsx}",
     "format:njx": "eslint --fix --ext .jsx,.js,.ts,.tsx packages/babel-plugin-nornj-in-jsx/**/*.{js,jsx,ts,tsx}",
-    "type-check": "tsc --noEmit",
     "test": "jest --config=test/jest.config.js",
     "test:njx": "lerna run --scope babel-plugin-nornj-in-jsx test",
     "cover": "jest --coverage --config=test/jest.config.js",
@@ -104,7 +103,7 @@
   },
   "lint-staged": {
     "packages/nornj/**/*.{js,jsx,ts,tsx}": [
-      "eslint --fix", 
+      "eslint --fix",
       "git add"
     ],
     "packages/nornj-react/**/*.{js,jsx,ts,tsx}": [

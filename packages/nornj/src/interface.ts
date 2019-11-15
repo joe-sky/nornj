@@ -30,14 +30,15 @@ export namespace Template {
     [key: string]: any;
   }
 
-  export interface Context {
-    /**
-     * React(or other such as Preact) component instance.
-     */
-    $this: {
-      [key: string]: any;
-    };
+  /**
+   * React(or other such as Preact) component instance.
+   */
+  export interface ContextThis {
+    [key: string]: any;
+  }
 
+  export interface Context {
+    $this: ContextThis;
     data: Data[] | any[];
     parent: Context;
     index: number;
@@ -54,7 +55,7 @@ export namespace Template {
   }
 
   export interface RenderChildren {
-    (params?: ChildrenParams): string | JSX.Element;
+    (params?: ChildrenParams): JSX.Element | any;
   }
 }
 
@@ -216,6 +217,10 @@ export interface Export {
   buildRender: typeof import('../src/compiler/compile').buildRender;
 
   buildRenderH: typeof import('../src/compiler/compile').buildRenderH;
+
+  arrayPush: typeof import('../src/utils/tools').arrayPush;
+
+  arraySlice: typeof import('../src/utils/tools').arraySlice;
 
   isObject: typeof import('../src/utils/tools').isObject;
 
