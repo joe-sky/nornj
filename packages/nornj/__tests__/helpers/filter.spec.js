@@ -2,42 +2,71 @@ import { render } from '../../src/compiler/compile';
 import '../../src/utils/createTmplRule';
 import { registerFilter, filters, filterConfig } from '../../src/helpers/filter';
 
-registerFilter({
-  cut: (v, len = 2) => {
-    return v.substr(len);
-  }
-});
+describe('Filters', () => {
+  beforeAll(() => {
+    registerFilter({
+      cut: (v, len = 2) => {
+        return v.substr(len);
+      }
+    });
+  });
 
-describe('Filter', () => {
-  it('One filter', () => {
+  it('cut', () => {
     expect(render("{{ '12345' | cut | cut(1) }}")).toBe('45'); // eslint-disable-line
+  });
+
+  it('currency', function() {
+    expect(render('{{98765 | currency}}')).toBe('$98,765.00');
+    expect(render("{{'98765' | currency}}")).toBe('$98,765.00'); // eslint-disable-line
+    expect(render('{{value | currency}}', { value: -98.765e3 })).toBe('-$98,765.00');
+    expect(render("{{'-98.765e3' | currency}}")).toBe('-$98,765.00'); // eslint-disable-line
+    expect(render('{{98765.321 | currency}}')).toBe('$98,765.32');
+    expect(render('{{98765.32132 | currency(0)}}')).toBe('$98,765');
+    expect(render("{{98765.321 | currency(0,'#')}}")).toBe('#98,765'); // eslint-disable-line
+    expect(render("{{98765.321 | currency('')}}")).toBe('98,765.32'); // eslint-disable-line
+    expect(render('{{-98765.321 | currency}}')).toBe('-$98,765.32');
+    expect(render('{{-0.99 | currency}}')).toBe('-$0.99');
+    expect(render('{{0.99999 | currency}}')).toBe('$1.00');
+    expect(render('{{null | currency}}')).toBe('');
+    expect(render('{{false | currency}}')).toBe('');
+    expect(render('{{Infinity | currency}}')).toBe('');
+    expect(render('{{NaN | currency}}')).toBe('');
+    expect(render('{{undefined | currency}}')).toBe('');
+    expect(render("{{'undefined' | currency}}")).toBe(''); // eslint-disable-line
+
+    filterConfig.currency.symbol = '￥';
+    expect(render('{{98765 | currency}}')).toBe('￥98,765.00');
+    filterConfig.currency.placeholder = '-';
+    expect(render('{{NaN | currency}}')).toBe('-');
   });
 });
 
-registerFilter({
-  '&': {
-    filter: (a, b) => {
-      return a * b + b;
-    },
-    options: {
-      isOperator: true
-    }
-  }
-});
+describe('Operators', () => {
+  beforeAll(() => {
+    registerFilter({
+      '&': {
+        filter: (a, b) => {
+          return a * b + b;
+        },
+        options: {
+          isOperator: true
+        }
+      }
+    });
 
-registerFilter({
-  '#.#._..#': {
-    filter: (a, b) => {
-      return Math.pow(a + b, b);
-    },
-    options: {
-      isOperator: true,
-      alias: 'plusAndPow'
-    }
-  }
-});
+    registerFilter({
+      '#.#._..#': {
+        filter: (a, b) => {
+          return Math.pow(a + b, b);
+        },
+        options: {
+          isOperator: true,
+          alias: 'plusAndPow'
+        }
+      }
+    });
+  });
 
-describe('Operator', () => {
   it('register operator', () => {
     expect(render('{{ 2&3**2 }}')).toBe(81);
   });
@@ -166,30 +195,5 @@ describe('Operator', () => {
     expect(render(`<img src="{{ { src: 'http://test.com/img.png' }.src }}">`)).toBe(
       '<img src="http://test.com/img.png" />'
     );
-  });
-
-  it('currency', function() {
-    expect(render('{{98765 | currency}}')).toBe('$98,765.00');
-    expect(render("{{'98765' | currency}}")).toBe('$98,765.00'); // eslint-disable-line
-    expect(render('{{value | currency}}', { value: -98.765e3 })).toBe('-$98,765.00');
-    expect(render("{{'-98.765e3' | currency}}")).toBe('-$98,765.00'); // eslint-disable-line
-    expect(render('{{98765.321 | currency}}')).toBe('$98,765.32');
-    expect(render('{{98765.32132 | currency(0)}}')).toBe('$98,765');
-    expect(render("{{98765.321 | currency(0,'#')}}")).toBe('#98,765'); // eslint-disable-line
-    expect(render("{{98765.321 | currency('')}}")).toBe('98,765.32'); // eslint-disable-line
-    expect(render('{{-98765.321 | currency}}')).toBe('-$98,765.32');
-    expect(render('{{-0.99 | currency}}')).toBe('-$0.99');
-    expect(render('{{0.99999 | currency}}')).toBe('$1.00');
-    expect(render('{{null | currency}}')).toBe('');
-    expect(render('{{false | currency}}')).toBe('');
-    expect(render('{{Infinity | currency}}')).toBe('');
-    expect(render('{{NaN | currency}}')).toBe('');
-    expect(render('{{undefined | currency}}')).toBe('');
-    expect(render("{{'undefined' | currency}}")).toBe(''); // eslint-disable-line
-
-    filterConfig.currency.symbol = '￥';
-    expect(render('{{98765 | currency}}')).toBe('￥98,765.00');
-    filterConfig.currency.placeholder = '-';
-    expect(render('{{NaN | currency}}')).toBe('-');
   });
 });
