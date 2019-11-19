@@ -1,4 +1,4 @@
-const nj = require('nornj/dist/nornj.common').default,
+const nj = require('nornj').default,
   includeParser = require('nornj/tools/includeParser'),
   njUtils = require('nornj/tools/utils'),
   loaderUtils = require('loader-utils');

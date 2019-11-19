@@ -1,4 +1,4 @@
-const nj = require('nornj/dist/nornj.common').default;
+const nj = require('nornj').default;
 const utils = require('./utils');
 
 const TYPES = {

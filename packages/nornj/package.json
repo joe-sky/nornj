@@ -2,7 +2,7 @@
   "name": "nornj",
   "version": "5.0.0-rc.47",
   "description": "A powerful template engine that can works with React, JSX enhancement or alternative tools.",
-  "main": "dist/nornj.runtime.common.js",
+  "main": "index.js",
   "module": "dist/nornj.runtime.esm.js",
   "unpkg": "dist/nornj.js",
   "jsdelivr": "dist/nornj.js",
