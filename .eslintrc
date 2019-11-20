@@ -26,17 +26,7 @@
     "es6": true
   },
   "rules": {
-    "prettier/prettier": [
-      "error",
-      {
-        "printWidth": 120,
-        "tabWidth": 2,
-        "singleQuote": true,
-        "semi": true,
-        "jsxBracketSameLine": true,
-        "useTabs": false
-      }
-    ],
+    "prettier/prettier": ["error"],
     "no-undef": [0, "never"],
     "jsx-quotes": [1, "prefer-double"],
     "camelcase": [

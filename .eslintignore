@@ -13,3 +13,6 @@
 /packages/nornj-react/redux/index.js
 /packages/nornj-react/router/index.js
 /packages/babel-plugin-nornj-in-jsx/coverage
+/packages/nornj-compile-editor/addon
+/packages/nornj-compile-editor/lib
+/packages/nornj-compile-editor/mode
