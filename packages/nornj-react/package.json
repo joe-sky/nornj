@@ -1,6 +1,6 @@
 {
   "name": "nornj-react",
-  "version": "5.0.0-rc.49",
+  "version": "5.0.0-rc.50",
   "description": "React bindings for NornJ template engine.",
   "main": "dist/nornj-react.common.js",
   "module": "dist/nornj-react.esm.js",
@@ -62,12 +62,12 @@
     "@types/react-redux": "^7.1.5",
     "@types/react-router-dom": "^5.1.2",
     "antd": "^3.20.5",
-    "babel-plugin-nornj-in-jsx": "^5.0.0-rc.49",
+    "babel-plugin-nornj-in-jsx": "^5.0.0-rc.50",
     "echarts-for-react": "^2.0.15-beta.0",
     "mobx": "^5.9.0",
     "mobx-react": "^5.4.3",
     "mobx-react-lite": "^1.2.0",
-    "nornj": "^5.0.0-rc.49",
+    "nornj": "^5.0.0-rc.50",
     "react-redux": "^7.1.3",
     "react-router-dom": "^5.1.2"
   }
