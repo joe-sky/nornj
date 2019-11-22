@@ -69,7 +69,7 @@ const MobxBindWrap = React.forwardRef<any, IProps>(
         compProps[valuePropName] = _value;
       }
 
-      compProps[changeEventName] = function(e) {
+      compProps[changeEventName] = function(e: React.BaseSyntheticEvent) {
         e && e.persist && e.persist();
 
         _setValue(
@@ -78,6 +78,7 @@ const MobxBindWrap = React.forwardRef<any, IProps>(
             target: e.target,
             value,
             args: arguments,
+            changeEventName,
             changeEvent,
             valuePropName,
             emitChangeDebounced,
@@ -95,6 +96,7 @@ const MobxBindWrap = React.forwardRef<any, IProps>(
           {
             value,
             args: arguments,
+            changeEventName,
             changeEvent,
             valuePropName,
             emitChangeDebounced
@@ -104,9 +106,28 @@ const MobxBindWrap = React.forwardRef<any, IProps>(
       };
     }
 
+    _formDataTrigger(value, changeEventName, true, props, compProps, $this);
+
     return <MobxBindTag {...props} {...compProps} ref={ref} />;
   }
 );
+
+function _formDataTrigger(value, changeEventName, notDirect?, props?, compProps?, $this?) {
+  if (value.source && value.source._njMobxFormData) {
+    const trigger = value.source[`trigger_${value.prop}`];
+    if (trigger !== changeEventName) {
+      const triggerEvent = props[trigger];
+      compProps[trigger] = function(e: React.BaseSyntheticEvent) {
+        e && e.persist && e.persist();
+
+        value.source.validate(value.prop);
+        triggerEvent && triggerEvent.apply($this, arguments);
+      };
+    } else if (!notDirect) {
+      value.source.validate(value.prop);
+    }
+  }
+}
 
 function _setValue(value, params, $this) {
   let _value = value;
@@ -135,6 +156,8 @@ function _setValue(value, params, $this) {
   } else {
     params.value.source[params.value.prop] = _value;
   }
+
+  _formDataTrigger(params.value, params.changeEventName);
 
   if (params.emitChangeDebounced) {
     params.emitChangeDebounced.current(params.args);

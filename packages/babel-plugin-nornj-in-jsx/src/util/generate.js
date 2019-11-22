@@ -218,7 +218,7 @@ function createRenderTmpl(babel, quasis, expressions, opts, path, taggedName) {
     switch (taggedName) {
       case 'tag':
         nj.each(tmplAst.content[0].params, attr => {
-          _getExpressionParams([attr.props[0].prop], paramIdentifiers);
+          attr.props && _getExpressionParams([attr.props[0].prop], paramIdentifiers);
         });
         break;
       case 'directive':
