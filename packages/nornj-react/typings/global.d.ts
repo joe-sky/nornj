@@ -37,3 +37,13 @@ declare namespace JSX {
     'n-mobxObserver': NornJReact.MobxObserver;
   }
 }
+
+declare module 'nornj-react/mobx';
+
+declare module 'nornj-react/mobx/native';
+
+declare module 'nornj-react/redux';
+
+declare module 'nornj-react/router';
+
+declare module 'nornj-react/lib/*';

@@ -1,3 +1,5 @@
-const njr: { [name: string]: any } = {};
+import { Export } from './interface';
+
+const njr: Export = {};
 
 export default njr;

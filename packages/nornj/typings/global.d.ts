@@ -423,3 +423,5 @@ declare namespace JSX {
     ['n-mobxBind']?: any;
   }
 }
+
+declare module 'nornj/lib/*';

@@ -7,7 +7,7 @@ export function createTaggedTmpl(opts: any = {}) {
   const { outputH, delimiters, fileName, isExpression, isCss } = opts;
   const tmplRule = delimiters ? createTmplRule(delimiters) : nj.tmplRule;
 
-  return function() {
+  return function(strs: TemplateStringsArray, ...args: any[]) {
     return compileStringTmpl.apply({ tmplRule, outputH, fileName, isExpression, isCss }, arguments);
   };
 }
@@ -19,17 +19,17 @@ export function createTaggedTmplH(opts: any = {}) {
 
 export const taggedTmpl = createTaggedTmpl();
 export const taggedTmplH = createTaggedTmplH();
-export function template() {
+export function template(strs: TemplateStringsArray, ...args: any[]) {
   return (nj.outputH ? taggedTmplH : taggedTmpl).apply(null, arguments)();
 }
 
 const _taggedExpressionH = createTaggedTmplH({ isExpression: true });
-export function expression() {
+export function expression(strs: TemplateStringsArray, ...args: any[]) {
   return _taggedExpressionH.apply(null, arguments)();
 }
 
 const _taggedCssH = createTaggedTmplH({ isCss: true });
-export function css() {
+export function css(strs: TemplateStringsArray, ...args: any[]) {
   return _taggedCssH.apply(null, arguments)();
 }
 

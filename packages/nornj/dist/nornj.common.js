@@ -1,8 +1,8 @@
 /*!
-* NornJ template engine v5.0.0-rc.50
-* (c) 2016-2019 Joe_Sky
-* Released under the MIT License.
-*/
+ * NornJ template engine v5.0.0-rc.51
+ * (c) 2016-2019 Joe_Sky
+ * Released under the MIT License.
+ */
 'use strict';
 
 Object.defineProperty(exports, '__esModule', { value: true });
@@ -11,7 +11,6 @@ var nj = function nj() {
   return nj['taggedTmpl' + (nj.outputH ? 'H' : '')].apply(null, arguments);
 };
 
-nj.createElement = null;
 nj.preAsts = {};
 nj.asts = {};
 nj.templates = {};
@@ -855,12 +854,12 @@ function template(fns, tmplKey) {
  * React(or other such as Preact) components.
  */
 
-var SwitchPrefixConfig;
+(function (_Template) {})(exports.Template || (exports.Template = {}));
 
 (function (SwitchPrefixConfig) {
   SwitchPrefixConfig["OnlyLowerCase"] = "onlyLowerCase";
   SwitchPrefixConfig["OnlyUpperCase"] = "onlyUpperCase";
-})(SwitchPrefixConfig || (SwitchPrefixConfig = {}));
+})(exports.SwitchPrefixConfig || (exports.SwitchPrefixConfig = {}));
 
 var extensions = {
   "if": function _if(value, options) {
@@ -1140,7 +1139,7 @@ var extensionConfig = {
     hasTagProps: true
   }),
   "switch": _config(_defaultCfg, {
-    needPrefix: SwitchPrefixConfig.OnlyLowerCase
+    needPrefix: exports.SwitchPrefixConfig.OnlyLowerCase
   }),
   each: _config(_defaultCfg, {
     newContext: {
@@ -3753,7 +3752,11 @@ function createTaggedTmpl() {
       isExpression = opts.isExpression,
       isCss = opts.isCss;
   var tmplRule = delimiters ? createTmplRule(delimiters) : nj.tmplRule;
-  return function () {
+  return function (strs) {
+    for (var _len = arguments.length, args = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+      args[_key - 1] = arguments[_key];
+    }
+
     return compileStringTmpl.apply({
       tmplRule: tmplRule,
       outputH: outputH,
@@ -3770,7 +3773,11 @@ function createTaggedTmplH() {
 }
 var taggedTmpl = createTaggedTmpl();
 var taggedTmplH = createTaggedTmplH();
-function template$1() {
+function template$1(strs) {
+  for (var _len2 = arguments.length, args = new Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
+    args[_key2 - 1] = arguments[_key2];
+  }
+
   return (nj.outputH ? taggedTmplH : taggedTmpl).apply(null, arguments)();
 }
 
@@ -3778,7 +3785,11 @@ var _taggedExpressionH = createTaggedTmplH({
   isExpression: true
 });
 
-function expression() {
+function expression(strs) {
+  for (var _len3 = arguments.length, args = new Array(_len3 > 1 ? _len3 - 1 : 0), _key3 = 1; _key3 < _len3; _key3++) {
+    args[_key3 - 1] = arguments[_key3];
+  }
+
   return _taggedExpressionH.apply(null, arguments)();
 }
 
@@ -3786,7 +3797,11 @@ var _taggedCssH = createTaggedTmplH({
   isCss: true
 });
 
-function css() {
+function css(strs) {
+  for (var _len4 = arguments.length, args = new Array(_len4 > 1 ? _len4 - 1 : 0), _key4 = 1; _key4 < _len4; _key4++) {
+    args[_key4 - 1] = arguments[_key4];
+  }
+
   return _taggedCssH.apply(null, arguments)();
 }
 assign(nj, {

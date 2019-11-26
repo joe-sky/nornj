@@ -27,7 +27,8 @@
     "runtime-umd": "cross-env TYPE=runtime NODE_ENV=development rollup -c -o dist/nornj.runtime.js",
     "runtime-min": "cross-env TYPE=runtime NODE_ENV=production rollup -c -o dist/nornj.runtime.min.js",
     "lib": "babel src --out-dir lib --extensions \".js,.jsx,.ts,.tsx\" --config-file \"../../.babelrc\"",
-    "build": "yarn run cjs && yarn run esm && yarn run umd && yarn run min && yarn run runtime-cjs && yarn run runtime-esm && yarn run runtime-umd && yarn run runtime-min && yarn run lib"
+    "dts": "cross-env TYPE=dts NODE_ENV=es rollup -c -o typings/nornj.d.ts",
+    "build": "yarn run cjs && yarn run esm && yarn run umd && yarn run min && yarn run runtime-cjs && yarn run runtime-esm && yarn run runtime-umd && yarn run runtime-min && yarn run lib && yarn run dts"
   },
   "keywords": [
     "nornj",

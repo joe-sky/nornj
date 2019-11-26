@@ -30,4 +30,5 @@ const { global: _global } = nj;
 _global.NornJReact = _global.njr = njr;
 
 export { bindTemplate, bindTemplate as registerTmpl };
+export * from './interface';
 export default njr;

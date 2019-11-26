@@ -1,19 +1,9 @@
-const nj: {
-  (strs: TemplateStringsArray, ...args: any[]): any;
-  includeParser?: Function;
-  createElement?: Function;
-  createRegexOperators?: Function;
-  createFilterAlias?: Function;
-  outputH: boolean;
-  textMode: boolean;
-  noWsMode: boolean;
-  fixTagName: boolean;
-  [name: string]: any;
-} = function() {
+import { Export } from './interface';
+
+const nj: Export = function() {
   return nj['taggedTmpl' + (nj.outputH ? 'H' : '')].apply(null, arguments);
 };
 
-nj.createElement = null;
 nj.preAsts = {};
 nj.asts = {};
 nj.templates = {};

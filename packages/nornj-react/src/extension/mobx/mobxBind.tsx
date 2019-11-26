@@ -1,5 +1,4 @@
-import nj, { registerExtension } from 'nornj';
-import { ExtensionDelegateOption, Component } from 'nornj/typings';
+import nj, { registerExtension, ExtensionDelegateOption, Component } from 'nornj';
 import React, { useRef } from 'react';
 import { toJS } from 'mobx';
 import extensionConfigs from '../../../mobx/extensionConfig';

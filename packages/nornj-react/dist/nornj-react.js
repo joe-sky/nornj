@@ -1,8 +1,8 @@
 /*!
-* NornJ-React v5.0.0-rc.50
-* (c) 2016-2019 Joe_Sky
-* Released under the MIT License.
-*/
+ * NornJ-React v5.0.0-rc.51
+ * (c) 2016-2019 Joe_Sky
+ * Released under the MIT License.
+ */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('nornj'), require('react')) :
   typeof define === 'function' && define.amd ? define(['exports', 'nornj', 'react'], factory) :

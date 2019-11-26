@@ -138,115 +138,143 @@ export interface Export {
    */
   (strs: TemplateStringsArray, ...args: any[]): any;
 
-  components: typeof import('../src/helpers/component').components;
+  components?: typeof import('../src/helpers/component').components;
 
-  componentConfig: typeof import('../src/helpers/component').componentConfig;
+  componentConfig?: typeof import('../src/helpers/component').componentConfig;
 
   /**
    * `nj.registerComponent`, support to register single or batch components to the NornJ.
    */
-  registerComponent: typeof import('../src/helpers/component').registerComponent;
+  registerComponent?: typeof import('../src/helpers/component').registerComponent;
 
-  getComponentConfig: typeof import('../src/helpers/component').getComponentConfig;
+  getComponentConfig?: typeof import('../src/helpers/component').getComponentConfig;
 
-  copyComponentConfig: typeof import('../src/helpers/component').copyComponentConfig;
+  copyComponentConfig?: typeof import('../src/helpers/component').copyComponentConfig;
 
-  filters: typeof import('../src/helpers/filter').filters;
+  filters?: typeof import('../src/helpers/filter').filters;
 
-  filterConfig: typeof import('../src/helpers/filter').filterConfig;
+  filterConfig?: typeof import('../src/helpers/filter').filterConfig;
 
   /**
    * `nj.registerFilter`, support to register single or batch filters and expressions to the NornJ.
    */
-  registerFilter: typeof import('../src/helpers/filter').registerFilter;
+  registerFilter?: typeof import('../src/helpers/filter').registerFilter;
 
-  extensions: typeof import('../src/helpers/extension').extensions;
+  extensions?: typeof import('../src/helpers/extension').extensions;
 
-  extensionConfig: typeof import('../src/helpers/extension').extensionConfig;
+  extensionConfig?: typeof import('../src/helpers/extension').extensionConfig;
 
   /**
    * `nj.registerExtension`, support to register single or batch tags and directives to the NornJ.
    */
-  registerExtension: typeof import('../src/helpers/extension').registerExtension;
+  registerExtension?: typeof import('../src/helpers/extension').registerExtension;
 
   /**
    * `nj.taggedTmpl`, NornJ tagged templates syntax `njs`.
    */
-  taggedTmpl(strs: TemplateStringsArray, ...args: any[]);
+  taggedTmpl?(strs: TemplateStringsArray, ...args: any[]);
 
   /**
    * `nj.htmlString`, NornJ tagged templates syntax `njs`.
    */
-  htmlString(strs: TemplateStringsArray, ...args: any[]);
+  htmlString?(strs: TemplateStringsArray, ...args: any[]);
 
   /**
    * `nj.taggedTmplH`, NornJ tagged templates syntax `nj` and `html`.
    */
-  taggedTmplH(strs: TemplateStringsArray, ...args: any[]);
+  taggedTmplH?(strs: TemplateStringsArray, ...args: any[]);
 
   /**
    * `nj.taggedTmplH`, NornJ tagged templates syntax `nj` and `html`.
    */
-  html(strs: TemplateStringsArray, ...args: any[]);
+  html?(strs: TemplateStringsArray, ...args: any[]);
 
   /**
    * `nj.template`, NornJ tagged templates syntax `t`.
    */
-  template(strs: TemplateStringsArray, ...args: any[]);
+  template?(strs: TemplateStringsArray, ...args: any[]);
 
   /**
    * `nj.expression`, NornJ tagged templates syntax `n`.
    */
-  expression(strs: TemplateStringsArray, ...args: any[]);
+  expression?(strs: TemplateStringsArray, ...args: any[]);
 
   /**
    * `nj.css`, NornJ tagged templates syntax `s`.
    */
-  css(strs: TemplateStringsArray, ...args: any[]);
+  css?(strs: TemplateStringsArray, ...args: any[]);
 
-  compile: typeof import('../src/compiler/compile').compile;
+  compile?: typeof import('../src/compiler/compile').compile;
 
-  compileH: typeof import('../src/compiler/compile').compileH;
+  compileH?: typeof import('../src/compiler/compile').compileH;
 
-  precompile: typeof import('../src/compiler/compile').precompile;
+  precompile?: typeof import('../src/compiler/compile').precompile;
 
-  render: typeof import('../src/compiler/compile').render;
+  render?: typeof import('../src/compiler/compile').render;
 
-  renderH: typeof import('../src/compiler/compile').renderH;
+  renderH?: typeof import('../src/compiler/compile').renderH;
 
-  buildRender: typeof import('../src/compiler/compile').buildRender;
+  buildRender?: typeof import('../src/compiler/compile').buildRender;
 
-  buildRenderH: typeof import('../src/compiler/compile').buildRenderH;
+  buildRenderH?: typeof import('../src/compiler/compile').buildRenderH;
 
-  arrayPush: typeof import('../src/utils/tools').arrayPush;
+  arrayPush?: typeof import('../src/utils/tools').arrayPush;
 
-  arraySlice: typeof import('../src/utils/tools').arraySlice;
+  arraySlice?: typeof import('../src/utils/tools').arraySlice;
 
-  isObject: typeof import('../src/utils/tools').isObject;
+  isObject?: typeof import('../src/utils/tools').isObject;
 
-  isNumber: typeof import('../src/utils/tools').isNumber;
+  isNumber?: typeof import('../src/utils/tools').isNumber;
 
-  isString: typeof import('../src/utils/tools').isString;
+  isString?: typeof import('../src/utils/tools').isString;
 
-  isArrayLike: typeof import('../src/utils/tools').isArrayLike;
+  isArrayLike?: typeof import('../src/utils/tools').isArrayLike;
 
-  each: typeof import('../src/utils/tools').each;
+  each?: typeof import('../src/utils/tools').each;
 
-  noop: typeof import('../src/utils/tools').noop;
+  noop?: typeof import('../src/utils/tools').noop;
 
-  assign: typeof import('../src/utils/tools').assign;
+  assign?: typeof import('../src/utils/tools').assign;
 
-  upperFirst: typeof import('../src/utils/tools').upperFirst;
+  upperFirst?: typeof import('../src/utils/tools').upperFirst;
 
-  lowerFirst: typeof import('../src/utils/tools').lowerFirst;
+  lowerFirst?: typeof import('../src/utils/tools').lowerFirst;
 
-  capitalize: typeof import('../src/utils/tools').capitalize;
+  capitalize?: typeof import('../src/utils/tools').capitalize;
 
-  config: typeof import('../src/config').config;
+  config?: typeof import('../src/config').config;
 
-  outputH: typeof import('../src/core').default.outputH;
+  includeParser?: Function;
+
+  createElement?: Function;
+
+  createRegexOperators?: Function;
+
+  createFilterAlias?: Function;
+
+  preAsts: { [name: string]: any };
+
+  asts: { [name: string]: any };
+
+  templates: { [name: string]: any };
+
+  errorTitle: string;
+
+  tmplRule: { [name: string]: any };
+
+  textTag: string;
+
+  noWsTag: string;
+
+  outputH: boolean;
+
+  textMode: boolean;
+
+  noWsMode: boolean;
+
+  fixTagName: boolean;
 
   global: { [name: string]: any };
 
-  default: Export;
+  default?: Export;
 }

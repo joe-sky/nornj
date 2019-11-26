@@ -1,8 +1,10 @@
 /node_modules
 /packages/nornj/dist
 /packages/nornj/lib
+/packages/nornj/typings/nornj.d.ts
 /packages/nornj-react/dist
 /packages/nornj-react/lib
+/packages/nornj-react/typings/nornj-react.d.ts
 /packages/nornj-react/antd/lib
 /packages/nornj-react/echarts/core.js
 /packages/nornj-react/echarts/index.js

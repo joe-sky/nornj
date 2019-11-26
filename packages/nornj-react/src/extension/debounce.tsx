@@ -1,5 +1,10 @@
-import nj, { registerExtension } from 'nornj';
-import { ExtensionDelegateOption, Component as NjComponent, ComponentOption, Template } from 'nornj/typings';
+import nj, {
+  registerExtension,
+  ExtensionDelegateOption,
+  Component as NjComponent,
+  ComponentOption,
+  Template
+} from 'nornj';
 import React, { Component } from 'react';
 import { debounce } from '../utils';
 
