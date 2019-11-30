@@ -90,7 +90,7 @@ function _createAstRoot() {
 }
 
 //Precompile template
-export function precompile(tmpl, outputH: boolean, tmplRule: object, hasAst?: boolean) {
+export function precompile(tmpl, outputH?: boolean, tmplRule: object = nj.tmplRule, hasAst?: boolean) {
   const root = _createAstRoot();
 
   if (tmpl.quasis) {

@@ -3,428 +3,132 @@ import { render, precompile } from '../../src/compiler/compile';
 import '../../src/utils/createTmplRule';
 import * as tools from '../../src/utils/tools';
 import { filterConfig } from '../../src/helpers/filter';
+import { registerExtension } from '../../src/helpers/extension';
 
 describe('Precompile', () => {
-  nj.registerExtension(
-    'noMargin',
-    options => {
-      options.exProps.style = 'margin:0';
-    },
-    { addSet: true }
-  );
+  beforeAll(() => {
+    process.env.NODE_ENV = 'production';
 
-  it('Extension attribute', () => {
-    const ret = precompile(
-      `
-      <i><n-test {{...abc}} /></i>
-    `,
-      true,
-      nj.tmplRule
+    registerExtension(
+      'noMargin',
+      options => {
+        options.tagProps.style = 'margin:0';
+      },
+      { isDirective: true }
     );
-
-    //console.log(ret.main.toString());
-    //expect(Object.keys(ret).length).not.toBe(8);
-    //expect(ret.main.toString()).toContain('g.x[\'noMargin\']');
   });
 
-  /* eslint-disable */
-  xit('Simple', () => {
-    const CUSTOM_VAR = 'nj_custom';
+  it('Custom directive', () => {
+    const ret = precompile(`<i n-noMargin>test</i>`, true);
 
-    function _replaceBackslash(str) {
-      return (str = str.replace(/\\/g, '\\\\'));
-    }
+    expect(Object.keys(ret).length).toBe(4);
+    expect(ret.main.toString()).toContain(`g.x['noMargin']`);
+  });
 
-    function _buildOptions() {
-      return '{ _njOpts: true }';
-    }
+  it('Expression case 1', () => {
+    const ret = precompile(`{{ d.e ** a.b.c(1, 2, 3) }}`);
 
-    function _buildDataValue(ast) {
-      let dataValueStr,
-        special = false;
-      const { isComputed, hasSet } = ast;
+    expect(ret.main.toString()).toContain(
+      `g.f['**'](g.f['.'](g.es(c.d('d')), 'e'), g.f['_'](g.f['.'](g.f['.'](g.es(c.d('a')), 'b'), 'c', true), [1, 2, 3]))`
+    );
+  });
 
-      if (ast.isBasicType) {
-        dataValueStr = ast.name;
-      } else {
-        const { name, parentNum } = ast;
-        let data = '',
-          specialP = false;
+  it('Expression case 2', () => {
+    const ret = precompile(`{{1 + 2 > 2 && 2 ** (3 + 1) <= 5 && (5 + 6 %% 7) >= 10}}`);
 
-        switch (name) {
-          case '@index':
-            data = 'index';
-            special = true;
-            break;
-          case '@item':
-            data = 'item';
-            special = true;
-            break;
-          case 'this':
-            data = 'data';
-            special = data => `${data}[${data}.length - 1]`;
-            break;
-          case '@data':
-            data = 'data';
-            special = true;
-            break;
-          case '@g':
-            data = 'p1.g';
-            special = CUSTOM_VAR;
-            break;
-          case '@root':
-            data = '(p2.root || p2)';
-            special = CUSTOM_VAR;
-            break;
-          case '@context':
-            data = 'p2';
-            special = CUSTOM_VAR;
-            break;
-          case '@lt':
-            data = "'<'"; // eslint-disable-line
-            special = CUSTOM_VAR;
-            break;
-          case '@gt':
-            data = "'>'"; // eslint-disable-line
-            special = CUSTOM_VAR;
-            break;
-          case '@lb':
-            data = "'{'"; // eslint-disable-line
-            special = CUSTOM_VAR;
-            break;
-          case '@rb':
-            data = "'}'"; // eslint-disable-line
-            special = CUSTOM_VAR;
-            break;
-          case '@q':
-            data = "'\"'"; // eslint-disable-line
-            special = CUSTOM_VAR;
-            break;
-          case '@sq':
-            data = '"\'"';
-            special = CUSTOM_VAR;
-            break;
-        }
+    expect(ret.main.toString()).toContain(`1 + 2 > 2 && g.f['**'](2, 3 + 1) <= 5 && (5 + g.f['%%'](6, 7)) >= 10`);
+  });
 
-        if (parentNum) {
-          if (!data) {
-            data = 'data';
-          }
+  it('Expression case 3', () => {
+    const ret = precompile(`{{'111'.length + 2 * 3}}`);
 
-          const isCtx = data == 'p2';
-          for (let i = 0; i < parentNum; i++) {
-            data = !isCtx ? 'parent.' + data : data + '.parent';
-          }
+    expect(ret.main.toString()).toContain(`g.f['.']('111', 'length') + 2 * 3`);
+  });
 
-          if (!special) {
-            specialP = true;
-          }
-        }
+  it('Expression case 4', () => {
+    const ret = precompile(
+      `{{' 123 '.trim(1 + 2 %% 5, alt(ctrl(123['length'].toString(123), '5', 6))) + shift() + 4 - 5 ** 6}}`
+    );
 
-        if (!special && !specialP) {
-          dataValueStr =
-            (isComputed ? 'p1.c(' : '') +
-            "p2.d('" +
-            name +
-            "'" +
-            (isComputed || hasSet ? ', 0, true' : '') +
-            ')' +
-            (isComputed ? ', p2, ' + level + ')' : '');
-        } else {
-          let dataStr = special === CUSTOM_VAR ? data : 'p2.' + data;
-          if (tools.isObject(special)) {
-            dataStr = special(dataStr);
-          }
-          dataValueStr = special
-            ? dataStr
-            : (isComputed ? 'p1.c(' : '') +
-              "p2.d('" +
-              name +
-              "', " +
-              dataStr +
-              (isComputed || hasSet ? ', true' : '') +
-              ')' +
-              (isComputed ? ', p2, ' + level + ')' : '');
-        }
-      }
-      if (dataValueStr) {
-        dataValueStr = _replaceBackslash(dataValueStr);
-      }
+    expect(ret.main.toString()).toContain(
+      `g.f['_'](g.f['.'](' 123 ', 'trim', true), [1 + g.f['%%'](2, 5), g.cf(c.d('alt', 0, true) || g.f['alt'])(g.cf(c.d('ctrl', 0, true) || g.f['ctrl'])(g.f['_'](g.f['.'](g.f['.'](123, 'length'), 'toString', true), [123]), '5', 6))]) + (g.cf(c.d('shift', 0, true) || g.f['shift'])()) + 4 - g.f['**'](5, 6)`
+    );
+  });
 
-      return dataValueStr;
-    }
-    /* eslint-enable */
+  it('Expression case 5', () => {
+    const ret = precompile(`{{'abcde'.substring(1, num.getLength()).length * 5 | test(100)}}`);
 
-    //console.log(render(`<i>{{(1+2**3) %% 5+'_123'}}</i>`));
+    expect(ret.main.toString()).toContain(
+      `g.f['.'](g.f['_'](g.f['.']('abcde', 'substring', true), [1, g.f['_'](g.f['.'](g.es(c.d('num')), 'getLength', true))]), 'length') * g.cf(c.d('test', 0, true) || g.f['test'])(5, 100)`
+    );
+  });
 
-    //const REGEX_OPERATOR = /\+|-|\*|%|==|<=|>=|<|>|&&/;
-    const OPERATORS = [
-      '+',
-      '-',
-      '*',
-      '/',
-      '%',
-      '===',
-      '!==',
-      '==',
-      '!=',
-      '<=',
-      '>=',
-      '=',
-      '+=',
-      '<',
-      '>',
-      '&&',
-      '?',
-      ':'
-    ];
-    const ASSIGN_OPERATORS = ['=', '+='];
+  it('Expression case 6', () => {
+    const ret = precompile(`{{('111'.length + 2) * 3 | test}}`);
 
-    const tmpl = `<div>
-      {{ d.e ** a.b.c(1, 2, 3) }}
-      <!---
-      {{1 + 2 > 2 && 2 ** (3 + 1) <= 5 && (5 + 6 %% 7) >= 10}}
-      {{1 + 2 ** 3 - 4 * 5 %% (6 + 7)}}
-      {{'111'.length + 2 * 3}}
-      {{' 123 '.trim() + 4 - 5 ** 6}}
-      {{' 123 '.trim(1 + 2 %% 5, alt(ctrl(123['length'].toString(123), '5', 6))) + shift() + 4 - 5 ** 6}}
-      {{'abcde'.substring(1, num.getLength()).length * 5 | test(100)}}
-      {{('111'.length + 2) * 3}}
-      {{('111'.length + 2) * 3 | test}}
-      {{('111'.length + 2) * 3 | test(100, 200)}}
-      {{a.b.c ? d.e.f : (1 + 2 === 3 ? 1 : 2)}}
-      {{[1, 2, 3][0] + 100}}
-      {{set a = '123' + '456'}}
-      {{ { a: 1, b: 2 }.b * 100 }}
-      {{ { a: require('../image1.png'), b: { c: { d: (1 + 2) | test } } }[b] * 100 }}
-      {{ d.e ** a.b.c(1, 2, 3) }}
-      {{ { fn: param => param + 'abc'.substring(param, 10) } }}
-      --->
-    </div>`;
+    expect(ret.main.toString()).toContain(
+      `(g.f['.']('111', 'length') + 2) * g.cf(c.d('test', 0, true) || g.f['test'])(3)`
+    );
+  });
 
-    /* eslint-disable */
-    const ast = {
-      prop: {
-        filters: [
-          {
-            params: [
-              {
-                name: "'e'",
-                isBasicType: true
-              }
-            ],
-            name: '.'
-          },
-          {
-            params: [
-              {
-                filters: [
-                  {
-                    params: [
-                      {
-                        name: "'b'",
-                        isBasicType: true
-                      }
-                    ],
-                    name: '.'
-                  },
-                  {
-                    params: [
-                      {
-                        name: "'c'",
-                        isBasicType: true
-                      }
-                    ],
-                    name: '.'
-                  },
-                  {
-                    params: [
-                      {
-                        name: '1',
-                        isBasicType: true
-                      },
-                      {
-                        name: '2',
-                        isBasicType: true
-                      },
-                      {
-                        name: '3',
-                        isBasicType: true
-                      }
-                    ],
-                    name: '_'
-                  }
-                ],
-                name: 'a'
-              }
-            ],
-            name: '**'
-          }
-        ],
-        name: 'd'
-      },
-      escape: true
-    };
-    /* eslint-enable */
+  it('Expression case 7', () => {
+    const ret = precompile(`{{('111'.length + 2) * 3 | test(100, 200)}}`);
 
-    function _buildExpression(ast, inObj) {
-      let codeStr =
-        ast.filters && OPERATORS.indexOf(ast.filters[0].name) < 0 ? '' : !inObj ? _buildDataValue(ast) : ast.name;
-      let lastCodeStr = '';
+    expect(ret.main.toString()).toContain(
+      `(g.f['.']('111', 'length') + 2) * g.cf(c.d('test', 0, true) || g.f['test'])(3, 100, 200)`
+    );
+  });
 
-      ast.filters &&
-        ast.filters.forEach((filter, i) => {
-          const hasFilterNext = ast.filters[i + 1] && OPERATORS.indexOf(ast.filters[i + 1].name) < 0;
+  it('Expression case 8', () => {
+    const ret = precompile(`{{a.b.c ? d.e.f : (1 + 2 === 3 ? 1 : 2)}}`);
 
-          if (OPERATORS.indexOf(filter.name) >= 0) {
-            //Native operator
-            if (ASSIGN_OPERATORS.indexOf(filter.name) >= 0) {
-              codeStr += `.source.${i == 0 ? ast.name : tools.clearQuot(ast.filters[i - 1].params[0].name)} ${
-                filter.name
-              } `;
-            } else {
-              codeStr += ` ${filter.name} `;
-            }
+    expect(ret.main.toString()).toContain(
+      `g.f['.'](g.f['.'](g.es(c.d('a')), 'b'), 'c') ? (g.f['.'](g.f['.'](g.es(c.d('d')), 'e'), 'f')) : (1 + 2 === 3 ? 1 : 2)`
+    );
+  });
 
-            if (!ast.filters[i + 1] || OPERATORS.indexOf(ast.filters[i + 1].name) >= 0) {
-              if (filter.params[0].filters) {
-                codeStr += '(';
-                codeStr += _buildExpression(filter.params[0]);
-                codeStr += ')';
-              } else {
-                codeStr += _buildDataValue(filter.params[0]);
-              }
-            }
-          } else if (filter.name === '_') {
-            //Call function
-            let _codeStr = `p1.sc(${lastCodeStr})`;
-            _codeStr += '(';
-            filter.params.forEach((param, j) => {
-              _codeStr += _buildExpression(param);
-              if (j < filter.params.length - 1) {
-                _codeStr += ', ';
-              }
-            });
-            _codeStr += ')';
+  it('Expression case 9', () => {
+    const ret = precompile(`{{[1, 2, 3][0] + 100}}`);
 
-            if (hasFilterNext) {
-              lastCodeStr = _codeStr;
-            } else {
-              codeStr += _codeStr;
-              lastCodeStr = '';
-            }
-          } else {
-            //Custom filter
-            let startStr, endStr, isObj, configF;
-            if (filter.name === 'bracket') {
-              startStr = '(';
-              endStr = ')';
-            } else if (filter.name === 'list') {
-              startStr = '[';
-              endStr = ']';
-            } else if (filter.name === 'obj') {
-              startStr = '{ ';
-              endStr = ' }';
-              isObj = true;
-            } else {
-              if (filter.name == 'require') {
-                startStr = 'require';
-              } else {
-                const filterStr = `p1.f['${filter.name}']`,
-                  warnStr = `p1.wn('${filter.name}', 'f')`,
-                  isDev = process.env.NODE_ENV !== 'production';
+    expect(ret.main.toString()).toContain(`g.f['.']([1, 2, 3], 0) + 100`);
+  });
 
-                configF = filterConfig[filter.name];
-                if (configF && configF.onlyGlobal) {
-                  startStr = isDev ? `(${filterStr} || ${warnStr})` : filterStr;
-                } else {
-                  startStr = `(p2.d('${filter.name}') || ${filterStr}${isDev ? ` || ${warnStr}` : ''})`;
-                }
-              }
-              startStr += '(';
-              endStr = ')';
-            }
+  it('Expression case 10', () => {
+    const ret = precompile(`{{set a = '123' + '456'}}`);
 
-            let _codeStr = startStr;
-            if (ast.isEmpty && i == 0) {
-              //Method
-              filter.params.forEach((param, j) => {
-                _codeStr += _buildExpression(param, isObj);
-                if (j < filter.params.length - 1) {
-                  _codeStr += ', ';
-                }
-              });
-            } else {
-              //Operator
-              if (i == 0) {
-                _codeStr += _buildDataValue(ast);
-              } else if (lastCodeStr !== '') {
-                _codeStr += lastCodeStr;
-              } else {
-                if (ast.filters[i - 1].params[0].filters) {
-                  _codeStr += _buildExpression(ast.filters[i - 1].params[0]);
-                } else {
-                  _codeStr += _buildDataValue(ast.filters[i - 1].params[0]);
-                }
-              }
+    expect(ret.main.toString()).toContain(`g.es(c.d('a', 0, true)).source.a = '123' + '456'`);
+  });
 
-              filter.params &&
-                filter.params.forEach((param, j) => {
-                  _codeStr += ', ';
-                  if (param.filters) {
-                    _codeStr += _buildExpression(param);
-                  } else {
-                    _codeStr += _buildDataValue(param);
-                  }
-                });
+  it('Expression case 11', () => {
+    const ret = precompile(`{{ { a: 1, b: 2 }.b * 100 }}`);
 
-              if (!configF || configF.hasOptions) {
-                _codeStr += `, ${_buildOptions()}`;
-              }
-            }
-            _codeStr += endStr;
+    expect(ret.main.toString()).toContain(`g.f['.']({ a : 1, b : 2 }, 'b') * 100`);
+  });
 
-            if (hasFilterNext) {
-              lastCodeStr = _codeStr;
-            } else {
-              codeStr += _codeStr;
-              lastCodeStr = '';
-            }
-          }
-        });
+  it('Expression case 12', () => {
+    const ret = precompile(`{{ { a: require('../image1.png'), b: { c: { d: (1 + 2) | test } } }[b] * 100 }}`);
 
-      return codeStr;
-    }
+    expect(ret.main.toString()).toContain(
+      `g.f['.']({ a : (require('../image1.png')), b : ({ c : ({ d : g.cf(c.d('test', 0, true) || g.f['test'])(1 + 2) }) }) }, g.es(c.d('b'))) * 100`
+    );
+  });
 
-    //console.log(_buildExpression(ast.prop));
+  it('Expression case 13', () => {
+    const ret = precompile(`{{ d.e ** a.b.c(1, 2, 3) }}`);
 
-    const ret = precompile(tmpl, false, nj.tmplRule);
+    expect(ret.main.toString()).toContain(
+      `g.f['**'](g.f['.'](g.es(c.d('d')), 'e'), g.f['_'](g.f['.'](g.f['.'](g.es(c.d('a')), 'b'), 'c', true), [1, 2, 3]))`
+    );
+  });
 
-    const gCode = `
-      p1.f['**'](p1.f['ctrl']('5', 2), 5)
+  // Todo
+  xit('Expression case 14', () => {
+    const ret = precompile(`{{ { fn: param => param + 'abc'.substring(param, 10) } }}`);
 
-      p1.f['.'](p1.f['.'](p1.f['.'](a, 'b'), 'c'), 'd')
+    expect(ret.main.toString()).toContain(`{ fn: param => param + (p1.sc(p1.f['.']('abc', 'substring'))(param, 10)) }`);
+  });
 
-      1 + p1.f['**'](2, 3) - 4 * p1.f['%%'](5, 6 + 7)
-
-      p1.f['.']('111', 'length') + 2 * 3
-
-      (p1.sc(p1.f['.'](' 123 ', 'trim'))()) + 4 - p1.f['**'](5, 6)
-
-      p1.f['.']({ a: 1, b: 2 }, 'b') * 100
-
-      p1.f['.']([1, 2, 3], 0) + 100
-
-      p1.f['.']((p1.sc(p1.f['.']('abcde', 'substring'))(1, (p1.sc(p1.f['.'](p2.d('num'), 'getLength'))()))), 'length') * 5
-      
-      { fn: param => param + (p1.sc(p1.f['.']('abc', 'substring'))(param, 10)) }
-
-      p2.d('a', 0, true).source.a = '123' + '456'
-    `;
-
-    //console.log(ret.main.toString());
-    //console.log(render(`{{ 1 == '1' || 1 == '2' }}`));
-    // var _v0 = null;
-    // console.log('1' + (_v0 && _v0()) + 3);
+  afterAll(() => {
+    process.env.NODE_ENV = 'test';
   });
 });
