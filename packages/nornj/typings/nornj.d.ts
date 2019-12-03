@@ -1,5 +1,5 @@
 /*!
- * NornJ template engine v5.0.0-rc.51
+ * NornJ template engine v5.0.0
  * (c) 2016-2019 Joe_Sky
  * Released under the MIT License.
  */
@@ -26,7 +26,7 @@ declare function capitalize(str: string): string;
 
 declare const compile: (tmpl: any, tmplKey: any, fileName?: string, delimiters?: object, tmplRule?: object) => any;
 declare const compileH: (tmpl: any, tmplKey: any, fileName?: string, delimiters?: object, tmplRule?: object) => any;
-declare function precompile(tmpl: any, outputH: boolean, tmplRule: object, hasAst?: boolean): {
+declare function precompile(tmpl: any, outputH?: boolean, tmplRule?: object, hasAst?: boolean): {
     useString: any;
     _no: number;
     _firstNode: boolean;

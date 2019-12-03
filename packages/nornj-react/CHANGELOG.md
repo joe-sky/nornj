@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [v5.0.0] 2019.12.03
+
+* 🚩 Support complete typescript type definition.
+
 ## [v5.0.0-rc.13] 2019.07.22
 
 * 🌟 Upgrade `antd` components to latest version.

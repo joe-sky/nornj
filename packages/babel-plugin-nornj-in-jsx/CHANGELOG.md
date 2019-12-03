@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [v5.0.0] 2019.12.03
+
+* 🚩 Support complete typescript type definition.
+
 ## [v5.0.0-rc.35] 2019.09.14
 
 * 🌟 Optimizing auto import the NornJ package.

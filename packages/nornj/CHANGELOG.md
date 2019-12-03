@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [v5.0.0] 2019.12.03
+
+* 🚩 Support complete typescript type definition.
+
 ## [v5.0.0-rc.42] 2019.09.12
 
 * ♻️ Refactoring code using typescript.
