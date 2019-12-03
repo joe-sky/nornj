@@ -7,7 +7,7 @@
   ],
   "command": {
     "publish": {
-      "message": "chore(release): publish %s"
+      "message": "chore(release): :bookmark: publish %s"
     }
   },
   "version": "5.0.0",
