@@ -1,11 +1,12 @@
 /*!
- * NornJ-React v5.0.0
+ * NornJ-React v5.0.1
  * (c) 2016-2019 Joe_Sky
  * Released under the MIT License.
  */
-/// <reference types="react" />
-declare function bindTemplate<T extends React.ElementType>(target: T): T;
-declare function bindTemplate(name: string | React.ElementType): <T extends React.ElementType>(target: T) => T;
+import { ElementType } from 'nornj';
+
+declare function bindTemplate<T extends ElementType>(target: T): T;
+declare function bindTemplate(name: string | ElementType): <T extends ElementType>(target: T) => T;
 
 /**
  * React bindings for NornJ template engine.

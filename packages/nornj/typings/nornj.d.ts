@@ -1,5 +1,5 @@
 /*!
- * NornJ template engine v5.0.0
+ * NornJ template engine v5.0.1
  * (c) 2016-2019 Joe_Sky
  * Released under the MIT License.
  */
@@ -85,10 +85,13 @@ declare function registerComponent(name: string, component: Component, options?:
 declare function getComponentConfig(name: Component): ComponentOption;
 declare function copyComponentConfig(component: Component, from: Component): Component;
 
+declare type ElementType<P = any> = {
+    [K in keyof JSX.IntrinsicElements]: P extends JSX.IntrinsicElements[K] ? K : never;
+}[keyof JSX.IntrinsicElements] | React.ComponentType<P>;
 /**
  * React(or other such as Preact) components.
  */
-declare type Component = string | React.ElementType;
+declare type Component = string | ElementType;
 /**
  * Properties of React(or other such as Preact) components.
  */
@@ -313,4 +316,4 @@ declare function expression(strs: TemplateStringsArray, ...args: any[]): any;
 declare function css(strs: TemplateStringsArray, ...args: any[]): any;
 
 export default nj;
-export { Component, ComponentOption, ComponentProps, ConfigOption, Export, ExtensionDelegate, ExtensionDelegateMultiParams, ExtensionDelegateOption, ExtensionOption, FilterDelegate, FilterDelegateOption, FilterOption, SwitchPrefixConfig, Template, compile, compileH, css, expression, taggedTmplH as html, taggedTmpl as htmlString, registerComponent, registerExtension, registerFilter, render, renderH, taggedTmpl, taggedTmplH, template };
+export { Component, ComponentOption, ComponentProps, ConfigOption, ElementType, Export, ExtensionDelegate, ExtensionDelegateMultiParams, ExtensionDelegateOption, ExtensionOption, FilterDelegate, FilterDelegateOption, FilterOption, SwitchPrefixConfig, Template, compile, compileH, css, expression, taggedTmplH as html, taggedTmpl as htmlString, registerComponent, registerExtension, registerFilter, render, renderH, taggedTmpl, taggedTmplH, template };

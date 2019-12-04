@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [v5.0.1] 2019.12.04
+
+* 🏷️ Added a `ElementType` type to replace the `React.ElementType` for compatibility.
+
 ## [v5.0.0] 2019.12.03
 
 * 🚩 Support complete typescript type definition.

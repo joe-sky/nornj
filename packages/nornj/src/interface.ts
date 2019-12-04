@@ -1,7 +1,13 @@
+export type ElementType<P = any> =
+  | {
+      [K in keyof JSX.IntrinsicElements]: P extends JSX.IntrinsicElements[K] ? K : never;
+    }[keyof JSX.IntrinsicElements]
+  | React.ComponentType<P>;
+
 /**
  * React(or other such as Preact) components.
  */
-export type Component = string | React.ElementType;
+export type Component = string | ElementType;
 
 /**
  * Properties of React(or other such as Preact) components.
