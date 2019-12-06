@@ -55,7 +55,7 @@
     "prefer-spread": 0,
     "prefer-rest-params": 0,
     "@typescript-eslint/indent": [
-      1,
+      0,
       2,
       {
         "SwitchCase": 1,
@@ -76,7 +76,7 @@
     "@typescript-eslint/no-namespace": 0,
     "react/jsx-curly-spacing": 0,
     "react/jsx-indent-props": 0,
-    "react/jsx-indent": [1, 2],
+    "react/jsx-indent": [0, 2],
     "react/jsx-no-undef": 0,
     "react/prop-types": 0,
     "react/display-name": 0,

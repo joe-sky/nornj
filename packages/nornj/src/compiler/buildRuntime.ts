@@ -261,8 +261,8 @@ export function buildExpression(ast, inObj, escape, fns, useStringLocal, level) 
     ast.filters && OPERATORS.indexOf(replaceFilterName(ast.filters[0].name)) < 0
       ? ''
       : !inObj
-      ? _buildDataValue(ast, escape, fns, level) // eslint-disable-line
-      : ast.name; // eslint-disable-line
+      ? _buildDataValue(ast, escape, fns, level)
+      : ast.name;
   let lastCodeStr = '';
 
   ast.filters &&

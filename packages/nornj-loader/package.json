@@ -26,6 +26,10 @@
   "dependencies": {
     "loader-utils": "^1.0.2"
   },
+  "devDependencies": {
+    "nornj": "^5.0.1",
+    "nornj-react": "^5.0.1"
+  },
   "peerDependencies": {
     "nornj": "*"
   }

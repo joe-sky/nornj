@@ -1,5 +1,5 @@
 /*!
- * NornJ template engine v5.0.1
+ * NornJ template engine v5.0.2
  * (c) 2016-2019 Joe_Sky
  * Released under the MIT License.
  */
@@ -2547,9 +2547,7 @@
   }
 
   function buildExpression(ast, inObj, escape, fns, useStringLocal, level) {
-    var codeStr = ast.filters && OPERATORS$1.indexOf(replaceFilterName(ast.filters[0].name)) < 0 ? '' : !inObj ? _buildDataValue(ast, escape, fns) // eslint-disable-line
-    : ast.name; // eslint-disable-line
-
+    var codeStr = ast.filters && OPERATORS$1.indexOf(replaceFilterName(ast.filters[0].name)) < 0 ? '' : !inObj ? _buildDataValue(ast, escape, fns) : ast.name;
     var lastCodeStr = '';
     ast.filters && ast.filters.forEach(function (filter, i) {
       var hasFilterNext = ast.filters[i + 1] && OPERATORS$1.indexOf(replaceFilterName(ast.filters[i + 1].name)) < 0;

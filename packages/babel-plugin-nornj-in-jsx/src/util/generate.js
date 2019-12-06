@@ -198,13 +198,13 @@ function createRenderTmpl(babel, quasis, expressions, opts, path, taggedName) {
     nj.createTmplRule(
       opts.delimiters != null
         ? opts.delimiters
-        : !isTmplFnS // eslint-disable-next-line
+        : !isTmplFnS
         ? {
             start: '{',
             end: '}',
             comment: ''
           }
-        : {} // eslint-disable-line
+        : {}
     ),
     hasAst
   );
@@ -217,9 +217,10 @@ function createRenderTmpl(babel, quasis, expressions, opts, path, taggedName) {
   if (tmplAst) {
     switch (taggedName) {
       case 'tag':
-        nj.each(tmplAst.content[0].params, attr => {
-          attr.props && _getExpressionParams([attr.props[0].prop], paramIdentifiers);
-        });
+        tmplAst.content[0] &&
+          nj.each(tmplAst.content[0].params, attr => {
+            attr.props && _getExpressionParams([attr.props[0].prop], paramIdentifiers);
+          });
         break;
       case 'directive':
         tmplAst.content[0].paramsEx &&
