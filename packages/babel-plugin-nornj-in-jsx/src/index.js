@@ -110,7 +110,7 @@ module.exports = function(babel) {
         state.hasImportNj = false;
         state.hasImportNjr = false;
         state.hasImportNjrMobx = false;
-        utils.setTmplConfig(state.opts, true);
+        utils.setTmplConfig(state.opts);
       },
       exit(path, state) {
         if (!state.hasNjInJSX) {
