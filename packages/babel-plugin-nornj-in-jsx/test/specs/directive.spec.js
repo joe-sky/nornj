@@ -37,3 +37,12 @@ describe('n-style directive', function() {
     expect(rendered).not.to.contain('<input style="display:none" class=');
   });
 });
+
+describe('n-mobxBind directive', function() {
+  const MobxBindTest = require('../fixtures/directive/n-mobxBind.jsx').MobxBindTest;
+
+  it('should render n-mobxBind', function() {
+    const rendered = util.render(MobxBindTest);
+    expect(rendered).to.contain('<input value="test"/>');
+  });
+});
