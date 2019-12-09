@@ -1,5 +1,5 @@
 /*!
- * NornJ-React v5.0.4
+ * NornJ-React v5.0.5
  * (c) 2016-2019 Joe_Sky
  * Released under the MIT License.
  */

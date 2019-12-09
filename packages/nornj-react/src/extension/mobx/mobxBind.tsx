@@ -113,7 +113,7 @@ const MobxBindWrap = React.forwardRef<any, IProps>(
 
 function _formDataTrigger(value, changeEventName, notDirect?, props?, compProps?, $this?) {
   if (value.source && value.source._njMobxFormData) {
-    const trigger = value.source[`trigger_${value.prop}`];
+    const trigger = value.source.fieldDatas.get(value.prop).trigger;
     if (trigger !== changeEventName) {
       const triggerEvent = props[trigger];
       compProps[trigger] = function(e: React.BaseSyntheticEvent) {
