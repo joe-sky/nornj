@@ -1,6 +1,6 @@
 {
   "name": "nornj-loader",
-  "version": "5.0.4",
+  "version": "5.0.5",
   "description": "Webpack loader for template engine NornJ",
   "main": "index.js",
   "files": [
@@ -27,8 +27,8 @@
     "loader-utils": "^1.0.2"
   },
   "devDependencies": {
-    "nornj": "^5.0.4",
-    "nornj-react": "^5.0.4"
+    "nornj": "^5.0.5",
+    "nornj-react": "^5.0.5"
   },
   "peerDependencies": {
     "nornj": "*"
