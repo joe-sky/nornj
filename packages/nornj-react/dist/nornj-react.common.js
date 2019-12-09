@@ -1,5 +1,5 @@
 /*!
- * NornJ-React v5.0.3
+ * NornJ-React v5.0.4
  * (c) 2016-2019 Joe_Sky
  * Released under the MIT License.
  */
@@ -176,8 +176,8 @@ function _possibleConstructorReturn(self, call) {
 function debounce(fn, delay) {
   var timeoutID = null;
   return function () {
-    var _this = this,
-        _arguments = arguments;
+    var _arguments = arguments,
+        _this = this;
 
     clearTimeout(timeoutID);
     timeoutID = setTimeout(function () {

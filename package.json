@@ -7,7 +7,7 @@
     "packages/nornj-loader",
     "packages/babel-plugin-nornj-in-jsx"
   ],
-  "version": "5.0.3",
+  "version": "5.0.4",
   "description": "A powerful template engine that can works with React, JSX enhancement or alternative tools.",
   "scripts": {
     "build": "lerna run build",

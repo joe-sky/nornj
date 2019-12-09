@@ -337,7 +337,11 @@ function _buildTmplFns(fns, tmplKey) {
 
 function _getExpressionParams(paramsAst, paramIdentifiers) {
   paramsAst.forEach(pAst => {
-    if (!pAst.isBasicType && pAst.name !== 'this' && !n`${pAst}.name.startsWith('_njParam')`) {
+    if (
+      !pAst.isBasicType &&
+      pAst.name !== 'this' &&
+      !(pAst.name && pAst.name.startsWith('_njParam')) /* && !n`${pAst}.name.startsWith('_njParam')` */
+    ) {
       paramIdentifiers.add(pAst.name);
     }
     if (pAst.filters) {
