@@ -21,7 +21,7 @@
 
 [English](https://github.com/joe-sky/nornj/blob/master/README.md) | 简体中文
 
-> 通知：NornJ的最新版`5.0.0`即将发布，旧版`0.4.x`将不再更新。
+> 通知：NornJ的最新版`5.x`目前已在`next`标签上发布，旧版`0.4.x`将不再更新。
 
 ## 文档
 

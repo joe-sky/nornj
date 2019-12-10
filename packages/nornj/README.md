@@ -21,7 +21,7 @@
 
 English | [简体中文](https://github.com/joe-sky/nornj/blob/master/docs/README.zh.md)
 
-> Notice: NornJ latest major version `5.0.0` will release soon, the `0.4.x` will no longer be updated.
+> Notice: NornJ latest version `5.x` is currently released on the `next` tag, the `0.4.x` will no longer be updated.
 
 ## Documents
 

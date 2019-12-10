@@ -67,6 +67,7 @@
     "@types/lodash": "^4.14.148",
     "@typescript-eslint/eslint-plugin": "^2.5.0",
     "@typescript-eslint/parser": "^2.5.0",
+    "babel-jest": "^24.9.0",
     "codecov": "^3.0.0",
     "commitlint": "^8.2.0",
     "create-react-class": "^15.6.3",
