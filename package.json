@@ -25,7 +25,7 @@
     "test:njx": "lerna run --scope babel-plugin-nornj-in-jsx test",
     "cover": "jest --coverage --config=test/jest.config.js",
     "cover:njx": "lerna run --scope babel-plugin-nornj-in-jsx cover",
-    "ci": "yarn run cover && codecov test/coverage/coverage-final.json",
+    "ci": "yarn run build && yarn run cover && codecov test/coverage/coverage-final.json",
     "ci:njx": "lerna run --scope babel-plugin-nornj-in-jsx ci",
     "release": "lerna publish",
     "release:next": "lerna publish --dist-tag next"
