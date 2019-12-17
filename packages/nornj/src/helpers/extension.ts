@@ -302,7 +302,7 @@ export const extensionConfig: { [name: string]: ExtensionOption } = {
   }),
   prop: _config(_defaultCfg, { isDirective: true, needPrefix: true, hasTagProps: true }),
   obj: _config(_defaultCfg, { needPrefix: true }),
-  with: _config(_defaultCfg, { newContext: { getDataFromProps: true } }),
+  with: _config(_defaultCfg, { useExpressionInProps: false, newContext: { getDataFromProps: true } }),
   style: { useExpressionInProps: false, needPrefix: true }
 };
 extensionConfig.then = _config(extensionConfig['else']);

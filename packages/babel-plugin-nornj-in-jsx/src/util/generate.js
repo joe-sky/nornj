@@ -4,8 +4,8 @@ const { locInfo } = require('./utils');
 
 function buildAttrs(types, tagName, attrs, quasis, expressions, lastAttrStr, newContextData) {
   const attrNames = Object.keys(attrs);
-  const exTagConfig = nj.extensionConfig[tagName];
-  const newContext = exTagConfig && exTagConfig.newContext;
+  const exTagConfig = nj.extensionConfig[tagName] || {};
+  const newContext = exTagConfig.newContext;
   const isCtxObject = nj.isObject(newContext);
   const getDataFromProps = newContext && newContext.getDataFromProps;
   const dataFromPropsExcept = getDataFromProps && getDataFromProps.except;
@@ -48,7 +48,7 @@ function buildAttrs(types, tagName, attrs, quasis, expressions, lastAttrStr, new
         } else if (attr.value.type == 'JSXExpressionContainer') {
           const expr = attr.value.expression;
 
-          if (types.isTemplateLiteral(expr)) {
+          if (types.isTemplateLiteral(expr) && !(exTagConfig.useExpressionInProps === false)) {
             if (expr.quasis.length === 1) {
               lastAttrStr = attrStr + '"{{' + expr.quasis[0].value.cooked + '}}"';
             } else {

@@ -1,5 +1,5 @@
 /*!
- * NornJ template engine v5.0.5
+ * NornJ template engine v5.0.6
  * (c) 2016-2019 Joe_Sky
  * Released under the MIT License.
  */
@@ -937,6 +937,7 @@ var extensionConfig = {
     needPrefix: true
   }),
   "with": _config(_defaultCfg, {
+    useExpressionInProps: false,
     newContext: {
       getDataFromProps: true
     }

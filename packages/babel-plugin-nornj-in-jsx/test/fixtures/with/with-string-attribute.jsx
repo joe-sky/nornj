@@ -5,7 +5,7 @@ module.exports = createReactClass({
   render: function() {
     return (
       <div>
-        <with attr="string">
+        <with attr={`string`}>
           <span>{attr}</span>
         </with>
       </div>
