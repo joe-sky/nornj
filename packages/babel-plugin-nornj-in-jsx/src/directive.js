@@ -89,16 +89,16 @@ module.exports = function(babel) {
           lastAttrStr = attrStr.substr(0, attrStr.length - 1);
         } else if (attr.value.type == 'JSXExpressionContainer') {
           const expr = attr.value.expression;
-          const cannotUseExpression = directiveConfig.useExpressionInProps === false;
+          const { useExpressionInProps } = directiveConfig;
 
           //Template literal case 1: `123 + abc`
-          if (isDirective && !cannotUseExpression && types.isStringLiteral(expr) && !expr.extra) {
+          if (isDirective && useExpressionInProps && types.isStringLiteral(expr) && !expr.extra) {
             lastAttrStr = attrStr + '"{{' + expr.value + '}}"';
           }
           //Template literal case 2: `123 + abc + ${def}`
           else if (
             isDirective &&
-            !cannotUseExpression &&
+            useExpressionInProps &&
             types.isCallExpression(expr) &&
             types.isStringLiteral(expr.callee.object) &&
             expr.callee.property.name === 'concat'
@@ -116,7 +116,7 @@ module.exports = function(babel) {
             _buildFromNjExp(directiveExpressions, attrStr);
           } else if (
             isDirective &&
-            !cannotUseExpression &&
+            useExpressionInProps &&
             directiveConfig.isBindable &&
             types.isMemberExpression(expr)
           ) {

@@ -7,11 +7,13 @@
         "extensionConfig": {
           "stateBind": {
             "isDirective": true,
-            "isBindable": true
+            "isBindable": true,
+            "useExpressionInProps": true
           },
           "bind": {
             "isDirective": true,
-            "isBindable": true
+            "isBindable": true,
+            "useExpressionInProps": true
           }
         },
         "noTaggedTemplates": true

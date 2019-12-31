@@ -1,5 +1,5 @@
 /*!
- * NornJ template engine v5.0.6
+ * NornJ template engine v5.0.7
  * (c) 2016-2019 Joe_Sky
  * Released under the MIT License.
  */
@@ -881,7 +881,7 @@ function _config(params, extra) {
     isSubTag: false,
     isDirective: false,
     isBindable: false,
-    useExpressionInProps: true,
+    useExpressionInProps: false,
     hasName: true,
     noTagName: false,
     hasTagProps: true,
@@ -906,18 +906,23 @@ var _defaultCfg = {
   hasName: false,
   hasTagProps: false,
   hasTmplCtx: false
-}; //Extension default config
+};
+
+var _defaultCfgExpInProps = _config(_defaultCfg, {
+  useExpressionInProps: true
+}); //Extension default config
+
 
 var extensionConfig = {
-  "if": _config(_defaultCfg),
-  "else": _config(_defaultCfg, {
+  "if": _config(_defaultCfgExpInProps),
+  "else": _config(_defaultCfgExpInProps, {
     isSubTag: true,
     hasTagProps: true
   }),
-  "switch": _config(_defaultCfg, {
+  "switch": _config(_defaultCfgExpInProps, {
     needPrefix: SwitchPrefixConfig.OnlyLowerCase
   }),
-  each: _config(_defaultCfg, {
+  each: _config(_defaultCfgExpInProps, {
     newContext: {
       item: 'item',
       index: 'index',
@@ -937,13 +942,11 @@ var extensionConfig = {
     needPrefix: true
   }),
   "with": _config(_defaultCfg, {
-    useExpressionInProps: false,
     newContext: {
       getDataFromProps: true
     }
   }),
   style: {
-    useExpressionInProps: false,
     needPrefix: true
   }
 };
@@ -953,6 +956,7 @@ extensionConfig.spread = _config(extensionConfig.prop);
 extensionConfig.block = _config(extensionConfig.obj);
 extensionConfig.arg = _config(extensionConfig.prop);
 extensionConfig.show = _config(extensionConfig.prop, {
+  useExpressionInProps: true,
   noTagName: true,
   hasOutputH: true
 });

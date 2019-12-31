@@ -259,7 +259,7 @@ function _config(params?: ExtensionOption, extra?: ExtensionOption): ExtensionOp
     isSubTag: false,
     isDirective: false,
     isBindable: false,
-    useExpressionInProps: true,
+    useExpressionInProps: false,
     hasName: true,
     noTagName: false,
     hasTagProps: true,
@@ -284,12 +284,14 @@ const _defaultCfg: ExtensionOption = {
   hasTmplCtx: false
 };
 
+const _defaultCfgExpInProps = _config(_defaultCfg, { useExpressionInProps: true });
+
 //Extension default config
 export const extensionConfig: { [name: string]: ExtensionOption } = {
-  if: _config(_defaultCfg),
-  else: _config(_defaultCfg, { isSubTag: true, hasTagProps: true }),
-  switch: _config(_defaultCfg, { needPrefix: SwitchPrefixConfig.OnlyLowerCase }),
-  each: _config(_defaultCfg, {
+  if: _config(_defaultCfgExpInProps),
+  else: _config(_defaultCfgExpInProps, { isSubTag: true, hasTagProps: true }),
+  switch: _config(_defaultCfgExpInProps, { needPrefix: SwitchPrefixConfig.OnlyLowerCase }),
+  each: _config(_defaultCfgExpInProps, {
     newContext: {
       item: 'item',
       index: 'index',
@@ -302,15 +304,15 @@ export const extensionConfig: { [name: string]: ExtensionOption } = {
   }),
   prop: _config(_defaultCfg, { isDirective: true, needPrefix: true, hasTagProps: true }),
   obj: _config(_defaultCfg, { needPrefix: true }),
-  with: _config(_defaultCfg, { useExpressionInProps: false, newContext: { getDataFromProps: true } }),
-  style: { useExpressionInProps: false, needPrefix: true }
+  with: _config(_defaultCfg, { newContext: { getDataFromProps: true } }),
+  style: { needPrefix: true }
 };
 extensionConfig.then = _config(extensionConfig['else']);
 extensionConfig.elseif = _config(extensionConfig['else']);
 extensionConfig.spread = _config(extensionConfig.prop);
 extensionConfig.block = _config(extensionConfig.obj);
 extensionConfig.arg = _config(extensionConfig.prop);
-extensionConfig.show = _config(extensionConfig.prop, { noTagName: true, hasOutputH: true });
+extensionConfig.show = _config(extensionConfig.prop, { useExpressionInProps: true, noTagName: true, hasOutputH: true });
 extensionConfig.css = _config(extensionConfig.obj);
 
 //Extension alias

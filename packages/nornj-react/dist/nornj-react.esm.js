@@ -1,5 +1,5 @@
 /*!
- * NornJ-React v5.0.6
+ * NornJ-React v5.0.7
  * (c) 2016-2019 Joe_Sky
  * Released under the MIT License.
  */
@@ -268,6 +268,7 @@ registerExtension('debounce', function (options) {
   tagProps.DebounceTag = tagName;
   tagProps.debounceDirectiveOptions = options;
 }, {
+  useExpressionInProps: true,
   onlyGlobal: true,
   isDirective: true
 });

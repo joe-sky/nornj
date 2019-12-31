@@ -92,5 +92,5 @@ registerExtension(
     tagProps.DebounceTag = tagName;
     tagProps.debounceDirectiveOptions = options;
   },
-  { onlyGlobal: true, isDirective: true }
+  { useExpressionInProps: true, onlyGlobal: true, isDirective: true }
 );

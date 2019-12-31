@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [v5.0.7] 2019.12.31
+
+* 🔧 Set the default value of `ExtensionOption.useExpressionInProps` to `false`.
+
 ## [v5.0.1] 2019.12.04
 
 * 🏷️ Added a `ElementType` type to replace the `React.ElementType` for compatibility.

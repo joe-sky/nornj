@@ -48,7 +48,7 @@ function buildAttrs(types, tagName, attrs, quasis, expressions, lastAttrStr, new
         } else if (attr.value.type == 'JSXExpressionContainer') {
           const expr = attr.value.expression;
 
-          if (types.isTemplateLiteral(expr) && !(exTagConfig.useExpressionInProps === false)) {
+          if (types.isTemplateLiteral(expr) && exTagConfig.useExpressionInProps) {
             if (expr.quasis.length === 1) {
               lastAttrStr = attrStr + '"{{' + expr.quasis[0].value.cooked + '}}"';
             } else {
