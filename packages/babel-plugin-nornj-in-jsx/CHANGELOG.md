@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [v5.1.0] 2020.01.10
+
+* 🌟 Support new ways to compile `n-bind` directive.
+
 ## [v5.0.3] 2019.12.07
 
 * :bug: Fix the babel config sometimes fail to read.

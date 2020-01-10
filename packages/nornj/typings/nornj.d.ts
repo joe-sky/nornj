@@ -1,9 +1,12 @@
 /*!
- * NornJ template engine v5.0.7
+ * NornJ template engine v5.1.0
  * (c) 2016-2019 Joe_Sky
  * Released under the MIT License.
  */
 /// <reference types="react" />
+declare function escape(str: any): any;
+declare function unescape(str: any): any;
+
 declare function config(configs: ConfigOption): void;
 
 declare function arrayPush(arr1: any, arr2: any): number;
@@ -85,6 +88,8 @@ declare function registerComponent(name: string, component: Component, options?:
 declare function getComponentConfig(name: Component): ComponentOption;
 declare function copyComponentConfig(component: Component, from: Component): Component;
 
+declare function getData(prop: any, data: any, hasSource?: any): any;
+
 declare type ElementType<P = any> = {
     [K in keyof JSX.IntrinsicElements]: P extends JSX.IntrinsicElements[K] ? K : never;
 }[keyof JSX.IntrinsicElements] | React.ComponentType<P>;
@@ -124,6 +129,7 @@ declare namespace Template {
     interface Context {
         $this: ContextThis;
         data: Data[] | any[];
+        getData: typeof getData;
         parent: Context;
         index: number;
         item: any;
@@ -301,6 +307,8 @@ interface Export {
     textMode: boolean;
     noWsMode: boolean;
     fixTagName: boolean;
+    escape?: typeof escape;
+    unescape?: typeof unescape;
     global: {
         [name: string]: any;
     };

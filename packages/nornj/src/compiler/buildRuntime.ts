@@ -228,12 +228,15 @@ function _buildDataValue(ast, escape, fns, level) {
         ')' +
         (isAccessor ? `, ${CONTEXT}` + ')' : '');
     } else {
-      let dataStr = special === CUSTOM_VAR ? data : `${CONTEXT}.` + data;
+      const isCustomVar = special === CUSTOM_VAR;
+      let dataStr = isCustomVar ? data : `${CONTEXT}.` + data;
       if (tools.isObject(special)) {
         dataStr = special(dataStr);
       }
       dataValueStr = special
-        ? dataStr
+        ? isCustomVar || !hasSet
+          ? dataStr
+          : `{ source: c, value: ${dataStr}, prop: '${data}', _njSrc: true }`
         : (isAccessor ? `${GLOBAL}.c(` : '') +
           `${CONTEXT}.d('` +
           name +

@@ -1,5 +1,5 @@
 /*!
- * NornJ template engine v5.0.7
+ * NornJ template engine v5.1.0
  * (c) 2016-2019 Joe_Sky
  * Released under the MIT License.
  */
@@ -523,9 +523,7 @@ function tmplWrap(configs, main) {
   return function (param1, param2) {
     var ctx = this,
         data = arraySlice(arguments);
-    return main(configs, ctx &&
-    /* eslint-disable */
-    ctx._njCtx ? assign({}, ctx, {
+    return main(configs, ctx && ctx._njCtx ? assign({}, ctx, {
       data: arrayPush(data, ctx.data)
     }) : {
       data: data,
@@ -538,9 +536,7 @@ function tmplWrap(configs, main) {
       d: getData,
       icp: _getLocalComponents(param1 && param1._njParam ? param2 : param1),
       _njCtx: true
-    }
-    /* eslint-enable */
-    );
+    });
   };
 }
 

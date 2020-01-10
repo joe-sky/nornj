@@ -182,7 +182,7 @@ export function tmplWrap(configs, main) {
 
     return main(
       configs,
-      ctx && /* eslint-disable */ ctx._njCtx
+      ctx && ctx._njCtx
         ? tools.assign({}, ctx, {
             data: tools.arrayPush(data, ctx.data)
           })
@@ -195,7 +195,7 @@ export function tmplWrap(configs, main) {
             d: getData,
             icp: _getLocalComponents(param1 && param1._njParam ? param2 : param1),
             _njCtx: true
-          } /* eslint-enable */
+          }
     );
   };
 }

@@ -158,6 +158,7 @@ function createRenderTmpl(babel, quasis, expressions, opts, path, taggedName) {
   const types = babel.types;
   const isTmplFnS = taggedName === 'njs';
   const isTmplFn = taggedName === 'nj' || taggedName === 'html' || isTmplFnS;
+  const expressionParamIdentifiers = new Map();
 
   let tmplStr = '';
   let paramCount = 0;
@@ -165,12 +166,13 @@ function createRenderTmpl(babel, quasis, expressions, opts, path, taggedName) {
     tmplStr += q.value.cooked;
     if (i < quasis.length - 1) {
       const expr = expressions[i];
+      const paramName = '_njParam' + paramCount;
       tmplStr +=
-        (expr.noExpression ? '' : '{{') +
-        _expressionPrefix(expr) +
-        '_njParam' +
-        paramCount +
-        (expr.noExpression ? '' : '}}');
+        (expr.noExpression ? '' : '{{') + _expressionPrefix(expr) + paramName + (expr.noExpression ? '' : '}}');
+
+      if (expr.paramIdentifierName != null) {
+        expressionParamIdentifiers.set(paramName, expr.paramIdentifierName);
+      }
       paramCount++;
     }
   });
@@ -301,6 +303,14 @@ function createRenderTmpl(babel, quasis, expressions, opts, path, taggedName) {
     paramIdentifiers.forEach(paramIdentifier => {
       if (path.scope.hasBinding(paramIdentifier)) {
         tmplParams.push(types.objectProperty(types.identifier(paramIdentifier), types.identifier(paramIdentifier)));
+      }
+    });
+  }
+
+  if (expressionParamIdentifiers.size) {
+    expressionParamIdentifiers.forEach((v, k) => {
+      if (path.scope.hasBinding(v)) {
+        tmplParams.push(types.objectProperty(types.identifier(`set${k}`), types.identifier(v)));
       }
     });
   }
