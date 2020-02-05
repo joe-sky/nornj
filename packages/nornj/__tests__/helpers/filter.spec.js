@@ -176,7 +176,7 @@ describe('Operators', () => {
     expect(render('{{ (0 .. 5).length }}')).toBe(6);
   });
 
-  it('..>', () => {
+  it('..<', () => {
     expect(render('{{ (0 ..< 5).length }}')).toBe(5);
   });
 

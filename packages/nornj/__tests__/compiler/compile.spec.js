@@ -121,8 +121,14 @@ describe('Precompile', () => {
     );
   });
 
+  it('Expression case 14', () => {
+    const ret = precompile(`{{ 1 .. (2 + 3) }}`);
+
+    expect(ret.main.toString()).toContain(`g.f['rOpe'](1, 2 + 3)`);
+  });
+
   // Todo
-  xit('Expression case 14', () => {
+  xit('Function in expression', () => {
     const ret = precompile(`{{ { fn: param => param + 'abc'.substring(param, 10) } }}`);
 
     expect(ret.main.toString()).toContain(`{ fn: param => param + (p1.sc(p1.f['.']('abc', 'substring'))(param, 10)) }`);

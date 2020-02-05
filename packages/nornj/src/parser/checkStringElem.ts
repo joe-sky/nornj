@@ -116,13 +116,13 @@ export function compileStringTmpl(tmpl) {
       }
     }
 
-    tmplFn = /* eslint-disable */ params
+    tmplFn = params
       ? function() {
           return tmplMainFn.apply(this, tools.arrayPush([params], arguments));
         }
       : function() {
           return tmplMainFn.apply(this, arguments);
-        }; /* eslint-enable */
+        };
     tools.defineProps(tmplFn, {
       _njTmpl: {
         value: ret

@@ -230,9 +230,9 @@ export const extensions: { [name: string]: ExtensionDelegate | ExtensionDelegate
       return options.children({
         data: [
           props && props.as
-            ? /* eslint-disable */ {
+            ? {
                 [props.as]: originalData
-              } /* eslint-enable */
+              }
             : originalData
         ]
       });

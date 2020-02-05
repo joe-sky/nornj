@@ -734,14 +734,14 @@ function _buildNode(node, parent, fns, counter, retType, level, useStringLocal, 
       retType,
       !useStringF
         ? { _compParam: _compParamC }
-        : /* eslint-disable */ {
+        : {
             _type: _typeC,
             _typeS: _type,
             _typeR: _typeRefer,
             _params: paramsStr !== '' ? _paramsC : null,
             _children: _childrenC,
             _selfClose: node.selfCloseTag
-          } /* eslint-enable */,
+          },
       fns,
       level,
       useStringLocal,
@@ -795,7 +795,6 @@ function _buildRender(node, parent, nodeType, retType, params, fns, level, useSt
 
   switch (nodeType) {
     case 1: //文本节点
-      /* eslint-disable */
       retStr =
         (!useStringF || allowNewline || noLevel
           ? ''
@@ -807,7 +806,6 @@ function _buildRender(node, parent, nodeType, retType, params, fns, level, useSt
         _buildLevelSpace(level, fns, allowNewline) +
         _buildLevelSpaceRt(useStringF, isFirst || noLevel) +
         params.text;
-      /* eslint-enable */
       break;
     case 2: //扩展标签
       retStr =

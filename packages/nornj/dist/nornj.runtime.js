@@ -1,5 +1,5 @@
 /*!
- * NornJ template engine v5.1.0
+ * NornJ template engine v5.1.1
  * (c) 2016-2019 Joe_Sky
  * Released under the MIT License.
  */
@@ -849,11 +849,7 @@
         var _options2 = options,
             props = _options2.props;
         return options.children({
-          data: [props && props.as ?
-          /* eslint-disable */
-          _defineProperty({}, props.as, originalData)
-          /* eslint-enable */
-          : originalData]
+          data: [props && props.as ? _defineProperty({}, props.as, originalData) : originalData]
         });
       }
     },
@@ -1110,7 +1106,7 @@
       return styleProps(cssText);
     },
     //Generate array by two positive integers,closed interval
-    '..': _getArrayByNum(1),
+    rOpe: _getArrayByNum(1),
     //Generate array by two positive integers,right open interval
     rLt: _getArrayByNum(0),
     //Compare two number or letter
@@ -1222,7 +1218,7 @@
     bool: _config$1(_defaultCfg$1),
     reg: _config$1(_defaultCfg$1),
     css: _config$1(_defaultCfg$1),
-    '..': _config$1(_defaultCfg$1),
+    rOpe: _config$1(_defaultCfg$1),
     rLt: _config$1(_defaultCfg$1),
     '<=>': _config$1(_defaultCfg$1),
     upperFirst: _config$1(_defaultCfg$1),
@@ -1406,15 +1402,11 @@
 
   function _createRender(outputH) {
     return function (tmpl, options) {
-      return (outputH ? compileH : compile)(tmpl, options ?
-      /* eslint-disable */
-      {
+      return (outputH ? compileH : compile)(tmpl, options ? {
         tmplKey: options.tmplKey ? options.tmplKey : tmpl._njTmplKey,
         fileName: options.fileName,
         delimiters: options.delimiters
-      }
-      /* eslint-enable */
-      : tmpl._njTmplKey).apply(null, arraySlice(arguments, 1));
+      } : tmpl._njTmplKey).apply(null, arraySlice(arguments, 1));
     };
   }
 

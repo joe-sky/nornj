@@ -1,5 +1,5 @@
 /*!
- * NornJ template engine v5.1.0
+ * NornJ template engine v5.1.1
  * (c) 2016-2019 Joe_Sky
  * Released under the MIT License.
  */
@@ -1073,11 +1073,7 @@
         var _options2 = options,
             props = _options2.props;
         return options.children({
-          data: [props && props.as ?
-          /* eslint-disable */
-          _defineProperty({}, props.as, originalData)
-          /* eslint-enable */
-          : originalData]
+          data: [props && props.as ? _defineProperty({}, props.as, originalData) : originalData]
         });
       }
     },
@@ -1334,7 +1330,7 @@
       return styleProps(cssText);
     },
     //Generate array by two positive integers,closed interval
-    '..': _getArrayByNum(1),
+    rOpe: _getArrayByNum(1),
     //Generate array by two positive integers,right open interval
     rLt: _getArrayByNum(0),
     //Compare two number or letter
@@ -1446,7 +1442,7 @@
     bool: _config$1(_defaultCfg$1),
     reg: _config$1(_defaultCfg$1),
     css: _config$1(_defaultCfg$1),
-    '..': _config$1(_defaultCfg$1),
+    rOpe: _config$1(_defaultCfg$1),
     rLt: _config$1(_defaultCfg$1),
     '<=>': _config$1(_defaultCfg$1),
     upperFirst: _config$1(_defaultCfg$1),
@@ -1690,6 +1686,7 @@
   var REGEX_OPERATORS_ESCAPE = /\*|\||\/|\.|\?|\+/g;
   var SP_FILTER_LOOKUP = {
     '||': 'or',
+    '..': 'rOpe',
     '..<': 'rLt'
   };
   var REGEX_SP_FILTER;
@@ -1703,7 +1700,7 @@
       return o.replace(REGEX_OPERATORS_ESCAPE, function (match) {
         return '\\' + match;
       });
-    }).join('|') + ')[\\s]*)', 'g');
+    }).join('|') + ')[\\s]+)', 'g');
   }
 
   createFilterAlias();
@@ -2956,18 +2953,14 @@
 
       fnStr += _buildRender(node, parent, 3, retType, !useStringF ? {
         _compParam: _compParamC
-      } :
-      /* eslint-disable */
-      {
+      } : {
         _type: _typeC,
         _typeS: _type,
         _typeR: _typeRefer,
         _params: _paramsStr !== '' ? _paramsC2 : null,
         _children: _childrenC,
         _selfClose: node.selfCloseTag
-      }
-      /* eslint-enable */
-      , fns, level, useStringLocal, node.allowNewline, isFirst);
+      }, fns, level, useStringLocal, node.allowNewline, isFirst);
     }
 
     return fnStr;
@@ -3001,11 +2994,7 @@
     switch (nodeType) {
       case 1:
         //文本节点
-
-        /* eslint-disable */
         retStr = (!useStringF || allowNewline || noLevel ? '' : isFirst ? parent.type !== 'nj_root' ? "".concat(GLOBAL, ".fl(").concat(CONTEXT, ") + ") : '' : "'\\n' + ") + _buildLevelSpace(level, fns, allowNewline) + _buildLevelSpaceRt(useStringF, isFirst || noLevel) + params.text;
-        /* eslint-enable */
-
         break;
 
       case 2:
@@ -3234,15 +3223,11 @@
         }
       }
 
-      tmplFn =
-      /* eslint-disable */
-      params ? function () {
+      tmplFn = params ? function () {
         return tmplMainFn.apply(this, arrayPush([params], arguments));
       } : function () {
         return tmplMainFn.apply(this, arguments);
       };
-      /* eslint-enable */
-
       defineProps(tmplFn, {
         _njTmpl: {
           value: ret
@@ -3698,15 +3683,11 @@
 
   function _createRender(outputH) {
     return function (tmpl, options) {
-      return (outputH ? compileH : compile)(tmpl, options ?
-      /* eslint-disable */
-      {
+      return (outputH ? compileH : compile)(tmpl, options ? {
         tmplKey: options.tmplKey ? options.tmplKey : tmpl._njTmplKey,
         fileName: options.fileName,
         delimiters: options.delimiters
-      }
-      /* eslint-enable */
-      : tmpl._njTmplKey).apply(null, arraySlice(arguments, 1));
+      } : tmpl._njTmplKey).apply(null, arraySlice(arguments, 1));
     };
   }
 

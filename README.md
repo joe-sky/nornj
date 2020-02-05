@@ -21,8 +21,6 @@
 
 English | [简体中文](https://github.com/joe-sky/nornj/blob/master/docs/README.zh.md)
 
-> Notice: NornJ latest version `5.x` is currently released on the `next` tag, the `0.4.x` will no longer be updated.
-
 ## Documents
 
 * [NornJ Guide(v5)](https://joe-sky.github.io/nornj-guide/zh)
@@ -148,7 +146,7 @@ In the above example, a template function was created using `tagged templates AP
 ## Install
 
 ```sh
-npm install babel-plugin-nornj-in-jsx@next  #or yarn add babel-plugin-nornj-in-jsx@next
+npm install babel-plugin-nornj-in-jsx  #or yarn add babel-plugin-nornj-in-jsx
 ```
 
 Next, add `nornj-in-jsx` to plugins in your babel configuration:

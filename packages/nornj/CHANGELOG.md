@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [v5.1.1] 2020.02.05
+
+* 🐞 Fixed a range operator bug in expressions. [#card-32606466](https://github.com/joe-sky/nornj/projects/1#card-32606466)
+
 ## [v5.0.7] 2019.12.31
 
 * 🔧 Set the default value of `ExtensionOption.useExpressionInProps` to `false`.

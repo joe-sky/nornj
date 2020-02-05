@@ -117,6 +117,7 @@ const REGEX_QUOTE = /"[^"]*"|'[^']*'/g;
 const REGEX_OPERATORS_ESCAPE = /\*|\||\/|\.|\?|\+/g;
 const SP_FILTER_LOOKUP = {
   '||': 'or',
+  '..': 'rOpe',
   '..<': 'rLt'
 };
 let REGEX_SP_FILTER;
@@ -133,7 +134,7 @@ function createFilterAlias(name?, alias?) {
           return o.replace(REGEX_OPERATORS_ESCAPE, match => '\\' + match);
         })
         .join('|') +
-      ')[\\s]*)',
+      ')[\\s]+)',
     'g'
   );
 }

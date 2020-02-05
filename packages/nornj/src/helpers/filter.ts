@@ -95,7 +95,7 @@ export const filters: { [name: string]: FilterDelegate } = {
   css: cssText => styleProps(cssText),
 
   //Generate array by two positive integers,closed interval
-  '..': _getArrayByNum(1),
+  rOpe: _getArrayByNum(1),
 
   //Generate array by two positive integers,right open interval
   rLt: _getArrayByNum(0),
@@ -186,7 +186,7 @@ export const filterConfig: { [name: string]: FilterOption } = {
   bool: _config(_defaultCfg),
   reg: _config(_defaultCfg),
   css: _config(_defaultCfg),
-  '..': _config(_defaultCfg),
+  rOpe: _config(_defaultCfg),
   rLt: _config(_defaultCfg),
   '<=>': _config(_defaultCfg),
   upperFirst: _config(_defaultCfg),
