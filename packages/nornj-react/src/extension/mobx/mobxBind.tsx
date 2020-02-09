@@ -119,11 +119,11 @@ function _formDataTrigger(value, changeEventName, notDirect?, props?, compProps?
       compProps[trigger] = function(e: React.BaseSyntheticEvent) {
         e && e.persist && e.persist();
 
-        value.source.validate(value.prop);
+        value.source.validate(value.prop).catch(nj.noop);
         triggerEvent && triggerEvent.apply($this, arguments);
       };
     } else if (!notDirect) {
-      value.source.validate(value.prop);
+      value.source.validate(value.prop).catch(nj.noop);
     }
   }
 }
