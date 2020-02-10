@@ -37,6 +37,7 @@ nj.registerExtension(
 
         return new Promise((resolve, reject) => {
           oFd.validator.validate({ [name]: value }, (errors, fields) => {
+            console.log(errors);
             if (errors) {
               this.error(oFd.message != null ? oFd.message : errors[0].message, name);
               reject({ errors, fields });
@@ -138,7 +139,7 @@ function TestForm() {
         value="joe_sky"
         type="string"
         required
-        asyncValidator={(rule, value, callback) => {
+        validator={(rule, value, callback) => {
           setTimeout(() => {
             if (value == 'joe') {
               callback(new Error('用户名已存在'));
@@ -160,13 +161,40 @@ function TestForm() {
   );
 }
 
+function TestFormSync() {
+  const formData = useLocalStore(() => (
+    <MobxFormData>
+      <MobxFieldData
+        name="userName"
+        value="joe_sky"
+        type="string"
+        required
+        validator={(rule, value, callback) => {
+          if (value == 'joe') {
+            return new Error('用户名已存在');
+          }
+          callback();
+        }}
+      />
+    </MobxFormData>
+  ));
+
+  return (
+    <MobxObserver>
+      <Form.Item n-mobxField={formData.userName}>
+        <Input n-mobxBind={formData.userName} />
+      </Form.Item>
+    </MobxObserver>
+  );
+}
+
 describe('mobxFormData tag', function() {
   it('should render', () => {
     const app = mount(<TestForm />);
     expect(app.find('input').props().value).toEqual('joe_sky');
   });
 
-  it('asynchronous verification succeeded', cb => {
+  it('asynchronous custom verification succeeded', cb => {
     const app = mount(<TestForm />);
     const event = { target: { value: 'joe-sky' } };
     app.find('input').simulate('change', event);
@@ -178,7 +206,7 @@ describe('mobxFormData tag', function() {
     }, 200);
   });
 
-  it('asynchronous verification failed', cb => {
+  it('asynchronous custom verification failed', cb => {
     const app = mount(<TestForm />);
     const event = { target: { value: 'joe' } };
     app.find('input').simulate('change', event);
@@ -188,5 +216,21 @@ describe('mobxFormData tag', function() {
       expect(app.find('div.ant-form-explain').text()).toEqual('用户名已存在');
       cb();
     }, 200);
+  });
+
+  it('custom verification succeeded', () => {
+    const app = mount(<TestFormSync />);
+    const event = { target: { value: 'joe-sky' } };
+    app.find('input').simulate('change', event);
+    app.update();
+    expect(app.find('div.ant-form-explain').length).toEqual(0);
+  });
+
+  it('custom verification failed', () => {
+    const app = mount(<TestFormSync />);
+    const event = { target: { value: 'joe' } };
+    app.find('input').simulate('change', event);
+    app.update();
+    expect(app.find('div.ant-form-explain').text()).toEqual('用户名已存在');
   });
 });

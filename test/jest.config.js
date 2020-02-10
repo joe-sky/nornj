@@ -18,8 +18,8 @@ module.exports = {
   setupFiles: ['<rootDir>/test/setup.js'],
   setupFilesAfterEnv: ['<rootDir>/node_modules/jest-enzyme/lib/index.js'],
   testMatch: [
-    '<rootDir>/packages/nornj/**/__tests__/**/*.(spec|test).{js,jsx,ts,tsx}',
-    '<rootDir>/packages/nornj-react/**/__tests__/**/*.(spec|test).{js,jsx,ts,tsx}'
+    // '<rootDir>/packages/nornj/**/__tests__/**/*.(spec|test).{js,jsx,ts,tsx}',
+    '<rootDir>/packages/nornj-react/**/__tests__/**/mobxFormData.(spec|test).{js,jsx,ts,tsx}'
   ],
   testEnvironment: 'enzyme',
   transform: {
