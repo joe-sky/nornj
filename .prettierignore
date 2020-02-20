@@ -9,6 +9,7 @@
 /packages/nornj-react/mobx/lib
 /packages/nornj-react/mobx/index.js
 /packages/nornj-react/mobx/native.js
+/packages/nornj-react/mobx/formData/index.js
 /packages/nornj-react/native/index.js
 /packages/nornj-react/redux/index.js
 /packages/nornj-react/router/index.js

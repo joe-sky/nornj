@@ -2,6 +2,7 @@
 /lib/
 /mobx/index.js
 /mobx/native.js
+/mobx/formData/index.js
 /mobx/lib/
 /native/index.js
 /router/index.js

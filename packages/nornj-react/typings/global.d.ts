@@ -12,6 +12,10 @@ declare function MobxObserver(): any;
  */
 declare function NjMobxObserver(): any;
 
+declare function MobxFormData(props: { [id: string]: any }): any;
+
+declare function MobxFieldData(props: { [id: string]: any }): any;
+
 declare namespace JSX {
   namespace NornJReact {
     interface Childrenable {
@@ -41,6 +45,8 @@ declare namespace JSX {
 declare module 'nornj-react/mobx';
 
 declare module 'nornj-react/mobx/native';
+
+declare module 'nornj-react/mobx/formData';
 
 declare module 'nornj-react/redux';
 

@@ -14,18 +14,6 @@
             "isDirective": true,
             "isBindable": true,
             "useExpressionInProps": true
-          },
-          "mobxFormData": {
-            "useExpressionInProps": false
-          },
-          "mobxFieldData": {
-            "useExpressionInProps": false
-          },
-          "mobxField": {
-            "isDirective": true,
-            "isBindable": true,
-            "useExpressionInProps": true,
-            "newContext": false
           }
         },
         "noTaggedTemplates": true
