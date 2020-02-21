@@ -1,6 +1,6 @@
 {
   "name": "nornj-react",
-  "version": "5.1.1",
+  "version": "5.2.0",
   "description": "React bindings for NornJ template engine.",
   "main": "dist/nornj-react.common.js",
   "module": "dist/nornj-react.esm.js",

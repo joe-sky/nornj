@@ -1,12 +1,12 @@
 import React, { Component, useState } from 'react';
 import { shallow, mount } from 'enzyme';
 import nj, { expression as n } from 'nornj';
-import '../../src/base';
-import '../../mobx';
-import '../../mobx/formData';
+import '../../../src/base';
+import '../../../src/extension/mobx/base';
+import '../../../src/extension/mobx/mobxFormData';
 import { useLocalStore } from 'mobx-react-lite';
-import Form from '../../antd/form';
-import Input from '../../antd/input';
+import Form from '../../../antd/form';
+import Input from '../../../antd/input';
 
 function TestForm() {
   const formData = useLocalStore(() => (
@@ -46,11 +46,11 @@ function TestFormSync() {
         value="joe_sky"
         type="string"
         required
-        validator={(rule, value, callback) => {
+        validator={(rule, value) => {
           if (value == 'joe') {
             return new Error('用户名已存在');
           }
-          callback();
+          return true;
         }}
       />
     </MobxFormData>
@@ -103,7 +103,7 @@ describe('mobxFormData tag', function() {
     expect(app.find('div.ant-form-explain').length).toEqual(0);
   });
 
-  it('custom verification failed', () => {
+  it.only('custom verification failed', () => {
     const app = mount(<TestFormSync />);
     const event = { target: { value: 'joe' } };
     app.find('input').simulate('change', event);

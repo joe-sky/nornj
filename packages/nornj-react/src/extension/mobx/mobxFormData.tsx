@@ -3,6 +3,129 @@ import { observable } from 'mobx';
 import schema from 'async-validator';
 import extensionConfigs from '../../../mobx/formData/extensionConfig';
 
+const createFormData = () => ({
+  _njMobxFormData: true,
+
+  fieldDatas: new Map(),
+
+  _validate(name) {
+    const oFd = this.fieldDatas.get(name);
+    let value = this[name];
+    switch (oFd.type) {
+      case 'number':
+      case 'integer':
+      case 'float':
+        value = n`${value}.trim()` !== '' ? +value : '';
+        break;
+      case 'boolean':
+        value = n`${value}.trim()` !== '' ? Boolean(value) : '';
+        break;
+    }
+
+    return new Promise((resolve, reject) => {
+      oFd.validator.validate({ [name]: value }, (errors, fields) => {
+        if (errors) {
+          this.error(n`${errors}[0].message`, name);
+          reject({ errors, fields });
+        } else {
+          this.clear(name);
+          resolve();
+        }
+      });
+    });
+  },
+
+  validate(name) {
+    if (name != null) {
+      return this._validate(name);
+    } else {
+      const validators = [];
+      this.fieldDatas.forEach((fieldData, name: string) => {
+        validators.push(this._validate(name));
+      });
+
+      return Promise.all(validators);
+    }
+  },
+
+  error(help, name) {
+    const oFd = this.fieldDatas.get(name);
+    oFd.validateStatus = 'error';
+    oFd.help = help;
+  },
+
+  _clear(name) {
+    const oFd = this.fieldDatas.get(name);
+    oFd.validateStatus = null;
+    oFd.help = null;
+  },
+
+  clear(name) {
+    if (name != null) {
+      return this._clear(name);
+    } else {
+      this.fieldDatas.forEach((fieldData, name: string) => {
+        this._clear(name);
+      });
+    }
+  },
+
+  _reset(name) {
+    this.clear(name);
+    const oFd = this.fieldDatas.get(name);
+    oFd.reset();
+  },
+
+  reset(name) {
+    if (name != null) {
+      return this._reset(name);
+    } else {
+      this.fieldDatas.forEach((fieldData, name: string) => {
+        this._reset(name);
+      });
+    }
+  },
+
+  add(fieldData) {
+    const { name, value, type = 'string', required = false, trigger = 'onChange', ...ruleOptions } = fieldData;
+    const fd = { name, value, type, required, trigger, ...ruleOptions };
+
+    fd.validator = new schema({
+      [name]: {
+        type,
+        required,
+        ...ruleOptions
+      }
+    });
+
+    fd.reset = function() {
+      this.value = value;
+    };
+
+    const oFd = observable(fd);
+    this.fieldDatas.set(name, oFd);
+
+    Object.defineProperty(this, name, {
+      get: function() {
+        return this.fieldDatas.get(name).value;
+      },
+      set: function(value) {
+        this.setValue(name, value);
+      },
+      enumerable: true,
+      configurable: true
+    });
+  },
+
+  delete(name) {
+    this.fieldDatas.delete(name);
+  },
+
+  setValue(name, value) {
+    this.fieldDatas.get(name).value = value;
+  }
+});
+
 registerExtension(
   'mobxFormData',
   options => {
@@ -12,99 +135,12 @@ registerExtension(
       _children = [_children];
     }
 
-    const ret = {
-      _njMobxFormData: true,
-      fieldDatas: new Map(),
-      validate(name) {
-        const oFd = this.fieldDatas.get(name);
-        let value = this[name];
-        switch (oFd.type) {
-          case 'number':
-          case 'integer':
-          case 'float':
-            value = n`${value}.trim()` !== '' ? +value : '';
-            break;
-          case 'boolean':
-            value = n`${value}.trim()` !== '' ? Boolean(value) : '';
-            break;
-        }
-
-        return new Promise((resolve, reject) => {
-          oFd.validator.validate({ [name]: value }, (errors, fields) => {
-            console.log(errors);
-            if (errors) {
-              this.error(oFd.message != null ? oFd.message : errors[0].message, name);
-              reject({ errors, fields });
-            } else {
-              this.clear(name);
-              resolve();
-            }
-          });
-        });
-      },
-      error(help, name) {
-        const oFd = this.fieldDatas.get(name);
-        oFd.validateStatus = 'error';
-        oFd.help = help;
-      },
-      clear(name) {
-        const oFd = this.fieldDatas.get(name);
-        oFd.validateStatus = null;
-        oFd.help = null;
-      },
-      reset(name) {
-        this.clear(name);
-        const oFd = this.fieldDatas.get(name);
-        oFd.reset();
-      },
-      add(fieldData) {
-        const {
-          name,
-          value,
-          type = 'string',
-          required = false,
-          message,
-          trigger = 'onChange',
-          ...ruleOptions
-        } = fieldData;
-        const fd = { name, value, type, required, message, trigger, ...ruleOptions };
-
-        fd.validator = new schema({
-          [name]: {
-            type,
-            required,
-            ...ruleOptions
-          }
-        });
-
-        fd.reset = function() {
-          this.value = value;
-        };
-
-        const oFd = observable(fd);
-        this.fieldDatas.set(name, oFd);
-
-        Object.defineProperty(this, name, {
-          get: function() {
-            return this.fieldDatas.get(name).value;
-          },
-          set: function(v) {
-            this.fieldDatas.get(name).value = v;
-          },
-          enumerable: true,
-          configurable: true
-        });
-      },
-      delete(name) {
-        this.fieldDatas.delete(name);
-      }
-    };
-
+    const formData = createFormData();
     _children.forEach(fieldData => {
-      fieldData && ret.add(fieldData);
+      fieldData && formData.add(fieldData);
     });
 
-    return props && props.observable ? observable(ret) : ret;
+    return n`${props}.observable` ? observable(formData) : formData;
   },
   extensionConfigs.mobxFormData
 );
