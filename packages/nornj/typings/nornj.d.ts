@@ -1,5 +1,5 @@
 /*!
- * NornJ template engine v5.1.1
+ * NornJ template engine v5.1.2
  * (c) 2016-2019 Joe_Sky
  * Released under the MIT License.
  */
@@ -107,6 +107,7 @@ interface ComponentOption {
     hasEventObject?: boolean;
     targetPropName?: string;
     valuePropName?: string;
+    getValueFromEvent?: Function;
     changeEventName?: string;
     needToJS?: boolean;
     [key: string]: any;

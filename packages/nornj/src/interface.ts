@@ -20,6 +20,7 @@ export interface ComponentOption {
   hasEventObject?: boolean;
   targetPropName?: string;
   valuePropName?: string;
+  getValueFromEvent?: Function;
   changeEventName?: string;
   needToJS?: boolean;
   [key: string]: any;

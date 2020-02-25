@@ -88,13 +88,14 @@ const MobxBindWrap = React.forwardRef<any, IProps>(
         );
       };
     } else {
+      const getValueFromEvent = componentConfig.getValueFromEvent;
       compProps[valuePropName] = _value;
-      compProps[changeEventName] = function(v) {
+      compProps[changeEventName] = function(...args: any[]) {
         _setValue(
-          v,
+          getValueFromEvent ? getValueFromEvent(...args) : args[0],
           {
             value,
-            args: arguments,
+            args,
             changeEventName,
             changeEvent,
             valuePropName,
