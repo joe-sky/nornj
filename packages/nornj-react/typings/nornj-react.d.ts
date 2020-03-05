@@ -8,6 +8,19 @@ import { ElementType } from 'nornj';
 declare function bindTemplate<T extends ElementType>(target: T): T;
 declare function bindTemplate(name: string | ElementType): <T extends ElementType>(target: T) => T;
 
+interface FormDataInstance {
+    _njMobxFormData: boolean;
+    fieldDatas: Map<any, any>;
+    validate(name: string): Promise<any>;
+    error(help: string, name: string): void;
+    clear(name: string): void;
+    reset(name: string): void;
+    add(fieldData: any): void;
+    delete(name: string): void;
+    setValue(name: string, value: any): void;
+    formData: FormDataInstance;
+    [key: string]: any;
+}
 /**
  * React bindings for NornJ template engine.
  */
@@ -25,4 +38,4 @@ interface Export {
 declare const njr: Export;
 
 export default njr;
-export { Export, bindTemplate, bindTemplate as registerTmpl };
+export { Export, FormDataInstance, bindTemplate, bindTemplate as registerTmpl };

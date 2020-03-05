@@ -9,7 +9,7 @@ import Form from '../../../antd/form';
 import Input from '../../../antd/input';
 
 function TestForm() {
-  const formData = useLocalStore(() => (
+  const { formData } = useLocalStore(() => (
     <MobxFormData>
       <MobxFieldData
         name="userName"
@@ -39,7 +39,7 @@ function TestForm() {
 }
 
 function TestFormSync() {
-  const formData = useLocalStore(() => (
+  const { formData } = useLocalStore(() => (
     <MobxFormData>
       <MobxFieldData
         name="userName"

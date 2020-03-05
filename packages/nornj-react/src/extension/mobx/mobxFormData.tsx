@@ -2,13 +2,14 @@ import { expression as n, registerExtension } from 'nornj';
 import { observable } from 'mobx';
 import schema from 'async-validator';
 import extensionConfigs from '../../../mobx/formData/extensionConfig';
+import { FormDataInstance } from '../../interface';
 
-const createFormData = () => ({
+const createFormData = (): FormDataInstance => ({
   _njMobxFormData: true,
 
   fieldDatas: new Map(),
 
-  _validate(name) {
+  _validate(name: string) {
     const oFd = this.fieldDatas.get(name);
     let value = this[name];
     switch (oFd.type) {
@@ -35,7 +36,7 @@ const createFormData = () => ({
     });
   },
 
-  validate(name) {
+  validate(name: string) {
     if (name != null) {
       return this._validate(name);
     } else {
@@ -48,21 +49,21 @@ const createFormData = () => ({
     }
   },
 
-  error(help, name) {
+  error(help: string, name: string) {
     const oFd = this.fieldDatas.get(name);
     oFd.validateStatus = 'error';
     oFd.help = help;
   },
 
-  _clear(name) {
+  _clear(name: string) {
     const oFd = this.fieldDatas.get(name);
     oFd.validateStatus = null;
     oFd.help = null;
   },
 
-  clear(name) {
+  clear(name: string) {
     if (name != null) {
-      return this._clear(name);
+      this._clear(name);
     } else {
       this.fieldDatas.forEach((fieldData, name: string) => {
         this._clear(name);
@@ -70,15 +71,15 @@ const createFormData = () => ({
     }
   },
 
-  _reset(name) {
+  _reset(name: string) {
     this.clear(name);
     const oFd = this.fieldDatas.get(name);
     oFd.reset();
   },
 
-  reset(name) {
+  reset(name: string) {
     if (name != null) {
-      return this._reset(name);
+      this._reset(name);
     } else {
       this.fieldDatas.forEach((fieldData, name: string) => {
         this._reset(name);
@@ -117,12 +118,16 @@ const createFormData = () => ({
     });
   },
 
-  delete(name) {
+  delete(name: string) {
     this.fieldDatas.delete(name);
   },
 
-  setValue(name, value) {
+  setValue(name: string, value) {
     this.fieldDatas.get(name).value = value;
+  },
+
+  get formData() {
+    return this;
   }
 });
 

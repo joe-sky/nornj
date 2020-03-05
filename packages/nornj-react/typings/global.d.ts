@@ -12,11 +12,15 @@ declare function MobxObserver(): any;
  */
 declare function NjMobxObserver(): any;
 
-declare function MobxFormData(props: { [id: string]: any }): any;
+declare function MobxFormData(props: { observable?: boolean }): any;
 
 declare function MobxFieldData(props: { [id: string]: any }): any;
 
+type FormDataWithJsxElement = { formData?: NornJReact.FormDataInstance };
+
 declare namespace JSX {
+  interface Element extends React.ReactElement<any, any>, FormDataWithJsxElement {}
+
   namespace NornJReact {
     interface Childrenable {
       children?: NornJ.Children | NornJ.Children[];

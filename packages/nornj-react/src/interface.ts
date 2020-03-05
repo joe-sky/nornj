@@ -1,3 +1,17 @@
+export interface FormDataInstance {
+  _njMobxFormData: boolean;
+  fieldDatas: Map<any, any>;
+  validate(name: string): Promise<any>;
+  error(help: string, name: string): void;
+  clear(name: string): void;
+  reset(name: string): void;
+  add(fieldData: any): void;
+  delete(name: string): void;
+  setValue(name: string, value: any): void;
+  formData: FormDataInstance;
+  [key: string]: any;
+}
+
 /**
  * React bindings for NornJ template engine.
  */
