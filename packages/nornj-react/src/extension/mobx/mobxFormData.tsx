@@ -1,10 +1,10 @@
 import { expression as n, registerExtension } from 'nornj';
-import { observable } from 'mobx';
+import { observable, runInAction } from 'mobx';
 import schema from 'async-validator';
 import extensionConfigs from '../../../mobx/formData/extensionConfig';
-import { FormDataInstance } from '../../interface';
+import { MobxFormDataInstance } from '../../interface';
 
-const createFormData = (): FormDataInstance => ({
+const createFormData = (): MobxFormDataInstance => ({
   _njMobxFormData: true,
 
   fieldDatas: new Map(),
@@ -122,8 +122,16 @@ const createFormData = (): FormDataInstance => ({
     this.fieldDatas.delete(name);
   },
 
-  setValue(name: string, value) {
-    this.fieldDatas.get(name).value = value;
+  setValue(name: string | object, value?: any) {
+    if (typeof name === 'string') {
+      runInAction(() => (this.fieldDatas.get(name).value = value));
+    } else {
+      this.fieldDatas.forEach((fieldData, fieldName: string) => {
+        if (fieldName in name) {
+          runInAction(() => (fieldData.value = name[fieldName]));
+        }
+      });
+    }
   },
 
   get formData() {

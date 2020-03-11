@@ -40,15 +40,36 @@ module.exports = function(babel) {
             path.replaceWith(exTagHandler(path.node, path, state));
           }
         }
+
+        const directives = astUtil.hasDirective(path.node);
+        if (directives && directives.length) {
+          const mobxField = directives.find(directive => directive.startsWith('n-mobxField'));
+          if (mobxField && !state.mobxFieldNodes.has(path.node)) {
+            if (!mobxField.includes('-noBind')) {
+              const children = astUtil.getChildren(types, path.node);
+              children[0].openingElement.attributes.push(
+                types.jsxAttribute(
+                  types.jsxIdentifier('n-mobxBind'),
+                  path.node.openingElement.attributes.find(node => node.name.name.startsWith('n-mobxField')).value
+                )
+              );
+            }
+
+            state.mobxFieldNodes.add(path.node);
+
+            path.replaceWith(
+              types.jsxElement(types.jsxOpeningElement(types.jsxIdentifier('MobxObserver'), []), null, [path.node])
+            );
+          }
+        }
       },
       exit(path, state) {
         const directives = astUtil.hasDirective(path.node);
-        if (directives.length) {
+        if (directives && directives.length) {
           state.hasNjInJSX = true;
 
           const hasMobx = directives.reduce(
-            (result, directive) =>
-              result || directive.indexOf('n-mobxBind') > -1 || directive.indexOf('n-mstBind') > -1,
+            (result, directive) => result || directive.startsWith('n-mobxBind') || directive.startsWith('n-mstBind'),
             false
           );
           hasMobx &&
@@ -59,7 +80,7 @@ module.exports = function(babel) {
           }
 
           const hasMobxFormData = directives.reduce(
-            (result, directive) => result || directive.indexOf('n-mobxField') > -1,
+            (result, directive) => result || directive.startsWith('n-mobxField'),
             false
           );
           hasMobxFormData &&
@@ -135,6 +156,7 @@ module.exports = function(babel) {
         state.hasImportNjr = false;
         state.hasImportNjrMobx = false;
         state.hasImportNjrMobxFormData = false;
+        state.mobxFieldNodes = new Set();
         utils.setTmplConfig(state.opts);
       },
       exit(path, state) {

@@ -14,9 +14,16 @@ declare function NjMobxObserver(): any;
 
 declare function MobxFormData(props: { observable?: boolean }): any;
 
-declare function MobxFieldData(props: { [id: string]: any }): any;
+declare function MobxFieldData(props: {
+  name: string;
+  value?: any;
+  type?: string;
+  required?: boolean;
+  validator?: Function;
+  [key: string]: any;
+}): any;
 
-type FormDataWithJsxElement = { formData?: NornJReact.FormDataInstance };
+type FormDataWithJsxElement = { formData?: NornJReact.MobxFormDataInstance };
 
 declare namespace JSX {
   interface Element extends React.ReactElement<any, any>, FormDataWithJsxElement {}
@@ -43,6 +50,22 @@ declare namespace JSX {
      * `<n-mobxObserver><div>{store.foo}</div></n-mobxObserver>`
      */
     'n-mobxObserver': NornJReact.MobxObserver;
+  }
+
+  interface IntrinsicAttributes {
+    /**
+     * NornJ directive `n-mobxBind`, example:
+     *
+     * `<input n-mobxBind={this.inputValue} />`
+     */
+    ['n-mobxBind']?: any;
+
+    /**
+     * NornJ directive `n-mobxField`, example:
+     *
+     * `<input n-mobxField={this.inputValue} />`
+     */
+    ['n-mobxField']?: any;
   }
 }
 

@@ -1,6 +1,6 @@
 {
   "name": "nornj-react",
-  "version": "5.2.0",
+  "version": "5.1.1",
   "description": "React bindings for NornJ template engine.",
   "main": "dist/nornj-react.common.js",
   "module": "dist/nornj-react.esm.js",
@@ -16,7 +16,7 @@
     "antd/",
     "echarts/",
     "src/",
-    "typings/",
+    "types/",
     "index.d.ts",
     "CHANGELOG.md",
     "LICENSE",
@@ -39,9 +39,9 @@
     "lib:redux": "babel redux/base.js --out-file redux/index.js --extensions \".js,.jsx,.ts,.tsx\" --config-file \"../../.babelrc\"",
     "lib:router": "babel router/base.js --out-file router/index.js --extensions \".js,.jsx,.ts,.tsx\" --config-file \"../../.babelrc\"",
     "lib:native": "babel native/base.js --out-file native/index.js --extensions \".js,.jsx,.ts,.tsx\" --config-file \"../../.babelrc\"",
-    "lib:antd": "babel antd --out-dir antd/lib --ignore \"antd/lib\" --extensions \".js,.jsx,.ts,.tsx\" --config-file \"../../.babelrc\"",
+    "lib:antd": "babel antd --out-dir antd/lib --ignore \"antd/lib\" --copy-files && babel antd --out-dir antd/lib --ignore \"antd/lib\",\"antd/**/index.d.ts\" --extensions \".js,.jsx,.ts,.tsx\" --config-file \"../../.babelrc\"",
     "lib:echarts": "babel echarts/base.js --out-file echarts/index.js --extensions \".js,.jsx,.ts,.tsx\" --config-file \"../../.babelrc\" && babel echarts/base.core.js --out-file echarts/core.js --extensions \".js,.jsx,.ts,.tsx\" --config-file \"../../.babelrc\"",
-    "dts": "cross-env TYPE=dts NODE_ENV=es rollup -c -o typings/nornj-react.d.ts",
+    "dts": "cross-env TYPE=dts NODE_ENV=es rollup -c -o types/nornj-react.d.ts",
     "build": "yarn run lib && yarn run lib:mobx && yarn run lib:mobxFormData && yarn run lib:redux && yarn run lib:router && yarn run lib:native && yarn run lib:antd && yarn run lib:echarts && yarn run cjs && yarn run esm && yarn run umd && yarn run umd:mobx && yarn run umd:redux && yarn run umd:router && yarn run min && yarn run min:mobx && yarn run min:redux && yarn run min:router && yarn run dts"
   },
   "keywords": [

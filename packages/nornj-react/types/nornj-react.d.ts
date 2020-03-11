@@ -1,6 +1,6 @@
 /*!
  * NornJ-React v5.2.0
- * (c) 2016-2019 Joe_Sky
+ * (c) 2016-2020 Joe_Sky
  * Released under the MIT License.
  */
 import { ElementType } from 'nornj';
@@ -8,7 +8,7 @@ import { ElementType } from 'nornj';
 declare function bindTemplate<T extends ElementType>(target: T): T;
 declare function bindTemplate(name: string | ElementType): <T extends ElementType>(target: T) => T;
 
-interface FormDataInstance {
+interface MobxFormDataInstance {
     _njMobxFormData: boolean;
     fieldDatas: Map<any, any>;
     validate(name: string): Promise<any>;
@@ -17,8 +17,8 @@ interface FormDataInstance {
     reset(name: string): void;
     add(fieldData: any): void;
     delete(name: string): void;
-    setValue(name: string, value: any): void;
-    formData: FormDataInstance;
+    setValue(name: string | object, value?: any): void;
+    formData: MobxFormDataInstance;
     [key: string]: any;
 }
 /**
@@ -38,4 +38,4 @@ interface Export {
 declare const njr: Export;
 
 export default njr;
-export { Export, FormDataInstance, bindTemplate, bindTemplate as registerTmpl };
+export { Export, MobxFormDataInstance, bindTemplate, bindTemplate as registerTmpl };

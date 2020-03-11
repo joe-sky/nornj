@@ -46,3 +46,18 @@ describe('n-mobxBind directive', function() {
     expect(rendered).to.contain('<input value="test"/>');
   });
 });
+
+describe('n-mobxField directive', function() {
+  const MobxFieldTest = require('../fixtures/directive/n-mobxField.jsx').MobxFieldTest;
+  const MobxFieldNoBindTest = require('../fixtures/directive/n-mobxField-noBind.jsx').MobxFieldTest;
+
+  it('should render n-mobxField', function() {
+    const rendered = util.render(MobxFieldTest);
+    expect(rendered).to.contain('<input type="text" value="joe_sky" class="ant-input"/>');
+  });
+
+  it('should render n-mobxField-noBind', function() {
+    const rendered = util.render(MobxFieldNoBindTest);
+    expect(rendered).to.contain('<input type="text" value="joe_sky" class="ant-input"/>');
+  });
+});

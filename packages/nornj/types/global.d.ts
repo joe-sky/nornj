@@ -414,13 +414,6 @@ declare namespace JSX {
      * `<input n-debounce={200} />`
      */
     ['n-debounce']?: number | string;
-
-    /**
-     * NornJ directive `n-mobxBind`, example:
-     *
-     * `<input n-mobxBind={this.inputValue} />`
-     */
-    ['n-mobxBind']?: any;
   }
 }
 

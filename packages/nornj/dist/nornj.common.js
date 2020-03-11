@@ -1,6 +1,6 @@
 /*!
- * NornJ template engine v5.1.2
- * (c) 2016-2019 Joe_Sky
+ * NornJ template engine v5.2.0
+ * (c) 2016-2020 Joe_Sky
  * Released under the MIT License.
  */
 'use strict';

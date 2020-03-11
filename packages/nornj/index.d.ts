@@ -1,5 +1,5 @@
-/// <reference path="./typings/global.d.ts" />
+/// <reference path="./types/global.d.ts" />
 
-export * from './typings/nornj.d';
-export { default } from './typings/nornj.d';
+export * from './types/nornj.d';
+export { default } from './types/nornj.d';
 export as namespace NornJ;

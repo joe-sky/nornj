@@ -1,6 +1,6 @@
 /*!
  * NornJ-React-Mobx v5.2.0
- * (c) 2016-2019 Joe_Sky
+ * (c) 2016-2020 Joe_Sky
  * Released under the MIT License.
  */
 (function (factory) {

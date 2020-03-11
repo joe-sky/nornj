@@ -30,11 +30,9 @@ function TestForm() {
   ));
 
   return (
-    <MobxObserver>
-      <Form.Item n-mobxField={formData.userName}>
-        <Input n-mobxBind={formData.userName} />
-      </Form.Item>
-    </MobxObserver>
+    <Form.Item n-mobxField={formData.userName}>
+      <Input />
+    </Form.Item>
   );
 }
 
@@ -57,11 +55,9 @@ function TestFormSync() {
   ));
 
   return (
-    <MobxObserver>
-      <Form.Item n-mobxField={formData.userName}>
-        <Input n-mobxBind={formData.userName} />
-      </Form.Item>
-    </MobxObserver>
+    <Form.Item n-mobxField={formData.userName}>
+      <Input />
+    </Form.Item>
   );
 }
 
@@ -103,7 +99,7 @@ describe('mobxFormData tag', function() {
     expect(app.find('div.ant-form-explain').length).toEqual(0);
   });
 
-  it.only('custom verification failed', () => {
+  it('custom verification failed', () => {
     const app = mount(<TestFormSync />);
     const event = { target: { value: 'joe' } };
     app.find('input').simulate('change', event);

@@ -1,4 +1,4 @@
-export interface FormDataInstance {
+export interface MobxFormDataInstance {
   _njMobxFormData: boolean;
   fieldDatas: Map<any, any>;
   validate(name: string): Promise<any>;
@@ -7,8 +7,8 @@ export interface FormDataInstance {
   reset(name: string): void;
   add(fieldData: any): void;
   delete(name: string): void;
-  setValue(name: string, value: any): void;
-  formData: FormDataInstance;
+  setValue(name: string | object, value?: any): void;
+  formData: MobxFormDataInstance;
   [key: string]: any;
 }
 

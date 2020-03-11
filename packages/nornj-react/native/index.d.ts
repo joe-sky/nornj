@@ -1,5 +1,5 @@
-/// <reference path="../typings/global.d.ts" />
+/// <reference path="../types/global.d.ts" />
 
-export * from '../typings/nornj-react.d';
-export { default } from '../typings/nornj-react.d';
+export * from '../types/nornj-react.d';
+export { default } from '../types/nornj-react.d';
 export as namespace NornJReact;
