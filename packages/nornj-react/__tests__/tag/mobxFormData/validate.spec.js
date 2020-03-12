@@ -18,10 +18,10 @@ function TestForm() {
 
   return (
     <>
-      <Form.Item className="field1" n-mobxField={formData.userName}>
+      <Form.Item className="field1" label="User Name" n-mobxField={formData.userName}>
         <Input />
       </Form.Item>
-      <Form.Item className="field2" n-mobxField={formData.age}>
+      <Form.Item className="field2" label="Age" n-mobxField={formData.age}>
         <Input />
       </Form.Item>
     </>

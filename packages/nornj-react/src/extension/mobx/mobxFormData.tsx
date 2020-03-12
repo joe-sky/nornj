@@ -170,6 +170,7 @@ registerExtension(
 
     tagProps.validateStatus = oFd.validateStatus;
     tagProps.help = oFd.help;
+    tagProps.required = oFd.required;
   },
   extensionConfigs.mobxField
 );
