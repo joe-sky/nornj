@@ -12,6 +12,7 @@
       {
         "loose": true
       }
-    ]
+    ],
+    "@babel/plugin-proposal-optional-chaining"
   ]
 }

@@ -1,5 +1,5 @@
-import { expression as n, registerExtension } from 'nornj';
-import { observable, runInAction } from 'mobx';
+import nj, { registerExtension } from 'nornj';
+import { observable, runInAction, reaction } from 'mobx';
 import schema from 'async-validator';
 import extensionConfigs from '../../../mobx/formData/extensionConfig';
 import { MobxFormDataInstance } from '../../interface';
@@ -16,17 +16,14 @@ const createFormData = (): MobxFormDataInstance => ({
       case 'number':
       case 'integer':
       case 'float':
-        value = n`${value}.trim()` !== '' ? +value : '';
-        break;
-      case 'boolean':
-        value = n`${value}.trim()` !== '' ? Boolean(value) : '';
+        value = nj.isString(value) && value?.trim() !== '' ? +value : value;
         break;
     }
 
     return new Promise((resolve, reject) => {
       oFd.validator.validate({ [name]: value }, (errors, fields) => {
         if (errors) {
-          this.error(n`${errors}[0].message`, name);
+          this.error(errors?.[0]?.message, name);
           reject({ errors, fields });
         } else {
           this.clear(name);
@@ -88,7 +85,7 @@ const createFormData = (): MobxFormDataInstance => ({
   },
 
   add(fieldData) {
-    const { name, value, type = 'string', required = false, trigger = 'onChange', ...ruleOptions } = fieldData;
+    const { name, value, type = 'string', required = false, trigger = 'valueChange', ...ruleOptions } = fieldData;
     const fd = { name, value, type, required, trigger, ...ruleOptions };
 
     fd.validator = new schema({
@@ -116,6 +113,12 @@ const createFormData = (): MobxFormDataInstance => ({
       enumerable: true,
       configurable: true
     });
+
+    trigger === 'valueChange' &&
+      reaction(
+        () => this[name],
+        () => this.validate(name).catch(nj.noop)
+      );
   },
 
   delete(name: string) {
@@ -153,7 +156,7 @@ registerExtension(
       fieldData && formData.add(fieldData);
     });
 
-    return n`${props}.observable` ? observable(formData) : formData;
+    return props?.observable ? observable(formData) : formData;
   },
   extensionConfigs.mobxFormData
 );

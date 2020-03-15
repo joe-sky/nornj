@@ -19,6 +19,7 @@ declare function MobxFieldData(props: {
   value?: any;
   type?: string;
   required?: boolean;
+  trigger: string;
   validator?: Function;
   [key: string]: any;
 }): any;

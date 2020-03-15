@@ -4,6 +4,8 @@ import { toJS } from 'mobx';
 import extensionConfigs from '../../../mobx/extensionConfig';
 import { debounce } from '../../utils';
 
+const FORMDATA_NOT_TRIGGER = ['valueChange', 'none'];
+
 interface IProps extends React.InputHTMLAttributes<any> {
   mobxBindDirectiveOptions: ExtensionDelegateOption;
   MobxBindTag: Component;
@@ -113,9 +115,16 @@ const MobxBindWrap = React.forwardRef<any, IProps>(
 );
 
 function _formDataTrigger(value, changeEventName, notDirect?, props?, compProps?, $this?) {
-  if (value.source && value.source._njMobxFormData) {
+  if (value?.source?._njMobxFormData) {
     const trigger = value.source.fieldDatas.get(value.prop).trigger;
-    if (trigger !== changeEventName) {
+    if (FORMDATA_NOT_TRIGGER.indexOf(trigger) > -1) {
+      return;
+    }
+    if (!notDirect) {
+      if (trigger === changeEventName) {
+        value.source.validate(value.prop).catch(nj.noop);
+      }
+    } else if (trigger !== changeEventName) {
       const triggerEvent = props[trigger];
       compProps[trigger] = function(e: React.BaseSyntheticEvent) {
         e && e.persist && e.persist();
@@ -123,8 +132,6 @@ function _formDataTrigger(value, changeEventName, notDirect?, props?, compProps?
         value.source.validate(value.prop).catch(nj.noop);
         triggerEvent && triggerEvent.apply($this, arguments);
       };
-    } else if (!notDirect) {
-      value.source.validate(value.prop).catch(nj.noop);
     }
   }
 }
