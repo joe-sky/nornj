@@ -13,7 +13,7 @@ function TestForm(props) {
   const { formData } = useLocalStore(() => (
     <MobxFormData>
       <MobxFieldData name="userName" value="joe_sky" type="string" trigger="onChange" required />
-      <MobxFieldData name="age" value="18" type="number" />
+      <MobxFieldData name="age" value="18a" type="number" />
       <MobxFieldData name="worked" value={true} type="boolean" required />
     </MobxFormData>
   ));
@@ -40,105 +40,53 @@ describe('Validate', function() {
   const app = mount(<TestForm formDataRef={ref} />);
   const formData = ref.current;
 
-  it('String value', () => {
-    expect(
-      app
-        .find('input')
-        .at(0)
-        .props().value
-    ).toEqual('joe_sky');
+  it('Validate single field', async () => {
+    try {
+      const values = await formData.validate('userName');
+      expect(values).toEqual({ userName: 'joe_sky' });
+    } catch (errorInfo) {
+      console.log(errorInfo);
+    }
 
-    app
-      .find('input')
-      .at(0)
-      .simulate('change', { target: { value: '' } });
-    app.update();
-    expect(
-      app
-        .find('.field1 .ant-form-item-control')
-        .at(0)
-        .hasClass('has-error')
-    ).toEqual(true);
-
-    app
-      .find('input')
-      .at(0)
-      .simulate('change', { target: { value: 'joe' } });
-    app.update();
-    expect(
-      app
-        .find('.field1 .ant-form-item-control')
-        .at(0)
-        .hasClass('has-error')
-    ).toEqual(false);
+    try {
+      const values = await formData.validate('age');
+      console.log(values);
+    } catch (errorInfo) {
+      expect(errorInfo.errors[0].field).toEqual('age');
+    }
   });
 
-  it('Number value', () => {
-    expect(
-      app
-        .find('input')
-        .at(1)
-        .props().value
-    ).toEqual('18');
+  it('Validate multiple fields', async () => {
+    try {
+      const values = await formData.validate(['userName', 'worked']);
+      expect(values).toEqual({ userName: 'joe_sky', worked: true });
+    } catch (errorInfo) {
+      console.log(errorInfo);
+    }
 
-    app
-      .find('input')
-      .at(1)
-      .simulate('change', { target: { value: 'joe_sky' } });
-    app.update();
-    expect(
-      app
-        .find('.field2 .ant-form-item-control')
-        .at(0)
-        .hasClass('has-error')
-    ).toEqual(true);
-
-    app
-      .find('input')
-      .at(1)
-      .simulate('change', { target: { value: '28' } });
-    app.update();
-    expect(
-      app
-        .find('.field2 .ant-form-item-control')
-        .at(0)
-        .hasClass('has-error')
-    ).toEqual(false);
+    try {
+      const values = await formData.validate(['userName', 'age']);
+      console.log(values);
+    } catch (errorInfo) {
+      expect(errorInfo.errors[0].field).toEqual('age');
+    }
   });
 
-  it('Boolean value', () => {
-    expect(
-      app
-        .find('input')
-        .at(2)
-        .props().checked
-    ).toEqual(true);
+  it('Validate all fields', async () => {
+    formData.age = 28;
+    try {
+      const values = await formData.validate();
+      expect(values).toEqual({ userName: 'joe_sky', age: 28, worked: true });
+    } catch (errorInfo) {
+      console.log(errorInfo);
+    }
 
-    formData.worked = false;
-    app.update();
-    expect(
-      app
-        .find('input')
-        .at(2)
-        .props().checked
-    ).toEqual(false);
-
-    formData.worked = 'true';
-    app.update();
-    expect(
-      app
-        .find('.field3 .ant-form-item-control')
-        .at(0)
-        .hasClass('has-error')
-    ).toEqual(true);
-
-    formData.worked = true;
-    app.update();
-    expect(
-      app
-        .find('.field3 .ant-form-item-control')
-        .at(0)
-        .hasClass('has-error')
-    ).toEqual(false);
+    formData.age = '28a';
+    try {
+      const values = await formData.validate();
+      console.log(values);
+    } catch (errorInfo) {
+      expect(errorInfo.errors[0].field).toEqual('age');
+    }
   });
 });

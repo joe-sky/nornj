@@ -54,6 +54,7 @@
     "no-control-regex": 0,
     "prefer-spread": 0,
     "prefer-rest-params": 0,
+    "require-atomic-updates": "off",
     "@typescript-eslint/indent": [
       0,
       2,

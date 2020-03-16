@@ -12,17 +12,9 @@ declare function MobxObserver(): any;
  */
 declare function NjMobxObserver(): any;
 
-declare function MobxFormData(props: { observable?: boolean }): any;
+declare const MobxFormData: NornJReact.MobxFormData;
 
-declare function MobxFieldData(props: {
-  name: string;
-  value?: any;
-  type?: string;
-  required?: boolean;
-  trigger: string;
-  validator?: Function;
-  [key: string]: any;
-}): any;
+declare const MobxFieldData: NornJReact.MobxFieldData;
 
 type FormDataWithJsxElement = { formData?: NornJReact.MobxFormDataInstance };
 

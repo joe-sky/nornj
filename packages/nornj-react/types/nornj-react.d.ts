@@ -3,23 +3,46 @@
  * (c) 2016-2020 Joe_Sky
  * Released under the MIT License.
  */
+/// <reference types="react" />
 import { ElementType } from 'nornj';
+import schema, { RuleItem } from 'async-validator';
 
 declare function bindTemplate<T extends ElementType>(target: T): T;
 declare function bindTemplate(name: string | ElementType): <T extends ElementType>(target: T) => T;
 
+interface MobxFieldDataProps extends RuleItem {
+    name: string;
+    value?: any;
+    trigger?: string;
+    [key: string]: any;
+}
+interface MobxFieldDataInstance extends MobxFieldDataProps {
+    validatorSchema?: schema;
+    reset?: Function;
+    validateStatus?: string;
+    help?: string;
+}
+interface MobxFieldData {
+    (props: MobxFieldDataProps): JSX.Element;
+}
+interface MobxFormDataProps {
+    observable?: boolean;
+}
 interface MobxFormDataInstance {
     _njMobxFormData: boolean;
-    fieldDatas: Map<any, any>;
-    validate(name: string): Promise<any>;
-    error(help: string, name: string): void;
-    clear(name: string): void;
-    reset(name: string): void;
-    add(fieldData: any): void;
+    fieldDatas: Map<string, MobxFieldDataInstance>;
+    validate(name: string | string[]): Promise<any>;
+    error(name: string, help: string): void;
+    clear(name: string | string[]): void;
+    reset(name: string | string[]): void;
+    add(fieldData: MobxFieldDataProps | JSX.Element): void;
     delete(name: string): void;
     setValue(name: string | object, value?: any): void;
     formData: MobxFormDataInstance;
     [key: string]: any;
+}
+interface MobxFormData {
+    (props: MobxFormDataProps): JSX.Element;
 }
 /**
  * React bindings for NornJ template engine.
@@ -38,4 +61,4 @@ interface Export {
 declare const njr: Export;
 
 export default njr;
-export { Export, MobxFormDataInstance, bindTemplate, bindTemplate as registerTmpl };
+export { Export, MobxFieldData, MobxFieldDataInstance, MobxFieldDataProps, MobxFormData, MobxFormDataInstance, MobxFormDataProps, bindTemplate, bindTemplate as registerTmpl };
