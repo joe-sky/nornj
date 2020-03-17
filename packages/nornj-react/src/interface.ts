@@ -1,4 +1,5 @@
 import schema, { RuleItem } from 'async-validator';
+import { IObservableObject } from 'mobx';
 
 export interface MobxFieldDataProps extends RuleItem {
   name: string;
@@ -24,7 +25,7 @@ export interface MobxFormDataProps {
 
 export interface MobxFormDataInstance {
   _njMobxFormData: boolean;
-  fieldDatas: Map<string, MobxFieldDataInstance>;
+  fieldDatas: Map<string, MobxFieldDataInstance & IObservableObject>;
   validate(name: string | string[]): Promise<any>;
   error(name: string, help: string): void;
   clear(name: string | string[]): void;
@@ -39,6 +40,8 @@ export interface MobxFormDataInstance {
 export interface MobxFormData {
   (props: MobxFormDataProps): JSX.Element;
 }
+
+export type MobxFormDataWithJSXElement = { formData?: MobxFormDataInstance & IObservableObject };
 
 /**
  * React bindings for NornJ template engine.

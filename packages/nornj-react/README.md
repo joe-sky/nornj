@@ -4,7 +4,7 @@ React bindings for NornJ template engine.
 
 [![NPM Version][npm-image]][npm-url]
 [![NPM Downloads][downloads-image]][npm-url]
-[![](https://img.shields.io/bundlephobia/minzip/nornj-react@next.svg?style=flat)](https://bundlephobia.com/result?p=nornj-react@next)
+[![](https://img.shields.io/bundlephobia/minzip/nornj-react@next.svg?style=flat)](https://bundlephobia.com/result?p=nornj-react)
 
 ### Install
 

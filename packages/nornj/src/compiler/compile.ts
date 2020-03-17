@@ -5,6 +5,7 @@ import * as tranData from '../transforms/transformData';
 import { buildRuntime } from './buildRuntime';
 import { compileStringTmpl } from '../parser/checkStringElem';
 import { createTmplRule } from '../utils/createTmplRule';
+import { Template } from '../interface';
 
 //编译模板并返回转换函数
 function _createCompile(outputH?: boolean) {
@@ -143,7 +144,7 @@ function _buildRender(outputH?: boolean) {
   return function(tmpl, params) {
     const tmplMainFn = (outputH ? compileH : compile)(tmpl, tmpl._njTmplKey);
     if (params) {
-      const tmplFn = function() {
+      const tmplFn = function(this: Template.Context) {
         return tmplMainFn.apply(this, tools.arrayPush([params], arguments));
       };
       tools.defineProp(params, '_njParam', {

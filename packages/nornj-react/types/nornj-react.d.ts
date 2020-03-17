@@ -6,6 +6,7 @@
 /// <reference types="react" />
 import { ElementType } from 'nornj';
 import schema, { RuleItem } from 'async-validator';
+import { IObservableObject } from 'mobx';
 
 declare function bindTemplate<T extends ElementType>(target: T): T;
 declare function bindTemplate(name: string | ElementType): <T extends ElementType>(target: T) => T;
@@ -30,7 +31,7 @@ interface MobxFormDataProps {
 }
 interface MobxFormDataInstance {
     _njMobxFormData: boolean;
-    fieldDatas: Map<string, MobxFieldDataInstance>;
+    fieldDatas: Map<string, MobxFieldDataInstance & IObservableObject>;
     validate(name: string | string[]): Promise<any>;
     error(name: string, help: string): void;
     clear(name: string | string[]): void;
@@ -44,6 +45,9 @@ interface MobxFormDataInstance {
 interface MobxFormData {
     (props: MobxFormDataProps): JSX.Element;
 }
+declare type MobxFormDataWithJSXElement = {
+    formData?: MobxFormDataInstance & IObservableObject;
+};
 /**
  * React bindings for NornJ template engine.
  */
@@ -61,4 +65,4 @@ interface Export {
 declare const njr: Export;
 
 export default njr;
-export { Export, MobxFieldData, MobxFieldDataInstance, MobxFieldDataProps, MobxFormData, MobxFormDataInstance, MobxFormDataProps, bindTemplate, bindTemplate as registerTmpl };
+export { Export, MobxFieldData, MobxFieldDataInstance, MobxFieldDataProps, MobxFormData, MobxFormDataInstance, MobxFormDataProps, MobxFormDataWithJSXElement, bindTemplate, bindTemplate as registerTmpl };

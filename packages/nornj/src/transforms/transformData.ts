@@ -1,5 +1,6 @@
 import nj from '../core';
 import * as tools from '../utils/tools';
+import { Template } from '../interface';
 const REGEX_NUM = /^(-?([0-9]+[.]?[0-9]+)|[0-9])$/;
 
 //提取style内参数
@@ -36,10 +37,10 @@ export function styleProps(obj) {
 }
 
 //Get value from multiple datas
-export function getData(prop, data, hasSource?) {
+export function getData(this: Template.Context | void, prop, data, hasSource?) {
   let value, obj;
   if (!data) {
-    data = this.data;
+    data = (this as Template.Context).data;
   }
 
   for (let i = 0, l = data.length; i < l; i++) {
@@ -176,7 +177,7 @@ function _getLocalComponents(localConfigs) {
 
 //构建可运行的模板函数
 export function tmplWrap(configs, main) {
-  return function(param1, param2) {
+  return function(this: Template.Context, param1, param2) {
     const ctx = this,
       data = tools.arraySlice(arguments);
 

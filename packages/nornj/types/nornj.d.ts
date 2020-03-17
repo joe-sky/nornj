@@ -88,7 +88,7 @@ declare function registerComponent(name: string, component: Component, options?:
 declare function getComponentConfig(name: Component): ComponentOption;
 declare function copyComponentConfig(component: Component, from: Component): Component;
 
-declare function getData(prop: any, data: any, hasSource?: any): any;
+declare function getData(this: Template.Context | void, prop: any, data: any, hasSource?: any): any;
 
 declare type ElementType<P = any> = {
     [K in keyof JSX.IntrinsicElements]: P extends JSX.IntrinsicElements[K] ? K : never;
