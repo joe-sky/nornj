@@ -3,6 +3,7 @@ import { observable, runInAction, reaction } from 'mobx';
 import schema from 'async-validator';
 import extensionConfigs from '../../../mobx/formData/extensionConfig';
 import { MobxFormDataInstance, MobxFieldDataProps, MobxFieldDataInstance } from '../../interface';
+import moment from 'moment';
 
 type operateCallback = (name: string) => void;
 
@@ -32,18 +33,32 @@ const createFormData = (): MobxFormDataInstance & {
         (!names.length || names.indexOf(name) > -1) && (callbackMulti || callback)(name);
       });
 
-      return callbackMultiReturn(names);
+      if (callbackMultiReturn) {
+        return callbackMultiReturn(names);
+      }
     }
   },
 
   _validate(name) {
     const oFd = this.fieldDatas.get(name);
-    let value = this[name];
+    const originalValue = this[name];
+    let value;
     switch (oFd.type) {
       case 'number':
       case 'integer':
       case 'float':
-        value = nj.isString(value) && value?.trim() !== '' && !isNaN(value) ? +value : value;
+        value =
+          nj.isString(originalValue) && originalValue?.trim() !== '' && !isNaN(originalValue)
+            ? +originalValue
+            : originalValue;
+        break;
+      case 'date':
+        if (moment.isMoment(originalValue)) {
+          value = originalValue.toDate();
+        }
+        break;
+      default:
+        value = originalValue;
         break;
     }
 
@@ -51,10 +66,10 @@ const createFormData = (): MobxFormDataInstance & {
       oFd.validatorSchema.validate({ [name]: value }, {}, (errors, fields) => {
         if (errors) {
           this.error(name, errors?.[0]?.message);
-          reject({ values: { [name]: value }, errors, fields });
+          reject({ values: { [name]: originalValue }, errors, fields });
         } else {
           this.clear(name);
-          resolve({ [name]: value });
+          resolve({ [name]: originalValue });
         }
       });
     });
@@ -99,7 +114,10 @@ const createFormData = (): MobxFormDataInstance & {
   },
 
   reset(names) {
-    return this._operate(names, name => this._reset(name));
+    return this._operate(names, name => {
+      this._reset(name);
+      this._clear(name);
+    });
   },
 
   add(fieldData: MobxFieldDataProps) {

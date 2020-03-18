@@ -16,10 +16,10 @@ declare const MobxFormData: NornJReact.MobxFormData;
 
 declare const MobxFieldData: NornJReact.MobxFieldData;
 
-type MobxFormDataWithJSXElement = NornJReact.MobxFormDataWithJSXElement;
+type JSXElementWithMobxFormData = NornJReact.JSXElementWithMobxFormData;
 
 declare namespace JSX {
-  interface Element extends React.ReactElement<any, any>, MobxFormDataWithJSXElement {}
+  interface Element extends React.ReactElement<any, any>, JSXElementWithMobxFormData {}
 
   namespace NornJReact {
     interface Childrenable {

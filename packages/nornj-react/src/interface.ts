@@ -24,12 +24,12 @@ export interface MobxFormDataProps {
 }
 
 export interface MobxFormDataInstance {
-  _njMobxFormData: boolean;
+  readonly _njMobxFormData: boolean;
   fieldDatas: Map<string, MobxFieldDataInstance & IObservableObject>;
-  validate(name: string | string[]): Promise<any>;
+  validate(name?: string | string[]): Promise<any>;
   error(name: string, help: string): void;
-  clear(name: string | string[]): void;
-  reset(name: string | string[]): void;
+  clear(name?: string | string[]): void;
+  reset(name?: string | string[]): void;
   add(fieldData: MobxFieldDataProps | JSX.Element): void;
   delete(name: string): void;
   setValue(name: string | object, value?: any): void;
@@ -41,7 +41,7 @@ export interface MobxFormData {
   (props: MobxFormDataProps): JSX.Element;
 }
 
-export type MobxFormDataWithJSXElement = { formData?: MobxFormDataInstance & IObservableObject };
+export type JSXElementWithMobxFormData = { formData?: MobxFormDataInstance & IObservableObject };
 
 /**
  * React bindings for NornJ template engine.

@@ -28,14 +28,15 @@ interface MobxFieldData {
 }
 interface MobxFormDataProps {
     observable?: boolean;
+    messages?: object;
 }
 interface MobxFormDataInstance {
-    _njMobxFormData: boolean;
+    readonly _njMobxFormData: boolean;
     fieldDatas: Map<string, MobxFieldDataInstance & IObservableObject>;
-    validate(name: string | string[]): Promise<any>;
+    validate(name?: string | string[]): Promise<any>;
     error(name: string, help: string): void;
-    clear(name: string | string[]): void;
-    reset(name: string | string[]): void;
+    clear(name?: string | string[]): void;
+    reset(name?: string | string[]): void;
     add(fieldData: MobxFieldDataProps | JSX.Element): void;
     delete(name: string): void;
     setValue(name: string | object, value?: any): void;
@@ -45,7 +46,7 @@ interface MobxFormDataInstance {
 interface MobxFormData {
     (props: MobxFormDataProps): JSX.Element;
 }
-declare type MobxFormDataWithJSXElement = {
+declare type JSXElementWithMobxFormData = {
     formData?: MobxFormDataInstance & IObservableObject;
 };
 /**
@@ -65,4 +66,4 @@ interface Export {
 declare const njr: Export;
 
 export default njr;
-export { Export, MobxFieldData, MobxFieldDataInstance, MobxFieldDataProps, MobxFormData, MobxFormDataInstance, MobxFormDataProps, MobxFormDataWithJSXElement, bindTemplate, bindTemplate as registerTmpl };
+export { Export, JSXElementWithMobxFormData, MobxFieldData, MobxFieldDataInstance, MobxFieldDataProps, MobxFormData, MobxFormDataInstance, MobxFormDataProps, bindTemplate, bindTemplate as registerTmpl };

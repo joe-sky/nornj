@@ -3551,6 +3551,7 @@
     elemArr.push(text);
   }
 
+  //编译模板并返回转换函数
   function _createCompile(outputH) {
     return function (tmpl, tmplKey, fileName, delimiters, tmplRule) {
       if (!tmpl) {
