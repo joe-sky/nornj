@@ -5,6 +5,7 @@ export interface MobxFieldDataProps extends RuleItem {
   name: string;
   value?: any;
   trigger?: string;
+  rules?: RuleItem[];
   [key: string]: any;
 }
 

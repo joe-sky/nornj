@@ -121,15 +121,17 @@ const createFormData = (): MobxFormDataInstance & {
   },
 
   add(fieldData: MobxFieldDataProps) {
-    const { name, value, type = 'string', required = false, trigger = 'valueChange', ...ruleOptions } = fieldData;
+    const { name, value, type = 'any', required = false, trigger = 'valueChange', rules, ...ruleOptions } = fieldData;
     const fd: MobxFieldDataInstance = { name, value, type, required, trigger, ...ruleOptions };
 
     fd.validatorSchema = new schema({
-      [name]: {
-        type,
-        required,
-        ...ruleOptions
-      }
+      [name]: rules?.length
+        ? rules.map(({ type = 'any', required = false, ...others }) => ({ type, required, ...others }))
+        : {
+            type,
+            required,
+            ...ruleOptions
+          }
     });
 
     fd.reset = function() {

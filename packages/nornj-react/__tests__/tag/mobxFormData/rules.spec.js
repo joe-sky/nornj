@@ -12,7 +12,15 @@ import Checkbox from '../../../antd/checkbox';
 function TestForm(props) {
   const { formData } = useLocalStore(() => (
     <MobxFormData>
-      <MobxFieldData name="userName" value="joe_sky" type="string" trigger="onChange" required />
+      <MobxFieldData
+        name="userName"
+        value="joe_sky"
+        rules={[
+          { type: 'string', required: true, message: '不能为空' },
+          { type: 'string', min: 3, message: '至少输入3个字符' }
+        ]}
+        trigger="onChange"
+      />
       <MobxFieldData name="age" value="18" type="number" />
       <MobxFieldData name="worked" value={true} type="boolean" required />
     </MobxFormData>

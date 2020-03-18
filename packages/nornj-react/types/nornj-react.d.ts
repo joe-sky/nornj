@@ -1,5 +1,5 @@
 /*!
- * NornJ-React v5.2.0
+ * NornJ-React v5.2.0-beta.1
  * (c) 2016-2020 Joe_Sky
  * Released under the MIT License.
  */
@@ -15,6 +15,7 @@ interface MobxFieldDataProps extends RuleItem {
     name: string;
     value?: any;
     trigger?: string;
+    rules?: RuleItem[];
     [key: string]: any;
 }
 interface MobxFieldDataInstance extends MobxFieldDataProps {
@@ -28,7 +29,6 @@ interface MobxFieldData {
 }
 interface MobxFormDataProps {
     observable?: boolean;
-    messages?: object;
 }
 interface MobxFormDataInstance {
     readonly _njMobxFormData: boolean;
