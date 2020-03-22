@@ -41,35 +41,16 @@ const createFormData = (): MobxFormDataInstance & {
 
   _validate(name) {
     const oFd = this.fieldDatas.get(name);
-    const originalValue = this[name];
-    let value;
-    switch (oFd.type) {
-      case 'number':
-      case 'integer':
-      case 'float':
-        value =
-          nj.isString(originalValue) && originalValue?.trim() !== '' && !isNaN(originalValue)
-            ? +originalValue
-            : originalValue;
-        break;
-      case 'date':
-        if (moment.isMoment(originalValue)) {
-          value = originalValue.toDate();
-        }
-        break;
-      default:
-        value = originalValue;
-        break;
-    }
+    const value = this[name];
 
     return new Promise((resolve, reject) => {
       oFd.validatorSchema.validate({ [name]: value }, {}, (errors, fields) => {
         if (errors) {
           this.error(name, errors?.[0]?.message);
-          reject({ values: { [name]: originalValue }, errors, fields });
+          reject({ values: { [name]: value }, errors, fields });
         } else {
           this.clear(name);
-          resolve({ [name]: originalValue });
+          resolve({ [name]: value });
         }
       });
     });
@@ -121,17 +102,32 @@ const createFormData = (): MobxFormDataInstance & {
   },
 
   add(fieldData: MobxFieldDataProps) {
-    const { name, value, type = 'any', required = false, trigger = 'valueChange', rules, ...ruleOptions } = fieldData;
-    const fd: MobxFieldDataInstance = { name, value, type, required, trigger, ...ruleOptions };
+    const { name, value, trigger = 'valueChange', rules, ...ruleOptions } = fieldData;
+    const fd: MobxFieldDataInstance = { name, value, trigger, rules, ...ruleOptions };
 
+    const _rules = rules ? rules : [ruleOptions];
     fd.validatorSchema = new schema({
-      [name]: rules?.length
-        ? rules.map(({ type = 'any', required = false, ...others }) => ({ type, required, ...others }))
-        : {
-            type,
-            required,
-            ...ruleOptions
+      [name]: _rules.map(({ type = 'string', required = false, transform: _transform, ...others }) => ({
+        type,
+        required,
+        transform: _value => {
+          switch (type) {
+            case 'number':
+            case 'integer':
+            case 'float':
+              _value = nj.isString(_value) && _value?.trim() !== '' && !isNaN(_value) ? +_value : _value;
+              break;
+            case 'date':
+              if (moment.isMoment(_value)) {
+                _value = _value.toDate();
+              }
+              break;
           }
+
+          return _transform ? _transform(_value) : _value;
+        },
+        ...others
+      }))
     });
 
     fd.reset = function() {
