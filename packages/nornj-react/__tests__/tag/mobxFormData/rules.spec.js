@@ -16,8 +16,8 @@ function TestForm(props) {
         name="userName"
         value="joe_sky"
         rules={[
-          { type: 'string', required: true, message: '不能为空' },
-          { type: 'string', min: 3, message: '至少输入3个字符' }
+          { required: true, message: '不能为空' },
+          { min: 3, message: '至少输入3个字符' }
         ]}
         trigger="onChange"
       />

@@ -1,8 +1,9 @@
-import nj, { registerExtension, ExtensionDelegateOption, Component } from 'nornj';
+import nj, { registerExtension, ExtensionDelegateOption, Component, ComponentOption } from 'nornj';
 import React, { useRef } from 'react';
 import { toJS } from 'mobx';
 import extensionConfigs from '../../../mobx/extensionConfig';
 import { debounce } from '../../utils';
+import { MobxFormDataInstance } from '../../interface';
 
 const FORMDATA_NOT_TRIGGER = ['valueChange', 'none'];
 
@@ -108,28 +109,44 @@ const MobxBindWrap = React.forwardRef<any, IProps>(
       };
     }
 
-    _formDataTrigger(value, changeEventName, true, props, compProps, $this);
+    _formDataTrigger(value, changeEventName, componentConfig, true, props, compProps, $this);
 
     return <MobxBindTag {...props} {...compProps} ref={ref} />;
   }
 );
 
-function _formDataTrigger(value, changeEventName, notDirect?, props?, compProps?, $this?) {
-  if (value?.source?._njMobxFormData) {
-    const trigger = value.source.fieldDatas.get(value.prop).trigger;
+function _formDataTrigger(
+  value,
+  changeEventName,
+  componentConfig?: ComponentOption,
+  notDirect?,
+  props?,
+  compProps?,
+  $this?
+) {
+  const formData: MobxFormDataInstance = value?.source;
+  if (formData?._njMobxFormData) {
+    const fieldName: string = value.prop;
+    const fieldData = formData.fieldDatas.get(fieldName);
+    const fieldDefaultRule = componentConfig?.fieldDefaultRule;
+    if (fieldDefaultRule) {
+      fieldData.setDefaultRule(fieldDefaultRule);
+    }
+
+    const trigger = fieldData.trigger;
     if (FORMDATA_NOT_TRIGGER.indexOf(trigger) > -1) {
       return;
     }
     if (!notDirect) {
       if (trigger === changeEventName) {
-        value.source.validate(value.prop).catch(nj.noop);
+        formData.validate(fieldName).catch(nj.noop);
       }
     } else if (trigger !== changeEventName) {
       const triggerEvent = props[trigger];
       compProps[trigger] = function(e: React.BaseSyntheticEvent) {
         e && e.persist && e.persist();
 
-        value.source.validate(value.prop).catch(nj.noop);
+        formData.validate(fieldName).catch(nj.noop);
         triggerEvent && triggerEvent.apply($this, arguments);
       };
     }

@@ -19,6 +19,7 @@ interface MobxFieldDataProps extends RuleItem {
     [key: string]: any;
 }
 interface MobxFieldDataInstance extends MobxFieldDataProps {
+    setDefaultRule?(rule: RuleItem): void;
     validatorSchema?: schema;
     reset?: Function;
     validateStatus?: string;

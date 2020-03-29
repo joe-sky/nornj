@@ -1,6 +1,6 @@
 import nj, { registerExtension } from 'nornj';
 import { observable, runInAction, reaction } from 'mobx';
-import schema from 'async-validator';
+import schema, { RuleItem } from 'async-validator';
 import extensionConfigs from '../../../mobx/formData/extensionConfig';
 import { MobxFormDataInstance, MobxFieldDataProps, MobxFieldDataInstance } from '../../interface';
 import moment from 'moment';
@@ -106,6 +106,15 @@ const createFormData = (): MobxFormDataInstance & {
     const fd: MobxFieldDataInstance = { name, value, trigger, rules, ...ruleOptions };
 
     const _rules = rules ? rules : [ruleOptions];
+    fd.setDefaultRule = rule => {
+      const schemaRules: RuleItem[] = (fd.validatorSchema as any).rules[name];
+      _rules.forEach((r, i) => {
+        if (r.type == null) {
+          schemaRules[i].type = rule.type;
+        }
+      });
+    };
+
     fd.validatorSchema = new schema({
       [name]: _rules.map(({ type = 'string', required = false, transform: _transform, ...others }) => ({
         type,
