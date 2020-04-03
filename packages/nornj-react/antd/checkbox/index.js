@@ -14,7 +14,10 @@ registerComponent({
   'ant-CheckboxGroup': {
     component: CheckboxGroup,
     options: {
-      needToJS: true
+      needToJS: true,
+      fieldDefaultRule: {
+        type: 'array'
+      }
     }
   }
 });

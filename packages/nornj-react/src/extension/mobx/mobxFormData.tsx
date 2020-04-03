@@ -119,8 +119,8 @@ const createFormData = (): MobxFormDataInstance & {
       [name]: _rules.map(({ type = 'string', required = false, transform: _transform, ...others }) => ({
         type,
         required,
-        transform: _value => {
-          switch (type) {
+        transform(_value) {
+          switch (this.type) {
             case 'number':
             case 'integer':
             case 'float':

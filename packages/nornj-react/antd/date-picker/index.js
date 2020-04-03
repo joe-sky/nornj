@@ -10,12 +10,29 @@ registerComponent({
       }
     }
   },
-  'ant-MonthPicker': DatePicker.MonthPicker,
-  'ant-WeekPicker': DatePicker.WeekPicker,
+  'ant-MonthPicker': {
+    component: DatePicker.MonthPicker,
+    options: {
+      fieldDefaultRule: {
+        type: 'date'
+      }
+    }
+  },
+  'ant-WeekPicker': {
+    component: DatePicker.WeekPicker,
+    options: {
+      fieldDefaultRule: {
+        type: 'date'
+      }
+    }
+  },
   'ant-RangePicker': {
     component: DatePicker.RangePicker,
     options: {
-      needToJS: true
+      needToJS: true,
+      fieldDefaultRule: {
+        type: 'array'
+      }
     }
   }
 });
