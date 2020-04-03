@@ -10,6 +10,6 @@
       "message": "chore(release): :bookmark: publish %s"
     }
   },
-  "version": "5.2.0-beta.2",
+  "version": "5.2.0-beta.3",
   "npmClient": "yarn"
 }
