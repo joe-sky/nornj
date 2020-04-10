@@ -104,8 +104,9 @@ const createFormData = (): MobxFormDataInstance & {
   add(fieldData: MobxFieldDataProps) {
     const { name, value, trigger = 'valueChange', rules, ...ruleOptions } = fieldData;
     const fd: MobxFieldDataInstance = { name, value, trigger, rules, ...ruleOptions };
-
     const _rules = rules ? rules : [ruleOptions];
+    fd.rules = _rules;
+
     fd.setDefaultRule = rule => {
       const schemaRules: RuleItem[] = (fd.validatorSchema as any).rules[name];
       _rules.forEach((r, i) => {
@@ -216,7 +217,7 @@ registerExtension(
 
     tagProps.validateStatus = oFd.validateStatus;
     tagProps.help = oFd.help;
-    tagProps.required = oFd.required;
+    tagProps.required = oFd.rules.find(rule => rule.required);
   },
   extensionConfigs.mobxField
 );
