@@ -47,9 +47,11 @@ module.exports = function(babel) {
           if (mobxField && !state.mobxFieldNodes.has(path.node)) {
             if (!mobxField.includes('-noBind')) {
               const children = astUtil.getChildren(types, path.node);
+              const directiveParam = mobxField.split('n-mobxField')[1];
+
               children[0].openingElement.attributes.push(
                 types.jsxAttribute(
-                  types.jsxIdentifier('n-mobxBind'),
+                  types.jsxIdentifier(`n-mobxBind${directiveParam}`),
                   path.node.openingElement.attributes.find(node => node.name.name.startsWith('n-mobxField')).value
                 )
               );
