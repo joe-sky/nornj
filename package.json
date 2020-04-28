@@ -10,6 +10,8 @@
   "version": "5.2.0-beta.5",
   "description": "A powerful template engine that can works with React, JSX enhancement or alternative tools.",
   "scripts": {
+    "start": "npm run dev",
+    "dev": "dumi dev",
     "build": "lerna run build",
     "lint": "yarn run lint:nj & yarn run lint:njr & yarn run lint:njl & yarn run lint:njx",
     "lint:nj": "eslint packages/nornj --ext .js,.jsx,.ts,.tsx",
@@ -73,6 +75,7 @@
     "commitlint": "^8.2.0",
     "create-react-class": "^15.6.3",
     "cross-env": "^5.1.0",
+    "dumi": "^1.0.20",
     "enzyme": "^3.9.0",
     "enzyme-adapter-react-16": "^1.11.2",
     "eslint": "^6.5.1",

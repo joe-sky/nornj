@@ -19,7 +19,7 @@
 [![NPM Downloads][downloads-image]][npm-url]
 [![](https://img.shields.io/bundlephobia/minzip/nornj@next.svg?style=flat)](https://bundlephobia.com/result?p=nornj)
 
-English | [简体中文](https://github.com/joe-sky/nornj/blob/master/docs/README.zh.md)
+English | [简体中文](https://github.com/joe-sky/nornj/blob/master/README.zh.md)
 
 ## Documents
 
