@@ -2,6 +2,7 @@
 title: 快速起步
 nav:
   title: 指南
+  order: 1
 ---
 
 # 在JSX中使用增强React开发体验

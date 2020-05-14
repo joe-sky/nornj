@@ -2,6 +2,7 @@
 title: 为什么要开发 NornJ
 nav:
   title: 指南
+  order: 1
 ---
 
 # 关于JSX的思考
