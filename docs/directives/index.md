@@ -293,7 +293,7 @@ class TestComponent extends Component {
 
 原生表单控件包含`文本框`、`复选框`、`单选按钮`、`选择框`等，以上都可以直接使用`n-mobxBind`指令，会自动监听相应控件的`onChange`事件并正确地更新值。
 
-#### 文本框
+### 文本框
 
 单行文本框：
 
@@ -329,7 +329,7 @@ class TestComponent extends Component {
 }
 ```
 
-#### 复选框
+### 复选框
 
 单个复选框，绑定到布尔值：
 
@@ -371,7 +371,7 @@ class TestComponent extends Component {
 }
 ```
 
-#### 单选按钮
+### 单选按钮
 
 ```js
 class TestComponent extends Component {
@@ -393,7 +393,7 @@ class TestComponent extends Component {
 }
 ```
 
-#### 选择框
+### 选择框
 
 单选时：
 

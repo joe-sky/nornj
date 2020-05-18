@@ -52,7 +52,9 @@ module.exports = function(babel) {
               children[0].openingElement.attributes.push(
                 types.jsxAttribute(
                   types.jsxIdentifier(`n-mobxBind${directiveParam}`),
-                  path.node.openingElement.attributes.find(node => node.name.name.startsWith('n-mobxField')).value
+                  path.node.openingElement.attributes.find(
+                    node => node.name && node.name.name.startsWith('n-mobxField')
+                  ).value
                 )
               );
             }

@@ -8,6 +8,12 @@ registerComponent({
       hasEventObject: true
     }
   },
+  'ant-InputPassword': {
+    component: Input.Password,
+    options: {
+      hasEventObject: true
+    }
+  },
   'ant-InputGroup': Input.Group,
   'ant-TextArea': {
     component: Input.TextArea,
