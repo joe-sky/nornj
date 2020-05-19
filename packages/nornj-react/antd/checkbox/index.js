@@ -8,7 +8,10 @@ registerComponent({
     options: {
       hasEventObject: true,
       valuePropName: 'checked',
-      targetPropName: 'checked'
+      targetPropName: 'checked',
+      fieldDefaultRule: {
+        type: 'boolean'
+      }
     }
   },
   'ant-CheckboxGroup': {

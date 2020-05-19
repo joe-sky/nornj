@@ -1,8 +1,8 @@
 ---
-title: NornJ - React Hooks Library
+title: NornJ - 可扩展的 JSX 语法全面增强工具
 hero:
   title: NornJ
-  desc: 一个可以为 JSX 提供扩展语法的模板引擎
+  desc: 🌠 可扩展的 JSX 语法全面增强工具
   actions:
     - text: 快速上手
       link: /guide/use-it-in-jsx

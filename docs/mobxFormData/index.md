@@ -3,7 +3,7 @@ title: 文档
 order: 2
 nav:
   title: MobxFormData
-  order: 5
+  order: 3
 toc: menu
 ---
 
@@ -26,20 +26,20 @@ toc: menu
 
 ## 对比其他表单数据管理方案
 
-|                        |      Ant-Design v3       |      Ant-Design v4       |  Formily（UForm）  |             MobxFormData              |
-| :--------------------- | :----------------------: | :----------------------: | :----------------: | :-----------------------------------: |
-| 底层验证框架           |    `async-validator`     |    `async-validator`     | @formily/validator |           `async-validator`           |
-| API 上手难度           |           一般           |           容易           |        较难        |                 容易                  |
-| 组件外管理表单数据     | ✖️ |    ⭕（官方不推荐）     |        ⭕         |                  ⭕                  |
-| 跨组件表单数据联动     |           较难           |           容易           |        一般        |                 容易                  |
-| 更新只渲染表单控件自身 | ✖️ |           ⭕            |        ⭕         |                  ⭕                  |
-| 自定义表单控件逻辑     |           一般           |           一般           |        一般        |     容易（不必创建新的表单组件）      |
-| Mobx 数据适配性        |           一般           |           一般           |        一般        | 好（直接读写可观察值、无需手工 toJS） |
-| 多重验证规则           |           ⭕            |           ⭕            |        ⭕         |                  ⭕                  |
-| 自动滚动至验证出错处   |           ⭕            |           ⭕            |        ⭕         |       ✖️        |
-| 完整表单生命周期       | ✖️ | ✖️ |        ⭕         |       ✖️        |
-| json 配置化生成        | ✖️ | ✖️ |        ⭕         |       ✖️        |
-| 适配多个组件库         | ✖️ | ✖️ |        ⭕         |           ⭕（未来可实现）           |
+|                        |   Ant-Design v3   |   Ant-Design v4   |  Formily（UForm）  |             MobxFormData              |
+| :--------------------- | :---------------: | :---------------: | :----------------: | :-----------------------------------: |
+| 底层验证框架           | `async-validator` | `async-validator` | @formily/validator |           `async-validator`           |
+| API 上手难度           |       一般        |       容易        |        较难        |                 容易                  |
+| 组件外管理表单数据     |        ✖️         | ⭕（官方不推荐）  |         ⭕         |                  ⭕                   |
+| 跨组件表单数据联动     |       较难        |       容易        |        一般        |                 容易                  |
+| 更新只渲染表单控件自身 |        ✖️         |        ⭕         |         ⭕         |                  ⭕                   |
+| 自定义表单控件逻辑     |       一般        |       一般        |        一般        |     容易（不必创建新的表单组件）      |
+| Mobx 数据适配性        |       一般        |       一般        |        一般        | 好（直接读写可观察值、无需手工 toJS） |
+| 多重验证规则           |        ⭕         |        ⭕         |         ⭕         |                  ⭕                   |
+| 自动滚动至验证出错处   |        ⭕         |        ⭕         |         ⭕         |                  ✖️                   |
+| 完整表单生命周期       |        ✖️         |        ✖️         |         ⭕         |                  ✖️                   |
+| json 配置化生成        |        ✖️         |        ✖️         |         ⭕         |                  ✖️                   |
+| 适配多个组件库         |        ✖️         |        ✖️         |         ⭕         |           ⭕（未来可实现）            |
 
 ## 快速开始
 
@@ -689,7 +689,7 @@ class TestForm extends React.Component {
     const { formDataUser } = this.props.store.testStore;
 
     return (
-      <each of={[...formDataUser.fieldDatas.keys]}>
+      <each of={[...formDataUser.fieldDatas.keys()]}>
         <Form.Item n-mobxField={`formDataUser[item]`} label={item}>
           <Input />
         </Form.Item>
@@ -702,7 +702,7 @@ class TestForm extends React.Component {
 如果遍历生成的 `Form.Item` 组件的子节点中存在逻辑判断，则需要使用 `n-mobxBind` 手工绑定表单控件：
 
 ```js
-<each of={[...formDataUser.fieldDatas.keys]}>
+<each of={[...formDataUser.fieldDatas.keys()]}>
   <Form.Item n-mobxField-noBind={`formDataUser[item]`} label={item}>
     <if condition={item == 'userName'}>
       <Input n-mobxBind={`formDataUser[item]`} />

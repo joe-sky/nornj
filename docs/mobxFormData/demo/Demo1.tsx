@@ -1,6 +1,5 @@
 import React from 'react';
 import { Form, Input, Button, Checkbox } from 'antd';
-import { observer } from 'mobx-react';
 import { useLocalStore } from 'mobx-react-lite';
 
 const layout = {
@@ -16,9 +15,19 @@ export default props => {
     <MobxFormData>
       <MobxFieldData name="userName" required message="Please input your username!" />
       <MobxFieldData name="password" required message="Please input your password!" />
-      <MobxFieldData name="remember" type="boolean" />
+      <MobxFieldData name="remember" />
     </MobxFormData>
   ));
+
+  const onSubmit = (e: React.MouseEvent<HTMLElement, MouseEvent>) =>
+    formData
+      .validate()
+      .then(values => {
+        console.log(values);
+      })
+      .catch(errorInfo => {
+        console.log(errorInfo);
+      });
 
   return (
     <Form {...layout} n-style="max-width:600">
@@ -35,18 +44,7 @@ export default props => {
       </Form.Item>
 
       <Form.Item {...tailLayout}>
-        <Button
-          type="primary"
-          onClick={e =>
-            formData
-              .validate()
-              .then(values => {
-                console.log(values);
-              })
-              .catch(errorInfo => {
-                console.log(errorInfo);
-              })
-          }>
+        <Button type="primary" onClick={onSubmit}>
           Submit
         </Button>
       </Form.Item>

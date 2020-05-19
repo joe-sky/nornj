@@ -95,10 +95,7 @@ const createFormData = (): MobxFormDataInstance & {
   },
 
   reset(names) {
-    return this._operate(names, name => {
-      this._reset(name);
-      this._clear(name);
-    });
+    return this._operate(names, name => this._reset(name));
   },
 
   add(fieldData: MobxFieldDataProps) {
@@ -141,6 +138,7 @@ const createFormData = (): MobxFormDataInstance & {
     });
 
     fd.reset = function() {
+      this._resetting = true;
       this.value = value;
     };
 
@@ -158,15 +156,25 @@ const createFormData = (): MobxFormDataInstance & {
       configurable: true
     });
 
-    trigger === 'valueChange' &&
-      reaction(
+    if (trigger === 'valueChange') {
+      oFd._reactionDispose = reaction(
         () => this[name],
-        () => this.validate(name).catch(nj.noop)
+        () => {
+          if (!oFd._resetting) {
+            this.validate(name).catch(nj.noop);
+          }
+          oFd._resetting = false;
+        }
       );
+    }
   },
 
   delete(name) {
+    const oFd = this.fieldDatas.get(name);
+    oFd?._reactionDispose();
+
     this.fieldDatas.delete(name);
+    delete this[name];
   },
 
   setValue(name, value) {

@@ -1,8 +1,9 @@
 ---
 title: 指令
+order: 2
 nav:
-  title: 指令
-  order: 3
+  title: JSX 语法扩展
+  order: 2
 toc: menu
 ---
 
