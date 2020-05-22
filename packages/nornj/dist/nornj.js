@@ -103,7 +103,21 @@
       toString = Object.prototype.toString;
   var errorTitle = nj.errorTitle;
   var defineProp = Object.defineProperty;
-  var defineProps = Object.defineProperties; //Push one by one to array
+  var defineProps = Object.defineProperties; // Internal function for creating a toString-based type tester.
+
+  function _tagTester(name) {
+    return function (obj) {
+      return toString.call(obj) === '[object ' + name + ']';
+    };
+  } //Reference by underscore
+
+
+  var isNumber = _tagTester('Number');
+  var isString = _tagTester('String');
+  var isMap = _tagTester('Map');
+  var isWeakMap = _tagTester('WeakMap');
+  var isSet = _tagTester('Set');
+  var isWeakSet = _tagTester('WeakSet'); //Push one by one to array
 
   function arrayPush(arr1, arr2) {
     nativeArrayPush.apply(arr1, arr2);
@@ -111,32 +125,21 @@
   }
   function arraySlice(arrLike, start, end) {
     return nativeArraySlice.call(arrLike, start, end);
-  } //判断是否为数组
-
+  }
   function isArray(obj) {
     return Array.isArray(obj);
-  } //判断是否为对象
-
+  }
   function isObject(obj) {
     var type = _typeof(obj);
 
     return !isArray(obj) && (type === 'function' || type === 'object' && !!obj);
-  } //判断是否为数字
-
-  function isNumber(obj) {
-    return toString.call(obj) === '[object Number]';
-  } //判断是否为字符串
-
-  function isString(obj) {
-    return toString.call(obj) === '[object String]';
-  } //获取属性值
+  }
 
   function _getProperty(key) {
     return function (obj) {
       return obj == null ? void 0 : obj[key];
     };
-  } //是否为类数组
-
+  }
 
   var _getLength = _getProperty('length');
 
@@ -144,7 +147,51 @@
     var length = _getLength(obj);
 
     return typeof length == 'number' && length >= 0;
-  } //遍历数组或对象
+  }
+
+  function _iteratorLoop(obj, func, isMap) {
+    var size = obj.size;
+    var i = 0;
+    var _iteratorNormalCompletion = true;
+    var _didIteratorError = false;
+    var _iteratorError = undefined;
+
+    try {
+      for (var _iterator = obj[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+        var item = _step.value;
+        var ret = void 0;
+
+        if (isMap) {
+          var _item = _slicedToArray(item, 2),
+              k = _item[0],
+              v = _item[1];
+
+          ret = func.call(obj, v, k, i, size);
+        } else {
+          ret = func.call(obj, item, i, size);
+        }
+
+        if (ret === false) {
+          break;
+        }
+
+        i++;
+      }
+    } catch (err) {
+      _didIteratorError = true;
+      _iteratorError = err;
+    } finally {
+      try {
+        if (!_iteratorNormalCompletion && _iterator["return"] != null) {
+          _iterator["return"]();
+        }
+      } finally {
+        if (_didIteratorError) {
+          throw _iteratorError;
+        }
+      }
+    }
+  }
 
   function each(obj, func, isArr) {
     if (!obj) {
@@ -163,6 +210,10 @@
           break;
         }
       }
+    } else if (isSet(obj) || isWeakSet(obj)) {
+      _iteratorLoop(obj, func);
+    } else if (isMap(obj) || isWeakMap(obj)) {
+      _iteratorLoop(obj, func, true);
     } else {
       var keys = Object.keys(obj),
           _l = keys.length;
@@ -182,10 +233,8 @@
     return str.replace(REGEX_TRIM_RIGHT, function (all, s1) {
       return s1 ? '\n' : '';
     });
-  } //Noop function
-
-  function noop() {} //抛出异常
-
+  }
+  function noop() {}
   function throwIf(val, msg, type) {
     if (!val) {
       switch (type) {
@@ -196,8 +245,7 @@
           throw Error(errorTitle + (msg || val));
       }
     }
-  } //Print warn
-
+  }
   function warn(msg, type) {
     switch (type) {
       case 'f':
@@ -206,16 +254,14 @@
     }
 
     console.warn(errorTitle + msg);
-  } //Print error
-
+  }
   function error(msg) {
     console.error(errorTitle + msg);
   } //create light weight object
 
   function obj() {
     return Object.create(null);
-  } //Clear quotation marks
-
+  }
   var REGEX_QUOT_D = /["]+/g,
       REGEX_QUOT_S = /[']+/g;
   function clearQuot(value, clearDouble) {
@@ -244,8 +290,7 @@
     }
 
     return value;
-  } //Transform to camel-case
-
+  }
   function camelCase(str) {
     if (str.indexOf('-') > -1) {
       str = str.replace(/-\w/g, function (letter) {
@@ -288,6 +333,10 @@
     isNumber: isNumber,
     isString: isString,
     isArrayLike: isArrayLike,
+    isMap: isMap,
+    isWeakMap: isWeakMap,
+    isSet: isSet,
+    isWeakSet: isWeakSet,
     each: each,
     noop: noop,
     throwIf: throwIf,
@@ -304,12 +353,16 @@
     __proto__: null,
     defineProp: defineProp,
     defineProps: defineProps,
+    isNumber: isNumber,
+    isString: isString,
+    isMap: isMap,
+    isWeakMap: isWeakMap,
+    isSet: isSet,
+    isWeakSet: isWeakSet,
     arrayPush: arrayPush,
     arraySlice: arraySlice,
     isArray: isArray,
     isObject: isObject,
-    isNumber: isNumber,
-    isString: isString,
     isArrayLike: isArrayLike,
     each: each,
     trimRight: trimRight,
@@ -967,22 +1020,23 @@
         }
 
         var isArrayLike$1 = isArrayLike(list);
+        var isArrayLoop = isArrayLike$1 || isSet(list) || isWeakSet(list);
         each(list, function (item, index, len, lenObj) {
           var param = {
             data: [item],
-            index: isArrayLike$1 ? index : len,
+            index: isArrayLoop ? index : len,
             item: item,
             newParent: true
           };
 
-          var _len = isArrayLike$1 ? len : lenObj;
+          var _len = isArrayLoop ? len : lenObj;
 
           var extra = {
             '@first': param.index === 0,
             '@last': param.index === _len - 1
           };
 
-          if (!isArrayLike$1) {
+          if (!isArrayLoop) {
             extra['@key'] = index;
           }
 

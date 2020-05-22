@@ -101,14 +101,28 @@ declare function NjDefault(): any;
  *
  * `<Each of={[1, 2, 3]}><i key={index}>{item}</i></Each>`
  */
-declare function Each<T>(props: { of: Iterable<T> | string; item?: string; index?: string }): any;
+declare function Each<T>(props: {
+  of: Iterable<T> | string;
+  item?: string;
+  index?: string;
+  $key?: string;
+  first?: string;
+  last?: string;
+}): any;
 
 /**
  * NornJ tag `Each`, example:
  *
  * `<NjEach of={[1, 2, 3]}><i key={index}>{item}</i></NjEach>`
  */
-declare function NjEach<T>(props: { of: Iterable<T> | string; item?: string; index?: string }): any;
+declare function NjEach<T>(props: {
+  of: Iterable<T> | string;
+  item?: string;
+  index?: string;
+  $key?: string;
+  first?: string;
+  last?: string;
+}): any;
 
 /**
  * The parameter `item` in NornJ tag `Each` loop, example:
@@ -164,14 +178,28 @@ declare function NjEmpty(): any;
  *
  * `<For of={[1, 2, 3]}><i key={index}>{item}</i></For>`
  */
-declare function For<T>(props: { of: Iterable<T> | string; item?: string; index?: string }): any;
+declare function For<T>(props: {
+  of: Iterable<T> | string;
+  item?: string;
+  index?: string;
+  $key?: string;
+  first?: string;
+  last?: string;
+}): any;
 
 /**
  * NornJ tag `For`, example:
  *
  * `<NjFor of={[1, 2, 3]}><i key={index}>{item}</i></NjFor>`
  */
-declare function NjFor<T>(props: { of: Iterable<T> | string; item?: string; index?: string }): any;
+declare function NjFor<T>(props: {
+  of: Iterable<T> | string;
+  item?: string;
+  index?: string;
+  $key?: string;
+  first?: string;
+  last?: string;
+}): any;
 
 declare function With(props: { [id: string]: any }): any;
 
@@ -253,6 +281,9 @@ declare namespace JSX {
       of: Iterable<T> | string;
       item?: string;
       index?: string;
+      $key?: string;
+      first?: string;
+      last?: string;
     }
 
     interface With extends Childrenable {

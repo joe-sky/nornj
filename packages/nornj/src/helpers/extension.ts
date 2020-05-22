@@ -118,23 +118,25 @@ export const extensions: { [name: string]: ExtensionDelegate | ExtensionDelegate
       }
 
       const isArrayLike = tools.isArrayLike(list);
+      const isArrayLoop = isArrayLike || tools.isSet(list) || tools.isWeakSet(list);
+
       tools.each(
         list,
         (item, index, len, lenObj) => {
           const param = {
             data: [item],
-            index: isArrayLike ? index : len,
+            index: isArrayLoop ? index : len,
             item,
             newParent: true
           };
 
-          const _len = isArrayLike ? len : lenObj;
+          const _len = isArrayLoop ? len : lenObj;
           const extra = {
             '@first': param.index === 0,
             '@last': param.index === _len - 1
           };
 
-          if (!isArrayLike) {
+          if (!isArrayLoop) {
             extra['@key'] = index;
           }
           param.data.push(extra);

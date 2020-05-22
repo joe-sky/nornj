@@ -31,4 +31,4 @@ toc: menu
 
 动态增加、减少表单项。
 
-<code src="./demo/Demo4" />
+<code src="./demo/Demo4/index.tsx" />

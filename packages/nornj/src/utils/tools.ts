@@ -8,6 +8,21 @@ const { errorTitle } = nj;
 export const defineProp = Object.defineProperty;
 export const defineProps = Object.defineProperties;
 
+// Internal function for creating a toString-based type tester.
+function _tagTester(name) {
+  return function(obj) {
+    return toString.call(obj) === '[object ' + name + ']';
+  };
+}
+
+//Reference by underscore
+export const isNumber = _tagTester('Number');
+export const isString = _tagTester('String');
+export const isMap = _tagTester('Map');
+export const isWeakMap = _tagTester('WeakMap');
+export const isSet = _tagTester('Set');
+export const isWeakSet = _tagTester('WeakSet');
+
 //Push one by one to array
 export function arrayPush(arr1, arr2): number {
   nativeArrayPush.apply(arr1, arr2);
@@ -18,35 +33,21 @@ export function arraySlice(arrLike?, start?: number, end?: number): any[] {
   return nativeArraySlice.call(arrLike, start, end);
 }
 
-//判断是否为数组
 export function isArray(obj) {
   return Array.isArray(obj);
 }
 
-//判断是否为对象
 export function isObject(obj) {
   const type = typeof obj;
   return !isArray(obj) && (type === 'function' || (type === 'object' && !!obj));
 }
 
-//判断是否为数字
-export function isNumber(obj) {
-  return toString.call(obj) === '[object Number]';
-}
-
-//判断是否为字符串
-export function isString(obj) {
-  return toString.call(obj) === '[object String]';
-}
-
-//获取属性值
 function _getProperty(key: string) {
   return function(obj) {
     return obj == null ? void 0 : obj[key];
   };
 }
 
-//是否为类数组
 const _getLength = _getProperty('length');
 
 export function isArrayLike(obj) {
@@ -54,7 +55,26 @@ export function isArrayLike(obj) {
   return typeof length == 'number' && length >= 0;
 }
 
-//遍历数组或对象
+function _iteratorLoop(obj, func: Function, isMap?: boolean) {
+  const size = obj.size;
+  let i = 0;
+
+  for (const item of obj) {
+    let ret;
+    if (isMap) {
+      const [k, v] = item;
+      ret = func.call(obj, v, k, i, size);
+    } else {
+      ret = func.call(obj, item, i, size);
+    }
+
+    if (ret === false) {
+      break;
+    }
+    i++;
+  }
+}
+
 export function each(obj, func: Function, isArr?: boolean) {
   if (!obj) {
     return;
@@ -72,6 +92,10 @@ export function each(obj, func: Function, isArr?: boolean) {
         break;
       }
     }
+  } else if (isSet(obj) || isWeakSet(obj)) {
+    _iteratorLoop(obj, func);
+  } else if (isMap(obj) || isWeakMap(obj)) {
+    _iteratorLoop(obj, func, true);
   } else {
     const keys = Object.keys(obj),
       l = keys.length;
@@ -91,10 +115,8 @@ export function trimRight(str: string) {
   return str.replace(REGEX_TRIM_RIGHT, (all, s1) => (s1 ? '\n' : ''));
 }
 
-//Noop function
 export function noop() {}
 
-//抛出异常
 export function throwIf(val, msg: string, type: string) {
   if (!val) {
     switch (type) {
@@ -106,7 +128,6 @@ export function throwIf(val, msg: string, type: string) {
   }
 }
 
-//Print warn
 export function warn(msg: string, type: string) {
   switch (type) {
     case 'f':
@@ -116,7 +137,6 @@ export function warn(msg: string, type: string) {
   console.warn(errorTitle + msg);
 }
 
-//Print error
 export function error(msg: string) {
   console.error(errorTitle + msg);
 }
@@ -126,7 +146,6 @@ export function obj() {
   return Object.create(null);
 }
 
-//Clear quotation marks
 const REGEX_QUOT_D = /["]+/g,
   REGEX_QUOT_S = /[']+/g;
 
@@ -155,7 +174,6 @@ export function clearQuot(value: string, clearDouble?: boolean) {
   return value;
 }
 
-//Transform to camel-case
 export function camelCase(str: string) {
   if (str.indexOf('-') > -1) {
     str = str.replace(/-\w/g, function(letter) {
@@ -205,6 +223,10 @@ assign(nj, {
   isNumber,
   isString,
   isArrayLike,
+  isMap,
+  isWeakMap,
+  isSet,
+  isWeakSet,
   each,
   noop,
   throwIf,

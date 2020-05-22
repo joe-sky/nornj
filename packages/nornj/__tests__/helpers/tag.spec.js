@@ -78,8 +78,8 @@ describe('Tags', () => {
     expect(
       render(
         `<nj-noWs>
-           <each {{list}} moreValues>
-             <if {{!(@last)}}>
+           <each {{list}}>
+             <if {{!@last}}>
                <i>{{@item}}</i>
              </if>
            </each>
@@ -114,6 +114,41 @@ describe('Tags', () => {
         </nj-noWs>
       `)
     ).toBe('<i>1</i><i>2</i><i>3</i><i>4</i><i>5</i>');
+  });
+
+  it('each for set', () => {
+    expect(
+      render(
+        `<nj-noWs>
+           <each {{list}}>
+             <if {{!@last}}>
+               <i>{{@item}}</i>
+             </if>
+           </each>
+         </nj-noWs>`,
+        {
+          list: new Set([1, 2, 2, 3])
+        }
+      )
+    ).toBe('<i>1</i><i>2</i>');
+  });
+
+  it('each for map', () => {
+    expect(
+      render(
+        `<nj-noWs>
+           <each {{list}}>
+             <i>{{@key}}:{{@item}}</i>
+           </each>
+         </nj-noWs>`,
+        {
+          list: new Map([
+            ['name', 'Joe'],
+            ['title', 'Author']
+          ])
+        }
+      )
+    ).toBe('<i>name:Joe</i><i>title:Author</i>');
   });
 
   it('prop', () => {

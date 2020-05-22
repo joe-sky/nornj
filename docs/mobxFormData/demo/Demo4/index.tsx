@@ -2,6 +2,7 @@ import React from 'react';
 import { Form, Input, Button, Icon } from 'antd';
 import { useLocalStore, useObserver } from 'mobx-react-lite';
 import './style.less';
+import nj from 'nornj';
 
 const formItemLayout = {
   labelCol: {
@@ -39,23 +40,25 @@ export default () => {
     formData.reset();
   };
 
+  let fieldName: string;
+
   return useObserver(() => (
     <Form name="dynamic_form_item" {...formItemLayoutWithOutLabel} className="dynamic-form">
       <div>
-        <each of={[...formData.fieldDatas.keys()]}>
+        <each of={formData.fieldDatas} $key="fieldName">
           <Form.Item
             {...(index === 0 ? formItemLayout : formItemLayoutWithOutLabel)}
             label={index === 0 ? 'Passengers' : ''}
             required={false}
-            key={item}>
-            <Form.Item n-mobxField={`formData[item]`}>
+            key={fieldName}>
+            <Form.Item n-mobxField={`formData[fieldName]`}>
               <Input placeholder="passenger name" style={{ width: '60%' }} />
               <if condition={formData.fieldDatas.size > 1}>
                 <Icon
                   type="minus-circle"
                   className="dynamic-delete-button"
                   style={{ margin: '0 8px' }}
-                  onClick={() => formData.delete(item)}
+                  onClick={() => formData.delete(fieldName)}
                 />
               </if>
             </Form.Item>

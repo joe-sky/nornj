@@ -1,4 +1,7 @@
 export default {
+  base: '/nornj/',
+  publicPath: '/nornj/',
+  exportStatic: {},
   extraBabelPlugins: [
     [
       'module-resolver',
@@ -48,9 +51,9 @@ export default {
   title: 'NornJ',
   logo: '/images/logo.png',
   favicon: '/favicon.ico',
-  dynamicImport: {},
-  manifest: {},
-  links: [{ rel: 'manifest', href: '/asset-manifest.json' }],
+  //dynamicImport: {},
+  //manifest: {},
+  //links: [{ rel: 'manifest', href: '/asset-manifest.json' }],
   hash: true,
   resolve: {
     includes: ['docs']

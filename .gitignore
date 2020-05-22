@@ -2,3 +2,5 @@
 /lib/
 /test/coverage/
 /.umi/
+/.umi-production/
+/dist/

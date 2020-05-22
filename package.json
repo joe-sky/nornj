@@ -13,6 +13,7 @@
     "start": "npm run dev",
     "dev": "dumi dev",
     "build": "lerna run build",
+    "build:doc": "dumi build",
     "lint": "yarn run lint:nj & yarn run lint:njr & yarn run lint:njl & yarn run lint:njx",
     "lint:nj": "eslint packages/nornj --ext .js,.jsx,.ts,.tsx",
     "lint:njr": "eslint packages/nornj-react --ext .js,.jsx,.ts,.tsx",
@@ -30,7 +31,8 @@
     "ci": "yarn run build && yarn run cover && codecov test/coverage/coverage-final.json",
     "ci:njx": "lerna run --scope babel-plugin-nornj-in-jsx ci",
     "release": "lerna publish",
-    "release:next": "lerna publish --dist-tag next"
+    "release:next": "lerna publish --dist-tag next",
+    "deploy": "gh-pages -d dist"
   },
   "keywords": [
     "nornj",
@@ -75,12 +77,13 @@
     "commitlint": "^8.2.0",
     "create-react-class": "^15.6.3",
     "cross-env": "^5.1.0",
-    "dumi": "^1.0.20",
+    "dumi": "^1.0.26",
     "enzyme": "^3.9.0",
     "enzyme-adapter-react-16": "^1.11.2",
     "eslint": "^6.5.1",
     "eslint-plugin-prettier": "^3.1.1",
     "eslint-plugin-react": "^7.16.0",
+    "gh-pages": "^2.2.0",
     "husky": "^3.0.9",
     "jest": "^24.5.0",
     "jest-css-modules-transform": "^2.1.1",

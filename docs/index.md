@@ -1,8 +1,8 @@
 ---
-title: NornJ - 可扩展的 JSX 语法全面增强工具
+title: NornJ - 让 React JSX 语法更加丰富多彩
 hero:
   title: NornJ
-  desc: 🌠 可扩展的 JSX 语法全面增强工具
+  desc: 🌠 让 React JSX 语法更加丰富多彩
   actions:
     - text: 快速上手
       link: /guide/use-it-in-jsx

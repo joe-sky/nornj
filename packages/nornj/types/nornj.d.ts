@@ -9,11 +9,11 @@ declare function unescape(str: any): any;
 
 declare function config(configs: ConfigOption): void;
 
+declare const isNumber: (obj: any) => boolean;
+declare const isString: (obj: any) => boolean;
 declare function arrayPush(arr1: any, arr2: any): number;
 declare function arraySlice(arrLike?: any, start?: number, end?: number): any[];
 declare function isObject(obj: any): boolean;
-declare function isNumber(obj: any): boolean;
-declare function isString(obj: any): boolean;
 declare function isArrayLike(obj: any): boolean;
 declare function each(obj: any, func: Function, isArr?: boolean): void;
 declare function noop(): void;
