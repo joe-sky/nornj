@@ -1,5 +1,5 @@
 import nj, { registerExtension } from 'nornj';
-import { observable, runInAction, reaction } from 'mobx';
+import { observable, runInAction, reaction, extendObservable, isComputedProp } from 'mobx';
 import schema, { RuleItem } from 'async-validator';
 import extensionConfigs from '../../../mobx/formData/extensionConfig';
 import { MobxFormDataInstance, MobxFieldDataProps, MobxFieldDataInstance } from '../../interface';
@@ -145,16 +145,20 @@ const createFormData = (): MobxFormDataInstance & {
     const oFd = observable(fd);
     this.fieldDatas.set(name, oFd);
 
-    Object.defineProperty(this, name, {
-      get: function() {
-        return this.fieldDatas.get(name).value;
-      },
-      set: function(value) {
-        this.setValue(name, value);
-      },
-      enumerable: true,
-      configurable: true
-    });
+    !isComputedProp(this, name) &&
+      extendObservable(
+        this,
+        Object.defineProperty({}, name, {
+          get: function() {
+            return this.fieldDatas.get(name)?.value;
+          },
+          set: function(value) {
+            this.setValue(name, value);
+          },
+          enumerable: true,
+          configurable: true
+        })
+      );
 
     if (trigger === 'valueChange') {
       oFd._reactionDispose = reaction(
@@ -172,21 +176,24 @@ const createFormData = (): MobxFormDataInstance & {
   delete(name) {
     const oFd = this.fieldDatas.get(name);
     oFd?._reactionDispose();
-
     this.fieldDatas.delete(name);
-    delete this[name];
   },
 
   setValue(name, value) {
-    if (typeof name === 'string') {
-      runInAction(() => (this.fieldDatas.get(name).value = value));
-    } else {
-      this.fieldDatas.forEach((fieldData, fieldName: string) => {
-        if (fieldName in name) {
-          runInAction(() => (fieldData.value = name[fieldName]));
+    runInAction(() => {
+      if (typeof name === 'string') {
+        const fieldData = this.fieldDatas.get(name);
+        if (fieldData) {
+          fieldData.value = value;
         }
-      });
-    }
+      } else {
+        this.fieldDatas.forEach((fieldData, fieldName: string) => {
+          if (fieldName in name) {
+            fieldData.value = name[fieldName];
+          }
+        });
+      }
+    });
   },
 
   get formData() {
