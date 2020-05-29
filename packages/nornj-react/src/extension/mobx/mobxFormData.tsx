@@ -2,14 +2,16 @@ import nj, { registerExtension } from 'nornj';
 import { observable, runInAction, reaction, extendObservable, isComputedProp } from 'mobx';
 import schema, { RuleItem } from 'async-validator';
 import extensionConfigs from '../../../mobx/formData/extensionConfig';
-import { MobxFormDataInstance, MobxFieldDataProps, MobxFieldDataInstance } from '../../interface';
+import { MobxFormDataProps, MobxFormDataInstance, MobxFieldDataProps, MobxFieldDataInstance } from '../../interface';
 import moment from 'moment';
 
 type operateCallback = (name: string) => void;
 
 type operateCallbackMulti = (name: string[]) => void;
 
-const createFormData = (): MobxFormDataInstance & {
+const createFormData = (
+  options?: MobxFormDataProps
+): MobxFormDataInstance & {
   _operate(
     name: string | string[],
     callback: operateCallback,
@@ -145,6 +147,13 @@ const createFormData = (): MobxFormDataInstance & {
     const oFd = observable(fd);
     this.fieldDatas.set(name, oFd);
 
+    if (options?.validateMessages) {
+      const { validateMessages } = options;
+      (fd.validatorSchema as any).messages(
+        typeof validateMessages === 'function' ? validateMessages(oFd) : validateMessages
+      );
+    }
+
     !isComputedProp(this, name) &&
       extendObservable(
         this,
@@ -204,13 +213,14 @@ const createFormData = (): MobxFormDataInstance & {
 registerExtension(
   'mobxFormData',
   options => {
-    const { children, props } = options;
+    const { children } = options;
+    const props: MobxFormDataProps = options.props;
     let _children = children();
     if (!Array.isArray(_children)) {
       _children = [_children];
     }
 
-    const formData = createFormData();
+    const formData = createFormData(props);
     _children.forEach((fieldData: MobxFieldDataInstance) => {
       fieldData && formData.add(fieldData);
     });
@@ -233,6 +243,9 @@ registerExtension(
     tagProps.validateStatus = oFd.validateStatus;
     tagProps.help = oFd.help;
     tagProps.required = oFd.rules.find(rule => rule.required);
+    if (!tagProps.label && oFd.label) {
+      tagProps.label = oFd.label;
+    }
   },
   extensionConfigs.mobxField
 );

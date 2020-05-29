@@ -55,6 +55,7 @@
     "prefer-spread": 0,
     "prefer-rest-params": 0,
     "require-atomic-updates": "off",
+    "no-prototype-builtins": 0,
     "@typescript-eslint/indent": [
       0,
       2,

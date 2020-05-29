@@ -1,5 +1,5 @@
 /*!
- * NornJ-React v5.2.0-rc.1
+ * NornJ-React v5.2.0-rc.2
  * (c) 2016-2020 Joe_Sky
  * Released under the MIT License.
  */
@@ -13,6 +13,7 @@ declare function bindTemplate(name: string | ElementType): <T extends ElementTyp
 
 interface MobxFieldDataProps extends RuleItem {
     name: string;
+    label?: string;
     value?: any;
     trigger?: string;
     rules?: RuleItem[];
@@ -28,8 +29,58 @@ interface MobxFieldDataInstance extends MobxFieldDataProps {
 interface MobxFieldData {
     (props: MobxFieldDataProps): JSX.Element;
 }
+declare type ValidateMessage = string | ((...args: any[]) => string);
+interface ValidateMessageInfo {
+    default?: ValidateMessage;
+    required?: ValidateMessage;
+    enum?: ValidateMessage;
+    whitespace?: ValidateMessage;
+    date?: {
+        format?: ValidateMessage;
+        parse?: ValidateMessage;
+        invalid?: ValidateMessage;
+    };
+    types?: {
+        string?: ValidateMessage;
+        method?: ValidateMessage;
+        array?: ValidateMessage;
+        object?: ValidateMessage;
+        number?: ValidateMessage;
+        date?: ValidateMessage;
+        boolean?: ValidateMessage;
+        integer?: ValidateMessage;
+        float?: ValidateMessage;
+        regexp?: ValidateMessage;
+        email?: ValidateMessage;
+        url?: ValidateMessage;
+        hex?: ValidateMessage;
+    };
+    string?: {
+        len?: ValidateMessage;
+        min?: ValidateMessage;
+        max?: ValidateMessage;
+        range?: ValidateMessage;
+    };
+    number?: {
+        len?: ValidateMessage;
+        min?: ValidateMessage;
+        max?: ValidateMessage;
+        range?: ValidateMessage;
+    };
+    array?: {
+        len?: ValidateMessage;
+        min?: ValidateMessage;
+        max?: ValidateMessage;
+        range?: ValidateMessage;
+    };
+    pattern?: {
+        mismatch?: ValidateMessage;
+    };
+}
+declare type ValidateMessages = ValidateMessageInfo | ((fieldData: MobxFieldDataInstance) => ValidateMessageInfo);
 interface MobxFormDataProps {
     observable?: boolean;
+    validateMessages?: ValidateMessages;
 }
 interface MobxFormDataInstance {
     readonly _njMobxFormData: boolean;
@@ -67,4 +118,4 @@ interface Export {
 declare const njr: Export;
 
 export default njr;
-export { Export, JSXElementWithMobxFormData, MobxFieldData, MobxFieldDataInstance, MobxFieldDataProps, MobxFormData, MobxFormDataInstance, MobxFormDataProps, bindTemplate, bindTemplate as registerTmpl };
+export { Export, JSXElementWithMobxFormData, MobxFieldData, MobxFieldDataInstance, MobxFieldDataProps, MobxFormData, MobxFormDataInstance, MobxFormDataProps, ValidateMessageInfo, ValidateMessages, bindTemplate, bindTemplate as registerTmpl };

@@ -3,6 +3,7 @@ import { IObservableObject } from 'mobx';
 
 export interface MobxFieldDataProps extends RuleItem {
   name: string;
+  label?: string;
   value?: any;
   trigger?: string;
   rules?: RuleItem[];
@@ -21,8 +22,61 @@ export interface MobxFieldData {
   (props: MobxFieldDataProps): JSX.Element;
 }
 
+//Reference by https://github.com/react-component/field-form
+declare type ValidateMessage = string | ((...args: any[]) => string);
+export interface ValidateMessageInfo {
+  default?: ValidateMessage;
+  required?: ValidateMessage;
+  enum?: ValidateMessage;
+  whitespace?: ValidateMessage;
+  date?: {
+    format?: ValidateMessage;
+    parse?: ValidateMessage;
+    invalid?: ValidateMessage;
+  };
+  types?: {
+    string?: ValidateMessage;
+    method?: ValidateMessage;
+    array?: ValidateMessage;
+    object?: ValidateMessage;
+    number?: ValidateMessage;
+    date?: ValidateMessage;
+    boolean?: ValidateMessage;
+    integer?: ValidateMessage;
+    float?: ValidateMessage;
+    regexp?: ValidateMessage;
+    email?: ValidateMessage;
+    url?: ValidateMessage;
+    hex?: ValidateMessage;
+  };
+  string?: {
+    len?: ValidateMessage;
+    min?: ValidateMessage;
+    max?: ValidateMessage;
+    range?: ValidateMessage;
+  };
+  number?: {
+    len?: ValidateMessage;
+    min?: ValidateMessage;
+    max?: ValidateMessage;
+    range?: ValidateMessage;
+  };
+  array?: {
+    len?: ValidateMessage;
+    min?: ValidateMessage;
+    max?: ValidateMessage;
+    range?: ValidateMessage;
+  };
+  pattern?: {
+    mismatch?: ValidateMessage;
+  };
+}
+
+export type ValidateMessages = ValidateMessageInfo | ((fieldData: MobxFieldDataInstance) => ValidateMessageInfo);
+
 export interface MobxFormDataProps {
   observable?: boolean;
+  validateMessages?: ValidateMessages;
 }
 
 export interface MobxFormDataInstance {

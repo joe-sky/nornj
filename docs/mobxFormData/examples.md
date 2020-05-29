@@ -31,4 +31,10 @@ toc: menu
 
 动态增加、减少表单项。
 
-<code src="./demo/Demo4/index.tsx" />
+<code src="./demo/Demo4" />
+
+## 自定义校验信息
+
+通过`validateMessages`自定义校验信息模板，模板内容可参考[此处](https://github.com/yiminghe/async-validator)。
+
+<code src="./demo/Demo5" />
