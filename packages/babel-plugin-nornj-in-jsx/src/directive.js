@@ -142,7 +142,9 @@ module.exports = function(babel) {
                   cooked: attrStr
                 })
               );
-              expr.paramIdentifierName = `set${nj.upperFirst(expr.name)}`;
+              if (expr.name != null) {
+                expr.paramIdentifierName = `set${nj.upperFirst(expr.name)}`;
+              }
               expressions.push(expr);
               lastAttrStr = '';
             }

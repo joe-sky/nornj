@@ -8,25 +8,25 @@ const layout = {
   wrapperCol: { span: 16 }
 };
 
-const validateMessages: ValidateMessages = ({ label }) => ({
-  required: name => `请输入${label}`,
+const validateMessages: ValidateMessages = fieldData => ({
+  required: name => `请输入${fieldData.label}`,
   types: {
-    email: name => `${label}格式不正确`,
-    number: name => `${label}请输入数字`
+    email: name => `${fieldData.label}格式不正确`,
+    number: name => `${fieldData.label}请输入数字`
   },
   number: {
-    range: (name, min, max) => `${label}必须在${min}和${max}之间`
+    range: (name, min, max) => `${fieldData.label}必须在${min}和${max}之间`
   }
 });
 
 export default props => {
   const { formData } = useLocalStore(() => (
     <MobxFormData validateMessages={validateMessages}>
-      <MobxFieldData name="name" label="Name" required />
-      <MobxFieldData name="email" label="Email" type="email" />
-      <MobxFieldData name="age" label="Age" type="number" min={0} max={99} />
-      <MobxFieldData name="website" label="Website" />
-      <MobxFieldData name="introduction" label="Introduction" />
+      <MobxFieldData name="name" required />
+      <MobxFieldData name="email" type="email" />
+      <MobxFieldData name="age" type="number" min={0} max={99} />
+      <MobxFieldData name="website" />
+      <MobxFieldData name="introduction" />
     </MobxFormData>
   ));
 
@@ -42,23 +42,23 @@ export default props => {
 
   return useObserver(() => (
     <Form {...layout} n-style="max-width:600">
-      <Form.Item n-mobxField={formData.name}>
+      <Form.Item n-mobxField={formData.name} label="Name">
         <Input />
       </Form.Item>
 
-      <Form.Item n-mobxField={formData.email}>
+      <Form.Item n-mobxField={formData.email} label="Email">
         <Input />
       </Form.Item>
 
-      <Form.Item n-mobxField={formData.age}>
+      <Form.Item n-mobxField={formData.age} label="Age">
         <InputNumber />
       </Form.Item>
 
-      <Form.Item n-mobxField={formData.website}>
+      <Form.Item n-mobxField={formData.website} label="Website">
         <Input />
       </Form.Item>
 
-      <Form.Item n-mobxField={formData.introduction}>
+      <Form.Item n-mobxField={formData.introduction} label="Introduction">
         <Input.TextArea />
       </Form.Item>
 

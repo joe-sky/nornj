@@ -243,7 +243,9 @@ registerExtension(
     tagProps.validateStatus = oFd.validateStatus;
     tagProps.help = oFd.help;
     tagProps.required = oFd.rules.find(rule => rule.required);
-    if (!tagProps.label && oFd.label) {
+    if (tagProps.label) {
+      oFd.label = tagProps.label;
+    } else if (oFd.label) {
       tagProps.label = oFd.label;
     }
   },
