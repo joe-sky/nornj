@@ -142,6 +142,7 @@ const createFormData = (
     fd.reset = function() {
       this._resetting = true;
       this.value = value;
+      this._resetting = false;
     };
 
     const oFd = observable(fd);
@@ -176,7 +177,6 @@ const createFormData = (
           if (!oFd._resetting) {
             this.validate(name).catch(nj.noop);
           }
-          oFd._resetting = false;
         }
       );
     }
