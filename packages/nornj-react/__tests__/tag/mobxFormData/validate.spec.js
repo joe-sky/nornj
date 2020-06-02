@@ -1,4 +1,5 @@
-import React, { Component, useState } from 'react';
+import React, { Component, useState, useEffect } from 'react';
+import { act } from 'react-dom/test-utils';
 import { shallow, mount } from 'enzyme';
 import nj, { expression as n } from 'nornj';
 import '../../../src/base';
@@ -9,7 +10,7 @@ import Form from '../../../antd/form';
 import Input from '../../../antd/input';
 import Checkbox from '../../../antd/checkbox';
 
-function TestForm(props) {
+const TestForm = React.forwardRef((props, ref) => {
   const { formData } = useLocalStore(() => (
     <MobxFormData>
       <MobxFieldData name="userName" value="joe_sky" type="string" trigger="onChange" required />
@@ -18,7 +19,9 @@ function TestForm(props) {
     </MobxFormData>
   ));
 
-  props.formDataRef.current = formData;
+  useEffect(() => {
+    ref.current = formData;
+  }, []);
 
   return (
     <>
@@ -33,23 +36,31 @@ function TestForm(props) {
       </Form.Item>
     </>
   );
-}
+});
 
 describe('Validate', function() {
   const ref = React.createRef();
-  const app = mount(<TestForm formDataRef={ref} />);
+  const app = mount(<TestForm ref={ref} />);
   const formData = ref.current;
 
   it('Validate single field', async () => {
     try {
-      const values = await formData.validate('userName');
+      let values;
+      await act(async () => {
+        values = await formData.validate('userName');
+      });
+
       expect(values).toEqual({ userName: 'joe_sky' });
     } catch (errorInfo) {
       console.log(errorInfo);
     }
 
     try {
-      const values = await formData.validate('age');
+      let values;
+      await act(async () => {
+        values = await formData.validate('age');
+      });
+
       console.log(values);
     } catch (errorInfo) {
       expect(errorInfo.errors[0].field).toEqual('age');
@@ -59,6 +70,7 @@ describe('Validate', function() {
   it('Validate multiple fields', async () => {
     try {
       const values = await formData.validate(['userName', 'worked']);
+
       expect(values).toEqual({ userName: 'joe_sky', worked: true });
     } catch (errorInfo) {
       console.log(errorInfo);
@@ -66,6 +78,7 @@ describe('Validate', function() {
 
     try {
       const values = await formData.validate(['userName', 'age']);
+
       console.log(values);
     } catch (errorInfo) {
       expect(errorInfo.errors[0].field).toEqual('age');
@@ -73,7 +86,10 @@ describe('Validate', function() {
   });
 
   it('Validate all fields', async () => {
-    formData.age = 28;
+    await act(async () => {
+      formData.age = 28;
+    });
+
     try {
       const values = await formData.validate();
       expect(values).toEqual({ userName: 'joe_sky', age: 28, worked: true });
@@ -81,7 +97,10 @@ describe('Validate', function() {
       console.log(errorInfo);
     }
 
-    formData.age = '28a';
+    await act(async () => {
+      formData.age = '28a';
+    });
+
     try {
       const values = await formData.validate();
       console.log(values);

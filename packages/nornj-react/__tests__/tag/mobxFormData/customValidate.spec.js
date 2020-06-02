@@ -1,4 +1,5 @@
 import React, { Component, useState } from 'react';
+import { act } from 'react-dom/test-utils';
 import { shallow, mount } from 'enzyme';
 import nj, { expression as n } from 'nornj';
 import '../../../src/base';
@@ -74,21 +75,23 @@ describe('mobxFormData tag', function() {
 
     setTimeout(() => {
       app.update();
-      expect(app.find('div.ant-form-explain').length).toEqual(0);
+      expect(app.find('div.ant-form-item-explain').length).toEqual(0);
       cb();
     }, 200);
   });
 
-  it('asynchronous custom verification failed', cb => {
+  it('asynchronous custom verification failed', async () => {
     const app = mount(<TestForm />);
     const event = { target: { value: 'joe' } };
     app.find('input').simulate('change', event);
 
-    setTimeout(() => {
-      app.update();
-      expect(app.find('div.ant-form-explain').text()).toEqual('用户名已存在');
-      cb();
-    }, 200);
+    await new Promise(resolve => {
+      setTimeout(() => {
+        app.update();
+        expect(app.find('div.ant-form-item-explain').text()).toEqual('用户名已存在');
+        resolve();
+      }, 200);
+    });
   });
 
   it('custom verification succeeded', () => {
@@ -96,7 +99,7 @@ describe('mobxFormData tag', function() {
     const event = { target: { value: 'joe-sky' } };
     app.find('input').simulate('change', event);
     app.update();
-    expect(app.find('div.ant-form-explain').length).toEqual(0);
+    expect(app.find('div.ant-form-item-explain').length).toEqual(0);
   });
 
   it('custom verification failed', () => {
@@ -104,6 +107,6 @@ describe('mobxFormData tag', function() {
     const event = { target: { value: 'joe' } };
     app.find('input').simulate('change', event);
     app.update();
-    expect(app.find('div.ant-form-explain').text()).toEqual('用户名已存在');
+    expect(app.find('div.ant-form-item-explain').text()).toEqual('用户名已存在');
   });
 });

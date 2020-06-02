@@ -1,3 +1,5 @@
+const deploy = process.env.DUMI_DEPLOY === 'true';
+
 export default {
   base: '/nornj/',
   publicPath: '/nornj/',
@@ -49,8 +51,8 @@ export default {
   ],
   mode: 'site',
   title: 'NornJ',
-  logo: '/images/logo.png',
-  favicon: '/favicon.ico',
+  logo: `/${deploy ? 'nornj/' : ''}images/logo.png`,
+  favicon: `/${deploy ? 'nornj/' : ''}favicon.ico`,
   //dynamicImport: {},
   //manifest: {},
   //links: [{ rel: 'manifest', href: '/asset-manifest.json' }],

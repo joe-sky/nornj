@@ -1,4 +1,5 @@
-import React, { Component, useState } from 'react';
+import React, { Component, useState, useEffect } from 'react';
+import { act } from 'react-dom/test-utils';
 import { shallow, mount } from 'enzyme';
 import nj, { expression as n } from 'nornj';
 import '../../../src/base';
@@ -9,7 +10,7 @@ import Form from '../../../antd/form';
 import Input from '../../../antd/input';
 import Checkbox from '../../../antd/checkbox';
 
-function TestForm(props) {
+const TestForm = React.forwardRef((props, ref) => {
   const { formData } = useLocalStore(() => (
     <MobxFormData>
       <MobxFieldData
@@ -26,7 +27,9 @@ function TestForm(props) {
     </MobxFormData>
   ));
 
-  props.formDataRef.current = formData;
+  useEffect(() => {
+    ref.current = formData;
+  }, []);
 
   return (
     <>
@@ -41,14 +44,14 @@ function TestForm(props) {
       </Form.Item>
     </>
   );
-}
+});
 
 describe('Rules', function() {
   const ref = React.createRef();
-  const app = mount(<TestForm formDataRef={ref} />);
+  const app = mount(<TestForm ref={ref} />);
   const formData = ref.current;
 
-  it('String value', () => {
+  it('String value', async () => {
     expect(
       app
         .find('input')
@@ -56,32 +59,26 @@ describe('Rules', function() {
         .props().value
     ).toEqual('joe_sky');
 
-    app
-      .find('input')
-      .at(0)
-      .simulate('change', { target: { value: '' } });
-    app.update();
-    expect(
+    await act(async () => {
       app
-        .find('.field1 .ant-form-item-control')
+        .find('input')
         .at(0)
-        .hasClass('has-error')
-    ).toEqual(true);
+        .simulate('change', { target: { value: '' } });
+    });
+    app.update();
+
+    expect(app.find('.field1.ant-form-item-has-error').length).toBeGreaterThan(0);
 
     app
       .find('input')
       .at(0)
       .simulate('change', { target: { value: 'joe' } });
     app.update();
-    expect(
-      app
-        .find('.field1 .ant-form-item-control')
-        .at(0)
-        .hasClass('has-error')
-    ).toEqual(false);
+
+    expect(app.find('.field1.ant-form-item-has-error').length).toEqual(0);
   });
 
-  it('Number value', () => {
+  it('Number value', async () => {
     expect(
       app
         .find('input')
@@ -89,32 +86,26 @@ describe('Rules', function() {
         .props().value
     ).toEqual('18');
 
-    app
-      .find('input')
-      .at(1)
-      .simulate('change', { target: { value: 'joe_sky' } });
-    app.update();
-    expect(
+    await act(async () => {
       app
-        .find('.field2 .ant-form-item-control')
-        .at(0)
-        .hasClass('has-error')
-    ).toEqual(true);
+        .find('input')
+        .at(1)
+        .simulate('change', { target: { value: 'joe_sky' } });
+    });
+    app.update();
+
+    expect(app.find('.field2.ant-form-item-has-error').length).toBeGreaterThan(0);
 
     app
       .find('input')
       .at(1)
       .simulate('change', { target: { value: '28' } });
     app.update();
-    expect(
-      app
-        .find('.field2 .ant-form-item-control')
-        .at(0)
-        .hasClass('has-error')
-    ).toEqual(false);
+
+    expect(app.find('.field2.ant-form-item-has-error').length).toEqual(0);
   });
 
-  it('Boolean value', () => {
+  it('Boolean value', async () => {
     expect(
       app
         .find('input')
@@ -122,8 +113,11 @@ describe('Rules', function() {
         .props().checked
     ).toEqual(true);
 
-    formData.worked = false;
+    await act(async () => {
+      formData.worked = false;
+    });
     app.update();
+
     expect(
       app
         .find('input')
@@ -131,22 +125,18 @@ describe('Rules', function() {
         .props().checked
     ).toEqual(false);
 
-    formData.worked = 'true';
+    await act(async () => {
+      formData.worked = 'true';
+    });
     app.update();
-    expect(
-      app
-        .find('.field3 .ant-form-item-control')
-        .at(0)
-        .hasClass('has-error')
-    ).toEqual(true);
 
-    formData.worked = true;
+    expect(app.find('.field3.ant-form-item-has-error').length).toBeGreaterThan(0);
+
+    await act(async () => {
+      formData.worked = true;
+    });
     app.update();
-    expect(
-      app
-        .find('.field3 .ant-form-item-control')
-        .at(0)
-        .hasClass('has-error')
-    ).toEqual(false);
+
+    expect(app.find('.field3.ant-form-item-has-error').length).toEqual(0);
   });
 });
