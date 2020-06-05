@@ -1,5 +1,5 @@
 import nj, { registerExtension } from 'nornj';
-import { observable, runInAction, reaction, extendObservable, isComputedProp } from 'mobx';
+import { observable, runInAction, reaction, extendObservable, isComputedProp, observe } from 'mobx';
 import schema, { RuleItem } from 'async-validator';
 import extensionConfigs from '../../../mobx/formData/extensionConfig';
 import { MobxFormDataProps, MobxFormDataInstance, MobxFieldDataProps, MobxFieldDataInstance } from '../../interface';
@@ -104,7 +104,15 @@ const createFormData = (
     const { name, value, trigger = 'valueChange', rules, ...ruleOptions } = fieldData;
     const fd: MobxFieldDataInstance = { name, value, trigger, rules, ...ruleOptions };
     const _rules = rules ? rules : [ruleOptions];
-    fd.rules = _rules;
+    fd.rules = _rules.map((rule, i) => {
+      const oRule = observable(rule);
+      observe(oRule, change => {
+        const schemaRules: RuleItem[] = (fd.validatorSchema as any).rules[name];
+        Object.assign(schemaRules[i], oRule);
+      });
+
+      return oRule;
+    });
 
     fd.setDefaultRule = rule => {
       const schemaRules: RuleItem[] = (fd.validatorSchema as any).rules[name];
@@ -140,9 +148,10 @@ const createFormData = (
     });
 
     fd.reset = function() {
-      this._resetting = true;
+      if (this.value !== value) {
+        this._resetting = true;
+      }
       this.value = value;
-      this._resetting = false;
     };
 
     const oFd = observable(fd);
@@ -177,6 +186,7 @@ const createFormData = (
           if (!oFd._resetting) {
             this.validate(name).catch(nj.noop);
           }
+          oFd._resetting = false;
         }
       );
     }
@@ -242,7 +252,9 @@ registerExtension(
 
     tagProps.validateStatus = oFd.validateStatus;
     tagProps.help = oFd.help;
-    tagProps.required = oFd.rules.find(rule => rule.required);
+    if (tagProps.required == null) {
+      tagProps.required = oFd.rules.find(rule => rule.required);
+    }
     if (tagProps.label) {
       oFd.label = tagProps.label;
     } else if (oFd.label) {

@@ -169,9 +169,7 @@ module.exports = function(babel) {
         }
 
         if (state.hasMobxWithNj && !state.hasImportNjrMobx) {
-          path.node.body.unshift(
-            types.importDeclaration([], types.stringLiteral(`nornj-react/mobx${state.opts.rn ? '/native' : ''}`))
-          );
+          path.node.body.unshift(types.importDeclaration([], types.stringLiteral('nornj-react/mobx')));
         }
         if (state.hasMobxFormDataWithNj && !state.hasImportNjrMobxFormData) {
           path.node.body.unshift(types.importDeclaration([], types.stringLiteral('nornj-react/mobx/formData')));

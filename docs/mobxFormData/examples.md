@@ -38,3 +38,5 @@ toc: menu
 通过`validateMessages`自定义校验信息模板，模板内容可参考[此处](https://github.com/yiminghe/async-validator)。
 
 <code src="./demo/Demo5" />
+
+<code src="./demo/Demo6" />
