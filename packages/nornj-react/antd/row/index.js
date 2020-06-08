@@ -1,5 +1,5 @@
 import { registerComponent } from 'nornj';
-import Row from 'antd/lib/row';
+import { Row } from 'antd';
 
 registerComponent({
   'ant-Row': Row

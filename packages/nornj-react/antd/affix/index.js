@@ -1,5 +1,5 @@
 import { registerComponent } from 'nornj';
-import Affix from 'antd/lib/affix';
+import { Affix } from 'antd';
 
 registerComponent({
   'ant-Affix': Affix

@@ -1,5 +1,5 @@
 import { registerComponent } from 'nornj';
-import Tooltip from 'antd/lib/tooltip';
+import { Tooltip } from 'antd';
 
 registerComponent({
   'ant-Tooltip': Tooltip

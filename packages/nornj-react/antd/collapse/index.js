@@ -1,5 +1,5 @@
 import { registerComponent } from 'nornj';
-import Collapse from 'antd/lib/collapse';
+import { Collapse } from 'antd';
 
 registerComponent({
   'ant-Collapse': Collapse,

@@ -1,5 +1,5 @@
 import { registerComponent } from 'nornj';
-import Breadcrumb from 'antd/lib/breadcrumb';
+import { Breadcrumb } from 'antd';
 
 registerComponent({
   'ant-Breadcrumb': Breadcrumb,

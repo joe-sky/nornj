@@ -1,2 +1,2 @@
-import version from 'antd/lib/version';
+import { version } from 'antd';
 export default version;

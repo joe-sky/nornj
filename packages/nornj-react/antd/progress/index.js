@@ -1,5 +1,5 @@
 import { registerComponent } from 'nornj';
-import Progress from 'antd/lib/progress';
+import { Progress } from 'antd';
 
 registerComponent({
   'ant-Progress': Progress

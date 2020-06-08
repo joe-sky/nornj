@@ -1,5 +1,5 @@
 import { registerComponent } from 'nornj';
-import Layout from 'antd/lib/layout';
+import { Layout } from 'antd';
 
 registerComponent({
   'ant-Layout': Layout

@@ -1,2 +1,2 @@
-import Notification from 'antd/lib/notification';
-export default Notification;
+import notification from 'antd/lib/notification';
+export default notification;

@@ -1,5 +1,5 @@
 import { registerComponent } from 'nornj';
-import Typography from 'antd/lib/typography';
+import { Typography } from 'antd';
 
 registerComponent({
   'ant-Typography': Typography

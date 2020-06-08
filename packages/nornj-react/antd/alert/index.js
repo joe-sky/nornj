@@ -1,5 +1,5 @@
 import { registerComponent } from 'nornj';
-import Alert from 'antd/lib/alert';
+import { Alert } from 'antd';
 
 registerComponent({
   'ant-Alert': Alert

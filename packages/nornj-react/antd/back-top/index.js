@@ -1,5 +1,5 @@
 import { registerComponent } from 'nornj';
-import BackTop from 'antd/lib/back-top';
+import { BackTop } from 'antd';
 
 registerComponent({
   'ant-BackTop': BackTop

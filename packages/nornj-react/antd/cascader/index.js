@@ -1,5 +1,5 @@
 import { registerComponent } from 'nornj';
-import Cascader from 'antd/lib/cascader';
+import { Cascader } from 'antd';
 
 registerComponent({
   'ant-Cascader': {

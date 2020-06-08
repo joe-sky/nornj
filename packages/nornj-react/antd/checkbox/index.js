@@ -1,5 +1,5 @@
 import { registerComponent } from 'nornj';
-import Checkbox from 'antd/lib/checkbox';
+import { Checkbox } from 'antd';
 const CheckboxGroup = Checkbox.Group;
 
 registerComponent({

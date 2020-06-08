@@ -1,5 +1,5 @@
 import { registerComponent } from 'nornj';
-import Card from 'antd/lib/card';
+import { Card } from 'antd';
 
 registerComponent({
   'ant-Card': Card

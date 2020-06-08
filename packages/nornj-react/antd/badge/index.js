@@ -1,5 +1,5 @@
 import { registerComponent } from 'nornj';
-import Badge from 'antd/lib/badge';
+import { Badge } from 'antd';
 
 registerComponent({
   'ant-Badge': Badge

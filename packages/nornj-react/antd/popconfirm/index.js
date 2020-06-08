@@ -1,5 +1,5 @@
 import { registerComponent } from 'nornj';
-import Popconfirm from 'antd/lib/popconfirm';
+import { Popconfirm } from 'antd';
 
 registerComponent({
   'ant-Popconfirm': Popconfirm

@@ -1,5 +1,5 @@
 import { registerComponent } from 'nornj';
-import Select from 'antd/lib/select';
+import { Select } from 'antd';
 const Option = Select.Option,
   OptGroup = Select.OptGroup;
 

@@ -1,5 +1,5 @@
 import { registerComponent } from 'nornj';
-import Rate from 'antd/lib/rate';
+import { Rate } from 'antd';
 
 registerComponent({
   'ant-Rate': Rate

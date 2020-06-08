@@ -1,5 +1,5 @@
 import { registerComponent } from 'nornj';
-import Upload from 'antd/lib/upload';
+import { Upload } from 'antd';
 
 registerComponent({
   'ant-Upload': {

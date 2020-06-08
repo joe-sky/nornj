@@ -1,5 +1,5 @@
 import { registerComponent } from 'nornj';
-import ConfigProvider from 'antd/lib/config-provider';
+import { ConfigProvider } from 'antd';
 
 registerComponent({
   'ant-ConfigProvider': ConfigProvider

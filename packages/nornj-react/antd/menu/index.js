@@ -1,5 +1,5 @@
 import { registerComponent } from 'nornj';
-import Menu from 'antd/lib/menu';
+import { Menu } from 'antd';
 
 registerComponent({
   'ant-Menu': Menu,

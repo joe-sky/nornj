@@ -1,5 +1,5 @@
 import { registerComponent } from 'nornj';
-import Empty from 'antd/lib/empty';
+import { Empty } from 'antd';
 
 registerComponent({
   'ant-Empty': Empty

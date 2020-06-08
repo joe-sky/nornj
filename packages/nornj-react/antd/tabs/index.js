@@ -1,5 +1,5 @@
 import { registerComponent } from 'nornj';
-import Tabs from 'antd/lib/tabs';
+import { Tabs } from 'antd';
 
 registerComponent({
   'ant-Tabs': Tabs,

@@ -1,9 +1,8 @@
 /*!
- * NornJ-React v5.2.0-rc.3
+ * NornJ-React v5.2.0-rc.4
  * (c) 2016-2020 Joe_Sky
  * Released under the MIT License.
  */
-/// <reference types="react" />
 import { ElementType } from 'nornj';
 import schema, { RuleItem } from 'async-validator';
 import { IObservableObject } from 'mobx';

@@ -1,5 +1,5 @@
 import { registerComponent } from 'nornj';
-import Calendar from 'antd/lib/calendar';
+import { Calendar } from 'antd';
 
 registerComponent({
   'ant-Calendar': Calendar

@@ -1,5 +1,5 @@
 import { registerComponent } from 'nornj';
-import Modal from 'antd/lib/modal';
+import { Modal } from 'antd';
 
 registerComponent({
   'ant-Modal': Modal

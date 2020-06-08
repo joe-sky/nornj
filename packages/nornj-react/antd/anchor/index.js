@@ -1,5 +1,5 @@
 import { registerComponent } from 'nornj';
-import Anchor from 'antd/lib/anchor';
+import { Anchor } from 'antd';
 
 registerComponent({
   'ant-Anchor': Anchor

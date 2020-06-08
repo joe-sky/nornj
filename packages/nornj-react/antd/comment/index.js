@@ -1,5 +1,5 @@
 import { registerComponent } from 'nornj';
-import Comment from 'antd/lib/comment';
+import { Comment } from 'antd';
 
 registerComponent({
   'ant-Comment': Comment

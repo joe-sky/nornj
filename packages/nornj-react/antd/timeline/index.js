@@ -1,5 +1,5 @@
 import { registerComponent } from 'nornj';
-import Timeline from 'antd/lib/timeline';
+import { Timeline } from 'antd';
 
 registerComponent({
   'ant-Timeline': Timeline

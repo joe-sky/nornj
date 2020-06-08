@@ -1,5 +1,5 @@
 import { registerComponent } from 'nornj';
-import Skeleton from 'antd/lib/skeleton';
+import { Skeleton } from 'antd';
 
 registerComponent({
   'ant-Skeleton': Skeleton

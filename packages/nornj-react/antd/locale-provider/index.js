@@ -1,5 +1,5 @@
 import { registerComponent } from 'nornj';
-import LocaleProvider from 'antd/lib/locale-provider';
+import { LocaleProvider } from 'antd';
 
 registerComponent({
   'ant-LocaleProvider': LocaleProvider

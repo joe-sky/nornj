@@ -1,5 +1,5 @@
 import { registerComponent } from 'nornj';
-import Avatar from 'antd/lib/avatar';
+import { Avatar } from 'antd';
 
 registerComponent({
   'ant-Avatar': Avatar

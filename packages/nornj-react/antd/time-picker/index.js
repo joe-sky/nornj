@@ -1,5 +1,5 @@
 import { registerComponent } from 'nornj';
-import TimePicker from 'antd/lib/time-picker';
+import { TimePicker } from 'antd';
 
 registerComponent({
   'ant-TimePicker': {

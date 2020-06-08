@@ -1,8 +1,2 @@
-import { registerComponent } from 'nornj';
-import Notification from 'antd/lib/notification';
-
-registerComponent({
-  'ant-Notification': Notification
-});
-
-export default Notification;
+import { notification } from 'antd';
+export default notification;

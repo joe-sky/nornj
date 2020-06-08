@@ -1,5 +1,5 @@
 import { registerComponent } from 'nornj';
-import List from 'antd/lib/list';
+import { List } from 'antd';
 
 registerComponent({
   'ant-List': List

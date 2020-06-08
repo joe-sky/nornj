@@ -1,5 +1,5 @@
 import { registerComponent } from 'nornj';
-import Statistic from 'antd/lib/statistic';
+import { Statistic } from 'antd';
 
 registerComponent({
   'ant-Statistic': Statistic

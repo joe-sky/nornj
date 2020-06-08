@@ -2,7 +2,6 @@ import React, { useEffect } from 'react';
 import { Form, Input, Button, Checkbox } from 'antd';
 import { useLocalStore } from 'mobx-react-lite';
 import { observer } from 'mobx-react';
-import { reaction, autorun } from 'mobx';
 
 const layout = {
   labelCol: { span: 8 },
@@ -14,17 +13,17 @@ const tailLayout = {
 
 const Demo = props => {
   const state = useLocalStore(() => ({
-    rememberMe: false
+    checkNick: false
   }));
 
   const { formData } = useLocalStore(() => (
     <MobxFormData>
-      <MobxFieldData name="userName" required message="Please input your username!" />
-      <MobxFieldData name="password" message="Please input your password!" />
+      <MobxFieldData name="name" required message="Please input your name" />
+      <MobxFieldData name="nickname" message="Please input your nickname" />
     </MobxFormData>
   ));
 
-  const onSubmit = (e: React.MouseEvent<HTMLElement, MouseEvent>) =>
+  const onCheck = (e: React.MouseEvent<HTMLElement, MouseEvent>) =>
     formData
       .validate()
       .then(values => {
@@ -34,30 +33,30 @@ const Demo = props => {
         console.log(errorInfo);
       });
 
-  const onRememberMeChange = () => {
-    formData.fieldDatas.get('password').rules[0].required = state.rememberMe;
-    formData.validate('password');
+  const onCheckNickChange = () => {
+    formData.fieldDatas.get('nickname').rules[0].required = state.checkNick;
+    formData.validate('nickname');
   };
 
   return (
     <Form {...layout} n-style="max-width:600">
-      <Form.Item n-mobxField={formData.userName} label="Username">
-        <Input />
+      <Form.Item n-mobxField={formData.name} label="Name">
+        <Input placeholder="Please input your name" />
       </Form.Item>
 
-      <Form.Item n-mobxField={formData.password} label="Password">
-        <Input.Password />
+      <Form.Item n-mobxField={formData.nickname} label="Nickname">
+        <Input placeholder="Please input your nickname" />
       </Form.Item>
 
       <Form.Item {...tailLayout}>
-        <Checkbox n-mobxBind={state.rememberMe} onChange={onRememberMeChange}>
-          Remember me
+        <Checkbox n-mobxBind={state.checkNick} onChange={onCheckNickChange}>
+          Nickname is required
         </Checkbox>
       </Form.Item>
 
       <Form.Item {...tailLayout}>
-        <Button type="primary" onClick={onSubmit}>
-          Submit
+        <Button type="primary" onClick={onCheck}>
+          Check
         </Button>
       </Form.Item>
     </Form>

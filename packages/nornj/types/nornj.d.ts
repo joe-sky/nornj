@@ -1,9 +1,8 @@
 /*!
- * NornJ template engine v5.2.0-rc.3
+ * NornJ template engine v5.2.0-rc.4
  * (c) 2016-2020 Joe_Sky
  * Released under the MIT License.
  */
-/// <reference types="react" />
 declare function escape(str: any): any;
 declare function unescape(str: any): any;
 

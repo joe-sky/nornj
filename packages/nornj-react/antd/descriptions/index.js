@@ -1,5 +1,5 @@
 import { registerComponent } from 'nornj';
-import Descriptions from 'antd/lib/descriptions';
+import { Descriptions } from 'antd';
 
 registerComponent({
   'ant-Descriptions': Descriptions

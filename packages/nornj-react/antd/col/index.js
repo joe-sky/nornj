@@ -1,5 +1,5 @@
 import { registerComponent } from 'nornj';
-import Col from 'antd/lib/col';
+import { Col } from 'antd';
 
 registerComponent({
   'ant-Col': Col

@@ -39,4 +39,8 @@ toc: menu
 
 <code src="./demo/Demo5" />
 
+## 动态校验规则
+
+根据不同情况执行不同的校验规则。
+
 <code src="./demo/Demo6" />

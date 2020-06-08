@@ -1,5 +1,5 @@
 import { registerComponent } from 'nornj';
-import Tag from 'antd/lib/tag';
+import { Tag } from 'antd';
 
 registerComponent({
   'ant-Tag': Tag

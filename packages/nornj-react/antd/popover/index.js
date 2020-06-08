@@ -1,5 +1,5 @@
 import { registerComponent } from 'nornj';
-import Popover from 'antd/lib/popover';
+import { Popover } from 'antd';
 
 registerComponent({
   'ant-Popover': Popover

@@ -1,5 +1,5 @@
 import { registerComponent } from 'nornj';
-import PageHeader from 'antd/lib/page-header';
+import { PageHeader } from 'antd';
 
 registerComponent({
   'ant-PageHeader': PageHeader

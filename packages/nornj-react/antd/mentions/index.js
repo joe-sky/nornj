@@ -1,5 +1,5 @@
 import { registerComponent } from 'nornj';
-import Mentions from 'antd/lib/mentions';
+import { Mentions } from 'antd';
 
 registerComponent({
   'ant-Mention': Mentions

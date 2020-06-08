@@ -1,5 +1,5 @@
 import { registerComponent } from 'nornj';
-import InputNumber from 'antd/lib/input-number';
+import { InputNumber } from 'antd';
 
 registerComponent({
   'ant-InputNumber': InputNumber

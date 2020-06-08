@@ -1,5 +1,5 @@
 import { registerComponent } from 'nornj';
-import Radio from 'antd/lib/radio';
+import { Radio } from 'antd';
 
 registerComponent({
   'ant-Radio': Radio,

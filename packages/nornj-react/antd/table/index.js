@@ -1,5 +1,5 @@
 import { registerComponent } from 'nornj';
-import Table from 'antd/lib/table';
+import { Table } from 'antd';
 
 const { Column, ColumnGroup } = Table;
 registerComponent({

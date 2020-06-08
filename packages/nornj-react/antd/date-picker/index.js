@@ -1,9 +1,17 @@
 import { registerComponent } from 'nornj';
-import DatePicker from 'antd/lib/date-picker';
+import { DatePicker } from 'antd';
 
 registerComponent({
   'ant-DatePicker': {
     component: DatePicker,
+    options: {
+      fieldDefaultRule: {
+        type: 'date'
+      }
+    }
+  },
+  'ant-YearPicker': {
+    component: DatePicker.YearPicker,
     options: {
       fieldDefaultRule: {
         type: 'date'

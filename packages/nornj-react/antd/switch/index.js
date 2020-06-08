@@ -1,5 +1,5 @@
 import { registerComponent } from 'nornj';
-import Switch from 'antd/lib/switch';
+import { Switch } from 'antd';
 
 registerComponent({
   'ant-Switch': {
