@@ -44,3 +44,9 @@ toc: menu
 根据不同情况执行不同的校验规则。
 
 <code src="./demo/Demo6" />
+
+## 复杂一点的控件
+
+这里演示`Form.Item`内有多个元素的使用方式。
+
+<code src="./demo/Demo7" />

@@ -1,3 +1,4 @@
+import React from 'react';
 import nj, { registerExtension } from 'nornj';
 import { observable, runInAction, reaction, extendObservable, isComputedProp, observe } from 'mobx';
 import schema, { RuleItem } from 'async-validator';
@@ -247,18 +248,33 @@ registerExtension(
   options => {
     const { value, tagProps } = options;
     const _value = value();
-    const { prop, source } = _value;
-    const oFd: MobxFieldDataInstance = source.fieldDatas.get(prop);
+    const { prop, source }: { prop: string | string[]; source: MobxFormDataInstance } = _value;
+    const fieldNames = Array.isArray(prop) ? prop : [prop];
 
-    tagProps.validateStatus = oFd.validateStatus;
-    tagProps.help = oFd.help;
-    if (tagProps.required == null) {
-      tagProps.required = oFd.rules.find(rule => rule.required);
-    }
-    if (tagProps.label) {
-      oFd.label = tagProps.label;
-    } else if (oFd.label) {
-      tagProps.label = oFd.label;
+    let validateStatus = null;
+    const help = [];
+    fieldNames.forEach(fieldName => {
+      const oFd: MobxFieldDataInstance = source.fieldDatas.get(fieldName);
+
+      if (validateStatus == null && oFd.validateStatus != null) {
+        validateStatus = oFd.validateStatus;
+      }
+      if (oFd.help != null) {
+        help.push(<div key={help.length}>{oFd.help}</div>);
+      }
+      if (tagProps.required == null) {
+        tagProps.required = oFd.rules.find(rule => rule.required);
+      }
+      if (tagProps.label) {
+        oFd.label = tagProps.label;
+      } else if (oFd.label) {
+        tagProps.label = oFd.label;
+      }
+    });
+
+    tagProps.validateStatus = validateStatus;
+    if (help.length) {
+      tagProps.help = <>{help}</>;
     }
   },
   extensionConfigs.mobxField

@@ -1,5 +1,7 @@
 const nj = require('nornj').default;
 const utils = require('./utils');
+const traverse = require('@babel/traverse').default;
+const types = require('@babel/types');
 
 const TYPES = {
   ELEMENT: 'JSXElement',
@@ -186,7 +188,7 @@ exports.getSanitizedExpressionForContent = function(babelTypes, blocks, keyPrefi
   return babelTypes.arrayExpression(blocks);
 };
 
-exports.hasDirective = function(node) {
+function hasDirective(node) {
   return (
     node.openingElement &&
     node.openingElement.attributes.reduce(function(result, attr) {
@@ -196,7 +198,8 @@ exports.hasDirective = function(node) {
       return result;
     }, [])
   );
-};
+}
+exports.hasDirective = hasDirective;
 
 function isDirective(name) {
   return name.indexOf('n-') === 0;
@@ -285,3 +288,29 @@ exports.isSubExTag = function(node) {
           (needPrefix == 'onlyUpperCase' && REGEX_LOWER_CASE.test(nodeName)) ||
           (needPrefix == 'onlyLowerCase' && REGEX_UPPER_CASE.test(nodeName)));
 };
+
+function hasMobxBind(path) {
+  let hasMobxBind = false;
+  traverse(
+    path.node,
+    {
+      JSXIdentifier: {
+        enter(path) {
+          if (hasMobxBind) {
+            return;
+          }
+
+          if (path.node.name.startsWith('n-mobxBind')) {
+            hasMobxBind = true;
+          }
+        }
+      }
+    },
+    path.scope,
+    path.state,
+    path
+  );
+
+  return hasMobxBind;
+}
+exports.hasMobxBind = hasMobxBind;

@@ -45,7 +45,7 @@ module.exports = function(babel) {
         if (directives && directives.length) {
           const mobxField = directives.find(directive => directive.startsWith('n-mobxField'));
           if (mobxField && !state.mobxFieldNodes.has(path.node)) {
-            if (!mobxField.includes('-noBind')) {
+            if (!mobxField.includes('-noBind') && !astUtil.hasMobxBind(path)) {
               const children = astUtil.getChildren(types, path.node);
               const directiveParam = mobxField.split('n-mobxField')[1];
 
