@@ -26,6 +26,10 @@ export interface ComponentOption {
   [key: string]: any;
 }
 
+export interface ComponentOptionFunc {
+  (...args: any[]): ComponentOption;
+}
+
 export namespace Template {
   export interface Global {
     tmplKey: string;

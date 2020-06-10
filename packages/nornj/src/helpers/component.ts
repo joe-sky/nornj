@@ -1,20 +1,22 @@
 import nj from '../core';
 import * as tools from '../utils/tools';
-import { Component, ComponentOption } from '../interface';
+import { Component, ComponentOption, ComponentOptionFunc } from '../interface';
+
+type ComponentOptionOrFunc = ComponentOption | ComponentOptionFunc;
 
 export const components: { [name: string]: Component } = {};
 
-export const componentConfig: Map<Component, ComponentOption> = new Map();
+export const componentConfig: Map<Component, ComponentOptionOrFunc> = new Map();
 
 export function registerComponent(options: {
-  [name: string]: Component | { component?: Component; options?: ComponentOption };
+  [name: string]: Component | { component?: Component; options?: ComponentOptionOrFunc };
 }): Component | Component[];
 export function registerComponent(
   name: string,
   component: Component,
-  options?: ComponentOption
+  options?: ComponentOptionOrFunc
 ): Component | Component[];
-export function registerComponent(name, component?: Component, options?: ComponentOption) {
+export function registerComponent(name, component?: Component, options?: ComponentOptionOrFunc) {
   let params = name,
     ret;
   if (!tools.isObject(name)) {
@@ -30,7 +32,7 @@ export function registerComponent(name, component?: Component, options?: Compone
     (v, k, i) => {
       let comp;
       if (v != null) {
-        const { component, options }: { component: Component; options: ComponentOption } = v;
+        const { component, options }: { component: Component; options: ComponentOptionOrFunc } = v;
         const name = k.toLowerCase();
 
         comp = component ? component : v;
@@ -53,7 +55,7 @@ export function registerComponent(name, component?: Component, options?: Compone
   return ret;
 }
 
-export function getComponentConfig(name: Component): ComponentOption {
+export function getComponentConfig(name: Component): ComponentOptionOrFunc {
   return componentConfig.get(tools.isString(name) ? components[name as string] || name : name);
 }
 

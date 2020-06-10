@@ -73,18 +73,19 @@ declare function registerFilter(options: {
 }): void;
 declare function registerFilter(name: string, filter: FilterDelegate, options?: FilterOption, mergeConfig?: boolean): void;
 
+declare type ComponentOptionOrFunc = ComponentOption | ComponentOptionFunc;
 declare const components: {
     [name: string]: Component;
 };
-declare const componentConfig: Map<Component, ComponentOption>;
+declare const componentConfig: Map<Component, ComponentOptionOrFunc>;
 declare function registerComponent(options: {
     [name: string]: Component | {
         component?: Component;
-        options?: ComponentOption;
+        options?: ComponentOptionOrFunc;
     };
 }): Component | Component[];
-declare function registerComponent(name: string, component: Component, options?: ComponentOption): Component | Component[];
-declare function getComponentConfig(name: Component): ComponentOption;
+declare function registerComponent(name: string, component: Component, options?: ComponentOptionOrFunc): Component | Component[];
+declare function getComponentConfig(name: Component): ComponentOptionOrFunc;
 declare function copyComponentConfig(component: Component, from: Component): Component;
 
 declare function getData(this: Template.Context | void, prop: any, data: any, hasSource?: any): any;
@@ -110,6 +111,9 @@ interface ComponentOption {
     changeEventName?: string;
     needToJS?: boolean;
     [key: string]: any;
+}
+interface ComponentOptionFunc {
+    (...args: any[]): ComponentOption;
 }
 declare namespace Template {
     interface Global {
@@ -324,4 +328,4 @@ declare function expression(strs: TemplateStringsArray, ...args: any[]): any;
 declare function css(strs: TemplateStringsArray, ...args: any[]): any;
 
 export default nj;
-export { Component, ComponentOption, ComponentProps, ConfigOption, ElementType, Export, ExtensionDelegate, ExtensionDelegateMultiParams, ExtensionDelegateOption, ExtensionOption, FilterDelegate, FilterDelegateOption, FilterOption, SwitchPrefixConfig, Template, compile, compileH, css, expression, taggedTmplH as html, taggedTmpl as htmlString, registerComponent, registerExtension, registerFilter, render, renderH, taggedTmpl, taggedTmplH, template };
+export { Component, ComponentOption, ComponentOptionFunc, ComponentProps, ConfigOption, ElementType, Export, ExtensionDelegate, ExtensionDelegateMultiParams, ExtensionDelegateOption, ExtensionOption, FilterDelegate, FilterDelegateOption, FilterOption, SwitchPrefixConfig, Template, compile, compileH, css, expression, taggedTmplH as html, taggedTmpl as htmlString, registerComponent, registerExtension, registerFilter, render, renderH, taggedTmpl, taggedTmplH, template };

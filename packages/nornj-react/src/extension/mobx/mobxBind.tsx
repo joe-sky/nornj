@@ -28,9 +28,12 @@ const MobxBindWrap = React.forwardRef<any, IProps>(
     },
     ref
   ) => {
-    let valuePropName = 'value',
-      changeEventName = 'onChange';
-    const componentConfig = nj.getComponentConfig(tagName) || {};
+    let valuePropName = 'value';
+    let changeEventName = 'onChange';
+    let componentConfig = nj.getComponentConfig(tagName) || {};
+    if (typeof componentConfig === 'function') {
+      componentConfig = componentConfig(props);
+    }
     const args = directiveProps && directiveProps.arguments;
     const debounceArg = _hasArg(args, 'debounce');
 

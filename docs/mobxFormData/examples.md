@@ -50,3 +50,21 @@ toc: menu
 这里演示`Form.Item`内有多个元素的使用方式。
 
 <code src="./demo/Demo7" />
+
+## 自定义表单控件
+
+自定义或第三方的表单控件，也可以与`MobxFormData`一起使用。
+
+<code src="./demo/Demo8" />
+
+## 时间类控件
+
+时间类组件的 value 类型为 moment 对象，所以在提交服务器前需要预处理。
+
+<code src="./demo/Demo9" />
+
+## 校验其他组件
+
+以上演示没有出现的表单控件对应的校验演示。
+
+<code src="./demo/Demo10" />
