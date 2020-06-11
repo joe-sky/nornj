@@ -57,6 +57,10 @@ toc: menu
 
 <code src="./demo/Demo8" />
 
+## 多表单联动
+
+<code src="./demo/Demo11" />
+
 ## 时间类控件
 
 时间类组件的 value 类型为 moment 对象，所以在提交服务器前需要预处理。

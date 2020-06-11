@@ -10,16 +10,19 @@ import { IObservableObject } from 'mobx';
 declare function bindTemplate<T extends ElementType>(target: T): T;
 declare function bindTemplate(name: string | ElementType): <T extends ElementType>(target: T) => T;
 
-interface MobxFieldDataProps extends RuleItem {
+interface MobxFieldRuleItem extends Omit<RuleItem, 'message'> {
+    message?: string | (() => string);
+}
+interface MobxFieldDataProps extends MobxFieldRuleItem {
     name: string;
     label?: string;
     value?: any;
     trigger?: string;
-    rules?: RuleItem[];
+    rules?: MobxFieldRuleItem[];
     [key: string]: any;
 }
 interface MobxFieldDataInstance extends MobxFieldDataProps {
-    setDefaultRule?(rule: RuleItem): void;
+    setDefaultRule?(rule: MobxFieldRuleItem): void;
     validatorSchema?: schema;
     reset?: Function;
     validateStatus?: string;
@@ -117,4 +120,4 @@ interface Export {
 declare const njr: Export;
 
 export default njr;
-export { Export, JSXElementWithMobxFormData, MobxFieldData, MobxFieldDataInstance, MobxFieldDataProps, MobxFormData, MobxFormDataInstance, MobxFormDataProps, ValidateMessageInfo, ValidateMessages, bindTemplate, bindTemplate as registerTmpl };
+export { Export, JSXElementWithMobxFormData, MobxFieldData, MobxFieldDataInstance, MobxFieldDataProps, MobxFieldRuleItem, MobxFormData, MobxFormDataInstance, MobxFormDataProps, ValidateMessageInfo, ValidateMessages, bindTemplate, bindTemplate as registerTmpl };

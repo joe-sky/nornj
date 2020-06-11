@@ -8,6 +8,7 @@ import '../../../src/extension/mobx/mobxFormData';
 import { useLocalStore } from 'mobx-react-lite';
 import Form from '../../../antd/form';
 import Input from '../../../antd/input';
+import { sleep } from '../../../../../test/utils';
 
 function TestForm() {
   const { formData } = useLocalStore(() => (
@@ -68,44 +69,48 @@ describe('mobxFormData tag', function() {
     expect(app.find('input').props().value).toEqual('joe_sky');
   });
 
-  it('asynchronous custom verification succeeded', cb => {
+  it('asynchronous custom verification succeeded', async () => {
     const app = mount(<TestForm />);
     const event = { target: { value: 'joe-sky' } };
-    app.find('input').simulate('change', event);
+    await act(async () => {
+      app.find('input').simulate('change', event);
 
-    setTimeout(() => {
+      await sleep(200);
       app.update();
       expect(app.find('div.ant-form-item-explain').length).toEqual(0);
-      cb();
-    }, 200);
+    });
   });
 
   it('asynchronous custom verification failed', async () => {
     const app = mount(<TestForm />);
     const event = { target: { value: 'joe' } };
-    app.find('input').simulate('change', event);
+    await act(async () => {
+      app.find('input').simulate('change', event);
 
-    await new Promise(resolve => {
-      setTimeout(() => {
-        app.update();
-        expect(app.find('div.ant-form-item-explain').text()).toEqual('用户名已存在');
-        resolve();
-      }, 200);
+      await sleep(200);
+      app.update();
+      expect(app.find('div.ant-form-item-explain').text()).toEqual('用户名已存在');
     });
   });
 
-  it('custom verification succeeded', () => {
+  it('custom verification succeeded', async () => {
     const app = mount(<TestFormSync />);
     const event = { target: { value: 'joe-sky' } };
-    app.find('input').simulate('change', event);
+    await act(async () => {
+      app.find('input').simulate('change', event);
+    });
+
     app.update();
     expect(app.find('div.ant-form-item-explain').length).toEqual(0);
   });
 
-  it('custom verification failed', () => {
+  it('custom verification failed', async () => {
     const app = mount(<TestFormSync />);
     const event = { target: { value: 'joe' } };
-    app.find('input').simulate('change', event);
+    await act(async () => {
+      app.find('input').simulate('change', event);
+    });
+
     app.update();
     expect(app.find('div.ant-form-item-explain').text()).toEqual('用户名已存在');
   });

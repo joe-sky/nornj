@@ -5,7 +5,10 @@ registerComponent({
   'ant-Switch': {
     component: Switch,
     options: {
-      valuePropName: 'checked'
+      valuePropName: 'checked',
+      fieldDefaultRule: {
+        type: 'boolean'
+      }
     }
   }
 });

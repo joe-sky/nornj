@@ -1,17 +1,21 @@
 import schema, { RuleItem } from 'async-validator';
 import { IObservableObject } from 'mobx';
 
-export interface MobxFieldDataProps extends RuleItem {
+export interface MobxFieldRuleItem extends Omit<RuleItem, 'message'> {
+  message?: string | (() => string);
+}
+
+export interface MobxFieldDataProps extends MobxFieldRuleItem {
   name: string;
   label?: string;
   value?: any;
   trigger?: string;
-  rules?: RuleItem[];
+  rules?: MobxFieldRuleItem[];
   [key: string]: any;
 }
 
 export interface MobxFieldDataInstance extends MobxFieldDataProps {
-  setDefaultRule?(rule: RuleItem): void;
+  setDefaultRule?(rule: MobxFieldRuleItem): void;
   validatorSchema?: schema;
   reset?: Function;
   validateStatus?: string;
@@ -84,7 +88,7 @@ export interface MobxFormDataInstance {
   fieldDatas: Map<string, MobxFieldDataInstance & IObservableObject>;
   validate(name?: string | string[]): Promise<any>;
   error(name: string, help: string): void;
-  clear(name?: string | string[]): void;
+  clear(name?: string | string[], success?: boolean): void;
   reset(name?: string | string[]): void;
   add(fieldData: MobxFieldDataProps | JSX.Element): void;
   delete(name: string): void;

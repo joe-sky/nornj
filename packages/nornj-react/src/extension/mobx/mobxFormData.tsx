@@ -3,7 +3,13 @@ import nj, { registerExtension } from 'nornj';
 import { observable, runInAction, reaction, extendObservable, isComputedProp, observe } from 'mobx';
 import schema, { RuleItem } from 'async-validator';
 import extensionConfigs from '../../../mobx/formData/extensionConfig';
-import { MobxFormDataProps, MobxFormDataInstance, MobxFieldDataProps, MobxFieldDataInstance } from '../../interface';
+import {
+  MobxFormDataProps,
+  MobxFormDataInstance,
+  MobxFieldDataProps,
+  MobxFieldDataInstance,
+  MobxFieldRuleItem
+} from '../../interface';
 import moment from 'moment';
 
 type operateCallback = (name: string) => void;
@@ -20,7 +26,7 @@ const createFormData = (
     callbackMultiReturn?: operateCallbackMulti
   ): any;
   _validate(name: string): Promise<any>;
-  _clear(name: string): any;
+  _clear(name: string, success?: boolean): any;
   _reset(name: string): any;
 } => ({
   _njMobxFormData: true,
@@ -52,7 +58,7 @@ const createFormData = (
           this.error(name, errors?.[0]?.message);
           reject({ values: { [name]: value }, errors, fields });
         } else {
-          this.clear(name);
+          this.clear(name, true);
           resolve({ [name]: value });
         }
       });
@@ -81,14 +87,14 @@ const createFormData = (
     oFd.help = help;
   },
 
-  _clear(name) {
+  _clear(name, success) {
     const oFd = this.fieldDatas.get(name);
-    oFd.validateStatus = null;
+    oFd.validateStatus = success ? 'success' : null;
     oFd.help = null;
   },
 
-  clear(names) {
-    return this._operate(names, name => this._clear(name));
+  clear(names, success) {
+    return this._operate(names, name => this._clear(name, success));
   },
 
   _reset(name) {
@@ -125,7 +131,7 @@ const createFormData = (
     };
 
     fd.validatorSchema = new schema({
-      [name]: _rules.map(({ type = 'string', required = false, transform: _transform, ...others }) => ({
+      [name]: (_rules as RuleItem[]).map(({ type = 'string', required = false, transform: _transform, ...others }) => ({
         type,
         required,
         transform(_value) {
