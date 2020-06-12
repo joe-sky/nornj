@@ -61,6 +61,12 @@ toc: menu
 
 <code src="./demo/Demo11" />
 
+## 表单数据存储于上层组件或 Store 中
+
+`MobxFormData` 在组件外进行表单数据的传递或操作是非常容易的，它可以很方便地支持在上层组件或独立的 `Store` 内定义：
+
+<code src="./demo/Demo12" />
+
 ## 时间类控件
 
 时间类组件的 value 类型为 moment 对象，所以在提交服务器前需要预处理。

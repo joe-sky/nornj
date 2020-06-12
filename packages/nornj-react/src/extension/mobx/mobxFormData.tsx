@@ -188,7 +188,7 @@ const createFormData = (
 
     if (trigger === 'valueChange') {
       oFd._reactionDispose = reaction(
-        () => this[name],
+        () => (Array.isArray(this[name]) ? this[name].map(item => item) : this[name]),
         () => {
           if (!oFd._resetting) {
             this.validate(name).catch(nj.noop);
