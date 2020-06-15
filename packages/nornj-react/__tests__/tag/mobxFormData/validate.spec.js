@@ -69,7 +69,10 @@ describe('Validate', function() {
 
   it('Validate multiple fields', async () => {
     try {
-      const values = await formData.validate(['userName', 'worked']);
+      let values;
+      await act(async () => {
+        values = await formData.validate(['userName', 'worked']);
+      });
 
       expect(values).toEqual({ userName: 'joe_sky', worked: true });
     } catch (errorInfo) {
@@ -77,7 +80,10 @@ describe('Validate', function() {
     }
 
     try {
-      const values = await formData.validate(['userName', 'age']);
+      let values;
+      await act(async () => {
+        values = await formData.validate(['userName', 'age']);
+      });
 
       console.log(values);
     } catch (errorInfo) {
@@ -91,7 +97,11 @@ describe('Validate', function() {
     });
 
     try {
-      const values = await formData.validate();
+      let values;
+      await act(async () => {
+        values = await formData.validate();
+      });
+
       expect(values).toEqual({ userName: 'joe_sky', age: 28, worked: true });
     } catch (errorInfo) {
       console.log(errorInfo);
@@ -102,7 +112,11 @@ describe('Validate', function() {
     });
 
     try {
-      const values = await formData.validate();
+      let values;
+      await act(async () => {
+        values = await formData.validate();
+      });
+
       console.log(values);
     } catch (errorInfo) {
       expect(errorInfo.errors[0].field).toEqual('age');

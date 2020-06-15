@@ -1,5 +1,5 @@
 /*!
- * NornJ-React v5.2.0-rc.4
+ * NornJ-React v5.2.0-rc.5
  * (c) 2016-2020 Joe_Sky
  * Released under the MIT License.
  */
@@ -89,7 +89,7 @@ interface MobxFormDataInstance {
     fieldDatas: Map<string, MobxFieldDataInstance & IObservableObject>;
     validate(name?: string | string[]): Promise<any>;
     error(name: string, help: string): void;
-    clear(name?: string | string[]): void;
+    clear(name?: string | string[], success?: boolean): void;
     reset(name?: string | string[]): void;
     add(fieldData: MobxFieldDataProps | JSX.Element): void;
     delete(name: string): void;

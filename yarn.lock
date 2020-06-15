@@ -7929,14 +7929,6 @@ ecc-jsbn@~0.1.1:
     jsbn "~0.1.0"
     safer-buffer "^2.1.0"
 
-echarts-for-react@^2.0.15-beta.0:
-  version "2.0.15-beta.1"
-  resolved "https://registry.yarnpkg.com/echarts-for-react/-/echarts-for-react-2.0.15-beta.1.tgz#1afa21ee0f08f9023eff0b5ab3351f2fe0f708b6"
-  integrity sha512-wR8XaI3j/4JvTidZrrJVfP/RqSggLRlzKOwcruytyLSA6AyE51T7mK+EucfwZ0NkX8H6tPFCHCvgJH1LyXjiIg==
-  dependencies:
-    fast-deep-equal "^2.0.1"
-    size-sensor "^0.2.0"
-
 ee-first@1.1.1:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/ee-first/-/ee-first-1.1.1.tgz#590c61156b0ae2f4f0255732a158b266bc56b21d"
@@ -17087,11 +17079,6 @@ sisteransi@^1.0.3:
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/sisteransi/-/sisteransi-1.0.3.tgz#98168d62b79e3a5e758e27ae63c4a053d748f4eb"
   integrity sha512-SbEG75TzH8G7eVXFSN5f9EExILKfly7SUvVY5DhhYLvfhKqhDFY0OzevWa/zwak0RLRfWS5AvfMWpd9gJvr5Yg==
-
-size-sensor@^0.2.0:
-  version "0.2.5"
-  resolved "https://registry.yarnpkg.com/size-sensor/-/size-sensor-0.2.5.tgz#e8ffb7cc5258893472bfda4f5734d66583247757"
-  integrity sha512-Rip8d6LmCHIBUY5iIS3nKln1X4bF8260oFI4suo6MX+vOV/aNpNWYKTyjamSJMbxP17qMlR0DmGXFEio3BYJUg==
 
 slash2@^2.0.0:
   version "2.0.0"

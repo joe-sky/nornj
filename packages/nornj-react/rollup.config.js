@@ -20,14 +20,6 @@ if (type !== 'dts') {
       external.push('mobx', 'mobx-react');
       indexEntry = './mobx/base.js';
       break;
-    case 'Redux':
-      external.push('react-redux');
-      indexEntry = './redux/base.js';
-      break;
-    case 'Router':
-      external.push('react-router-dom');
-      indexEntry = './router/base.js';
-      break;
   }
   config = {
     input: indexEntry,
@@ -38,9 +30,7 @@ if (type !== 'dts') {
         react: 'React',
         'react-dom': 'ReactDOM',
         mobx: 'mobx',
-        'mobx-react': 'mobxReact',
-        'react-redux': 'ReactRedux',
-        'react-router-dom': 'ReactRouterDOM'
+        'mobx-react': 'mobxReact'
       }
     },
     external,
@@ -69,7 +59,7 @@ if (type !== 'dts') {
       }),
       resolve({
         customResolveOptions: {
-          moduleDirectory: ['src', 'mobx', 'redux', 'router']
+          moduleDirectory: ['src', 'mobx']
         },
         extensions: ['.js', '.jsx', '.ts', '.tsx']
       })
