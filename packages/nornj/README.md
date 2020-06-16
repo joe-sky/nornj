@@ -159,7 +159,7 @@ Next, add `nornj-in-jsx` to plugins in your babel configuration:
 }
 ```
 
-## Boilerplate projects
+<!-- ## Boilerplate projects
 
 * NornJ + React + Redux + React-Router + Webpack: [react-redux-nornj-todomvc](https://github.com/joe-sky/nornj/blob/master/examples/react-redux-nornj-todomvc)
 * NornJ + React + Redux + React-Router(no need webpack): [react-redux-nornj-todomvc-es5](https://github.com/joe-sky/nornj/blob/master/examples/react-redux-nornj-todomvc-es5)
@@ -174,7 +174,7 @@ Next, add `nornj-in-jsx` to plugins in your babel configuration:
 * [babel-plugin-nornj-in-jsx(Babel plugin provided by NornJ)](https://github.com/joe-sky/nornj/tree/master/packages/babel-plugin-nornj-in-jsx)
 * [babel-plugin-nornj-loader(nornj-loader's Babel plugin ver)](https://github.com/yuhongda/babel-plugin-nornj-loader)
 * [react-native transformer(nornj-loader's RN ver)](https://github.com/joe-sky/nornj/blob/master/tools/metroTransformer.js)
-* [express-nornj(NornJ's Express view engine)](https://github.com/joe-sky/nornj/blob/master/tools/expressEngine.js)
+* [express-nornj(NornJ's Express view engine)](https://github.com/joe-sky/nornj/blob/master/tools/expressEngine.js) -->
 <!--* [koa-nornj(NornJ's Koa middleware)](https://github.com/qingqinxl1/koa-nornj)-->
 
 ## Syntax highlight
@@ -182,9 +182,9 @@ Next, add `nornj-in-jsx` to plugins in your babel configuration:
 * [nornj-highlight(vscode)](https://github.com/joe-sky/nornj-highlight)
 <!--* [language-nornj(atom)](https://github.com/zyj1022/language-nornj)-->
 
-## Browser support
+<!-- ## Browser support
 
-* Supports all modern browsers and Internet Explorer 9+.
+* Supports all modern browsers and Internet Explorer 9+. -->
 
 ## License
 
