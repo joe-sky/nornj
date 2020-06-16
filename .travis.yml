@@ -5,7 +5,7 @@ install:
   - npm install -g yarn
   - yarn
 script:
-  - npm run ci && npm run ci:njx
+  - npm run ci
 branches:
   only:
   - master

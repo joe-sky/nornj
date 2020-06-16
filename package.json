@@ -28,8 +28,7 @@
     "test:njx": "lerna run --scope babel-plugin-nornj-in-jsx test",
     "cover": "jest --coverage --config=test/jest.config.js",
     "cover:njx": "lerna run --scope babel-plugin-nornj-in-jsx cover",
-    "ci": "yarn run build && yarn run cover && codecov test/coverage/coverage-final.json",
-    "ci:njx": "lerna run --scope babel-plugin-nornj-in-jsx ci",
+    "ci": "yarn run build && yarn run cover && yarn run cover:njx && codecov",
     "release": "lerna publish",
     "release:next": "lerna publish --dist-tag next",
     "deploy": "gh-pages -d dist"
@@ -75,7 +74,7 @@
     "@typescript-eslint/eslint-plugin": "^2.5.0",
     "@typescript-eslint/parser": "^2.5.0",
     "babel-jest": "^26.0.1",
-    "codecov": "^3.0.0",
+    "codecov": "^3.7.0",
     "commitlint": "^8.2.0",
     "create-react-class": "^15.6.3",
     "cross-env": "^5.1.0",
