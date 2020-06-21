@@ -1,9 +1,10 @@
 {
   "packages": [
-    "packages/babel-plugin-nornj-in-jsx",
     "packages/nornj",
+    "packages/nornj-react",
     "packages/nornj-loader",
-    "packages/nornj-react"
+    "packages/babel-plugin-nornj-in-jsx",
+    "packages/babel-preset-nornj-with-antd"
   ],
   "command": {
     "publish": {

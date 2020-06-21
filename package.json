@@ -5,7 +5,8 @@
     "packages/nornj",
     "packages/nornj-react",
     "packages/nornj-loader",
-    "packages/babel-plugin-nornj-in-jsx"
+    "packages/babel-plugin-nornj-in-jsx",
+    "packages/babel-preset-nornj-with-antd"
   ],
   "version": "5.2.0-rc.5",
   "description": "A powerful template engine that can works with React, JSX enhancement or alternative tools.",

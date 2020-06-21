@@ -1,0 +1,48 @@
+{
+  "name": "babel-preset-nornj-with-antd",
+  "version": "5.2.0-rc.4",
+  "description": "Make the NornJ template work gracefully in the JSX environment",
+  "author": {
+    "name": "Joe_Sky",
+    "email": "hitomi_doax@sina.com"
+  },
+  "main": "lib/index.js",
+  "files": [
+    "src/",
+    "lib/",
+    "LICENSE",
+    "README.md"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/joe-sky/nornj.git"
+  },
+  "bugs": {
+    "url": "https://github.com/joe-sky/nornj/issues"
+  },
+  "keywords": [
+    "react",
+    "jsx",
+    "nornj",
+    "if",
+    "else",
+    "for",
+    "each",
+    "loop",
+    "switch",
+    "babel"
+  ],
+  "license": "MIT",
+  "scripts": {
+    "build": "babel src --out-dir lib --extensions \".js,.jsx,.ts,.tsx\" --config-file \"../../.babelrc\""
+  },
+  "dependencies": {
+    "babel-plugin-import": "^1.13.0",
+    "babel-plugin-module-resolver": "^3.2.0",
+    "babel-plugin-nornj-in-jsx": "^5.2.0-rc.4",
+    "lodash.merge": "^4.6.2"
+  },
+  "devDependencies": {
+    "@types/lodash.merge": "^4.6.6"
+  }
+}
