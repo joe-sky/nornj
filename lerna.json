@@ -1,16 +1,16 @@
 {
   "packages": [
-    "packages/nornj",
-    "packages/nornj-react",
-    "packages/nornj-loader",
     "packages/babel-plugin-nornj-in-jsx",
-    "packages/babel-preset-nornj-with-antd"
+    "packages/babel-preset-nornj-with-antd",
+    "packages/nornj",
+    "packages/nornj-loader",
+    "packages/nornj-react"
   ],
   "command": {
     "publish": {
       "message": "chore(release): :bookmark: publish %s"
     }
   },
-  "version": "5.2.0-rc.4",
+  "version": "5.2.0-rc.5",
   "npmClient": "yarn"
 }
