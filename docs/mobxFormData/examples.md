@@ -39,12 +39,6 @@ toc: menu
 
 <code src="./demo/Demo5" />
 
-## 动态校验规则
-
-根据不同情况执行不同的校验规则。
-
-<code src="./demo/Demo6" />
-
 ## 复杂一点的控件
 
 这里演示`Form.Item`内有多个元素的使用方式。
@@ -72,6 +66,12 @@ toc: menu
 时间类组件的 value 类型为 moment 对象，所以在提交服务器前需要预处理。
 
 <code src="./demo/Demo9" />
+
+## 动态校验规则
+
+根据不同情况执行不同的校验规则。
+
+<code src="./demo/Demo6" />
 
 ## 校验其他组件
 

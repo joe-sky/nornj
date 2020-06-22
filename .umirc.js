@@ -4,44 +4,11 @@ export default {
   base: '/nornj/',
   publicPath: '/nornj/',
   exportStatic: {},
-  extraBabelPlugins: [
+  extraBabelPresets: [
     [
-      'module-resolver',
+      'nornj-with-antd',
       {
-        alias: {
-          '^antd$': 'nornj-react/antd'
-        },
-        extensions: ['.js', '.jsx', '.ts', '.tsx', '.es', '.es6', '.mjs']
-      }
-    ],
-    [
-      'import',
-      {
-        libraryName: 'antd',
-        libraryDirectory: 'es',
-        style: true
-      },
-      'antd'
-    ],
-    [
-      'import',
-      {
-        libraryName: 'nornj-react/antd',
-        style: true
-      },
-      'nornj-react/antd'
-    ],
-    [
-      'nornj-in-jsx',
-      {
-        imports: ['nornj-react/antd'],
         extensionConfig: {
-          switch: {
-            needPrefix: 'onlyUpperCase'
-          },
-          empty: {
-            needPrefix: 'onlyUpperCase'
-          },
           tooltip: {
             needPrefix: 'onlyUpperCase'
           }

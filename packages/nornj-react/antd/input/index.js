@@ -21,7 +21,12 @@ registerComponent({
       hasEventObject: true
     }
   },
-  'ant-Search': Input.Search
+  'ant-Search': {
+    component: Input.Search,
+    options: {
+      hasEventObject: true
+    }
+  }
 });
 
 export default Input;
