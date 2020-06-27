@@ -6,13 +6,13 @@ const { Option } = Select;
 
 export default props => {
   const { formData } = useLocalStore(() => (
-    <MobxFormData>
-      <MobxFieldData name="username" required message="Username is required" />
-      <MobxFieldData name="province" required message="Province is required" />
-      <MobxFieldData name="street" required message="Street is required" />
-      <MobxFieldData name="year" required />
-      <MobxFieldData name="month" required />
-    </MobxFormData>
+    <mobxFormData>
+      <mobxFieldData name="username" required message="Username is required" />
+      <mobxFieldData name="province" required message="Province is required" />
+      <mobxFieldData name="street" required message="Street is required" />
+      <mobxFieldData name="year" required />
+      <mobxFieldData name="month" required />
+    </mobxFormData>
   ));
 
   const onSubmit = (e: React.MouseEvent<HTMLElement, MouseEvent>) =>
@@ -26,8 +26,8 @@ export default props => {
       });
 
   return (
-    <Form labelCol={{ span: 8 }} wrapperCol={{ span: 16 }} n-style="max-width:600">
-      <Form.Item n-mobxField={formData.username} label="Username">
+    <Form labelCol={{ span: 8 }} wrapperCol={{ span: 16 }} style={{ maxWidth: 600 }}>
+      <Form.Item mobxField={formData.username} label="Username">
         <Input style={{ width: 160 }} placeholder="Please input" />
         <Tooltip title="Useful information">
           <a href="#API" style={{ margin: '0 8px' }}>
@@ -36,22 +36,22 @@ export default props => {
         </Tooltip>
       </Form.Item>
 
-      <Form.Item label="Address" n-mobxField={`formData[['province', 'street']]`}>
+      <Form.Item label="Address" mobxField={`formData[['province', 'street']]`}>
         <Input.Group compact>
-          <Select placeholder="Select province" n-mobxBind={formData.province}>
+          <Select placeholder="Select province" mobxBind={formData.province}>
             <Option value="Zhejiang">Zhejiang</Option>
             <Option value="Jiangsu">Jiangsu</Option>
           </Select>
-          <Input style={{ width: '50%' }} placeholder="Input street" n-mobxBind={formData.street} />
+          <Input style={{ width: '50%' }} placeholder="Input street" mobxBind={formData.street} />
         </Input.Group>
       </Form.Item>
 
       <Form.Item label="BirthDate" style={{ marginBottom: 0 }} required>
-        <Form.Item n-mobxField={formData.year} style={{ display: 'inline-block', width: 'calc(50% - 8px)' }}>
+        <Form.Item mobxField={formData.year} style={{ display: 'inline-block', width: 'calc(50% - 8px)' }}>
           <Input placeholder="Input birth year" />
         </Form.Item>
         <Form.Item
-          n-mobxField={formData.month}
+          mobxField={formData.month}
           style={{ display: 'inline-block', width: 'calc(50% - 8px)', margin: '0 8px' }}>
           <Input placeholder="Input birth month" />
         </Form.Item>

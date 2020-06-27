@@ -1,7 +1,7 @@
 import nj from '../core';
 import * as tools from '../utils/tools';
 import * as tranData from '../transforms/transformData';
-import { ExtensionDelegate, ExtensionDelegateMultiParams, SwitchPrefixConfig, ExtensionOption } from '../interface';
+import { ExtensionDelegate, ExtensionDelegateMultiParams, ExtensionPrefixConfig, ExtensionOption } from '../interface';
 
 //Global extension list
 export const extensions: { [name: string]: ExtensionDelegate | ExtensionDelegateMultiParams } = {
@@ -292,7 +292,7 @@ const _defaultCfgExpInProps = _config(_defaultCfg, { useExpressionInProps: true 
 export const extensionConfig: { [name: string]: ExtensionOption } = {
   if: _config(_defaultCfgExpInProps),
   else: _config(_defaultCfgExpInProps, { isSubTag: true, hasTagProps: true }),
-  switch: _config(_defaultCfgExpInProps, { needPrefix: SwitchPrefixConfig.OnlyLowerCase }),
+  switch: _config(_defaultCfgExpInProps, { needPrefix: ExtensionPrefixConfig.OnlyLowerCase }),
   each: _config(_defaultCfgExpInProps, {
     newContext: {
       item: 'item',

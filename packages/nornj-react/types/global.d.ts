@@ -21,12 +21,12 @@ type JSXElementWithMobxFormData = NornJReact.JSXElementWithMobxFormData;
 declare namespace JSX {
   interface Element extends React.ReactElement<any, any>, JSXElementWithMobxFormData {}
 
-  namespace NornJReact {
-    interface Childrenable {
-      children?: NornJ.Children | NornJ.Children[];
-    }
+  namespace NJR {
+    interface MobxObserver extends NJ.Childrenable {}
 
-    interface MobxObserver extends Childrenable {}
+    type MobxFormData = NornJReact.MobxFormDataProps & NJ.Childrenable;
+
+    type MobxFieldData = NornJReact.MobxFieldDataProps & NJ.Childrenable;
   }
 
   interface IntrinsicElements {
@@ -35,23 +35,41 @@ declare namespace JSX {
      *
      * `<mobxObserver><div>{store.foo}</div></mobxObserver>`
      */
-    mobxObserver: NornJReact.MobxObserver;
+    mobxObserver: NJR.MobxObserver;
 
     /**
      * NornJ tag `mobxObserver` is the same as the Observer component of Mobx(https://mobx-react.js.org/observer-component), but its children does not need a nested function. example:
      *
      * `<n-mobxObserver><div>{store.foo}</div></n-mobxObserver>`
      */
-    'n-mobxObserver': NornJReact.MobxObserver;
+    'n-mobxObserver': NJR.MobxObserver;
+
+    mobxFormData: NJR.MobxFormData;
+
+    mobxFieldData: NJR.MobxFieldData;
   }
 
   interface IntrinsicAttributes {
+    /**
+     * NornJ directive `mobxBind`, example:
+     *
+     * `<input mobxBind={this.inputValue} />`
+     */
+    mobxBind?: any;
+
     /**
      * NornJ directive `n-mobxBind`, example:
      *
      * `<input n-mobxBind={this.inputValue} />`
      */
     ['n-mobxBind']?: any;
+
+    /**
+     * NornJ directive `mobxField`, example:
+     *
+     * `<input mobxField={this.inputValue} />`
+     */
+    mobxField?: any;
 
     /**
      * NornJ directive `n-mobxField`, example:

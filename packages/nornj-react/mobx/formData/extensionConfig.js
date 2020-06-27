@@ -10,7 +10,8 @@ module.exports = {
     {
       isDirective: true,
       isBindable: true,
-      useExpressionInProps: true
+      useExpressionInProps: true,
+      needPrefix: 'free'
     },
     formDataConfig
   )

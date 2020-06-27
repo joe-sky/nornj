@@ -38,8 +38,8 @@ const PriceInput: React.FC<PriceInputProps> = ({ value = {}, onChange }) => {
 
   return useObserver(() => (
     <span>
-      <Input n-mobxBind={state.number} onChange={triggerChange} style={{ width: 100 }} />
-      <Select n-mobxBind={state.currency} style={{ width: 80, margin: '0 8px' }} onChange={triggerChange}>
+      <Input mobxBind={state.number} onChange={triggerChange} style={{ width: 100 }} />
+      <Select mobxBind={state.currency} style={{ width: 80, margin: '0 8px' }} onChange={triggerChange}>
         <Option value="rmb">RMB</Option>
         <Option value="dollar">Dollar</Option>
       </Select>
@@ -56,8 +56,8 @@ export default props => {
   };
 
   const { formData } = useLocalStore(() => (
-    <MobxFormData>
-      <MobxFieldData
+    <mobxFormData>
+      <mobxFieldData
         name="price"
         value={{
           number: 0,
@@ -66,7 +66,7 @@ export default props => {
         type="object"
         validator={checkPrice}
       />
-    </MobxFormData>
+    </mobxFormData>
   ));
 
   const onSubmit = () =>
@@ -81,7 +81,7 @@ export default props => {
 
   return useObserver(() => (
     <Form layout="inline">
-      <Form.Item label="Price" n-mobxField={formData.price}>
+      <Form.Item label="Price" mobxField={formData.price}>
         <PriceInput />
       </Form.Item>
       <Form.Item>

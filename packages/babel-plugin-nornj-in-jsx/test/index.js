@@ -1,4 +1,4 @@
-const njInJsx = require('../src/index');
+const nornjInJsx = require('../src/index');
 const styledJsx = require('styled-jsx/babel').default;
 const objectRestSpread = require('@babel/plugin-proposal-object-rest-spread').default;
 
@@ -7,7 +7,7 @@ require('@babel/register')({
   plugins: [
     styledJsx,
     [
-      njInJsx,
+      nornjInJsx,
       {
         // delimiters: {
         //   start: '{',

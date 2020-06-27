@@ -28,17 +28,17 @@ const rangeConfig: Rules = {
 
 const TimeRelatedForm = () => {
   const { formData } = useLocalStore(() => (
-    <MobxFormData>
-      <MobxFieldData name="date-picker" {...config} />
-      <MobxFieldData name="date-time-picker" {...config} />
-      <MobxFieldData name="year-picker" {...config} />
-      <MobxFieldData name="quarter-picker" {...config} />
-      <MobxFieldData name="month-picker" {...config} />
-      <MobxFieldData name="week-picker" {...config} />
-      <MobxFieldData name="range-picker" {...rangeConfig} />
-      <MobxFieldData name="range-time-picker" {...rangeConfig} />
-      <MobxFieldData name="time-picker" {...config} />
-    </MobxFormData>
+    <mobxFormData>
+      <mobxFieldData name="date-picker" {...config} />
+      <mobxFieldData name="date-time-picker" {...config} />
+      <mobxFieldData name="year-picker" {...config} />
+      <mobxFieldData name="quarter-picker" {...config} />
+      <mobxFieldData name="month-picker" {...config} />
+      <mobxFieldData name="week-picker" {...config} />
+      <mobxFieldData name="range-picker" {...rangeConfig} />
+      <mobxFieldData name="range-time-picker" {...rangeConfig} />
+      <mobxFieldData name="time-picker" {...config} />
+    </mobxFormData>
   ));
 
   const onSubmit = () =>
@@ -68,31 +68,31 @@ const TimeRelatedForm = () => {
 
   return (
     <Form {...formItemLayout}>
-      <Form.Item label="DatePicker" n-mobxField={`formData['date-picker']`}>
+      <Form.Item label="DatePicker" mobxField={`formData['date-picker']`}>
         <DatePicker />
       </Form.Item>
-      <Form.Item label="DatePicker[showTime]" n-mobxField={`formData['date-time-picker']`}>
+      <Form.Item label="DatePicker[showTime]" mobxField={`formData['date-time-picker']`}>
         <DatePicker showTime format="YYYY-MM-DD HH:mm:ss" />
       </Form.Item>
-      <Form.Item label="YearPicker" n-mobxField={`formData['year-picker']`}>
+      <Form.Item label="YearPicker" mobxField={`formData['year-picker']`}>
         <YearPicker />
       </Form.Item>
-      <Form.Item label="QuarterPicker" n-mobxField={`formData['quarter-picker']`}>
+      <Form.Item label="QuarterPicker" mobxField={`formData['quarter-picker']`}>
         <DatePicker picker="quarter" />
       </Form.Item>
-      <Form.Item label="MonthPicker" n-mobxField={`formData['month-picker']`}>
+      <Form.Item label="MonthPicker" mobxField={`formData['month-picker']`}>
         <MonthPicker />
       </Form.Item>
-      <Form.Item label="WeekPicker" n-mobxField={`formData['week-picker']`}>
+      <Form.Item label="WeekPicker" mobxField={`formData['week-picker']`}>
         <WeekPicker />
       </Form.Item>
-      <Form.Item label="RangePicker" n-mobxField={`formData['range-picker']`}>
+      <Form.Item label="RangePicker" mobxField={`formData['range-picker']`}>
         <RangePicker />
       </Form.Item>
-      <Form.Item label="RangePicker[showTime]" n-mobxField={`formData['range-time-picker']`}>
+      <Form.Item label="RangePicker[showTime]" mobxField={`formData['range-time-picker']`}>
         <RangePicker showTime format="YYYY-MM-DD HH:mm:ss" />
       </Form.Item>
-      <Form.Item label="TimePicker" n-mobxField={`formData['time-picker']`}>
+      <Form.Item label="TimePicker" mobxField={`formData['time-picker']`}>
         <TimePicker />
       </Form.Item>
       <Form.Item

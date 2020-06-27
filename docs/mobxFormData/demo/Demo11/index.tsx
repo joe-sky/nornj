@@ -27,10 +27,10 @@ interface User {
 
 const ModalForm: React.FC<ModalFormProps> = ({ visible, setVisible, onCancel, formDataList }) => {
   const { formData } = useLocalStore(() => (
-    <MobxFormData>
-      <MobxFieldData name="name" required />
-      <MobxFieldData name="age" required />
-    </MobxFormData>
+    <mobxFormData>
+      <mobxFieldData name="name" required />
+      <mobxFieldData name="age" required />
+    </mobxFormData>
   ));
 
   const onOk = () =>
@@ -50,10 +50,10 @@ const ModalForm: React.FC<ModalFormProps> = ({ visible, setVisible, onCancel, fo
   return (
     <Modal title="Basic Drawer" visible={visible} onOk={onOk} onCancel={onCancel}>
       <Form layout="vertical">
-        <Form.Item label="User Name" n-mobxField={formData.name}>
+        <Form.Item label="User Name" mobxField={formData.name}>
           <Input />
         </Form.Item>
-        <Form.Item label="User Age" n-mobxField={formData.age}>
+        <Form.Item label="User Age" mobxField={formData.age}>
           <InputNumber />
         </Form.Item>
       </Form>
@@ -73,10 +73,10 @@ export default props => {
   };
 
   const { formData } = useLocalStore(() => (
-    <MobxFormData>
-      <MobxFieldData name="group" required />
-      <MobxFieldData name="users" value={[]} type="array" required />
-    </MobxFormData>
+    <mobxFormData>
+      <mobxFieldData name="group" required />
+      <mobxFieldData name="users" value={[]} type="array" required />
+    </mobxFormData>
   ));
 
   const onSubmit = () =>
@@ -93,11 +93,11 @@ export default props => {
 
   return (
     <div id="components-form-demo-form-context">
-      <Form {...layout} n-style="max-width:600">
-        <Form.Item label="Group Name" n-mobxField={formData.group}>
+      <Form {...layout} style={{ maxWidth: 600 }}>
+        <Form.Item label="Group Name" mobxField={formData.group}>
           <Input />
         </Form.Item>
-        <Form.Item label="User List" n-mobxField-noBind={formData.users}>
+        <Form.Item label="User List" mobxField-noBind={formData.users}>
           <each of={formData.users} item="user">
             <empty>
               <Typography.Text className="ant-form-text" type="secondary">

@@ -1,6 +1,6 @@
 /*!
- * NornJ template engine v5.2.0-rc.5
- * (c) 2016-2020 Joe_Sky
+ * NornJ template engine v5.2.0-rc.6
+ * (c) Joe_Sky
  * Released under the MIT License.
  */
 declare function escape(str: any): any;
@@ -186,9 +186,10 @@ interface ExtensionDelegate {
 }
 interface ExtensionDelegateMultiParams extends FilterDelegate {
 }
-declare enum SwitchPrefixConfig {
+declare enum ExtensionPrefixConfig {
     OnlyLowerCase = "onlyLowerCase",
-    OnlyUpperCase = "onlyUpperCase"
+    OnlyUpperCase = "onlyUpperCase",
+    Free = "free"
 }
 interface ExtensionOption {
     onlyGlobal?: boolean;
@@ -203,7 +204,7 @@ interface ExtensionOption {
     hasTagProps?: boolean;
     hasTmplCtx?: boolean;
     hasOutputH?: boolean;
-    needPrefix?: boolean | SwitchPrefixConfig;
+    needPrefix?: boolean | ExtensionPrefixConfig;
     [key: string]: any;
 }
 interface ConfigOption {
@@ -328,4 +329,4 @@ declare function expression(strs: TemplateStringsArray, ...args: any[]): any;
 declare function css(strs: TemplateStringsArray, ...args: any[]): any;
 
 export default nj;
-export { Component, ComponentOption, ComponentOptionFunc, ComponentProps, ConfigOption, ElementType, Export, ExtensionDelegate, ExtensionDelegateMultiParams, ExtensionDelegateOption, ExtensionOption, FilterDelegate, FilterDelegateOption, FilterOption, SwitchPrefixConfig, Template, compile, compileH, css, expression, taggedTmplH as html, taggedTmpl as htmlString, registerComponent, registerExtension, registerFilter, render, renderH, taggedTmpl, taggedTmplH, template };
+export { Component, ComponentOption, ComponentOptionFunc, ComponentProps, ConfigOption, ElementType, Export, ExtensionDelegate, ExtensionDelegateMultiParams, ExtensionDelegateOption, ExtensionOption, ExtensionPrefixConfig, FilterDelegate, FilterDelegateOption, FilterOption, Template, compile, compileH, css, expression, taggedTmplH as html, taggedTmpl as htmlString, registerComponent, registerExtension, registerFilter, render, renderH, taggedTmpl, taggedTmplH, template };

@@ -12,20 +12,20 @@ const formItemLayout = {
 
 export default props => {
   const { formData } = useLocalStore(() => (
-    <MobxFormData>
-      <MobxFieldData name="select" required message="Please select your country!" />
-      <MobxFieldData name="select-multiple" required message="Please select your favourite colors!" />
-      <MobxFieldData name="input-number" value={3} required message="Please enter numbers 1 to 10!" />
-      <MobxFieldData name="switch" />
-      <MobxFieldData name="slider" value={20} />
-      <MobxFieldData name="slider-range" value={[20, 40]} />
-      <MobxFieldData name="radio-group" required />
-      <MobxFieldData name="radio-button" required />
-      <MobxFieldData name="checkbox-group" value={['A', 'B']} required />
-      <MobxFieldData name="rate" value={3.5} max={4} required message="Please select rates 1 to 4!" />
-      <MobxFieldData name="upload" required />
-      <MobxFieldData name="dragger" required />
-    </MobxFormData>
+    <mobxFormData>
+      <mobxFieldData name="select" required message="Please select your country!" />
+      <mobxFieldData name="select-multiple" required message="Please select your favourite colors!" />
+      <mobxFieldData name="input-number" value={3} required message="Please enter numbers 1 to 10!" />
+      <mobxFieldData name="switch" />
+      <mobxFieldData name="slider" value={20} />
+      <mobxFieldData name="slider-range" value={[20, 40]} />
+      <mobxFieldData name="radio-group" required />
+      <mobxFieldData name="radio-button" required />
+      <mobxFieldData name="checkbox-group" value={['A', 'B']} required />
+      <mobxFieldData name="rate" value={3.5} max={4} required message="Please select rates 1 to 4!" />
+      <mobxFieldData name="upload" required />
+      <mobxFieldData name="dragger" required />
+    </mobxFormData>
   ));
 
   const onSubmit = () =>
@@ -39,18 +39,18 @@ export default props => {
       });
 
   return (
-    <Form {...formItemLayout} n-style="max-width:600">
+    <Form {...formItemLayout} style={{ maxWidth: 600 }}>
       <Form.Item label="Plain Text">
         <span className="ant-form-text">China</span>
       </Form.Item>
-      <Form.Item label="Select" hasFeedback n-mobxField={formData.select}>
+      <Form.Item label="Select" hasFeedback mobxField={formData.select}>
         <Select placeholder="Please select a country">
           <Option value="china">China</Option>
           <Option value="usa">U.S.A</Option>
         </Select>
       </Form.Item>
 
-      <Form.Item label="Select[multiple]" n-mobxField={`formData['select-multiple']`}>
+      <Form.Item label="Select[multiple]" mobxField={`formData['select-multiple']`}>
         <Select mode="multiple" placeholder="Please select favourite colors">
           <Option value="red">Red</Option>
           <Option value="green">Green</Option>
@@ -58,16 +58,16 @@ export default props => {
         </Select>
       </Form.Item>
 
-      <Form.Item label="InputNumber" n-mobxField={`formData['input-number']`}>
+      <Form.Item label="InputNumber" mobxField={`formData['input-number']`}>
         <InputNumber min={1} max={10} />
         <span className="ant-form-text"> machines</span>
       </Form.Item>
 
-      <Form.Item label="Switch" n-mobxField={formData.switch}>
+      <Form.Item label="Switch" mobxField={formData.switch}>
         <Switch />
       </Form.Item>
 
-      <Form.Item label="Slider" n-mobxField={formData.slider}>
+      <Form.Item label="Slider" mobxField={formData.slider}>
         <Slider
           marks={{
             0: 'A',
@@ -80,7 +80,7 @@ export default props => {
         />
       </Form.Item>
 
-      <Form.Item label="Slider[range]" n-mobxField={`formData['slider-range']`}>
+      <Form.Item label="Slider[range]" mobxField={`formData['slider-range']`}>
         <Slider
           marks={{
             0: 'A',
@@ -94,7 +94,7 @@ export default props => {
         />
       </Form.Item>
 
-      <Form.Item label="Radio.Group" n-mobxField={`formData['radio-group']`}>
+      <Form.Item label="Radio.Group" mobxField={`formData['radio-group']`}>
         <Radio.Group>
           <Radio value="a">item 1</Radio>
           <Radio value="b">item 2</Radio>
@@ -102,7 +102,7 @@ export default props => {
         </Radio.Group>
       </Form.Item>
 
-      <Form.Item label="Radio.Button" n-mobxField={`formData['radio-button']`}>
+      <Form.Item label="Radio.Button" mobxField={`formData['radio-button']`}>
         <Radio.Group>
           <Radio.Button value="a">item 1</Radio.Button>
           <Radio.Button value="b">item 2</Radio.Button>
@@ -110,7 +110,7 @@ export default props => {
         </Radio.Group>
       </Form.Item>
 
-      <Form.Item label="Checkbox.Group" n-mobxField={`formData['checkbox-group']`}>
+      <Form.Item label="Checkbox.Group" mobxField={`formData['checkbox-group']`}>
         <Checkbox.Group>
           <Row>
             <Col span={8}>
@@ -147,11 +147,11 @@ export default props => {
         </Checkbox.Group>
       </Form.Item>
 
-      <Form.Item label="Rate" n-mobxField={formData.rate}>
+      <Form.Item label="Rate" mobxField={formData.rate}>
         <Rate />
       </Form.Item>
 
-      <Form.Item label="Upload" n-mobxField={formData.upload} extra="longgggggggggggggggggggggggggggggggggg">
+      <Form.Item label="Upload" mobxField={formData.upload} extra="longgggggggggggggggggggggggggggggggggg">
         <Upload name="logo" action="/upload.do" listType="picture">
           <Button>
             <UploadOutlined /> Click to upload
@@ -159,7 +159,7 @@ export default props => {
         </Upload>
       </Form.Item>
 
-      <Form.Item label="Dragger" n-mobxField={formData.dragger}>
+      <Form.Item label="Dragger" mobxField={formData.dragger}>
         <Upload.Dragger name="files" action="/upload.do">
           <p className="ant-upload-drag-icon">
             <InboxOutlined />

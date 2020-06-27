@@ -14,11 +14,11 @@ const tailLayout = {
 
 export default props => {
   const { formData } = useLocalStore(() => (
-    <MobxFormData>
-      <MobxFieldData name="note" required />
-      <MobxFieldData name="gender" required />
-      <MobxFieldData name="customizeGender" required />
-    </MobxFormData>
+    <mobxFormData>
+      <mobxFieldData name="note" required />
+      <mobxFieldData name="gender" required />
+      <mobxFieldData name="customizeGender" required />
+    </mobxFormData>
   ));
 
   const onGenderChange = value => {
@@ -55,12 +55,12 @@ export default props => {
   };
 
   return useObserver(() => (
-    <Form {...layout} n-style="max-width:600">
-      <Form.Item n-mobxField={formData.note} label="Note">
+    <Form {...layout} style={{ maxWidth: 600 }}>
+      <Form.Item mobxField={formData.note} label="Note">
         <Input />
       </Form.Item>
 
-      <Form.Item n-mobxField={formData.gender} label="Gender">
+      <Form.Item mobxField={formData.gender} label="Gender">
         <Select placeholder="Select a option and change input text above" onChange={onGenderChange} allowClear>
           <Option value="male">male</Option>
           <Option value="female">female</Option>
@@ -69,13 +69,13 @@ export default props => {
       </Form.Item>
 
       <if condition={formData.gender === 'other'}>
-        <Form.Item n-mobxField={formData.customizeGender} label="Customize Gender">
+        <Form.Item mobxField={formData.customizeGender} label="Customize Gender">
           <Input />
         </Form.Item>
       </if>
 
       <Form.Item {...tailLayout}>
-        <Button type="primary" onClick={onSubmit} n-style="margin-right:8">
+        <Button type="primary" onClick={onSubmit} style={{ marginRight: 8 }}>
           Submit
         </Button>
         <Button htmlType="button" onClick={onReset}>

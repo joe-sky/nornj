@@ -12,11 +12,11 @@ const tailLayout = {
 
 export default props => {
   const { formData } = useLocalStore(() => (
-    <MobxFormData>
-      <MobxFieldData name="userName" required message="Please input your username!" />
-      <MobxFieldData name="password" required message="Please input your password!" />
-      <MobxFieldData name="remember" />
-    </MobxFormData>
+    <mobxFormData>
+      <mobxFieldData name="userName" required message="Please input your username!" />
+      <mobxFieldData name="password" required message="Please input your password!" />
+      <mobxFieldData name="remember" />
+    </mobxFormData>
   ));
 
   const onSubmit = (e: React.MouseEvent<HTMLElement, MouseEvent>) =>
@@ -30,16 +30,16 @@ export default props => {
       });
 
   return (
-    <Form {...layout} n-style="max-width:600">
-      <Form.Item n-mobxField={formData.userName} label="Username">
+    <Form {...layout} style={{ maxWidth: 600 }}>
+      <Form.Item mobxField={formData.userName} label="Username">
         <Input />
       </Form.Item>
 
-      <Form.Item n-mobxField={formData.password} label="Password">
+      <Form.Item mobxField={formData.password} label="Password">
         <Input.Password />
       </Form.Item>
 
-      <Form.Item {...tailLayout} n-mobxField={formData.remember}>
+      <Form.Item {...tailLayout} mobxField={formData.remember}>
         <Checkbox>Remember me</Checkbox>
       </Form.Item>
 

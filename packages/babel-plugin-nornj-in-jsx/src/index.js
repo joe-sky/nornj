@@ -43,17 +43,22 @@ module.exports = function(babel) {
 
         const directives = astUtil.hasDirective(path.node);
         if (directives && directives.length) {
-          const mobxField = directives.find(directive => directive.startsWith('n-mobxField'));
+          const mobxField = directives.find(
+            directive => directive.startsWith('n-mobxField') || directive.startsWith('mobxField')
+          );
           if (mobxField && !state.mobxFieldNodes.has(path.node)) {
             if (!mobxField.includes('-noBind') && !astUtil.hasMobxBind(path)) {
               const children = astUtil.getChildren(types, path.node);
-              const directiveParam = mobxField.split('n-mobxField')[1];
+              const directiveParam = mobxField.split(
+                mobxField.includes('n-mobxField') ? 'n-mobxField' : 'mobxField'
+              )[1];
 
               children[0].openingElement.attributes.push(
                 types.jsxAttribute(
                   types.jsxIdentifier(`n-mobxBind${directiveParam}`),
                   path.node.openingElement.attributes.find(
-                    node => node.name && node.name.name.startsWith('n-mobxField')
+                    node =>
+                      node.name && (node.name.name.startsWith('n-mobxField') || node.name.name.startsWith('mobxField'))
                   ).value
                 )
               );
@@ -73,7 +78,12 @@ module.exports = function(babel) {
           state.hasNjInJSX = true;
 
           const hasMobx = directives.reduce(
-            (result, directive) => result || directive.startsWith('n-mobxBind') || directive.startsWith('n-mstBind'),
+            (result, directive) =>
+              result ||
+              directive.startsWith('n-mobxBind') ||
+              directive.startsWith('mobxBind') ||
+              directive.startsWith('n-mstBind') ||
+              directive.startsWith('mstBind'),
             false
           );
           hasMobx &&
@@ -84,7 +94,7 @@ module.exports = function(babel) {
           }
 
           const hasMobxFormData = directives.reduce(
-            (result, directive) => result || directive.startsWith('n-mobxField'),
+            (result, directive) => result || directive.startsWith('n-mobxField') || directive.startsWith('mobxField'),
             false
           );
           hasMobxFormData &&

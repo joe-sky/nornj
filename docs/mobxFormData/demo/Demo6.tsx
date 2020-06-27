@@ -17,10 +17,10 @@ const Demo = props => {
   }));
 
   const { formData } = useLocalStore(() => (
-    <MobxFormData>
-      <MobxFieldData name="name" required message="Please input your name" />
-      <MobxFieldData name="nickname" message="Please input your nickname" />
-    </MobxFormData>
+    <mobxFormData>
+      <mobxFieldData name="name" required message="Please input your name" />
+      <mobxFieldData name="nickname" message="Please input your nickname" />
+    </mobxFormData>
   ));
 
   const onCheck = (e: React.MouseEvent<HTMLElement, MouseEvent>) =>
@@ -39,17 +39,17 @@ const Demo = props => {
   };
 
   return (
-    <Form {...layout} n-style="max-width:600">
-      <Form.Item n-mobxField={formData.name} label="Name">
+    <Form {...layout} style={{ maxWidth: 600 }}>
+      <Form.Item mobxField={formData.name} label="Name">
         <Input placeholder="Please input your name" />
       </Form.Item>
 
-      <Form.Item n-mobxField={formData.nickname} label="Nickname">
+      <Form.Item mobxField={formData.nickname} label="Nickname">
         <Input placeholder="Please input your nickname" />
       </Form.Item>
 
       <Form.Item {...tailLayout}>
-        <Checkbox n-mobxBind={state.checkNick} onChange={onCheckNickChange}>
+        <Checkbox mobxBind={state.checkNick} onChange={onCheckNickChange}>
           Nickname is required
         </Checkbox>
       </Form.Item>

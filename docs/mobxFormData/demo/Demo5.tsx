@@ -21,13 +21,13 @@ const validateMessages: ValidateMessages = fieldData => ({
 
 export default props => {
   const { formData } = useLocalStore(() => (
-    <MobxFormData validateMessages={validateMessages}>
-      <MobxFieldData name="name" required />
-      <MobxFieldData name="email" type="email" />
-      <MobxFieldData name="age" type="number" min={0} max={99} />
-      <MobxFieldData name="website" />
-      <MobxFieldData name="introduction" />
-    </MobxFormData>
+    <mobxFormData validateMessages={validateMessages}>
+      <mobxFieldData name="name" required />
+      <mobxFieldData name="email" type="email" />
+      <mobxFieldData name="age" type="number" min={0} max={99} />
+      <mobxFieldData name="website" />
+      <mobxFieldData name="introduction" />
+    </mobxFormData>
   ));
 
   const onSubmit = () =>
@@ -41,24 +41,24 @@ export default props => {
       });
 
   return useObserver(() => (
-    <Form {...layout} n-style="max-width:600">
-      <Form.Item n-mobxField={formData.name} label="Name">
+    <Form {...layout} style={{ maxWidth: 600 }}>
+      <Form.Item mobxField={formData.name} label="Name">
         <Input />
       </Form.Item>
 
-      <Form.Item n-mobxField={formData.email} label="Email">
+      <Form.Item mobxField={formData.email} label="Email">
         <Input />
       </Form.Item>
 
-      <Form.Item n-mobxField={formData.age} label="Age">
+      <Form.Item mobxField={formData.age} label="Age">
         <InputNumber />
       </Form.Item>
 
-      <Form.Item n-mobxField={formData.website} label="Website">
+      <Form.Item mobxField={formData.website} label="Website">
         <Input />
       </Form.Item>
 
-      <Form.Item n-mobxField={formData.introduction} label="Introduction">
+      <Form.Item mobxField={formData.introduction} label="Introduction">
         <Input.TextArea />
       </Form.Item>
 

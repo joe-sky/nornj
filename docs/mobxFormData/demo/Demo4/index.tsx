@@ -24,7 +24,7 @@ const formItemLayoutWithOutLabel = {
 let count = 0;
 
 export default () => {
-  const { formData } = useLocalStore(() => <MobxFormData />);
+  const { formData } = useLocalStore(() => <mobxFormData />);
 
   const onSubmit = () =>
     formData
@@ -48,7 +48,7 @@ export default () => {
         <each of={formData.fieldDatas} $key="fieldName">
           <Form.Item
             {...(index === 0 ? formItemLayout : formItemLayoutWithOutLabel)}
-            n-mobxField={`formData[fieldName]`}
+            mobxField={`formData[fieldName]`}
             label={index === 0 ? 'Passengers' : ''}
             required={false}
             key={fieldName}>
@@ -67,7 +67,7 @@ export default () => {
             type="dashed"
             onClick={() => {
               formData.add(
-                <MobxFieldData
+                <mobxFieldData
                   name={`input_${count}`}
                   required
                   whitespace
@@ -84,7 +84,7 @@ export default () => {
       </div>
 
       <Form.Item>
-        <Button type="primary" onClick={onSubmit} n-style="margin-right:8">
+        <Button type="primary" onClick={onSubmit} style={{ marginRight: 8 }}>
           Submit
         </Button>
         <Button onClick={onReset}>Reset</Button>

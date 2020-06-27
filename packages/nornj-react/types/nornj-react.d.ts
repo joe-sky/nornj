@@ -1,6 +1,6 @@
 /*!
- * NornJ-React v5.2.0-rc.5
- * (c) 2016-2020 Joe_Sky
+ * NornJ-React v5.2.0-rc.6
+ * (c) Joe_Sky
  * Released under the MIT License.
  */
 import { ElementType } from 'nornj';

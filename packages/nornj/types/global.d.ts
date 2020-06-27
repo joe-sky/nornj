@@ -248,7 +248,7 @@ declare function n(strs: TemplateStringsArray, ...args: any);
 declare function s(strs: TemplateStringsArray, ...args: any);
 
 declare namespace JSX {
-  namespace NornJ {
+  namespace NJ {
     type Children = Element | string | number | boolean | null | typeof undefined;
 
     interface Childrenable {
@@ -299,131 +299,131 @@ declare namespace JSX {
      *
      * `<if condition={false}><input /></if>`
      */
-    if: NornJ.If;
+    if: NJ.If;
 
     /**
      * NornJ tag `if`, example:
      *
      * `<n-if condition={false}><input /></n-if>`
      */
-    'n-if': NornJ.If;
+    'n-if': NJ.If;
 
     /**
      * NornJ tag `then`, example:
      *
      * `<if condition={foo > 10}><input /><then>100</then><else>200</else></if>`
      */
-    then: NornJ.Then;
+    then: NJ.Then;
 
     /**
      * NornJ tag `then`, example:
      *
      * `<n-if condition={foo > 10}><input /><n-then>100</n-then><n-else>200</n-else></n-if>`
      */
-    'n-then': NornJ.Then;
+    'n-then': NJ.Then;
 
     /**
      * NornJ tag `elseif`, example:
      *
      * `<if condition={foo > 10}><input /><elseif condition={foo > 5}><input type="button" /></elseif></if>`
      */
-    elseif: NornJ.Elseif;
+    elseif: NJ.Elseif;
 
     /**
      * NornJ tag `elseif`, example:
      *
      * `<n-if condition={foo > 10}><input /><n-elseif condition={foo > 5}><input type="button" /></n-elseif></n-if>`
      */
-    'n-elseif': NornJ.Elseif;
+    'n-elseif': NJ.Elseif;
 
     /**
      * NornJ tag `else`, example:
      *
      * `<if condition={foo > 10}><input /><else><input type="button" /></else></if>`
      */
-    else: NornJ.Else;
+    else: NJ.Else;
 
     /**
      * NornJ tag `else`, example:
      *
      * `<n-if condition={foo > 10}><input /><n-else><input type="button" /></n-else></n-if>`
      */
-    'n-else': NornJ.Else;
+    'n-else': NJ.Else;
 
     /**
      * NornJ tag `Switch`, example:
      *
      * `<n-switch value={foo}><n-case value={1}><input /></n-case><n-case value={2}><input type="button" /></n-case><n-default>nothing</n-default></n-switch>`
      */
-    'n-switch': NornJ.Switch;
+    'n-switch': NJ.Switch;
 
     /**
      * NornJ tag `case`, example:
      *
      * `<switch value={foo}><case value={1}><input /></case><case value={2}><input type="button" /></case><default>nothing</default></switch>`
      */
-    case: NornJ.Case;
+    case: NJ.Case;
 
     /**
      * NornJ tag `case`, example:
      *
      * `<n-switch value={foo}><n-case value={1}><input /></n-case><n-case value={2}><input type="button" /></n-case><n-default>nothing</n-default></n-switch>`
      */
-    'n-case': NornJ.Case;
+    'n-case': NJ.Case;
 
     /**
      * NornJ tag `default`, example:
      *
      * `<switch value={foo}><case value={1}><input /></case><case value={2}><input type="button" /></case><default>nothing</default></switch>`
      */
-    default: NornJ.Default;
+    default: NJ.Default;
 
     /**
      * NornJ tag `default`, example:
      *
      * `<n-switch value={foo}><n-case value={1}><input /></n-case><n-case value={2}><input type="button" /></n-case><n-default>nothing</n-default></n-switch>`
      */
-    'n-default': NornJ.Default;
+    'n-default': NJ.Default;
 
     /**
      * NornJ tag `each`, example:
      *
      * `<each of={[1, 2, 3]}><i key={index}>{item}</i></each>`
      */
-    each: NornJ.Each;
+    each: NJ.Each;
 
     /**
      * NornJ tag `each`, example:
      *
      * `<n-each of={[1, 2, 3]}><i key={index}>{item}</i></n-each>`
      */
-    'n-each': NornJ.Each;
+    'n-each': NJ.Each;
 
     /**
      * NornJ tag `empty`, example:
      *
      * `<each of={[1, 2, 3]}><i key={index}>{item}</i><empty>nothing</empty></each>`
      */
-    empty: NornJ.Empty;
+    empty: NJ.Empty;
 
     /**
      * NornJ tag `empty`, example:
      *
      * `<n-each of={[1, 2, 3]}><i key={index}>{item}</i><n-empty>nothing</n-empty></n-each>`
      */
-    'n-empty': NornJ.Empty;
+    'n-empty': NJ.Empty;
 
-    for: NornJ.Each;
+    for: NJ.Each;
 
-    'n-for': NornJ.Each;
+    'n-for': NJ.Each;
 
-    with: NornJ.With;
+    with: NJ.With;
 
-    'n-with': NornJ.With;
+    'n-with': NJ.With;
   }
 
   interface IntrinsicAttributes {
-    children?: NornJ.Children | NornJ.Children[];
+    children?: NJ.Children | NJ.Children[];
 
     /**
      * NornJ directive `n-show`, example:

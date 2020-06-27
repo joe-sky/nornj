@@ -7,9 +7,9 @@ const { Option } = Select;
 
 class TestStore {
   @observable formDataUser = (
-    <MobxFormData>
-      <MobxFieldData name="username" required message="Username is required!" />
-    </MobxFormData>
+    <mobxFormData>
+      <mobxFieldData name="username" required message="Username is required!" />
+    </mobxFormData>
   ).formData;
 
   async getData() {
@@ -32,7 +32,7 @@ export default props => {
   return useObserver(() => (
     <div>
       <Form layout="inline">
-        <Form.Item label="Username" n-mobxField={testStore.formDataUser.username}>
+        <Form.Item label="Username" mobxField={testStore.formDataUser.username}>
           <Input />
         </Form.Item>
       </Form>
