@@ -292,7 +292,7 @@ const _defaultCfgExpInProps = _config(_defaultCfg, { useExpressionInProps: true 
 export const extensionConfig: { [name: string]: ExtensionOption } = {
   if: _config(_defaultCfgExpInProps),
   else: _config(_defaultCfgExpInProps, { isSubTag: true, hasTagProps: true }),
-  switch: _config(_defaultCfgExpInProps, { needPrefix: ExtensionPrefixConfig.OnlyLowerCase }),
+  switch: _config(_defaultCfgExpInProps, { needPrefix: ExtensionPrefixConfig.onlyLowerCase }),
   each: _config(_defaultCfgExpInProps, {
     newContext: {
       item: 'item',

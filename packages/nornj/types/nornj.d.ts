@@ -187,9 +187,9 @@ interface ExtensionDelegate {
 interface ExtensionDelegateMultiParams extends FilterDelegate {
 }
 declare enum ExtensionPrefixConfig {
-    OnlyLowerCase = "onlyLowerCase",
-    OnlyUpperCase = "onlyUpperCase",
-    Free = "free"
+    onlyLowerCase = "onlyLowerCase",
+    onlyUpperCase = "onlyUpperCase",
+    free = "free"
 }
 interface ExtensionOption {
     onlyGlobal?: boolean;
@@ -204,7 +204,7 @@ interface ExtensionOption {
     hasTagProps?: boolean;
     hasTmplCtx?: boolean;
     hasOutputH?: boolean;
-    needPrefix?: boolean | ExtensionPrefixConfig;
+    needPrefix?: boolean | keyof typeof ExtensionPrefixConfig;
     [key: string]: any;
 }
 interface ConfigOption {

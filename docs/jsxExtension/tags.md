@@ -13,25 +13,37 @@ toc: menu
 
 ```js
 const Test = props => (
-  <If condition={props.isTest}>
+  <if condition={props.isTest}>
     <i>success</i>
-    <Else>
+    <else>
       <i>fail</i>
-    </Else>
-  </If>
+    </else>
+  </if>
 );
 ```
 
-上例中的`<If>`、`<Else>`等都是标签语法。
+上例中的`<if>`、`<else>`等都是标签语法。
 
-## 与 React 组件的区别
+## 标签与 React 组件的区别
 
-简单地说，`NornJ`标签可以实现以下几种普通`React`组件无法实现的功能：
+`NornJ`标签有以下几种与常规 React 组件不同的特性：
 
-- [延迟渲染子节点](#lazy-render-children)
-- [生成子节点可用的新变量](#generate-new-variable)
+- [支持小写开头](#支持小写开头)
+- [延迟渲染子节点](#延迟渲染子节点)
+- [生成子节点可用的新变量](#生成子节点可用的新变量)
 
-下面我们用实例分别解释下这些特性。
+### 支持小写开头
+
+`NornJ`标签默认使用小写开头，与 React 中的`div`、`span`等标签定位类似。标签不用像组件那样需引入，它可以直接使用：
+
+```js
+//这里的 if 标签和 i 是一样的，无需引入可直接使用
+const Test = props => (
+  <if condition={props.isTest}>
+    <i>success</i>
+  </if>
+);
+```
 
 ### 延迟渲染子节点
 
@@ -50,41 +62,76 @@ const Foo = ({ data }) => (
 );
 ```
 
-但是可以看出，`react-if`需要一个额外的`<Then>`标签；而且文档中也注明了，如果不在`<Then>`或`<Else>`中写一个返回子节点的函数是会存在性能消耗的。因为在并不确定`condition`的值之前，所有的分支节点都没必要进行提前渲染。
+上例可以看出，`react-if`需要一个额外的`<Then>`标签；而且文档中也注明了，如果不在`<Then>`或`<Else>`中写一个返回子节点的函数是会存在性能消耗的。因为在并不确定`condition`的值之前，所有的分支节点都没必要进行提前渲染。
 
-然而`NornJ`的`<If>`标签则不存在上述问题，因为它的本质并不是 React 组件而是一个`模板函数`，由配套的 babel 插件进行了转换：
+然而`NornJ`的`<if>`标签则不存在上述问题，因为它的本质并不是 React 组件而是一组`渲染函数`，由配套的 babel 插件进行了转换。如下例：
 
 ```js
-const test = props => (
-  nj.renderH(`
-    <if condition={_njParam0}>
-      {#_njParam1}
-      <else>
-        {#_njParam2}
-      </else>
-    </if>
-  `, {
-    _njParam0: props.isTest,
-    _njParam1: () => <i>success</i>,
-    _njParam2: () => <i>fail</i>
-  });
-);
+<if condition={isTest}>
+  <i>success</i>
+  <else>
+    <i>fail</i>
+  </else>
+</if>
+```
+
+babel 转换后为：
+
+```js
+{
+  //此函数返回<i>fail</i>
+  fn1: function fn1(g,c,p) {
+    var _type0 = g.e('i', g, 'i', c);
+    var _compParam0 = [_type0, null];
+
+    _compParam0.push('fail');
+
+    return g.H(_compParam0);
+  },
+  //此函数返回<i>success</i>
+  fn2: function fn2(g,c,p) {
+    var _type0 = g.e('i', g, 'i', c);
+    var _compParam0 = [_type0, null];
+
+    _compParam0.push('success');
+
+    return g.H(_compParam0);
+  },
+  //将if、else标签解析为渲染函数
+  main: function main(g,c,p) {
+    var _ex0 = g.x['if'];
+    var _params0 = {
+      'condition': (c.d('isTest'))
+    };
+
+    var _ex1 = g.x['else'];
+    var _dataRefer1 = [
+    { _njOpts: 1, useString: g.us, tagProps: _params0, children: g.r(g, c, g.fn1) }
+    ];
+
+    _ex1.apply(c, _dataRefer1);
+    var _dataRefer0 = [
+    { _njOpts: 2, useString: g.us, props: _params0, children: g.r(g, c, g.fn2) }
+    ];
+    g.aa(_params0, _dataRefer0);
+
+    return _ex0.apply(c, _dataRefer0);
+  }
+}
 ```
 
 从上面可以看出，`<i>success</i>`等其实是包在函数内并没立即执行的。
 
-> 另外，这并不是`NornJ`标签最终的运行时代码，`NornJ`配套的 babel 插件还会做进一步的模板预编译以提高性能。
-
 ### 生成子节点可用的新变量
 
-例如`<Each>`循环：
+例如`<each>`循环：
 
 ```js
 const Test = props => (
   <div>
-    <Each of={[1, 2, 3]}>
+    <each of={[1, 2, 3]}>
       <i>{item}</i>
-    </Each>
+    </each>
   </div>
 );
 ```
@@ -101,13 +148,13 @@ const Test = props => (
 );
 ```
 
-上述虽然是`JSX`的常规写法，但是标签子节点中插入的`额外花括号`、`函数体`等，可能或多或少还是增加了少量代码，以及影响了一点点标签嵌套的可读性。
+上述虽然是`JSX`的常规写法，但是标签子节点中插入的`额外花括号`、`函数体`等，或多或少还是增加了少量代码，代码层级多时可能会影响一点标签嵌套的可读性。
 
 ---
 
 下面是`NornJ`已有内置的标签：
 
-## If
+## if
 
 示例：
 
@@ -115,10 +162,10 @@ const Test = props => (
 const Test = props => (
   <div>
     This is a if tag demo.
-    <If condition={props.type}>
+    <if condition={props.type}>
       test if tag
       <span>test1</span>
-    </If>
+    </if>
   </div>
 );
 ```
@@ -133,7 +180,7 @@ const Test = props => (
 
 `if`标签还包含`else`、`elseif`等子标签。
 
-### Else
+### else
 
 示例：
 
@@ -141,13 +188,13 @@ const Test = props => (
 const Test = props => (
   <div>
     This is a if tag demo.
-    <If condition={props.type}>
+    <if condition={props.type}>
       test if tag
       <span>test1</span>
-      <Else>
+      <else>
         <span>test2</span>
-      </Else>
-    </If>
+      </else>
+    </if>
   </div>
 );
 ```
@@ -165,25 +212,25 @@ ReactDOM.render(<Test type={false} />, document.body);
 */
 ```
 
-### Elseif
+### elseif
 
 `elseif`标签可以实现多分支流程：
 
 ```js
 const Test = props => (
   <div>
-    <If condition={props.num > 100}>
+    <if condition={props.num > 100}>
       100
-      <Elseif condition={props.num > 50}>
+      <elseif condition={props.num > 50}>
         50
-      </Elseif>
-      <Elseif condition={props.num > 20}>
+      </elseif>
+      <elseif condition={props.num > 20}>
         20
-      </Elseif>
-      <Else>
+      </elseif>
+      <else>
         0
-      </Else>
-    </If>
+      </else>
+    </if>
   <div>
 );
 
@@ -200,41 +247,39 @@ ReactDOM.render(<Test num={30} />, document.body);
 | :-------- | :------ | :-------------------------- |
 | condition | Boolean | elseif 标签子节点的渲染条件 |
 
-## Each
+## each
 
 `each`标签可以实现循环：
 
 ```js
-<Each of={numbers}>
-  {' '}
-  //要循环的数组
+<each of={numbers}>
   <i>num: {item}</i> //item表示使用数组项
   <i>no: {index}</i> //index表示使用数组项索引值
-</Each>
+</each>
 ```
 
 在循环中内嵌`if`标签：
 
 ```js
-<Each of={numbers}>
-  <If condition={first}>
+<each of={numbers}>
+  <if condition={first}>
     show first
     <br />
-  </If>{' '}
+  </if>{' '}
   //first表示数组第一项
-  <If condition={last}>show last</If> //last表示数组最后一项
-</Each>
+  <if condition={last}>show last</if> //last表示数组最后一项
+</each>
 ```
 
 如要循环的数组为空，则可以渲染`empty`标签的内容：
 
 ```js
-<Each of={numbers}>
+<each of={numbers}>
   <span>test {item.no}</span>
   <empty>
     <span>no data</span>
   </empty>
-</Each>
+</each>
 ```
 
 - `each`标签的参数列表：
@@ -247,37 +292,37 @@ ReactDOM.render(<Test num={30} />, document.body);
 | first    | String | 循环中生成的第一项变量名，可以改变     |
 | last     | String | 循环中生成的最后一项变量名，可以改变   |
 
-### For
+### for
 
 `for`标签是`each`标签的别名，用法是完全一样的：
 
 ```js
-<For of={numbers}>
+<for of={numbers}>
   <span>test {item.no}</span>
   <empty>
     <span>no data</span>
   </empty>
-</For>
+</for>
 ```
 
-## Switch
+## switch
 
 `switch`标签也可以实现多分支流程：
 
 ```js
 const Test = props => (
   <div>
-    <Switch value={props.num}>
-      <Case value={50}>
+    <switch value={props.num}>
+      <case value={50}>
         50
-      </Case>
-      <Case value={30}>
+      </case>
+      <case value={30}>
         30
-      </Case>
-      <Default>
+      </case>
+      <default>
         0
-      </Default>
-    </Switch>
+      </default>
+    </switch>
   <div>
 );
 
@@ -294,21 +339,21 @@ ReactDOM.render(<Test num={30} />, document.body);
 | :------- | :--- | :----------------------------------------------------------------------------------------------------------------------------------------------- |
 | value    | Any  | 在 switch 标签的 value 参数传入要判断值；<br>然后其会和 case 标签中的 value 值进行`===`判断；<br>所有 case 都不匹配时则渲染 default 标签的子节点 |
 
-## With
+## with
 
 `with`标签主要用于在`JSX`中创建新的变量：
 
 ```js
-<Each of={[1, 2, 3]}>
-  <With num={item} i={index}>
+<each of={[1, 2, 3]}>
+  <with num={item} i={index}>
     <span>
       test-{num}-{i}
     </span>
-  </With>
-</Each>
+  </with>
+</each>
 ```
 
-## MobxObserver
+## mobxObserver
 
 `mobxObserver`标签实际上就是[mobx-react-lite 库的 observer 组件](https://github.com/mobxjs/mobx-react-lite#observer)，只不过它在编写时无需在子节点写函数：
 
@@ -325,9 +370,9 @@ function ObservePerson(props) {
       <Observer>{() => <div>{person.name}</div>}</Observer>
 
       {/* MobxObserver标签 */}
-      <MobxObserver>
+      <mobxObserver>
         <div>{person.name}</div>
-      </MobxObserver>
+      </mobxObserver>
 
       <button onClick={() => (person.name = 'Mike')}>No! I am Mike</button>
     </div>
@@ -341,15 +386,15 @@ function ObservePerson(props) {
 
 ### 开发一个最简单的标签
 
-例如实现一个`Unless`标签，功能即为与`If`标签相反，它的`condition`属性为 false 时才渲染子节点：
+例如实现一个`unless`标签，功能即为与`if`标签相反，它的`condition`属性为 false 时才渲染子节点：
 
 ```js
-<Unless condition={false}>
+<unless condition={false}>
   <div>Test unless</div>
-</Unless>
+</unless>
 ```
 
-上面的`Unless`标签实际上是一个扩展函数，使用`nj.registerExtension`方法注册：
+上面的`unless`标签实际上是一个扩展函数，使用`nj.registerExtension`方法注册：
 
 ```js
 import nj from 'nornj';
@@ -365,7 +410,7 @@ nj.registerExtension(
 );
 ```
 
-然后还需要配置一下`.babelrc`，因为这样配套的 babel 插件才知道需要对`Unless`标签进行转换：
+然后还需要配置一下`.babelrc`，因为这样配套的 babel 插件才知道需要对`unless`标签进行转换：
 
 ```js
 {
@@ -383,7 +428,7 @@ nj.registerExtension(
 }
 ```
 
-这样我们就成功开发了一个`Unless`标签，与普通 React 组件不同的是，它可以获得`NornJ`标签的[延迟渲染子节点](#lazy-render-children)特性。
+这样我们就成功开发了一个`unless`标签，与普通 React 组件不同的是，它可以获得`NornJ`标签的[延迟渲染子节点](#延迟渲染子节点)特性。
 
 #### 标签扩展函数的 options 参数
 
@@ -394,19 +439,19 @@ nj.registerExtension(
 
 ### 更复杂的标签
 
-上面的例子我们介绍了如何开发一个最简单的标签`Unless`，它只需在扩展函数内按照一定条件判断是否返回子节点就可以了；也无需配置更多的`extensionConfig`配置参数，填写`true`即可。
+上面的例子我们介绍了如何开发一个最简单的标签`unless`，它只需在扩展函数内按照一定条件判断是否返回子节点就可以了；也无需配置更多的`extensionConfig`配置参数，填写`true`即可。
 
-接下来我们实现一个循环标签`SimpleFor`，用法如下：
+接下来我们实现一个循环标签`simpleFor`，用法如下：
 
 ```js
-<SimpleFor of={[1, 2, 3]}>
-  <If condition={!loopFirst}>
+<simpleFor of={[1, 2, 3]}>
+  <if condition={!loopFirst}>
     <div key={loopIndex}>Test for: {loopItem}</div>
-  </If>
-</SimpleFor>
+  </if>
+</simpleFor>
 ```
 
-我们还注意到上面循环体中的`loopIndex`与`loopItem`是该标签生成出来的新变量，也就是获得了`NornJ`标签的[生成子节点可用的新变量](#generate-new-variable)特性。这就需要配置`extensionConfig`的`newContext`参数：
+我们还注意到上面循环体中的`loopIndex`与`loopItem`是该标签生成出来的新变量，也就是获得了`NornJ`标签的[生成子节点可用的新变量](#生成子节点可用的新变量)特性。这就需要配置`extensionConfig`的`newContext`参数：
 
 ```js
 {
@@ -455,34 +500,34 @@ nj.registerExtension('simpleFor', options => {
 });
 ```
 
-如需要改变循环体中的`loopItem`等参数名，在`SimpleFor`标签的属性上修改在`extensionConfig.simpleFor.newContext.data`中设置的对象名即可，如`item`、`index`等：
+如需要改变循环体中的`loopItem`等参数名，在`simpleFor`标签的属性上修改在`extensionConfig.simpleFor.newContext.data`中设置的对象名即可，如`item`、`index`等：
 
 ```js
-<SimpleFor of={[1, 2, 3]} item="itemNum" index="itemIndex" first="itemFirst">
-  <If condition={!itemFirst}>
+<simpleFor of={[1, 2, 3]} item="itemNum" index="itemIndex" first="itemFirst">
+  <if condition={!itemFirst}>
     <div key={itemIndex}>Test for: {itemNum}</div>
-  </If>
-</SimpleFor>
+  </if>
+</simpleFor>
 ```
 
 ### 子标签
 
-`NornJ`标签还可以在子节点中附带`子标签`，比如`<If>`标签内的`<Else>`、`<Elseif>`，`<Each>`标签内的`<Empty>`等。
+`NornJ`标签还可以在子节点中附带`子标签`，比如`<if>`标签内的`<else>`、`<elseif>`，`<each>`标签内的`<empty>`等。
 
 > 配套 babel 插件在运作时会将子标签连同其主标签一起进行转换。目前`NornJ`的 babel 插件暂时只支持转换 1 级子标签，这在大多数情况下足够用了。
 
-比如我们需要给上面开发的`Unless`标签增加一个名为`Otherwise`的`子标签`，功能为在`condition`条件为 true 时渲染它的子节点。用法如下：
+比如我们需要给上面开发的`unless`标签增加一个名为`otherwise`的`子标签`，功能为在`condition`条件为 true 时渲染它的子节点。用法如下：
 
 ```js
-<Unless condition={false}>
+<unless condition={false}>
   <div>Test unless</div>
-  <Otherwise>
+  <otherwise>
     <div>Test otherwise</div>
-  </Otherwise>
-</Unless>
+  </otherwise>
+</unless>
 ```
 
-编写`Otherwise`标签扩展函数：
+编写`otherwise`标签扩展函数：
 
 ```js
 import nj from 'nornj';
@@ -493,16 +538,16 @@ nj.registerExtension(
     const {
       props,
       children,
-      tagProps //tagProps是主标签(Unless)的props对象
+      tagProps //tagProps是主标签(unless)的props对象
     } = options;
 
-    //把Otherwise的子节点函数添加在Unless标签的props对象上面。注意，不必在这里执行它
+    //把otherwise的子节点函数添加在unless标签的props对象上面。注意，不必在这里执行它
     tagProps.otherwise = children;
   }
 );
 ```
 
-接着修改`Unless`标签的扩展函数：
+接着修改`unless`标签的扩展函数：
 
 ```js
 import nj from 'nornj';
@@ -510,14 +555,14 @@ import nj from 'nornj';
 nj.registerExtension('unless', options => {
   const { props, children } = options;
   if (!props.condition) {
-    return children(); //输出Unless标签的子节点：Test unless
+    return children(); //输出unless标签的子节点：Test unless
   } else if (props.otherwise != null) {
-    return props.otherwise(); //输出Otherwise标签的子节点：Test otherwise
+    return props.otherwise(); //输出otherwise标签的子节点：Test otherwise
   }
 });
 ```
 
-最后在`.babelrc`配置一下`Otherwise`的标签信息，需要设置`isSubTag`参数为`true`：
+最后在`.babelrc`配置一下`otherwise`的标签信息，需要设置`isSubTag`参数为`true`：
 
 ```js
 {

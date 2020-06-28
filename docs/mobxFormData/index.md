@@ -20,91 +20,76 @@ toc: menu
 - ⭐ 基于 [async-validator](https://github.com/yiminghe/async-validator) 的轻量级封装
 - 💫 完整的 `Mobx` 可观察类型数据驱动表单
 - 🌟 完美支持 [Ant Design](https://ant.design/) 表单控件（v3 或 v4）
-- ⚡ 支持局部渲染 `Form.Item` 组件
-- 🔥 可脱离 `Form` 组件独立运作
+- ⚡ 高性能，支持局部渲染 `Form.Item` 组件
+- 🔥 易于解决循环动态增减表单项等复杂场景
 - 🚀 易于处理跨组件表单数据通信场景
 
 ## 对比其他表单数据管理方案
 
-|                        |   Ant-Design v3   |   Ant-Design v4   |  Formily（UForm）  |             MobxFormData              |
-| :--------------------- | :---------------: | :---------------: | :----------------: | :-----------------------------------: |
-| 底层验证框架           | `async-validator` | `async-validator` | @formily/validator |           `async-validator`           |
-| API 上手难度           |       一般        |       容易        |        较难        |                 容易                  |
-| 组件外管理表单数据     |        ✖️         | ⭕（官方不推荐）  |         ⭕         |                  ⭕                   |
-| 跨组件表单数据联动     |       较难        |       容易        |        一般        |                 容易                  |
-| 更新只渲染表单控件自身 |        ✖️         |        ⭕         |         ⭕         |                  ⭕                   |
-| 自定义表单控件逻辑     |       一般        |       一般        |        一般        |     容易（不必创建新的表单组件）      |
-| Mobx 数据适配性        |       一般        |       一般        |        一般        | 好（直接读写可观察值、无需手工 toJS） |
-| 多重验证规则           |        ⭕         |        ⭕         |         ⭕         |                  ⭕                   |
-| 自动滚动至验证出错处   |        ⭕         |        ⭕         |         ⭕         |                  ✖️                   |
-| 完整表单生命周期       |        ✖️         |        ✖️         |         ⭕         |                  ✖️                   |
-| json 配置化生成        |        ✖️         |        ✖️         |         ⭕         |                  ✖️                   |
-| 适配多个组件库         |        ✖️         |        ✖️         |         ⭕         |           ⭕（未来可实现）            |
+|                        |   Ant-Design v3   |        Ant-Design v4        |  Formily（UForm）  |             MobxFormData              |
+| :--------------------- | :---------------: | :-------------------------: | :----------------: | :-----------------------------------: |
+| 底层验证框架           | `async-validator` |      `async-validator`      | @formily/validator |           `async-validator`           |
+| API 上手难度           |       一般        |            容易             |       较复杂       |                 容易                  |
+| 组件外管理表单数据     | ⭕（API 较复杂）  |      ⭕（官方不推荐）       |         ⭕         |       ⭕（API 与正常用法相同）        |
+| 跨组件表单数据联动     |      较复杂       |            容易             |        一般        |                 容易                  |
+| 更新只渲染表单控件自身 |        ✖️         |             ⭕              |         ⭕         |                  ⭕                   |
+| 自定义表单控件逻辑     |       一般        | 容易（支持 Form.Item 嵌套） |        一般        |  容易（不用 Form.Item 嵌套也可支持）  |
+| Mobx 数据适配性        |       一般        |            一般             |        一般        | 好（直接读写可观察值、无需手工 toJS） |
+| 多重验证规则           |        ⭕         |             ⭕              |         ⭕         |                  ⭕                   |
+| 自动滚动至验证出错处   |        ⭕         |             ⭕              |         ⭕         |           ⭕（未来可实现）            |
+| json 配置化生成        |        ✖️         |             ✖️              |         ⭕         |                  ✖️                   |
+| 适配多个组件库         |        ✖️         |             ✖️              |         ⭕         |           ⭕（未来可实现）            |
 
 ## 快速开始
 
 ### 安装与配置 babel
 
 ```bash
-npm install babel-plugin-nornj-in-jsx babel-plugin-import babel-plugin-module-resolver
+npm install babel-preset-nornj-with-antd
 ```
 
 配置`.babelrc`:
 
 ```js
 {
-  "plugins": [
-    [
-      'module-resolver',
-      {
-        alias: {
-          '^antd$': 'nornj-react/antd',
-        },
-        extensions: ['.js', '.jsx', '.ts', '.tsx', '.es', '.es6', '.mjs'],
-      },
-    ],
-    [
-      "import",
-      {
-        libraryName: "nornj-react/antd",
-        style: false,
-      }
-    ],
-    "nornj-in-jsx"
+  "presets": [
+    "nornj-with-antd"
   ]
 }
 ```
 
 ### 引入 JSX 类型定义
 
-`MobxFormData` 标签的 JSX 类型定义需在全局引入一次，例如在 APP.jsx：
+`MobxFormData` 的 JSX 类型定义需在全局引入一次(例如在 APP.jsx)：
 
 ```js
 import 'nornj-react';
 ```
 
+这样 `mobxFormData` 等标签在 IDE 中就可以支持代码提示了。
+
 ### 使用 JSX 标签定义表单域
 
-创建 `MobxFormData` 和 `MobxFieldData` 标签描述表单域各参数：
+创建 `mobxFormData` 和 `mobxFieldData` 标签描述表单域各参数：
 
 ```js
-<MobxFormData observable>
-  <MobxFieldData name="userName" value="joe_sky" type="string" trigger="onChange" required />
-  <MobxFieldData name="age" value="33" type="number" />
-</MobxFormData>
+<mobxFormData observable>
+  <mobxFieldData name="userName" value="joe_sky" type="string" trigger="onChange" required />
+  <mobxFieldData name="age" value="33" type="number" />
+</mobxFormData>
 ```
 
 ### 绑定到 Form.Item 组件
 
-使用 `n-mobxField` 指令绑定到 `Form.Item` 组件，即完成了一个最简单的响应式表单：
+使用 `mobxField` 指令绑定到 `Form.Item` 组件，即完成了一个最简单的响应式表单：
 
 ```js
 const TestForm = observer(props => {
   const { formData } = useLocalStore(() => (
-    <MobxFormData>
-      <MobxFieldData name="userName" value="joe_sky" type="string" trigger="onChange" required />
-      <MobxFieldData name="age" value="33" type="number" />
-    </MobxFormData>
+    <mobxFormData>
+      <mobxFieldData name="userName" value="joe_sky" type="string" trigger="onChange" required />
+      <mobxFieldData name="age" value="33" type="number" />
+    </mobxFormData>
   ));
 
   const onSubmit = async e => {
@@ -114,11 +99,11 @@ const TestForm = observer(props => {
 
   return (
     <>
-      <Form.Item n-mobxField={formData.userName} label="User Name">
+      <Form.Item mobxField={formData.userName} label="User Name">
         <Input />
       </Form.Item>
       User Name: {formData.userName}
-      <Form.Item n-mobxField={formData.age} label="Age">
+      <Form.Item mobxField={formData.age} label="Age">
         <Input />
       </Form.Item>
       Age: {formData.age}
@@ -138,16 +123,16 @@ const TestForm = observer(props => {
 
 `MobxFormData` 是一个基于 `Babel Plugin` 的表单数据管理方案，即会将一些语法糖转换为实际运行的代码：
 
-- MobxFormData & MobxFieldData
+- mobxFormData & mobxFieldData
 
 转换前：
 
 ```js
 const { formData } = (
-  <MobxFormData observable>
-    <MobxFieldData name="userName" value="joe_sky" type="string" trigger="onChange" required />
-    <MobxFieldData name="age" value="33" type="number" />
-  </MobxFormData>
+  <mobxFormData observable>
+    <mobxFieldData name="userName" value="joe_sky" type="string" trigger="onChange" required />
+    <mobxFieldData name="age" value="33" type="number" />
+  </mobxFormData>
 );
 ```
 
@@ -170,16 +155,16 @@ const { formData } = createFormData({ observable: true }, [
 ]);
 ```
 
-- n-mobxField
+- mobxField
 
 转换前：
 
 ```js
 <>
-  <Form.Item n-mobxField={formData.userName} label="User Name">
+  <Form.Item mobxField={formData.userName} label="User Name">
     <Input />
   </Form.Item>
-  <Form.Item n-mobxField={formData.age} label="Age">
+  <Form.Item mobxField={formData.age} label="Age">
     <Input />
   </Form.Item>
 </>
@@ -190,13 +175,13 @@ const { formData } = createFormData({ observable: true }, [
 ```js
 <>
   <MobxObserver>
-    <Form.Item n-mobxField={formData.userName} label="User Name">
-      <Input n-mobxBind={formData.userName} />
+    <Form.Item mobxField={formData.userName} label="User Name">
+      <Input mobxBind={formData.userName} />
     </Form.Item>
   </MobxObserver>
   <MobxObserver>
-    <Form.Item n-mobxField={formData.age} label="Age">
-      <Input n-mobxBind={formData.age} />
+    <Form.Item mobxField={formData.age} label="Age">
+      <Input mobxBind={formData.age} />
     </Form.Item>
   </MobxObserver>
 </>
@@ -204,16 +189,16 @@ const { formData } = createFormData({ observable: true }, [
 
 ## 使用方法
 
-### MobxFormData & MobxFieldData
+### mobxFormData & mobxFieldData
 
-使用 `MobxFormData` 和 `MobxFieldData` 标签（参数请参考 [MobxFormDataProps](#mobxformdataprops) 和 [MobxFieldDataProps](#mobxfielddataprops)）来描述表单数据，它的返回值是 `formData` 实例（[MobxFormDataInstance](#mobxformdatainstance)）：
+使用 `mobxFormData` 和 `mobxFieldData` 标签（参数请参考 [MobxFormDataProps](#mobxformdataprops) 和 [MobxFieldDataProps](#mobxfielddataprops)）来描述表单数据，它的返回值是 `formData` 实例（[MobxFormDataInstance](#mobxformdatainstance)）：
 
 ```js
 const { formData } = (
-  <MobxFormData observable>
-    <MobxFieldData name="userName" value="joe_sky" type="string" />
-    <MobxFieldData name="age" value="33" type="number" />
-  </MobxFormData>
+  <mobxFormData observable>
+    <mobxFieldData name="userName" value="joe_sky" type="string" />
+    <mobxFieldData name="age" value="33" type="number" />
+  </mobxFormData>
 );
 ```
 
@@ -232,12 +217,12 @@ formData.validate();
 
 - 多重验证规则
 
-可以在 `MobxFieldData` 标签的 `rules` 属性上设置多个验证规则（类型为 [RuleItem](#ruleitem)），它们会依次进行验证并输出各自的错误信息：
+可以在 `mobxFieldData` 标签的 `rules` 属性上设置多个验证规则（类型为 [RuleItem](#ruleitem)），它们会依次进行验证并输出各自的错误信息：
 
 ```js
 const { formData } = (
-  <MobxFormData observable>
-    <MobxFieldData
+  <mobxFormData observable>
+    <mobxFieldData
       name="userName"
       value="joe_sky"
       rules={[
@@ -246,45 +231,45 @@ const { formData } = (
       ]}
       trigger="onChange"
     />
-  </MobxFormData>
+  </mobxFormData>
 );
 ```
 
-### n-mobxField
+### mobxField
 
-使用 `n-mobxField` 指令将 `formData` 实例绑定到 `Form.Item` 组件，将指令的值设置为 `formData#fieldName` 即可：
+使用 `mobxField` 指令将 `formData` 实例绑定到 `Form.Item` 组件，将指令的值设置为 `formData#fieldName` 即可：
 
 ```js
 <>
-  <Form.Item n-mobxField={formData.userName} label="User Name">
+  <Form.Item mobxField={formData.userName} label="User Name">
     <Input />
   </Form.Item>
-  <Form.Item n-mobxField={formData.age} label="Age">
+  <Form.Item mobxField={formData.age} label="Age">
     <Input />
   </Form.Item>
 </>
 ```
 
-> 此种方式可解决绝大多数表单数据校验场景，它实际上自动为 `Form.Item` 下层的表单元素组件设置了 [n-mobxBind](./directives.md#n-mobxbind) 指令。
+> 此种方式可解决绝大多数表单数据校验场景，它实际上自动为 `Form.Item` 下层的表单元素组件设置了 [mobxBind](./directives.md#mobxbind) 指令。
 
-如果 `n-mobxField` 有不满足需求的场景，我们还可以自行编写表单元素组件的各种参数与逻辑，增加 `noBind` 参数即可：
+如果 `mobxField` 有不满足需求的场景，我们还可以自行编写表单元素组件的各种参数与逻辑，增加 `noBind` 参数即可：
 
 ```js
 const TestForm = observer(props => {
   const { formData } = useLocalStore(() => (
-    <MobxFormData>
-      <MobxFieldData name="userName" value="joe_sky" type="string" />
-      <MobxFieldData name="age" value="33" type="number" />
-    </MobxFormData>
+    <mobxFormData>
+      <mobxFieldData name="userName" value="joe_sky" type="string" />
+      <mobxFieldData name="age" value="33" type="number" />
+    </mobxFormData>
   ));
 
   return (
     <>
-      <Form.Item n-mobxField-noBind={formData.userName} label="User Name">
-        <Input n-mobxBind={formData.userName} />
+      <Form.Item mobxField-noBind={formData.userName} label="User Name">
+        <Input mobxBind={formData.userName} />
         <Input value={'Age：' + formData.age} />
       </Form.Item>
-      <Form.Item n-mobxField-noBind={formData.age} label="Age">
+      <Form.Item mobxField-noBind={formData.age} label="Age">
         <Input value={(formData.age + '').trim()} onChange={e => (formData.age = e.target.value)} />
       </Form.Item>
     </>
@@ -292,11 +277,11 @@ const TestForm = observer(props => {
 });
 ```
 
-另外 `n-mobxField` 也支持使用 `n-mobxBind` 的参数和修饰符：
+另外 `mobxField` 也支持使用 `mobxBind` 的参数和修饰符：
 
 ```js
 <>
-  <Form.Item n-mobxField-debounce$200={formData.userName} label="User Name">
+  <Form.Item mobxField-debounce$200={formData.userName} label="User Name">
     <Input onChange={e => console.log(formData.userName)} />
   </Form.Item>
 </>
@@ -304,11 +289,11 @@ const TestForm = observer(props => {
 
 - 绑定动态数据
 
-`n-mobxField` 也可以支持绑定动态数据，语法稍有不同：
+`mobxField` 也可以支持绑定动态数据，语法稍有不同：
 
 ```js
 <Each of={users}>
-  <Form.Item n-mobxField={`formData[item.userName]`} label={item.userName}>
+  <Form.Item mobxField={`formData[item.userName]`} label={item.userName}>
     <Input />
   </Form.Item>
 </Each>
@@ -316,23 +301,23 @@ const TestForm = observer(props => {
 
 ### React hooks
 
-使用 `mobx-react` 包提供的 [useLocalStore](https://mobx-react.js.org/state-local) 即可，在它的参数中传入 `MobxFormData` 标签：
+使用 `mobx-react` 包提供的 [useLocalStore](https://mobx-react.js.org/state-local) 即可，在它的参数中传入 `mobxFormData` 标签：
 
 ```js
 const TestForm = observer(props => {
   const { formData: formDataUser } = useLocalStore(() => (
-    <MobxFormData>
-      <MobxFieldData name="userName" value="joe_sky" type="string" />
-      <MobxFieldData name="age" value="33" type="number" />
-    </MobxFormData>
+    <mobxFormData>
+      <mobxFieldData name="userName" value="joe_sky" type="string" />
+      <mobxFieldData name="age" value="33" type="number" />
+    </mobxFormData>
   ));
 
   return (
     <>
-      <Form.Item n-mobxField={formDataUser.userName} label="User Name">
+      <Form.Item mobxField={formDataUser.userName} label="User Name">
         <Input />
       </Form.Item>
-      <Form.Item n-mobxField={formDataUser.age} label="Age">
+      <Form.Item mobxField={formDataUser.age} label="Age">
         <Input />
       </Form.Item>
     </>
@@ -347,10 +332,10 @@ const TestForm = observer(props => {
 ```js
 const TestForm = observer(props => {
   const { formData: formDataUser } = useLocalStore(() => (
-    <MobxFormData>
-      <MobxFieldData name="userName" value="joe_sky" type="string" />
-      <MobxFieldData name="age" value="33" type="number" />
-    </MobxFormData>
+    <mobxFormData>
+      <mobxFieldData name="userName" value="joe_sky" type="string" />
+      <mobxFieldData name="age" value="33" type="number" />
+    </mobxFormData>
   ));
 
   useEffect(() => {
@@ -365,25 +350,25 @@ const TestForm = observer(props => {
 
 ### React class 组件
 
-在 class 组件中，我们可以直接使用 `MobxFormData` 标签创建 `formData` 实例：
+在 class 组件中，我们可以直接使用 `mobxFormData` 标签创建 `formData` 实例：
 
 ```js
 @observer
 class TestForm extends React.Component {
   @observable formDataUser = (
-    <MobxFormData>
-      <MobxFieldData name="userName" value="joe_sky" type="string" />
-      <MobxFieldData name="age" value="33" type="number" />
-    </MobxFormData>
+    <mobxFormData>
+      <mobxFieldData name="userName" value="joe_sky" type="string" />
+      <mobxFieldData name="age" value="33" type="number" />
+    </mobxFormData>
   ).formData;
 
   render() {
     return (
       <>
-        <Form.Item n-mobxField={this.formDataUser.userName} label="User Name">
+        <Form.Item mobxField={this.formDataUser.userName} label="User Name">
           <Input />
         </Form.Item>
-        <Form.Item n-mobxField={this.formDataUser.age} label="Age">
+        <Form.Item mobxField={this.formDataUser.age} label="Age">
           <Input />
         </Form.Item>
       </>
@@ -400,10 +385,10 @@ class TestForm extends React.Component {
 @observer
 class TestForm extends React.Component {
   @observable formDataUser = (
-    <MobxFormData>
-      <MobxFieldData name="userName" value="joe_sky" type="string" />
-      <MobxFieldData name="age" value="33" type="number" />
-    </MobxFormData>
+    <mobxFormData>
+      <mobxFieldData name="userName" value="joe_sky" type="string" />
+      <mobxFieldData name="age" value="33" type="number" />
+    </mobxFormData>
   ).formData;
 
   componentDidMount() {
@@ -424,10 +409,10 @@ class TestForm extends React.Component {
 class TestStore {
   @observable userList = [];
   @observable formDataUser = (
-    <MobxFormData>
-      <MobxFieldData name="userName" value="joe_sky" type="string" />
-      <MobxFieldData name="age" value="33" type="number" />
-    </MobxFormData>
+    <mobxFormData>
+      <mobxFieldData name="userName" value="joe_sky" type="string" />
+      <mobxFieldData name="age" value="33" type="number" />
+    </mobxFormData>
   ).formData;
 
   async getData(params) {
@@ -448,10 +433,10 @@ class TestForm extends React.Component {
 
     return (
       <>
-        <Form.Item n-mobxField={formDataUser.userName} label="User Name">
+        <Form.Item mobxField={formDataUser.userName} label="User Name">
           <Input />
         </Form.Item>
-        <Form.Item n-mobxField={formDataUser.age} label="Age">
+        <Form.Item mobxField={formDataUser.age} label="Age">
           <Input />
         </Form.Item>
       </>
@@ -536,7 +521,7 @@ formData.reset(['userName', 'age']);
 formData.reset();
 ```
 
-各表单域初始值即为在 `MobxFieldData` 标签上设置的 `value` 参数：
+各表单域初始值即为在 `mobxFieldData` 标签上设置的 `value` 参数：
 
 ```js
 <MobxFieldData name="userName" value="joe_sky" />
@@ -567,10 +552,10 @@ formData.error('userName', '用户名已存在');
 
 ### 自定义验证
 
-在 `MobxFieldData` 标签的 `validator` 参数的函数内部编写逻辑即可实现自定义验证：
+在 `mobxFieldData` 标签的 `validator` 参数的函数内部编写逻辑即可实现自定义验证：
 
 ```js
-<MobxFieldData
+<mobxFieldData
   name="userName"
   value="joe_sky"
   type="string"
@@ -588,10 +573,10 @@ formData.error('userName', '用户名已存在');
 
 ### 异步自定义验证
 
-在 `MobxFieldData` 标签的 `asyncValidator` 参数的函数内部编写逻辑即可实现异步自定义验证：
+在 `mobxFieldData` 标签的 `asyncValidator` 参数的函数内部编写逻辑即可实现异步自定义验证：
 
 ```js
-<MobxFieldData
+<mobxFieldData
   name="userName"
   value="joe_sky"
   type="string"
@@ -612,23 +597,23 @@ formData.error('userName', '用户名已存在');
 
 ### 触发验证时机
 
-使用 `MobxFieldData` 标签的 `trigger` 参数可设置触发表单域验证的时机，默认值为 `valueChange`，即在 `formData` 实例上的表单域值改变时触发。
+使用 `mobxFieldData` 标签的 `trigger` 参数可设置触发表单域验证的时机，默认值为 `valueChange`，即在 `formData` 实例上的表单域值改变时触发。
 
 我们也可以将 `trigger` 设置为表单控件的事件名称来改变触发验证时机，如 `onBlur` ：
 
 ```js
-<MobxFieldData name="userName" value="joe_sky" type="string" required trigger="onBlur" />
+<mobxFieldData name="userName" value="joe_sky" type="string" required trigger="onBlur" />
 ```
 
 如果想完全手工控制触发验证，则可以设置为 `none`：
 
 ```js
-<MobxFieldData name="userName" value="joe_sky" type="string" required trigger="none" />
+<mobxFieldData name="userName" value="joe_sky" type="string" required trigger="none" />
 ```
 
 ### 动态创建/删除
 
-有时候我们需要动态生成 `MobxFormData` 标签，可以这样做：
+有时候我们需要动态生成 `mobxFormData` 标签，可以这样做：
 
 ```js
 class TestStore {
@@ -637,30 +622,30 @@ class TestStore {
 
   constructor() {
     this.formDataUser = (
-      <MobxFormData observable>
+      <mobxFormData observable>
         <each of={this.userList}>
-          <MobxFieldData name={`user${index}`} value={item} type="string" />
+          <mobxFieldData name={`user${index}`} value={item} type="string" />
         </each>
-      </MobxFormData>
+      </mobxFormData>
     ).formData;
   }
 }
 ```
 
-已生成好的 `formData` 实例，也可以使用 `add` 或 `delete` 方法添加/删除 `MobxFieldData` 标签：
+已生成好的 `formData` 实例，也可以使用 `add` 或 `delete` 方法添加/删除 `mobxFieldData` 标签：
 
 ```js
 class TestStore {
   @observable userList = ['joe', 'sky'];
   @observable formDataUser = (
-    <MobxFormData>
-      <MobxFieldData name="userName" value="joe_sky" type="string" />
-      <MobxFieldData name="age" value="33" type="number" />
-    </MobxFormData>
+    <mobxFormData>
+      <mobxFieldData name="userName" value="joe_sky" type="string" />
+      <mobxFieldData name="age" value="33" type="number" />
+    </mobxFormData>
   ).formData;
 
   add() {
-    this.formDataUser.add(<MobxFieldData name="worked" value={true} type="boolean" />);
+    this.formDataUser.add(<mobxFieldData name="worked" value={true} type="boolean" />);
   }
 
   delete() {
@@ -671,7 +656,7 @@ class TestStore {
 
 ### 查找/遍历
 
-`formData` 实例中有一个名为 `fieldDatas` 的 Map 类型成员，它里面保存了所有 `MobxFieldData` 标签生成的 `fieldData` 实例（类型为 [MobxFieldDataInstance](#mobxfielddatainstance)）。
+`formData` 实例中有一个名为 `fieldDatas` 的 Map 类型成员，它里面保存了所有 `mobxFieldData` 标签生成的 `fieldData` 实例（类型为 [MobxFieldDataInstance](#mobxfielddatainstance)）。
 
 我们可以这样找某个表单域实例：
 
@@ -689,8 +674,8 @@ class TestForm extends React.Component {
     const { formDataUser } = this.props.store.testStore;
 
     return (
-      <each of={[...formDataUser.fieldDatas.keys()]}>
-        <Form.Item n-mobxField={`formDataUser[item]`} label={item}>
+      <each of={formDataUser.fieldDatas} $key="fieldName">
+        <Form.Item mobxField={`formDataUser[fieldName]`} label={fieldName}>
           <Input />
         </Form.Item>
       </each>
@@ -699,15 +684,15 @@ class TestForm extends React.Component {
 }
 ```
 
-如果遍历生成的 `Form.Item` 组件的子节点中存在逻辑判断，则需要使用 `n-mobxBind` 手工绑定表单控件：
+如果遍历生成的 `Form.Item` 组件的子节点中存在逻辑判断，则需要使用 `mobxBind` 手工绑定表单控件：
 
 ```js
-<each of={[...formDataUser.fieldDatas.keys()]}>
-  <Form.Item n-mobxField-noBind={`formDataUser[item]`} label={item}>
+<each of={formDataUser.fieldDatas} $key="fieldName">
+  <Form.Item mobxField={`formDataUser[fieldName]`} label={fieldName}>
     <if condition={item == 'userName'}>
-      <Input n-mobxBind={`formDataUser[item]`} />
+      <Input mobxBind={`formDataUser[fieldName]`} />
       <else>
-        <Input.TextArea n-mobxBind={`formDataUser[item]`} />
+        <Input.TextArea mobxBind={`formDataUser[fieldName]`} />
       </else>
     </if>
   </Form.Item>

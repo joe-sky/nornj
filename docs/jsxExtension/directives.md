@@ -17,16 +17,51 @@ toc: menu
 
 上例中的`n-show`即为指令语法。
 
-## 指令能做什么
+## 指令与组件 props 的区别
 
-`指令`通常可以用来封装一些实用功能，以实现写更少的代码去做更多的事情为目的。具体来说`NornJ`的指令主要可以实现以下几种功能：
+`指令`通常可以用来封装一些实用功能，以实现写更少的代码去做更多的事情为目的。具体来说`NornJ`指令有以下几种与 React 组件 props 不同的特性：
 
-- [操作将传入组件的 props 值](#set-component-props)
-- [封装包装组件](#encapsulate-wrapped-component)
+- [需要前缀](#需要前缀)
+- [可对组件 props 进行额外处理](#可对组件-props-进行额外处理)
+- [支持封装高阶组件](#支持封装高阶组件)
 
-### 操作将传入组件的 props 值
+### 需要前缀
 
-`NornJ`的指令最主要的功能就是用来设置(或修改)`JSX`标签的属性值。比如预置指令`n-show`，它就是用来设置 JSX 标签的`style.display`属性：
+`NornJ`指令是全局作用域的，通常每个 React 组件都可能能使用到，一般需要加`n-`前缀：
+
+```js
+<input n-debounce={200} onChange={e => console.log(e.target.value)} />
+```
+
+但也有可不加前缀的指令，如`mobxBind`：
+
+```js
+<input mobxBind={this.inputValue} />
+```
+
+是否需要加前缀可以在 babel 配置中设定：
+
+```js
+{
+  ...
+  "plugins": [
+    [
+      "nornj-in-jsx",
+      {
+        "extensionConfig": {
+          "mobxBind": {
+            "needPrefix": "free"  //不加前缀时能保证和其他组件的 props 命名不冲突即可
+          }
+        }
+      }
+    ]
+  ]
+}
+```
+
+### 可对组件 props 进行额外处理
+
+`NornJ`指令最主要的功能就是用来设置(或修改)组件的 props 值。比如预置指令`n-show`，它就是用来设置 JSX 标签的`style.display`属性：
 
 ```js
 <input n-show={false} />
@@ -48,14 +83,14 @@ const newTodo = useInput('');
 
 但是，上面这种方式也存在以下这些问题：
 
-- 封装扩展的内部无法获取 JSX 标签已有的其他属性值，比如上例中的`name="input"`。这在开发一些功能时会有局限。
+- 封装扩展的内部无法获取 JSX 标签已有的其他 props 值，比如上例中的`name="input"`。这在开发一些功能时会有局限。
 - 写法与常规的 JSX 属性区别较大，可读性差一些。
 
-然而`NornJ`的指令语法可以完美解决上述问题。
+然而`NornJ`指令语法可以完美解决上述问题。
 
-### 封装包装组件
+### 支持封装高阶组件
 
-设置(或修改)`JSX`标签的属性值是`NornJ`的指令最基本的功能。指令还能实现更高级的功能，可以在当前指令所在组件的外层再套自定义逻辑的包装组件。下面我们看一个简单的应用例子(使用[ant-design 的 Tooltip 组件](https://ant.design/components/tooltip/))。
+设置(或修改)`JSX`标签的属性值是`NornJ`指令最基本的功能。指令还能实现更高级的功能，可以在当前指令所在组件的外层再套自定义逻辑的高阶组件。下面我们看一个简单的应用例子(使用[ant-design 的 Tooltip 组件](https://ant.design/components/tooltip/))。
 
 `ant-design的Tooltip组件`常规的写法：
 
@@ -71,7 +106,7 @@ ReactDOM.render(
 );
 ```
 
-然而可以使用`NornJ指令`的扩展开发方式将上面的 Tooltip 组件封装在一个包装组件之中，这样就可以像下面这种方式使用：
+然而可以使用`NornJ`指令的扩展开发方式将上面的 Tooltip 组件封装在一个高阶组件之中，这样就可以像下面这种方式使用：
 
 ```js
 ReactDOM.render(
@@ -87,7 +122,7 @@ ReactDOM.render(
 
 下面是`NornJ`已有内置的指令：
 
-## n-show
+## show
 
 使用`n-show`可以在 JSX 中很方便地切换标签的`style.display`值是否为 none，当值为`false`时不显示：
 
@@ -101,17 +136,17 @@ class TestComponent extends Component {
 ReactDOM.render(<TestComponent show={false} />);
 
 //渲染结果：
-<input style="display:none" />
+<input style="display:none" />;
 ```
 
-- `n-show指令`与`<If>标签`的区别
+- `n-show指令`与`<if>标签`的区别
 
 | 语法     | 特点                         | 建议使用场景                     |
 | :------- | :--------------------------- | :------------------------------- |
 | `n-show` | 初始渲染开销大；切换时开销小 | 在条件频繁切换时使用，性能会更好 |
-| `<If>`   | 初始渲染开销小；切换时开销大 | 在条件很少改变时使用，性能会更好 |
+| `<if>`   | 初始渲染开销小；切换时开销大 | 在条件很少改变时使用，性能会更好 |
 
-## n-style
+## style
 
 使用`n-style`可以在 JSX 中使用与 html 语法一致的 css 写法：
 
@@ -136,7 +171,7 @@ class TestComponent extends Component {
 }
 ```
 
-## n-debounce
+## debounce
 
 使用`n-debounce`可以在 JSX 中为`input`等表单元素增加防抖效果，以减少用户输入频率而提高性能：
 
@@ -176,9 +211,9 @@ class TestComponent extends Component {
 }
 ```
 
-## n-mobxBind
+## mobxBind
 
-使用`n-mobxBind`指令可以配合`Mobx`的可观察变量在`<input>`及`<textarea>`等表单元素上创建`双向数据绑定`，它会根据控件类型自动选取正确的方法来更新值。
+使用`mobxBind`指令可以配合`Mobx`的可观察变量在`<input>`及`<textarea>`等表单元素上创建`双向数据绑定`，它会根据控件类型自动选取正确的方法来更新值。
 
 - 基本使用方法
 
@@ -190,14 +225,14 @@ class TestComponent extends Component {
   @observable inputValue = 'test';
 
   render() {
-    return <input n-mobxBind={this.inputValue} />;
+    return <input mobxBind={this.inputValue} />;
   }
 }
 ```
 
 如上所示，无需编写`<input>`标签的`onChange`事件，`inputValue`变量已自动和`<input>`标签建立了`双向数据绑定`的关系。
 
-- 实质上，`n-mobxBind`的实现原理其实就是下面的语法糖形式：
+- 实质上，`mobxBind`的实现原理其实就是下面的语法糖形式：
 
 ```js
 class TestComponent extends Component {
@@ -215,7 +250,7 @@ class TestComponent extends Component {
 
 - `onChange`事件
 
-由于`n-mobxBind`默认自动设置了组件的`onChange`事件，但有些情况下我们可能还是需要在`onChange`中做一些其他的操作：
+由于`mobxBind`默认自动设置了组件的`onChange`事件，但有些情况下我们可能还是需要在`onChange`中做一些其他的操作：
 
 ```js
 class TestComponent extends Component {
@@ -226,7 +261,7 @@ class TestComponent extends Component {
   };
 
   render() {
-    return <input n-mobxBind={this.inputValue} onChange={this.onChange} />;
+    return <input mobxBind={this.inputValue} onChange={this.onChange} />;
   }
 }
 ```
@@ -235,7 +270,7 @@ class TestComponent extends Component {
 
 - 增加防抖效果
 
-可以使用`debounce`参数为`n-mobxBind`提供防抖效果：
+可以使用`debounce`参数为`mobxBind`提供防抖效果：
 
 ```js
 import { Component } from 'react';
@@ -251,8 +286,8 @@ class TestComponent extends Component {
   render() {
     return (
       <>
-        <input n-mobxBind-debounce={this.inputValue} onChange={this.onChange} />
-        <input n-mobxBind-debounce$200={this.inputValue} onChange={this.onChange} />
+        <input mobxBind-debounce={this.inputValue} onChange={this.onChange} />
+        <input mobxBind-debounce$200={this.inputValue} onChange={this.onChange} />
       </>
     );
   }
@@ -281,18 +316,18 @@ class TestComponent extends Component {
   }
 
   render() {
-    return <input n-mobxBind={this.inputValue} />;
+    return <input mobxBind={this.inputValue} />;
   }
 }
 ```
 
-如存在 camel 命名法(`set + 首字母大写的observable变量名`)定义的`action`时，`n-mobxBind`会默认执行它来更新数据。上例中为`setInputValue`。
+如存在 camel 命名法(`set + 首字母大写的observable变量名`)定义的`action`时，`mobxBind`会默认执行它来更新数据。上例中为`setInputValue`。
 
-接下来我们来按控件分类列举下`n-mobxBind`指令可支持的场景：
+接下来我们来按控件分类列举下`mobxBind`指令可支持的场景：
 
 ### 绑定原生表单控件
 
-原生表单控件包含`文本框`、`复选框`、`单选按钮`、`选择框`等，以上都可以直接使用`n-mobxBind`指令，会自动监听相应控件的`onChange`事件并正确地更新值。
+原生表单控件包含`文本框`、`复选框`、`单选按钮`、`选择框`等，以上都可以直接使用`mobxBind`指令，会自动监听相应控件的`onChange`事件并正确地更新值。
 
 ### 文本框
 
@@ -305,7 +340,7 @@ class TestComponent extends Component {
   render() {
     return (
       <>
-        <input n-mobxBind={this.inputValue} />
+        <input mobxBind={this.inputValue} />
         <p>Message is: {this.inputValue}</p>
       </>
     );
@@ -322,7 +357,7 @@ class TestComponent extends Component {
   render() {
     return (
       <>
-        <textarea n-mobxBind={this.inputValue}></textarea>
+        <textarea mobxBind={this.inputValue}></textarea>
         <p>Message is: {this.inputValue}</p>
       </>
     );
@@ -341,7 +376,7 @@ class TestComponent extends Component {
   render() {
     return (
       <>
-        <input type="checkbox" id="checkbox" n-mobxBind={this.checked} />
+        <input type="checkbox" id="checkbox" mobxBind={this.checked} />
         <label for="checkbox">{this.checked}</label>
       </>
     );
@@ -358,11 +393,11 @@ class TestComponent extends Component {
   render() {
     return (
       <>
-        <input type="checkbox" id="jack" value="Jack" n-mobxBind={this.checkedNames} />
+        <input type="checkbox" id="jack" value="Jack" mobxBind={this.checkedNames} />
         <label for="jack">Jack</label>
-        <input type="checkbox" id="john" value="John" n-mobxBind={this.checkedNames} />
+        <input type="checkbox" id="john" value="John" mobxBind={this.checkedNames} />
         <label for="john">John</label>
-        <input type="checkbox" id="mike" value="Mike" n-mobxBind={this.checkedNames} />
+        <input type="checkbox" id="mike" value="Mike" mobxBind={this.checkedNames} />
         <label for="mike">Mike</label>
         <br />
         <span>Checked names: {this.checkedNames}</span>
@@ -381,10 +416,10 @@ class TestComponent extends Component {
   render() {
     return (
       <>
-        <input type="radio" id="one" value="One" n-mobxBind={this.picked}>
+        <input type="radio" id="one" value="One" mobxBind={this.picked}>
         <label for="one">One</label>
         <br />
-        <input type="radio" id="two" value="Two" n-mobxBind={this.picked}>
+        <input type="radio" id="two" value="Two" mobxBind={this.picked}>
         <label for="two">Two</label>
         <br />
         <span>Picked: {this.picked}</span>
@@ -405,7 +440,7 @@ class TestComponent extends Component {
   render() {
     return (
       <>
-        <select n-mobxBind={this.selected}>
+        <select mobxBind={this.selected}>
           <option disabled value="">
             请选择
           </option>
@@ -429,7 +464,7 @@ class TestComponent extends Component {
   render() {
     return (
       <>
-        <select n-mobxBind={this.selected} multiple n-style="width: 50px;">
+        <select mobxBind={this.selected} multiple n-style="width: 50px;">
           <option>A</option>
           <option>B</option>
           <option>C</option>
@@ -442,7 +477,7 @@ class TestComponent extends Component {
 }
 ```
 
-用`<Each>`渲染的动态选项：
+用`<each>`渲染的动态选项：
 
 ```js
 class TestComponent extends Component {
@@ -456,10 +491,10 @@ class TestComponent extends Component {
   render() {
     return (
       <>
-        <select n-mobxBind={this.selected}>
-          <Each of={this.options}>
+        <select mobxBind={this.selected}>
+          <each of={this.options}>
             <option value={item.value}>{item.text}</option>
-          <Each/>
+          <each/>
         </select>
         <span>Selected: {this.selected}</span>
       </>
@@ -470,7 +505,7 @@ class TestComponent extends Component {
 
 ### 绑定组件
 
-除了上述的原生表单控件外，`n-mobxBind`指令也可以绑定到任意 React 组件上。当然，前提是该组件可能需要使用`nj.registerComponent`进行注册，并且设置一些必要的参数。
+除了上述的原生表单控件外，`mobxBind`指令也可以绑定到任意 React 组件上。当然，前提是该组件可能需要使用`nj.registerComponent`进行注册，并且设置一些必要的参数。
 
 例如我们注册一个使用[ant-design 的 Input 组件](https://ant.design/components/input/)的例子，首先是注册组件：
 
@@ -488,7 +523,7 @@ nj.registerComponent(
 );
 ```
 
-上述代码在全局统一注册一次就可以了。然后便可以正常地使用`n-mobxBind`指令进行绑定：
+上述代码在全局统一注册一次就可以了。然后便可以正常地使用`mobxBind`指令进行绑定：
 
 ```js
 import { Component } from 'react';
@@ -499,7 +534,7 @@ class TestComponent extends Component {
   @observable inputValue = 'test';
 
   render() {
-    return <Input n-mobxBind={this.inputValue} />;
+    return <Input mobxBind={this.inputValue} />;
   }
 }
 ```
@@ -534,25 +569,19 @@ nj.registerComponent(
 
 #### 已预置注册的组件
 
-目前[ant-design 组件库](https://ant.design/docs/react/introduce)已在[nornj-react](https://github.com/joe-sky/nornj-react/tree/master/antd)包中预置注册了全部组件。也就是说对于`ant-design组件库`无需再手工注册了，按下面方式直接引入就可以使用`n-mobxBind`指令。
+目前[ant-design 组件库](https://ant.design/docs/react/introduce)已在[nornj-react](https://github.com/joe-sky/nornj-react/tree/master/antd)包中预置注册了全部组件。也就是说对于`ant-design组件库`无需再手工注册了，按下面方式直接引入就可以使用`mobxBind`指令。
 
-首先需要安装[babel-plugin-import 插件](https://github.com/ant-design/babel-plugin-import)，并在`.babelrc`增加以下配置：
+首先需要安装[babel-preset-nornj-with-antd](https://github.com/joe-sky/nornj/tree/master/packages/babel-preset-nornj-with-antd)，并在`.babelrc`增加以下配置：
 
 ```js
-"plugins": [
-   ...
-   [
-     "import",
-     {
-       "libraryName": "nornj-react/antd",
-       "style": true
-     }
-   ],
-   ...
-]
+{
+  "presets": [
+    "nornj-with-antd"
+  ]
+}
 ```
 
-然后这样引入使用各`ant-design组件`即可：
+然后这样引入使用各`ant-design组件`并使用即可：
 
 ```js
 import {
@@ -573,21 +602,21 @@ import {
   Icon,
   Steps,
   Divider
-} from 'nornj-react/antd';  //注意，此处由"antd"改为"nornj-react/antd"
+} from 'antd';
 
 ...
 class TestComponent extends Component {
   @observable inputValue = 'test';
 
   render() {
-    return <Input n-mobxBind={this.inputValue} />;
+    return <Input mobxBind={this.inputValue} />;
   }
 }
 ```
 
-<!-- # n-mstBind
+<!-- # mstBind
 
-`n-mstBind`即为`n-mobxBind`的默认使用action来更新值的版本，用来配合`mobx-state-tree`的变量使用：
+`mstBind`即为`mobxBind`的默认使用action来更新值的版本，用来配合`mobx-state-tree`的变量使用：
 
 store：
 
@@ -613,16 +642,16 @@ component：
 @observer
 class TestComponent extends Component {
   render() {
-    return <input n-mstBind={this.props.rootStore.testStore} />;
+    return <input mstBind={this.props.rootStore.testStore} />;
   }
 }
 ```
 
-如上，`n-mstBind`会默认执行camel命名法(`set + 变量名`)定义的`action`来更新值，上例中为`setInputValue`。除此外`n-mstBind`的其他特性与上述的`n-mobxBind`完全相同。 -->
+如上，`mstBind`会默认执行camel命名法(`set + 变量名`)定义的`action`来更新值，上例中为`setInputValue`。除此外`mstBind`的其他特性与上述的`mobxBind`完全相同。 -->
 
 ## 开发新的指令
 
-`NornJ`的指令都是支持可扩展的，也就是说可以自行封装各种新功能。
+`NornJ`指令都是支持可扩展的，也就是说可以自行封装各种新功能。
 
 ### 开发一个最简单的指令
 
@@ -679,11 +708,11 @@ nj.registerExtension(
 }
 ```
 
-这样我们就成功开发了一个`n-class`指令，该实例演示了`NornJ`指令的[操作将传入组件的 props 值](#set-component-props)功能。
+这样我们就成功开发了一个`n-class`指令，该实例演示了`NornJ`指令的[可对组件 props 进行额外处理](#可对组件-props-进行额外处理)功能。
 
 ### 更复杂的指令
 
-接下来我们来实现一个内部封装了包装组件的指令`n-tooltip`，它的作用和[ant-design 的 Tooltip 组件](https://ant.design/components/tooltip/)是一样的：
+接下来我们来实现一个内部封装了高阶组件的指令`n-tooltip`，它的作用和[ant-design 的 Tooltip 组件](https://ant.design/components/tooltip/)是一样的：
 
 ```js
 <div>
@@ -691,7 +720,7 @@ nj.registerExtension(
 </div>
 ```
 
-首先，我们组要实现一个包装组件`WrappedTooltip.jsx`：
+首先，我们组要实现一个高阶组件`WrappedTooltip.jsx`：
 
 ```js
 import React from 'react';
@@ -739,14 +768,14 @@ nj.registerExtension(
       setTagName //运行此函数，可以修改当前即将渲染的组件对象
     } = options;
 
-    setTagName(WrappedTooltip); //将当前渲染的组件修改为包装组件
-    tagProps.TooltipDirectiveTag = tagName; //传递指令所在组件对象到包装组件中
-    tagProps.tooltipDirectiveOptions = options; //传递指令的options到包装组件中
+    setTagName(WrappedTooltip); //将当前渲染的组件修改为高阶组件
+    tagProps.TooltipDirectiveTag = tagName; //传递指令所在组件对象到高阶组件中
+    tagProps.tooltipDirectiveOptions = options; //传递指令的options到高阶组件中
   }
 );
 ```
 
-> 上例有个需要注意的地方，就是`TooltipDirectiveTag`和`tooltipDirectiveOptions`参数的命名应当特例化而避免和其他指令的重复。因为这样才能适应同时存在多个含有包装组件的指令的场景，比如`<div n-directive1 n-directive2>`。
+> 上例有个需要注意的地方，就是`TooltipDirectiveTag`和`tooltipDirectiveOptions`参数的命名应当特例化而避免和其他指令的重复。因为这样才能适应同时存在多个含有高阶组件的指令的场景，比如`<div n-directive1 n-directive2>`。
 
 这样`n-tooltip`指令就开发完成了，还可以变更参数控制显示方向：
 
@@ -759,7 +788,7 @@ nj.registerExtension(
 
 ### 数据绑定指令
 
-数据绑定指令一般用来将传入的值与表单控件建立`双向绑定关系`，`n-mobxBind`就是一个数据绑定指令，这种特殊的指令同样也可以支持扩展。下面我们先来实现一个用于 React Hooks Api 的`n-bind`指令，用法如下：
+数据绑定指令一般用来将传入的值与表单控件建立`双向绑定关系`，`mobxBind`就是一个数据绑定指令，这种特殊的指令同样也可以支持扩展。下面我们先来实现一个用于 React Hooks Api 的`n-bind`指令，用法如下：
 
 ```js
 function TestBind() {
@@ -938,6 +967,6 @@ function putStateValue(value, ret) {
 
 `putStateValue`函数的实现逻辑其实很简单，就是递归获取`this.state.foo.count`当前层级值的`parent`属性，然后按相应格式构造出`setState`函数所需的参数结构即可。
 
-如上，我们就实现了一个更复杂的数据绑定指令`n-stateBind`。其实`n-mobxBind`指令的实现方式也与本例中的`n-stateBind`类似。
+如上，我们就实现了一个更复杂的数据绑定指令`n-stateBind`。其实`mobxBind`指令的实现方式也与本例中的`n-stateBind`类似。
 
-> 为什么 NornJ 中只内置实现了支持 Mobx 的数据绑定指令？答案其实很简单：因为 Mobx 可观察变量的特性与操作方式，更适合此种指令方案的语法结构等各方面，可以更好地呈现双向数据绑定的优势而提高开发效率。
+> 为什么 NornJ 中只内置实现了支持 Mobx 的数据绑定指令？主要是因为 Mobx 可观察变量的特性与操作方式，更适合此种指令方案的语法结构等各方面，可以更好地呈现双向数据绑定的优势而提高开发效率。
