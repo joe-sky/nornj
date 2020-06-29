@@ -1,5 +1,6 @@
 ---
-title: 快速起步
+title: 快速上手
+order: 2
 nav:
   title: 指南
   order: 1

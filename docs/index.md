@@ -1,26 +1,59 @@
 ---
-title: NornJ - 让 React JSX 语法更加丰富多彩
+title: NornJ - 更精彩的 React JSX
 hero:
   title: NornJ
-  desc: 🌠 让 React JSX 语法更加丰富多彩
+  desc: 🌠 基于 Babel，更精彩的 React JSX
   actions:
     - text: 快速上手
       link: /guide/use-it-in-jsx
-# features:
-#   - icon: https://gw.alipayobjects.com/zos/bmw-prod/813f5ed9-6bc4-43d4-9f74-ec81ecf35733/k7htg6n4_w144_h144.png
-#     title: 内容丰富
-#     desc: 拥有丰富的自定义 Hooks，每个 Hooks 都有丰富的在线示例供您体验。
-#   - icon: https://gw.alipayobjects.com/zos/bmw-prod/7659205c-6637-4fa2-8529-d32e5818304b/k7htflfb_w144_h144.png
-#     title: 完备的教程
-#     desc: 包含适合全年龄段的丰富的 React Hooks 教程，想学 React Hooks，来这里就够了。
-#   - icon: https://gw.alipayobjects.com/zos/bmw-prod/6319a122-e8b8-497f-9b45-37cfbe77edaa/k7htfx7t_w144_h144.png
-#     title: 生产可用
-#     desc: 已在蚂蚁内外经受过足够大量的线上系统的考验及打磨，健壮性值得信赖。
-# footer: Open-source MIT Licensed | Copyright © 2019-present<br />Powered by [dumi](https://d.umijs.org)
+features:
+  - icon: https://gw.alipayobjects.com/os/q/cms/images/k9ziitmp/13668549-b393-42a2-97c3-a6365ba87ac2_w96_h96.png
+    title: 简单易用
+    desc: 简单配置 babel，就能拥有 if、for、switch 等常用 JSX 扩展语法，并支持完备的 IDE 代码提示体验。
+  - icon: https://gw.alipayobjects.com/zos/bmw-prod/d60657df-0822-4631-9d7c-e7a869c2f21c/k79dmz3q_w126_h126.png
+    title: 强大的扩展能力
+    desc: 完整的可扩展设计，开发者使用简洁的 API，即可为 React JSX 创造出更丰富的组件复用思路。
+  - icon: https://gw.alipayobjects.com/os/q/cms/images/k9zij2bh/67f75d56-0d62-47d6-a8a5-dbd0cb79a401_w96_h96.png
+    title: Typescript
+    desc: 使用 TypeScript 开发，提供完整的类型定义文件。
+footer: Open-source MIT Licensed | Copyright © 2016-present<br />Powered by [Joe_Sky](https://github.com/joe-sky)
 ---
 
 ## 轻松上手
 
+### 安装
+
 ```bash
-npm install babel-plugin-nornj-in-jsx  #or yarn add babel-plugin-nornj-in-jsx
+npm install babel-plugin-nornj-in-jsx
 ```
+
+### 配置 Babel
+
+```js
+{
+  "plugins": [
+    "nornj-in-jsx"
+  ]
+}
+```
+
+### 开始使用
+
+```js
+const App = props => (
+  <if condition={props.success}>
+    <i>success</i>
+    <else>
+      <i>fail</i>
+    </else>
+  </if>
+);
+
+ReactDOM.render(<App success={false} />, document.querySelector('#app'));
+
+//渲染结果：<i>fail</i>
+```
+
+## Playground
+
+[Codesandbox 示例](https://codesandbox.io/s/z2nj54r3wx)
