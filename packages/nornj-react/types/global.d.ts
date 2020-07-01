@@ -86,8 +86,4 @@ declare module 'nornj-react/mobx/native';
 
 declare module 'nornj-react/mobx/formData';
 
-declare module 'nornj-react/redux';
-
-declare module 'nornj-react/router';
-
 declare module 'nornj-react/lib/*';

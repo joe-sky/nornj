@@ -1,4 +1,4 @@
-const { default: nj, expression: n } = require('nornj');
+const { default: nj, expression: n } = require('nornj/dist/nornj.common');
 const njUtils = require('nornj/tools/utils');
 const { locInfo } = require('./utils');
 

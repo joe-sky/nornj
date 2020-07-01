@@ -5,6 +5,7 @@ import { uglify } from 'rollup-plugin-uglify';
 import filesize from 'rollup-plugin-filesize';
 import license from 'rollup-plugin-license';
 import resolve from 'rollup-plugin-node-resolve';
+import copy from 'rollup-plugin-copy';
 
 const env = process.env.NODE_ENV;
 const type = process.env.TYPE;
@@ -64,6 +65,20 @@ if (type !== 'dts') {
   }
 
   config.plugins.push(filesize());
+
+  if (env === 'cjs' || env === 'es') {
+    config.plugins.push(
+      copy({
+        targets: [
+          {
+            src: 'types/dist.definition.ts',
+            dest: 'dist',
+            rename: `${env === 'cjs' ? 'nornj.common' : 'nornj.esm'}.d.ts`
+          }
+        ]
+      })
+    );
+  }
 } else {
   config = {
     input: './src/base.ts',

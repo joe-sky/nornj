@@ -1,4 +1,4 @@
-const nj = require('nornj').default;
+const nj = require('nornj/dist/nornj.common').default;
 
 function setTmplConfig(opts) {
   if (opts.extensionConfig) {

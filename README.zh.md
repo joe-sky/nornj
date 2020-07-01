@@ -1,64 +1,62 @@
-<a href="https://joe-sky.github.io/nornj-guide/" target="_blank" rel="noopener noreferrer"><img width="187" src="https://joe-sky.github.io/nornj-guide/images/logo.png" alt="NornJ"></a>
--------
+<p align="center">
+  <a href="https://joe-sky.github.io/nornj-guide/" target="_blank" rel="noopener noreferrer"><img width="240" src="./public/images/nornj.png" alt="NornJ"></a>
+</p>
 
-```
-  ____        __   
-/\  __ \     /\ \  
-\ \ \/\ \   _\_\ \ `<html>
- \ \_\ \_\ /\_____\   Hello World!
-  \/_/\/_/ \/_____/ </html>`();
-
-```
-
-`NornJ`(读音[ˌnɔ:nˈdʒeɪ]，简称`nj`)是一个可以同React一起工作的模板引擎，**JSX的增强或替代工具**。
-
-[![NPM Version][npm-image]][npm-url]
-<a href="https://www.npmjs.com/package/nornj"><img src="https://img.shields.io/npm/l/nornj.svg" alt="License"></a>
-<a href="https://travis-ci.org/joe-sky/nornj"><img src="https://travis-ci.org/joe-sky/nornj.svg?branch=master" alt="Travis CI Status"/></a>
-<a href="https://codecov.io/gh/joe-sky/nornj"><img src="https://codecov.io/gh/joe-sky/nornj/branch/master/graph/badge.svg" alt="Codecov" /></a>
-[![NPM Downloads][downloads-image]][npm-url]
-[![](https://img.shields.io/bundlephobia/minzip/nornj@next.svg?style=flat)](https://bundlephobia.com/result?p=nornj@next)
+<p align="center">
+  <a href="https://www.npmjs.org/package/nornj"><img src="https://img.shields.io/npm/v/nornj.svg" alt="NPM Version"></a>
+  <a href="https://www.npmjs.com/package/nornj"><img src="https://img.shields.io/npm/l/nornj.svg" alt="License"></a>
+  <a href="https://travis-ci.org/joe-sky/nornj"><img src="https://travis-ci.org/joe-sky/nornj.svg?branch=master" alt="Travis CI Status"></a>
+  <a href="https://codecov.io/gh/joe-sky/nornj"><img src="https://codecov.io/gh/joe-sky/nornj/branch/master/graph/badge.svg" alt="Codecov"></a>
+  <a href="https://www.npmjs.org/package/nornj"><img src="https://img.shields.io/npm/dm/nornj.svg" alt="NPM Downloads"></a>
+  <a href="https://bundlephobia.com/result?p=nornj"><img src="https://img.shields.io/bundlephobia/minzip/nornj@next.svg?style=flat" alt="Minzipped Size"></a>
+</p>
 
 [English](https://github.com/joe-sky/nornj/blob/master/README.md) | 简体中文
 
+## 简介
+
+`NornJ`(读音[ˌnɔ:nˈdʒeɪ]，简称`nj`)是一个可以同 React 一起工作的模板引擎，**JSX 的增强或替代工具**。
+
 ## 文档
 
-* [NornJ指南(v5)](https://joe-sky.github.io/nornj-guide/zh)
-* [NornJ指南(v0.4)](https://joe-sky.github.io/nornj-guide-v0.4)
+- [NornJ 指南(v5)](https://joe-sky.github.io/nornj-guide/zh)
+- [NornJ 指南(v0.4)](https://joe-sky.github.io/nornj-guide-v0.4)
 
 ## 概述
 
-`React`的`JSX`几乎可以使用`javascript`的全部语法且非常灵活，可配合`babel`适应各种复杂的使用场景。但是，使用`NornJ`配合`React`开发还能做得更好，因为它能给JSX带来`模板引擎`的特性：
+`React`的`JSX`几乎可以使用`javascript`的全部语法且非常灵活，可配合`babel`适应各种复杂的使用场景。但是，使用`NornJ`配合`React`开发还能做得更好，因为它能给 JSX 带来`模板引擎`的特性：
 
-* 支持流程控制语法：
+- 支持流程控制语法：
 
 ```js
-<Each of={[1, 2, 3]}><i>{item}</i></Each>
+<Each of={[1, 2, 3]}>
+  <i>{item}</i>
+</Each>
 ```
 
-* 支持指令语法：
+- 支持指令语法：
 
 ```js
 <img n-show={false} />
 ```
 
-* 支持过滤器语法：
+- 支持过滤器语法：
 
 ```js
 <button>{n`foo | upperFirst`}</button>
 ```
 
-* 支持自定义运算符：
+- 支持自定义运算符：
 
 ```js
 <input value={n`(1 .. 100).join('-')`} />
 ```
 
-`NornJ`不仅有预置的上述几类可增强`JSX`的语法，并且还实现了**支持用户扩展更多的语法**。`NornJ`还同时提供了`JSX`和`tagged templates`两套几乎相同的语法API，以适应不同用户的口味 :wink:
+`NornJ`不仅有预置的上述几类可增强`JSX`的语法，并且还实现了**支持用户扩展更多的语法**。`NornJ`还同时提供了`JSX`和`tagged templates`两套几乎相同的语法 API，以适应不同用户的口味 :wink:
 
 ## 基本示例
 
-* 直接在JSX中使用(结合[styled-jsx](https://github.com/zeit/styled-jsx))：
+- 直接在 JSX 中使用(结合[styled-jsx](https://github.com/zeit/styled-jsx))：
 
 ```js
 class App extends Component {
@@ -93,18 +91,20 @@ class App extends Component {
 }
 ```
 
-如上例，配合`NornJ`提供的[配套babel插件](https://github.com/joe-sky/nornj/tree/master/packages/babel-plugin-nornj-in-jsx)，便可以在`JSX`中编写各种新的增强语法。
+如上例，配合`NornJ`提供的[配套 babel 插件](https://github.com/joe-sky/nornj/tree/master/packages/babel-plugin-nornj-in-jsx)，便可以在`JSX`中编写各种新的增强语法。
 
-* 使用`tagged templates`语法(结合[styled-components](https://github.com/styled-components/styled-components))：
+- 使用`tagged templates`语法(结合[styled-components](https://github.com/styled-components/styled-components))：
 
 ```js
 const template = html`
   <Container>
     <ul>
-      <each of={todos}>
-        <if {@index > 5}>
+      <each of="{todos}">
+        <if {@index>
+          5}>
           <li>{@item * 2}</li>
-          <elseif {@index > 10}>
+          <elseif {@index>
+            10}>
             <li>{@item * 3}</li>
           </elseif>
         </if>
@@ -116,7 +116,7 @@ const template = html`
 
 const Container = styled.div`
   padding: 20px;
-  font-size: .75rem;
+  font-size: 0.75rem;
 `;
 
 class App extends Component {
@@ -135,13 +135,13 @@ class App extends Component {
 
 ## 在线演示地址
 
-### 使用JSX
+### 使用 JSX
 
-* [在线Playground(codesandbox)](https://codesandbox.io/s/z2nj54r3wx)
+- [在线 Playground(codesandbox)](https://codesandbox.io/s/z2nj54r3wx)
 
-### 使用tagged templates
+### 使用 tagged templates
 
-* [在线Playground(codepen)](https://codepen.io/joe_sky/pen/ooPNbj)
+- [在线 Playground(codepen)](https://codepen.io/joe_sky/pen/ooPNbj)
 
 ## 安装
 
@@ -179,8 +179,8 @@ npm install babel-plugin-nornj-in-jsx  #or yarn add babel-plugin-nornj-in-jsx
 
 ## 语法高亮插件
 
-* [nornj-highlight(vscode)](https://github.com/joe-sky/nornj-highlight)
-<!-- * [language-nornj(atom)](https://github.com/zyj1022/language-nornj) -->
+- [nornj-highlight(vscode)](https://github.com/joe-sky/nornj-highlight)
+  <!-- * [language-nornj(atom)](https://github.com/zyj1022/language-nornj) -->
 
 <!-- ## 浏览器支持
 

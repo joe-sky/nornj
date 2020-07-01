@@ -1,54 +1,52 @@
-<a href="https://joe-sky.github.io/nornj-guide/" target="_blank" rel="noopener noreferrer"><img width="187" src="https://joe-sky.github.io/nornj-guide/images/logo.png" alt="NornJ"></a>
--------
+<p align="center">
+  <a href="https://joe-sky.github.io/nornj-guide/" target="_blank" rel="noopener noreferrer"><img width="240" src="./public/images/nornj.png" alt="NornJ"></a>
+</p>
 
-```
-  ____        __   
-/\  __ \     /\ \  
-\ \ \/\ \   _\_\ \ `<html>
- \ \_\ \_\ /\_____\   Hello World!
-  \/_/\/_/ \/_____/ </html>`();
-
-```
-
-`NornJ`(pronounced [ˌnɔ:nˈdʒeɪ]，abbreviated as `nj`) is a template engine that can works with React, JSX enhancement or alternative tools.
-
-[![NPM Version][npm-image]][npm-url]
-<a href="https://www.npmjs.com/package/nornj"><img src="https://img.shields.io/npm/l/nornj.svg" alt="License"></a>
-<a href="https://travis-ci.org/joe-sky/nornj"><img src="https://travis-ci.org/joe-sky/nornj.svg?branch=master" alt="Travis CI Status"/></a>
-<a href="https://codecov.io/gh/joe-sky/nornj"><img src="https://codecov.io/gh/joe-sky/nornj/branch/master/graph/badge.svg" alt="Codecov" /></a>
-[![NPM Downloads][downloads-image]][npm-url]
-[![](https://img.shields.io/bundlephobia/minzip/nornj@next.svg?style=flat)](https://bundlephobia.com/result?p=nornj)
+<p align="center">
+  <a href="https://www.npmjs.org/package/nornj"><img src="https://img.shields.io/npm/v/nornj.svg" alt="NPM Version"></a>
+  <a href="https://www.npmjs.com/package/nornj"><img src="https://img.shields.io/npm/l/nornj.svg" alt="License"></a>
+  <a href="https://travis-ci.org/joe-sky/nornj"><img src="https://travis-ci.org/joe-sky/nornj.svg?branch=master" alt="Travis CI Status"></a>
+  <a href="https://codecov.io/gh/joe-sky/nornj"><img src="https://codecov.io/gh/joe-sky/nornj/branch/master/graph/badge.svg" alt="Codecov"></a>
+  <a href="https://www.npmjs.org/package/nornj"><img src="https://img.shields.io/npm/dm/nornj.svg" alt="NPM Downloads"></a>
+  <a href="https://bundlephobia.com/result?p=nornj"><img src="https://img.shields.io/bundlephobia/minzip/nornj@next.svg?style=flat" alt="Minzipped Size"></a>
+</p>
 
 English | [简体中文](https://github.com/joe-sky/nornj/blob/master/README.zh.md)
 
+## Introduction
+
+`NornJ`(pronounced [ˌnɔ:nˈdʒeɪ]，abbreviated as `nj`) is a template engine that can works with React, JSX enhancement or alternative tools.
+
 ## Documents
 
-* [NornJ Guide(v5)](https://joe-sky.github.io/nornj-guide/zh)
-* [NornJ Guide(v0.4)](https://joe-sky.github.io/nornj-guide-v0.4)
+- [NornJ Guide(v5)](https://joe-sky.github.io/nornj-guide/zh)
+- [NornJ Guide(v0.4)](https://joe-sky.github.io/nornj-guide-v0.4)
 
 ## Introduction
 
 In `React` development, the `JSX` can use almost all the syntax of javascript and it's very flexible. But if we use `NornJ` with `React` and `JSX`, we can do better, because it can gives JSX `template engine` features:
 
-* Support control statements：
+- Support control statements：
 
 ```js
-<Each of={[1, 2, 3]}><i>{item}</i></Each>
+<Each of={[1, 2, 3]}>
+  <i>{item}</i>
+</Each>
 ```
 
-* Support directives：
+- Support directives：
 
 ```js
 <img n-show={false} />
 ```
 
-* Support filters：
+- Support filters：
 
 ```js
 <button>{n`foo | upperFirst`}</button>
 ```
 
-* Support custom operators：
+- Support custom operators：
 
 ```js
 <input value={n`(1 .. 100).join('-')`} />
@@ -58,7 +56,7 @@ In `React` development, the `JSX` can use almost all the syntax of javascript an
 
 ## Basic
 
-* Use NornJ syntaxs in JSX(with [styled-jsx](https://github.com/zeit/styled-jsx))：
+- Use NornJ syntaxs in JSX(with [styled-jsx](https://github.com/zeit/styled-jsx))：
 
 ```js
 class App extends Component {
@@ -95,16 +93,18 @@ class App extends Component {
 
 For above example, combining with the [Babel plugin provided by NornJ](https://github.com/joe-sky/nornj/tree/master/packages/babel-plugin-nornj-in-jsx), it is possible to write various new enhancement syntaxs in JSX.
 
-* Use NornJ tagged templates syntaxs(with [styled-components](https://github.com/styled-components/styled-components))：
+- Use NornJ tagged templates syntaxs(with [styled-components](https://github.com/styled-components/styled-components))：
 
 ```js
 const template = html`
   <Container>
     <ul>
-      <each of={todos}>
-        <if {@index > 5}>
+      <each of="{todos}">
+        <if {@index>
+          5}>
           <li>{@item * 2}</li>
-          <elseif {@index > 10}>
+          <elseif {@index>
+            10}>
             <li>{@item * 3}</li>
           </elseif>
         </if>
@@ -116,7 +116,7 @@ const template = html`
 
 const Container = styled.div`
   padding: 20px;
-  font-size: .75rem;
+  font-size: 0.75rem;
 `;
 
 class App extends Component {
@@ -137,11 +137,11 @@ In the above example, a template function was created using `tagged templates AP
 
 ### Use it in JSX
 
-* [NornJ playground(codesandbox)](https://codesandbox.io/s/z2nj54r3wx)
+- [NornJ playground(codesandbox)](https://codesandbox.io/s/z2nj54r3wx)
 
 ### Use tagged templates
 
-* [NornJ playground(codepen)](https://codepen.io/joe_sky/pen/ooPNbj)
+- [NornJ playground(codepen)](https://codepen.io/joe_sky/pen/ooPNbj)
 
 ## Install
 
@@ -179,8 +179,8 @@ Next, add `nornj-in-jsx` to plugins in your babel configuration:
 
 ## Syntax highlight
 
-* [nornj-highlight(vscode)](https://github.com/joe-sky/nornj-highlight)
-<!--* [language-nornj(atom)](https://github.com/zyj1022/language-nornj)-->
+- [nornj-highlight(vscode)](https://github.com/joe-sky/nornj-highlight)
+  <!--* [language-nornj(atom)](https://github.com/zyj1022/language-nornj)-->
 
 <!-- ## Browser support
 
