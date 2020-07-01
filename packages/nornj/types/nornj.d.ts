@@ -1,5 +1,5 @@
 /*!
- * NornJ template engine v5.2.0-rc.7
+ * NornJ template engine v5.2.0-rc.8
  * (c) Joe_Sky
  * Released under the MIT License.
  */
