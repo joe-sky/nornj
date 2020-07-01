@@ -3,7 +3,7 @@ import merge from 'lodash.merge';
 export default function(context, { moduleResolverPlugin, importPlugin, ...nornjInJsx }: Record<string, any> = {}) {
   const plugins = [
     [
-      require.resolve('babel-plugin-module-resolver'),
+      require('babel-plugin-module-resolver'),
       merge(
         {
           alias: {
@@ -15,7 +15,7 @@ export default function(context, { moduleResolverPlugin, importPlugin, ...nornjI
       )
     ],
     [
-      require.resolve('babel-plugin-import'),
+      require('babel-plugin-import'),
       merge(
         {
           libraryName: 'nornj-react/antd',
@@ -26,7 +26,7 @@ export default function(context, { moduleResolverPlugin, importPlugin, ...nornjI
       'nornj-react/antd'
     ],
     [
-      require.resolve('babel-plugin-nornj-in-jsx'),
+      require('babel-plugin-nornj-in-jsx'),
       merge(
         {
           imports: ['nornj-react/antd'],
