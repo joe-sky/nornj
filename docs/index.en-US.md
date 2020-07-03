@@ -1,5 +1,5 @@
 ---
-title: NornJ - 更精彩的 React JSX
+title: NornJ - 基于 Babel，更精彩的 React JSX
 hero:
   title: NornJ
   desc: 🌠 基于 Babel，更精彩的 React JSX
@@ -54,6 +54,10 @@ ReactDOM.render(<App success={false} />, document.querySelector('#app'));
 //渲染结果：<i>fail</i>
 ```
 
+## Create-React-App 示例
+
+[nornj-antd-v4-demo](https://github.com/joe-sky/nornj-antd-v4-demo)
+
 ## Playground
 
-[Codesandbox 示例](https://codesandbox.io/s/z2nj54r3wx)
+[nornj-antd-v4-demo(Codesandbox)](https://codesandbox.io/s/nostalgic-driscoll-t8kty)

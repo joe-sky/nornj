@@ -6,15 +6,35 @@ nav:
   order: 1
 ---
 
-# 在JSX中使用增强React开发体验
+## 配置 Babel
 
-`NornJ`语法通过配套的[babel插件](https://github.com/joe-sky/nornj/tree/master/packages/babel-plugin-nornj-in-jsx)可直接在JSX中编写，例如：
+### 安装
+
+```bash
+npm install babel-plugin-nornj-in-jsx
+```
+
+### 配置 Babel
+
+```js
+{
+  "plugins": [
+    "nornj-in-jsx"
+  ]
+}
+```
+
+## 使用 Create-React-App
+
+<!-- # 在 JSX 中使用增强 React 开发体验
+
+`NornJ`语法通过配套的[babel 插件](https://github.com/joe-sky/nornj/tree/master/packages/babel-plugin-nornj-in-jsx)可直接在 JSX 中编写，例如：
 
 <code src="./demo/Demo1.tsx" />
 
 下面的是一个在线可运行实例：
 
-* [在线Playground(codesandbox)](https://codesandbox.io/s/z2nj54r3wx)
+- [在线 Playground(codesandbox)](https://codesandbox.io/s/z2nj54r3wx)
 
 ## 安装
 
@@ -30,7 +50,8 @@ npm install babel-plugin-nornj-in-jsx  #or yarn add babel-plugin-nornj-in-jsx
     "nornj-in-jsx"
   ]
 }
-```
+``` -->
+
 <!--
 ## 在js文件中使用NornJ模板
 
@@ -194,8 +215,8 @@ const Button = () => {
 }
 ```-->
 
-具体请见[babel-plugin-nornj-in-jsx](https://github.com/joe-sky/nornj/blob/master/packages/babel-plugin-nornj-in-jsx/README.md)。
+<!-- 具体请见[babel-plugin-nornj-in-jsx](https://github.com/joe-sky/nornj/blob/master/packages/babel-plugin-nornj-in-jsx/README.md)。
 
-## 与各种React已有生态结合
+## 与各种 React 已有生态结合
 
-`NornJ`可直接支持所有`React`现有生态，包括`Redux`、`React-Router`、`Mobx`、`Ant Design`等等，它可以和任何已有的`React`生态共存。
+`NornJ`可直接支持所有`React`现有生态，包括`Redux`、`React-Router`、`Mobx`、`Ant Design`等等，它可以和任何已有的`React`生态共存。 -->

@@ -19,8 +19,8 @@ English | [简体中文](https://github.com/joe-sky/nornj/blob/master/README.zh.
 
 ## Documents
 
-- [NornJ Guide(v5)](https://joe-sky.github.io/nornj-guide/zh)
-- [NornJ Guide(v0.4)](https://joe-sky.github.io/nornj-guide-v0.4)
+- [NornJ Guide(github.io)](https://joe-sky.github.io/nornj)
+- [NornJ Guide(gitee.io)](https://joe-sky.gitee.io/nornj)
 
 ## Introduction
 
@@ -29,9 +29,9 @@ In `React` development, the `JSX` can use almost all the syntax of javascript an
 - Support control statements：
 
 ```js
-<Each of={[1, 2, 3]}>
+<each of={[1, 2, 3]}>
   <i>{item}</i>
-</Each>
+</each>
 ```
 
 - Support directives：
@@ -75,14 +75,14 @@ class App extends Component {
           }
         `</style>
         <ul>
-          <Each of={todos} item="todo">
-            <If condition={index > 5}>
+          <each of={todos} item="todo">
+            <if condition={index > 5}>
               <li>{todo * 2}</li>
-              <Elseif condition={index > 10}>
+              <elseif condition={index > 10}>
                 <li>{todo * 3}</li>
-              </Elseif>
-            </If>
-          </Each>
+              </elseif>
+            </if>
+          </each>
         </ul>
         <button n-show={todos.length > 0} onClick={this.addTodo}>Add Todo</button>
       </div>
@@ -135,13 +135,7 @@ In the above example, a template function was created using `tagged templates AP
 
 ## Playground
 
-### Use it in JSX
-
-- [NornJ playground(codesandbox)](https://codesandbox.io/s/z2nj54r3wx)
-
-### Use tagged templates
-
-- [NornJ playground(codepen)](https://codepen.io/joe_sky/pen/ooPNbj)
+- [nornj-antd-v4-demo(Codesandbox)](https://codesandbox.io/s/nostalgic-driscoll-t8kty)
 
 ## Install
 
@@ -159,9 +153,11 @@ Next, add `nornj-in-jsx` to plugins in your babel configuration:
 }
 ```
 
-<!-- ## Boilerplate projects
+## Boilerplate projects
 
-* NornJ + React + Redux + React-Router + Webpack: [react-redux-nornj-todomvc](https://github.com/joe-sky/nornj/blob/master/examples/react-redux-nornj-todomvc)
+- [nornj-antd-v4-demo](https://github.com/joe-sky/nornj-antd-v4-demo)
+
+<!-- * NornJ + React + Redux + React-Router + Webpack: [react-redux-nornj-todomvc](https://github.com/joe-sky/nornj/blob/master/examples/react-redux-nornj-todomvc)
 * NornJ + React + Redux + React-Router(no need webpack): [react-redux-nornj-todomvc-es5](https://github.com/joe-sky/nornj/blob/master/examples/react-redux-nornj-todomvc-es5)
 * NornJ + Backbone + Marionette(render html string): [backbone-marionette-nornj-todomvc](https://github.com/joe-sky/nornj/blob/master/examples/backbone-marionette-nornj-todomvc)
 * NornJ + React-Native + Styled-Components: [nornj-react-native-counter](https://github.com/joe-sky/nornj-react-native-counter)
@@ -189,7 +185,3 @@ Next, add `nornj-in-jsx` to plugins in your babel configuration:
 ## License
 
 MIT
-
-[npm-image]: http://img.shields.io/npm/v/nornj.svg
-[downloads-image]: http://img.shields.io/npm/dm/nornj.svg
-[npm-url]: https://www.npmjs.org/package/nornj

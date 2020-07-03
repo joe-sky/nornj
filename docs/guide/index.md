@@ -6,11 +6,69 @@ nav:
   order: 1
 ---
 
-# 什么是 NornJ？
+## 什么是 NornJ
 
-`NornJ`，我们可以把它读作 `[ˌnɔ:nˈdʒeɪ]` 或简称 `nj`，它是一个基于 Babel 的 React JSX 新增语法扩展方案。**它的目标是创造出更简单、易读的 JSX 写法，以及通过 JSX 语法扩展继续丰富 React 现有的组件复用思路。**
+`NornJ`，我们可以把它读作 `[ˌnɔ:nˈdʒeɪ]` 或简称 `nj`，它是一个基于 Babel 的 React JSX 新增语法扩展方案。**它的目标是创造出更简单、易读、实用的 JSX 写法，以及通过 JSX 语法扩展继续丰富 React 现有的组件复用思路。**
 
-# 关于 JSX 的思考
+## 它能做什么
+
+与其他的 Babel JSX 扩展（如[jsx-control-statements](https://github.com/AlexGilleran/jsx-control-statements)）类似， `NornJ` 内置了一些常用的 JSX 扩展如流程控制：
+
+```js
+ReactDOM.render(
+  <>
+    <if condition={isOk}>
+      success
+      <else>fail</else>
+    </if>
+
+    <for of={[1, 2, 3]}>
+      <i>{item}</i>
+    </for>
+  </>,
+  document.body
+);
+```
+
+以及一些常用指令：
+
+```js
+ReactDOM.render(
+  <>
+    <img n-show={isShow} />
+
+    <input n-debounce={200} onChange={e => console.log(e.target.value)} />
+  </>,
+  document.body
+);
+```
+
+还包括 Babel 配合 Tagged Templates 语法实现的过滤器语法等：
+
+```js
+const num = 100;
+
+ReactDOM.render(
+  <>
+    <i>{n`num | random(5000) | currency`}</i>
+  </>,
+  document.body
+);
+```
+
+另外，和大多数 Babel 扩展不太一样的地方，它是一个可以支持扩展的方案。
+
+## 它的可扩展能力
+
+## 它的运作原理
+
+## 它的运行时体积多大
+
+## 它的性能
+
+## 它的命名
+
+<!-- # 关于 JSX 的思考
 
 我们平时都编写`JSX`来创建 React 组件，`JSX`非常好用，能适应各种各样的场景。依现状不难列出和`JSX`有关的以下几个话题：
 
@@ -53,7 +111,7 @@ const test = props => (
 
 下面的是一个在线可运行实例：
 
-- [在线 Playground(codesandbox)](https://codesandbox.io/s/z2nj54r3wx)
+- [在线 Playground(codesandbox)](https://codesandbox.io/s/z2nj54r3wx) -->
 
 <!-- # NornJ有哪些主要的语法糖
 

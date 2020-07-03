@@ -77,22 +77,24 @@
         return ret + '}';
       }
 
-      function generate(str) {
-        return _buildTmplFns(
-          nj.precompile(
-            str,
-            true,
-            nj.createTmplRule({
-              start: '{',
-              end: '}',
-              comment: '',
-              extension: 'n-',
-              prop: 'p-',
-              strProp: 's'
-            })
-          ),
-          'testKey'
+      function ast(str, hasAst) {
+        return nj.precompile(
+          str,
+          true,
+          nj.createTmplRule({
+            start: '{',
+            end: '}',
+            comment: '',
+            extension: 'n-',
+            prop: 'p-',
+            strProp: 's'
+          }),
+          hasAst
         );
+      }
+
+      function generate(str) {
+        return _buildTmplFns(ast(str), 'testKey');
       }
 
       var editor = CodeMirror.fromTextArea(document.getElementById('code'), {
@@ -103,7 +105,26 @@
 
       editor.on('change', function(instance, changeObj) {
         editor2.setValue(generate(instance.getValue()));
+        !v4 && editor3.setValue(JSON.stringify(ast(instance.getValue(), true).ast, null, 2));
       });
+    </script>
+  </article>
+  <article id="astCode">
+    <h2>NornJ AST code</h2>
+    <form><textarea id="code3" name="code3"><html</textarea></form>
+
+    <script>
+      if (!v4) {
+        var editor3 = CodeMirror.fromTextArea(document.getElementById('code3'), {
+          mode: 'text/javascript',
+          lineNumbers: true,
+          autoCloseTags: true
+        });
+
+        editor3.setValue(JSON.stringify(ast(editor.getValue(), true).ast, null, 2));
+      } else {
+        document.querySelector('#astCode').style.display = 'none';
+      }
     </script>
   </article>
   <article>
