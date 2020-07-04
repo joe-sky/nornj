@@ -78,46 +78,30 @@ const Foo = ({ data }) => (
 babel 转换后为：
 
 ```js
-{
+nj.renderH({
   //此函数返回<i>fail</i>
-  fn1: function fn1(g,c,p) {
-    var _type0 = g.e('i', g, 'i', c);
-    var _compParam0 = [_type0, null];
-
-    _compParam0.push('fail');
-
-    return g.H(_compParam0);
+  fn1: function(g,c,p) {
+    return g.d('_njParam1');
   },
   //此函数返回<i>success</i>
-  fn2: function fn2(g,c,p) {
-    var _type0 = g.e('i', g, 'i', c);
-    var _compParam0 = [_type0, null];
-
-    _compParam0.push('success');
-
-    return g.H(_compParam0);
+  fn2: function(g,c,p) {
+    return g.d('_njParam2');
   },
   //将if、else标签解析为渲染函数
-  main: function main(g,c,p) {
-    var _ex0 = g.x['if'];
+  main: function(g,c,p) {
     var _params0 = {
-      'condition': (c.d('isTest'))
+      condition: c.d('isTest')
     };
 
-    var _ex1 = g.x['else'];
-    var _dataRefer1 = [
-    { _njOpts: 1, useString: g.us, tagProps: _params0, children: g.r(g, c, g.fn1) }
-    ];
+    g.x['else'].apply(c, [{ tagProps: _params0, children: g.r(g, c, g.fn1) }]);
 
-    _ex1.apply(c, _dataRefer1);
-    var _dataRefer0 = [
-    { _njOpts: 2, useString: g.us, props: _params0, children: g.r(g, c, g.fn2) }
-    ];
-    g.aa(_params0, _dataRefer0);
-
-    return _ex0.apply(c, _dataRefer0);
+    return _exg.x['if']0.apply(c, [{ props: _params0, children: g.r(g, c, g.fn2) }]);
   }
-}
+}, {
+  isTest: isTest,
+  _njParam1: () => <i>success</i>,
+  _njParam2: () => <i>fail</i>
+});
 ```
 
 从上面可以看出，`<i>success</i>`等其实是包在函数内并没立即执行的。

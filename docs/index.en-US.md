@@ -5,7 +5,7 @@ hero:
   desc: 🌠 基于 Babel，更精彩的 React JSX
   actions:
     - text: 快速上手
-      link: /guide/use-it-in-jsx
+      link: /guide/getting-started
 features:
   - icon: https://gw.alipayobjects.com/os/q/cms/images/k9ziitmp/13668549-b393-42a2-97c3-a6365ba87ac2_w96_h96.png
     title: 简单易用
