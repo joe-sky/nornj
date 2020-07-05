@@ -792,13 +792,12 @@ nj.registerExtension(
 
 ```js
 function TestBind() {
-  const $count = useState(100), //useState的返回值是一个数组，需要将它传到n-bind指令中
-    [count] = $count; //如有需要，可以再从$count解构出count和setCount
+  const [count, setCount] = useState(100);
 
   return (
     <div>
       <input
-        n-bind={$count} //与count建立双向数据绑定关系
+        n-bind={count} //与count建立双向数据绑定关系
         onChange={e => console.log(e.target.value)}
       />
       input: {count}
@@ -807,39 +806,75 @@ function TestBind() {
 }
 ```
 
-编写`n-bind`的扩展函数：
+首先需要修改`.babelrc`配置：
+
+```js
+{
+  ...
+  "plugins": [
+    [
+      "nornj-in-jsx",
+      {
+        "extensionConfig": {
+          "stateBind": {
+            "isDirective": true,
+            "isBindable": true, //设置isBindable为true，在取指令的值时会返回特殊的格式
+            "useExpressionInProps": true
+          }
+        }
+      }
+    ]
+  ]
+}
+```
+
+然后编写`n-bind`的扩展函数：
 
 ```js
 nj.registerExtension('bind', options => {
-  const { tagProps, value } = options;
+  const {
+    tagProps,
+    value,
+    context: { getData }
+  } = options;
 
-  const [state, setState] = value(); //按useState的返回值结构来解构变量
-  tagProps.value = state; //设置当前组件的value对象
+  const _value = value(); //注意，这里的value函数返回值是个特殊的对象结构，各属性如示例下面的表格所示
+  const setter = context.getData(`set${nj.upperFirst(_value.prop)}`);
+  tagProps.value = _value.value; //设置当前组件的value对象
 
-  const _onChange = tagProps.onChange; //暂存当前组件的onChange事件函数
+  //暂存当前组件的onChange事件函数
+  const _onChange = tagProps.onChange;
+
+  //重新设置onChange事件
   tagProps.onChange = function(e) {
-    //重新设置onChange事件
-    setState(e.target.value); //更新变量值
+    setter(e.target.value); //更新变量值
     _onChange.apply(null, arguments); //执行组件的onChange事件，并传递参数
   };
 });
 ```
 
+上面扩展函数代码中的`_value`对象的各属性为：
+
+| 属性名   | 类型   | 作用                                                                                                                                                                                                       |
+| :------- | :----- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `value`  | Any    | 指令值，例：`<input n-stateBind={this.state.foo.bar} />`中的`this.state.foo.bar`值。                                                                                                                       |
+| `prop`   | String | 指令值的属性名，例：`<input n-stateBind={this.state.foo.bar} />`中的`'bar'`。                                                                                                                              |
+| `source` | Object | 指令值的当前层级所属对象引用，例：`<input n-stateBind={this.state.foo.bar} />`中的`this.state.foo`。                                                                                                       |
+| `parent` | Object | 指令值的当前层级所属对象的父级对象引用，例：`<input n-stateBind={this.state.foo.bar} />`中的`this.state`。 <br> 但是`parent`对象也是一个包含`source`属性的对象，所以可以向上级递归取出所有层级的对象引用。 |
+
 用如上的方式我们就成功实现了一个简单的数据绑定指令`n-bind`。但是它目前只支持文本框，下面我们再让它支持单选按钮，用法如下：
 
 ```js
 function TestBind() {
-  const $count = useState(100),
-    [count] = $count;
-  const $num = useState(''),
-    [num] = $num;
+  const [count, setCount] = useState(100);
+  const [num, setNum] = useState('');
 
   return (
     <div>
-      <input n-bind={$count} onChange={e => console.log(e.target.value)} />
+      <input n-bind={count} onChange={e => console.log(e.target.value)} />
       input: {count}
-      <input type="radio" value="first" n-bind={$num} />
-      <input type="radio" value="second" n-bind={$num} />
+      <input type="radio" value="first" n-bind={num} />
+      <input type="radio" value="second" n-bind={num} />
       radio: {num}
     </div>
   );
@@ -850,22 +885,29 @@ function TestBind() {
 
 ```js
 nj.registerExtension('bind', options => {
-  const { tagProps, value } = options;
+  const {
+    tagProps,
+    value,
+    context: { getData }
+  } = options;
 
-  const [state, setState] = value(); //按useState的返回值结构来解构变量
+  const _value = value(); //获取指令值
+  const setter = context.getData(`set${nj.upperFirst(_value.prop)}`);
 
   if (tagProps.type == 'radio') {
     //单选按钮
-    tagProps.checked = tagProps.value === state; //判断当前单选按钮组件是否为选中状态
+    tagProps.checked = tagProps.value === _value.value; //判断当前单选按钮组件是否为选中状态
   } else {
     //文本框
-    tagProps.value = state; //设置当前文本框组件的value对象
+    tagProps.value = _value.value; //设置当前文本框组件的value对象
   }
 
-  const _onChange = tagProps.onChange; //暂存当前组件的onChange事件函数
+  //暂存当前组件的onChange事件函数
+  const _onChange = tagProps.onChange;
+
+  //重新设置onChange事件
   tagProps.onChange = function(e) {
-    //重新设置onChange事件
-    setState(e.target.value); //更新变量值
+    setter(e.target.value); //更新变量值
     _onChange.apply(null, arguments); //执行组件的onChange事件，并传递参数
   };
 });
@@ -912,7 +954,8 @@ class TestStateBind extends Component {
         "extensionConfig": {
           "stateBind": {
             "isDirective": true,
-            "isBindable": true   //设置isBindable为true，在取指令的值时会返回特殊的格式
+            "isBindable": true, //设置isBindable为true，在取指令的值时会返回特殊的格式
+            "useExpressionInProps": true
           }
         }
       }
@@ -933,12 +976,14 @@ nj.registerExtension('stateBind', options => {
     }
   } = options;
 
-  const _value = value(); //注意，这里的value返回值是个特殊的对象结构，各属性如示例下面的表格所示
+  const _value = value();
   tagProps.value = _value.value; //设置当前组件的value对象
 
-  const _onChange = tagProps.onChange; //暂存当前组件的onChange事件函数
+  //暂存当前组件的onChange事件函数
+  const _onChange = tagProps.onChange;
+
+  //重新设置onChange事件
   tagProps.onChange = function(e) {
-    //重新设置onChange事件
     $this.setState(
       //使用组件实例上的setState函数更新值
       putStateValue(_value, e.target.value), //用自定义的putStateValue函数创建出setState所需的参数结构，下面有putStateValue的详细实现
@@ -947,15 +992,6 @@ nj.registerExtension('stateBind', options => {
   };
 });
 ```
-
-上面扩展函数代码中的`_value`对象的各属性为：
-
-| 属性名   | 类型   | 作用                                                                                                                                                                                                       |
-| :------- | :----- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `value`  | Any    | 指令值，例：`<input n-stateBind={this.state.foo.bar} />`中的`this.state.foo.bar`值。                                                                                                                       |
-| `prop`   | String | 指令值的属性名，例：`<input n-stateBind={this.state.foo.bar} />`中的`'bar'`。                                                                                                                              |
-| `source` | Object | 指令值的当前层级所属对象引用，例：`<input n-stateBind={this.state.foo.bar} />`中的`this.state.foo`。                                                                                                       |
-| `parent` | Object | 指令值的当前层级所属对象的父级对象引用，例：`<input n-stateBind={this.state.foo.bar} />`中的`this.state`。 <br> 但是`parent`对象也是一个包含`source`属性的对象，所以可以向上级递归取出所有层级的对象引用。 |
 
 最后是`putStateValue`函数的实现：
 
@@ -967,6 +1003,6 @@ function putStateValue(value, ret) {
 
 `putStateValue`函数的实现逻辑其实很简单，就是递归获取`this.state.foo.count`当前层级值的`parent`属性，然后按相应格式构造出`setState`函数所需的参数结构即可。
 
-如上，我们就实现了一个更复杂的数据绑定指令`n-stateBind`。其实`mobxBind`指令的实现方式也与本例中的`n-stateBind`类似。
+如上，我们就实现了一个更复杂的数据绑定指令 n-stateBind。其实 `mobxBind` 指令的实现方式也与本例中的 n-bind 和 n-stateBind 类似。
 
 > 为什么 NornJ 中只内置实现了支持 Mobx 的数据绑定指令？主要是因为 Mobx 可观察变量的特性与操作方式，更适合此种指令方案的语法结构等各方面，可以更好地呈现双向数据绑定的优势而提高开发效率。

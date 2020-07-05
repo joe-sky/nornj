@@ -24,6 +24,8 @@ npm install babel-plugin-nornj-in-jsx
 }
 ```
 
+## 配置 Eslint
+
 ## 使用 Create-React-App
 
 <!-- # 在 JSX 中使用增强 React 开发体验
