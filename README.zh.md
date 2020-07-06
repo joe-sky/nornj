@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="https://joe-sky.github.io/nornj-guide/" target="_blank" rel="noopener noreferrer"><img width="240" src="./public/images/nornj.png" alt="NornJ"></a>
+  <a href="https://joe-sky.gitee.io/nornj/" target="_blank" rel="noopener noreferrer"><img width="240" src="https://joe-sky.gitee.io/nornj/images/nornj.png" alt="NornJ"></a>
 </p>
 
 <p align="center">
@@ -15,7 +15,7 @@
 
 ## 简介
 
-`NornJ`(读音[ˌnɔ:nˈdʒeɪ]，简称`nj`)是一个可以同 React 一起工作的模板引擎，**JSX 的增强或替代工具**。
+`NornJ`(读音[ˌnɔ:nˈdʒeɪ]，简称`nj`)是一个基于 Babel 的 React JSX 新增语法扩展方案。
 
 ## 文档
 
