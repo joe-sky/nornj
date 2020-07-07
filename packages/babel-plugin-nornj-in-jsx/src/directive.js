@@ -90,7 +90,11 @@ module.exports = function(babel) {
           lastAttrStr = attrStr.substr(0, attrStr.length - 1);
         } else if (attr.value.type == 'JSXExpressionContainer') {
           const expr = attr.value.expression;
-          const { useExpressionInProps } = directiveConfig;
+          let { useExpressionInProps } = directiveConfig;
+          const { isBindable } = directiveConfig;
+          if (isBindable) {
+            useExpressionInProps = true;
+          }
 
           //Template literal case 1: `123 + abc`
           if (isDirective && useExpressionInProps && types.isStringLiteral(expr) && !expr.extra) {
@@ -115,7 +119,7 @@ module.exports = function(babel) {
             }
 
             _buildFromNjExp(directiveExpressions, attrStr);
-          } else if (isDirective && useExpressionInProps && directiveConfig.isBindable) {
+          } else if (isDirective && isBindable) {
             if (types.isMemberExpression(expr)) {
               const directiveMemberExpressions = generate.getDirectiveMemberExpression(types, expr);
               quasis.push(

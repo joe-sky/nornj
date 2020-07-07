@@ -100,11 +100,9 @@ const template = html`
   <Container>
     <ul>
       <each of="{todos}">
-        <if {@index>
-          5}>
+        <if condition="{@index > 5}">
           <li>{@item * 2}</li>
-          <elseif {@index>
-            10}>
+          <elseif condition="{@index > 10}">
             <li>{@item * 3}</li>
           </elseif>
         </if>

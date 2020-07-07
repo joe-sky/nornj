@@ -1,9 +1,8 @@
 const bindConfig = {
   onlyGlobal: true,
   newContext: false,
-  isBindable: true,
-  useExpressionInProps: true,
   isDirective: true,
+  isBindable: true,
   needPrefix: 'free'
 };
 

@@ -44,8 +44,18 @@ declare namespace JSX {
      */
     'n-mobxObserver': NJR.MobxObserver;
 
+    /**
+     * NornJ tag `mobxFormData`, example:
+     *
+     * `<mobxFormData><mobxFieldData name="userName" required /></mobxFormData>`
+     */
     mobxFormData: NJR.MobxFormData;
 
+    /**
+     * NornJ tag `mobxFieldData`, example:
+     *
+     * `<mobxFormData><mobxFieldData name="userName" required /></mobxFormData>`
+     */
     mobxFieldData: NJR.MobxFieldData;
   }
 

@@ -8,7 +8,7 @@
     "packages/babel-plugin-nornj-in-jsx",
     "packages/babel-preset-nornj-with-antd"
   ],
-  "version": "5.2.0-rc.8",
+  "version": "5.2.0-rc.9",
   "description": "A powerful template engine that can works with React, JSX enhancement or alternative tools.",
   "scripts": {
     "start": "npm run dev",
@@ -27,6 +27,7 @@
     "format:njx": "eslint --fix --ext .jsx,.js,.ts,.tsx packages/babel-plugin-nornj-in-jsx/**/*.{js,jsx,ts,tsx}",
     "test": "jest --config=test/jest.config.js",
     "test:njx": "lerna run --scope babel-plugin-nornj-in-jsx test",
+    "jest:clear": "jest --clearCache",
     "cover": "jest --coverage --config=test/jest.config.js",
     "cover:njx": "lerna run --scope babel-plugin-nornj-in-jsx cover",
     "ci": "yarn run build && yarn run cover && yarn run cover:njx && codecov",

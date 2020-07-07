@@ -816,10 +816,9 @@ function TestBind() {
       "nornj-in-jsx",
       {
         "extensionConfig": {
-          "stateBind": {
+          "bind": {
             "isDirective": true,
-            "isBindable": true, //设置isBindable为true，在取指令的值时会返回特殊的格式
-            "useExpressionInProps": true
+            "isBindable": true //设置isBindable为true，在取指令的值时会返回特殊的格式
           }
         }
       }
@@ -954,8 +953,7 @@ class TestStateBind extends Component {
         "extensionConfig": {
           "stateBind": {
             "isDirective": true,
-            "isBindable": true, //设置isBindable为true，在取指令的值时会返回特殊的格式
-            "useExpressionInProps": true
+            "isBindable": true //设置isBindable为true，在取指令的值时会返回特殊的格式
           }
         }
       }
