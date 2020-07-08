@@ -15,16 +15,25 @@ English | [简体中文](https://github.com/joe-sky/nornj/blob/master/README.zh.
 
 ## Introduction
 
-`NornJ`(pronounced [ˌnɔ:nˈdʒeɪ]，abbreviated as `nj`) is a template engine that can works with React, JSX enhancement or alternative tools.
+`NornJ`(pronounced [ˌnɔ:nˈdʒeɪ]，abbreviated as `nj`) is a React JSX extensions plugin based on Babel.
 
 ## Documents
 
 - [NornJ Guide(github.io)](https://joe-sky.github.io/nornj)
 - [NornJ Guide(gitee.io)](https://joe-sky.gitee.io/nornj)
 
+## Packages
+
+| Package                                                                                                            | Badges                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| ------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [nornj](https://github.com/joe-sky/nornj/tree/master/packages/nornj)                                               | <a href="https://www.npmjs.org/package/nornj"><img src="https://img.shields.io/npm/v/nornj.svg" alt="NPM Version"></a> <a href="https://www.npmjs.org/package/nornj"><img src="https://img.shields.io/npm/dm/nornj.svg" alt="NPM Downloads"></a> <a href="https://bundlephobia.com/result?p=nornj"><img src="https://img.shields.io/bundlephobia/minzip/nornj.svg?style=flat" alt="Minzipped Size"></a>                                     |
+| [nornj-react](https://github.com/joe-sky/nornj/tree/master/packages/nornj-react)                                   | <a href="https://www.npmjs.org/package/nornj-react"><img src="https://img.shields.io/npm/v/nornj-react.svg" alt="NPM Version"></a> <a href="https://www.npmjs.org/package/nornj-react"><img src="https://img.shields.io/npm/dm/nornj-react.svg" alt="NPM Downloads"></a> <a href="https://bundlephobia.com/result?p=nornj-react"><img src="https://img.shields.io/bundlephobia/minzip/nornj-react.svg?style=flat" alt="Minzipped Size"></a> |
+| [babel-plugin-nornj-in-jsx](https://github.com/joe-sky/nornj/tree/master/packages/babel-plugin-nornj-in-jsx)       | <a href="https://www.npmjs.org/package/babel-plugin-nornj-in-jsx"><img src="https://img.shields.io/npm/v/babel-plugin-nornj-in-jsx.svg" alt="NPM Version"></a> <a href="https://www.npmjs.org/package/babel-plugin-nornj-in-jsx"><img src="https://img.shields.io/npm/dm/babel-plugin-nornj-in-jsx.svg" alt="NPM Downloads"></a>                                                                                                            |
+| [babel-preset-nornj-with-antd](https://github.com/joe-sky/nornj/tree/master/packages/babel-preset-nornj-with-antd) | <a href="https://www.npmjs.org/package/babel-preset-nornj-with-antd"><img src="https://img.shields.io/npm/v/babel-preset-nornj-with-antd.svg" alt="NPM Version"></a> <a href="https://www.npmjs.org/package/babel-preset-nornj-with-antd"><img src="https://img.shields.io/npm/dm/babel-preset-nornj-with-antd.svg" alt="NPM Downloads"></a>                                                                                                |
+
 ## Introduction
 
-In `React` development, the `JSX` can use almost all the syntax of javascript and it's very flexible. But if we use `NornJ` with `React` and `JSX`, we can do better, because it can gives JSX `template engine` features:
+In `React` development, the `JSX` can use almost all the syntax of javascript and it's very flexible. But if we use `NornJ` with `React` and `JSX`, we can do better, because it can gives JSX new features:
 
 - Support control statements：
 
@@ -52,7 +61,9 @@ In `React` development, the `JSX` can use almost all the syntax of javascript an
 <input value={n`(1 .. 100).join('-')`} />
 ```
 
-`NornJ` presets the above `JSX` enhancement syntaxs, and also **supports custom extensions of more syntaxs**. It provides two kinds of similar API: `JSX` and `Tagged templates`, can adapt to the preferences of different users :wink:.
+`NornJ` presets the above `JSX` enhancement syntaxs, and also **supports custom extensions of more syntaxs**.
+
+<!-- It provides two kinds of similar API: `JSX` and `Tagged templates`, can adapt to the preferences of different users :wink:. -->
 
 ## Basic
 
@@ -93,7 +104,7 @@ class App extends Component {
 
 For above example, combining with the [Babel plugin provided by NornJ](https://github.com/joe-sky/nornj/tree/master/packages/babel-plugin-nornj-in-jsx), it is possible to write various new enhancement syntaxs in JSX.
 
-- Use NornJ tagged templates syntaxs(with [styled-components](https://github.com/styled-components/styled-components))：
+<!-- - Use NornJ tagged templates syntaxs(with [styled-components](https://github.com/styled-components/styled-components))：
 
 ```js
 const template = html`
@@ -129,7 +140,7 @@ class App extends Component {
 }
 ```
 
-In the above example, a template function was created using `tagged templates API of NornJ`. In this way, the template can be separated from the component logic code, and it also supports more concise writing than `NornJ JSX API`.
+In the above example, a template function was created using `tagged templates API of NornJ`. In this way, the template can be separated from the component logic code, and it also supports more concise writing than `NornJ JSX API`. -->
 
 ## Playground
 
@@ -155,30 +166,9 @@ Next, add `nornj-in-jsx` to plugins in your babel configuration:
 
 - [nornj-antd-v4-demo](https://github.com/joe-sky/nornj-antd-v4-demo)
 
-<!-- * NornJ + React + Redux + React-Router + Webpack: [react-redux-nornj-todomvc](https://github.com/joe-sky/nornj/blob/master/examples/react-redux-nornj-todomvc)
-* NornJ + React + Redux + React-Router(no need webpack): [react-redux-nornj-todomvc-es5](https://github.com/joe-sky/nornj/blob/master/examples/react-redux-nornj-todomvc-es5)
-* NornJ + Backbone + Marionette(render html string): [backbone-marionette-nornj-todomvc](https://github.com/joe-sky/nornj/blob/master/examples/backbone-marionette-nornj-todomvc)
-* NornJ + React-Native + Styled-Components: [nornj-react-native-counter](https://github.com/joe-sky/nornj-react-native-counter)
-* NornJ + React + Mobx + React-Router: [nornj-react-mst-boilerplate](https://github.com/joe-sky/nornj-cli/tree/master/templates/react-mst)
-
-## Tools
-
-* [nornj-react(React bindings)](https://github.com/joe-sky/nornj-react)
-* [nornj-loader(Webpack loader)](https://github.com/joe-sky/nornj-loader)
-* [babel-plugin-nornj-in-jsx(Babel plugin provided by NornJ)](https://github.com/joe-sky/nornj/tree/master/packages/babel-plugin-nornj-in-jsx)
-* [babel-plugin-nornj-loader(nornj-loader's Babel plugin ver)](https://github.com/yuhongda/babel-plugin-nornj-loader)
-* [react-native transformer(nornj-loader's RN ver)](https://github.com/joe-sky/nornj/blob/master/tools/metroTransformer.js)
-* [express-nornj(NornJ's Express view engine)](https://github.com/joe-sky/nornj/blob/master/tools/expressEngine.js) -->
-<!--* [koa-nornj(NornJ's Koa middleware)](https://github.com/qingqinxl1/koa-nornj)-->
-
 ## Syntax highlight
 
 - [nornj-highlight(vscode)](https://github.com/joe-sky/nornj-highlight)
-  <!--* [language-nornj(atom)](https://github.com/zyj1022/language-nornj)-->
-
-<!-- ## Browser support
-
-* Supports all modern browsers and Internet Explorer 9+. -->
 
 ## License
 

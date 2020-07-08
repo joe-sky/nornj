@@ -78,30 +78,33 @@ const Foo = ({ data }) => (
 babel 转换后为：
 
 ```js
-nj.renderH({
-  //此函数返回<i>fail</i>
-  fn1: function(g,c,p) {
-    return g.d('_njParam1');
-  },
-  //此函数返回<i>success</i>
-  fn2: function(g,c,p) {
-    return g.d('_njParam2');
-  },
-  //将if、else标签解析为渲染函数
-  main: function(g,c,p) {
-    var _params0 = {
-      condition: c.d('isTest')
-    };
+nj.renderH(
+  {
+    //此函数返回<i>fail</i>
+    fn1: function(g, c, p) {
+      return g.d('_njParam1');
+    },
+    //此函数返回<i>success</i>
+    fn2: function(g, c, p) {
+      return g.d('_njParam2');
+    },
+    //将if、else标签解析为渲染函数
+    main: function(g, c, p) {
+      var _params0 = {
+        condition: c.d('isTest')
+      };
 
-    g.x['else'].apply(c, [{ tagProps: _params0, children: g.r(g, c, g.fn1) }]);
+      g.x['else'].apply(c, [{ tagProps: _params0, children: g.r(g, c, g.fn1) }]);
 
-    return _exg.x['if']0.apply(c, [{ props: _params0, children: g.r(g, c, g.fn2) }]);
+      return g.x['if'].apply(c, [{ props: _params0, children: g.r(g, c, g.fn2) }]);
+    }
+  },
+  {
+    isTest: isTest,
+    _njParam1: () => <i>success</i>,
+    _njParam2: () => <i>fail</i>
   }
-}, {
-  isTest: isTest,
-  _njParam1: () => <i>success</i>,
-  _njParam2: () => <i>fail</i>
-});
+);
 ```
 
 从上面可以看出，`<i>success</i>`等其实是包在函数内并没立即执行的。

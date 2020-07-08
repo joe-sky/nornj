@@ -107,6 +107,12 @@ ReactDOM.render(
 }
 ```
 
+## 语法高亮插件
+
+NornJ 提供了一个 vscode 语法高亮插件, 对应它支持的少量需要高亮的功能：
+
+- [nornj-highlight(vscode)](https://github.com/joe-sky/nornj-highlight)
+
 ## 使用 Create-React-App
 
 通常可以在使用 Create-React-App 创建项目后，执行 eject 命令弹出配置，按照前面的方式在 package.json 中配置下 Babel 及 Eslint 即可。

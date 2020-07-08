@@ -141,29 +141,32 @@ import nj from 'nornj';
 import 'nornj-react';
 
 ReactDOM.render(
-  <div>{
-    nj.renderH({
-      fn1: function(g, c, p) {
-        return g.d('_njParam1');
-      },
-      fn2: function(g, c, p) {
-        return g.d('_njParam2');
-      },
-      main: function(g, c, p) {
-        var _params0 = {
-          condition: c.d('isTest')
-        };
+  <div>
+    {nj.renderH(
+      {
+        fn1: function(g, c, p) {
+          return g.d('_njParam1');
+        },
+        fn2: function(g, c, p) {
+          return g.d('_njParam2');
+        },
+        main: function(g, c, p) {
+          var _params0 = {
+            condition: c.d('isTest')
+          };
 
-        g.x['else'].apply(c, [{ tagProps: _params0, children: g.r(g, c, g.fn1) }]);
+          g.x['else'].apply(c, [{ tagProps: _params0, children: g.r(g, c, g.fn1) }]);
 
-        return _exg.x['if']0.apply(c, [{ props: _params0, children: g.r(g, c, g.fn2) }])  ;
+          return g.x['if'].apply(c, [{ props: _params0, children: g.r(g, c, g.fn2) }]);
+        }
+      },
+      {
+        isTest: isTest,
+        _njParam1: () => <i>success</i>,
+        _njParam2: () => <i>fail</i>
       }
-    }, {
-      isTest: isTest,
-      _njParam1: () => <i>success</i>,
-      _njParam2: () => <i>fail</i>
-    })
-  }</div>,
+    )}
+  </div>,
   document.body
 );
 ```
