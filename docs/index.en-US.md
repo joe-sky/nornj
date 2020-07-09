@@ -1,33 +1,33 @@
 ---
-title: NornJ - 基于 Babel，更精彩的 JS(X)
+title: NornJ - More exciting JS(X) based on Babel
 hero:
   title: NornJ
-  desc: 🌠 基于 Babel，更精彩的 JS(X)
+  desc: 🌠 More exciting JS(X) based on Babel
   actions:
-    - text: 快速上手
+    - text: Getting Started
       link: /guide/getting-started
 features:
   - icon: https://gw.alipayobjects.com/os/q/cms/images/k9ziitmp/13668549-b393-42a2-97c3-a6365ba87ac2_w96_h96.png
-    title: 简单易用
-    desc: 简单配置 babel，就能拥有 if、for、switch 等常用 JSX 扩展语法，并支持完备的 IDE 代码提示体验。
+    title: Easy to use
+    desc: By simply configuring Babel, you can have JSX extension syntax such as if, for, switch, and support complete IDE code intelligence.
   - icon: https://gw.alipayobjects.com/zos/bmw-prod/d60657df-0822-4631-9d7c-e7a869c2f21c/k79dmz3q_w126_h126.png
-    title: 强大的扩展能力
-    desc: 完整的可扩展设计，开发者使用简洁的 API，即可为 React JSX 创造出更丰富的组件复用思路。
+    title: Powerful Extensiblity
+    desc: Fully Extensible design, developers can use simple API to create richer component reuse ideas for React JSX.
   - icon: https://gw.alipayobjects.com/os/q/cms/images/k9zij2bh/67f75d56-0d62-47d6-a8a5-dbd0cb79a401_w96_h96.png
     title: Typescript
-    desc: 使用 TypeScript 开发，提供完整的类型定义文件。
+    desc: Written in Typescript, provides the complete type definition files.
 footer: Open-source MIT Licensed | Copyright © 2016-present<br />Powered by [Joe_Sky](https://github.com/joe-sky)
 ---
 
-## 轻松上手
+## Quick Start
 
-### 安装
+### 1. Installing
 
 ```bash
 npm install babel-plugin-nornj-in-jsx
 ```
 
-### 配置 Babel
+### 2. Configure Babel
 
 ```js
 {
@@ -37,7 +37,7 @@ npm install babel-plugin-nornj-in-jsx
 }
 ```
 
-### 开始使用
+### 3. Getting Started
 
 ```js
 const App = props => (
@@ -51,10 +51,10 @@ const App = props => (
 
 ReactDOM.render(<App success={false} />, document.querySelector('#app'));
 
-//渲染结果：<i>fail</i>
+//Render result：<i>fail</i>
 ```
 
-## Create-React-App 示例
+## Create-React-App Example
 
 [nornj-antd-v4-demo](https://github.com/joe-sky/nornj-antd-v4-demo)
 

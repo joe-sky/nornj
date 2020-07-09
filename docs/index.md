@@ -21,13 +21,13 @@ footer: Open-source MIT Licensed | Copyright © 2016-present<br />Powered by [Jo
 
 ## 轻松上手
 
-### 安装
+### 1. 安装
 
 ```bash
 npm install babel-plugin-nornj-in-jsx
 ```
 
-### 配置 Babel
+### 2. 配置 Babel
 
 ```js
 {
@@ -37,7 +37,7 @@ npm install babel-plugin-nornj-in-jsx
 }
 ```
 
-### 开始使用
+### 3. 开始使用
 
 ```js
 const App = props => (

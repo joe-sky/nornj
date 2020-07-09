@@ -7,7 +7,7 @@ nav:
 toc: menu
 ---
 
-# MobxFormData
+# mobxFormData
 
 基于`Mobx`的轻量级响应式`React`表单数据管理方案
 
