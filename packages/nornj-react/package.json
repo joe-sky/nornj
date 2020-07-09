@@ -11,6 +11,7 @@
     "lib/",
     "mobx/",
     "native/",
+    "router/",
     "antd/",
     "src/",
     "types/",
@@ -26,13 +27,16 @@
     "min": "cross-env NODE_ENV=production rollup -c -o dist/nornj-react.min.js",
     "umd:mobx": "cross-env NODE_ENV=development WITH_EX=Mobx rollup -c -o dist/nornj-react-mobx.js",
     "min:mobx": "cross-env NODE_ENV=production WITH_EX=Mobx rollup -c -o dist/nornj-react-mobx.min.js",
+    "umd:router": "cross-env NODE_ENV=development WITH_EX=Router rollup -c -o dist/nornj-react-router.js",
+    "min:router": "cross-env NODE_ENV=production WITH_EX=Router rollup -c -o dist/nornj-react-router.min.js",
     "lib": "babel src --out-dir lib --extensions \".js,.jsx,.ts,.tsx\" --config-file \"../../.babelrc\"",
     "lib:mobx": "babel mobx/base.js --out-file mobx/index.js --extensions \".js,.jsx,.ts,.tsx\" --config-file \"../../.babelrc\"",
     "lib:mobxFormData": "babel mobx/formData/base.js --out-file mobx/formData/index.js --extensions \".js,.jsx,.ts,.tsx\" --config-file \"../../.babelrc\"",
+    "lib:router": "babel router/base.js --out-file router/index.js --extensions \".js,.jsx,.ts,.tsx\" --config-file \"../../.babelrc\"",
     "lib:native": "babel native/base.js --out-file native/index.js --extensions \".js,.jsx,.ts,.tsx\" --config-file \"../../.babelrc\"",
     "lib:antd": "babel antd --out-dir antd/lib --copy-files && rimraf ./antd/lib/lib && babel antd --out-dir antd/lib --ignore \"antd/lib\",\"antd/**/index.d.ts\" --extensions \".js,.jsx,.ts,.tsx\" --config-file \"./antd.babelrc\"",
     "dts": "cross-env TYPE=dts NODE_ENV=es rollup -c -o types/nornj-react.d.ts",
-    "build": "yarn run lib && yarn run lib:mobx && yarn run lib:mobxFormData && yarn run lib:native && yarn run lib:antd && yarn run cjs && yarn run esm && yarn run umd && yarn run umd:mobx && yarn run min && yarn run min:mobx && yarn run dts"
+    "build": "yarn run lib && yarn run lib:mobx && yarn run lib:mobxFormData && yarn run lib:router && yarn run lib:native && yarn run lib:antd && yarn run cjs && yarn run esm && yarn run umd && yarn run umd:mobx && yarn run umd:router && yarn run min && yarn run min:mobx && yarn run min:router && yarn run dts"
   },
   "keywords": [
     "nornj",

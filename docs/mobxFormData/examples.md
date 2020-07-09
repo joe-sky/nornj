@@ -2,7 +2,7 @@
 title: 表单示例
 order: 1
 nav:
-  title: MobxFormData
+  title: mobxFormData
   order: 5
 toc: menu
 ---

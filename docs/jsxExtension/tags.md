@@ -2,7 +2,7 @@
 title: 标签
 order: 1
 nav:
-  title: JSX 语法扩展
+  title: JS(X) 语法扩展
   order: 2
 toc: menu
 ---

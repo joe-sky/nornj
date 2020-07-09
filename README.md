@@ -15,7 +15,7 @@ English | [简体中文](https://github.com/joe-sky/nornj/blob/master/README.zh.
 
 ## Introduction
 
-`NornJ`(pronounced [ˌnɔ:nˈdʒeɪ]，abbreviated as `nj`) is a React JSX extensions plugin based on Babel.
+`NornJ`(pronounced [ˌnɔ:nˈdʒeɪ]，abbreviated as `nj`) is a JS(X) extensions plugin based on Babel.
 
 ## Documents
 
@@ -61,9 +61,7 @@ In `React` development, the `JSX` can use almost all the syntax of javascript an
 <input value={n`(1 .. 100).join('-')`} />
 ```
 
-`NornJ` presets the above `JSX` enhancement syntaxs, and also **supports custom extensions of more syntaxs**.
-
-<!-- It provides two kinds of similar API: `JSX` and `Tagged templates`, can adapt to the preferences of different users :wink:. -->
+`NornJ` presets the above `JSX` enhancement syntaxs, and also **supports custom extensions of more syntaxs**. It provides two kinds of similar API: `JSX` and `Tagged templates`, can adapt to the preferences of different users :wink:.
 
 ## Basic
 
@@ -104,7 +102,7 @@ class App extends Component {
 
 For above example, combining with the [Babel plugin provided by NornJ](https://github.com/joe-sky/nornj/tree/master/packages/babel-plugin-nornj-in-jsx), it is possible to write various new enhancement syntaxs in JSX.
 
-<!-- - Use NornJ tagged templates syntaxs(with [styled-components](https://github.com/styled-components/styled-components))：
+- Use NornJ tagged templates syntaxs(with [styled-components](https://github.com/styled-components/styled-components))：
 
 ```js
 const template = html`
@@ -140,7 +138,7 @@ class App extends Component {
 }
 ```
 
-In the above example, a template function was created using `tagged templates API of NornJ`. In this way, the template can be separated from the component logic code, and it also supports more concise writing than `NornJ JSX API`. -->
+In the above example, a template function was created using `tagged templates API of NornJ`. In this way, the template can be separated from the component logic code, and it also supports more concise writing than `NornJ JSX API`.
 
 ## Playground
 

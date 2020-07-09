@@ -20,6 +20,10 @@ if (type !== 'dts') {
       external.push('mobx', 'mobx-react');
       indexEntry = './mobx/base.js';
       break;
+    case 'Router':
+      external.push('react-router-dom');
+      indexEntry = './router/base.js';
+      break;
   }
   config = {
     input: indexEntry,
@@ -30,7 +34,8 @@ if (type !== 'dts') {
         react: 'React',
         'react-dom': 'ReactDOM',
         mobx: 'mobx',
-        'mobx-react': 'mobxReact'
+        'mobx-react': 'mobxReact',
+        'react-router-dom': 'ReactRouterDOM'
       }
     },
     external,
@@ -59,7 +64,7 @@ if (type !== 'dts') {
       }),
       resolve({
         customResolveOptions: {
-          moduleDirectory: ['src', 'mobx']
+          moduleDirectory: ['src', 'mobx', 'router']
         },
         extensions: ['.js', '.jsx', '.ts', '.tsx']
       })

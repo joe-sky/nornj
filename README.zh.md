@@ -15,7 +15,7 @@
 
 ## 简介
 
-`NornJ`(读音[ˌnɔ:nˈdʒeɪ]，简称`nj`)是一个基于 Babel 的 React JSX 新增语法扩展方案。
+`NornJ`(读音[ˌnɔ:nˈdʒeɪ]，简称`nj`)是一个基于 Babel 的 JS(X) 新增语法扩展方案。
 
 ## 文档
 
@@ -61,9 +61,7 @@
 <input value={n`(1 .. 100).join('-')`} />
 ```
 
-`NornJ`不仅有预置的上述几类可增强`JSX`的语法，并且还实现了**支持用户扩展更多的语法**。
-
-<!-- `NornJ`还同时提供了`JSX`和`tagged templates`两套几乎相同的语法 API，以适应不同用户的口味 :wink: -->
+`NornJ`不仅有预置的上述几类可增强`JSX`的语法，并且还实现了**支持用户扩展更多的语法**。`NornJ`还同时提供了`JSX`和`tagged templates`两套几乎相同的语法 API，以适应不同用户的口味 :wink:
 
 ## 基本示例
 
@@ -104,7 +102,7 @@ class App extends Component {
 
 如上例，配合`NornJ`提供的[配套 babel 插件](https://github.com/joe-sky/nornj/tree/master/packages/babel-plugin-nornj-in-jsx)，便可以在`JSX`中编写各种新的增强语法。
 
-<!-- - 使用`tagged templates`语法(结合[styled-components](https://github.com/styled-components/styled-components))：
+- 使用`tagged templates`语法(结合[styled-components](https://github.com/styled-components/styled-components))：
 
 ```js
 const template = html`
@@ -140,7 +138,7 @@ class App extends Component {
 }
 ```
 
-上例中使用了`NornJ`的`tagged templates API`创建了一个模板函数，它可以做到与`React`组件的逻辑代码分离，并且还能支持比`JSX API`更加简练的写法。 -->
+上例中使用了`NornJ`的`tagged templates API`创建了一个模板函数，它可以做到与`React`组件的逻辑代码分离，并且还能支持比`JSX API`更加简练的写法。
 
 ## 在线演示地址
 

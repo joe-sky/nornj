@@ -2,7 +2,7 @@
 title: 文档
 order: 2
 nav:
-  title: MobxFormData
+  title: mobxFormData
   order: 3
 toc: menu
 ---
