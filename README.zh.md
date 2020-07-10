@@ -15,7 +15,7 @@
 
 ## 简介
 
-`NornJ`(读音[ˌnɔ:nˈdʒeɪ]，简称`nj`)是一个基于 Babel 的 JS(X) 新增语法扩展方案。
+`NornJ`(读音[ˌnɔ:nˈdʒeɪ]，简称`nj`)是一个基于 Babel 的 JS(X) 新语法扩展方案。
 
 ## 文档
 
@@ -33,9 +33,9 @@
 
 ## 概述
 
-`React`的`JSX`几乎可以使用`javascript`的全部语法且非常灵活，可配合`babel`适应各种复杂的使用场景。但是，使用`NornJ`配合`React`开发还能做得更好，因为它能给 JSX 带来新特性：
+`NornJ` 基于 Babel 为 JS/JSX/TS/TSX 环境带来了一些新语法体验，最常用的使用场景就是配合 React 来使用它。这些新语法有如下这几类：
 
-- 支持流程控制语法：
+- 流程控制
 
 ```js
 <each of={[1, 2, 3]}>
@@ -43,29 +43,39 @@
 </each>
 ```
 
-- 支持指令语法：
+- 指令
 
 ```js
 <img n-show={false} />
 ```
 
-- 支持过滤器语法：
+- 过滤器
 
 ```js
 <button>{n`foo | upperFirst`}</button>
 ```
 
-- 支持自定义运算符：
+- 自定义运算符
 
 ```js
 <input value={n`(1 .. 100).join('-')`} />
 ```
 
-`NornJ`不仅有预置的上述几类可增强`JSX`的语法，并且还实现了**支持用户扩展更多的语法**。`NornJ`还同时提供了`JSX`和`tagged templates`两套几乎相同的语法 API，以适应不同用户的口味 :wink:
+这些语法都是可扩展的，也就是说我们可以使用 `NornJ` 的特性，来亲自创造更多的新语法思路 :wink:
 
-## 基本示例
+## 特征
 
-- 直接在 JSX 中使用(结合[styled-jsx](https://github.com/zeit/styled-jsx))：
+- ✨ 内置 if/for/switch 等基本 JSX 标签扩展(可参考：[jsx-control-statements](https://github.com/AlexGilleran/jsx-control-statements))
+- ⭐ 内置 show/style/debounce 等基本 JSX 指令扩展(可参考：[babel-plugin-react-directives](https://github.com/peakchen90/babel-plugin-react-directives))
+- 🌟 内置原生 JS 没有的 `..`、`<=>` 等自定义运算符
+- 💫 以上几种 JS(X) 扩展语法，都可以支持用户自行扩展出新的
+- 🔥 扩展语法能够突破 JSX/TSX 现有的能力
+- ⚡ 性能好，含运行时但体积小
+- 🚀 上手超快，直接配置 Babel 即可使用
+
+## React 示例
+
+- 本例结合了[styled-jsx](https://github.com/zeit/styled-jsx)来演示在 JSX 中使用：
 
 ```js
 class App extends Component {
@@ -99,46 +109,6 @@ class App extends Component {
   }
 }
 ```
-
-如上例，配合`NornJ`提供的[配套 babel 插件](https://github.com/joe-sky/nornj/tree/master/packages/babel-plugin-nornj-in-jsx)，便可以在`JSX`中编写各种新的增强语法。
-
-- 使用`tagged templates`语法(结合[styled-components](https://github.com/styled-components/styled-components))：
-
-```js
-const template = html`
-  <Container>
-    <ul>
-      <each of="{todos}">
-        <if condition="{@index > 5}">
-          <li>{@item * 2}</li>
-          <elseif condition="{@index > 10}">
-            <li>{@item * 3}</li>
-          </elseif>
-        </if>
-      </each>
-    </ul>
-    <button n-show="{todos.length > 0}" :onClick="addTodo">Add Todo</button>
-  </Container>
-`;
-
-const Container = styled.div`
-  padding: 20px;
-  font-size: 0.75rem;
-`;
-
-class App extends Component {
-  addTodo = e => {
-    const { todos = [] } = this.state;
-    this.setState({ todos: todos.concat(`Item ${todos.length}`) });
-  };
-
-  render() {
-    return template({ components: { Container } }, this.state, this);
-  }
-}
-```
-
-上例中使用了`NornJ`的`tagged templates API`创建了一个模板函数，它可以做到与`React`组件的逻辑代码分离，并且还能支持比`JSX API`更加简练的写法。
 
 ## 在线演示地址
 
