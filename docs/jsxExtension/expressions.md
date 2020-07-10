@@ -323,24 +323,6 @@ nj.filterConfig.currency.symbol = '￥';
 nj.filterConfig.currency.placeholder = '-';
 ```
 
-### toJS
-
-`toJS`即为`Mobx`的`toJS`方法：
-
-```js
-const Test = () => {
-  const view = useLocalStore(() => ({
-    texts: ['abc', 'def']
-  }));
-
-  return (
-    <>
-      <i>{JSON.stringify(n`view | toJS`)}</i>
-    </>
-  );
-};
-```
-
 ### 使用 Lodash
 
 `NornJ`的过滤器可以使用`Lodash`库的全部工具函数。它是一个过滤器的扩展，需要先这样全局引入一次：

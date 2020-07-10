@@ -1,11 +1,13 @@
 ---
-title: 表单示例
-order: 1
+title: mobxFormData Examples
+order: 3
 nav:
-  title: mobxFormData
-  order: 5
+  title: Mobx Extension
+  order: 3
 toc: menu
 ---
+
+<Alert>This chapter will be translated in English soon.</Alert>
 
 # 表单示例
 

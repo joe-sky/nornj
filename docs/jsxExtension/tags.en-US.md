@@ -341,33 +341,6 @@ ReactDOM.render(<Test num={30} />, document.body);
 </each>
 ```
 
-## mobxObserver
-
-`mobxObserver`标签实际上就是[mobx-react-lite 库的 observer 组件](https://github.com/mobxjs/mobx-react-lite#observer)，只不过它在编写时无需在子节点写函数：
-
-```js
-import { Observer, useObservable } from 'mobx-react-lite';
-
-function ObservePerson(props) {
-  const person = useObservable({ name: 'John' });
-  return (
-    <div>
-      {person.name}
-
-      {/* 原生写法 */}
-      <Observer>{() => <div>{person.name}</div>}</Observer>
-
-      {/* MobxObserver标签 */}
-      <mobxObserver>
-        <div>{person.name}</div>
-      </mobxObserver>
-
-      <button onClick={() => (person.name = 'Mike')}>No! I am Mike</button>
-    </div>
-  );
-}
-```
-
 ## 开发新的标签
 
 `NornJ`的标签都是支持可扩展的，也就是说与 React 组件一样可以自行封装各种新功能。

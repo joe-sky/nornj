@@ -21,7 +21,7 @@ footer: Open-source MIT Licensed | Copyright © 2016-present<br />Powered by [Jo
 
 ## Quick Start
 
-### 1. Installing
+### 1. Installation
 
 ```bash
 npm install babel-plugin-nornj-in-jsx
