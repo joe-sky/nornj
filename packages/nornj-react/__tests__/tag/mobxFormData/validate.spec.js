@@ -12,11 +12,11 @@ import Checkbox from '../../../antd/checkbox';
 
 const TestForm = React.forwardRef((props, ref) => {
   const { formData } = useLocalStore(() => (
-    <MobxFormData>
-      <MobxFieldData name="userName" value="joe_sky" type="string" trigger="onChange" required />
-      <MobxFieldData name="age" value="18a" type="number" />
-      <MobxFieldData name="worked" value={true} type="boolean" required />
-    </MobxFormData>
+    <mobxFormData>
+      <mobxFieldData name="userName" value="joe_sky" type="string" trigger="onChange" required />
+      <mobxFieldData name="age" value="18a" type="number" />
+      <mobxFieldData name="worked" value={true} type="boolean" required />
+    </mobxFormData>
   ));
 
   useEffect(() => {

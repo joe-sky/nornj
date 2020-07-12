@@ -116,7 +116,7 @@ nj.registerExtension('unless', options => {
 
 ## 它的运作原理
 
-另一个与大多数 Babel 插件的不同点是，`NornJ` JSX 语法的需要配合一些运行时代码。这些代码在 nornj 和 nornj-react 两个包里，Babel 插件在转换 js/ts 文件时，会依当前使用 `NornJ` 语法的情况，自动进行这两个包的导入工作。
+另一个与大多数 Babel 插件的不同点是，`NornJ` JS(X) 语法需要配合一些运行时代码。这些代码在 nornj 和 nornj-react 两个包里，Babel 插件在转换 js/ts 文件时，会依当前使用 `NornJ` 语法的情况，自动进行这两个包的导入工作。
 
 我们来看一个具体例子，比如这段 JSX：
 

@@ -12,8 +12,8 @@ import { sleep } from '../../../../../test/utils';
 
 function TestForm() {
   const { formData } = useLocalStore(() => (
-    <MobxFormData>
-      <MobxFieldData
+    <mobxFormData>
+      <mobxFieldData
         name="userName"
         value="joe_sky"
         type="string"
@@ -28,7 +28,7 @@ function TestForm() {
           }, 100);
         }}
       />
-    </MobxFormData>
+    </mobxFormData>
   ));
 
   return (
@@ -40,8 +40,8 @@ function TestForm() {
 
 function TestFormSync() {
   const { formData } = useLocalStore(() => (
-    <MobxFormData>
-      <MobxFieldData
+    <mobxFormData>
+      <mobxFieldData
         name="userName"
         value="joe_sky"
         type="string"
@@ -53,7 +53,7 @@ function TestFormSync() {
           return true;
         }}
       />
-    </MobxFormData>
+    </mobxFormData>
   ));
 
   return (

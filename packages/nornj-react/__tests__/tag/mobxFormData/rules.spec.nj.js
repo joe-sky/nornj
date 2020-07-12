@@ -1,7 +1,8 @@
-import React, { Component, useState, useEffect } from 'react';
+import React, { Component, useState, useEffect, Fragment } from 'react';
 import { act } from 'react-dom/test-utils';
 import { shallow, mount } from 'enzyme';
-import nj, { expression as n } from 'nornj';
+import { useObserver } from 'mobx-react';
+import nj, { html } from 'nornj';
 import '../../../src/base';
 import '../../../src/extension/mobx/base';
 import '../../../src/extension/mobx/mobxFormData';
@@ -9,6 +10,20 @@ import { useLocalStore } from 'mobx-react-lite';
 import Form from '../../../antd/form';
 import Input from '../../../antd/input';
 import Checkbox from '../../../antd/checkbox';
+
+const template = html`
+  <${Fragment}>
+    <ant-Form.Item n-mobxField="{formData.userName}" className="field1" label="User Name">
+      <input n-mobxBind="{formData.userName}" />
+    <//>
+    <ant-Form.Item n-mobxField="{formData.age}" className="field2" label="Age">
+      <input n-mobxBind="{formData.age}" />
+    <//>
+    <ant-Form.Item n-mobxField="{formData.worked}" className="field3" label="Already Worked">
+      <ant-Checkbox value="worked" n-mobxBind="{formData.worked}" />
+    <//>
+  <//>
+`;
 
 const TestForm = React.forwardRef((props, ref) => {
   const { formData } = useLocalStore(() => (
@@ -31,19 +46,7 @@ const TestForm = React.forwardRef((props, ref) => {
     ref.current = formData;
   }, []);
 
-  return (
-    <>
-      <Form.Item n-mobxField={formData.userName} className="field1" label="User Name">
-        <Input />
-      </Form.Item>
-      <Form.Item n-mobxField={formData.age} className="field2" label="Age">
-        <Input />
-      </Form.Item>
-      <Form.Item n-mobxField={formData.worked} className="field3" label="Already Worked">
-        <Checkbox value="worked" />
-      </Form.Item>
-    </>
-  );
+  return useObserver(() => template({ formData }));
 });
 
 describe('Rules', function() {
