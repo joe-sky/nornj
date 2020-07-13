@@ -1,8 +1,8 @@
 ---
-title: NornJ - More exciting JS(X) based on Babel
+title: NornJ - More exciting JS(X) based on Template Engine
 hero:
   title: NornJ
-  desc: 🌠 More exciting JS(X) based on Babel
+  desc: 🌠 More exciting JS(X) based on Template Engine
   actions:
     - text: Getting Started
       link: /guide/getting-started

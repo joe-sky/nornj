@@ -1,8 +1,8 @@
 ---
-title: NornJ - 基于 Babel，更精彩的 JS(X)
+title: NornJ - 基于模板引擎，更精彩的 JS(X)
 hero:
   title: NornJ
-  desc: 🌠 基于 Babel，更精彩的 JS(X)
+  desc: 🌠 基于模板引擎，更精彩的 JS(X)
   actions:
     - text: 快速上手
       link: /guide/getting-started

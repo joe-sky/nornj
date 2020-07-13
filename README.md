@@ -15,7 +15,7 @@ English | [简体中文](https://github.com/joe-sky/nornj/blob/master/README.zh.
 
 ## Introduction
 
-`NornJ`(pronounced [ˌnɔ:nˈdʒeɪ]，abbreviated as `nj`) is a JS(X) extensions plugin based on Babel.
+`NornJ`(pronounced [ˌnɔ:nˈdʒeɪ]，abbreviated as `nj`) is a JS(X) extension solution based on Template Engine.
 
 ## Documents
 
