@@ -19,6 +19,8 @@
 
 ## 概述
 
+> 目前 `v5.x` 文档中暂时只有 JSX API，作者正在整理最新版 NornJ 模板引擎文档，近期放出。
+
 `NornJ` 基于 Babel 为 JS/JSX/TS/TSX 环境带来了一些新语法体验，最常用的使用场景就是配合 React 来使用它。这些新语法有如下这几类：
 
 - 流程控制
@@ -106,6 +108,42 @@ class App extends Component {
         <button n-show={todos.length > 0} onClick={this.addTodo}>Add Todo</button>
       </div>
     );
+  }
+}
+```
+
+- 本例结合了[styled-components](https://github.com/styled-components/styled-components)来演示在 Tagged Templates 中使用 NornJ 的模板引擎语法（详细文档正在整理，近期放出）：
+
+```js
+const template = html`
+  <Container>
+    <ul>
+      <each of="{todos}">
+        <if condition="{@index > 5}">
+          <li>{@item * 2}</li>
+          <elseif condition="{@index > 10}">
+            <li>{@item * 3}</li>
+          </elseif>
+        </if>
+      </each>
+    </ul>
+    <button n-show="{todos.length > 0}" :onClick="addTodo">Add Todo</button>
+  </Container>
+`;
+
+const Container = styled.div`
+  padding: 20px;
+  font-size: 0.75rem;
+`;
+
+class App extends Component {
+  addTodo = e => {
+    const { todos = [] } = this.state;
+    this.setState({ todos: todos.concat(`Item ${todos.length}`) });
+  };
+
+  render() {
+    return template({ components: { Container } }, this.state, this);
   }
 }
 ```
