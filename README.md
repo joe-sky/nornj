@@ -67,7 +67,7 @@ In `React` development, the `JSX` can use almost all the syntax of javascript an
 
 ## Basic
 
-- Use NornJ syntaxs in JSX(with [styled-jsx](https://github.com/zeit/styled-jsx), detailed documents are being sorted out and released recently)：
+- Use NornJ syntaxs in JSX(with [styled-jsx](https://github.com/zeit/styled-jsx))：
 
 ```js
 class App extends Component {
@@ -104,7 +104,7 @@ class App extends Component {
 
 For above example, combining with the [Babel plugin provided by NornJ](https://github.com/joe-sky/nornj/tree/master/packages/babel-plugin-nornj-in-jsx), it is possible to write various new enhancement syntaxs in JSX.
 
-- Use NornJ tagged templates syntaxs(with [styled-components](https://github.com/styled-components/styled-components))：
+- Use NornJ tagged templates syntaxs(with [styled-components](https://github.com/styled-components/styled-components), the Template Engine documents are being sorted out and released recently)：
 
 ```js
 const template = html`
