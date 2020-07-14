@@ -15,7 +15,13 @@ const tailLayout = {
 export default props => {
   const { formData } = useLocalStore(() => (
     <mobxFormData>
-      <mobxFieldData name="note" required />
+      <mobxFieldData
+        name="note"
+        rules={[
+          { required: true, message: 'note is required' },
+          { max: 20, message: 'cannot enter more than 20 characters' }
+        ]}
+      />
       <mobxFieldData name="gender" required />
       <mobxFieldData name="customizeGender" required />
     </mobxFormData>

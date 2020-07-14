@@ -20,7 +20,7 @@ export default {
   title: 'NornJ',
   logo: `/${deploy ? 'nornj/' : ''}images/logo.png`,
   favicon: `/${deploy ? 'nornj/' : ''}favicon.ico`,
-  //dynamicImport: {},
+  dynamicImport: {},
   //manifest: {},
   //links: [{ rel: 'manifest', href: '/asset-manifest.json' }],
   hash: true,
