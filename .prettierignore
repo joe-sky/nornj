@@ -3,7 +3,7 @@
 /packages/nornj/lib
 /packages/nornj-react/dist
 /packages/nornj-react/lib
-/packages/nornj-react/antd/lib
+/packages/nornj-react/antd
 /packages/nornj-react/echarts/core.js
 /packages/nornj-react/echarts/index.js
 /packages/nornj-react/mobx/lib

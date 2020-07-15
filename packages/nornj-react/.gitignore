@@ -9,8 +9,7 @@
 /router/index.js
 /redux/index.js
 /server/index.js
-/antd/**/*.js
-/antd/lib/
+/antd/
 /echarts/index.js
 /echarts/core.js
 /test/coverage/
