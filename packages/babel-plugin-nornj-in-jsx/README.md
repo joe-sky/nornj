@@ -1,6 +1,6 @@
 <div align="center">
-  <a href="https://joe-sky.github.io/nornj-guide/">
-    <img width="100" src="https://raw.githubusercontent.com/joe-sky/nornj-highlight/master/images/logo.png">
+  <a href="https://joe-sky.github.io/nornj/">
+    <img width="100" src="../../public/images/logo.png">
   </a>
   <a href="https://babeljs.io/">
     <img width="245" src="https://raw.githubusercontent.com/babel/logo/master/babel.png">

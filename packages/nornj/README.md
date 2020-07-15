@@ -1,4 +1,4 @@
-<a href="https://joe-sky.github.io/nornj-guide/" target="_blank" rel="noopener noreferrer"><img width="187" src="https://joe-sky.github.io/nornj-guide/images/logo.png" alt="NornJ"></a>
+<a href="https://joe-sky.github.io/nornj/" target="_blank" rel="noopener noreferrer"><img width="187" src="../../public/images/nornj.png" alt="NornJ"></a>
 -------
 
 ```
