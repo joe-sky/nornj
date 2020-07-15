@@ -124,6 +124,10 @@
       "eslint --fix",
       "git add"
     ],
+    "packages/nornj-react/**/*.{js,jsx,ts,tsx}": [
+      "eslint --fix",
+      "git add"
+    ],
     "packages/nornj-loader/**/*.{js,jsx,ts,tsx}": [
       "eslint --fix",
       "git add"
