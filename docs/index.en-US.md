@@ -1,8 +1,8 @@
 ---
-title: NornJ - More exciting JS(X) based on Template Engine
+title: NornJ - More exciting JS/JSX based on Template Engine
 hero:
   title: NornJ
-  desc: 🌠 More exciting JS(X) based on Template Engine
+  desc: 🌠 More exciting JS/JSX based on Template Engine
   actions:
     - text: Getting Started
       link: /guide/getting-started

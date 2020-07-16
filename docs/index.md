@@ -1,8 +1,8 @@
 ---
-title: NornJ - 基于模板引擎，更精彩的 JS(X)
+title: NornJ - 基于模板引擎，更精彩的 JS/JSX
 hero:
   title: NornJ
-  desc: 🌠 基于模板引擎，更精彩的 JS(X)
+  desc: 🌠 基于模板引擎，更精彩的 JS/JSX
   actions:
     - text: 快速上手
       link: /guide/getting-started

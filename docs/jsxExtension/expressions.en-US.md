@@ -2,7 +2,7 @@
 title: Expressions
 order: 3
 nav:
-  title: JS(X) Syntax Extension
+  title: JS/JSX Syntax Extension
   order: 2
 toc: menu
 ---
