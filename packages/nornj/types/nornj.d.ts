@@ -1,5 +1,5 @@
 /*!
- * NornJ template engine v5.2.1
+ * NornJ template engine v5.2.2
  * (c) Joe_Sky
  * Released under the MIT License.
  */
@@ -149,6 +149,14 @@ declare namespace Template {
     interface RenderChildren {
         (params?: ChildrenParams): JSX.Element | any;
     }
+    /**
+     * NornJ render function, example:
+     *
+     * `template({ ...args1 }, { ...args2 }, ...)`
+     */
+    interface RenderFunc {
+        (...args: Data[]): any;
+    }
 }
 interface FilterDelegateOption {
     _njOpts: number;
@@ -220,7 +228,7 @@ interface Export {
     /**
      * `nj.taggedTmplH`, NornJ tagged templates syntax `nj` and `html`.
      */
-    (strs: TemplateStringsArray, ...args: any[]): any;
+    (strs: TemplateStringsArray, ...args: any[]): Template.RenderFunc;
     components?: typeof components;
     componentConfig?: typeof componentConfig;
     /**
@@ -244,19 +252,19 @@ interface Export {
     /**
      * `nj.taggedTmpl`, NornJ tagged templates syntax `njs`.
      */
-    taggedTmpl?(strs: TemplateStringsArray, ...args: any[]): any;
+    taggedTmpl?(strs: TemplateStringsArray, ...args: any[]): Template.RenderFunc;
     /**
      * `nj.htmlString`, NornJ tagged templates syntax `njs`.
      */
-    htmlString?(strs: TemplateStringsArray, ...args: any[]): any;
+    htmlString?(strs: TemplateStringsArray, ...args: any[]): Template.RenderFunc;
     /**
      * `nj.taggedTmplH`, NornJ tagged templates syntax `nj` and `html`.
      */
-    taggedTmplH?(strs: TemplateStringsArray, ...args: any[]): any;
+    taggedTmplH?(strs: TemplateStringsArray, ...args: any[]): Template.RenderFunc;
     /**
      * `nj.taggedTmplH`, NornJ tagged templates syntax `nj` and `html`.
      */
-    html?(strs: TemplateStringsArray, ...args: any[]): any;
+    html?(strs: TemplateStringsArray, ...args: any[]): Template.RenderFunc;
     /**
      * `nj.template`, NornJ tagged templates syntax `t`.
      */
