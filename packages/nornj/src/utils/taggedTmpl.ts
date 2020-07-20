@@ -4,12 +4,15 @@ import { compileStringTmpl } from '../parser/checkStringElem';
 import { createTmplRule } from '../utils/createTmplRule';
 import { Template } from '../interface';
 
-export function createTaggedTmpl(opts: any = {}): Template.RenderFunc {
+export function createTaggedTmpl(opts: any = {}) {
   const { outputH, delimiters, fileName, isExpression, isCss } = opts;
   const tmplRule = delimiters ? createTmplRule(delimiters) : nj.tmplRule;
 
   return function(strs: TemplateStringsArray, ...args: any[]) {
-    return compileStringTmpl.apply({ tmplRule, outputH, fileName, isExpression, isCss }, arguments);
+    return compileStringTmpl.apply(
+      { tmplRule, outputH, fileName, isExpression, isCss },
+      arguments
+    ) as Template.RenderFunc;
   };
 }
 

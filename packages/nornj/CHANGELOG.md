@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## [v5.2.3] 2020.07.20
+## [v5.2.4] 2020.07.20
 
 - 🌟 Fixed types for `nj.html` and `nj.htmlString`.
 
