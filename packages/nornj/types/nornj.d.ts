@@ -1,5 +1,5 @@
 /*!
- * NornJ template engine v5.2.2
+ * NornJ template engine v5.2.3
  * (c) Joe_Sky
  * Released under the MIT License.
  */
@@ -330,8 +330,8 @@ interface Export {
 
 declare const nj: Export;
 
-declare const taggedTmpl: (strs: TemplateStringsArray, ...args: any[]) => any;
-declare const taggedTmplH: (strs: TemplateStringsArray, ...args: any[]) => any;
+declare const taggedTmpl: Template.RenderFunc;
+declare const taggedTmplH: Template.RenderFunc;
 declare function template(strs: TemplateStringsArray, ...args: any[]): any;
 declare function expression(strs: TemplateStringsArray, ...args: any[]): any;
 declare function css(strs: TemplateStringsArray, ...args: any[]): any;

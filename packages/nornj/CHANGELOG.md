@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [v5.2.3] 2020.07.20
+
+- 🌟 Fixed types for `nj.html` and `nj.htmlString`.
+
 ## [v5.2.0] 2020.07.08
 
 - 🌟 `mobxFormData` tag official released.
