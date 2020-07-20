@@ -165,6 +165,7 @@ Next, add `nornj-in-jsx` to plugins in your babel configuration:
 ## Boilerplate projects
 
 - [nornj-antd-v4-demo](https://github.com/joe-sky/nornj-antd-v4-demo)
+- [nornj-react-vite-demo](https://github.com/joe-sky/nornj-react-vite-demo)
 
 ## Syntax highlight
 

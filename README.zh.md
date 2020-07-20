@@ -152,6 +152,7 @@ class App extends Component {
 
 - [nornj-antd-v4-demo(Codesandbox)](https://codesandbox.io/s/nostalgic-driscoll-t8kty)
 - [nornj-antd-v4-demo(源码)](https://github.com/joe-sky/nornj-antd-v4-demo)
+- [nornj-react-vite-demo](https://github.com/joe-sky/nornj-react-vite-demo)
 
 ## 快速开始
 
