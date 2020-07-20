@@ -1,6 +1,6 @@
 {
   "name": "babel-preset-nornj-with-antd",
-  "version": "5.2.3",
+  "version": "5.2.4",
   "description": "Make the NornJ work gracefully in the JSX environment with Ant Design",
   "author": {
     "name": "Joe_Sky",
@@ -39,7 +39,7 @@
   "dependencies": {
     "babel-plugin-import": "^1.13.0",
     "babel-plugin-module-resolver": "^3.2.0",
-    "babel-plugin-nornj-in-jsx": "^5.2.3",
+    "babel-plugin-nornj-in-jsx": "^5.2.4",
     "lodash.merge": "^4.6.2"
   },
   "devDependencies": {
