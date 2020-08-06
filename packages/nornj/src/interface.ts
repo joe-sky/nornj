@@ -154,6 +154,14 @@ export interface ConfigOption {
   fixTagName?: boolean;
 }
 
+export type JSXNode = JSX.Element | string | number | boolean | null | undefined;
+
+export type JSXChild = JSXNode | Array<JSXNode>;
+
+export interface Childrenable {
+  children?: JSXChild;
+}
+
 export interface Export {
   /**
    * `nj.taggedTmplH`, NornJ tagged templates syntax `nj` and `html`.

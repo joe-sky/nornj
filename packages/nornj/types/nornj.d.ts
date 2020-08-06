@@ -1,5 +1,5 @@
 /*!
- * NornJ template engine v5.2.4
+ * NornJ template engine v5.2.5
  * (c) Joe_Sky
  * Released under the MIT License.
  */
@@ -224,6 +224,11 @@ interface ConfigOption {
     noWsMode?: boolean;
     fixTagName?: boolean;
 }
+declare type JSXNode = JSX.Element | string | number | boolean | null | undefined;
+declare type JSXChild = JSXNode | Array<JSXNode>;
+interface Childrenable {
+    children?: JSXChild;
+}
 interface Export {
     /**
      * `nj.taggedTmplH`, NornJ tagged templates syntax `nj` and `html`.
@@ -337,4 +342,4 @@ declare function expression(strs: TemplateStringsArray, ...args: any[]): any;
 declare function css(strs: TemplateStringsArray, ...args: any[]): any;
 
 export default nj;
-export { Component, ComponentOption, ComponentOptionFunc, ComponentProps, ConfigOption, ElementType, Export, ExtensionDelegate, ExtensionDelegateMultiParams, ExtensionDelegateOption, ExtensionOption, ExtensionPrefixConfig, FilterDelegate, FilterDelegateOption, FilterOption, Template, compile, compileH, css, expression, taggedTmplH as html, taggedTmpl as htmlString, registerComponent, registerExtension, registerFilter, render, renderH, taggedTmpl, taggedTmplH, template };
+export { Childrenable, Component, ComponentOption, ComponentOptionFunc, ComponentProps, ConfigOption, ElementType, Export, ExtensionDelegate, ExtensionDelegateMultiParams, ExtensionDelegateOption, ExtensionOption, ExtensionPrefixConfig, FilterDelegate, FilterDelegateOption, FilterOption, JSXChild, JSXNode, Template, compile, compileH, css, expression, taggedTmplH as html, taggedTmpl as htmlString, registerComponent, registerExtension, registerFilter, render, renderH, taggedTmpl, taggedTmplH, template };

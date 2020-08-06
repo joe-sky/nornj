@@ -13,7 +13,7 @@ toc: menu
 
 NornJ 内置提供了不少与 Mobx 相关的扩展功能，在此章节单独描述。
 
-<Alert>Mobx 扩展并不是使用 NornJ 时必须安装的，Babel 插件在检查到有的 JS(X) 语法使用了某个 Mobx 扩展时，会自动引入额外的代码文件。</Alert>
+<Alert>Mobx 扩展并不是使用 NornJ 时必须安装的，Babel 插件在检查到有的 JS/JSX 语法使用了某个 Mobx 扩展时，会自动引入额外的代码文件。</Alert>
 
 ```js
 //如下检查到 mobxBind 语法时，才自动引入相关的代码包

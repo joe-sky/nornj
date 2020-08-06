@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [v5.2.5] 2020.08.06
+
+- 🐞 Fixed the children nodes types for `JSX.IntrinsicAttributes`.
+
 ## [v5.2.4] 2020.07.20
 
 - 🌟 Fixed types for `nj.html` and `nj.htmlString`.

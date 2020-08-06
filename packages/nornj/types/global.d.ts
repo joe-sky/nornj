@@ -108,6 +108,7 @@ declare function Each<T>(props: {
   $key?: string;
   first?: string;
   last?: string;
+  children: NornJ.JSXChild;
 }): any;
 
 /**
@@ -122,6 +123,7 @@ declare function NjEach<T>(props: {
   $key?: string;
   first?: string;
   last?: string;
+  children: NornJ.JSXChild;
 }): any;
 
 /**
@@ -185,6 +187,7 @@ declare function For<T>(props: {
   $key?: string;
   first?: string;
   last?: string;
+  children: NornJ.JSXChild;
 }): any;
 
 /**
@@ -199,6 +202,7 @@ declare function NjFor<T>(props: {
   $key?: string;
   first?: string;
   last?: string;
+  children: NornJ.JSXChild;
 }): any;
 
 declare function With(props: { [id: string]: any }): any;
@@ -249,48 +253,43 @@ declare function s(strs: TemplateStringsArray, ...args: any): any;
 
 declare namespace JSX {
   namespace NJ {
-    type Children = Element | string | number | boolean | null | typeof undefined;
-
-    interface Childrenable {
-      children?: Children | Children[];
-    }
-
-    interface If extends Childrenable {
+    interface If extends NornJ.Childrenable {
       condition: boolean | number | string;
     }
 
-    interface Then extends Childrenable {}
+    interface Then extends NornJ.Childrenable {}
 
-    interface Elseif extends Childrenable {
+    interface Elseif extends NornJ.Childrenable {
       condition: boolean | number | string;
     }
 
-    interface Else extends Childrenable {}
+    interface Else extends NornJ.Childrenable {}
 
-    interface Switch extends Childrenable {
+    interface Switch extends NornJ.Childrenable {
       value: any;
     }
 
-    interface Case extends Childrenable {
+    interface Case extends NornJ.Childrenable {
       value: any;
     }
 
-    interface Default extends Childrenable {}
+    interface Default extends NornJ.Childrenable {}
 
-    interface Each<T = any> extends Childrenable {
+    interface Each<T = any> extends NornJ.Childrenable {
       of: Iterable<T> | string;
       item?: string;
       index?: string;
       $key?: string;
       first?: string;
       last?: string;
+      children: NornJ.JSXChild;
     }
 
-    interface With extends Childrenable {
+    interface With extends NornJ.Childrenable {
       [id: string]: any;
     }
 
-    interface Empty extends Childrenable {}
+    interface Empty extends NornJ.Childrenable {}
   }
 
   interface IntrinsicElements {
@@ -423,8 +422,6 @@ declare namespace JSX {
   }
 
   interface IntrinsicAttributes {
-    children?: NJ.Children | NJ.Children[];
-
     /**
      * NornJ directive `n-show`, example:
      *

@@ -112,11 +112,11 @@ nj.registerExtension('unless', options => {
 </unless>
 ```
 
-除了 if 这样的标签外，所有的指令和过滤器也都同样支持扩展，具体请看[JSX 语法扩展](../jsx-extension)。
+除了 if 这样的标签外，所有的指令和过滤器也都同样支持扩展，具体请看[JS/JSX 语法扩展](../jsx-extension)。
 
 ## 它的运作原理
 
-另一个与大多数 Babel 插件的不同点是，`NornJ` JS(X) 语法需要配合一些运行时代码。这些代码在 nornj 和 nornj-react 两个包里，Babel 插件在转换 js/ts 文件时，会依当前使用 `NornJ` 语法的情况，自动进行这两个包的导入工作。
+另一个与大多数 Babel 插件的不同点是，`NornJ` JS/JSX 扩展语法需要配合一些运行时代码。这些代码在 nornj 和 nornj-react 两个包里，Babel 插件在转换 js/ts 文件时，会依当前使用 `NornJ` 语法的情况，自动进行这两个包的导入工作。
 
 我们来看一个具体例子，比如这段 JSX：
 

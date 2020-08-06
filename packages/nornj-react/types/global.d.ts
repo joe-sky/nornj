@@ -22,11 +22,11 @@ declare namespace JSX {
   interface Element extends React.ReactElement<any, any>, JSXElementWithMobxFormData {}
 
   namespace NJR {
-    interface MobxObserver extends NJ.Childrenable {}
+    interface MobxObserver extends NornJ.Childrenable {}
 
-    type MobxFormData = NornJReact.MobxFormDataProps & NJ.Childrenable;
+    type MobxFormData = NornJReact.MobxFormDataProps & NornJ.Childrenable;
 
-    type MobxFieldData = NornJReact.MobxFieldDataProps & NJ.Childrenable;
+    type MobxFieldData = NornJReact.MobxFieldDataProps & NornJ.Childrenable;
   }
 
   interface IntrinsicElements {
