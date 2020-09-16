@@ -33,7 +33,7 @@ English | [简体中文](https://github.com/joe-sky/nornj/blob/master/README.zh.
 
 ## Overview
 
-> At present, only JSX API is available in the `v5.x` document. The author is sorting out the latest version of NornJ Template Engine document, which is released recently.
+<!-- > At present, only JSX API is available in the `v5.x` document. The author is sorting out the latest version of NornJ Template Engine document, which is released recently. -->
 
 In `React` development, the `JSX` can use almost all the syntax of javascript and it's very flexible. But if we use `NornJ` with `React` and `JSX`, we can do better, because it can gives JSX new features:
 
