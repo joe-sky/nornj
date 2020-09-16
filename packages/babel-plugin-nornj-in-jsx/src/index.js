@@ -180,19 +180,22 @@ module.exports = function(babel) {
 
         if (state.hasMobxWithNj && !state.hasImportNjrMobx) {
           path.node.body.unshift(
-            types.importDeclaration([], types.stringLiteral('nornj-react/mobx' + state.opts.esm ? '/esm' : ''))
+            types.importDeclaration([], types.stringLiteral('nornj-react/mobx' + (state.opts.esm ? '/esm' : '')))
           );
         }
         if (state.hasMobxFormDataWithNj && !state.hasImportNjrMobxFormData) {
           path.node.body.unshift(
-            types.importDeclaration([], types.stringLiteral('nornj-react/mobx/formData' + state.opts.esm ? '/esm' : ''))
+            types.importDeclaration(
+              [],
+              types.stringLiteral('nornj-react/mobx/formData' + (state.opts.esm ? '/esm' : ''))
+            )
           );
         }
         if (!state.hasImportNjr) {
           path.node.body.unshift(
             types.importDeclaration(
               [],
-              types.stringLiteral(`nornj-react${state.opts.rn ? ('/native' + state.opts.esm ? '/esm' : '') : ''}`)
+              types.stringLiteral(`nornj-react${state.opts.rn ? '/native' + (state.opts.esm ? '/esm' : '') : ''}`)
             )
           );
         }

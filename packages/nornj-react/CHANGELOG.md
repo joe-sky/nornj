@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## [v5.2.6] 2020.09.16
+## [v5.2.7] 2020.09.16
 
 - 🌟 ES module adaptation.
 
