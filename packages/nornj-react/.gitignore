@@ -1,5 +1,6 @@
 /node_modules/
 /lib/
+/es/
 /dist/
 /mobx/index.js
 /mobx/native.js

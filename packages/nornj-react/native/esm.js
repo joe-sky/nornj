@@ -1,2 +1,2 @@
-export * from '../src/base.native';
-export { default } from '../src/base.native';
+export * from '../es/base.native';
+export { default } from '../es/base.native';

@@ -8,7 +8,7 @@
     "packages/babel-plugin-nornj-in-jsx",
     "packages/babel-preset-nornj-with-antd"
   ],
-  "version": "5.2.7",
+  "version": "5.2.8",
   "description": "A powerful template engine that can works with React, JSX enhancement or alternative tools.",
   "scripts": {
     "start": "npm run dev",

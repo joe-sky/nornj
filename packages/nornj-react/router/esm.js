@@ -1,1 +1,1 @@
-import '../src/extension/router';
+import '../es/extension/router';

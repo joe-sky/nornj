@@ -1,1 +1,1 @@
-import '../src/extension/mobx/base';
+import '../es/extension/mobx/base';

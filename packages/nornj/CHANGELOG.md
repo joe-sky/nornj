@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [v5.2.8] 2020.09.16
+
+- 🌟 ES module adaptation.
+
 ## [v5.2.5] 2020.08.06
 
 - 🐞 Fixed the children nodes types for `JSX.IntrinsicAttributes`.
