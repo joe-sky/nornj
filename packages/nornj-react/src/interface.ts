@@ -101,6 +101,8 @@ export interface MobxFormData {
   (props: MobxFormDataProps): JSX.Element;
 }
 
+export type FormDataInstance<T> = MobxFormDataInstance & T;
+
 export type JSXElementWithMobxFormData = { formData?: MobxFormDataInstance & IObservableObject };
 
 /**
