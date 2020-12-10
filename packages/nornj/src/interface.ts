@@ -272,6 +272,8 @@ export interface Export {
 
   capitalize?: typeof import('../src/utils/tools').capitalize;
 
+  as?: typeof import('../src/utils/tools').as;
+
   config?: typeof import('../src/config').config;
 
   includeParser?: Function;

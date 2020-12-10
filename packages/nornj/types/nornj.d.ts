@@ -1,5 +1,5 @@
 /*!
- * NornJ template engine v5.2.8
+ * NornJ template engine v5.3.0
  * (c) Joe_Sky
  * Released under the MIT License.
  */
@@ -25,6 +25,7 @@ declare const assign: {
 declare function upperFirst(str: string): string;
 declare function lowerFirst(str: string): string;
 declare function capitalize(str: string): string;
+declare function as<R, T = any>(value: T): R;
 
 declare const compile: (tmpl: any, tmplKey: any, fileName?: string, delimiters?: object, tmplRule?: object) => any;
 declare const compileH: (tmpl: any, tmplKey: any, fileName?: string, delimiters?: object, tmplRule?: object) => any;
@@ -301,6 +302,7 @@ interface Export {
     upperFirst?: typeof upperFirst;
     lowerFirst?: typeof lowerFirst;
     capitalize?: typeof capitalize;
+    as?: typeof as;
     config?: typeof config;
     includeParser?: Function;
     createElement?: Function;
@@ -342,4 +344,4 @@ declare function expression(strs: TemplateStringsArray, ...args: any[]): any;
 declare function css(strs: TemplateStringsArray, ...args: any[]): any;
 
 export default nj;
-export { Childrenable, Component, ComponentOption, ComponentOptionFunc, ComponentProps, ConfigOption, ElementType, Export, ExtensionDelegate, ExtensionDelegateMultiParams, ExtensionDelegateOption, ExtensionOption, ExtensionPrefixConfig, FilterDelegate, FilterDelegateOption, FilterOption, JSXChild, JSXNode, Template, compile, compileH, css, expression, taggedTmplH as html, taggedTmpl as htmlString, registerComponent, registerExtension, registerFilter, render, renderH, taggedTmpl, taggedTmplH, template };
+export { Childrenable, Component, ComponentOption, ComponentOptionFunc, ComponentProps, ConfigOption, ElementType, Export, ExtensionDelegate, ExtensionDelegateMultiParams, ExtensionDelegateOption, ExtensionOption, ExtensionPrefixConfig, FilterDelegate, FilterDelegateOption, FilterOption, JSXChild, JSXNode, Template, as, compile, compileH, css, expression, taggedTmplH as html, taggedTmpl as htmlString, registerComponent, registerExtension, registerFilter, render, renderH, taggedTmpl, taggedTmplH, template };

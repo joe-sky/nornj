@@ -9,4 +9,5 @@ export { registerExtension } from './helpers/extension';
 export { registerFilter } from './helpers/filter';
 export { registerComponent } from './helpers/component';
 export { compile, compileH, render, renderH } from './compiler/compile.runtime';
+export { as } from './utils/tools';
 export default nj;

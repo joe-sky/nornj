@@ -20,4 +20,5 @@ export {
   css
 } from './utils/taggedTmpl';
 export * from './interface';
+export { as } from './utils/tools';
 export default nj;

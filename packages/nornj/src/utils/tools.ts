@@ -213,6 +213,10 @@ export function capitalize(str: string) {
   return upperFirst(str);
 }
 
+export function as<R, T = any>(value: T): R {
+  return (value as T | R) as R;
+}
+
 assign(nj, {
   defineProp,
   defineProps,
@@ -236,5 +240,6 @@ assign(nj, {
   assign,
   upperFirst,
   lowerFirst,
-  capitalize
+  capitalize,
+  as
 });

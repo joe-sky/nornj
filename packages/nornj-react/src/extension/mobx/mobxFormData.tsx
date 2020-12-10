@@ -1,5 +1,5 @@
-import React from 'react';
-import nj, { registerExtension } from 'nornj';
+import React, { useMemo } from 'react';
+import nj, { registerExtension, as } from 'nornj';
 import { observable, runInAction, reaction, extendObservable, isComputedProp, observe } from 'mobx';
 import schema, { RuleItem } from 'async-validator';
 import extensionConfigs from '../../../mobx/formData/extensionConfig';
@@ -8,7 +8,8 @@ import {
   MobxFormDataInstance,
   MobxFieldDataProps,
   MobxFieldDataInstance,
-  MobxFieldRuleItem
+  MobxFieldRuleItem,
+  FormDataInstance
 } from '../../interface';
 import moment from 'moment';
 
@@ -285,3 +286,7 @@ registerExtension(
   },
   extensionConfigs.mobxField
 );
+
+export function useFormData<T>(formDataElement: () => JSX.Element, deps: any[] = []) {
+  return useMemo<FormDataInstance<T>>(() => as(observable(formDataElement())), deps);
+}
