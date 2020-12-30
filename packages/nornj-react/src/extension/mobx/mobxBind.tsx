@@ -1,4 +1,4 @@
-import nj, { registerExtension, ExtensionDelegateOption, Component, ComponentOption } from 'nornj';
+import nj, { registerExtension, ExtensionDelegateOption, Component, ComponentOption, ExtensionOption } from 'nornj';
 import React, { useRef } from 'react';
 import { toJS } from 'mobx';
 import extensionConfigs from '../../../mobx/extensionConfig';
@@ -222,7 +222,7 @@ registerExtension(
     tagProps.mobxBindDirectiveOptions = options;
     tagProps._mobxBindValue = ret;
   },
-  extensionConfigs.mobxBind
+  extensionConfigs.mobxBind as ExtensionOption
 );
 
 nj.extensions.mstBind = nj.extensions.mobxBind;

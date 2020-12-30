@@ -1,1 +1,1 @@
-import '../../es/extension/mobx/mobxFormData';
+export * from '../../es/extension/mobx/mobxFormData';

@@ -13,17 +13,24 @@ import Checkbox from '../../../antd/checkbox';
 const TestForm = React.forwardRef((props, ref) => {
   const { formData } = useLocalStore(() => (
     <mobxFormData>
-      <mobxFieldData
-        name="userName"
-        value="joe_sky"
-        rules={[
-          { required: true, message: '不能为空' },
-          { min: 3, message: '至少输入3个字符' }
-        ]}
-        trigger="onChange"
-      />
-      <mobxFieldData name="age" value="18" type="number" />
-      <mobxFieldData name="worked" value={true} type="boolean" required />
+      <>
+        <mobxFieldData
+          name="userName"
+          value="joe_sky"
+          rules={[
+            { required: true, message: '不能为空' },
+            { min: 3, message: '至少输入3个字符' }
+          ]}
+          trigger="onChange"
+        />
+        <mobxFieldData name="age" value="18" type="number" />
+        <if condition={ref != null}>
+          <mobxFieldData name="worked" value={true} type="boolean" required />
+        </if>
+      </>
+      <each of={[1, 2, 3]}>
+        <mobxFieldData name={`field${item}`} value={item} type="number" />
+      </each>
     </mobxFormData>
   ));
 

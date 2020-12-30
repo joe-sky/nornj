@@ -1,5 +1,5 @@
-import React, { useMemo } from 'react';
-import nj, { registerExtension, as } from 'nornj';
+import React, { Fragment, isValidElement, useMemo } from 'react';
+import nj, { registerExtension, as, ExtensionOption } from 'nornj';
 import { observable, runInAction, reaction, extendObservable, isComputedProp, observe } from 'mobx';
 import schema, { RuleItem } from 'async-validator';
 import extensionConfigs from '../../../mobx/formData/extensionConfig';
@@ -228,6 +228,24 @@ const createFormData = (
   }
 });
 
+function getChildrenWithoutFragment(children: any[]) {
+  const actualChildren = [];
+
+  children.forEach(child => {
+    if (!isValidElement(child) || child.type !== Fragment) {
+      if (Array.isArray(child)) {
+        getChildrenWithoutFragment(child)?.forEach(child => actualChildren.push(child));
+      } else {
+        actualChildren.push(child);
+      }
+    } else {
+      getChildrenWithoutFragment((child?.props as any)?.children)?.forEach(child => actualChildren.push(child));
+    }
+  });
+
+  return actualChildren;
+}
+
 registerExtension(
   'mobxFormData',
   options => {
@@ -239,7 +257,7 @@ registerExtension(
     }
 
     const formData = createFormData(props);
-    _children.forEach((fieldData: MobxFieldDataInstance) => {
+    getChildrenWithoutFragment(_children).forEach((fieldData: MobxFieldDataInstance) => {
       fieldData && formData.add(fieldData);
     });
 
@@ -284,7 +302,7 @@ registerExtension(
       tagProps.help = <>{help}</>;
     }
   },
-  extensionConfigs.mobxField
+  extensionConfigs.mobxField as ExtensionOption
 );
 
 export function useFormData<T>(formDataElement: () => JSX.Element, deps: any[] = []) {

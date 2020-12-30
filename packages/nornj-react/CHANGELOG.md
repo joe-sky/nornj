@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## [v5.3.0] 2020.12.30
+
+- 🌟 Add `useFormData` hook.
+- 🐛 Support `<each>` and `<></>` in `<mobxFormData>` children.
+
 ## [v5.2.8] 2020.09.16
 
 - 🌟 ES module adaptation.

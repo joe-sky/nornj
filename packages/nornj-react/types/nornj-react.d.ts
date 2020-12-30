@@ -1,5 +1,5 @@
 /*!
- * NornJ-React v5.2.8
+ * NornJ-React v5.3.0
  * (c) Joe_Sky
  * Released under the MIT License.
  */
@@ -100,6 +100,7 @@ interface MobxFormDataInstance {
 interface MobxFormData {
     (props: MobxFormDataProps): JSX.Element;
 }
+declare type FormDataInstance<T> = MobxFormDataInstance & T;
 declare type JSXElementWithMobxFormData = {
     formData?: MobxFormDataInstance & IObservableObject;
 };
@@ -120,4 +121,4 @@ interface Export {
 declare const njr: Export;
 
 export default njr;
-export { Export, JSXElementWithMobxFormData, MobxFieldData, MobxFieldDataInstance, MobxFieldDataProps, MobxFieldRuleItem, MobxFormData, MobxFormDataInstance, MobxFormDataProps, ValidateMessageInfo, ValidateMessages, bindTemplate, bindTemplate as registerTmpl };
+export { Export, FormDataInstance, JSXElementWithMobxFormData, MobxFieldData, MobxFieldDataInstance, MobxFieldDataProps, MobxFieldRuleItem, MobxFormData, MobxFormDataInstance, MobxFormDataProps, ValidateMessageInfo, ValidateMessages, bindTemplate, bindTemplate as registerTmpl };

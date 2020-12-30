@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [v5.3.0] 2020.12.30
+
+- 🌟 Add `as` tool function.
+
 ## [v5.2.8] 2020.09.16
 
 - 🌟 ES module adaptation.
