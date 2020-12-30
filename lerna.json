@@ -11,6 +11,6 @@
       "message": "chore(release): :bookmark: publish %s"
     }
   },
-  "version": "5.2.8",
+  "version": "5.3.0",
   "npmClient": "yarn"
 }
