@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { Form, Input, Button, Checkbox } from 'antd';
 import { useLocalStore } from 'mobx-react-lite';
 import { observer } from 'mobx-react';
+import { useFormData } from 'nornj-react/mobx/formData';
 
 const layout = {
   labelCol: { span: 8 },
@@ -11,12 +12,12 @@ const tailLayout = {
   wrapperCol: { offset: 8, span: 16 }
 };
 
-const Demo = props => {
+const Demo: React.FC = props => {
   const state = useLocalStore(() => ({
     checkNick: false
   }));
 
-  const { formData } = useLocalStore(() => (
+  const formData = useFormData(() => (
     <mobxFormData>
       <mobxFieldData name="name" required message="Please input your name" />
       <mobxFieldData name="nickname" message="Please input your nickname" />

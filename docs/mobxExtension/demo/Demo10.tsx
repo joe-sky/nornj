@@ -1,7 +1,8 @@
 import React from 'react';
 import { Form, Select, InputNumber, Switch, Radio, Slider, Button, Upload, Rate, Checkbox, Row, Col } from 'antd';
 import { UploadOutlined, InboxOutlined } from '@ant-design/icons';
-import { useLocalStore } from 'mobx-react-lite';
+import { useLocalStore, observer } from 'mobx-react-lite';
+import { useFormData } from 'nornj-react/mobx/formData';
 
 const { Option } = Select;
 
@@ -10,8 +11,8 @@ const formItemLayout = {
   wrapperCol: { span: 14 }
 };
 
-export default props => {
-  const { formData } = useLocalStore(() => (
+export default observer(props => {
+  const formData = useFormData(() => (
     <mobxFormData>
       <mobxFieldData name="select" required message="Please select your country!" />
       <mobxFieldData name="select-multiple" required message="Please select your favourite colors!" />
@@ -176,4 +177,4 @@ export default props => {
       </Form.Item>
     </Form>
   );
-};
+});

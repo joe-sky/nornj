@@ -1,6 +1,7 @@
 import React from 'react';
 import { Form, Input, Button, Select } from 'antd';
-import { useLocalStore, useObserver } from 'mobx-react-lite';
+import { observer } from 'mobx-react-lite';
+import { useFormData } from 'nornj-react/mobx/formData';
 
 const { Option } = Select;
 
@@ -12,8 +13,8 @@ const tailLayout = {
   wrapperCol: { offset: 8, span: 16 }
 };
 
-export default props => {
-  const { formData } = useLocalStore(() => (
+export default observer(props => {
+  const formData = useFormData(() => (
     <mobxFormData>
       <mobxFieldData
         name="note"
@@ -60,7 +61,7 @@ export default props => {
     formData.gender = 'male';
   };
 
-  return useObserver(() => (
+  return (
     <Form {...layout} style={{ maxWidth: 600 }}>
       <Form.Item mobxField={formData.note} label="Note">
         <Input />
@@ -92,5 +93,5 @@ export default props => {
         </Button>
       </Form.Item>
     </Form>
-  ));
-};
+  );
+});

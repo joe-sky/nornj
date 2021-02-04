@@ -4,14 +4,14 @@ import { shallow, mount } from 'enzyme';
 import nj, { expression as n } from 'nornj';
 import '../../../src/base';
 import '../../../src/extension/mobx/base';
-import '../../../src/extension/mobx/mobxFormData';
-import { useLocalStore } from 'mobx-react-lite';
+import { useFormData } from '../../../src/extension/mobx/mobxFormData';
+import { observer } from 'mobx-react-lite';
 import Form from '../../../antd/form';
 import Input from '../../../antd/input';
 import { sleep } from '../../../../../test/utils';
 
 function TestForm() {
-  const { formData } = useLocalStore(() => (
+  const formData = useFormData(() => (
     <mobxFormData>
       <mobxFieldData
         name="userName"
@@ -39,7 +39,7 @@ function TestForm() {
 }
 
 function TestFormSync() {
-  const { formData } = useLocalStore(() => (
+  const formData = useFormData(() => (
     <mobxFormData>
       <mobxFieldData
         name="userName"

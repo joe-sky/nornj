@@ -1,6 +1,7 @@
 import React from 'react';
 import { Form, DatePicker, TimePicker, Button } from 'antd';
-import { useLocalStore, useObserver } from 'mobx-react-lite';
+import { useLocalStore, observer } from 'mobx-react-lite';
+import { useFormData } from 'nornj-react/mobx/formData';
 import { RuleItem } from 'async-validator';
 
 const { YearPicker, MonthPicker, RangePicker, WeekPicker } = DatePicker;
@@ -26,8 +27,8 @@ const rangeConfig: Rules = {
   rules: [{ type: 'array', required: true, message: 'Please select time!' }]
 };
 
-const TimeRelatedForm = () => {
-  const { formData } = useLocalStore(() => (
+const TimeRelatedForm = observer(() => {
+  const formData = useFormData(() => (
     <mobxFormData>
       <mobxFieldData name="date-picker" {...config} />
       <mobxFieldData name="date-time-picker" {...config} />
@@ -106,6 +107,6 @@ const TimeRelatedForm = () => {
       </Form.Item>
     </Form>
   );
-};
+});
 
 export default TimeRelatedForm;

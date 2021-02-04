@@ -84,8 +84,10 @@ import 'nornj-react';
 使用 `mobxField` 指令绑定到 `Form.Item` 组件，即完成了一个最简单的响应式表单：
 
 ```js
+import { useFormData } from 'nornj-react/mobx/formData';
+
 const TestForm = observer(props => {
-  const { formData } = useLocalStore(() => (
+  const formData = useFormData(() => (
     <mobxFormData>
       <mobxFieldData name="userName" value="joe_sky" type="string" trigger="onChange" required />
       <mobxFieldData name="age" value="33" type="number" />
@@ -255,8 +257,10 @@ const { formData } = (
 如果 `mobxField` 有不满足需求的场景，我们还可以自行编写表单元素组件的各种参数与逻辑，增加 `noBind` 参数即可：
 
 ```js
+import { useFormData } from 'nornj-react/mobx/formData';
+
 const TestForm = observer(props => {
-  const { formData } = useLocalStore(() => (
+  const formData = useFormData(() => (
     <mobxFormData>
       <mobxFieldData name="userName" value="joe_sky" type="string" />
       <mobxFieldData name="age" value="33" type="number" />
@@ -301,11 +305,13 @@ const TestForm = observer(props => {
 
 ### React hooks
 
-使用 `mobx-react` 包提供的 [useLocalStore](https://mobx-react.js.org/state-local) 即可，在它的参数中传入 `mobxFormData` 标签：
+使用 `nornj-react` 包提供的 `useFormData` hook，在它的参数中传入 `mobxFormData` 标签：
 
 ```js
+import { useFormData } from 'nornj-react/mobx/formData';
+
 const TestForm = observer(props => {
-  const { formData: formDataUser } = useLocalStore(() => (
+  const formDataUser = useFormData(() => (
     <mobxFormData>
       <mobxFieldData name="userName" value="joe_sky" type="string" />
       <mobxFieldData name="age" value="33" type="number" />
@@ -331,7 +337,7 @@ const TestForm = observer(props => {
 
 ```js
 const TestForm = observer(props => {
-  const { formData: formDataUser } = useLocalStore(() => (
+  const formDataUser = useFormData(() => (
     <mobxFormData>
       <mobxFieldData name="userName" value="joe_sky" type="string" />
       <mobxFieldData name="age" value="33" type="number" />
@@ -343,6 +349,23 @@ const TestForm = observer(props => {
       formDataUser.setValue(values);
     });
   }, []);
+
+  ...
+};
+```
+
+- 重新初始化数据
+
+`useFormData` 的第二个参数可以传入一个数组，用途与 `useEffect` 非常类似，即在依赖变更时重新执行初始化表单数据：
+
+```js
+const TestForm = observer(props => {
+  const formDataUser = useFormData(() => (
+    <mobxFormData>
+      <mobxFieldData name={props.userName} value="joe_sky" type="string" />
+      <mobxFieldData name={props.age} value="33" type="number" />
+    </mobxFormData>
+  ), [props.userName, props.age]);
 
   ...
 };
@@ -821,6 +844,14 @@ interface MobxFormDataInstance extends IObservableObject {
   setValue(name: string | object, value?: any): void;
   [key: string]: any;
 }
+```
+
+### useFormData
+
+```ts
+type FormDataInstance<T> = MobxFormDataInstance & T;
+
+declare function useFormData<T = {}>(formDataElement: () => JSX.Element, deps?: any[]): FormDataInstance<T>;
 ```
 
 [npm-image]: http://img.shields.io/npm/v/nornj-react.svg

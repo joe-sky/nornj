@@ -305,6 +305,6 @@ registerExtension(
   extensionConfigs.mobxField as ExtensionOption
 );
 
-export function useFormData<T>(formDataElement: () => JSX.Element, deps: any[] = []) {
+export function useFormData<T = {}>(formDataElement: () => JSX.Element, deps: any[] = []) {
   return useMemo<FormDataInstance<T>>(() => as(observable(formDataElement())), deps);
 }

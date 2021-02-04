@@ -1,6 +1,7 @@
 import React from 'react';
 import { Form, Input, Button, Checkbox } from 'antd';
-import { useLocalStore } from 'mobx-react-lite';
+import { observer } from 'mobx-react-lite';
+import { useFormData } from 'nornj-react/mobx/formData';
 
 const layout = {
   labelCol: { span: 8 },
@@ -10,8 +11,8 @@ const tailLayout = {
   wrapperCol: { offset: 8, span: 16 }
 };
 
-export default props => {
-  const { formData } = useLocalStore(() => (
+export default observer(props => {
+  const formData = useFormData(() => (
     <mobxFormData>
       <mobxFieldData name="userName" required message="Please input your username!" />
       <mobxFieldData name="password" required message="Please input your password!" />
@@ -50,4 +51,4 @@ export default props => {
       </Form.Item>
     </Form>
   );
-};
+});

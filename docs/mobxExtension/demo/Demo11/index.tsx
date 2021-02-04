@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Form, Input, InputNumber, Modal, Button, Avatar, Typography } from 'antd';
 import { SmileOutlined, UserOutlined } from '@ant-design/icons';
 import { useLocalStore } from 'mobx-react-lite';
+import { useFormData } from 'nornj-react/mobx/formData';
 import { MobxFormDataInstance } from 'nornj-react';
 import './style.less';
 
@@ -26,7 +27,7 @@ interface User {
 }
 
 const ModalForm: React.FC<ModalFormProps> = ({ visible, setVisible, onCancel, formDataList }) => {
-  const { formData } = useLocalStore(() => (
+  const formData = useFormData(() => (
     <mobxFormData>
       <mobxFieldData name="name" required />
       <mobxFieldData name="age" required />
@@ -72,7 +73,7 @@ export default props => {
     setVisible(false);
   };
 
-  const { formData } = useLocalStore(() => (
+  const formData = useFormData(() => (
     <mobxFormData>
       <mobxFieldData name="group" required />
       <mobxFieldData name="users" value={[]} type="array" required />

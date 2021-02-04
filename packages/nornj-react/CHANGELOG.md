@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [v5.3.1] 2021.02.04
+
+- 🏷️ Fix `useFormData` type.
+
 ## [v5.3.0] 2020.12.30
 
 - 🌟 Add `useFormData` hook.

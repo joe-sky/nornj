@@ -1,7 +1,8 @@
 import React from 'react';
 import { Form, Input, Button } from 'antd';
 import { MinusCircleOutlined, PlusCircleOutlined } from '@ant-design/icons';
-import { useLocalStore, useObserver } from 'mobx-react-lite';
+import { useLocalStore, observer } from 'mobx-react-lite';
+import { useFormData } from 'nornj-react/mobx/formData';
 import './style.less';
 
 const formItemLayout = {
@@ -23,8 +24,8 @@ const formItemLayoutWithOutLabel = {
 
 let count = 0;
 
-export default () => {
-  const { formData } = useLocalStore(() => <mobxFormData />);
+export default observer(() => {
+  const formData = useFormData(() => <mobxFormData />);
 
   const onSubmit = () =>
     formData
@@ -42,7 +43,7 @@ export default () => {
 
   let fieldName: string;
 
-  return useObserver(() => (
+  return (
     <Form name="dynamic_form_item" {...formItemLayoutWithOutLabel} className="dynamic-form">
       <div>
         <each of={formData.fieldDatas} $key="fieldName">
@@ -90,5 +91,5 @@ export default () => {
         <Button onClick={onReset}>Reset</Button>
       </Form.Item>
     </Form>
-  ));
-};
+  );
+});

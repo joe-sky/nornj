@@ -1,7 +1,8 @@
 import React from 'react';
 import { Form, Input, InputNumber, Button } from 'antd';
-import { useLocalStore, useObserver } from 'mobx-react-lite';
+import { observer } from 'mobx-react-lite';
 import { ValidateMessages } from 'nornj-react';
+import { useFormData } from 'nornj-react/mobx/formData';
 
 const layout = {
   labelCol: { span: 8 },
@@ -19,8 +20,8 @@ const validateMessages: ValidateMessages = fieldData => ({
   }
 });
 
-export default props => {
-  const { formData } = useLocalStore(() => (
+export default observer(props => {
+  const formData = useFormData(() => (
     <mobxFormData validateMessages={validateMessages}>
       <mobxFieldData name="name" required />
       <mobxFieldData name="email" type="email" />
@@ -40,7 +41,7 @@ export default props => {
         console.log(errorInfo);
       });
 
-  return useObserver(() => (
+  return (
     <Form {...layout} style={{ maxWidth: 600 }}>
       <Form.Item mobxField={formData.name} label="Name">
         <Input />
@@ -68,5 +69,5 @@ export default props => {
         </Button>
       </Form.Item>
     </Form>
-  ));
-};
+  );
+});

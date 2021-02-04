@@ -1,6 +1,7 @@
 import React from 'react';
 import { Form, Input, Select, Button } from 'antd';
-import { useLocalStore, useObserver } from 'mobx-react-lite';
+import { useLocalStore, observer } from 'mobx-react-lite';
+import { useFormData } from 'nornj-react/mobx/formData';
 
 const { Option } = Select;
 
@@ -14,7 +15,7 @@ interface PriceInputProps {
   onChange?: (value: PriceValue) => void;
 }
 
-const PriceInput: React.FC<PriceInputProps> = ({ value = {}, onChange }) => {
+const PriceInput = observer<PriceInputProps>(({ value = {}, onChange }) => {
   const state = useLocalStore(() => ({
     _number: value?.number,
     get number() {
@@ -36,7 +37,7 @@ const PriceInput: React.FC<PriceInputProps> = ({ value = {}, onChange }) => {
     }
   };
 
-  return useObserver(() => (
+  return (
     <span>
       <Input mobxBind={state.number} onChange={triggerChange} style={{ width: 100 }} />
       <Select mobxBind={state.currency} style={{ width: 80, margin: '0 8px' }} onChange={triggerChange}>
@@ -44,10 +45,10 @@ const PriceInput: React.FC<PriceInputProps> = ({ value = {}, onChange }) => {
         <Option value="dollar">Dollar</Option>
       </Select>
     </span>
-  ));
-};
+  );
+});
 
-export default props => {
+export default observer(props => {
   const checkPrice = (rule, value) => {
     if (value.number > 0) {
       return Promise.resolve();
@@ -55,7 +56,7 @@ export default props => {
     return Promise.reject('Price must be greater than zero!');
   };
 
-  const { formData } = useLocalStore(() => (
+  const formData = useFormData(() => (
     <mobxFormData>
       <mobxFieldData
         name="price"
@@ -79,7 +80,7 @@ export default props => {
         console.log(errorInfo);
       });
 
-  return useObserver(() => (
+  return (
     <Form layout="inline">
       <Form.Item label="Price" mobxField={formData.price}>
         <PriceInput />
@@ -90,5 +91,5 @@ export default props => {
         </Button>
       </Form.Item>
     </Form>
-  ));
-};
+  );
+});

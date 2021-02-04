@@ -94,6 +94,4 @@ declare module 'nornj-react/mobx';
 
 declare module 'nornj-react/mobx/native';
 
-declare module 'nornj-react/mobx/formData';
-
 declare module 'nornj-react/lib/*';

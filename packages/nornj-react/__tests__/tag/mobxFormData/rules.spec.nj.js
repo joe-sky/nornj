@@ -5,8 +5,8 @@ import { useObserver } from 'mobx-react';
 import nj, { html } from 'nornj';
 import '../../../src/base';
 import '../../../src/extension/mobx/base';
-import '../../../src/extension/mobx/mobxFormData';
-import { useLocalStore } from 'mobx-react-lite';
+import { useFormData } from '../../../src/extension/mobx/mobxFormData';
+import { observer } from 'mobx-react-lite';
 import Form from '../../../antd/form';
 import Input from '../../../antd/input';
 import Checkbox from '../../../antd/checkbox';
@@ -26,7 +26,7 @@ const template = html`
 `;
 
 const TestForm = React.forwardRef((props, ref) => {
-  const { formData } = useLocalStore(() => (
+  const formData = useFormData(() => (
     <mobxFormData>
       <mobxFieldData
         name="userName"

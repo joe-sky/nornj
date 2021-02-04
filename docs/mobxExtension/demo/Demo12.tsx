@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { Form, Input, Select, Tooltip, Button } from 'antd';
 import { observable, toJS } from 'mobx';
-import { useObserver } from 'mobx-react-lite';
+import { observer } from 'mobx-react-lite';
 
 const { Option } = Select;
 
@@ -13,7 +13,7 @@ class TestStore {
   ).formData;
 
   async getData() {
-    await new Promise(resolve => {
+    await new Promise<void>(resolve => {
       setTimeout(() => {
         this.formDataUser.username = 'Ant Design';
         resolve();
@@ -24,12 +24,12 @@ class TestStore {
 
 const testStore = new TestStore();
 
-export default props => {
+export default observer(props => {
   useEffect(() => {
     testStore.getData();
   }, []);
 
-  return useObserver(() => (
+  return (
     <div>
       <Form layout="inline">
         <Form.Item label="Username" mobxField={testStore.formDataUser.username}>
@@ -49,5 +49,5 @@ export default props => {
         )}
       </pre>
     </div>
-  ));
-};
+  );
+});

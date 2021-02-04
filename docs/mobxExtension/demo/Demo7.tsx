@@ -1,11 +1,12 @@
 import React from 'react';
 import { Form, Input, Select, Tooltip, Button } from 'antd';
-import { useLocalStore } from 'mobx-react-lite';
+import { observer } from 'mobx-react-lite';
+import { useFormData } from 'nornj-react/mobx/formData';
 
 const { Option } = Select;
 
-export default props => {
-  const { formData } = useLocalStore(() => (
+export default observer(props => {
+  const formData = useFormData(() => (
     <mobxFormData>
       <mobxFieldData name="username" required message="Username is required" />
       <mobxFieldData name="province" required message="Province is required" />
@@ -64,4 +65,4 @@ export default props => {
       </Form.Item>
     </Form>
   );
-};
+});
