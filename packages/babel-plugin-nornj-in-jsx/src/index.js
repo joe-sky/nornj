@@ -28,7 +28,7 @@ module.exports = function(babel) {
             !nj.extensionConfig.mobxFormData &&
             utils.setTmplConfig({ extensionConfig: require('nornj-react/mobx/formData/extensionConfig') });
 
-          if (astUtil.isExTag(nodeName)) {
+          if (astUtil.isExTag(nodeName, state.opts)) {
             state.hasNjInJSX = true;
             if (hasMobx) {
               state.hasMobxWithNj = true;
@@ -67,7 +67,7 @@ module.exports = function(babel) {
             state.mobxFieldNodes.add(path.node);
 
             path.replaceWith(
-              types.jsxElement(types.jsxOpeningElement(types.jsxIdentifier('MobxObserver'), []), null, [path.node])
+              types.jsxElement(types.jsxOpeningElement(types.jsxIdentifier('mobxObserver'), []), null, [path.node])
             );
           }
         }

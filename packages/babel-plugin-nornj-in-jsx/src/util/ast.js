@@ -241,7 +241,11 @@ exports.hasExPrefix = hasExPrefix;
 const REGEX_LOWER_CASE = /^[a-z]/;
 const REGEX_UPPER_CASE = /^[A-Z]/;
 
-exports.isExTag = function(nodeName) {
+exports.isExTag = function(nodeName, opts = {}) {
+  if (opts.onlyLowercaseExName && REGEX_UPPER_CASE.test(nodeName)) {
+    return false;
+  }
+
   const exPrefix = hasExPrefix(nodeName);
   let isSubTag;
   let needPrefix;

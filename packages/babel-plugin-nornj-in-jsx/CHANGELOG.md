@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [v5.3.2] 2021.02.07
+
+- 🌟 Add `onlyLowercaseExName` option for `nornj-in-jsx`.
+
 ## [v5.2.8] 2020.09.16
 
 - 🌟 ES module adaptation.
