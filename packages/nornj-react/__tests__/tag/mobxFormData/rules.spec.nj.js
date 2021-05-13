@@ -1,7 +1,7 @@
 import React, { Component, useState, useEffect, Fragment } from 'react';
 import { act } from 'react-dom/test-utils';
 import { shallow, mount } from 'enzyme';
-import { useObserver } from 'mobx-react';
+import { Observer } from 'mobx-react';
 import nj, { html } from 'nornj';
 import '../../../src/base';
 import '../../../src/extension/mobx/base';
@@ -46,7 +46,7 @@ const TestForm = React.forwardRef((props, ref) => {
     ref.current = formData;
   }, []);
 
-  return useObserver(() => template({ formData }));
+  return <Observer>{() => template({ formData })}</Observer>;
 });
 
 describe('Rules', function() {

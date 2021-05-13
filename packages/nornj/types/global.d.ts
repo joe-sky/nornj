@@ -3,98 +3,98 @@
  *
  * `<If condition={false}><input /></If>`
  */
-declare function If(props: { condition: boolean | number | string }): any;
+declare function If(props: { condition: boolean | number | string } & NornJ.Childrenable): any;
 
 /**
  * NornJ tag `If`, example:
  *
  * `<NjIf condition={false}><input /></NjIf>`
  */
-declare function NjIf(props: { condition: boolean | number | string }): any;
+declare function NjIf(props: { condition: boolean | number | string } & NornJ.Childrenable): any;
 
 /**
  * NornJ tag `Then`, example:
  *
  * `<If condition={foo > 10}><input /><Then>100</Then><Else>200</Else></If>`
  */
-declare function Then(): any;
+declare function Then(props: NornJ.Childrenable): any;
 
 /**
  * NornJ tag `Then`, example:
  *
  * `<NjIf condition={foo > 10}><input /><NjThen>100</NjThen><NjElse>200</NjElse></NjIf>`
  */
-declare function NjThen(): any;
+declare function NjThen(props: NornJ.Childrenable): any;
 
 /**
  * NornJ tag `Elseif`, example:
  *
  * `<If condition={foo > 10}><input /><Elseif condition={foo > 5}><input type="button" /></Elseif></If>`
  */
-declare function Elseif(props: { condition: boolean | number | string }): any;
+declare function Elseif(props: { condition: boolean | number | string } & NornJ.Childrenable): any;
 
 /**
  * NornJ tag `Elseif`, example:
  *
  * `<NjIf condition={foo > 10}><input /><NjElseif condition={foo > 5}><input type="button" /></NjElseif></NjIf>`
  */
-declare function NjElseif(props: { condition: boolean | number | string }): any;
+declare function NjElseif(props: { condition: boolean | number | string } & NornJ.Childrenable): any;
 
 /**
  * NornJ tag `Else`, example:
  *
  * `<If condition={foo > 10}><input /><Else><input type="button" /></Else></If>`
  */
-declare function Else(): any;
+declare function Else(props: NornJ.Childrenable): any;
 
 /**
  * NornJ tag `Else`, example:
  *
  * `<NjIf condition={foo > 10}><input /><NjElse><input type="button" /></NjElse></NjIf>`
  */
-declare function NjElse(): any;
+declare function NjElse(props: NornJ.Childrenable): any;
 
 /**
  * NornJ tag `Switch`, example:
  *
  * `<Switch value={foo}><Case value={1}><input /></Case><Case value={2}><input type="button" /></Case><Default>nothing</Default></Switch>`
  */
-declare function Switch(props: { value: any }): any;
+declare function Switch(props: { value: any } & NornJ.Childrenable): any;
 
 /**
  * NornJ tag `Switch`, example:
  *
  * `<NjSwitch value={foo}><NjCase value={1}><input /></NjCase><NjCase value={2}><input type="button" /></NjCase><NjDefault>nothing</NjDefault></NjSwitch>`
  */
-declare function NjSwitch(props: { value: any }): any;
+declare function NjSwitch(props: { value: any } & NornJ.Childrenable): any;
 
 /**
  * NornJ tag `Case`, example:
  *
  * `<Switch value={foo}><Case value={1}><input /></Case><Case value={2}><input type="button" /></Case><Default>nothing</Default></Switch>`
  */
-declare function Case(props: { value: any }): any;
+declare function Case(props: { value: any } & NornJ.Childrenable): any;
 
 /**
  * NornJ tag `Case`, example:
  *
  * `<NjSwitch value={foo}><NjCase value={1}><input /></NjCase><NjCase value={2}><input type="button" /></NjCase><NjDefault>nothing</NjDefault></NjSwitch>`
  */
-declare function NjCase(props: { value: any }): any;
+declare function NjCase(props: { value: any } & NornJ.Childrenable): any;
 
 /**
  * NornJ tag `Default`, example:
  *
  * `<Switch value={foo}><Case value={1}><input /></Case><Case value={2}><input type="button" /></Case><Default>nothing</Default></Switch>`
  */
-declare function Default(): any;
+declare function Default(props: NornJ.Childrenable): any;
 
 /**
  * NornJ tag `Default`, example:
  *
  * `<NjSwitch value={foo}><NjCase value={1}><input /></NjCase><NjCase value={2}><input type="button" /></NjCase><NjDefault>nothing</NjDefault></NjSwitch>`
  */
-declare function NjDefault(): any;
+declare function NjDefault(props: NornJ.Childrenable): any;
 
 /**
  * NornJ tag `Each`, example:
@@ -166,14 +166,14 @@ declare const key: any;
  *
  * `<Each of={[1, 2, 3]}><i key={index}>{item}</i><Empty>nothing</Empty></Each>`
  */
-declare function Empty(): any;
+declare function Empty(props: NornJ.Childrenable): any;
 
 /**
  * NornJ tag `Empty`, example:
  *
  * `<NjEach of={[1, 2, 3]}><i key={index}>{item}</i><NjEmpty>nothing</NjEmpty></NjEach>`
  */
-declare function NjEmpty(): any;
+declare function NjEmpty(props: NornJ.Childrenable): any;
 
 /**
  * NornJ tag `For`, example:

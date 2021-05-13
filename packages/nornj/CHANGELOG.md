@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [v5.3.3] 2021.05.13
+
+- 🌟 Fix type error of `If`/`Each`/etc capitalized tags in TSX.
+
 ## [v5.3.0] 2020.12.30
 
 - 🌟 Add `as` tool function.
