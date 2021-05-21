@@ -145,14 +145,14 @@ declare const index: number;
  *
  * `<Each of={[1, 2, 3]}><i key={index}>isFirst:{first}</i></Each>`
  */
-declare const first: number;
+declare const first: boolean;
 
 /**
  * The parameter `last` in NornJ tag `Each` loop, example:
  *
  * `<Each of={[1, 2, 3]}><i key={index}>isLast:{last}</i></Each>`
  */
-declare const last: number;
+declare const last: boolean;
 
 /**
  * The parameter `key` in NornJ tag `Each` loop, example:

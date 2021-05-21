@@ -1,8 +1,12 @@
 # CHANGELOG
 
+## [v5.3.4] 2021.05.21
+
+- 🐞 Fix type for `first` and `last` of `For` tag.
+
 ## [v5.3.3] 2021.05.13
 
-- 🌟 Fix type error of `If`/`Each`/etc capitalized tags in TSX.
+- 🐞 Fix type error of `If`/`Each`/etc capitalized tags in TSX.
 
 ## [v5.3.0] 2020.12.30
 
