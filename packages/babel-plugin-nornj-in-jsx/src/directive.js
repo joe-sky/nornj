@@ -24,7 +24,7 @@ module.exports = function(babel) {
     } else {
       quasis.push(
         types.TemplateElement({
-          raw: '',
+          raw: tagName,
           cooked: tagName
         })
       );
@@ -50,7 +50,7 @@ module.exports = function(babel) {
         if (i == 0) {
           quasis.push(
             types.TemplateElement({
-              raw: '',
+              raw: attrStr + '"{{' + e,
               cooked: attrStr + '"{{' + e
             })
           );
@@ -60,7 +60,7 @@ module.exports = function(babel) {
           if (nj.isString(e)) {
             quasis.push(
               types.TemplateElement({
-                raw: '',
+                raw: e,
                 cooked: e
               })
             );
@@ -124,7 +124,7 @@ module.exports = function(babel) {
               const directiveMemberExpressions = generate.getDirectiveMemberExpression(types, expr);
               quasis.push(
                 types.TemplateElement({
-                  raw: '',
+                  raw: attrStr + '"{{',
                   cooked: attrStr + '"{{'
                 })
               );
@@ -142,7 +142,7 @@ module.exports = function(babel) {
             } else {
               quasis.push(
                 types.TemplateElement({
-                  raw: '',
+                  raw: attrStr,
                   cooked: attrStr
                 })
               );
@@ -155,7 +155,7 @@ module.exports = function(babel) {
           } else {
             quasis.push(
               types.TemplateElement({
-                raw: '',
+                raw: attrStr,
                 cooked: attrStr
               })
             );
@@ -165,7 +165,7 @@ module.exports = function(babel) {
         } else {
           quasis.push(
             types.TemplateElement({
-              raw: '',
+              raw: attrStr,
               cooked: attrStr
             })
           );
@@ -175,7 +175,7 @@ module.exports = function(babel) {
       } else {
         quasis.push(
           types.TemplateElement({
-            raw: '',
+            raw: ' ',
             cooked: ' '
           })
         );
@@ -188,7 +188,7 @@ module.exports = function(babel) {
     if (!isSelfClosing) {
       quasis.push(
         types.TemplateElement({
-          raw: '',
+          raw: lastAttrStr + '>',
           cooked: lastAttrStr + '>'
         })
       );
@@ -198,13 +198,13 @@ module.exports = function(babel) {
       if (!isComponent) {
         quasis.push(
           types.TemplateElement({
-            raw: '',
+            raw: '</' + elName + '>',
             cooked: '</' + elName + '>'
           })
         );
       } else {
         const closeTagPrefix = types.TemplateElement({
-          raw: '',
+          raw: '</',
           cooked: '</'
         });
         closeTagPrefix.isCloseTagPrefix = true;
@@ -212,7 +212,7 @@ module.exports = function(babel) {
         expressions.push(elName);
         quasis.push(
           types.TemplateElement({
-            raw: '',
+            raw: '>',
             cooked: '>'
           })
         );
@@ -220,7 +220,7 @@ module.exports = function(babel) {
     } else {
       quasis.push(
         types.TemplateElement({
-          raw: '',
+          raw: lastAttrStr + ' />',
           cooked: lastAttrStr + ' />'
         })
       );

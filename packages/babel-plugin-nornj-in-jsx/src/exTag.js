@@ -40,7 +40,7 @@ module.exports = function(babel) {
         if (childrenBlocks.length) {
           quasis.push(
             types.TemplateElement({
-              raw: '',
+              raw: lastAttrStr + '>',
               cooked: lastAttrStr + '>'
             })
           );
@@ -69,7 +69,7 @@ module.exports = function(babel) {
           );
           quasis.push(
             types.TemplateElement({
-              raw: '',
+              raw: lastAttrStr + '>',
               cooked: lastAttrStr + '>'
             })
           );
@@ -88,14 +88,14 @@ module.exports = function(babel) {
 
         quasis.push(
           types.TemplateElement({
-            raw: '',
+            raw: lastAttrStr + '</n-' + elName + '>',
             cooked: lastAttrStr + '</n-' + elName + '>'
           })
         );
       } else {
         quasis.push(
           types.TemplateElement({
-            raw: '',
+            raw: lastAttrStr + '>',
             cooked: lastAttrStr + '>'
           })
         );
@@ -104,7 +104,7 @@ module.exports = function(babel) {
 
         quasis.push(
           types.TemplateElement({
-            raw: '',
+            raw: '</n-' + elName + '>',
             cooked: '</n-' + elName + '>'
           })
         );
@@ -112,7 +112,7 @@ module.exports = function(babel) {
     } else {
       quasis.push(
         types.TemplateElement({
-          raw: '',
+          raw: lastAttrStr + ' />',
           cooked: lastAttrStr + ' />'
         })
       );
